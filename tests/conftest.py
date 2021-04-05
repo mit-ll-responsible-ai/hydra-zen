@@ -1,4 +1,8 @@
+import os
 import sys
+import tempfile
+
+import pytest
 
 try:
     import numpy
@@ -24,3 +28,13 @@ OPTIONAL_TEST_DEPENDENCIES = (
 for module in OPTIONAL_TEST_DEPENDENCIES:
     if module not in sys.modules:
         collect_ignore_glob.append(f"*{module}*")
+
+
+@pytest.fixture()
+def cleandir():
+    """Run function in a temporary directory."""
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        old_dir = os.getcwd()  # get current working directory (cwd)
+        os.chdir(tmpdirname)  # change cwd to the temp-directory
+        yield tmpdirname  # yields control to the test to be run
+        os.chdir(old_dir)
