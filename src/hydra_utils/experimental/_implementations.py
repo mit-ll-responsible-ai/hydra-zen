@@ -38,7 +38,6 @@ def get_hydra_cfg(
     -------
     hydra_cfg: DictConfig
         A HydraConf configuration object
-
     """
     config_search_path = create_config_search_path(config_dir)
     config_loader = ConfigLoaderImpl(config_search_path=config_search_path)
@@ -76,9 +75,7 @@ def _gen_config(
 
     Returns
     -------
-    config: Dictconfig
-    config_name: str
-
+    config, config_name: Tuple[Union[DictConfig, ListConfig], str]
     """
     if config_name is None:
         # TODO: Too much??
@@ -159,9 +156,9 @@ def hydra_launch(
     else:
         task_cfg = copy.deepcopy(config)
 
-    if "hydra" in task_cfg and hydra_overrides and len(hydra_overrides) > 0:
+    if "hydra" in task_cfg and hydra_overrides:
         raise ValueError(
-            "hydra_overrides set when hydra config is already provided in the input config"
+            "`hydra_overrides` cannot be specified when `config` is already derived from a HydraConfig"
         )
 
     if config_dir is not None:
