@@ -1,5 +1,6 @@
-import versioneer
 from setuptools import find_packages, setup
+
+import versioneer
 
 DISTNAME = "hydra_utils"
 LICENSE = "MIT"
@@ -16,7 +17,7 @@ CLASSIFIERS = [
     "Programming Language :: Python :: 3.9",
     "Topic :: Scientific/Engineering",
 ]
-KEYWORDS = "machine learning research configuration scalable reproducible",
+KEYWORDS = ("machine learning research configuration scalable reproducible",)
 INSTALL_REQUIRES = ["hydra-core >= 1.1.0dev5"]
 TESTS_REQUIRE = ["pytest >= 3.8", "hypothesis >= 5.32.0"]
 
@@ -40,7 +41,8 @@ setup(
     install_requires=INSTALL_REQUIRES,
     tests_require=TESTS_REQUIRE,
     url=URL,
-    download_url="https://github.com/mitll-SAFERai/hydra_utils/tarball/" + versioneer.get_version(),
+    download_url="https://github.com/mitll-SAFERai/hydra_utils/tarball/"
+    + versioneer.get_version(),
     python_requires=">=3.7",
     packages=find_packages(where="src", exclude=["tests", "tests.*"]),
     package_dir={"": "src"},
