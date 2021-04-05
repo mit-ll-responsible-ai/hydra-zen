@@ -1,16 +1,11 @@
 import string
-from dataclasses import dataclass
 from typing import Any, Dict
 
 import hypothesis.strategies as st
-import numpy as np
 import pytest
 from hypothesis import given
-from raiden.framework.lightning import RaidenDataModule
-from raiden.hydra_utils import instantiate
-from torch.optim import Adam
 
-from hydra_utils import builds, just
+from hydra_utils import builds, instantiate, just
 from tests import valid_hydra_literals
 
 arbitrary_kwargs = st.dictionaries(
@@ -53,28 +48,8 @@ def test_builds_roundtrip_with_partial(
     assert expected_kwargs == partial_struct(**call_kwargs)  # resolve partial
 
 
-def test_builds_roundtrip_with_ufunc():
-    assert instantiate(builds(np.add, hydra_partial=True))(1.0, 2.0) == np.array(3.0)
-
-
 def test_documented_builds_simple_roundtrip_example():
     assert {"a": 1, "b": "x"} == instantiate(builds(dict, a=1, b="x"))
-
-
-def test_documented_builds_roundtrip_partial_with_interpolation_example():
-    import torch as tr
-    from torch.optim import Adam
-
-    @dataclass
-    class ModuleConfig:
-        learning_rate: float = 100.2
-        optimizer: Any = builds(Adam, lr="${learning_rate}", hydra_partial=True)
-
-    params = [tr.tensor(1.0)]
-    config = instantiate(ModuleConfig)
-    optim = config.optimizer(params)
-    assert isinstance(optim, Adam)
-    assert optim.defaults["lr"] == 100.2
 
 
 def f(x, y=dict(a=2)):
@@ -107,13 +82,8 @@ def local_function():
 @pytest.mark.parametrize(
     "obj",
     [
-        RaidenDataModule,
         local_function,
         LocalClass,
-        np.array,
-        np.add,
-        np.ufunc,  # ufuncs work!
-        Adam,
         int,
         str,
         list,

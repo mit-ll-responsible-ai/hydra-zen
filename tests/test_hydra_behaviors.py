@@ -5,8 +5,8 @@ import hypothesis.strategies as st
 import pytest
 from hypothesis import assume, given
 from omegaconf import DictConfig, ListConfig
-from raiden.hydra_utils import builds, hydrated_dataclass, instantiate, mutable_value
 
+from hydra_utils import builds, hydrated_dataclass, instantiate, mutable_value
 from hydra_utils.structured_configs._utils import get_obj_path
 
 

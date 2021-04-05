@@ -49,7 +49,7 @@ class Instantiable(DataClass, Protocol[T]):  # pragma: no cover
 
 class Just(Instantiable, Protocol[T]):
     obj: str  # interpolated string for importing obj
-    _target_: str = "raiden.hydra_utils.identity"
+    _target_: str = "hydra_utils.identity"  # TODO: update this
 
 
 class Builds(Instantiable, Protocol[T]):  # pragma: no cover

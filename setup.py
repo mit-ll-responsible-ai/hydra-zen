@@ -17,7 +17,7 @@ CLASSIFIERS = [
     "Programming Language :: Python :: 3.9",
     "Topic :: Scientific/Engineering",
 ]
-KEYWORDS = ("machine learning research configuration scalable reproducible",)
+KEYWORDS = "machine learning research configuration scalable reproducible"
 INSTALL_REQUIRES = [
     "hydra-core >= 1.1.0dev5",
     "typing-extensions >= 3.7.4.1",

@@ -3,9 +3,8 @@ from dataclasses import is_dataclass
 import hypothesis.strategies as st
 import pytest
 from hypothesis import given
-from raiden.hydra_utils import builds
 
-from hydra_utils import instantiate
+from hydra_utils import builds, instantiate
 
 
 def f_three_vars(x, y, z):

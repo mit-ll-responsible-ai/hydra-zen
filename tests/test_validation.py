@@ -1,10 +1,10 @@
 import inspect
+from collections import Counter
 from dataclasses import dataclass, is_dataclass
+from itertools import zip_longest
 
 import hypothesis.strategies as st
 import pytest
-import raiden
-import torch as tr
 from hypothesis import assume, given
 
 from hydra_utils import builds, hydrated_dataclass, instantiate, just
@@ -65,13 +65,18 @@ def test_builds_raises_when_base_has_invalid_arg(full_sig, partial):
 @pytest.mark.parametrize(
     "target",
     [
-        tr.optim.Adam,
-        tr.nn.Linear,
-        tr.nn.ReLU,
-        tr.softmax,
-        tr.tensor,
-        raiden.framework.lightning.RaidenDataModule,
-        raiden.framework.lightning.MetricsCallback,
+        list,
+        builds,
+        just,
+        Counter,
+        zip_longest,
+        dataclass,
+        x_is_var_pos,
+        sig_is_empty,
+        given,
+        assume,
+        hydrated_dataclass,
+        inspect.signature,
     ],
 )
 @given(partial=st.booleans(), full_sig=st.booleans())

@@ -5,8 +5,8 @@ from typing import Any
 import hypothesis.strategies as st
 import pytest
 from hypothesis import given, settings
-from raiden.hydra_utils import builds, hydrated_dataclass, mutable_value
 
+from hydra_utils import builds, hydrated_dataclass, mutable_value
 from tests import valid_hydra_literals
 
 Empty = Parameter.empty

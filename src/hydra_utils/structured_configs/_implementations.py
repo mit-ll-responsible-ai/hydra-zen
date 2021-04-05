@@ -110,11 +110,10 @@ def just(obj: Importable) -> Just[Importable]:
 
     Demonstrating the simple behavior of ``just`` in the context of ``hydra``.
 
-    >>> from hydra.utils import instantiate
-    >>> from hydra_utils import just
+    >>> from hydra_utils import just, instantiate
     >>> just_str_conf = just(str)
     >>> just_str_conf._target_
-    'raiden.hydra_utils.identity'
+    'hydra_utils.structured_configs._utils.identity'
     >>> just_str_conf.obj
     '${get_obj:builtins.str}'
     >>> str is instantiate(just_str_conf)
@@ -289,7 +288,7 @@ def builds(
     --------
     **Basic Usage**
 
-    >>> from raiden.hydra_utils import builds, instantiate
+    >>> from hydra_utils import builds, instantiate
     >>> builds(dict, a=1, b='x')  # makes a dataclass that will "build" a dictionary with the specified fields
     types.Builds_dict
     >>> instantiate(builds(dict, a=1, b='x'))  # using hydra to build the dictionary

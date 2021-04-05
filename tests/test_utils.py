@@ -3,12 +3,10 @@ from dataclasses import dataclass
 from typing import Dict, List
 
 import hypothesis.strategies as st
-import numpy as np
 import omegaconf
 import pytest
 from hypothesis import given, note
 from omegaconf import OmegaConf
-from torch.optim import Adam
 
 from hydra_utils import mutable_value
 from hydra_utils.structured_configs._utils import interpolated, safe_name
@@ -26,12 +24,12 @@ def pass_through_kwargs(**kwargs):
     return kwargs
 
 
-omegaconf.OmegaConf.register_new_resolver("_raiden_pass_through", pass_through)
+omegaconf.OmegaConf.register_new_resolver("_test_pass_through", pass_through)
 
 
 @given(st.lists(valid_hydra_literals))
 def test_interpolate_roundtrip(literals):
-    interpolated_string = interpolated("_raiden_pass_through", *literals)
+    interpolated_string = interpolated("_test_pass_through", *literals)
 
     note(interpolated_string)
 
@@ -60,14 +58,12 @@ def f():
     [
         (1, "1"),
         (dict, "dict"),
-        (Adam, "Adam"),
         (C, "C"),
         (C.f, "C.f"),
         (C(), "C as a repr"),
         ("moo", "'moo'"),
         (None, "None"),
         (f, "f"),
-        (np.add, "add"),
     ],
 )
 def test_safename_known(obj, expected_name):
@@ -93,7 +89,7 @@ def test_mutable_values():
 
 
 def test_documented_instantiate_example():
-    from raiden.hydra_utils import builds, instantiate
+    from hydra_utils import builds, instantiate
 
     assert instantiate(builds(dict, a=1, b=2), c=3) == dict(a=1, b=2, c=3)
     assert instantiate(builds(list), (1, 2, 3)) == [1, 2, 3]
