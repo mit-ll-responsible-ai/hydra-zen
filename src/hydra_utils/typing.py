@@ -24,10 +24,12 @@ class Partial(Generic[_T]):
     args: Tuple[Any, ...]
     keywords: Dict[str, Any]
 
-    def __init__(self, func: Callable[..., _T], *args: Any, **kwargs: Any) -> None:
+    def __init__(
+        self, func: Callable[..., _T], *args: Any, **kwargs: Any
+    ) -> None:  # pragma: no cover
         ...
 
-    def __call__(self, *args: Any, **kwargs: Any) -> _T:
+    def __call__(self, *args: Any, **kwargs: Any) -> _T:  # pragma: no cover
         ...
 
 
