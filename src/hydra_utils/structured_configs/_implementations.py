@@ -41,10 +41,9 @@ def _check_importable_path(obj: Any):
 
     Examples
     --------
-    >>> class C:
-    ...     def f(self): pass
-    >>> _check_importable_path(C)  # OK
-    >>> _check_importable_path(C.f)  # raises
+    >>> def outer_scope():
+    ...     def unimportable(): pass
+    ...     _check_importable_path(unimportable)  # raises
     """
     path = _utils.get_obj_path(obj)
     # catches "<locals>" and "<unknown>"
