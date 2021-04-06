@@ -44,14 +44,17 @@ def test_builds_raises_when_user_specified_arg_is_not_in_sig(func, full_sig, par
         builds(func, x=10, hydra_partial=partial, populate_full_signature=full_sig)
 
 
+@dataclass
+class A:
+    x: int = 1  # `x` is not a parameter in y
+
+
+def f(y):
+    return y
+
+
 @given(partial=st.booleans(), full_sig=st.booleans())
 def test_builds_raises_when_base_has_invalid_arg(full_sig, partial):
-    @dataclass
-    class A:
-        x: int = 1  # `x` is not a parameter in y
-
-    def f(y):
-        return y
 
     with pytest.raises(TypeError):
         builds(
@@ -94,26 +97,28 @@ def test_fuzz_build_validation_against_a_bunch_of_common_objects(
     builds(target, hydra_partial=partial, populate_full_signature=full_sig)
 
 
+def f2():
+    pass
+
+
 @given(partial=st.booleans(), full_sig=st.booleans())
 def test_builds_raises_when_base_with_partial_target_is_specified(
     partial: bool, full_sig: bool
 ):
-    def f():
-        pass
 
-    partiald_conf = builds(f, hydra_partial=True)
+    partiald_conf = builds(f2, hydra_partial=True)
 
     if not partial:
         with pytest.raises(TypeError):
             builds(
-                f,
+                f2,
                 populate_full_signature=full_sig,
                 hydra_partial=partial,
                 builds_bases=(partiald_conf,),
             )
     else:
         builds(
-            f,
+            f2,
             populate_full_signature=full_sig,
             hydra_partial=partial,
             builds_bases=(partiald_conf,),
@@ -170,7 +175,7 @@ def test_just_raises_with_legible_message():
     assert "just(1)" in str(exec_info.value)
 
 
-def test_hydratated_dataclass_from_instance_raise():
+def test_hydrated_dataclass_from_instance_raise():
     @dataclass
     class A:
         x: int = 1
@@ -178,3 +183,20 @@ def test_hydratated_dataclass_from_instance_raise():
     instance_of_a = A()
     with pytest.raises(NotImplementedError):
         hydrated_dataclass(dict)(instance_of_a)
+
+
+@given(partial=st.booleans(), full_sig=st.booleans())
+def test_builds_raises_for_unimportable_target(partial, full_sig):
+    def unreachable():
+        pass
+
+    with pytest.raises(ModuleNotFoundError):
+        builds(unreachable, hydra_partial=partial, populate_full_signature=full_sig)
+
+
+def test_just_raises_for_unimportable_target():
+    def unreachable():
+        pass
+
+    with pytest.raises(ModuleNotFoundError):
+        just(unreachable)
