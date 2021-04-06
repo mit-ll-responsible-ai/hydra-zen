@@ -1,10 +1,8 @@
-import functools
 import inspect
 from collections import defaultdict
 from dataclasses import Field, dataclass, field, fields, is_dataclass, make_dataclass
 from typing import (
     Any,
-    Callable,
     Dict,
     List,
     Mapping,
@@ -18,6 +16,7 @@ from typing import (
 
 from typing_extensions import Literal
 
+from hydra_utils.funcs import identity, partial
 from hydra_utils.structured_configs import _utils
 from hydra_utils.typing import Builds, Importable, Instantiable, Just, PartialBuilds
 
@@ -76,11 +75,6 @@ class hydrated_dataclass:
         )
 
 
-def partial(_partial_target_: Callable, *args, **kwargs) -> Callable:
-    """Provides a named parameter for using partial"""
-    return functools.partial(_partial_target_, *args, **kwargs)
-
-
 def just(obj: Importable) -> Just[Importable]:
     """Produces a structured config that, when instantiated by hydra, 'just'
     returns ``obj``.
@@ -113,7 +107,7 @@ def just(obj: Importable) -> Just[Importable]:
     >>> from hydra_utils import just, instantiate
     >>> just_str_conf = just(str)
     >>> just_str_conf._target_
-    'hydra_utils.structured_configs._utils.identity'
+    'hydra_utils.funcs.identity'
     >>> just_str_conf.obj
     '${get_obj:builtins.str}'
     >>> str is instantiate(just_str_conf)
@@ -130,7 +124,7 @@ def just(obj: Importable) -> Just[Importable]:
             (
                 "_target_",
                 str,
-                field(default=_utils.get_obj_path(_utils.identity), init=False),
+                field(default=_utils.get_obj_path(identity), init=False),
             ),
             (
                 "obj",

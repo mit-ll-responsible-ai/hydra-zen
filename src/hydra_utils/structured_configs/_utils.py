@@ -90,10 +90,6 @@ def interpolated(func: Union[str, Callable], *literals: Any) -> str:
     return f"${{{name}:{','.join(str(i) for i in literals)}}}"
 
 
-def identity(obj: T) -> T:
-    return obj
-
-
 def get_obj(path: str) -> Union[type, Callable[..., Any]]:
     """Imports an object given the specified path."""
     try:
