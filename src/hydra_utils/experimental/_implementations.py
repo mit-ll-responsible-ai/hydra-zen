@@ -120,10 +120,10 @@ def hydra_launch(
         The function Hydra will execute with the given configuration.
 
     multirun_overrides: Optional[List[str]] (default: None)
-        If provided, Hydra will run in "multirun" mode using the provided overrides.  See [here](https://hydra.cc/docs/tutorials/basic/running_your_app/multi-run).
+        If provided, Hydra will run in "multirun" mode using the provided overrides.  See [1]
 
     hydra_overrides: Optional[List[str]] (default: None)
-        If provided, overrides default hydra configurations. See [here](https://hydra.cc/docs/advanced/override_grammar/basic).
+        If provided, overrides default hydra configurations. See [2] and [3]
 
     config_dir: Optional[Union[str, Path]] (default: None)
         Add configuration directories if needed.
@@ -134,6 +134,12 @@ def hydra_launch(
     -------
     result: JobReturn
         The return value of the task_function
+
+    References
+    ----------
+    .. [1] https://hydra.cc/docs/tutorials/basic/running_your_app/multi-run
+    .. [2] https://hydra.cc/docs/advanced/override_grammar/basic
+    .. [3] https://hydra.cc/docs/configure_hydra/intro
 
     Examples
     --------
@@ -197,7 +203,6 @@ def hydra_launch(
     [tensor(0.1803, grad_fn=<MeanBackward0>),
     tensor(-0.2261, grad_fn=<MeanBackward0>)]
 
-    To configuring Hydra options via ``hydra_overrides`` see [here](https://hydra.cc/docs/configure_hydra/intro)
     """
     if is_dataclass(config):
         task_cfg = OmegaConf.create(config)
