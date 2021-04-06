@@ -48,10 +48,6 @@ def test_builds_roundtrip_with_partial(
     assert expected_kwargs == partial_struct(**call_kwargs)  # resolve partial
 
 
-def test_documented_builds_simple_roundtrip_example():
-    assert {"a": 1, "b": "x"} == instantiate(builds(dict, a=1, b="x"))
-
-
 def f(x, y=dict(a=2)):
     return x, y
 
