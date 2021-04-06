@@ -6,9 +6,9 @@ import hypothesis.strategies as st
 import pytest
 import torch as tr
 from hypothesis import assume, given
-from torch.optim import Adam
+from torch.optim import Adam, AdamW
 
-from hydra_utils import builds, instantiate, just
+from hydra_utils import builds, hydrated_dataclass, instantiate, just
 from hydra_utils.structured_configs._utils import safe_name
 
 
@@ -71,3 +71,18 @@ def test_documented_builds_roundtrip_partial_with_interpolation_example():
     optim = config.optimizer(params)
     assert isinstance(optim, Adam)
     assert optim.defaults["lr"] == 100.2
+
+
+def test_documented_inheritance_example():
+    @dataclass
+    class AdamBaseConfig:
+        lr: float = 0.001
+        eps: float = 1e-8
+
+    @hydrated_dataclass(target=AdamW, hydra_partial=True)
+    class AdamWConfig(AdamBaseConfig):
+        weight_decay: float = 0.01
+
+    partialed = instantiate(AdamWConfig)
+    assert partialed.keywords == {"lr": 0.001, "eps": 1e-08, "weight_decay": 0.01}
+    assert partialed.func is AdamW

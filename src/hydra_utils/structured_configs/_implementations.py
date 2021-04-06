@@ -1,6 +1,7 @@
 import inspect
 from collections import defaultdict
 from dataclasses import Field, dataclass, field, fields, is_dataclass, make_dataclass
+from functools import partial
 from typing import (
     Any,
     Dict,
@@ -27,7 +28,24 @@ def mutable_value(x: Any) -> Field:
     """Used to set a mutable object as a default value for a field
     in a dataclass.
 
-    This is an alias for ``field(default_factory=lambda: x)``"""
+    This is an alias for ``field(default_factory=lambda: x)``
+
+    Examples
+    --------
+    >>> from hydra_utils import mutable_value
+    >>> from dataclasses import dataclass
+
+    See https://docs.python.org/3/library/dataclasses.html#mutable-default-values
+
+    >>> @dataclass
+    ... class HasMutableDefault
+    ...     a_list: list  = [1, 2, 3]  # error: mutable default
+
+    Using `mutable_value` to specify the default list:
+
+    >>> @dataclass
+    ... class HasMutableDefault
+    ...     a_list: list  = mutable_value([1, 2, 3])  # ok"""
     return field(default_factory=lambda: x)
 
 
@@ -35,6 +53,59 @@ Field_Entry = Tuple[str, type, Field]
 
 
 class hydrated_dataclass:
+    """A decorator that uses `hydra_utils.builds` to create a dataclass with the appropriate
+    hydra-specific fields for specifying a structured config.
+
+    Examples
+    --------
+    A simple usage of `hydrated_dataclass`. Here, we specify a structured config
+
+    >>> from hydra_utils import hydrated_dataclass, instantiate
+    >>> @hydrated_dataclass(target=dict)
+    ... class DictConf:
+    ...     x : int = 2
+    ...     y : str = 'hello'
+
+    >>> instantiate(DictConf(x=10))  # override default `x`
+    {'x': 10, 'y': 'hello'}
+
+    We can also design a configuration that only partially instantiates our target.
+
+    >>> def power(x: float, exponent: float) -> float: return x ** exponent
+    >>> @hydrated_dataclass(target=power, hydra_partial=True)
+    ... class PowerConf:
+    ...     exponent : float = 2.0
+
+    >>> partiald_power = instantiate(PowerConf)
+    >>> partiald_power(10.0)
+    100.0
+
+    Inheritance can be used to compose configurations
+
+    >>> from dataclasses import dataclass
+    >>> from torch.optim import AdamW
+    >>> @dataclass
+    ... class AdamBaseConfig:
+    ...     lr : float = 0.001
+    ...     eps : float = 1e-8
+
+    >>> @hydrated_dataclass(target=AdamW, hydra_partial=True)
+    ... class AdamWConfig(AdamBaseConfig):
+    ...     weight_decay : float = 0.01
+    >>> instantiate(AdamWConfig)
+    functools.partial(<class 'torch.optim.adamw.AdamW'>, lr=0.001, eps=1e-08, weight_decay=0.01)
+
+    Because this decorator uses `hyda_utils.builds` under the hood, common mistakes like misspelled
+    parameters will be caught upon constructing the structured config.
+
+    >>> @hydrated_dataclass(target=AdamW, hydra_partial=True)
+    ... class AdamWConfig(AdamBaseConfig):
+    ...     wieght_decay : float = 0.01  # i before e, right!?
+    TypeError: Building: AdamW ..
+    The following unexpected keyword argument(s) for torch.optim.adamw.AdamW was specified via inheritance
+    from a base class: wieght_decay
+    """
+
     def __init__(
         self,
         target: Importable,
@@ -44,7 +115,35 @@ class hydrated_dataclass:
         hydra_recursive: bool = True,
         hydra_convert: Literal["none", "partial", "all"] = "none",
     ):
+        """
+        Parameters
+        ----------
+        target : Union[Instantiable, Callable]
+            The object to be instantiated/called.
 
+        populate_full_signature : bool, optional (default=False)
+            If True, then the resulting dataclass's __init__ signature and fields
+            will be populated according to the signature of ``target``.
+
+            Values specified in **kwargs_for_target take precedent over the corresponding
+            default values from the signature.
+
+        hydra_partial : bool, optional (default=False)
+            If True, then hydra-instantiation produces `functools.partial(target, **kwargs)`
+
+        hydra_recursive : bool, optional (default=True)
+            If True, then upon hydra will recursively instantiate all other
+            hydra-config objects nested within this dataclass [2]_.
+
+        hydra_convert: Literal["none", "partial", "all"], optional (default="none")
+            Determines how hydra handles the non-primitive objects passed to `target` [3]_.
+
+               none - Passed objects are DictConfig and ListConfig, default
+            partial - Passed objects are converted to dict and list, with
+                      the exception of Structured Configs (and their fields).
+                all - Passed objects are dicts, lists and primitives without
+                      a trace of OmegaConf containers
+        """
         self._target = target
         self._populate_full_signature = populate_full_signature
         self._hydra_recursive = hydra_recursive
@@ -79,7 +178,8 @@ def just(obj: Importable) -> Just[Importable]:
     """Produces a structured config that, when instantiated by hydra, 'just'
     returns ``obj``.
 
-    This is convenient for specifying a python object as part of your configuration.
+    This is convenient for specifying a particular, un-instantiated object as part of your
+    configuration.
 
     Parameters
     ----------
@@ -102,16 +202,17 @@ def just(obj: Importable) -> Just[Importable]:
     ... class ModuleConfig:
     ...     optimizer: Any = just(Adam)
 
-    Demonstrating the simple behavior of ``just`` in the context of ``hydra``.
+    Demonstrating the simple behavior of ``just`` in the context of leveraging ``hydra``.
 
     >>> from hydra_utils import just, instantiate
     >>> just_str_conf = just(str)
+    >>> str is instantiate(just_str_conf)  # "just" returns the object `str`
+    True
     >>> just_str_conf._target_
     'hydra_utils.funcs.identity'
     >>> just_str_conf.obj
     '${get_obj:builtins.str}'
-    >>> str is instantiate(just_str_conf)
-    True"""
+    """
     try:
         obj_path = _utils.get_obj_path(obj)
     except AttributeError:
