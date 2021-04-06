@@ -1,5 +1,5 @@
 from dataclasses import Field, _DataclassParams
-from typing import Dict, Tuple, TypeVar
+from typing import Any, Callable, Dict, Generic, Tuple, TypeVar
 
 from typing_extensions import Literal, Protocol
 
@@ -10,12 +10,25 @@ __all__ = [
     "Just",
     "Builds",
     "PartialBuilds",
+    "Partial",
 ]
 
 
 # TODO: Define Instantiable
 
-T = TypeVar("T")
+_T = TypeVar("_T")
+
+
+class Partial(Generic[_T]):
+    func: Callable[..., _T]
+    args: Tuple[Any, ...]
+    keywords: Dict[str, Any]
+
+    def __init__(self, func: Callable[..., _T], *args: Any, **kwargs: Any) -> None:
+        ...
+
+    def __call__(self, *args: Any, **kwargs: Any) -> _T:
+        ...
 
 
 class _Importable(Protocol):
@@ -43,19 +56,19 @@ class DataClass(Protocol):
     __module__: str
 
 
-class Instantiable(DataClass, Protocol[T]):  # pragma: no cover
+class Instantiable(DataClass, Protocol[_T]):  # pragma: no cover
     _target_: str
 
 
-class Just(Instantiable, Protocol[T]):
+class Just(Instantiable, Protocol[_T]):
     obj: str  # interpolated string for importing obj
     _target_: str = "hydra_utils.identity"  # TODO: update this
 
 
-class Builds(Instantiable, Protocol[T]):  # pragma: no cover
+class Builds(Instantiable, Protocol[_T]):  # pragma: no cover
     _convert_: Literal["none", "partial", "all"]
     _recursive_: bool
 
 
-class PartialBuilds(Builds, Protocol[T]):
+class PartialBuilds(Builds, Protocol[_T]):
     _partial_target_: str
