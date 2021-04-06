@@ -13,7 +13,7 @@ from hydra.conf import HydraConf
 from hydra.core.config_store import ConfigStore
 from hydra.core.global_hydra import GlobalHydra
 from hydra.core.plugins import Plugins
-from hydra.core.utils import run_job
+from hydra.core.utils import run_job, JobReturn
 from hydra.types import RunMode
 from omegaconf import DictConfig, ListConfig, OmegaConf
 from omegaconf.omegaconf import open_dict
@@ -88,6 +88,7 @@ def _gen_config(
     #     seed: int = cfg.seed
     #     testing: bool = cfg.testing
 
+    # TODO: Need better type handling?
     MultirunConfig = make_dataclass(
         "MultirunConfig",
         [(k, OmegaConf.get_type(v), v) for k, v in cfg.items() if k != "hydra"],
@@ -102,12 +103,12 @@ def _gen_config(
 
 def hydra_launch(
     config: Union[DataClass, DictConfig],
-    task_function: Callable[[Any], Any],
-    multirun_overrides: Optional[Sequence[str]] = None,
-    hydra_overrides: Optional[Sequence[str]] = None,
+    task_function: Callable[[DictConfig], Any],
+    multirun_overrides: Optional[List[str]] = None,
+    hydra_overrides: Optional[List[str]] = None,
     config_dir: Optional[Union[str, Path]] = None,
     job_name: str = "hydra_launch",
-) -> Any:
+) -> JobReturn:
     """Launch Hydra job.
 
     Parameters
@@ -115,14 +116,14 @@ def hydra_launch(
     config: Union[DataClass, DictConfig]
         The experiment configuration.
 
-    task_function: Callable[[Any], Any]
+    task_function: Callable[[DictConfig], Any]
         The function Hydra will execute with the given configuration.
 
-    multirun_overrides: Optional[Sequence[str]] (default: None)
-        If provided, Hydra will run in "multirun" mode using the provided overrides.
+    multirun_overrides: Optional[List[str]] (default: None)
+        If provided, Hydra will run in "multirun" mode using the provided overrides.  See [here](https://hydra.cc/docs/advanced/override_grammar/basic).
 
-    hydra_overrides: Optional[Sequence[str]] (default: None)
-        If provided, updates
+    hydra_overrides: Optional[List[str]] (default: None)
+        If provided, overrides default hydra configurations. See [here](https://hydra.cc/docs/advanced/override_grammar/basic).
 
     config_dir: Optional[Union[str, Path]] (default: None)
         Add configuration directories if needed.
