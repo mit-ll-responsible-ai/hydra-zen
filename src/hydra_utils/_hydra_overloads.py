@@ -20,58 +20,34 @@ from typing import Any, Callable, Type, TypeVar, overload
 
 from hydra.utils import instantiate as hydra_instantiate
 
-from .typing import Builds, Just, PartialBuilds
+from .typing import Builds, Just, Partial, PartialBuilds
 
 T = TypeVar("T")
 
 
 @overload
-def instantiate(config: Just[T], *args, **kwargs) -> T:  # pragma: no cover
-    ...
-
-
-@overload
-def instantiate(config: Builds[Type[T]], *args, **kwargs) -> T:  # pragma: no cover
+def instantiate(config: Just[T], *args: Any, **kwargs: Any) -> T:  # pragma: no cover
     ...
 
 
 @overload
 def instantiate(
-    config: Builds[Callable[..., T]], *args, **kwargs
+    config: PartialBuilds[T], *args: Any, **kwargs: Any
+) -> Partial[T]:  # pragma: no cover
+    ...
+
+
+@overload
+def instantiate(
+    config: Builds[Type[T]], *args: Any, **kwargs: Any
 ) -> T:  # pragma: no cover
     ...
 
 
 @overload
 def instantiate(
-    config: PartialBuilds[Type[T]], *args, **kwargs
-) -> Callable[..., T]:  # pragma: no cover
-    ...
-
-
-@overload
-def instantiate(
-    config: Type[Builds[Type[T]]], *args, **kwargs
+    config: Builds[Callable[..., T]], *args: Any, **kwargs: Any
 ) -> T:  # pragma: no cover
-    ...
-
-
-@overload
-def instantiate(
-    config: Type[Builds[Callable[..., T]]], *args, **kwargs
-) -> T:  # pragma: no cover
-    ...
-
-
-@overload
-def instantiate(
-    config: Type[PartialBuilds[Type[T]]], *args, **kwargs
-) -> Callable[..., T]:  # pragma: no cover
-    ...
-
-
-@overload
-def instantiate(config: Any, *args, **kwargs) -> Any:  # pragma: no cover
     ...
 
 
