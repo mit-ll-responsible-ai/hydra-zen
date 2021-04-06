@@ -13,7 +13,7 @@ from hydra.conf import HydraConf
 from hydra.core.config_store import ConfigStore
 from hydra.core.global_hydra import GlobalHydra
 from hydra.core.plugins import Plugins
-from hydra.core.utils import run_job
+from hydra.core.utils import run_job, JobReturn
 from hydra.types import RunMode
 from omegaconf import DictConfig, ListConfig, OmegaConf
 from omegaconf.omegaconf import open_dict
@@ -88,6 +88,7 @@ def _gen_config(
     #     seed: int = cfg.seed
     #     testing: bool = cfg.testing
 
+    # TODO: Need better type handling?
     MultirunConfig = make_dataclass(
         "MultirunConfig",
         [(k, OmegaConf.get_type(v), v) for k, v in cfg.items() if k != "hydra"],
@@ -102,12 +103,12 @@ def _gen_config(
 
 def hydra_launch(
     config: Union[DataClass, DictConfig],
-    task_function: Callable[[Any], Any],
-    multirun_overrides: Optional[Sequence[str]] = None,
-    hydra_overrides: Optional[Sequence[str]] = None,
+    task_function: Callable[[DictConfig], Any],
+    multirun_overrides: Optional[List[str]] = None,
+    hydra_overrides: Optional[List[str]] = None,
     config_dir: Optional[Union[str, Path]] = None,
     job_name: str = "hydra_launch",
-) -> Any:
+) -> JobReturn:
     """Launch Hydra job.
 
     Parameters
@@ -115,14 +116,14 @@ def hydra_launch(
     config: Union[DataClass, DictConfig]
         The experiment configuration.
 
-    task_function: Callable[[Any], Any]
+    task_function: Callable[[DictConfig], Any]
         The function Hydra will execute with the given configuration.
 
-    multirun_overrides: Optional[Sequence[str]] (default: None)
-        If provided, Hydra will run in "multirun" mode using the provided overrides.
+    multirun_overrides: Optional[List[str]] (default: None)
+        If provided, Hydra will run in "multirun" mode using the provided overrides.  See [1]
 
-    hydra_overrides: Optional[Sequence[str]] (default: None)
-        If provided, updates
+    hydra_overrides: Optional[List[str]] (default: None)
+        If provided, overrides default hydra configurations. See [2] and [3]
 
     config_dir: Optional[Union[str, Path]] (default: None)
         Add configuration directories if needed.
@@ -131,25 +132,77 @@ def hydra_launch(
 
     Returns
     -------
-    result: Any
+    result: JobReturn
         The return value of the task_function
+
+    References
+    ----------
+    .. [1] https://hydra.cc/docs/tutorials/basic/running_your_app/multi-run
+    .. [2] https://hydra.cc/docs/advanced/override_grammar/basic
+    .. [3] https://hydra.cc/docs/configure_hydra/intro
 
     Examples
     --------
+
+    A simple usage of ``hydra_launch`` to understand the difference between a Hydra ``run`` and ``multirun`` job.
+
+    Simple Hydra ``run``:
+
     >>> from hydra_utils import instantiate, builds
     >>> from hydra_utils.experimental import hydra_launch
-    >>> def f(a: int = 1, b: int = 2):
-    ...    return dict(a=a, b=b)
-
-    >>> job = hydra_launch(builds(f, a=1, b=1), task_function=lambda x: instantiate(x))
+    >>> job = hydra_launch(builds(dict, a=1, b=1), task_function=lambda x: instantiate(x))
     >>> job.return_value
     {'a': 1, 'b': 1}
 
-    >>> def f(a: int = 1, b: int = 2):
-    ...    return dict(a=a, b=b)
-    >>> hydra, job = hydra_launch(builds(f, a=1, b=1), task_function=lambda x: instantiate(x), multirun_overrides=["a=1,2"])
+    Using Hydra ``multirun``:
+
+    >>> job = hydra_launch(builds(dict, a=1, b=1), task_function=lambda x: instantiate(x), multirun_overrides=["a=1,2"])
     >>> [j.return_value for j in job[0]]
     [{'a': 1, 'b': 1}, {'a': 2, 'b': 1}]
+
+    Using a more complex ``task_function``
+
+    >>> from hydra_utils.experimental import hydra_launch
+    >>> from hydra_utils import builds, instantiate
+    >>> cfg = dict(f=builds(pow, exp=2, hydra_partial=True), x=1)
+    >>> def task_function(cfg):
+    ...    return instantiate(cfg.f)(cfg.x)
+
+    Launch a job to evaluate the function using the given configuration:
+
+    >>> job = hydra_launch(cfg, task_function)
+    >>> job.return_value
+    1
+
+    Launch a ``multirun`` over a list of different ``x`` values using Hydra's override syntax ``range``:
+
+    >>> jobs = hydra_launch(cfg, task_function, multirun_overrides=["x=range(-2,3)"])
+    >>> [j.return_value for j in jobs[0]]
+    [4, 1, 0, 1, 4]
+
+    An example using ``PyTorch``
+
+    >>> from torch.optim import Adam
+    >>> from torch.nn import Linear
+    >>> AdamConfig = builds(Adam, lr=0.001, hydra_partial=True)
+    >>> ModelConfig = builds(Linear, in_features=1, out_features=1)
+    >>> cfg = dict(optim=AdamConfig(), model=ModelConfig())
+    >>> def task_function(cfg):
+    ...     model = instantiate(cfg.model)
+    ...     optim = instantiate(cfg.optim)(model.parameters())
+    ...     loss = model(torch.ones(1)).mean()
+    ...     optim.zero_grad()
+    ...     loss.backward()
+    ...     optim.step()
+    ...     return loss
+
+    Evalulate the function for different learning rates
+
+    >>> jobs = hydra_launch(cfg, task_function, multirun_overrides=["optim.lr=0.1,1.0"])
+    >>> [j.return_value for j in jobs[0]]
+    [tensor(0.1803, grad_fn=<MeanBackward0>),
+    tensor(-0.2261, grad_fn=<MeanBackward0>)]
+
     """
     if is_dataclass(config):
         task_cfg = OmegaConf.create(config)
