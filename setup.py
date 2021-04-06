@@ -49,7 +49,7 @@ setup(
     url=URL,
     download_url="https://github.com/mitll-SAFERai/hydra_utils/tarball/"
     + versioneer.get_version(),
-    python_requires=">=3.7",
+    python_requires=">=3.6",
     packages=find_packages(where="src", exclude=["tests", "tests.*"]),
     package_dir={"": "src"},
 )
