@@ -15,13 +15,44 @@ from typing import (
     overload,
 )
 
-from typing_extensions import Literal
+from typing_extensions import Final, Literal
 
 from hydra_utils.funcs import identity, partial
 from hydra_utils.structured_configs import _utils
 from hydra_utils.typing import Builds, Importable, Instantiable, Just, PartialBuilds
 
 __all__ = ["builds", "just", "hydrated_dataclass", "mutable_value"]
+
+_TARGET_FIELD_NAME: Final[str] = "_target_"
+_PARTIAL_TARGET_FIELD_NAME: Final[str] = "_partial_target_"
+
+
+def _check_importable_path(obj: Any):
+    """
+    Raises if `obj` is defined in unreachable namespace
+
+    Parameters
+    ----------
+    obj : Any
+
+    Raises
+    ------
+    ModuleNotFoundError
+
+    Examples
+    --------
+    >>> class C:
+    ...     def f(self): pass
+    >>> _check_importable_path(C)  # OK
+    >>> _check_importable_path(C.f)  # raises
+    """
+    path = _utils.get_obj_path(obj)
+    # catches "<locals>" and "<unknown>"
+    if "<" in path:
+        name = _utils.safe_name(obj)
+        raise ModuleNotFoundError(
+            f"{name} is not importable from path: {_utils.get_obj_path(obj)}"
+        )
 
 
 def mutable_value(x: Any) -> Field:
@@ -219,11 +250,14 @@ def just(obj: Importable) -> Just[Importable]:
         raise AttributeError(
             f"`just({obj})`: `obj` is not importable; it is missing the attributes `__module__` and/or `__qualname__`"
         )
+
+    _check_importable_path(obj)
+
     out_class = make_dataclass(
         ("Just_" + _utils.safe_name(obj)),
         [
             (
-                "_target_",
+                _TARGET_FIELD_NAME,
                 str,
                 field(default=_utils.get_obj_path(identity), init=False),
             ),
@@ -550,14 +584,24 @@ def builds(
             + "`builds(..., hydra_partial=True)` requires that `hydra_recursive=True`"
         )
 
+    _check_importable_path(target)
+
     if hydra_partial is True:
         target_field = [
-            ("_target_", str, field(default=_utils.get_obj_path(partial), init=False)),
-            ("_partial_target_", Any, field(default=just(target), init=False)),
+            (
+                _TARGET_FIELD_NAME,
+                str,
+                field(default=_utils.get_obj_path(partial), init=False),
+            ),
+            (_PARTIAL_TARGET_FIELD_NAME, Any, field(default=just(target), init=False)),
         ]
     else:
         target_field = [
-            ("_target_", str, field(default=_utils.get_obj_path(target), init=False))
+            (
+                _TARGET_FIELD_NAME,
+                str,
+                field(default=_utils.get_obj_path(target), init=False),
+            )
         ]
 
     # `base_fields` stores the list of fields that will be present in our dataclass
@@ -721,7 +765,7 @@ def builds(
 
     out = make_dataclass(dataclass_name, fields=base_fields, bases=builds_bases)
 
-    if hydra_partial is False and hasattr(out, "_partial_target_"):
+    if hydra_partial is False and hasattr(out, _PARTIAL_TARGET_FIELD_NAME):
         # `out._partial_target_` has been inherited; this will lead to an error when
         # hydra-instantiation occurs, since it will be passed to target.
         # There is not an easy way to delete this, since it comes from a parent class
