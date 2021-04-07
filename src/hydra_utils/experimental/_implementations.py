@@ -61,7 +61,7 @@ def _load_config(
 
     Notes
     -----
-    This function uses Hydra's Compose API [1]
+    This function uses Hydra's Compose API [1]_
 
     Parameters
     ----------
