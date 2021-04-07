@@ -11,7 +11,6 @@ from hydra.core.config_store import ConfigStore
 from hydra.core.global_hydra import GlobalHydra
 from hydra.core.plugins import Plugins
 from hydra.core.utils import JobReturn, run_job
-from hydra.errors import ConfigCompositionException
 from hydra.experimental import compose, initialize
 from omegaconf import DictConfig, OmegaConf
 
@@ -25,7 +24,7 @@ def _store_config(
 
     Notes
     -----
-    The input configuration is registered in the Hydra ConfigStore using a randomly generated or user provided config name.
+    The input configuration is registered in the Hydra ConfigStore [1] using a randomly generated or user provided config name.
 
     Parameters
     ----------
@@ -39,6 +38,10 @@ def _store_config(
     -------
     config_name: str
         The configuration name used to store the default configuration.
+
+    References
+    ----------
+    .. [1] https://hydra.cc/docs/tutorials/structured_config/config_store
     """
     if config_name is None:
         # TODO: Too much??
@@ -55,13 +58,17 @@ def _load_config(
 ) -> DictConfig:
     """Generates the configuration object including Hydra configurations.
 
+    Notes
+    -----
+    This function uses Hydra's Compose API [1]
+
     Parameters
     ----------
-    config_name: Optional[str]
-        A default configuration name if available, otherwise a new object is
+    config_name: Optional[str] (default: None)
+        The configuration name used to store the default configuration.
 
     overrides: List[str] (default: [])
-        If provided, overrides default configurations, see [1] and [2].
+        If provided, overrides default configurations, see [2] and [3].
 
     Returns
     -------
@@ -69,8 +76,9 @@ def _load_config(
 
     References
     ----------
-    .. [1] https://hydra.cc/docs/configure_hydra/intro
-    .. [2] https://hydra.cc/docs/advanced/override_grammar/basic
+    .. [1] https://hydra.cc/docs/experimental/compose_api
+    .. [2] https://hydra.cc/docs/configure_hydra/intro
+    .. [3] https://hydra.cc/docs/advanced/override_grammar/basic
     """
     with initialize():
         task_cfg = compose(
