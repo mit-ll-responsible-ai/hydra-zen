@@ -69,7 +69,7 @@ def _load_config(
         The configuration name used to store the default configuration.
 
     overrides: List[str] (default: [])
-        If provided, overrides default configurations, see [2] and [3].
+        If provided, overrides default configurations, see [2]_ and [3]_.
 
     Returns
     -------
