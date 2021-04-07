@@ -111,7 +111,7 @@ def hydra_launch(
         The function Hydra will execute with the given configuration.
 
     overrides: List[str] (default: [])
-        If provided, overrides default configurations, see [2] and [3].
+        If provided, overrides default configurations, see [2]_ and [3]_.
 
     multirun_overrides: List[str] (default: [])
         If provided, Hydra will run in "multirun" mode using the provided overrides [1].
