@@ -14,9 +14,7 @@ __all__ = [
 ]
 
 
-# TODO: Define Instantiable
-
-_T = TypeVar("_T")
+_T = TypeVar("_T", covariant=True)
 
 
 class Partial(Generic[_T]):
@@ -64,7 +62,7 @@ class Instantiable(DataClass, Protocol[_T]):  # pragma: no cover
 
 class Just(Instantiable, Protocol[_T]):
     obj: str  # interpolated string for importing obj
-    _target_: str = "hydra_utils.identity"  # TODO: update this
+    _target_: str = "hydra_utils.funcs.identity"  # TODO: update this
 
 
 class Builds(Instantiable, Protocol[_T]):  # pragma: no cover

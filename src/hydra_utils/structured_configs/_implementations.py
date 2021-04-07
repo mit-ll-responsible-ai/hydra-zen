@@ -138,7 +138,7 @@ class hydrated_dataclass:
 
     def __init__(
         self,
-        target: Importable,
+        target: Any,
         *,
         populate_full_signature: bool = False,
         hydra_partial: bool = False,
@@ -177,10 +177,10 @@ class hydrated_dataclass:
         self._target = target
         self._populate_full_signature = populate_full_signature
         self._hydra_recursive = hydra_recursive
-        self._hydra_convert = hydra_convert
+        self._hydra_convert: Literal["none", "partial", "all"] = hydra_convert
         self._hydra_partial = hydra_partial
 
-    def __call__(self, decorated_obj: type) -> Builds[Importable]:
+    def __call__(self, decorated_obj: Any) -> Builds:
         if not isinstance(decorated_obj, type):
             raise NotImplementedError(
                 "Class instances are not supported by `hydrated_dataclass` (yet)."
