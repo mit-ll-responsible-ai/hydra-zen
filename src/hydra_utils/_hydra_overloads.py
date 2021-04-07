@@ -34,7 +34,7 @@ def instantiate(config: Just[T], *args: Any, **kwargs: Any) -> T:  # pragma: no 
 
 @overload
 def instantiate(
-    config: PartialBuilds[Type[T]], *args: Any, **kwargs: Any
+    config: PartialBuilds[T], *args: Any, **kwargs: Any
 ) -> Partial[T]:  # pragma: no cover
     ...
 
