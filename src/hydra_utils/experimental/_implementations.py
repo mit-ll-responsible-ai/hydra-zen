@@ -114,7 +114,7 @@ def hydra_launch(
         If provided, overrides default configurations, see [2]_ and [3]_.
 
     multirun_overrides: List[str] (default: [])
-        If provided, Hydra will run in "multirun" mode using the provided overrides [1].
+        If provided, Hydra will run in "multirun" mode using the provided overrides [1]_.
 
     config_dir: Optional[Union[str, Path]] (default: None)
         Add configuration directories if needed.
