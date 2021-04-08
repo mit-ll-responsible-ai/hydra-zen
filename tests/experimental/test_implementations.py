@@ -32,7 +32,7 @@ def test_store_config(as_dataclass, as_dictconfig):
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize(
     "overrides",
-    [[], ["hydra.run.dir=test_hydra_overrided"]],
+    [None, [], ["hydra.run.dir=test_hydra_overrided"]],
 )
 @pytest.mark.parametrize("as_dataclass", [True, False])
 @pytest.mark.parametrize(
@@ -41,7 +41,7 @@ def test_store_config(as_dataclass, as_dictconfig):
 def test_hydra_launch_job(overrides, as_dataclass, as_dictconfig, with_hydra):
     cfg = builds(dict, a=1, b=1)
     task_function = lambda config: instantiate(config)
-    override_exists = len(overrides) > 1
+    override_exists = overrides and len(overrides) > 1
 
     if not as_dataclass:
         cfg = dict(f=cfg)
@@ -69,7 +69,7 @@ def test_hydra_launch_job(overrides, as_dataclass, as_dictconfig, with_hydra):
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize(
     "overrides",
-    [[], ["hydra.sweep.dir=test_hydra_overrided"]],
+    [None, [], ["hydra.sweep.dir=test_hydra_overrided"]],
 )
 @pytest.mark.parametrize("as_dataclass", [True, False])
 @pytest.mark.parametrize(
@@ -77,12 +77,12 @@ def test_hydra_launch_job(overrides, as_dataclass, as_dictconfig, with_hydra):
 )
 @pytest.mark.parametrize("use_default_dir", [True, False])
 def test_hydra_launch_multirun(
-    overrides, as_dataclass, as_dictconfig, with_hydra, use_default_dir: bool
+    overrides, as_dataclass, as_dictconfig, with_hydra, use_default_dir
 ):
     cfg = builds(dict, a=1, b=1)
     task_function = lambda config: instantiate(config)
     multirun_overrides = ["a=1,2"]
-    override_exists = len(overrides) > 1
+    override_exists = overrides and len(overrides) > 1
 
     if not as_dataclass:
         cfg = dict(f=cfg)

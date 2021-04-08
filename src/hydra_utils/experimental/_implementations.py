@@ -1,8 +1,6 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 import copy
-import string
 from pathlib import Path
-from random import choice
 from typing import Any, Callable, List, Mapping, Optional, Union
 
 from hydra._internal.hydra import Hydra
@@ -18,21 +16,16 @@ from hydra_utils.typing import DataClass
 
 
 def _store_config(
-    cfg: Union[DataClass, DictConfig, Mapping], config_name: Optional[str] = None
+    cfg: Union[DataClass, DictConfig, Mapping], config_name: str = "hydra_launch"
 ) -> str:
     """Generates a Structured Config and registers it in the ConfigStore.
-
-    Notes
-    -----
-    The input configuration is registered in the Hydra ConfigStore [1]_ using a randomly 
-    generated or user provided config name.
 
     Parameters
     ----------
     cfg: Union[DataClass, DictConfig, Mapping]
         A configuration as a dataclass, configuration object, or a dictionary.
 
-    config_name: Optional[str]
+    config_name: str (default: hydra_launch)
         A default configuration name if available, otherwise a new object is
 
     Returns
@@ -40,40 +33,40 @@ def _store_config(
     config_name: str
         The configuration name used to store the default configuration.
 
+    Notes
+    -----
+    The input configuration is registered in the Hydra ConfigStore [1]_ using a randomly
+    generated or user provided config name.
+
     References
     ----------
     .. [1] https://hydra.cc/docs/tutorials/structured_config/config_store
     """
-    if config_name is None:
-        # TODO: Too much??
-        letters = string.ascii_lowercase
-        config_name = "".join(choice(letters) for i in range(10))
-
     cs = ConfigStore().instance()
     cs.store(name=config_name, node=cfg)
     return config_name
 
 
 def _load_config(
-    config_name: Optional[str] = None, overrides: List[str] = []
+    config_name: Optional[str] = None, overrides: Optional[List[str]] = None
 ) -> DictConfig:
     """Generates the configuration object including Hydra configurations.
-
-    Notes
-    -----
-    This function uses Hydra's Compose API [1]_
 
     Parameters
     ----------
     config_name: Optional[str] (default: None)
         The configuration name used to store the default configuration.
 
-    overrides: List[str] (default: [])
+    overrides: Optional[List[str]] (default: None)
         If provided, overrides default configurations, see [2]_ and [3]_.
 
     Returns
     -------
     config: DictConfig
+
+    Notes
+    -----
+    This function uses Hydra's Compose API [1]_
 
     References
     ----------
@@ -81,10 +74,11 @@ def _load_config(
     .. [2] https://hydra.cc/docs/configure_hydra/intro
     .. [3] https://hydra.cc/docs/advanced/override_grammar/basic
     """
+
     with initialize():
         task_cfg = compose(
             config_name,
-            overrides=overrides,
+            overrides=[] if overrides is None else overrides,
             return_hydra_config=True,
         )
 
@@ -95,9 +89,9 @@ def hydra_launch(
     config: Union[DataClass, DictConfig, Mapping],
     task_function: Callable[[DictConfig], Any],
     multirun_overrides: List[str] = [],
-    overrides: List[str] = [],
+    overrides: Optional[List[str]] = None,
     config_dir: Optional[Union[str, Path]] = None,
-    config_name: Optional[str] = None,
+    config_name: str = "hydra_launch",
     job_name: str = "hydra_launch",
 ) -> JobReturn:
     """Launch Hydra job.
@@ -110,7 +104,7 @@ def hydra_launch(
     task_function: Callable[[DictConfig], Any]
         The function Hydra will execute with the given configuration.
 
-    overrides: List[str] (default: [])
+    overrides: Optional[List[str]] (default: [])
         If provided, overrides default configurations, see [2]_ and [3]_.
 
     multirun_overrides: List[str] (default: [])
@@ -197,6 +191,7 @@ def hydra_launch(
         config_name = _store_config(config, config_name)
         task_cfg = _load_config(config_name=config_name, overrides=overrides)
     else:
+        overrides = [] if overrides is None else overrides
         if len(overrides) > 0:
             raise ValueError(
                 "Non-empty overrides provided with full config object already provided, did you mean `multirun_overrides`?"
