@@ -88,7 +88,7 @@ def _load_config(
 def hydra_launch(
     config: Union[DataClass, DictConfig, Mapping],
     task_function: Callable[[DictConfig], Any],
-    multirun_overrides: List[str] = [],
+    multirun_overrides: Optional[List[str]] = None,
     overrides: Optional[List[str]] = None,
     config_dir: Optional[Union[str, Path]] = None,
     config_name: str = "hydra_launch",
@@ -104,10 +104,10 @@ def hydra_launch(
     task_function: Callable[[DictConfig], Any]
         The function Hydra will execute with the given configuration.
 
-    overrides: Optional[List[str]] (default: [])
+    overrides: Optional[List[str]] (default: None)
         If provided, overrides default configurations, see [2]_ and [3]_.
 
-    multirun_overrides: List[str] (default: [])
+    multirun_overrides: Optional[List[str]] (default: None)
         If provided, Hydra will run in "multirun" mode using the provided overrides [1]_.
 
     config_dir: Optional[Union[str, Path]] (default: None)
@@ -204,6 +204,7 @@ def hydra_launch(
 
     hydra = Hydra.create_main_hydra2(task_name=job_name, config_search_path=search_path)
     try:
+        multirun_overrides = [] if multirun_overrides is None else multirun_overrides
         if len(multirun_overrides) > 0:
             sweeper = Plugins.instance().instantiate_sweeper(
                 config=task_cfg,
