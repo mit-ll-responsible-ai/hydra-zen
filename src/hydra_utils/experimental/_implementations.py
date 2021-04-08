@@ -113,7 +113,7 @@ def hydra_launch(
 
     would be
 
-    >> job = hydra_launch(config, task_function, multirun_overrides=["job/group=group_name", "job.group.param=1,2,3"])
+    >>> job = hydra_launch(config, task_function, multirun_overrides=["job/group=group_name", "job.group.param=1,2,3"])
 
     This functions executes Hydra and therefore creates its own working directory.  See Configuring Hydra [3]_ for more
     details on customizing Hydra.
