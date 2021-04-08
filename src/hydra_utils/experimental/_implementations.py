@@ -35,8 +35,8 @@ def _store_config(
 
     Notes
     -----
-    The input configuration is registered in the Hydra ConfigStore [1]_ using a randomly
-    generated or user provided config name.
+    The input configuration is registered in the Hydra ConfigStore [1]_ using a 
+    user-provided config name.
 
     References
     ----------
