@@ -94,7 +94,29 @@ def hydra_launch(
     config_name: str = "hydra_launch",
     job_name: str = "hydra_launch",
 ) -> JobReturn:
-    """Launch Hydra job.
+    """Launch a Hydra job defined by ``task_function`` using the configuration
+    provided in ``config``.
+
+    Similar to how Hydra CLI works, ``overrides`` are a string list of configuration
+    values to use for a given experiment run.  For example, the Hydra CLI provided by
+
+    $ python -m job.task_function job/group=group_name job.group.param=1
+
+    would be
+
+    >> job = hydra_launch(config, task_function, overrides=["job/group=group_name", "job.group.param=1"])
+
+    Similarly, to execute a ``multirun`` job, simply provide the override syntax in ``multirun_overrides``.
+    For example, the Hydra CLI provided by
+
+    $ python -m job.task_function job/group=group_name job.group.param=1,2,3 --multirun
+
+    would be
+
+    >> job = hydra_launch(config, task_function, multirun_overrides=["job/group=group_name", "job.group.param=1,2,3"])
+
+    This functions executes Hydra and therefore creates its own working directory.  See Configuring Hydra [3]_ for more
+    details on customizing Hydra.
 
     Parameters
     ----------
@@ -118,7 +140,13 @@ def hydra_launch(
     Returns
     -------
     result: JobReturn
-        The return value of the task_function
+        The object storing the results of the Hydra experiment.
+            - overrides: From ``overrides`` and ``multirun_overrides``
+            - return_value: The return value of the task function
+            - cfg: The configuration object sent to the task function
+            - hydra_cfg: The hydra configuration object
+            - working_dir: The experiment working directory
+            - task_name: The task name of the Hydra job
 
     References
     ----------
