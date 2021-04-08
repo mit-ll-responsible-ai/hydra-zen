@@ -104,7 +104,7 @@ def hydra_launch(
 
     would be
 
-    >> job = hydra_launch(config, task_function, overrides=["job/group=group_name", "job.group.param=1"])
+    >>> job = hydra_launch(config, task_function, overrides=["job/group=group_name", "job.group.param=1"])
 
     Similarly, to execute a ``multirun`` job, simply provide the override syntax in ``multirun_overrides``.
     For example, the Hydra CLI provided by
