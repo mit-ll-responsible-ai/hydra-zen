@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Massachusetts Institute of Technology
+
 import inspect
 from collections import Counter
 from dataclasses import dataclass, is_dataclass

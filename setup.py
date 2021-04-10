@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Massachusetts Institute of Technology
+
 from setuptools import find_packages, setup
 
 import versioneer

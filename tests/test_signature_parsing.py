@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Massachusetts Institute of Technology
+
 import inspect
 from inspect import Parameter
 from typing import Any

@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Massachusetts Institute of Technology
+
 from typing import Callable, Tuple, Type
 
 from hydra_zen import builds, instantiate, just

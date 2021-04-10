@@ -1,3 +1,6 @@
+# Copyright (c) 2021 Massachusetts Institute of Technology
+
+
 def test_version():
     import hydra_zen
 

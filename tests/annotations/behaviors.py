@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Massachusetts Institute of Technology
+
 from typing import Tuple
 
 from hydra_zen import builds, instantiate, just

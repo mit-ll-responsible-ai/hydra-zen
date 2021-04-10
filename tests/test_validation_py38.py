@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Massachusetts Institute of Technology
+
 import hypothesis.strategies as st
 import pytest
 from hypothesis import given

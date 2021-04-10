@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Massachusetts Institute of Technology
+
 """
 Simple helper functions used to implement `just` and `builds`. This module is designed specifically so
 that these functions have a legible module-path when they appear in configuration files.

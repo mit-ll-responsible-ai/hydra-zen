@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Massachusetts Institute of Technology
+
 from hydra_zen import builds, hydrated_dataclass, instantiate
 
 
