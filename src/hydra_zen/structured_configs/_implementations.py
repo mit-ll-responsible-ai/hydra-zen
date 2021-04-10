@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Massachusetts Institute of Technology
+
 import inspect
 from collections import defaultdict
 from dataclasses import Field, dataclass, field, fields, is_dataclass, make_dataclass

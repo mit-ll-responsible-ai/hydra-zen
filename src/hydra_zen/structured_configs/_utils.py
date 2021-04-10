@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Massachusetts Institute of Technology
+
 import sys
 from dataclasses import is_dataclass
 from enum import Enum

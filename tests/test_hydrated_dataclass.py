@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Massachusetts Institute of Technology
+
 from dataclasses import is_dataclass
 
 import pytest

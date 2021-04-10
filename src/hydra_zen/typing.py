@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Massachusetts Institute of Technology
+
 from dataclasses import Field, _DataclassParams
 from typing import Any, Callable, Dict, Generic, Tuple, TypeVar
 

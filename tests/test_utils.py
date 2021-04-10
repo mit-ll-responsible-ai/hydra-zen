@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Massachusetts Institute of Technology
+
 import sys
 from dataclasses import dataclass
 from typing import Dict, List

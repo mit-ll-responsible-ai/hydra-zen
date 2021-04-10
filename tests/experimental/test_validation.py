@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Massachusetts Institute of Technology
+
 import pytest
 from hydra.core.config_store import ConfigStore
 from hydra.errors import ConfigCompositionException

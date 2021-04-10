@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Massachusetts Institute of Technology
+
 """
 Provides annotation overloads for various hydra functions, using the types defined in `hydra_utils.typing`.
 This enables tools like IDEs to be more incisive during static analysis and to provide users with additional

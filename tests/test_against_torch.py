@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Massachusetts Institute of Technology
+
 import inspect
 from dataclasses import dataclass
 from typing import Any

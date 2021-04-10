@@ -1,8 +1,8 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
+
 from pathlib import Path
 
 import pytest
-from hydra.conf import HydraConf
 from hydra.core.config_store import ConfigStore
 from omegaconf.omegaconf import OmegaConf
 
