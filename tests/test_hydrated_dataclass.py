@@ -2,7 +2,7 @@ from dataclasses import is_dataclass
 
 import pytest
 
-from hydra_utils import hydrated_dataclass, instantiate
+from hydra_zen import hydrated_dataclass, instantiate
 
 
 def f1(x, y):

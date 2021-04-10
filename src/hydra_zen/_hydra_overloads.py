@@ -88,7 +88,7 @@ def instantiate(config: Any, *args, **kwargs) -> Any:
 
     Examples
     --------
-    >>> from hydra_utils import instantiate, builds
+    >>> from hydra_zen import instantiate, builds
     >>> config = builds(dict, a=1, b=2)  # type: Builds[Type[dict]]
     >>> instantiate(config, c=3)  # static analysis can deduce that the result type is `dict`
     {'a': 1, 'b': 2, 'c': 3}

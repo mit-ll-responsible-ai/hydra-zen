@@ -1,6 +1,6 @@
 from typing import Tuple
 
-from hydra_utils import builds, instantiate, just
+from hydra_zen import builds, instantiate, just
 
 
 class A:

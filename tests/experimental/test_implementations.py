@@ -6,9 +6,9 @@ from hydra.conf import HydraConf
 from hydra.core.config_store import ConfigStore
 from omegaconf.omegaconf import OmegaConf
 
-from hydra_utils import builds, instantiate
-from hydra_utils.experimental import hydra_launch
-from hydra_utils.experimental._implementations import _load_config, _store_config
+from hydra_zen import builds, instantiate
+from hydra_zen.experimental import hydra_launch
+from hydra_zen.experimental._implementations import _load_config, _store_config
 
 
 @pytest.mark.parametrize("as_dataclass", [True, False])
@@ -40,12 +40,17 @@ def test_store_config(as_dataclass, as_dictconfig):
 )
 def test_hydra_launch_job(overrides, as_dataclass, as_dictconfig, with_hydra):
     cfg = builds(dict, a=1, b=1)
-    task_function = lambda config: instantiate(config)
+
+    def task_function(config):
+        return instantiate(config)
+
     override_exists = overrides and len(overrides) > 1
 
     if not as_dataclass:
         cfg = dict(f=cfg)
-        task_function = lambda config: instantiate(config.f)
+
+        def task_function(config):
+            return instantiate(config.f)
 
     if as_dictconfig:
         if not with_hydra:
@@ -80,13 +85,19 @@ def test_hydra_launch_multirun(
     overrides, as_dataclass, as_dictconfig, with_hydra, use_default_dir
 ):
     cfg = builds(dict, a=1, b=1)
-    task_function = lambda config: instantiate(config)
+
+    def task_function(config):
+        return instantiate(config)
+
     multirun_overrides = ["a=1,2"]
     override_exists = overrides and len(overrides) > 1
 
     if not as_dataclass:
         cfg = dict(f=cfg)
-        task_function = lambda config: instantiate(config.f)
+
+        def task_function(config):
+            return instantiate(config.f)
+
         multirun_overrides = ["f.a=1,2"]
 
     if as_dictconfig:

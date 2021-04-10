@@ -12,7 +12,7 @@ from hydra.core.utils import JobReturn, run_job
 from hydra.experimental import compose, initialize
 from omegaconf import DictConfig, OmegaConf
 
-from hydra_utils.typing import DataClass
+from hydra_zen.typing import DataClass
 
 
 def _store_config(
@@ -35,7 +35,7 @@ def _store_config(
 
     Notes
     -----
-    The input configuration is registered in the Hydra ConfigStore [1]_ using a 
+    The input configuration is registered in the Hydra ConfigStore [1]_ using a
     user-provided config name.
 
     References
@@ -161,8 +161,8 @@ def hydra_launch(
 
     Simple Hydra ``run``:
 
-    >>> from hydra_utils import instantiate, builds
-    >>> from hydra_utils.experimental import hydra_launch
+    >>> from hydra_zen import instantiate, builds
+    >>> from hydra_zen.experimental import hydra_launch
     >>> job = hydra_launch(builds(dict, a=1, b=1), task_function=lambda x: instantiate(x))
     >>> job.return_value
     {'a': 1, 'b': 1}
@@ -175,8 +175,8 @@ def hydra_launch(
 
     Using a more complex ``task_function``
 
-    >>> from hydra_utils.experimental import hydra_launch
-    >>> from hydra_utils import builds, instantiate
+    >>> from hydra_zen.experimental import hydra_launch
+    >>> from hydra_zen import builds, instantiate
     >>> cfg = dict(f=builds(pow, exp=2, hydra_partial=True), x=1)
     >>> def task_function(cfg):
     ...    return instantiate(cfg.f)(cfg.x)

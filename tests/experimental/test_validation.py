@@ -2,9 +2,9 @@ import pytest
 from hydra.core.config_store import ConfigStore
 from hydra.errors import ConfigCompositionException
 
-from hydra_utils import builds
-from hydra_utils.experimental import hydra_launch
-from hydra_utils.experimental._implementations import _load_config, _store_config
+from hydra_zen import builds
+from hydra_zen.experimental import hydra_launch
+from hydra_zen.experimental._implementations import _load_config, _store_config
 
 
 @pytest.mark.usefixtures("cleandir")

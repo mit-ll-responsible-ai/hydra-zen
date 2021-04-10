@@ -1,7 +1,7 @@
 from typing import Callable, Tuple, Type
 
-from hydra_utils import builds, instantiate, just
-from hydra_utils.typing import Builds, Just, Partial, PartialBuilds
+from hydra_zen import builds, instantiate, just
+from hydra_zen.typing import Builds, Just, Partial, PartialBuilds
 
 
 class A:

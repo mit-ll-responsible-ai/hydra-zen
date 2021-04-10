@@ -4,7 +4,7 @@ import hypothesis.strategies as st
 import pytest
 from hypothesis import given
 
-from hydra_utils import builds, instantiate
+from hydra_zen import builds, instantiate
 
 
 def f_three_vars(x, y, z):

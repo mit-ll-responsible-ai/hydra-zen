@@ -7,7 +7,7 @@ import hypothesis.strategies as st
 import pytest
 from hypothesis import assume, given
 
-from hydra_utils import builds, hydrated_dataclass, instantiate, just
+from hydra_zen import builds, hydrated_dataclass, instantiate, just
 
 
 def test_builds_with_populate_sig_raises_on_target_without_sig():

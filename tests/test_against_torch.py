@@ -8,8 +8,8 @@ import torch as tr
 from hypothesis import assume, given
 from torch.optim import Adam, AdamW
 
-from hydra_utils import builds, hydrated_dataclass, instantiate, just
-from hydra_utils.structured_configs._utils import safe_name
+from hydra_zen import builds, hydrated_dataclass, instantiate, just
+from hydra_zen.structured_configs._utils import safe_name
 
 
 @pytest.mark.parametrize(
