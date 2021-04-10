@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from hydra_utils import builds, instantiate, just
-from hydra_utils.structured_configs._utils import safe_name
+from hydra_zen import builds, instantiate, just
+from hydra_zen.structured_configs._utils import safe_name
 
 
 def test_builds_roundtrip_with_ufunc():

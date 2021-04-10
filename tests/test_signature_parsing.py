@@ -6,7 +6,7 @@ import hypothesis.strategies as st
 import pytest
 from hypothesis import given, settings
 
-from hydra_utils import builds, hydrated_dataclass, mutable_value
+from hydra_zen import builds, hydrated_dataclass, mutable_value
 from tests import valid_hydra_literals
 
 Empty = Parameter.empty

@@ -2,7 +2,7 @@ import hypothesis.strategies as st
 import pytest
 from hypothesis import given
 
-from hydra_utils import builds
+from hydra_zen import builds
 
 
 def x_is_pos_only(x, /):

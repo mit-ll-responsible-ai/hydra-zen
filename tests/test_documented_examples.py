@@ -1,4 +1,4 @@
-from hydra_utils import builds, hydrated_dataclass, instantiate
+from hydra_zen import builds, hydrated_dataclass, instantiate
 
 
 def test_hydrated_simple_example():

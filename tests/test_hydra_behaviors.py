@@ -6,8 +6,8 @@ import pytest
 from hypothesis import assume, given
 from omegaconf import DictConfig, ListConfig
 
-from hydra_utils import builds, hydrated_dataclass, instantiate, mutable_value
-from hydra_utils.structured_configs._utils import get_obj_path
+from hydra_zen import builds, hydrated_dataclass, instantiate, mutable_value
+from hydra_zen.structured_configs._utils import get_obj_path
 
 
 def f_three_vars(x, y, z):

@@ -17,9 +17,9 @@ from typing import (
 
 from typing_extensions import Final, Literal
 
-from hydra_utils.funcs import identity, partial
-from hydra_utils.structured_configs import _utils
-from hydra_utils.typing import Builds, Importable, Instantiable, Just, PartialBuilds
+from hydra_zen.funcs import identity, partial
+from hydra_zen.structured_configs import _utils
+from hydra_zen.typing import Builds, Importable, Instantiable, Just, PartialBuilds
 
 __all__ = ["builds", "just", "hydrated_dataclass", "mutable_value"]
 
@@ -62,7 +62,7 @@ def mutable_value(x: Any) -> Field:
 
     Examples
     --------
-    >>> from hydra_utils import mutable_value
+    >>> from hydra_zen import mutable_value
     >>> from dataclasses import dataclass
 
     See https://docs.python.org/3/library/dataclasses.html#mutable-default-values
@@ -90,7 +90,7 @@ class hydrated_dataclass:
     --------
     A simple usage of `hydrated_dataclass`. Here, we specify a structured config
 
-    >>> from hydra_utils import hydrated_dataclass, instantiate
+    >>> from hydra_zen import hydrated_dataclass, instantiate
     >>> @hydrated_dataclass(target=dict)
     ... class DictConf:
     ...     x : int = 2
@@ -227,14 +227,14 @@ def just(obj: Importable) -> Just[Importable]:
     in your structured config:
 
     >>> from torch.optim import Adam
-    >>> from hydra_utils import just
+    >>> from hydra_zen import just
     >>> @dataclass
     ... class ModuleConfig:
     ...     optimizer: Any = just(Adam)
 
     Demonstrating the simple behavior of ``just`` in the context of leveraging ``hydra``.
 
-    >>> from hydra_utils import just, instantiate
+    >>> from hydra_zen import just, instantiate
     >>> just_str_conf = just(str)
     >>> str is instantiate(just_str_conf)  # "just" returns the object `str`
     True
@@ -416,7 +416,7 @@ def builds(
     --------
     **Basic Usage**
 
-    >>> from hydra_utils import builds, instantiate
+    >>> from hydra_zen import builds, instantiate
     >>> builds(dict, a=1, b='x')  # makes a dataclass that will "build" a dictionary with the specified fields
     types.Builds_dict
     >>> instantiate(builds(dict, a=1, b='x'))  # using hydra to build the dictionary

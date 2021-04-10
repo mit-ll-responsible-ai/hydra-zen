@@ -8,8 +8,8 @@ import pytest
 from hypothesis import given, note
 from omegaconf import OmegaConf
 
-from hydra_utils import mutable_value
-from hydra_utils.structured_configs._utils import interpolated, safe_name
+from hydra_zen import mutable_value
+from hydra_zen.structured_configs._utils import interpolated, safe_name
 
 from . import valid_hydra_literals
 
@@ -89,7 +89,7 @@ def test_mutable_values():
 
 
 def test_documented_instantiate_example():
-    from hydra_utils import builds, instantiate
+    from hydra_zen import builds, instantiate
 
     assert instantiate(builds(dict, a=1, b=2), c=3) == dict(a=1, b=2, c=3)
     assert instantiate(builds(list), (1, 2, 3)) == [1, 2, 3]

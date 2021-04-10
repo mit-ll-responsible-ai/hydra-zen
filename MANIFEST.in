@@ -1,2 +1,2 @@
 include versioneer.py
-include src/hydra_utils/_version.py
+include src/hydra_zen/_version.py

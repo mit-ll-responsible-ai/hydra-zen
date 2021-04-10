@@ -8,7 +8,7 @@ from hydra.utils import log
 from omegaconf import OmegaConf
 from typing_extensions import Final
 
-from hydra_utils.typing import Importable
+from hydra_zen.typing import Importable
 
 COMMON_MODULES_WITH_OBFUSCATED_IMPORTS: Tuple[str, ...] = ("numpy",)
 UNKNOWN_NAME: Final[str] = "<unknown>"
