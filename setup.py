@@ -47,7 +47,7 @@ setup(
     install_requires=INSTALL_REQUIRES,
     tests_require=TESTS_REQUIRE,
     url=URL,
-    download_url="https://github.com/mitll-SAFERai/hydra_zen/tarball/"
+    download_url="https://github.com/mitll-SAFERai/hydra-zen/tarball/"
     + versioneer.get_version(),
     python_requires=">=3.6",
     packages=find_packages(where="src", exclude=["tests", "tests.*"]),
