@@ -14,7 +14,8 @@ from hydra_zen.typing import Importable
 
 COMMON_MODULES_WITH_OBFUSCATED_IMPORTS: Tuple[str, ...] = ("numpy",)
 UNKNOWN_NAME: Final[str] = "<unknown>"
-
+HYDRA_SUPPORTED_PRIMITIVES: Final = {int, float, bool, str, Enum}
+KNOWN_MUTABLE_TYPES = (list, dict, set)
 
 T = TypeVar("T")
 
@@ -103,9 +104,6 @@ def get_obj(path: str) -> Union[type, Callable[..., Any]]:
 
 
 OmegaConf.register_new_resolver("hydra_utils_get_obj", get_obj, use_cache=False)
-
-HYDRA_SUPPORTED_PRIMITIVES = {int, float, bool, str, Enum}
-KNOWN_MUTABLE_TYPES = (list, dict, set)
 
 
 def sanitized_type(type_: type) -> type:
