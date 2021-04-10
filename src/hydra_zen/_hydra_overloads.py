@@ -96,6 +96,6 @@ def instantiate(config: Any, *args, **kwargs) -> Any:
     {'a': 1, 'b': 2, 'c': 3}
 
     >>> config = builds(list)  # type: Builds[Type[list]]
-    >>> instantiate(config, (1, 2, 3))  # static analysis can deduce that the result type is `dict`
+    >>> instantiate(config, (1, 2, 3))  # static analysis can deduce that the result type is `list`
     [1, 2, 3]"""
     return hydra_instantiate(config, *args, **kwargs)

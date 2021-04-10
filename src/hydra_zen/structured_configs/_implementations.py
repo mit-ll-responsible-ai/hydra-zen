@@ -496,12 +496,12 @@ def builds(
     >>> instantiate(builds_a_function(a=1, b="hi"))
     (1, 'hi', -10.0)
 
-    You can auto-populate your structured config
+    **Botched Configs Fail Quickly and Loudly**
 
-    ``builds`` will raise if you specify an argument that is incompatible with the target. This means
-    that you will catch mistakes before you try to instantiate your configurations
+    ``builds`` will raise if you specify an argument that is incompatible with the target's signature.
+    This means that you will catch mistakes before you try to instantiate your configurations
 
-    >>> builds(a_function, z=10)
+    >>> builds(a_function, z=10)  # `z` is not in the signature of `a_function`
     TypeError: Building: a_function ..
     The following unexpected keyword argument(s) was specified for __main__.a_function via `builds`: z
 
