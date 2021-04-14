@@ -103,7 +103,7 @@ def get_obj(path: str) -> Union[type, Callable[..., Any]]:
         raise e
 
 
-OmegaConf.register_new_resolver("hydra_utils_get_obj", get_obj, use_cache=False)
+OmegaConf.register_new_resolver("hydra_zen_get_obj", get_obj, use_cache=False)
 
 
 def sanitized_type(type_: type) -> type:
