@@ -85,7 +85,7 @@ Field_Entry = Tuple[str, type, Field]
 
 
 class hydrated_dataclass:
-    """A decorator that uses `hydra_utils.builds` to create a dataclass with the appropriate
+    """A decorator that uses `hydra_zen.builds` to create a dataclass with the appropriate
     hydra-specific fields for specifying a structured config.
 
     Examples
@@ -241,7 +241,7 @@ def just(obj: Importable) -> Just[Importable]:
     >>> str is instantiate(just_str_conf)  # "just" returns the object `str`
     True
     >>> just_str_conf._target_
-    'hydra_utils.funcs.identity'
+    'hydra_zen.funcs.identity'
     >>> just_str_conf.obj
     '${get_obj:builtins.str}'
     """
@@ -266,7 +266,7 @@ def just(obj: Importable) -> Just[Importable]:
                 "obj",
                 Any,
                 field(
-                    default=_utils.interpolated("hydra_utils_get_obj", obj_path),
+                    default=_utils.interpolated("hydra_zen_get_obj", obj_path),
                     init=False,
                 ),
             ),
