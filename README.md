@@ -48,8 +48,8 @@ def parabaloid(x, y):
 class ExpConfig:
     starting_xy: Tuple[float, float] = (-1.5, 0.5)
     num_steps: int = 20
-    optim: Any = builds(SGD, lr=0.3, momentum=0.0, hydra_partial=True)
-    landscape_fn: Any = just(parabaloid)
+    optim: Any = builds(SGD, lr=0.3, momentum=0.0, hydra_partial=True)  # type: PartialBuilds[Type[SGD]]
+    landscape_fn: Any = just(parabaloid)  # type: Just[(Any, Any) -> Any]
 ```
 
 Each `builds(<target>, ...)` and `just(<target>)` call creates a dataclass, which serves as a structured config for that `<target>`.

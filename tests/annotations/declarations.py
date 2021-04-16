@@ -41,10 +41,10 @@ should_be_int: int = instantiate(conf_f)
 
 # test builds(...)
 conf_A: Builds[Type[A]] = builds(A)
-should_be_a_again: A = instantiate(conf_A)
+should_be_a_again_again: A = instantiate(conf_A)
 
 conf_f: Builds[f_sig] = builds(f)
-should_be_int: int = instantiate(conf_f)
+should_be_int_again: int = instantiate(conf_f)
 
 # test just(...)
 conf_just_f: Just[f_sig] = just(f)
