@@ -20,7 +20,7 @@ hydra-zen offers:
   - Runtime validation of configurations to catch mistakes before your application launches.
 
 ## Installation
-`hydra-zen` is light weight: its dependencies are `hydra` and `typing-extensions`
+`hydra-zen` is light weight: its dependencies are `hydra-core` and `typing-extensions`
 
 ```shell script
 pip install hydra-zen
