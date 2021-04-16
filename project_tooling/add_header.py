@@ -10,8 +10,8 @@ import os
 import os.path as path
 from pathlib import Path
 
-OLD_HEADER = ""
-NEW_HEADER = "# Copyright (c) 2021 Massachusetts Institute of Technology"
+OLD_HEADER = "# Copyright (c) 2021 Massachusetts Institute of Technology"
+NEW_HEADER = "# Copyright (c) 2021 Massachusetts Institute of Technology\n# SPDX-License-Identifier: MIT"
 EXCLUDED = {"_version.py", "versioneer.py"}
 
 
@@ -46,6 +46,7 @@ def get_src_files(dirname):
 
 
 def add_headers(files):
+    # this needs to be modified to be able to replace multi-line headers!
     for line in fileinput.input(files, inplace=True):
         if fileinput.isfirstline():
             if NEW_HEADER in line:
