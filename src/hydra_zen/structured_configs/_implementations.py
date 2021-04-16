@@ -366,7 +366,13 @@ def builds(
         NumPy's various ufuncs.
 
     hydra_partial : bool, optional (default=False)
-        If True, then hydra-instantiation produces `functools.partial(target, **kwargs)`
+        If True, then hydra-instantiation produces `functools.partial(target, **kwargs_for_target)`,
+        this enables the partial-configuration of objects.
+
+        Specifying `hydra_partial=True` and `populate_full_signature=True` together will
+        populate the dataclass' signature only with parameters that are specified by the
+        user or that have default values specified in the target's signature. I.e. it is
+        presumed that un-specified parameters are to be excluded from the partial configuration.
 
     hydra_recursive : bool, optional (default=True)
         If True, then upon hydra will recursively instantiate all other
@@ -398,7 +404,7 @@ def builds(
     ------
     TypeError
         One or more unexpected arguments were specified via **kwargs_for_target, which
-        are not compatible with the signature of ``target``.
+        are not compatible with the signature of `target`.
 
     Notes
     -----
@@ -410,6 +416,10 @@ def builds(
     early and explicitly.
 
     Mutable values are automatically specified using ``field(default_factory=lambda: <value>)`` [4]_.
+
+    `builds(...)` is annotated to return the generic protocols `Builds` and `PartialBuilds`, which are
+    available in `hydra_zen.typing`. These are leveraged by `hydra_zen.instantiate` to provide static
+    analysis tooling with enhanced context.
 
     References
     ----------
@@ -739,8 +749,11 @@ def builds(
                 )
 
                 if param.default is inspect.Parameter.empty:
-                    # no default-value specified in signature
-                    base_fields.append(param_field)
+                    if not hydra_partial:
+                        # No default value specified in signature or by the user.
+                        # We don't include these fields if the user specified a partial build
+                        # because we assume that they want to fill these in by using partial
+                        base_fields.append(param_field)
                 else:
                     if isinstance(param.default, _utils.KNOWN_MUTABLE_TYPES):
                         value = mutable_value(param.default)
