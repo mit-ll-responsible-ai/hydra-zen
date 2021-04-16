@@ -46,6 +46,7 @@ def get_src_files(dirname):
 
 
 def add_headers(files):
+    # this needs to be modified to be able to replace multi-line headers!
     for line in fileinput.input(files, inplace=True):
         if fileinput.isfirstline():
             if NEW_HEADER in line:
