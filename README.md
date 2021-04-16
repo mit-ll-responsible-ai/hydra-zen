@@ -139,7 +139,7 @@ landscape_fn:
 ```
 
 
-## COPYRIGHT
+## Disclaimer
 DISTRIBUTION STATEMENT A. Approved for public release. Distribution is unlimited.
 
 This material is based upon work supported by the Under Secretary of Defense for Research and 
