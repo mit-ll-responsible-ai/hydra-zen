@@ -342,13 +342,10 @@ def builds(
     builds_bases: Tuple[Any, ...] = (),
     **kwargs_for_target,
 ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]:
-    """Produces a structured config (i.e. a dataclass) [1]_ that, when instantiated by hydra,
-    initializes/calls ``target`` with the provided keyword arguments.
+    """Returns a dataclass object that configures `target` with user-specified and auto-populated parameter values.
 
-    The returned object is an un-instantiated dataclass.
-
-    ``builds`` provides a simple and functional way to dynamically create rich structured
-    configurations.
+    The resulting dataclass is specifically a structured config [1]_ that enables Hydra to initialize/call
+    `target` either fully or partially. See Notes for additional features and explanation of implementation details.
 
     Parameters
     ----------
@@ -362,14 +359,23 @@ def builds(
         resulting dataclass, unless ``populate_full_signature=True`` is specified (see below).
 
     populate_full_signature : bool, optional (default=False)
-        If True, then the resulting dataclass's __init__ signature and fields
-        will be populated according to the signature of ``target``.
+        If `True`, then the resulting dataclass's signature and fields will be populated
+        according to the signature of `target`.
 
         Values specified in **kwargs_for_target take precedent over the corresponding
         default values from the signature.
 
+        This option is not available for objects with inaccessible signatures, such as
+        NumPy's various ufuncs.
+
     hydra_partial : bool, optional (default=False)
-        If True, then hydra-instantiation produces `functools.partial(target, **kwargs)`
+        If True, then hydra-instantiation produces `functools.partial(target, **kwargs_for_target)`,
+        this enables the partial-configuration of objects.
+
+        Specifying `hydra_partial=True` and `populate_full_signature=True` together will
+        populate the dataclass' signature only with parameters that are specified by the
+        user or that have default values specified in the target's signature. I.e. it is
+        presumed that un-specified parameters are to be excluded from the partial configuration.
 
     hydra_recursive : bool, optional (default=True)
         If True, then upon hydra will recursively instantiate all other
@@ -385,6 +391,9 @@ def builds(
                   a trace of OmegaConf containers
 
     builds_bases : Tuple[DataClass, ...]
+        Specifies a tuple of parent classes that the resulting dataclass inherits from.
+        A `PartialBuilds` class (resulting from `hydra_partial=True`) cannot be a parent
+        of a `Builds` class (i.e. where `hydra_partial=False` was specified).
 
     dataclass_name : Optional[str]
         If specified, determines the name of the returned class object.
@@ -398,18 +407,22 @@ def builds(
     ------
     TypeError
         One or more unexpected arguments were specified via **kwargs_for_target, which
-        are not compatible with the signature of ``target``.
+        are not compatible with the signature of `target`.
 
     Notes
     -----
+    Type annotations are inferred from the target's signature and are only retained if they are compatible
+    with hydra's limited set of supported annotations; otherwise `Any` is specified.
+
     ``builds`` provides runtime validation of user-specified named arguments against
     the target's signature. This helps to ensure that typos in field names fail
     early and explicitly.
 
     Mutable values are automatically specified using ``field(default_factory=lambda: <value>)`` [4]_.
 
-    Type annotations are inferred from the target's signature and are only retained if they are compatible
-    with hydra's limited set of supported annotations; otherwise `Any` is specified.
+    `builds(...)` is annotated to return the generic protocols `Builds` and `PartialBuilds`, which are
+    available in `hydra_zen.typing`. These are leveraged by `hydra_zen.instantiate` to provide static
+    analysis tooling with enhanced context.
 
     References
     ----------
@@ -739,8 +752,11 @@ def builds(
                 )
 
                 if param.default is inspect.Parameter.empty:
-                    # no default-value specified in signature
-                    base_fields.append(param_field)
+                    if not hydra_partial:
+                        # No default value specified in signature or by the user.
+                        # We don't include these fields if the user specified a partial build
+                        # because we assume that they want to fill these in by using partial
+                        base_fields.append(param_field)
                 else:
                     if isinstance(param.default, _utils.KNOWN_MUTABLE_TYPES):
                         value = mutable_value(param.default)

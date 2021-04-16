@@ -104,17 +104,52 @@ def test_builds_with_full_sig_mirrors_target_sig(
 
     params = inspect.signature(Conf).parameters.values()
 
-    expected_sig = [("x", str), ("y", int), ("z", Any)]
+    expected_sig = [("x", str)] if not partial else []
+
+    expected_sig += [("y", int), ("z", Any)]
     if include_extra_param:
         expected_sig.append(("named_param", Any))
 
     actual_sig = [(p.name, p.annotation) for p in params]
     assert expected_sig == actual_sig
 
-    conf = Conf(x=-100)
-    assert conf.x == -100
+    if not partial:
+        conf = Conf(x=-100)
+        assert conf.x == -100
+    else:
+        # x should be excluded when partial=True and full-sig is populated
+        conf = Conf()
+
     assert conf.y == 0
     assert conf.z == [2]
 
     if include_extra_param:
         assert conf.named_param == 2
+
+
+def f4(x: int, y: int, z: int, default: float = 100.0):
+    pass
+
+
+@given(
+    user_specified_values=st.dictionaries(
+        keys=st.sampled_from(["x", "y", "z"]), values=st.integers(0, 3), max_size=3
+    )
+)
+def test_builds_partial_with_full_sig_excludes_non_specified_params(
+    user_specified_values,
+):
+    Conf = builds(
+        f4, **user_specified_values, populate_full_signature=True, hydra_partial=True
+    )
+
+    expected_sig = [
+        (var_name, int, user_specified_values[var_name])
+        for var_name in sorted(user_specified_values)
+    ] + [("default", float, 100.0)]
+
+    actual_sig = [
+        (p.name, p.annotation, p.default)
+        for p in inspect.signature(Conf).parameters.values()
+    ]
+    assert expected_sig == actual_sig

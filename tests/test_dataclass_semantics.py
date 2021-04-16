@@ -14,21 +14,26 @@ def f_three_vars(x, y, z):
     return x, y, z
 
 
-def f(x, y):
-    return x, y
+def f(x, y, z: int = 3):
+    return x, y, z
 
 
 @given(full_sig=st.booleans(), partial=st.booleans())
 def test_builds_produces_dataclass(full_sig: bool, partial: bool):
 
-    if full_sig:
+    if full_sig and not partial:
         Builds_f = builds(f, populate_full_signature=full_sig, hydra_partial=partial)
     else:
-        Builds_f = builds(f, x=None, y=None, hydra_partial=partial)
+        Builds_f = builds(
+            f, x=None, y=None, hydra_partial=partial, populate_full_signature=full_sig
+        )
     assert is_dataclass(Builds_f)
     out = Builds_f(x=1.0, y=-1.0)
     assert out.x == 1.0
     assert out.y == -1.0
+
+    if full_sig:
+        assert out.z == 3
 
 
 def f_2(x, y, z):
