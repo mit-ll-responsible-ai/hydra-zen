@@ -1,4 +1,5 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
+# SPDX-License-Identifier: MIT
 
 """
 Provides annotation overloads for various hydra functions, using the types defined in `hydra_utils.typing`.

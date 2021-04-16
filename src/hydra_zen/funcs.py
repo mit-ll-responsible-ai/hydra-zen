@@ -1,4 +1,5 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
+# SPDX-License-Identifier: MIT
 
 """
 Simple helper functions used to implement `just` and `builds`. This module is designed specifically so

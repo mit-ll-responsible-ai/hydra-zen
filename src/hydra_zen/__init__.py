@@ -1,4 +1,5 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
+# SPDX-License-Identifier: MIT
 
 from ._hydra_overloads import instantiate
 from ._version import get_versions
