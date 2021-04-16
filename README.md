@@ -12,7 +12,7 @@ Configure and run your applications without leaving Python!
 
 hydra-zen offers:
   - Functions for dynamically and ergonomically creating [structured configs](https://hydra.cc/docs/next/tutorials/structured_config/schema/) 
-  that can be used to **fully or partially instantiate** objects in your application, using both user-specified and auto-populated configuration values.
+  that can be used to **fully or partially instantiate – or retrieve without instantiation –** objects in your application, using both user-specified and auto-populated configuration values.
   - The ability to launch hydra jobs, complete with parameter sweeps and multi-run configurations, from within a notebook or any
   other Python runtime.
   - Incisive type annotations that provide enriched context to IDEs, type checkers, and other tooling, about your project's
