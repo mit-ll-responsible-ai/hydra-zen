@@ -13,6 +13,7 @@ from typing import (
     Optional,
     Set,
     Tuple,
+    Type,
     Union,
     get_type_hints,
     overload,
@@ -207,7 +208,7 @@ class hydrated_dataclass:
         )
 
 
-def just(obj: Importable) -> Just[Importable]:
+def just(obj: Importable) -> Type[Just[Importable]]:
     """Produces a structured config that, when instantiated by hydra, 'just'
     returns ``obj``.
 
@@ -338,7 +339,7 @@ def builds(
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     **kwargs_for_target,
-) -> Union[Builds[Importable], PartialBuilds[Importable]]:
+) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]:
     """Produces a structured config (i.e. a dataclass) [1]_ that, when instantiated by hydra,
     initializes/calls ``target`` with the provided keyword arguments.
 

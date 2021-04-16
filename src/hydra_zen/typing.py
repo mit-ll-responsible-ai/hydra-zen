@@ -4,7 +4,7 @@
 from dataclasses import Field, _DataclassParams
 from typing import Any, Callable, Dict, Generic, Tuple, TypeVar
 
-from typing_extensions import Literal, Protocol
+from typing_extensions import Literal, Protocol, runtime_checkable
 
 __all__ = [
     "Importable",
@@ -48,30 +48,29 @@ class DataClass(Protocol):
     # Thus we add this __call__ method to make it look like objects
     # of type `Build` (which would be an *instance* of Build) are
     # instantiable
-    def __call__(self, *args, **kwargs) -> "DataClass":  # pragma: no cover
-        ...
+    # def __call__(self, *args, **kwargs) -> "DataClass":  # pragma: no cover
+    #     ...
 
     __dataclass_fields__: Dict[str, Field]
     __dataclass_params__: _DataclassParams
-    __mro__: Tuple[type, ...]
-    __name__: str
-    __qualname__: str
-    __module__: str
 
 
 class Instantiable(DataClass, Protocol[_T]):  # pragma: no cover
     _target_: str
 
 
+@runtime_checkable
 class Just(Instantiable, Protocol[_T]):
-    obj: str  # interpolated string for importing obj
-    _target_: str = "hydra_utils.funcs.identity"
+    path: str  # interpolated string for importing obj
+    _target_: str = "hydra_utils.funcs.get_obj"
 
 
+@runtime_checkable
 class Builds(Instantiable, Protocol[_T]):  # pragma: no cover
     _convert_: Literal["none", "partial", "all"]
     _recursive_: bool
 
 
+@runtime_checkable
 class PartialBuilds(Builds, Protocol[_T]):
     _partial_target_: str
