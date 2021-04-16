@@ -18,8 +18,16 @@ from hydra_zen.typing import Builds, Just, PartialBuilds
     ],
 )
 def test_runtime_checkability_of_protocols(fn, protocol):
-    conf = fn(dict)()
+    Conf = fn(dict)
+    assert isinstance(Conf, protocol)
+
+    conf = Conf()
     assert isinstance(conf, protocol)
 
 
-# def test_build_p:pass
+def test_Builds_is_not_PartialBuilds():
+    Conf = builds(dict)
+    assert not isinstance(Conf, PartialBuilds)
+
+    PConf = builds(dict, hydra_partial=True)
+    assert isinstance(PConf, Builds)
