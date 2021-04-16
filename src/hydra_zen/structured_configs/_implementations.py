@@ -184,7 +184,7 @@ class hydrated_dataclass:
         self._hydra_convert: Literal["none", "partial", "all"] = hydra_convert
         self._hydra_partial = hydra_partial
 
-    def __call__(self, decorated_obj: Any) -> Builds:
+    def __call__(self, decorated_obj: Any) -> Type[Builds]:
         if not isinstance(decorated_obj, type):
             raise NotImplementedError(
                 "Class instances are not supported by `hydrated_dataclass` (yet)."
@@ -293,7 +293,7 @@ def builds(
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     **kwargs_for_target,
-) -> Builds[Importable]:  # pragma: no cover
+) -> Type[Builds[Importable]]:  # pragma: no cover
     ...
 
 
@@ -309,7 +309,7 @@ def builds(
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     **kwargs_for_target,
-) -> PartialBuilds[Importable]:  # pragma: no cover
+) -> Type[PartialBuilds[Importable]]:  # pragma: no cover
     ...
 
 
@@ -325,7 +325,9 @@ def builds(
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     **kwargs_for_target,
-) -> Union[Builds[Importable], PartialBuilds[Importable]]:  # pragma: no cover
+) -> Union[
+    Type[Builds[Importable]], Type[PartialBuilds[Importable]]
+]:  # pragma: no cover
     ...
 
 
@@ -614,7 +616,7 @@ def builds(
     #       if they were explicitly specified by the user?
     #       - Presently we always need to write these, otherwise inheritance
     #         becomes an issue (as it is with _partial_target_
-    base_fields: List[Union[Tuple[str, type], Field_Entry]] = target_field + [
+    base_fields: List[Tuple[str, type, Field_Entry]] = target_field + [
         ("_recursive_", bool, field(default=hydra_recursive, init=False)),
         ("_convert_", str, field(default=hydra_convert, init=False)),
     ]
