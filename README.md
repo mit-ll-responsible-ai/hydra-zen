@@ -70,7 +70,9 @@ def gradient_descent(*, starting_xy, optim, num_steps, landscape_fn):
     of x,y values"""
     xy = tr.tensor(starting_xy, requires_grad=True)
     trajectory = [xy.detach().clone().numpy()]
-
+    
+    # `optim` is only partially instantiated and needs
+    # to be passed the tensor parameter  
     optim = optim([xy])
 
     for i in range(num_steps):
