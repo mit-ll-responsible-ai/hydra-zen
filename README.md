@@ -127,13 +127,13 @@ num_steps: 20
 optim:
   _target_: hydra_zen.funcs.partial
   _partial_target_:
-    _target_: hydra_zen.funcs.identity
-    obj: ${hydra_zen_get_obj:torch.optim.sgd.SGD}
+    _target_: hydra_zen.funcs.get_obj
+    path: torch.optim.sgd.SGD
   _recursive_: true
   _convert_: none
   lr: 0.3
   momentum: 0.0
 landscape_fn:
-  _target_: hydra_zen.funcs.identity
-  obj: ${hydra_zen_get_obj:__main__.parabaloid}
+  _target_: hydra_zen.funcs.get_obj
+  path: __main__.parabaloid
 ```
