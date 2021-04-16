@@ -31,7 +31,21 @@ Callable_T = TypeVar("Callable_T", bound=Callable)
 
 
 @overload
+def instantiate(
+    config: Type[Just[T]], *args: Any, **kwargs: Any
+) -> T:  # pragma: no cover
+    ...
+
+
+@overload
 def instantiate(config: Just[T], *args: Any, **kwargs: Any) -> T:  # pragma: no cover
+    ...
+
+
+@overload
+def instantiate(
+    config: Type[PartialBuilds[Type[T]]], *args: Any, **kwargs: Any
+) -> Partial[T]:  # pragma: no cover
     ...
 
 
@@ -51,7 +65,21 @@ def instantiate(
 
 @overload
 def instantiate(
+    config: Type[Builds[Type[T]]], *args: Any, **kwargs: Any
+) -> T:  # pragma: no cover
+    ...
+
+
+@overload
+def instantiate(
     config: Builds[Type[T]], *args: Any, **kwargs: Any
+) -> T:  # pragma: no cover
+    ...
+
+
+@overload
+def instantiate(
+    config: Type[Builds[Callable[..., T]]], *args: Any, **kwargs: Any
 ) -> T:  # pragma: no cover
     ...
 

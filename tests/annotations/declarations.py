@@ -30,23 +30,25 @@ partial_out: Partial[A] = instantiate(conf_a_partial)
 out_a: A = partial_out()
 
 f_sig = Callable[[int], int]
-conf_f_partial: PartialBuilds[f_sig] = builds(f, hydra_partial=True)
+conf_f_partial: Type[PartialBuilds[f_sig]] = builds(f, hydra_partial=True)
+conf_f_partial_instance = conf_f_partial()
 partial_out_f: Partial[f_sig] = instantiate(conf_f_partial)
+partial_out_f_via_instance: Partial[f_sig] = instantiate(conf_f_partial_instance)
 
 # test builds(..., hydra_partial=False)
-conf_A: Builds[Type[A]] = builds(A, hydra_partial=False)
-should_be_a_again: A = instantiate(conf_A)
+conf_A_1: Type[Builds[Type[A]]] = builds(A, hydra_partial=False)
+should_be_a_again: A = instantiate(conf_A_1)
 
-conf_f: Builds[f_sig] = builds(f, hydra_partial=False)
-should_be_int: int = instantiate(conf_f)
+conf_f_1: Builds[f_sig] = builds(f, hydra_partial=False)
+should_be_int: int = instantiate(conf_f_1)
 
 # test builds(...)
-conf_A: Builds[Type[A]] = builds(A)
-should_be_a_again_again: A = instantiate(conf_A)
+conf_A_2: Builds[Type[A]] = builds(A)
+should_be_a_again_again: A = instantiate(conf_A_2)
 
-conf_f: Builds[f_sig] = builds(f)
-should_be_int_again: int = instantiate(conf_f)
+conf_f_2: Builds[f_sig] = builds(f)
+should_be_int_again: int = instantiate(conf_f_2)
 
 # test just(...)
-conf_just_f: Just[f_sig] = just(f)
-conf_just_A: Just[Type[A]] = just(A)
+conf_just_f: Type[Just[f_sig]] = just(f)
+conf_just_A: Type[Just[Type[A]]] = just(A)
