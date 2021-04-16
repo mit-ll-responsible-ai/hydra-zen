@@ -7,10 +7,14 @@ that these functions have a legible module-path when they appear in configuratio
 
 import functools as _functools
 import typing as _typing
+from typing import Any, Callable, Union
+
+from hydra._internal import utils as hydra_internal_utils
+from hydra.utils import log
 
 _T = _typing.TypeVar("_T")
 
-__all__ = ["partial", "identity"]
+__all__ = ["partial", "get_obj"]
 
 
 def partial(_partial_target_: _typing.Callable, *args, **kwargs) -> _typing.Callable:
@@ -18,6 +22,11 @@ def partial(_partial_target_: _typing.Callable, *args, **kwargs) -> _typing.Call
     return _functools.partial(_partial_target_, *args, **kwargs)
 
 
-def identity(obj: _T) -> _T:
-    """Returns ``obj`` unchanged."""
-    return obj
+def get_obj(path: str) -> Union[type, Callable[..., Any]]:
+    """Imports an object given the specified path."""
+    try:
+        cl = hydra_internal_utils._locate(path)
+        return cl
+    except Exception as e:  # pragma: no cover
+        log.error(f"Error getting callable at {path} : {e}")
+        raise e

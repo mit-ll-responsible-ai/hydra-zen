@@ -19,7 +19,7 @@ from typing import (
 
 from typing_extensions import Final, Literal
 
-from hydra_zen.funcs import identity, partial
+from hydra_zen.funcs import get_obj, partial
 from hydra_zen.structured_configs import _utils
 from hydra_zen.typing import Builds, Importable, Instantiable, Just, PartialBuilds
 
@@ -260,13 +260,13 @@ def just(obj: Importable) -> Just[Importable]:
             (
                 _TARGET_FIELD_NAME,
                 str,
-                field(default=_utils.get_obj_path(identity), init=False),
+                field(default=_utils.get_obj_path(get_obj), init=False),
             ),
             (
-                "obj",
-                Any,
+                "path",
+                str,
                 field(
-                    default=_utils.interpolated("hydra_zen_get_obj", obj_path),
+                    default=obj_path,
                     init=False,
                 ),
             ),

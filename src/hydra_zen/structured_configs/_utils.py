@@ -5,9 +5,6 @@ from dataclasses import is_dataclass
 from enum import Enum
 from typing import Any, Callable, Tuple, TypeVar, Union
 
-import hydra._internal.utils as hydra_internal_utils
-from hydra.utils import log
-from omegaconf import OmegaConf
 from typing_extensions import Final
 
 from hydra_zen.typing import Importable
@@ -91,19 +88,6 @@ def interpolated(func: Union[str, Callable], *literals: Any) -> str:
         )
     name = func if isinstance(func, str) else func.__name__
     return f"${{{name}:{','.join(str(i) for i in literals)}}}"
-
-
-def get_obj(path: str) -> Union[type, Callable[..., Any]]:
-    """Imports an object given the specified path."""
-    try:
-        cl = hydra_internal_utils._locate(path)
-        return cl
-    except Exception as e:  # pragma: no cover
-        log.error(f"Error getting callable at {path} : {e}")
-        raise e
-
-
-OmegaConf.register_new_resolver("hydra_zen_get_obj", get_obj, use_cache=False)
 
 
 def sanitized_type(type_: type) -> type:
