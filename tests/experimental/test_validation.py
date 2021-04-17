@@ -11,7 +11,25 @@ from hydra_zen.experimental._implementations import _load_config, _store_config
 
 
 @pytest.mark.usefixtures("cleandir")
-def test_hydra_launch_with_hydra_in_config():
+@pytest.mark.parametrize(
+    "override_args, expected",
+    [
+        [
+            dict(overrides=["a=2"]),
+            dict(a=2, b=10),
+        ],
+        [
+            dict(multirun_overrides=["a=2,3"]),
+            [dict(a=2, b=10), dict(a=3, b=10)],
+        ],
+        [dict(overrides=["a=2", "b=100"]), dict(a=2, b=100)],
+        [
+            dict(overrides=["b=12"], multirun_overrides=["a=2,3"]),
+            [dict(a=2, b=12), dict(a=3, b=12)],
+        ],
+    ],
+)
+def test_hydra_launch_with_hydra_in_config(override_args, expected):
     # validate hydra_launch executes properly if config contains
     # hydra configuration object
     cn = _store_config(builds(dict, a=1, b=1))
@@ -23,31 +41,12 @@ def test_hydra_launch_with_hydra_in_config():
     task_cfg.b = 10
 
     # override works and user value is set
-    job = hydra_launch(task_cfg, task_function=tf, overrides=["a=2"])
-    assert job.return_value == dict(a=2, b=10)
-
-    jobs = hydra_launch(
-        task_cfg,
-        task_function=tf,
-        multirun_overrides=["a=2,3"],
-    )
-    for i, j in enumerate(jobs[0]):
-        assert j.return_value["a"] == i + 2
-        assert j.return_value["b"] == 10
-
-    # overrides user value
-    job = hydra_launch(task_cfg, task_function=tf, overrides=["a=2", "b=100"])
-    assert job.return_value == dict(a=2, b=100)
-
-    jobs = hydra_launch(
-        task_cfg,
-        task_function=tf,
-        overrides=["b=12"],
-        multirun_overrides=["a=2,3"],
-    )
-    for i, j in enumerate(jobs[0]):
-        assert j.return_value["a"] == i + 2
-        assert j.return_value["b"] == 12
+    job = hydra_launch(task_cfg, task_function=tf, **override_args)
+    if isinstance(job, list):
+        for e, j in zip(expected, job[0]):
+            assert j.return_value == e
+    else:
+        assert job.return_value == expected
 
 
 @pytest.mark.usefixtures("cleandir")
