@@ -32,34 +32,9 @@ pip install hydra-zen
 Let's use hydra-zen to configure an "experiment" that measures the impact of [momentum](https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Momentum) when performing [gradient descent](https://en.wikipedia.org/wiki/Gradient_descent)
 down a 2D parabolic surface. 
 
-```python
-from dataclasses import dataclass
-from typing import Any, Tuple
+The following function uses PyTorch to perform gradient descent down our surface (a.k.a "landscape")
+and recording the trajectory traveled (returned as a NumPy-array of x-y coordinates).
 
-from torch.optim import SGD
-
-from hydra_zen import builds, just
-
-# defines our surface that we will be descending
-def parabaloid(x, y):
-    return 0.1 * x ** 2 + 0.2 * y ** 2
-
-# defines the configuration for our experiment
-@dataclass
-class ExpConfig:
-    starting_xy: Tuple[float, float] = (-1.5, 0.5)
-    num_steps: int = 20
-    optim: Any = builds(SGD, lr=0.3, momentum=0.0, hydra_partial=True)  # type: Type[PartialBuilds[Type[SGD]]]
-    landscape_fn: Any = just(parabaloid)  # type: Type[Just[(Any, Any) -> Any]]
-```
-
-Each `builds(<target>, ...)` and `just(<target>)` call creates a dataclass, which serves as a structured config for that `<target>`.
-We can use `builds` configure an object to be either fully or partially instantiated using a combination of
-user-provided and default values, and use `just` to have an object be returned without calling or instantiating it.
-
-The resulting dataclass represents our experiment's configuration, from which we can adjust the starting condition, the number of
-steps taken, the optimization method used, and even the landscape to be used. It will configure
-the following function:
 
 ```python
 import torch as tr
@@ -68,7 +43,19 @@ import numpy as np
 
 def gradient_descent(*, starting_xy, optim, num_steps, landscape_fn):
     """Performs gradient descent down `landscape_fn`, and returns a trajectory
-    of x,y values"""
+    of x,y values
+    
+    Parameters
+    ----------
+    starting_xy : Tuple[float, float]
+    optim : torch.optim.Optimizer
+    num_steps : int
+    landscape_fn : (x: Tensor, y: Tensor) -> z: Tensor
+    
+    Returns
+    -------
+    ndarray, shape-(num_steps + 1, 2)
+    """
     xy = tr.tensor(starting_xy, requires_grad=True)
     trajectory = [xy.detach().clone().numpy()]
     
@@ -85,7 +72,73 @@ def gradient_descent(*, starting_xy, optim, num_steps, landscape_fn):
     return np.stack(trajectory)
 ```
 
-Let's launch multiple hydra jobs, each configured to perform gradient descent with a different momentum value
+
+We want run this function under different conditions – using different momentum values in our optimizer – to perform our analysis. 
+It is useful to be able to do this in a way that is easily configurable, repeatable, and scalable (e.g. run in parallel), 
+which is where Hydra and hydra-zen come into play. 
+                      
+We can write a dataclass that serves as a structured configuration of our function;
+hydra-zen makes short work of generating configurations for the various Python objects
+that we need in our function, like our optimizer and even our "landscape" function.
+
+```python
+from dataclasses import dataclass
+from typing import Any, Tuple
+
+from torch.optim import SGD
+
+from hydra_zen import builds, just
+
+# defines our surface that we will be descending
+def parabaloid(x, y):
+    return 0.1 * x ** 2 + 0.2 * y ** 2
+
+# defines the configuration for our experiment
+@dataclass
+class ExpConfig:
+    # `optim` is configured as a partial-instantiation of SGD.
+    # (we wont fully instantiate it until we have access to the
+    # tensor that we are optimizing in our function). 
+    optim: Any = builds(SGD, lr=0.3, momentum=0.0, hydra_partial=True)  # type: Type[PartialBuilds[Type[SGD]]]
+    
+    # `landscape_fn` is configured to be 'just' the un-instantiated the 
+    # `parabaloid` function 
+    landscape_fn: Any = just(parabaloid)  # type: Type[Just[(Any, Any) -> Any]]
+    
+    starting_xy: Tuple[float, float] = (-1.5, 0.5)
+    num_steps: int = 20
+```
+
+Each `builds(<target>, ...)` and `just(<target>)` call creates a dataclass that configures `<target>`.
+
+Thus `ExpConfig` can be used to configure our experiment.
+Let's see what this configuration looks like as a yaml file (which Hydra can use to run configure
+and run our function from the commandline):
+
+```python
+>>> from hydra_zen import to_yaml  # an alias for OmegaConf.to_yaml
+>>> print(to_yaml(ExpConfig))
+starting_xy:
+- -1.5
+- 0.5
+num_steps: 20
+optim:
+  _target_: hydra_zen.funcs.partial
+  _partial_target_:
+    _target_: hydra_zen.funcs.get_obj
+    path: torch.optim.sgd.SGD
+  _recursive_: true
+  _convert_: none
+  lr: 0.3
+  momentum: 0.0
+landscape_fn:
+  _target_: hydra_zen.funcs.get_obj
+  path: __main__.parabaloid
+```
+
+This structured configuration of our function can have its various configurable parameters overriden
+before it is used to instantiate the objects that are needed by our function.
+Let's launch multiple hydra jobs, and configure each one to perform gradient descent with a different momentum value.
 
 ```python
 >>> from hydra_zen import instantiate  # annotated alias of hydra.utils.instantiate
@@ -115,30 +168,14 @@ sake of legibility):
 
 
 
-`ExpConfig` is a standard structured config, thus it can used directly by Hydra to configure and run our application from the commandline.
-Hydra can also serialize it to a yaml configuration file
+It must be emphasized that `ExpConfig` is a standard structured config, and thus it is fully compatible
+with all standard Hydra workflows – one is not required to use `hydra_zen.experimental.hydra_launch`
 
-```python
->>> from hydra_zen import to_yaml  # an alias for OmegaConf.to_yaml
->>> print(to_yaml(ExpConfig))
-starting_xy:
-- -1.5
-- 0.5
-num_steps: 20
-optim:
-  _target_: hydra_zen.funcs.partial
-  _partial_target_:
-    _target_: hydra_zen.funcs.get_obj
-    path: torch.optim.sgd.SGD
-  _recursive_: true
-  _convert_: none
-  lr: 0.3
-  momentum: 0.0
-landscape_fn:
-  _target_: hydra_zen.funcs.get_obj
-  path: __main__.parabaloid
-```
-
+As your project grows in size, the process of configuring your experiments and applications can become 
+highly cumbersome and end up a source of substantial technical debt.
+The tools supplied by hydra-zen helps to keep this configuration process sleek, explicit, and
+easy to reason about. Ultimately, hydra-zen it promotes a Python-centric worfkflows that are 
+configurable, repeatable, and scalable.
 
 ## Disclaimer
 DISTRIBUTION STATEMENT A. Approved for public release. Distribution is unlimited.
