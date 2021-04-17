@@ -148,7 +148,7 @@ def to_yaml(cfg: Any, *, resolve: bool = False, sort_keys: bool = False) -> str:
     resolve : bool, optional (default=False)
         If `True`, interpolated fields in `cfg` will be resolved in the yaml.
 
-    sort_keys : bool
+    sort_keys : bool, optional (default=False)
         If `True`, the yaml's entries will alphabetically ordered.
 
     Returns
