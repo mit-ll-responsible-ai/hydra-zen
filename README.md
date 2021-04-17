@@ -7,7 +7,7 @@
 hydra-zen helps you configure your project using the power of [Hydra](https://github.com/facebookresearch/hydra), while enjoying the [Zen of Python](https://www.python.org/dev/peps/pep-0020/)!
 
 It provides simple, Hydra-compatible tools that enable Python-centric workflows for designing and configuring large-scale
-projects, such as machine learning experiments.
+projects such as machine learning experiments.
 Configure and run your applications without leaving Python!
 
 hydra-zen offers:
@@ -84,15 +84,11 @@ def gradient_descent(*, starting_xy, optim, num_steps, landscape_fn):
 ```
 
 
-To configure this function in a simple but expressive way, we define a dataclass that Hydra 
-recognizes as a "structured config".
-hydra-zen makes short work of generating configurations for the various Python objects
-that we need in our function: our optimizer class and our "landscape" function.
+To configure this function we'll define a dataclass that Hydra recognizes as a "structured config".
+hydra-zen makes short work of generating a configuration that can "build" `gradient_descent` along with
+the various Python objects that we want to pass to it.
 
 ```python
-from dataclasses import dataclass
-from typing import Any, Tuple
-
 from torch.optim import SGD
 
 from hydra_zen import builds, just
@@ -101,46 +97,50 @@ from hydra_zen import builds, just
 def parabaloid(x, y):
     return 0.1 * x ** 2 + 0.2 * y ** 2
 
-# defines the configuration for our experiment
-@dataclass
-class ExpConfig:
-    # `optim` is configured as a partial-instantiation of SGD.
-    # (we wont fully instantiate it until we have access to the
-    # tensor that we are optimizing in our function). 
-    optim: Any = builds(SGD, lr=0.3, momentum=0.0, hydra_partial=True)  # type: Type[PartialBuilds[Type[SGD]]]
-    
-    # `landscape_fn` is configured to be 'just' the un-instantiated the 
-    # `parabaloid` function 
-    landscape_fn: Any = just(parabaloid)  # type: Type[Just[(Any, Any) -> Any]]
-    
-    starting_xy: Tuple[float, float] = (-1.5, 0.5)
-    num_steps: int = 20
+# Defines dataclasses that configure `gradient_descent`
+# and its parameters. Invalid parameter names will be caught here.
+ConfigGradDesc = builds(
+    gradient_descent,
+    optim=builds(SGD, lr=0.3, momentum=0.0, hydra_partial=True),
+    landscape_fn=just(parabaloid),
+    starting_xy=(-1.5, 0.5),
+    num_steps=20,
+)
+
+# ConfigGradDesc              : Type[Builds[Type[gradient_descent]]]
+# ConfigGradDesc.optim        : Type[PartialBuilds[Type[SGD]]]
+# ConfigGradDesc.landscape_fn : Type[Just[Type[parabaloid]]]
+# ConfigGradDesc.starting_xy  : Tuple[int, int]
+# ConfigGradDesc.num_steps    : int
 ```
 
 Each `builds(<target>, ...)` and `just(<target>)` call creates a dataclass that configures the target object.
 `builds` can both auto-populate the configuration based on the target's signature and incorporate user-specified
 defaults.
-Thus these parameters - even nested ones – can be accessed and modified in an intuitive way:
+Thus `ConfigGradDesc` is simply a dataclass, and its parameters – even nested ones – can be accessed and modified in 
+an intuitive way:
 
 ```python
->>> ExpConfig.num_steps
-20 
->>> ExpConfig.optim.momentum
+>>> ConfigGradDesc
+types.Builds_gradient_descent
+
+>>> ConfigGradDesc.num_steps
+20
+
+>>> ConfigGradDesc.optim
+types.PartialBuilds_SGD
+>>> ConfigGradDesc.optim.momentum
 0.0
->>> ExpConfig.landscape_fn.path
-'__main__.parabaloid'
 ```
 
-Let's see what this configuration looks like as a yaml file (which Hydra can use to configure
-and run our function from the commandline):
+Let's see what this configuration looks like as a yaml file:
 
 ```python
 >>> from hydra_zen import to_yaml  # an alias for OmegaConf.to_yaml
->>> print(to_yaml(ExpConfig))
-starting_xy:
-- -1.5
-- 0.5
-num_steps: 20
+>>> print(to_yaml(ConfigGradDesc))
+_target_: __main__.gradient_descent
+_recursive_: true
+_convert_: none
 optim:
   _target_: hydra_zen.funcs.partial
   _partial_target_:
@@ -153,21 +153,30 @@ optim:
 landscape_fn:
   _target_: hydra_zen.funcs.get_obj
   path: __main__.parabaloid
+starting_xy:
+- -1.5
+- 0.5
+num_steps: 20
 ```
 
 Suppose that we want to run `gradient_descent` using the `SGD` optimizer configured with different momentum
 values. We don't need to write boiler plate code to expose this particular parameter of this particular object in order
-to adjust its value; Hydra makes it easy to override any of the above configured values.
-To see this, we'll launch multiple hydra jobs from a Python console (or notebook) and configure each one to perform 
+to adjust its value; Hydra makes it easy to override any of the above configured values and to recursively instantiate the
+objects in our configuration with these values.
+
+To demonstrate this, we'll launch multiple Hydra jobs from a Python console (or notebook) and configure each one to perform 
 gradient descent with a different SDG-momentum value.
 
 ```python
 >>> from hydra_zen import instantiate  # annotated alias of hydra.utils.instantiate
 >>> from hydra_zen.experimental import hydra_launch
- 
+
+>>> # `instantiate(ConfigGradDesc)` recursively instantiates the objects 
+>>> # in our configuration and thus ultimately calls:
+>>> #   `gradient_descent(optim=partial(SGD, [...]), num_steps=20, [...])`
 >>> jobs = hydra_launch(
-...     ExpConfig,
-...     task_function=lambda cfg: gradient_descent(**instantiate(cfg)),
+...     ConfigGradDesc,
+...     task_function=instantiate,
 ...     multirun_overrides=["optim.momentum=0.0,0.2,0.4,0.6,0.8,1.0"],
 ... )
 [2021-04-15 21:49:40,635][HYDRA] Launching 6 jobs locally
@@ -180,17 +189,18 @@ gradient descent with a different SDG-momentum value.
 ```
 
 Let's plot the trajectories produced by these jobs 
-(omitting the [plot-function definition](https://gist.github.com/rsokl/c7e2ed1aab02b35208bb5b4c8051a931) for the sake of legibility):
+(omitting the [plot-function's definition](https://gist.github.com/rsokl/c7e2ed1aab02b35208bb5b4c8051a931) for the sake of legibility):
 
 ```python
->>> plot_jobs(jobs, fn=parabaloid)
+>>> func = instantiate(ConfigGradDesc.landscape_fn)  # Type[Just[Type[parabaloid]]] -> parabaloid
+>>> plot_jobs(jobs, fn=func)
 ```
 ![image](https://user-images.githubusercontent.com/29104956/114961883-b0b56580-9e37-11eb-9de1-87c8efc1780c.png)
 
 See that we could have configured _any_ aspect of this run in the same way. The learning rate, the number
 of steps taken, the optimizer used (along with _its_ parameters), and even the landscape-function traversed can all be re-configured
 and run in various combinations through this same succinct and explicit interface.
-This is the power of Hydra and the zen of Python!
+This is the combined power of Hydra and the zen of Python in full effect!
 
 
 ## Disclaimer
