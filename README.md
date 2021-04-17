@@ -18,6 +18,7 @@ hydra-zen offers:
   - Incisive type annotations that provide enriched context to IDEs, type checkers, and other tooling, about your project's
   configurations.
   - Runtime validation of configurations to catch mistakes before your application launches.
+  - Support for both object-oriented libraries (e.g. `torch.nn`) as well as functional ones (e.g. `jax` and `numpy`) 
 
 ## Installation
 `hydra-zen` is light weight: its dependencies are `hydra-core` and `typing-extensions`
