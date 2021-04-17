@@ -57,7 +57,7 @@ def gradient_descent(*, starting_xy, optim, num_steps, landscape_fn):
     Parameters
     ----------
     starting_xy : Tuple[float, float]
-    optim : torch.optim.Optimizer
+    optim : Type[torch.optim.Optimizer]
     num_steps : int
     landscape_fn : (x: Tensor, y: Tensor) -> Tensor
     
@@ -68,9 +68,9 @@ def gradient_descent(*, starting_xy, optim, num_steps, landscape_fn):
     xy = torch.tensor(starting_xy, requires_grad=True)
     trajectory = [xy.detach().clone().numpy()]
     
-    # `optim` is only partially instantiated and needs
-    # to be passed the tensor parameter  
-    optim = optim([xy])
+    # `optim` needs to be instantiated with 
+    # the tensor parameter(s) to be updated
+    optim : torch.optim.Optimizer = optim([xy])
 
     for i in range(num_steps):
         z = landscape_fn(*xy)
