@@ -37,8 +37,8 @@ and records the trajectory traveled (returned as a NumPy-array of x-y coordinate
 
 
 ```python
-import torch as tr
-import numpy as np
+import torch
+import numpy
 
 
 def gradient_descent(*, starting_xy, optim, num_steps, landscape_fn):
@@ -56,7 +56,7 @@ def gradient_descent(*, starting_xy, optim, num_steps, landscape_fn):
     -------
     ndarray, shape-(num_steps + 1, 2)
     """
-    xy = tr.tensor(starting_xy, requires_grad=True)
+    xy = torch.tensor(starting_xy, requires_grad=True)
     trajectory = [xy.detach().clone().numpy()]
     
     # `optim` is only partially instantiated and needs
@@ -69,7 +69,7 @@ def gradient_descent(*, starting_xy, optim, num_steps, landscape_fn):
         z.backward()
         optim.step()
         trajectory.append(xy.detach().clone().numpy())
-    return np.stack(trajectory)
+    return numpy.stack(trajectory)
 ```
 
 
