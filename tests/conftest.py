@@ -8,12 +8,17 @@ import tempfile
 import pytest
 
 try:
-    import numpy
+    import numpy  # add to sys.modules
 except ImportError:
     pass
 
 try:
     import torch
+except ImportError:
+    pass
+
+try:
+    import jax
 except ImportError:
     pass
 
@@ -26,6 +31,7 @@ if sys.version_info < (3, 8):
 OPTIONAL_TEST_DEPENDENCIES = (
     "numpy",
     "torch",
+    "jax"
 )
 
 for module in OPTIONAL_TEST_DEPENDENCIES:

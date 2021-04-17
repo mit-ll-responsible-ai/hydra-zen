@@ -23,39 +23,12 @@ from typing_extensions import Final, Literal
 
 from hydra_zen.funcs import get_obj, partial
 from hydra_zen.structured_configs import _utils
-from hydra_zen.typing import Builds, Importable, Instantiable, Just, PartialBuilds
+from hydra_zen.typing import Builds, Importable, Just, PartialBuilds
 
 __all__ = ["builds", "just", "hydrated_dataclass", "mutable_value"]
 
 _TARGET_FIELD_NAME: Final[str] = "_target_"
 _PARTIAL_TARGET_FIELD_NAME: Final[str] = "_partial_target_"
-
-
-def _check_importable_path(obj: Any):
-    """
-    Raises if `obj` is defined in unreachable namespace
-
-    Parameters
-    ----------
-    obj : Any
-
-    Raises
-    ------
-    ModuleNotFoundError
-
-    Examples
-    --------
-    >>> def outer_scope():
-    ...     def unimportable(): pass
-    ...     _check_importable_path(unimportable)  # raises
-    """
-    path = _utils.get_obj_path(obj)
-    # catches "<locals>" and "<unknown>"
-    if "<" in path:
-        name = _utils.safe_name(obj)
-        raise ModuleNotFoundError(
-            f"{name} is not importable from path: {_utils.get_obj_path(obj)}"
-        )
 
 
 def mutable_value(x: Any) -> Field:
@@ -253,8 +226,6 @@ def just(obj: Importable) -> Type[Just[Importable]]:
         raise AttributeError(
             f"`just({obj})`: `obj` is not importable; it is missing the attributes `__module__` and/or `__qualname__`"
         )
-
-    _check_importable_path(obj)
 
     out_class = make_dataclass(
         ("Just_" + _utils.safe_name(obj)),
@@ -601,8 +572,6 @@ def builds(
             _utils.building_error_prefix(target)
             + "`builds(..., hydra_partial=True)` requires that `hydra_recursive=True`"
         )
-
-    _check_importable_path(target)
 
     if hydra_partial is True:
         target_field = [
