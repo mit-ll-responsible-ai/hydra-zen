@@ -112,7 +112,7 @@ class ExpConfig:
 Each `builds(<target>, ...)` and `just(<target>)` call creates a dataclass that configures `<target>`.
 
 Thus `ExpConfig` can be used to configure our experiment.
-Let's see what this configuration looks like as a yaml file (which Hydra can use to run configure
+Let's see what this configuration looks like as a yaml file (which Hydra can use to configure
 and run our function from the commandline):
 
 ```python
