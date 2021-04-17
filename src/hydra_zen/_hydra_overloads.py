@@ -22,8 +22,12 @@ E.g.
 from typing import Any, Callable, Type, TypeVar, overload
 
 from hydra.utils import instantiate as hydra_instantiate
+from omegaconf import OmegaConf
 
 from .typing import Builds, Just, Partial, PartialBuilds
+
+__all__ = ["instantiate", "to_yaml"]
+
 
 T = TypeVar("T")
 
@@ -128,3 +132,42 @@ def instantiate(config: Any, *args, **kwargs) -> Any:
     >>> instantiate(config, (1, 2, 3))  # static analysis can deduce that the result type is `list`
     [1, 2, 3]"""
     return hydra_instantiate(config, *args, **kwargs)
+
+
+def to_yaml(cfg: Any, *, resolve: bool = False, sort_keys: bool = False) -> str:
+    """
+    Returns yaml-formatted text representation of `cfg`.
+
+    This is an alias of `omegaconf.Omegaconf.to_yaml`.
+
+    Parameters
+    ----------
+    cfg : Any
+        A valid configuration object (e.g. DictConfig, ListConfig, dataclass).
+
+    resolve : bool, optional (default=False)
+        If `True`, interpolated fields in `cfg` will be resolved in the yaml.
+
+    sort_keys : bool
+        If `True`, the yaml's entries will alphabetically ordered.
+
+    Returns
+    -------
+    yaml : str
+
+    Examples
+    --------
+    >>> from hydra_zen import builds, to_yaml
+    >>> cfg = builds(dict, a=builds(dict, b=2))  # structured config of nested dictionaries
+    >>> print(to_yaml(cfg))
+    _target_: builtins.dict
+    _recursive_: true
+    _convert_: none
+    a:
+      _target_: builtins.dict
+      _recursive_: true
+      _convert_: none
+      b: 2
+
+    """
+    return OmegaConf.to_yaml(cfg=cfg, resolve=resolve, sort_keys=sort_keys)
