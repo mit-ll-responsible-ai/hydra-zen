@@ -39,19 +39,19 @@ Ultimately, hydra-zen promotes Python-centric workflows that are configurable, r
 ## Basic Usage
 
 Let's use hydra-zen to configure an "experiment" that measures the impact of [momentum](https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Momentum) when performing [gradient descent](https://en.wikipedia.org/wiki/Gradient_descent)
-down a 2D parabolic surface. 
+down a 2D parabolic surface. The following function uses PyTorch to perform gradient descent (via a user-specified optimizer)
+down a given "landscape" function.
 
-The following function is a toy example that uses PyTorch to perform gradient descent down a surface (a.k.a "landscape").
-This does not involve hydra-zen, but we will use hydra-zen to configure the ways in which we run this function.
 
 
 ```python
 import torch
 import numpy
 
-# This is the function that we will run under various configurations 
-# in order to perform our analysis. 
 # This code does not involve hydra-zen in any way.
+#
+# This is the function that we will run under various configurations 
+# in order to perform our analysis.
 def gradient_descent(*, starting_xy, optim, num_steps, landscape_fn):
     """
     Parameters
@@ -162,7 +162,7 @@ values. We don't need to write boiler plate code to expose this particular param
 to adjust its value; Hydra makes it easy to override any of the above configured values and to recursively instantiate the
 objects in our configuration with these values.
 
-To demonstrate this, we'll launch multiple Hydra jobs from a Python console (or notebook) and configure each one to perform 
+To demonstrate this, we'll use hydra-zen to launch multiple jobs from a Python console (or notebook) and configure each one to perform 
 gradient descent with a different SDG-momentum value.
 
 ```python
