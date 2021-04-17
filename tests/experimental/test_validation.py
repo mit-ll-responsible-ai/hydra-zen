@@ -5,21 +5,35 @@ import pytest
 from hydra.core.config_store import ConfigStore
 from hydra.errors import ConfigCompositionException
 
-from hydra_zen import builds
+from hydra_zen import builds, instantiate
 from hydra_zen.experimental import hydra_launch
 from hydra_zen.experimental._implementations import _load_config, _store_config
 
 
 @pytest.mark.usefixtures("cleandir")
-def test_hydra_launch_with_overrides_not_needed():
-    # hydra config is loaded into task_cfg, so overrides is not used
+def test_hydra_launch_with_hydra_in_config():
+    # validate hydra_launch executes properly if config contains
+    # hydra configuration object
     cn = _store_config(builds(dict, a=1, b=1))
     task_cfg = _load_config(cn)
+    assert "hydra" in task_cfg
 
-    with pytest.raises(ValueError):
-        hydra_launch(
-            task_cfg, task_function=lambda _: print("hello"), overrides=["a=1,2"]
-        )
+    # Provide user override
+    task_cfg.b = 10
+
+    job = hydra_launch(
+        task_cfg, task_function=lambda cfg: instantiate(cfg), overrides=["a=2"]
+    )
+    assert job.return_value == dict(a=2, b=10)
+
+    jobs = hydra_launch(
+        task_cfg,
+        task_function=lambda cfg: instantiate(cfg),
+        multirun_overrides=["a=2,3"],
+    )
+    for i, j in enumerate(jobs[0]):
+        assert j.return_value["a"] == i + 2
+        assert j.return_value["b"] == 10
 
 
 @pytest.mark.usefixtures("cleandir")
