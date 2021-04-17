@@ -1,6 +1,5 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-import copy
 from pathlib import Path
 from typing import Any, Callable, List, Mapping, Optional, Union
 
@@ -216,16 +215,8 @@ def hydra_launch(
     >>> [j.return_value for j in jobs[0]]
     [0.3054758310317993, 0.28910207748413086]
     """
-    if not OmegaConf.is_config(config) or not hasattr(config, "hydra"):
-        config_name = _store_config(config, config_name)
-        task_cfg = _load_config(config_name=config_name, overrides=overrides)
-    else:
-        overrides = [] if overrides is None else overrides
-        if len(overrides) > 0:
-            raise ValueError(
-                "Non-empty overrides provided with full config object already provided, did you mean `multirun_overrides`?"
-            )
-        task_cfg = copy.deepcopy(config)
+    config_name = _store_config(config, config_name)
+    task_cfg = _load_config(config_name=config_name, overrides=overrides)
 
     if config_dir is not None:
         config_dir = str(Path(config_dir).absolute())
