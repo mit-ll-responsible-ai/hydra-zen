@@ -33,7 +33,7 @@ Let's use hydra-zen to configure an "experiment" that measures the impact of [mo
 down a 2D parabolic surface. 
 
 The following function uses PyTorch to perform gradient descent down our surface (a.k.a "landscape")
-and recording the trajectory traveled (returned as a NumPy-array of x-y coordinates).
+and records the trajectory traveled (returned as a NumPy-array of x-y coordinates).
 
 
 ```python
@@ -50,7 +50,7 @@ def gradient_descent(*, starting_xy, optim, num_steps, landscape_fn):
     starting_xy : Tuple[float, float]
     optim : torch.optim.Optimizer
     num_steps : int
-    landscape_fn : (x: Tensor, y: Tensor) -> z: Tensor
+    landscape_fn : (x: Tensor, y: Tensor) -> Tensor
     
     Returns
     -------
