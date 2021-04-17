@@ -8,9 +8,13 @@ from typing import Any, Callable, Tuple, TypeVar, Union
 
 from typing_extensions import Final
 
-from hydra_zen.typing import Importable
-
-COMMON_MODULES_WITH_OBFUSCATED_IMPORTS: Tuple[str, ...] = ("numpy",)
+COMMON_MODULES_WITH_OBFUSCATED_IMPORTS: Tuple[str, ...] = (
+    "numpy",
+    "numpy.random",
+    "jax.numpy",
+    "jax",
+    "torch",
+)
 UNKNOWN_NAME: Final[str] = "<unknown>"
 HYDRA_SUPPORTED_PRIMITIVES: Final = {int, float, bool, str, Enum}
 KNOWN_MUTABLE_TYPES = (list, dict, set)
@@ -37,24 +41,38 @@ def building_error_prefix(target) -> str:
     return f"Building: {safe_name(target)} ..\n"
 
 
-def get_obj_path(obj: Importable) -> str:
+def get_obj_path(obj: Any) -> str:
     name = safe_name(obj, repr_allowed=False)
 
     if name == UNKNOWN_NAME:
         raise AttributeError(f"{obj} does not have a `__name__` attribute")
 
-    try:
-        module = obj.__module__
-    except AttributeError as e:
-        for module in COMMON_MODULES_WITH_OBFUSCATED_IMPORTS:
-            # NumPy's ufuncs do not have an inspectable `__module__` attribute, so we
-            # check to see if the object lives in NumPy's top-level namespace.
-            #
-            # This can be used for other libraries as well
-            if hasattr(sys.modules.get(module), obj.__name__):
+    module = getattr(obj, "__module__", None)
+    
+    if "<" in name or module is None:
+        # NumPy's ufuncs do not have an inspectable `__module__` attribute, so we
+        # check to see if the object lives in NumPy's top-level namespace.
+        #
+        # or..
+        #
+        # Qualname produced a name from a local namespace.
+        # E.g. jax.numpy.add.__qualname__ is '_maybe_bool_binop.<locals>.fn'
+        # Thus we defer to the name of the object and look for it in the
+        # top-level namespace of the known suspects
+        #
+        # or...
+        #
+        # module is None, which is apparently a thing..: numpy.random.rand.__module__ is None
+        
+        # don't use qualname for obfuscated paths
+        name = obj.__name__
+        for new_module in COMMON_MODULES_WITH_OBFUSCATED_IMPORTS:
+            if getattr(sys.modules.get(new_module), name, None) is obj:
+                module = new_module
                 break
         else:  # pragma: no cover
-            raise e
+            name = safe_name(obj)
+            raise ModuleNotFoundError(f"{name} is not importable")
 
     return f"{module}.{name}"
 

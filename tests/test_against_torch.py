@@ -14,13 +14,38 @@ from torch.optim import Adam, AdamW
 from hydra_zen import builds, hydrated_dataclass, instantiate, just
 from hydra_zen.structured_configs._utils import safe_name
 
+torch_objects = [
+    tr.softmax,
+    tr.tensor,
+    tr.randn,
+    tr.is_tensor,
+    tr.as_strided,
+    tr.Tensor,
+    tr.dtype,
+    tr.empty,
+    tr.optim.Adam,
+    tr.nn.Linear,
+    tr.nn.ReLU,
+    tr.nn.Sequential,
+    tr.nn.BatchNorm1d,
+    tr.autograd.backward,
+    tr.autograd.grad,
+    tr.autograd.functional.jacobian,
+    tr.cuda.current_device,
+    tr.cuda.device_count,
+    tr.backends.cuda.is_built,
+    tr.distributed.is_available,
+    tr.distributions.distribution.Distribution,
+    tr.distributions.bernoulli.Bernoulli,
+    tr.fft.fft,
+    tr.jit.script,
+    tr.linalg.cholesky,
+    tr.overrides.get_ignored_functions,
+    tr.profiler.profile,
+]
 
-@pytest.mark.parametrize(
-    "obj",
-    [
-        Adam,
-    ],
-)
+
+@pytest.mark.parametrize("obj", torch_objects)
 def test_just_roundtrip(obj):
     assert instantiate(just(obj)) is obj
 
@@ -35,16 +60,7 @@ def test_safename_known(obj, expected_name):
     assert safe_name(obj) == expected_name
 
 
-@pytest.mark.parametrize(
-    "target",
-    [
-        tr.optim.Adam,
-        tr.nn.Linear,
-        tr.nn.ReLU,
-        tr.softmax,
-        tr.tensor,
-    ],
-)
+@pytest.mark.parametrize("target", torch_objects)
 @given(partial=st.booleans(), full_sig=st.booleans())
 def test_fuzz_build_validation_against_a_bunch_of_common_objects(
     target, partial: bool, full_sig: bool

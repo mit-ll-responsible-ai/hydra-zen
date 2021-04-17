@@ -26,6 +26,7 @@ if sys.version_info < (3, 8):
 OPTIONAL_TEST_DEPENDENCIES = (
     "numpy",
     "torch",
+    "jax"
 )
 
 for module in OPTIONAL_TEST_DEPENDENCIES:
