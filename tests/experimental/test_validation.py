@@ -18,22 +18,36 @@ def test_hydra_launch_with_hydra_in_config():
     task_cfg = _load_config(cn)
     assert "hydra" in task_cfg
 
+    tf = lambda cfg: instantiate(cfg)
     # Provide user override
     task_cfg.b = 10
 
-    job = hydra_launch(
-        task_cfg, task_function=lambda cfg: instantiate(cfg), overrides=["a=2"]
-    )
+    # override works and user value is set
+    job = hydra_launch(task_cfg, task_function=tf, overrides=["a=2"])
     assert job.return_value == dict(a=2, b=10)
 
     jobs = hydra_launch(
         task_cfg,
-        task_function=lambda cfg: instantiate(cfg),
+        task_function=tf,
         multirun_overrides=["a=2,3"],
     )
     for i, j in enumerate(jobs[0]):
         assert j.return_value["a"] == i + 2
         assert j.return_value["b"] == 10
+
+    # overrides user value
+    job = hydra_launch(task_cfg, task_function=tf, overrides=["a=2", "b=100"])
+    assert job.return_value == dict(a=2, b=100)
+
+    jobs = hydra_launch(
+        task_cfg,
+        task_function=tf,
+        overrides=["b=12"],
+        multirun_overrides=["a=2,3"],
+    )
+    for i, j in enumerate(jobs[0]):
+        assert j.return_value["a"] == i + 2
+        assert j.return_value["b"] == 12
 
 
 @pytest.mark.usefixtures("cleandir")
