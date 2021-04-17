@@ -8,12 +8,17 @@ import tempfile
 import pytest
 
 try:
-    import numpy
+    import numpy  # add to sys.modules
 except ImportError:
     pass
 
 try:
     import torch
+except ImportError:
+    pass
+
+try:
+    import jax
 except ImportError:
     pass
 
