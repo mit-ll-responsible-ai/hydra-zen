@@ -158,8 +158,8 @@ def to_yaml(cfg: Any, *, resolve: bool = False, sort_keys: bool = False) -> str:
     Examples
     --------
     >>> from hydra_zen import builds, to_yaml
-    >>> cfg = builds(dict, a=builds(dict, b=2))  # structured config of nested dictionaries
-    >>> print(to_yaml(cfg))
+    >>> cfg = builds(dict, a=builds(dict, b="${a}"))  # structured config of nested dictionaries
+    >>> print(to_yaml(cfg, resolve=True))
     _target_: builtins.dict
     _recursive_: true
     _convert_: none
@@ -167,7 +167,6 @@ def to_yaml(cfg: Any, *, resolve: bool = False, sort_keys: bool = False) -> str:
       _target_: builtins.dict
       _recursive_: true
       _convert_: none
-      b: 2
-
+      b: 1
     """
     return OmegaConf.to_yaml(cfg=cfg, resolve=resolve, sort_keys=sort_keys)
