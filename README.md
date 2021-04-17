@@ -53,9 +53,7 @@ import numpy
 # in order to perform our analysis. 
 # This code does not involve hydra-zen in any way.
 def gradient_descent(*, starting_xy, optim, num_steps, landscape_fn):
-    """Performs gradient descent down `landscape_fn`, and returns a trajectory
-    of x,y values.
-    
+    """
     Parameters
     ----------
     starting_xy : Tuple[float, float]
