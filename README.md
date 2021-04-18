@@ -105,6 +105,8 @@ ConfigGradDesc = builds(
     num_steps=20,
 )
 
+# `hydra_zen.typing` provides: `Builds`, `PartialBuilds`, and `Just` 
+# 
 # ConfigGradDesc              : Type[Builds[Type[gradient_descent]]]
 # ConfigGradDesc.optim        : Type[PartialBuilds[Type[SGD]]]
 # ConfigGradDesc.landscape_fn : Type[Just[Type[parabaloid]]]
@@ -124,37 +126,33 @@ types.Builds_gradient_descent
 
 >>> ConfigGradDesc.num_steps
 20
+>>> ConfigGradDesc.starting_xy
+(-1.5, 0.5)
 
 >>> ConfigGradDesc.optim
 types.PartialBuilds_SGD
 >>> ConfigGradDesc.optim.momentum
 0.0
+>>> ConfigGradDesc.optim.lr
+0.3
+
+>>> ConfigGradDesc.landscape_fn.path
+'__main__.parabaloid'
 ```
 
-Let's see what this configuration looks like as a yaml file:
+Hydra provides us with a powerful means of recursively instantiating the objects that are
+configured by these nested dataclasses, and thus call `gradient_descent` with these particular
+configured values:
 
 ```python
->>> from hydra_zen import to_yaml  # an alias for OmegaConf.to_yaml
->>> print(to_yaml(ConfigGradDesc))
-_target_: __main__.gradient_descent
-_recursive_: true
-_convert_: none
-optim:
-  _target_: hydra_zen.funcs.partial
-  _partial_target_:
-    _target_: hydra_zen.funcs.get_obj
-    path: torch.optim.sgd.SGD
-  _recursive_: true
-  _convert_: none
-  lr: 0.3
-  momentum: 0.0
-landscape_fn:
-  _target_: hydra_zen.funcs.get_obj
-  path: __main__.parabaloid
-starting_xy:
-- -1.5
-- 0.5
-num_steps: 20
+>>> from hydra_zen import instantiate # annotated alias of hydra.utils.instantiate
+>>> # Recursively instantiates the objects in our configuration and thus calls:
+>>> #   `gradient_descent(optim=partial(SGD, [...]), starting_xy=(-1.5, 0.5), [...])`
+>>> instantiate(ConfigGradDesc)  # returns shape-(N, 2) array of xy values
+array([[-1.5       ,  0.5       ],
+       [-1.41      ,  0.44      ],
+       ...
+       [-0.43515927,  0.03878139]], dtype=float32)
 ```
 
 Suppose that we want to run `gradient_descent` using the `SGD` optimizer configured with different momentum
@@ -166,12 +164,9 @@ To demonstrate this, we'll use hydra-zen to launch multiple jobs from a Python c
 gradient descent with a different SDG-momentum value.
 
 ```python
->>> from hydra_zen import instantiate  # annotated alias of hydra.utils.instantiate
+# Running `gradient_descent` using multiple SGD-momentum values
 >>> from hydra_zen.experimental import hydra_launch
 
->>> # `instantiate(ConfigGradDesc)` recursively instantiates the objects 
->>> # in our configuration and thus ultimately calls:
->>> #   `gradient_descent(optim=partial(SGD, [...]), num_steps=20, [...])`
 >>> jobs = hydra_launch(
 ...     ConfigGradDesc,
 ...     task_function=instantiate,
@@ -198,6 +193,7 @@ Let's plot the trajectories produced by these jobs
 See that we could have configured _any_ aspect of this run in the same way. The learning rate, the number
 of steps taken, the optimizer used (along with _its_ parameters), and even the landscape-function traversed can all be re-configured
 and run in various combinations through this same succinct and explicit interface.
+We could also dump `ConfigGradDesc` to a yaml configuration file and use that to configure our application.
 This is the combined power of Hydra and the zen of Python in full effect!
 
 
