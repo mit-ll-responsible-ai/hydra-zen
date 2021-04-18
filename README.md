@@ -146,8 +146,6 @@ configured values:
 
 ```python
 >>> from hydra_zen import instantiate # annotated alias of hydra.utils.instantiate
->>> # Recursively instantiates the objects in our configuration and thus calls:
->>> #   `gradient_descent(optim=partial(SGD, [...]), starting_xy=(-1.5, 0.5), [...])`
 >>> instantiate(ConfigGradDesc)  # returns shape-(N, 2) array of xy values
 array([[-1.5       ,  0.5       ],
        [-1.41      ,  0.44      ],
