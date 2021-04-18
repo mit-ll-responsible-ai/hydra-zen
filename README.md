@@ -45,11 +45,11 @@ down a given "landscape" function.
 
 
 ```python
+# Setting up our code..
+# This does not involve hydra-zen in any way.
 import torch
 import numpy
 
-# This code does not involve hydra-zen in any way.
-#
 # This is the function that we will run under various configurations 
 # in order to perform our analysis.
 def gradient_descent(*, starting_xy, optim, num_steps, landscape_fn):
@@ -87,6 +87,8 @@ hydra-zen makes short work of generating a configuration that can "build" `gradi
 the various Python objects that we want to pass to it.
 
 ```python
+# Using hydra-zen to configure our code
+
 from torch.optim import SGD
 
 from hydra_zen import builds, just
@@ -121,6 +123,7 @@ Thus `ConfigGradDesc` is simply a dataclass, and its parameters – even nested 
 an intuitive way:
 
 ```python
+# Examining the structured config for `gradient_descent`
 >>> ConfigGradDesc
 types.Builds_gradient_descent
 
@@ -145,6 +148,7 @@ configured by these nested dataclasses, and thus call `gradient_descent` with th
 configured values:
 
 ```python
+# Instantiating our config and running `gradient_descent`
 >>> from hydra_zen import instantiate # annotated alias of hydra.utils.instantiate
 >>> instantiate(ConfigGradDesc)  # returns shape-(N, 2) array of xy values
 array([[-1.5       ,  0.5       ],
