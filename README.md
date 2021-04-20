@@ -7,22 +7,21 @@
 hydra-zen helps you configure your project using the power of [Hydra](https://github.com/facebookresearch/hydra), while enjoying the [Zen of Python](https://www.python.org/dev/peps/pep-0020/)!
 
 It provides simple, Hydra-compatible tools that enable Python-centric workflows for designing and configuring large-scale
-projects such as machine learning experiments.
-Configure and run your applications without leaving Python!
+projects, such as machine learning experiments.
+With hydra-zen, you can configure and run your applications without leaving Python!
 
 hydra-zen offers:
   - Functions for dynamically and ergonomically creating [structured configs](https://hydra.cc/docs/next/tutorials/structured_config/schema/) 
   that can be used to **fully or partially instantiate – or retrieve without instantiation –** objects in your application, using both 
-  user-specified and auto-populated values to configure them.
-  - The ability to launch hydra jobs, complete with parameter sweeps and multi-run configurations, from within a notebook or any
+  user-specified and auto-populated parameter values.
+  - The ability to launch Hydra jobs, complete with parameter sweeps and multi-run configurations, from within a notebook or any
   other Python environment.
-  - Incisive type annotations that provide enriched context to IDEs, type checkers, and other tooling, about your project's
-  configurations.
+  - Incisive type annotations that provide enriched context about your project's configurations to IDEs, type checkers, and other tooling.
   - Runtime validation of configurations to catch mistakes before your application launches.
-  - Equal support for both object-oriented libraries (e.g. `torch.nn`) and functional ones (e.g. `jax` and `numpy`) 
+  - Equal support for both object-oriented libraries (e.g., `torch.nn`) and functional ones (e.g., `jax` and `numpy`).
 
 ## Installation
-`hydra-zen` is light weight: its dependencies are `hydra-core` and `typing-extensions`
+`hydra-zen` is lightweight: its only dependencies are `hydra-core` and `typing-extensions`.
 
 ```shell script
 pip install hydra-zen
@@ -30,10 +29,9 @@ pip install hydra-zen
 
 ## Brief Motivation
 
-As your project grows in size, the process of configuring your experiments and applications can become 
-highly cumbersome and end up a source of major technical debt. 
-Extensive boiler plate code and repositories of generated static configurations are things to be avoided.
-The tools supplied by hydra-zen help to keep your configuration process sleek and easy to reason about. 
+As your project grows in size, the process of configuring your experiments and applications can become highly cumbersome,
+with extensive boilerplate code and repositories of generated static configurations becoming a source of major technical debt. 
+The tools supplied by hydra-zen will keep your configuration process sleek and easy to reason about. 
 Ultimately, hydra-zen promotes Python-centric workflows that are configurable, repeatable, and scalable.
 
 ## Basic Usage
