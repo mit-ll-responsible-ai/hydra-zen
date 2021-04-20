@@ -163,7 +163,7 @@ to adjust its value; Hydra makes it easy to override any of the above configured
 objects in our configuration with these values.
 
 To demonstrate this, we'll use hydra-zen to launch multiple jobs from a Python console (or notebook) and configure each one to perform 
-gradient descent with a different SDG-momentum value.
+gradient descent with a different SGD-momentum value.
 
 ```python
 # Running `gradient_descent` using multiple SGD-momentum values
