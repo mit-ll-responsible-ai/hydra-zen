@@ -131,7 +131,7 @@ down a given "landscape" function.
 
 
 ```python
-# Setting up our code..
+# Setting up our code...
 # This does not involve hydra-zen in any way.
 import torch
 import numpy
@@ -156,7 +156,7 @@ def gradient_descent(*, starting_xy, optim, num_steps, landscape_fn):
     
     # `optim` needs to be instantiated with 
     # the tensor parameter(s) to be updated
-    optim : torch.optim.Optimizer = optim([xy])
+    optim: torch.optim.Optimizer = optim([xy])
 
     for i in range(num_steps):
         z = landscape_fn(*xy)
@@ -246,7 +246,7 @@ array([[-1.5       ,  0.5       ],
 ```
 
 Now suppose that we want to run `gradient_descent` multiple times, each run with `SGD` optimizer configured with different momentum values. 
-Because we are using hydra-zen, we don't need to write boiler plate code to expose this particular parameter of this particular object in order to adjust its value. 
+Because we are using hydra-zen, we don't need to write boilerlate code to expose this particular parameter of this particular object in order to adjust its value. 
 Hydra makes it easy to override any of the above configured values and to recursively instantiate the objects in our configuration with these values.
 
 To demonstrate this, we'll use hydra-zen to launch multiple jobs from a Python console (or notebook) and configure each one to perform 
