@@ -8,7 +8,7 @@ from hydra.core.config_store import ConfigStore
 from omegaconf.omegaconf import OmegaConf
 
 from hydra_zen import builds, instantiate
-from hydra_zen.experimental import hydra_launch
+from hydra_zen.experimental import hydra_multirun, hydra_run
 from hydra_zen.experimental._implementations import _load_config, _store_config
 
 
@@ -39,7 +39,7 @@ def test_store_config(as_dataclass, as_dictconfig):
 @pytest.mark.parametrize(
     "as_dictconfig, with_hydra", [(True, True), (True, False), (False, False)]
 )
-def test_hydra_launch_job(overrides, as_dataclass, as_dictconfig, with_hydra):
+def test_hydra_run_job(overrides, as_dataclass, as_dictconfig, with_hydra):
     cfg = builds(dict, a=1, b=1)
 
     def task_function(config):
@@ -61,7 +61,7 @@ def test_hydra_launch_job(overrides, as_dataclass, as_dictconfig, with_hydra):
             cfg = _load_config(cn, overrides=overrides)
             overrides = []
 
-    job = hydra_launch(
+    job = hydra_run(
         cfg,
         task_function=task_function,
         overrides=overrides,
@@ -82,7 +82,7 @@ def test_hydra_launch_job(overrides, as_dataclass, as_dictconfig, with_hydra):
     "as_dictconfig, with_hydra", [(True, True), (True, False), (False, False)]
 )
 @pytest.mark.parametrize("use_default_dir", [True, False])
-def test_hydra_launch_multirun(
+def test_hydra_multirun(
     overrides, as_dataclass, as_dictconfig, with_hydra, use_default_dir
 ):
     cfg = builds(dict, a=1, b=1)
@@ -110,11 +110,13 @@ def test_hydra_launch_multirun(
             overrides = []
 
     additl_kwargs = {} if use_default_dir else dict(config_dir=Path.cwd())
-    job = hydra_launch(
+    _overrides = (
+        multirun_overrides if overrides is None else overrides + multirun_overrides
+    )
+    job = hydra_multirun(
         cfg,
         task_function=task_function,
-        multirun_overrides=multirun_overrides,
-        overrides=overrides,
+        overrides=_overrides,
         **additl_kwargs,
     )
     for i, j in enumerate(job[0]):
