@@ -78,8 +78,7 @@ This can be used in a recursive fashion.
 16
 ```
 
-The `just(<target>)` function creates a configuration that "just" returns the target,
-without calling/initializing it.
+The `just(<target>)` function creates a configuration that "just" returns the target (a non-literal Python object), without calling/initializing it.
 
 ```python
 # configuration says: "just" return the square function
@@ -95,14 +94,14 @@ without calling/initializing it.
 Instances of these configurations can be created that override parameter values.
 
 ```python
->>> instantiate(NumberConf(number_type=float))
+>>> instantiate(NumberConf(number_type=just(float)))
 {'number_type': float}
 
->>> instantiate(NumberConf(number_type=complex))
+>>> instantiate(NumberConf(number_type=just(complex)))
 {'number_type': complex}
 ```
 
-The dataclasses produced by `builds` and `just` are valid [structured configs](https://hydra.cc/docs/next/tutorials/structured_config/intro) for Hydra to use, thus they can be serialized to yaml configuration files
+The dataclasses produced by `builds` and `just` are valid [structured configs](https://hydra.cc/docs/next/tutorials/structured_config/intro) for Hydra to use, thus they can be serialized to yaml configuration files, which can later be loaded and "instantiated" for reproducible results.
 
 ```python
 >>> from hydra_zen import to_yaml  # alias of `omegaconf.OmegaCong.to_yaml`
