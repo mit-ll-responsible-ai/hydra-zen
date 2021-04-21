@@ -91,7 +91,7 @@ The `just(<target>)` function creates a configuration that "just" returns the ta
 {'number_type': int}
 ```
 
-Instances of these configurations can be created that override parameter values.
+Instances of these configurations can be created that override the previously-configured default values.
 
 ```python
 >>> instantiate(NumberConf(number_type=just(float)))
