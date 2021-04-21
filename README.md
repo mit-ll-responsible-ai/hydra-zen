@@ -73,7 +73,7 @@ Hydra's `instantiate` function is used to enact this build:
 This can be used in a recursive fashion.
 
 ```python
->>> def square(x: int) -> int: return x ** 2
+>>> def square(x): return x ** 2
 >>> instantiate(builds(square, x=builds(square, x=2)))  # calls `square(square(2))`
 16
 ```
