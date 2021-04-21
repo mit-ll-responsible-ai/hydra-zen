@@ -6,14 +6,14 @@
 
 hydra-zen helps you configure your project using the power of [Hydra](https://github.com/facebookresearch/hydra), while enjoying the [Zen of Python](https://www.python.org/dev/peps/pep-0020/)!
 
-It provides simple, Hydra-compatible tools that enable Python-centric workflows for designing and configuring large-scale
-projects, such as machine learning experiments.
-With hydra-zen, you can configure and run your applications without leaving Python!
+hydra-zen provides simple, Hydra-compatible tools that enable Python-centric workflows for designing, configuring, and running large-scale projects, such as machine learning experiments.
+These will keep your configuration process sleek and easy to reason about by encouraging you to write concise, but expressive configs within your Python code rather than in yaml files.
+
+Ultimately, hydra-zen promotes workflows that are configurable, repeatable, and scalable, while eliminating boilerplate code and other sources of technical debt from your work.
 
 hydra-zen offers:
   - Functions for dynamically and ergonomically creating [structured configs](https://hydra.cc/docs/next/tutorials/structured_config/schema/) 
-  that can be used to **fully or partially instantiate – or retrieve without instantiation –** objects in your application, using both 
-  user-specified and auto-populated parameter values.
+  that can be used to fully or partially instantiate – or retrieve without instantiation – objects in your application, using both user-specified and auto-populated parameter values.
   - The ability to launch Hydra jobs, complete with parameter sweeps and multi-run configurations, from within a notebook or any
   other Python environment.
   - Incisive type annotations that provide enriched context about your project's configurations to IDEs, type checkers, and other tooling.
@@ -27,20 +27,14 @@ hydra-zen offers:
 pip install hydra-zen
 ```
 
-## Brief Motivation
-
-As your project grows in size, the process of configuring your experiments and applications can become highly cumbersome,
-with extensive boilerplate code and repositories of generated static configurations becoming a source of major technical debt. 
-The tools supplied by hydra-zen will keep your configuration process sleek and easy to reason about. 
-Ultimately, hydra-zen promotes Python-centric workflows that are configurable, repeatable, and scalable.
-
 ## Diving into hydra-zen
 ### Building Basic Configs with hydra-zen
 
 hydra-zen provides simple, but powerful, functions for creating rich configurations.
-Here we will see how we can use and chain `builds(...)` and `just(...)` together to create configurations for calling (or initializing) and retrieving Python objects.
-In the next section, we will see that these can be used to configure a realistic machine learning application.
+These structured configs can be used to launch Hydra jobs (from CLI or within Python).
+They can also be serialized to yaml files.
 
+This section simply presents the ABCs of using hydra-zen to configure your project.
 
 `builds(<target>, ...)` creates a dataclass that tells Hydra how to "build" `<target>`
 with both user-specified and auto-populated parameter values.
@@ -52,7 +46,7 @@ with both user-specified and auto-populated parameter values.
 >>> BuildsDict = builds(dict, hello=1, goodbye=None)
 
 # signature: BuildsDict(hello: Any = 1, goodbye: Any = None)
->>> BuildsDict  # A class-object with the following configurtable attrs...
+>>> BuildsDict  # A class-object with the following configurable attrs...
 types.Builds_dict
 >>> BuildsDict._target_
 'builtins.dict'
@@ -60,19 +54,20 @@ types.Builds_dict
 1
 >>> BuildsDict.goodbye
 None
+
+# overriding `goodbye` by making an instance of the dataclass
+>>> BuildsDict(goodbye=2)
+Builds_dict(_target_='builtins.dict', _recursive_=True, _convert_='none', hello=1, goodbye=2)
 ```
 
-Hydra's `instantiate` function is used to enact this build:
+Hydra's `instantiate` function is used to enact this build. This can be used in a recursive fashion:
 
 ```python
 >>> from hydra_zen import instantiate  # annotated alias of hydra.utils.instantiate
 >>> instantiate(BuildsDict)  # calls `dict(hello=1, goodbye=None)`
 {'hello': 1, 'goodbye': None}
-```
 
-This can be used in a recursive fashion.
-
-```python
+# recursively instantiating nested builds
 >>> def square(x): return x ** 2
 >>> instantiate(builds(square, x=builds(square, x=2)))  # calls `square(square(2))`
 16
@@ -91,21 +86,10 @@ The `just(<target>)` function creates a configuration that "just" returns the ta
 {'number_type': int}
 ```
 
-Instances of these configurations can be created that override the previously-configured default values.
-
-```python
->>> instantiate(NumberConf(number_type=just(float)))
-{'number_type': float}
-
->>> instantiate(NumberConf(number_type=just(complex)))
-{'number_type': complex}
-```
-
 The dataclasses produced by `builds` and `just` are valid [structured configs](https://hydra.cc/docs/next/tutorials/structured_config/intro) for Hydra to use, thus they can be serialized to yaml configuration files, which can later be loaded and "instantiated" for reproducible results.
 
 ```python
 >>> from hydra_zen import to_yaml  # alias of `omegaconf.OmegaCong.to_yaml`
->>> NumberConf = builds(dict, number_type=just(int))
 >>> print(to_yaml(NumberConf))
 _target_: builtins.dict
 _recursive_: true
@@ -123,7 +107,8 @@ functionality not yet discussed.
 
 It's time to see how we can use hydra-zen in an applied setting.
 
-Let's use hydra-zen to configure an "experiment" that measures the impact of [momentum](https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Momentum) when performing [gradient descent](https://en.wikipedia.org/wiki/Gradient_descent)
+Let's use hydra-zen to both configure and run "experiment" using Hydra, but without ever leaving our Python environment.
+Our experiment will measure the impact of [momentum](https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Momentum) when performing [gradient descent](https://en.wikipedia.org/wiki/Gradient_descent)
 down a 2D parabolic surface. The following function uses PyTorch to perform gradient descent (via a user-specified optimizer)
 down a given "landscape" function.
 
@@ -164,17 +149,12 @@ def gradient_descent(*, starting_xy, optim, num_steps, landscape_fn):
         optim.step()
         trajectory.append(xy.detach().clone().numpy())
     return numpy.stack(trajectory)
-
-
-# defines our surface that we will be descending
-def parabaloid(x, y):
-    return 0.1 * x ** 2 + 0.2 * y ** 2
 ```
 
 
-We will write a configuration that describes how to "build" `gradient_descent`
-along with all of the parameter values that we want to pass to it.
-Of course, we will use `builds` and `just` to do so.
+We will use `build` and `just` to configure `gradient_descent`
+as well as the parameter values that we want to pass to it.
+Note that we want our optimizer, `SGD`, to only be *partially* built by our config given that it is fully initialized within `gradient_descent`; `builds` makes simple work of this. 
 
 ```python
 # Using hydra-zen to configure our code
@@ -182,6 +162,11 @@ Of course, we will use `builds` and `just` to do so.
 from torch.optim import SGD
 
 from hydra_zen import builds, just
+
+# defines our surface that we will be descending
+def parabaloid(x, y):
+    return 0.1 * x ** 2 + 0.2 * y ** 2
+
 
 # Defines dataclasses that configure `gradient_descent`
 # and its parameters. Invalid parameter names will be caught here.
@@ -245,16 +230,17 @@ array([[-1.5       ,  0.5       ],
 ```
 
 Now suppose that we want to run `gradient_descent` multiple times – each run with the `SGD` optimizer configured with a different momentum value. 
-Because we are using hydra-zen, we don't need to write boilerlate code to expose this particular parameter of this particular object in order to adjust its value. 
-Hydra makes it easy to override any of the above configured values and to recursively instantiate the objects in our configuration with these values.
+Because we are using hydra-zen, we don't need to write boilerlate code to expose this particular parameter of this particular object in order to adjust its value.
 
 To demonstrate this, we'll use hydra-zen to launch multiple jobs from a Python console (or notebook) and configure each one to perform 
 gradient descent with a different SGD-momentum value.
 
 ```python
-# Running `gradient_descent` using multiple SGD-momentum values
+# Running `gradient_descent` configured with multiple SGD-momentum values
 >>> from hydra_zen.experimental import hydra_launch
 
+# Returns `List[JobReturn]`
+# Each `JobReturn` includes: return value, task name, config
 >>> jobs = hydra_launch(
 ...     ConfigGradDesc,
 ...     task_function=instantiate,
@@ -268,6 +254,7 @@ gradient descent with a different SGD-momentum value.
 [2021-04-15 21:49:40,975][HYDRA] 	#4 : optim.momentum=0.8
 [2021-04-15 21:49:41,060][HYDRA] 	#5 : optim.momentum=1.0
 ```
+In this example we used Hydra's default launcher, but its various plugins – launchers (e.g. the [SLURM-based launcher](https://hydra.cc/docs/next/plugins/submitit_launcher)) and parameter sweepers – can be used here.
 
 Let's plot the trajectories produced by these jobs 
 (omitting the [plot-function's definition](https://gist.github.com/rsokl/c7e2ed1aab02b35208bb5b4c8051a931) for the sake of legibility):
