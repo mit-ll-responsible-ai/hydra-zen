@@ -245,7 +245,7 @@ array([[-1.5       ,  0.5       ],
        [-0.43515927,  0.03878139]], dtype=float32)
 ```
 
-Now suppose that we want to run `gradient_descent` multiple times, each run with `SGD` optimizer configured with different momentum values. 
+Now suppose that we want to run `gradient_descent` multiple times – each run with the `SGD` optimizer configured with a different momentum value. 
 Because we are using hydra-zen, we don't need to write boilerlate code to expose this particular parameter of this particular object in order to adjust its value. 
 Hydra makes it easy to override any of the above configured values and to recursively instantiate the objects in our configuration with these values.
 
