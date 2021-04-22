@@ -229,48 +229,17 @@ array([[-1.5       ,  0.5       ],
        [-0.43515927,  0.03878139]], dtype=float32)
 ```
 
-### Running Experiments with Hydra's Run and Multirun
-
-We can also use hydra-zen to launch the experiment as a Hydra application taking full advantage of Hydra's ecosystem of plugins for launchers and sweepers along with any logging configuration.
-To simply run the experiment, override a default parameter, and log all outputs in the "outputs/gradient_descent" directory execute:
-
-```python
-# Running a single `gradient_descent` experiment
->>> from hydra_zen.experimental import hydra_run
-
-# Returns Hydra's JobReturn object
->>> job = hydra_run(
-...     ConfigGradDesc,
-...     task_function=instantiate,
-...     overrides=["hydra.run.dir="outputs/gradient_descent", "optim.momentum=0.2"],
-... )
->>> job.return_value
-array([[-1.5       ,  0.5       ],
-       [-1.41      ,  0.44      ],
-       ...
-       [-0.43515927,  0.03878139]], dtype=float32)
-```
-
 Now suppose that we want to run `gradient_descent` multiple times – each run with the `SGD` optimizer configured with a different momentum value. 
 Because we are using hydra-zen, we don't need to write boilerlate code to expose this particular parameter of this particular object in order to adjust its value.
 
 To demonstrate this, we'll use hydra-zen to launch multiple jobs from a Python console (or notebook) using Hydra's default sweeper and launcher plugins and configure each one to perform gradient descent with a different SGD-momentum value.
 
 ```python
-<<<<<<< HEAD
 # Running `gradient_descent` using multiple SGD-momentum values
 >>> from hydra_zen.experimental import hydra_multirun
 
 # Returns a List of Hydra's JobReturn objects for each experiment
 >>> jobs = hydra_multirun(
-=======
-# Running `gradient_descent` configured with multiple SGD-momentum values
->>> from hydra_zen.experimental import hydra_launch
-
-# Returns `List[JobReturn]`
-# Each `JobReturn` includes: return value, task name, config
->>> jobs = hydra_launch(
->>>>>>> main
 ...     ConfigGradDesc,
 ...     task_function=instantiate,
 ...     overrides=["hydra/sweeper=basic", "optim.momentum=range(0.0,1.2,0.2)"],
