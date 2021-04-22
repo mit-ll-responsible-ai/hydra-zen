@@ -143,8 +143,6 @@ def hydra_run(
     Examples
     --------
 
-    A simple usage of ``hydra_launch`` to understand the difference between a Hydra ``run`` and ``multirun`` job.
-
     Simple Hydra ``run``:
 
     >>> from hydra_zen import instantiate, builds
@@ -249,13 +247,10 @@ def hydra_multirun(
 
     job_name: str (default: "hydra_launch")
 
-    is_multirun: bool (default: False)
-        Is this a Hydra "multirun" or not.  See [1]_.
-
     Returns
     -------
     result: List[List[JobReturn]]
-        The object storing the results of the Hydra experiment.
+        The object storing the results of each Hydra experiment.
             - overrides: From ``overrides`` and ``multirun_overrides``
             - return_value: The return value of the task function
             - cfg: The configuration object sent to the task function
@@ -272,17 +267,7 @@ def hydra_multirun(
     Examples
     --------
 
-    A simple usage of ``hydra_launch`` to understand the difference between a Hydra ``run`` and ``multirun`` job.
-
-    Simple Hydra ``run``:
-
-    >>> from hydra_zen import instantiate, builds
-    >>> from hydra_zen.experimental import hydra_run, hydra_multirun
-    >>> job = hydra_run(builds(dict, a=1, b=1), task_function=lambda x: instantiate(x))
-    >>> job.return_value
-    {'a': 1, 'b': 1}
-
-    Using Hydra ``multirun``:
+    Simple Hydra `multirun``:
 
     >>> job = hydra_multirun(builds(dict, a=1, b=1), task_function=lambda x: instantiate(x), overrides=["a=1,2"])
     >>> [j.return_value for j in job[0]]
@@ -294,12 +279,6 @@ def hydra_multirun(
     >>> cfg = dict(f=builds(pow, exp=2, hydra_partial=True), x=1)
     >>> def task_function(cfg):
     ...    return instantiate(cfg.f)(cfg.x)
-
-    Launch a job to evaluate the function using the given configuration:
-
-    >>> job = hydra_run(cfg, task_function)
-    >>> job.return_value
-    1
 
     Launch a ``multirun`` over a list of different ``x`` values using Hydra's override syntax ``range``:
 
@@ -329,6 +308,8 @@ def hydra_multirun(
     >>> [j.return_value for j in jobs[0]]
     [0.3054758310317993, 0.28910207748413086]
     """
+
+    # Separate Hydra overrides from experiment overrides
     hydra_overrides = []
     _overrides = []
     for o in overrides:
@@ -337,6 +318,9 @@ def hydra_multirun(
         else:
             _overrides.append(o)
 
+    # Only the hydra overrides are needed to extract the Hydra configuration for
+    # the launcher and sweepers.
+    # The sweeper handles the overides for each experiment
     config_name = _store_config(config, config_name)
     task_cfg = _load_config(config_name=config_name, overrides=hydra_overrides)
 
