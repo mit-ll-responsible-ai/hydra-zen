@@ -105,7 +105,7 @@ def hydra_run(
 
     >>> job = hydra_run(config, task_function, overrides=["job/group=group_name", "job.group.param=1"])
 
-    This functions executes Hydra and therefore creates its own working directory.  See Configuring Hydra [3]_ for more
+    This functions executes Hydra and therefore creates its own working directory.  See Configuring Hydra [2]_ for more
     details on customizing Hydra.
 
     Parameters
