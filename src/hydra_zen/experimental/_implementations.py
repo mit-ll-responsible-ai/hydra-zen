@@ -7,11 +7,10 @@ from hydra._internal.hydra import Hydra
 from hydra._internal.utils import create_config_search_path
 from hydra.core.config_store import ConfigStore
 from hydra.core.global_hydra import GlobalHydra
-from hydra.core.plugins import Plugins
 from hydra.core.utils import JobReturn, run_job
 from hydra.experimental import compose, initialize
 from hydra.plugins.sweeper import Sweeper
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig
 
 from .._hydra_overloads import instantiate
 from ..typing import DataClass
