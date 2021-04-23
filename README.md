@@ -232,19 +232,17 @@ array([[-1.5       ,  0.5       ],
 Now suppose that we want to run `gradient_descent` multiple times – each run with the `SGD` optimizer configured with a different momentum value. 
 Because we are using hydra-zen, we don't need to write boilerlate code to expose this particular parameter of this particular object in order to adjust its value.
 
-To demonstrate this, we'll use hydra-zen to launch multiple jobs from a Python console (or notebook) and configure each one to perform 
-gradient descent with a different SGD-momentum value.
+To demonstrate this, we'll use hydra-zen to launch multiple jobs from a Python console (or notebook) using Hydra's default sweeper and launcher plugins, and configure each one to perform gradient descent with a different SGD-momentum value.
 
 ```python
-# Running `gradient_descent` configured with multiple SGD-momentum values
->>> from hydra_zen.experimental import hydra_launch
+# Running `gradient_descent` using multiple SGD-momentum values
+>>> from hydra_zen.experimental import hydra_multirun
 
-# Returns `List[JobReturn]`
-# Each `JobReturn` includes: return value, task name, config
->>> jobs = hydra_launch(
+# Returns a List of Hydra's JobReturn objects for each experiment
+>>> jobs = hydra_multirun(
 ...     ConfigGradDesc,
 ...     task_function=instantiate,
-...     multirun_overrides=["optim.momentum=0.0,0.2,0.4,0.6,0.8,1.0"],
+...     overrides=["hydra/sweeper=basic", "optim.momentum=range(0.0,1.2,0.2)"],
 ... )
 [2021-04-15 21:49:40,635][HYDRA] Launching 6 jobs locally
 [2021-04-15 21:49:40,635][HYDRA] 	#0 : optim.momentum=0.0
@@ -253,6 +251,11 @@ gradient descent with a different SGD-momentum value.
 [2021-04-15 21:49:40,889][HYDRA] 	#3 : optim.momentum=0.6
 [2021-04-15 21:49:40,975][HYDRA] 	#4 : optim.momentum=0.8
 [2021-04-15 21:49:41,060][HYDRA] 	#5 : optim.momentum=1.0
+>>> jobs[0][1].return_value  # corresponds to momentum=0.2
+array([[-1.5       ,  0.5       ],
+       [-1.41      ,  0.44      ],
+       ...
+       [-0.43515927,  0.03878139]], dtype=float32)
 ```
 In this example we used Hydra's default launcher, but its various plugins – launchers (e.g. the [SLURM-based launcher](https://hydra.cc/docs/next/plugins/submitit_launcher)) and parameter sweepers – can be used here.
 
