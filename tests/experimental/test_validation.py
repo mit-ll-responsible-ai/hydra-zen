@@ -1,6 +1,8 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
+import os
+
 import pytest
 from hydra.core.config_store import ConfigStore
 from hydra.errors import ConfigCompositionException
@@ -31,12 +33,11 @@ def test_hydra_run_with_hydra_in_config(overrides, hydra_overrides, expected):
     if hydra_overrides is not None:
         assert task_cfg.hydra.run.dir == "test"
 
-    tf = lambda cfg: instantiate(cfg)
     # Provide user override
     task_cfg.b = 10
 
     # override works and user value is set
-    job = hydra_run(task_cfg, task_function=tf, overrides=overrides)
+    job = hydra_run(task_cfg, task_function=instantiate, overrides=overrides)
     assert job.return_value == expected
     assert job.working_dir == "tested"
 
@@ -65,15 +66,14 @@ def test_hydra_multirun_with_hydra_in_config(overrides, hydra_overrides, expecte
     if hydra_overrides is not None:
         assert task_cfg.hydra.sweep.dir == "test"
 
-    tf = lambda cfg: instantiate(cfg)
     # Provide user override
     task_cfg.b = 10
 
     # override works and user value is set
-    job = hydra_multirun(task_cfg, task_function=tf, overrides=overrides)
+    job = hydra_multirun(task_cfg, task_function=instantiate, overrides=overrides)
     for e, j, k in zip(expected, job[0], range(len(expected))):
         assert j.return_value == e
-        assert j.working_dir == f"tested/{k}"
+        assert j.working_dir == f"tested{os.path.sep}{k}"
 
 
 @pytest.mark.usefixtures("cleandir")
