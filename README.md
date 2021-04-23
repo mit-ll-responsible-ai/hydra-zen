@@ -13,7 +13,7 @@ Ultimately, hydra-zen promotes workflows that are configurable, repeatable, and 
 
 hydra-zen offers:
   - Functions for dynamically and ergonomically creating [structured configs](https://hydra.cc/docs/next/tutorials/structured_config/schema/) 
-  that can be used to fully or partially instantiate – or retrieve without instantiation – objects in your application, using both user-specified and auto-populated parameter values.
+  that can be used to fully or partially instantiate objects in your application (or retrieve them without instantiation), using both user-specified and auto-populated parameter values.
   - The ability to launch Hydra jobs, complete with parameter sweeps and multi-run configurations, from within a notebook or any
   other Python environment.
   - Incisive type annotations that provide enriched context about your project's configurations to IDEs, type checkers, and other tooling.
@@ -34,7 +34,7 @@ hydra-zen provides simple, but powerful, functions for creating rich configurati
 These structured configs can be used to launch Hydra jobs (from CLI or within Python).
 They can also be serialized to yaml files.
 
-This section simply presents the ABCs of using hydra-zen to configure your project.
+This section presents the ABCs of using hydra-zen to configure your project.
 
 `builds(<target>, ...)` creates a dataclass that tells Hydra how to "build" `<target>`
 with both user-specified and auto-populated parameter values.
@@ -48,10 +48,13 @@ with both user-specified and auto-populated parameter values.
 # signature: BuildsDict(hello: Any = 1, goodbye: Any = None)
 >>> BuildsDict  # A class-object with the following configurable attrs...
 types.Builds_dict
+
 >>> BuildsDict._target_
 'builtins.dict'
+
 >>> BuildsDict.hello
 1
+
 >>> BuildsDict.goodbye
 None
 
@@ -64,6 +67,7 @@ Hydra's `instantiate` function is used to enact this build. This can be used in 
 
 ```python
 >>> from hydra_zen import instantiate  # annotated alias of hydra.utils.instantiate
+
 >>> instantiate(BuildsDict)  # calls `dict(hello=1, goodbye=None)`
 {'hello': 1, 'goodbye': None}
 
@@ -76,14 +80,16 @@ Hydra's `instantiate` function is used to enact this build. This can be used in 
 The `just(<target>)` function creates a configuration that "just" returns the target (a non-literal Python object), without calling/initializing it.
 
 ```python
+>>> from hydra_zen import just
+
 # configuration says: "just" return the square function
 >>> JustSquare = just(square)
 >>> instantiate(JustSquare)
 <function __main__.square(x)>
 
->>> NumberConf = builds(dict, number_type=just(int))
+>>> NumberConf = builds(dict, intial_val=2., transform=just(square))
 >>> instantiate(NumberConf)  # calls `dict(number_type=int)`
-{'number_type': int}
+{'intial_val': 2.0, 'transform': <function __main__.square(x)>}
 ```
 
 The dataclasses produced by `builds` and `just` are valid [structured configs](https://hydra.cc/docs/next/tutorials/structured_config/intro) for Hydra to use, thus they can be serialized to yaml configuration files, which can later be loaded and "instantiated" for reproducible results.
@@ -94,9 +100,10 @@ The dataclasses produced by `builds` and `just` are valid [structured configs](h
 _target_: builtins.dict
 _recursive_: true
 _convert_: none
-number_type:
+intial_val: 2.0
+transform:
   _target_: hydra_zen.funcs.get_obj
-  path: builtins.int
+  path: __main__.square
 ```
 
 Don't let the simplicity of these functions deceive you!
@@ -107,11 +114,10 @@ functionality not yet discussed.
 
 It's time to see how we can use hydra-zen in an applied setting.
 
-Let's use hydra-zen to both configure and run "experiment" using Hydra, but without ever leaving our Python environment.
+Let's use hydra-zen to both configure and run an "experiment" using Hydra, but without ever leaving our Python environment.
 Our experiment will measure the impact of [momentum](https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Momentum) when performing [gradient descent](https://en.wikipedia.org/wiki/Gradient_descent)
 down a 2D parabolic surface. The following function uses PyTorch to perform gradient descent (via a user-specified optimizer)
 down a given "landscape" function.
-
 
 
 ```python
@@ -257,7 +263,7 @@ array([[-1.5       ,  0.5       ],
        ...
        [-0.43515927,  0.03878139]], dtype=float32)
 ```
-In this example we used Hydra's default launcher, but its various plugins – launchers (e.g. the [SLURM-based launcher](https://hydra.cc/docs/next/plugins/submitit_launcher)) and parameter sweepers – can be used here.
+In this example we used Hydra's default launcher, but its various plugins – launchers (e.g., the [SLURM-based launcher](https://hydra.cc/docs/next/plugins/submitit_launcher)) and parameter sweepers – can be used here.
 
 Let's plot the trajectories produced by these jobs 
 (omitting the [plot-function's definition](https://gist.github.com/rsokl/c7e2ed1aab02b35208bb5b4c8051a931) for the sake of legibility):
