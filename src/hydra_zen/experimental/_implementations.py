@@ -205,8 +205,8 @@ def hydra_multirun(
     task_function: Callable[[DictConfig], Any],
     overrides: Optional[List[str]] = None,
     config_dir: Optional[Union[str, Path]] = None,
-    config_name: str = "hydra_launch",
-    job_name: str = "hydra_launch",
+    config_name: str = "hydra_multirun",
+    job_name: str = "hydra_multirun",
 ) -> List[JobReturn]:
     """Launch a Hydra ``multirun`` ([1]_) job defined by ``task_function`` using the configuration
     provided in ``config``.
@@ -245,7 +245,7 @@ def hydra_multirun(
     config_dir: Optional[Union[str, Path]] (default: None)
         Add configuration directories if needed.
 
-    job_name: str (default: "hydra_launch")
+    job_name: str (default: "hydra_multirun")
 
     Returns
     -------
