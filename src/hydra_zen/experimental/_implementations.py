@@ -7,11 +7,10 @@ from hydra._internal.hydra import Hydra
 from hydra._internal.utils import create_config_search_path
 from hydra.core.config_store import ConfigStore
 from hydra.core.global_hydra import GlobalHydra
-from hydra.core.plugins import Plugins
 from hydra.core.utils import JobReturn, run_job
 from hydra.experimental import compose, initialize
 from hydra.plugins.sweeper import Sweeper
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig
 
 from .._hydra_overloads import instantiate
 from ..typing import DataClass
@@ -93,17 +92,17 @@ def hydra_run(
     overrides: Optional[List[str]] = None,
     config_name: str = "hydra_run",
 ) -> JobReturn:
-    """Launch a Hydra job defined by ``task_function`` using the configuration
-    provided in ``config``.
+    """Launch a Hydra job defined by `task_function` using the configuration
+    provided in `config`.
 
-    Similar to how Hydra CLI works, ``overrides`` are a string list of configuration
-    values to use for a given experiment run.  For example, the Hydra CLI provided by
+    Similar to how Hydra CLI works, `overrides` are a string list of configuration
+    values to use for a given experiment run.  For example, the Hydra CLI provided by::
 
-    $ python -m job.task_function job/group=group_name job.group.param=1
+       $ python -m job.task_function job/group=group_name job.group.param=1
 
-    would be
+    would be::
 
-    >>> job = hydra_run(config, task_function, overrides=["job/group=group_name", "job.group.param=1"])
+       >>> job = hydra_run(config, task_function, overrides=["job/group=group_name", "job.group.param=1"])
 
     This functions executes Hydra and therefore creates its own working directory.  See Configuring Hydra [2]_ for more
     details on customizing Hydra.
@@ -128,7 +127,7 @@ def hydra_run(
     -------
     result: JobReturn
         The object storing the results of the Hydra experiment.
-            - overrides: From ``overrides`` and ``multirun_overrides``
+            - overrides: From `overrides` and `multirun_overrides`
             - return_value: The return value of the task function
             - cfg: The configuration object sent to the task function
             - hydra_cfg: The hydra configuration object
@@ -143,7 +142,7 @@ def hydra_run(
     Examples
     --------
 
-    Simple Hydra ``run``:
+    Simple Hydra run:
 
     >>> from hydra_zen import instantiate, builds
     >>> from hydra_zen.experimental import hydra_run
@@ -151,7 +150,7 @@ def hydra_run(
     >>> job.return_value
     {'a': 1, 'b': 1}
 
-    Using a more complex ``task_function``
+    Using a more complex task function:
 
     >>> from hydra_zen.experimental import hydra_run
     >>> from hydra_zen import builds, instantiate
@@ -165,7 +164,7 @@ def hydra_run(
     >>> job.return_value
     1
 
-    An example using ``PyTorch``
+    An example using PyTorch:
 
     >>> from torch.optim import Adam
     >>> from torch.nn import Linear
@@ -173,9 +172,9 @@ def hydra_run(
     >>> ModelConfig = builds(Linear, in_features=1, out_features=1)
     >>> cfg = dict(optim=AdamConfig(), model=ModelConfig())
     >>> def task_function(cfg):
-    ...     model = instantiate(cfg.model)
-    ...     optim = instantiate(cfg.optim)(model.parameters())
-    ...     loss = model(torch.ones(1)).mean()
+    ...     cfg = instantiate(cfg)
+    ...     optim = cfg.optim(model.parameters())
+    ...     loss = cfg.model(torch.ones(1)).mean()
     ...     optim.zero_grad()
     ...     loss.backward()
     ...     optim.step()
@@ -208,10 +207,10 @@ def hydra_multirun(
     config_name: str = "hydra_multirun",
     job_name: str = "hydra_multirun",
 ) -> List[JobReturn]:
-    """Launch a Hydra ``multirun`` ([1]_) job defined by ``task_function`` using the configuration
-    provided in ``config``.
+    """Launch a Hydra multi-run ([1]_) job defined by `task_function` using the configuration
+    provided in `config`.
 
-    Similar to how Hydra CLI works, ``overrides`` are a string list of configuration
+    Similar to how Hydra CLI works, `overrides` are a string list of configuration
     values to use for a given experiment run.  For example, the Hydra CLI provided by::
 
        $ python -m job.task_function job/group=group_name job.group.param=1 --multirun
@@ -220,13 +219,13 @@ def hydra_multirun(
 
        >>> job = hydra_multirun(config, task_function, overrides=["job/group=group_name", "job.group.param=1"])
 
-    To sweep over parameters the Hydra CLI provided by
+    To sweep over parameters the Hydra CLI provided by::
 
-    $ python -m job.task_function job/group=group_name job.group.param=1,2,3 --multirun
+       $ python -m job.task_function job/group=group_name job.group.param=1,2,3 --multirun
 
-    would be
+    would be::
 
-    >>> job = hydra_multirun(config, task_function, overrides=["job/group=group_name", "job.group.param=1,2,3"])
+       >>> job = hydra_multirun(config, task_function, overrides=["job/group=group_name", "job.group.param=1,2,3"])
 
     This functions executes Hydra and therefore creates its own working directory.  See Configuring Hydra [3]_ for more
     details on customizing Hydra.
@@ -251,7 +250,7 @@ def hydra_multirun(
     -------
     result: List[List[JobReturn]]
         The object storing the results of each Hydra experiment.
-            - overrides: From ``overrides`` and ``multirun_overrides``
+            - overrides: From `overrides` and `multirun_overrides`
             - return_value: The return value of the task function
             - cfg: The configuration object sent to the task function
             - hydra_cfg: The hydra configuration object
@@ -267,26 +266,26 @@ def hydra_multirun(
     Examples
     --------
 
-    Simple Hydra `multirun``:
+    Simple Hydra multirun:
 
     >>> job = hydra_multirun(builds(dict, a=1, b=1), task_function=lambda x: instantiate(x), overrides=["a=1,2"])
     >>> [j.return_value for j in job[0]]
     [{'a': 1, 'b': 1}, {'a': 2, 'b': 1}]
 
-    Using a more complex ``task_function``
+    Using a more complex `task_function`
 
     >>> from hydra_zen import builds, instantiate
     >>> cfg = dict(f=builds(pow, exp=2, hydra_partial=True), x=1)
     >>> def task_function(cfg):
     ...    return instantiate(cfg.f)(cfg.x)
 
-    Launch a ``multirun`` over a list of different ``x`` values using Hydra's override syntax ``range``:
+    Launch a multi-run over a list of different `x` values using Hydra's override syntax `range`:
 
     >>> jobs = hydra_multirun(cfg, task_function, overrides=["x=range(-2,3)"])
     >>> [j.return_value for j in jobs[0]]
     [4, 1, 0, 1, 4]
 
-    An example using ``PyTorch``
+    An example using PyTorch
 
     >>> from torch.optim import Adam
     >>> from torch.nn import Linear
@@ -294,9 +293,9 @@ def hydra_multirun(
     >>> ModelConfig = builds(Linear, in_features=1, out_features=1)
     >>> cfg = dict(optim=AdamConfig(), model=ModelConfig())
     >>> def task_function(cfg):
-    ...     model = instantiate(cfg.model)
-    ...     optim = instantiate(cfg.optim)(model.parameters())
-    ...     loss = model(torch.ones(1)).mean()
+    ...     cfg = instantiate(cfg)
+    ...     optim = cfg.optim(model.parameters())
+    ...     loss = cfg.model(torch.ones(1)).mean()
     ...     optim.zero_grad()
     ...     loss.backward()
     ...     optim.step()
