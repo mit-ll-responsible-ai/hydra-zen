@@ -87,9 +87,9 @@ The `just(<target>)` function creates a configuration that "just" returns the ta
 >>> instantiate(JustSquare)
 <function __main__.square(x)>
 
->>> NumberConf = builds(dict, intial_val=2., transform=just(square))
+>>> NumberConf = builds(dict, initial_val=2., transform=just(square))
 >>> instantiate(NumberConf)  # calls `dict(number_type=int)`
-{'intial_val': 2.0, 'transform': <function __main__.square(x)>}
+{'initial_val': 2.0, 'transform': <function __main__.square(x)>}
 ```
 
 The dataclasses produced by `builds` and `just` are valid [structured configs](https://hydra.cc/docs/next/tutorials/structured_config/intro) for Hydra to use, thus they can be serialized to yaml configuration files, which can later be loaded and "instantiated" for reproducible results.
@@ -100,7 +100,7 @@ The dataclasses produced by `builds` and `just` are valid [structured configs](h
 _target_: builtins.dict
 _recursive_: true
 _convert_: none
-intial_val: 2.0
+initial_val: 2.0
 transform:
   _target_: hydra_zen.funcs.get_obj
   path: __main__.square
