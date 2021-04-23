@@ -92,7 +92,7 @@ def test_hydra_multirun(
 
     additl_kwargs = {} if use_default_dir else dict(config_dir=Path.cwd())
     _overrides = (
-        multirun_overrides if overrides is None else overrides + multirun_overrides
+        multirun_overrides if overrides is None else (overrides + multirun_overrides)
     )
     job = hydra_multirun(
         cfg, task_function=instantiate, overrides=_overrides, **additl_kwargs
