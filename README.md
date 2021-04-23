@@ -232,7 +232,7 @@ array([[-1.5       ,  0.5       ],
 Now suppose that we want to run `gradient_descent` multiple times – each run with the `SGD` optimizer configured with a different momentum value. 
 Because we are using hydra-zen, we don't need to write boilerlate code to expose this particular parameter of this particular object in order to adjust its value.
 
-To demonstrate this, we'll use hydra-zen to launch multiple jobs from a Python console (or notebook) using Hydra's default sweeper and launcher plugins and configure each one to perform gradient descent with a different SGD-momentum value.
+To demonstrate this, we'll use hydra-zen to launch multiple jobs from a Python console (or notebook) using Hydra's default sweeper and launcher plugins, and configure each one to perform gradient descent with a different SGD-momentum value.
 
 ```python
 # Running `gradient_descent` using multiple SGD-momentum values
