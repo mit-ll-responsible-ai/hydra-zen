@@ -212,13 +212,13 @@ def hydra_multirun(
     provided in ``config``.
 
     Similar to how Hydra CLI works, ``overrides`` are a string list of configuration
-    values to use for a given experiment run.  For example, the Hydra CLI provided by
+    values to use for a given experiment run.  For example, the Hydra CLI provided by::
 
-    $ python -m job.task_function job/group=group_name job.group.param=1 --multirun
+       $ python -m job.task_function job/group=group_name job.group.param=1 --multirun
 
-    would be
+    would be::
 
-    >>> job = hydra_multirun(config, task_function, overrides=["job/group=group_name", "job.group.param=1"])
+       >>> job = hydra_multirun(config, task_function, overrides=["job/group=group_name", "job.group.param=1"])
 
     To sweep over parameters the Hydra CLI provided by
 
