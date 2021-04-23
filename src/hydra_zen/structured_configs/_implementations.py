@@ -35,7 +35,7 @@ def mutable_value(x: Any) -> Field:
     """Used to set a mutable object as a default value for a field
     in a dataclass.
 
-    This is an alias for ``field(default_factory=lambda: x)``
+    This is an alias for `field(default_factory=lambda: x)`
 
     Examples
     --------
@@ -130,7 +130,7 @@ class hydrated_dataclass:
 
         populate_full_signature : bool, optional (default=False)
             If True, then the resulting dataclass's __init__ signature and fields
-            will be populated according to the signature of ``target``.
+            will be populated according to the signature of `target`.
 
             Values specified in **kwargs_for_target take precedent over the corresponding
             default values from the signature.
@@ -183,7 +183,7 @@ class hydrated_dataclass:
 
 def just(obj: Importable) -> Type[Just[Importable]]:
     """Produces a structured config that, when instantiated by hydra, 'just'
-    returns ``obj``.
+    returns `obj`.
 
     This is convenient for specifying a particular, un-instantiated object as part of your
     configuration.
@@ -200,25 +200,14 @@ def just(obj: Importable) -> Type[Just[Importable]]:
 
     Examples
     --------
-    Demonstrating how to use ``just`` to specify a particular torch-optimizer
-    in your structured config:
-
-    >>> from torch.optim import Adam
-    >>> from hydra_zen import just
-    >>> @dataclass
-    ... class ModuleConfig:
-    ...     optimizer: Any = just(Adam)
-
-    Demonstrating the simple behavior of ``just`` in the context of leveraging ``hydra``.
-
-    >>> from hydra_zen import just, instantiate
-    >>> just_str_conf = just(str)
-    >>> str is instantiate(just_str_conf)  # "just" returns the object `str`
+    >>> from hydra_zen import just, instantiate, to_yaml
+    >>> just_range = just(range)
+    >>> range is instantiate(just_range)
     True
-    >>> just_str_conf._target_
+    >>> just_range._target_
     'hydra_zen.funcs.identity'
-    >>> just_str_conf.obj
-    '${get_obj:builtins.str}'
+    >>> just_range.path
+    'builtins.range'
     """
     try:
         obj_path = _utils.get_obj_path(obj)
@@ -323,11 +312,11 @@ def builds(
     target : Union[Instantiable, Callable]
         The object to be instantiated/called
 
-    **kwargs_for_target : Any
+    kwargs_for_target : Any
         The keyword arguments passed to `target(...)`.
 
         The arguments specified here solely determine the fields and init-parameters of the
-        resulting dataclass, unless ``populate_full_signature=True`` is specified (see below).
+        resulting dataclass, unless `populate_full_signature=True` is specified (see below).
 
     populate_full_signature : bool, optional (default=False)
         If `True`, then the resulting dataclass's signature and fields will be populated
@@ -355,11 +344,11 @@ def builds(
     hydra_convert: Literal["none", "partial", "all"], optional (default="none")
         Determines how hydra handles the non-primitive objects passed to `target` [3]_.
 
-           none - Passed objects are DictConfig and ListConfig, default
-        partial - Passed objects are converted to dict and list, with
-                  the exception of Structured Configs (and their fields).
-            all - Passed objects are dicts, lists and primitives without
-                  a trace of OmegaConf containers
+        - `"none"`: Passed objects are DictConfig and ListConfig, default
+        - `"partial"`: Passed objects are converted to dict and list, with
+          the exception of Structured Configs (and their fields).
+        - `"all"`: Passed objects are dicts, lists and primitives without
+          a trace of OmegaConf containers
 
     builds_bases : Tuple[DataClass, ...]
         Specifies a tuple of parent classes that the resulting dataclass inherits from.
@@ -385,11 +374,11 @@ def builds(
     Type annotations are inferred from the target's signature and are only retained if they are compatible
     with hydra's limited set of supported annotations; otherwise `Any` is specified.
 
-    ``builds`` provides runtime validation of user-specified named arguments against
+    `builds` provides runtime validation of user-specified named arguments against
     the target's signature. This helps to ensure that typos in field names fail
     early and explicitly.
 
-    Mutable values are automatically specified using ``field(default_factory=lambda: <value>)`` [4]_.
+    Mutable values are automatically specified using `field(default_factory=lambda: <value>)` [4]_.
 
     `builds(...)` is annotated to return the generic protocols `Builds` and `PartialBuilds`, which are
     available in `hydra_zen.typing`. These are leveraged by `hydra_zen.instantiate` to provide static
@@ -412,7 +401,7 @@ def builds(
     >>> instantiate(builds(dict, a=1, b='x'))  # using hydra to build the dictionary
     {'a': 1, 'b': 'x'}
 
-    Using ``builds`` with partial instantiation
+    Using `builds` with partial instantiation
 
     >>> def a_two_tuple(x: int, y: float): return x, y
     >>> PartialBuildsFunc = builds(a_two_tuple, x=1, hydra_partial=True)  # specifies only `x`
@@ -422,7 +411,7 @@ def builds(
     >>> partial_func(y=22)
     (1, 22)
 
-    Using ``builds`` makes it easy to compose configurations:
+    Using `builds` makes it easy to compose configurations:
 
     >>> import numpy as np
     >>> LoadsData = builds(np.array, object=[1., 2.])
@@ -433,7 +422,7 @@ def builds(
 
     **Understanding What builds is Doing**
 
-    It is important to gain some insight into the dataclass that ``builds`` creates.
+    It is important to gain some insight into the dataclass that `builds` creates.
     Let's dig a bit deeper into the first example.
 
     >>> from dataclasses import is_dataclass
@@ -443,21 +432,21 @@ def builds(
     types.Builds_dict
     >>> is_dataclass(DictConf)
     True
-    >>> inspect.signature(DictConf)  # the dataclass' signature reflects the arguments passed to ``builds``
+    >>> inspect.signature(DictConf)  # the dataclass' signature reflects the arguments passed to `builds`
     <Signature (a: Any = 1, b: Any = 'x') -> None>
     >>> DictConf.a  # class attribute of `Builds_dict`
     1
     >>> DictConf.b  # class attribute of `Builds_dict`
     "x"
 
-    We can create an instance ``DictConf`` dataclass to overrides its default values
+    We can create an instance `DictConf` dataclass to overrides its default values
 
     >>> DictConf(a=-10)  # creates an instance of `DictConf`
     Builds_dict(_target_='builtins.dict', _recursive_=True, _convert_='none', a=-10, b='x')
     >>> instantiate(DictConf(a=-10))
     {'a': -10, 'b': 'x'}
 
-    What is going on under the hood is that ``builds`` is defining a dataclass that is compatible with
+    What is going on under the hood is that `builds` is defining a dataclass that is compatible with
     hydra's mechanism for instantiating/calling objects; the dataclass can be serialized to, and recreated from, a yaml:
 
     >>> from omegaconf import OmegaConf
@@ -468,8 +457,8 @@ def builds(
     a: 1
     b: x
 
-    ``_target_``, ``_recursive_``, and ``_convert_`` are hydra-specific fields that are automatically created by
-    ``builds``. These are be controlled via ``builds(<target>, hydra_convert=<>, hydra_recursive=<>)``.
+    `_target_`, `_recursive_`, and `_convert_` are hydra-specific fields that are automatically created by
+    `builds`. These are be controlled via `builds(<target>, hydra_convert=<>, hydra_recursive=<>)`.
 
     **Additional Features and Functionality**
 
@@ -486,7 +475,7 @@ def builds(
 
     **Botched Configs Fail Quickly and Loudly**
 
-    ``builds`` will raise if you specify an argument that is incompatible with the target's signature.
+    `builds` will raise if you specify an argument that is incompatible with the target's signature.
     This means that you will catch mistakes before you try to instantiate your configurations
 
     >>> builds(a_function, z=10)  # `z` is not in the signature of `a_function`
@@ -498,7 +487,7 @@ def builds(
     >>> from torch.optim import Adam
     >>> from torch.nn import Linear
 
-    Demonstrating how to use ``builds`` to configure a torch-optimizer with a
+    Demonstrating how to use `builds` to configure a torch-optimizer with a
     specified learning rate in your structured config:
 
     >>> from dataclasses import dataclass
