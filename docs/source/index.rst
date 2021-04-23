@@ -11,6 +11,7 @@ Welcome to hydra-zen's documentation!
    :caption: Contents:
 
    structured_configs
+   experimental
 
 Indices and tables
 ==================
