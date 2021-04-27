@@ -2,12 +2,13 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass
-from typing import Any, List
+from typing import Any, List, Tuple
 
 import hypothesis.strategies as st
 import pytest
 from hypothesis import assume, given
 from omegaconf import DictConfig, ListConfig
+from omegaconf.errors import ValidationError
 
 from hydra_zen import builds, hydrated_dataclass, instantiate, mutable_value
 from hydra_zen.structured_configs._utils import get_obj_path
@@ -160,3 +161,31 @@ def test_recursive(recursive: bool, via_hydrated_dataclass: bool):
                 "y": 1,
             }
         }
+
+
+def f(x: Tuple[int]):
+    return x
+
+
+class C:
+    def __init__(self, x: int):
+        self.x = x
+
+
+def g(x: C):
+    return x
+
+
+def test_type_checking():
+    conf = builds(f, populate_full_signature=True)(
+        x=("hi",)
+    )  # violates type annotation
+    with pytest.raises(ValidationError):
+        instantiate(conf)
+
+    # nested configs should get validated too
+    with pytest.raises(ValidationError):
+        instantiate(builds(g, x=builds(C, x="hi")))
+
+    # should be ok
+    instantiate(builds(g, x=builds(C, x=1)))

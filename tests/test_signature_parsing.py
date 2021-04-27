@@ -3,7 +3,7 @@
 
 import inspect
 from inspect import Parameter
-from typing import Any
+from typing import Any, Optional, Tuple
 
 import hypothesis.strategies as st
 import pytest
@@ -127,26 +127,56 @@ def test_builds_with_full_sig_mirrors_target_sig(
         assert conf.named_param == 2
 
 
-def f4(x: int, y: int, z: int, default: float = 100.0):
+def a_func(
+    x: int,
+    y: str,
+    z: bool,
+    a_tuple: Tuple[str] = ("hi",),
+    optional: Optional[int] = None,
+    default: float = 100.0,
+):
     pass
 
 
+class AClass:
+    def __init__(
+        self,
+        x: int,
+        y: str,
+        z: bool,
+        a_tuple: Tuple[str] = ("hi",),
+        optional: Optional[int] = None,
+        default: float = 100.0,
+    ):
+        pass
+
+
+@pytest.mark.parametrize("target", [a_func, AClass])
 @given(
     user_specified_values=st.dictionaries(
         keys=st.sampled_from(["x", "y", "z"]), values=st.integers(0, 3), max_size=3
     )
 )
 def test_builds_partial_with_full_sig_excludes_non_specified_params(
+    target,
     user_specified_values,
 ):
+    name_to_type = dict(x=int, y=str, z=bool)
     Conf = builds(
-        f4, **user_specified_values, populate_full_signature=True, hydra_partial=True
+        target,
+        **user_specified_values,
+        populate_full_signature=True,
+        hydra_partial=True
     )
 
     expected_sig = [
-        (var_name, int, user_specified_values[var_name])
+        (var_name, name_to_type[var_name], user_specified_values[var_name])
         for var_name in sorted(user_specified_values)
-    ] + [("default", float, 100.0)]
+    ] + [
+        ("a_tuple", Tuple[str], ("hi",)),
+        ("optional", Optional[int], None),
+        ("default", float, 100.0),
+    ]
 
     actual_sig = [
         (p.name, p.annotation, p.default)

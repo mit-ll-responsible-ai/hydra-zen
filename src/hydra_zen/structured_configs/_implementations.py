@@ -610,7 +610,10 @@ def builds(
     # this properly resolves forward references, whereas the annotations
     # from signature do not
     try:
-        type_hints = get_type_hints(target)
+        if type(target) is type and hasattr(type, "__init__"):
+            type_hints = get_type_hints(target.__init__)
+        else:
+            type_hints = get_type_hints(target)
     except TypeError:
         # Covers case for ufuncs, which do not have inspectable type hints
         type_hints = defaultdict(lambda: Any)
