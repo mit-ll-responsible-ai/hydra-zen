@@ -18,7 +18,7 @@ from omegaconf.errors import (
 )
 from typing_extensions import Final, Literal, Protocol
 
-from hydra_zen import mutable_value
+from hydra_zen import builds, instantiate, mutable_value
 from hydra_zen.structured_configs._utils import interpolated, safe_name, sanitized_type
 
 from . import valid_hydra_literals
@@ -144,12 +144,10 @@ class SomeProtocol(Protocol):
         (Optional[Color], Optional[Color]),
         (Optional[List[Color]], Optional[List[Color]]),
         (Optional[List[List[int]]], Optional[List[Any]]),
-        (List, List),  # supported containers
-        (List[int], List[int]),
+        (List[int], List[int]),  # supported containers
         (List[frozenset], List[Any]),
         (List[List[int]], List[Any]),
         (List[T], List[Any]),
-        (Dict, Dict),
         (Dict[str, float], Dict[str, float]),
         (Dict[C, int], Dict[Any, int]),
         (Dict[str, C], Dict[str, Any]),
@@ -160,7 +158,9 @@ class SomeProtocol(Protocol):
     ],
 )
 def test_sanitized_type_expected_behavior(in_type, expected_type):
+
     assert sanitized_type(in_type) == expected_type, in_type
+
     if in_type != expected_type:
         # In cases where we change the type, it should be because omegaconf
         # doesn't support that annotation.
@@ -191,3 +191,25 @@ def test_sanitized_type_expected_behavior(in_type, expected_type):
 
 def test_tuple_annotation_normalization():
     assert sanitized_type(Tuple[int, str, int]) is Tuple[Any, Any, Any]
+
+
+def f_list(x: List):
+    return x
+
+
+def f_dict(x: Dict):
+    return x
+
+
+def f_tuple(x: Tuple):
+    return x
+
+
+@pytest.mark.parametrize(
+    "func, value", [(f_list, [1]), (f_dict, dict(a=1)), (f_tuple, (1,))]
+)
+def test_bare_generics(func, value):
+    # python is super flaky about how it represents bare generics.. so
+    # we have to write a separate test for them here where we don't
+    # check the output of sanitize_type
+    assert instantiate(builds(func, populate_full_signature=True, x=value)) == value
