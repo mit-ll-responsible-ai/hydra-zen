@@ -10,7 +10,7 @@ from typing_extensions import Final
 
 try:
     from typing import get_args, get_origin
-except ImportError:
+except ImportError:  # pragma: no cover
     # remove at Python 3.7 end-of-life
     import collections
 
