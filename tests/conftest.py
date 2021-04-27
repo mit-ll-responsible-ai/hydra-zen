@@ -28,11 +28,11 @@ collect_ignore_glob = []
 if sys.version_info < (3, 8):
     collect_ignore_glob.append("*py38*")
 
-OPTIONAL_TEST_DEPENDENCIES = (
-    "numpy",
-    "torch",
-    "jax"
-)
+if sys.version_info < (3, 9):
+    collect_ignore_glob.append("*py39*")
+
+
+OPTIONAL_TEST_DEPENDENCIES = ("numpy", "torch", "jax")
 
 for module in OPTIONAL_TEST_DEPENDENCIES:
     if module not in sys.modules:
