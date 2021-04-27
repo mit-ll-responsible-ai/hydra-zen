@@ -4,9 +4,70 @@
 import sys
 from dataclasses import is_dataclass
 from enum import Enum
-from typing import Any, Callable, Tuple, TypeVar, Union
+from typing import Any, Callable, Dict, List, Tuple, TypeVar, Union
 
 from typing_extensions import Final
+
+try:
+    from typing import get_args, get_origin
+except ImportError:
+    # remove at Python 3.7 end-of-life
+    import collections
+
+    def get_origin(obj: Any) -> Union[None, type]:
+        """Get the unsubscripted version of a type.
+
+        Parameters
+        ----------
+        obj : Any
+
+        Returns
+        -------
+        Union[None, type]
+            Return None for unsupported types.
+
+        Notes
+        -----
+        Bare `Generic` not supported by this hacked version of `get_origin`
+
+        Examples
+        --------
+        >>> assert get_origin(Literal[42]) is Literal
+        >>> assert get_origin(int) is None
+        >>> assert get_origin(ClassVar[int]) is ClassVar
+        >>> assert get_origin(Generic[T]) is Generic
+        >>> assert get_origin(Union[T, int]) is Union
+        >>> assert get_origin(List[Tuple[T, T]][int]) == list
+        """
+        return getattr(obj, "__origin__", None)
+
+    def get_args(obj: Any) -> Union[Tuple[type, ...], Tuple[List[type], type]]:
+        """Get type arguments with all substitutions performed.
+
+        Parameters
+        ----------
+        obj : Any
+
+        Returns
+        -------
+        Union[Tuple[type, ...], Tuple[List[type], type]]
+            Callable[[t1, ...], r] -> ([t1, ...], r)
+
+        Examples
+        --------
+        >>> assert get_args(Dict[str, int]) == (str, int)
+        >>> assert get_args(int) == ()
+        >>> assert get_args(Union[int, Union[T, int], str][int]) == (int, str)
+        >>> assert get_args(Union[int, Tuple[T, int]][str]) == (int, Tuple[str, int])
+        >>> assert get_args(Callable[[], T][int]) == ([], int)
+        """
+        if hasattr(obj, "__origin__") and hasattr(obj, "__args__"):
+            args = obj.__args__
+            if get_origin(obj) is collections.abc.Callable and args[0] is not Ellipsis:
+                args = (list(args[:-1]), args[-1])
+            return args
+        return ()
+
 
 COMMON_MODULES_WITH_OBFUSCATED_IMPORTS: Tuple[str, ...] = (
     "numpy",
@@ -48,7 +109,7 @@ def get_obj_path(obj: Any) -> str:
         raise AttributeError(f"{obj} does not have a `__name__` attribute")
 
     module = getattr(obj, "__module__", None)
-    
+
     if "<" in name or module is None:
         # NumPy's ufuncs do not have an inspectable `__module__` attribute, so we
         # check to see if the object lives in NumPy's top-level namespace.
@@ -63,7 +124,7 @@ def get_obj_path(obj: Any) -> str:
         # or...
         #
         # module is None, which is apparently a thing..: numpy.random.rand.__module__ is None
-        
+
         # don't use qualname for obfuscated paths
         name = obj.__name__
         for new_module in COMMON_MODULES_WITH_OBFUSCATED_IMPORTS:
@@ -109,7 +170,7 @@ def interpolated(func: Union[str, Callable], *literals: Any) -> str:
     return f"${{{name}:{','.join(str(i) for i in literals)}}}"
 
 
-def sanitized_type(type_: type) -> type:
+def sanitized_type(type_: type, primitive_only: bool = False) -> type:
     """Returns ``type_`` unchanged if it is supported as an annotation by hydra,
     otherwise returns ``Any``
 
@@ -119,8 +180,73 @@ def sanitized_type(type_: type) -> type:
     int
 
     >>> sanitized_type(frozenset)  # not supported by hydra
-    typing.Any"""
-    # TODO: Fully mirror hydra's range of supported type-annotations
+    typing.Any
+
+    >>> sanitized_type(List[int])
+    List[int]
+
+    >>> sanitized_type(Dict[str, frozenset])
+    Dict[str, Any]
+    """
+
+    # Warning: mutating `type_` will mutate the signature being inspected
+    # Even calling deepcopy(`type_`) silently fails to prevent this.
+    origin = get_origin(type_)
+
+    if origin is not None:
+        if primitive_only:
+            return Any
+
+        args = get_args(type_)
+        if origin is Union:
+            # Hydra only supports Optional[<type>] unions
+            if len(args) != 2 or type(None) not in args:
+                # isn't Optional[<type>]
+                return Any
+
+            optional_type, none_type = args
+            if not isinstance(None, none_type):
+                optional_type = none_type
+                none_type = type(None)
+            optional_type = sanitized_type(optional_type)
+
+            if optional_type is Any:  # Union[Any, T] is just Any
+                return Any
+            return Union[optional_type, none_type]
+
+        if origin is list:
+            return List[sanitized_type(args[0], primitive_only=True)] if args else type_
+
+        if origin is dict:
+            return (
+                Dict[
+                    sanitized_type(args[0], primitive_only=True),
+                    sanitized_type(args[1], primitive_only=True),
+                ]
+                if args
+                else type_
+            )
+
+        if origin is tuple:
+            # hydra silently supports tuples of homogenous types
+            # It has some weird behavior. It treats `Tuple[t1, t2, ...]` as `List[t1]`
+            # It isn't clear that we want to perpetrate this on our end..
+            # So we deal with inhomogeneous types as e.g. `Tuple[str, int]` -> `Tuple[Any, Any]`.
+            #
+            # Otherwise we preserve the annotation as accurately as possible
+            if not args:
+                return Any  # bare Tuple not supported by hydra
+            unique_args = set(args)
+
+            _unique_type = (
+                sanitized_type(args[0], primitive_only=True)
+                if len(unique_args) == 1
+                else Any
+            )
+
+            return Tuple[(_unique_type,) * len(args)]
+        return Any
+
     if (
         type_ is Any
         or type_ in HYDRA_SUPPORTED_PRIMITIVES
@@ -128,4 +254,5 @@ def sanitized_type(type_: type) -> type:
         or (isinstance(type_, type) and issubclass(type_, Enum))
     ):
         return type_
+
     return Any
