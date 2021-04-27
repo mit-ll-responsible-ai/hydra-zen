@@ -150,7 +150,7 @@ class SomeProtocol(Protocol):
         (List[List[int]], List[Any]),
         (List[T], List[Any]),
         (Dict, Dict),
-        (Dict[str, int], Dict[str, int]),
+        (Dict[str, float], Dict[str, float]),
         (Dict[C, int], Dict[Any, int]),
         (Dict[str, C], Dict[str, Any]),
         (Dict[C, C], Dict[Any, Any]),
