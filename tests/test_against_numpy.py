@@ -7,8 +7,9 @@ import hypothesis.strategies as st
 import numpy as np
 import pytest
 from hypothesis import assume, given
+from omegaconf import OmegaConf
 
-from hydra_zen import builds, instantiate, just
+from hydra_zen import builds, instantiate, just, to_yaml
 from hydra_zen.structured_configs._utils import safe_name
 
 
@@ -63,4 +64,9 @@ def test_fuzz_build_validation_against_a_bunch_of_common_objects(
 
     if doesnt_have_sig and full_sig:
         assume(False)
-    builds(target, hydra_partial=partial, populate_full_signature=full_sig)
+    conf = builds(target, hydra_partial=partial, populate_full_signature=full_sig)
+
+    OmegaConf.create(to_yaml(conf))  # ensure serializable
+
+    if partial:
+        instantiate(conf)  # ensure instantiable

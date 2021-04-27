@@ -9,9 +9,10 @@ import hypothesis.strategies as st
 import pytest
 import torch as tr
 from hypothesis import assume, given
+from omegaconf import OmegaConf
 from torch.optim import Adam, AdamW
 
-from hydra_zen import builds, hydrated_dataclass, instantiate, just
+from hydra_zen import builds, hydrated_dataclass, instantiate, just, to_yaml
 from hydra_zen.structured_configs._utils import safe_name
 
 torch_objects = [
@@ -35,7 +36,6 @@ torch_objects = [
     tr.cuda.device_count,
     tr.backends.cuda.is_built,
     tr.distributed.is_available,
-    tr.distributions.distribution.Distribution,
     tr.distributions.bernoulli.Bernoulli,
     tr.fft.fft,
     tr.jit.script,
@@ -73,7 +73,12 @@ def test_fuzz_build_validation_against_a_bunch_of_common_objects(
 
     if doesnt_have_sig and full_sig:
         assume(False)
-    builds(target, hydra_partial=partial, populate_full_signature=full_sig)
+    conf = builds(target, hydra_partial=partial, populate_full_signature=full_sig)
+
+    OmegaConf.create(to_yaml(conf))  # ensure serializable
+
+    if partial:
+        instantiate(conf)  # ensure instantiable
 
 
 def test_documented_builds_roundtrip_partial_with_interpolation_example():
