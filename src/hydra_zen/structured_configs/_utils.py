@@ -172,7 +172,7 @@ def interpolated(func: Union[str, Callable], *literals: Any) -> str:
 
 def sanitized_type(type_: type, primitive_only: bool = False) -> type:
     """Returns ``type_`` unchanged if it is supported as an annotation by hydra,
-    otherwise returns ``Any``
+    otherwise returns ``Any``.
 
     Examples
     --------

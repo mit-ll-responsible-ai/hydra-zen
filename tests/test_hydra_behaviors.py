@@ -185,7 +185,7 @@ def test_type_checking():
 
     # nested configs should get validated too
     with pytest.raises(ValidationError):
-        instantiate(builds(g, x=builds(C, x="hi")))
+        instantiate(builds(g, x=builds(C, x="hi")))  # Invalid: `C.x` must be int
 
     # should be ok
     instantiate(builds(g, x=builds(C, x=1)))
