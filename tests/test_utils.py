@@ -155,13 +155,12 @@ class SomeProtocol(Protocol):
         (Dict[str, C], Dict[str, Any]),
         (Dict[C, C], Dict[Any, Any]),
         (Dict[str, List[int]], Dict[str, Any]),
-        (Tuple, Any),
         (Tuple[str, str, str], Tuple[str, str, str]),
         (Tuple[List[int]], Tuple[Any]),
     ],
 )
 def test_sanitized_type_expected_behavior(in_type, expected_type):
-    assert sanitized_type(in_type) == expected_type
+    assert sanitized_type(in_type) == expected_type, in_type
     if in_type != expected_type:
         # In cases where we change the type, it should be because omegaconf
         # doesn't support that annotation.

@@ -214,10 +214,10 @@ def sanitized_type(type_: type, primitive_only: bool = False) -> type:
                 return Any
             return Union[optional_type, none_type]
 
-        if origin is list:
+        if origin is list or origin is List:
             return List[sanitized_type(args[0], primitive_only=True)] if args else type_
 
-        if origin is dict:
+        if origin is dict or origin is Dict:
             return (
                 Dict[
                     sanitized_type(args[0], primitive_only=True),
@@ -227,7 +227,7 @@ def sanitized_type(type_: type, primitive_only: bool = False) -> type:
                 else type_
             )
 
-        if origin is tuple:
+        if origin is tuple or origin is Tuple:
             # hydra silently supports tuples of homogenous types
             # It has some weird behavior. It treats `Tuple[t1, t2, ...]` as `List[t1]`
             # It isn't clear that we want to perpetrate this on our end..
@@ -253,6 +253,10 @@ def sanitized_type(type_: type, primitive_only: bool = False) -> type:
         or is_dataclass(type_)
         or (isinstance(type_, type) and issubclass(type_, Enum))
     ):
+        return type_
+
+    # Needed to cover python 3.6 where __origin__ doesn't normalize to type
+    if not primitive_only and type_ in {List, Tuple, Dict}:  # pragma: no cover
         return type_
 
     return Any
