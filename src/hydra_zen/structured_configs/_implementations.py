@@ -611,6 +611,8 @@ def builds(
     # from signature do not
     try:
         if type(target) is type and hasattr(type, "__init__"):
+            # target is class object...
+            # calling `get_type_hints(target)` returns empty dict
             type_hints = get_type_hints(target.__init__)
         else:
             type_hints = get_type_hints(target)
