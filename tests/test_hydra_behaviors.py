@@ -176,6 +176,10 @@ def g(x: C):
     return x
 
 
+def g2(x: List[C]):
+    return x
+
+
 def test_type_checking():
     conf = builds(f, populate_full_signature=True)(
         x=("hi",)
@@ -189,3 +193,8 @@ def test_type_checking():
 
     # should be ok
     instantiate(builds(g, x=builds(C, x=1)))
+
+    conf_C = builds(C, x=1)
+
+    # should be ok
+    instantiate(builds(g2, x=[conf_C, conf_C]))

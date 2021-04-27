@@ -186,7 +186,7 @@ def test_sanitized_type_expected_behavior(in_type, expected_type):
     class Tmp:
         x: expected_type
 
-    OmegaConf.structured(Tmp)
+    OmegaConf.structured(Tmp)  # shouldn't raise on `expected_type`
 
 
 def test_tuple_annotation_normalization():
