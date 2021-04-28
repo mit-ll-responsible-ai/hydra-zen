@@ -53,6 +53,14 @@ def test_interpolate_roundtrip(literals):
         assert lit == interp
 
 
+OmegaConf.register_new_resolver("len", len)
+
+
+def test_interpolation_with_string_literal():
+    cc = instantiate(builds(dict, total=interpolated(len, "9")))
+    assert cc["total"] == 1
+
+
 class C:
     def __repr__(self):
         return "C as a repr"

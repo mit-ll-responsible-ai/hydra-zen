@@ -167,7 +167,7 @@ def interpolated(func: Union[str, Callable], *literals: Any) -> str:
             f"`func` must be a string or have a `__name__` field, got: {func}"
         )
     name = func if isinstance(func, str) else func.__name__
-    return f"${{{name}:{','.join(str(i) for i in literals)}}}"
+    return f"${{{name}:{','.join(repr(i) for i in literals)}}}"
 
 
 def sanitized_type(type_: type, primitive_only: bool = False) -> type:
