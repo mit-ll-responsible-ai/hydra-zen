@@ -124,11 +124,11 @@ def instantiate(config: Any, *args, **kwargs) -> Any:
     Examples
     --------
     >>> from hydra_zen import instantiate, builds
-    >>> config = builds(dict, a=1, b=2)  # type: Builds[Type[dict]]
+    >>> config = builds(dict, a=1, b=2)  # type: Type[Builds[Type[dict]]]
     >>> instantiate(config, c=3)  # static analysis can deduce that the result type is `dict`
     {'a': 1, 'b': 2, 'c': 3}
 
-    >>> config = builds(list)  # type: Builds[Type[list]]
+    >>> config = builds(list)  # type: Type[Builds[Type[list]]]
     >>> instantiate(config, (1, 2, 3))  # static analysis can deduce that the result type is `list`
     [1, 2, 3]"""
     return hydra_instantiate(config, *args, **kwargs)

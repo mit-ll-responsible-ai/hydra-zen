@@ -146,7 +146,7 @@ def hydra_run(
 
     >>> from hydra_zen import instantiate, builds
     >>> from hydra_zen.experimental import hydra_run
-    >>> job = hydra_run(builds(dict, a=1, b=1), task_function=lambda x: instantiate(x))
+    >>> job = hydra_run(builds(dict, a=1, b=1), task_function=instantiate)
     >>> job.return_value
     {'a': 1, 'b': 1}
 
@@ -154,7 +154,7 @@ def hydra_run(
 
     >>> from hydra_zen.experimental import hydra_run
     >>> from hydra_zen import builds, instantiate
-    >>> cfg = dict(f=builds(pow, exp=2, hydra_partial=True), x=1)
+    >>> cfg = dict(f=builds(pow, exp=2, hydra_partial=True), x=10)
     >>> def task_function(cfg):
     ...    return instantiate(cfg.f)(cfg.x)
 
@@ -162,7 +162,7 @@ def hydra_run(
 
     >>> job = hydra_run(cfg, task_function)
     >>> job.return_value
-    1
+    100
 
     An example using PyTorch:
 
@@ -268,7 +268,11 @@ def hydra_multirun(
 
     Simple Hydra multirun:
 
-    >>> job = hydra_multirun(builds(dict, a=1, b=1), task_function=lambda x: instantiate(x), overrides=["a=1,2"])
+    >>> job = hydra_multirun(
+    ...     builds(dict, a=1, b=1),
+    ...     task_function=instantiate,
+    ...     overrides=["a=1,2"],
+    ... )
     >>> [j.return_value for j in job[0]]
     [{'a': 1, 'b': 1}, {'a': 2, 'b': 1}]
 

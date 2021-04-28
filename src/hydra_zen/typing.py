@@ -43,14 +43,6 @@ Importable = TypeVar("Importable")
 
 
 class DataClass(Protocol):
-    # We are doing something a bit hacky here.. but instead of
-    # using, e.g., Type[Builds] everywhere, it is nicer to use `Builds`.
-    # Thus we add this __call__ method to make it look like objects
-    # of type `Build` (which would be an *instance* of Build) are
-    # instantiable
-    # def __call__(self, *args, **kwargs) -> "DataClass":  # pragma: no cover
-    #     ...
-
     __dataclass_fields__: Dict[str, Field]
     __dataclass_params__: _DataclassParams
 
