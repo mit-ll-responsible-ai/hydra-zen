@@ -21,8 +21,10 @@ project = "hydra-zen"
 copyright = "2021 Massachusetts Institute of Technology"
 author = "Ryan Soklaski, Justin Goodwin"
 
+# The short X.Y version
+version = ".".join(hydra_zen.__version__.split(".")[:2])
 # The full version, including alpha/beta/rc tags
-release = "v0.1.0"
+release = hydra_zen.__version__
 
 
 # -- General configuration ---------------------------------------------------
