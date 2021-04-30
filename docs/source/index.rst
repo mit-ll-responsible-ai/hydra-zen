@@ -25,6 +25,7 @@ hydra-zen offers:
    :caption: Contents:
 
    installation
+   overview
    structured_configs
    experimental
 

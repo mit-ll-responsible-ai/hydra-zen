@@ -1,5 +1,6 @@
-Structured Configs
-==================
+
+Creating Structured Configs
+===========================
 
 .. currentmodule:: hydra_zen
 
