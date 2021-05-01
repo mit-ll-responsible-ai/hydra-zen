@@ -23,7 +23,7 @@ Basic Usage
    from hydra_zen.experimental import hydra_multirun
 
    # some code to configure and run
-   def repeat_text(text: str, num: int) -> str:
+   def repeat_text(num: int, text: str) -> str:
        return text * num
 
 .. code-block:: pycon
@@ -36,8 +36,8 @@ Basic Usage
    'hihi'
 
    # type hints provide runtime validation
-   >>> instantiate(config, num=2.0, text="hi")
-   ValidationError: Value '2.0' could not be converted to Integer
+   >>> instantiate(config, num=2.5, text="hi")
+   ValidationError: Value '2.5' could not be converted to Integer
        full_key: num
        object_type=Builds_repeat_text
 
