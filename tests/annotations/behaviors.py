@@ -3,7 +3,7 @@
 
 from typing import Tuple
 
-from hydra_zen import builds, instantiate, just
+from hydra_zen import builds, hydrated_dataclass, instantiate, just
 
 
 class A:
@@ -74,3 +74,12 @@ conf_just_A_instance = just(A)()
 just_A_2 = instantiate(conf_just_A_instance)
 instance_of_a = just_A_2()
 out3: Tuple[int, str] = instance_of_a.x
+
+
+@hydrated_dataclass(A)
+class B:
+    x: int
+
+
+b = B(x=2)
+b.x = 3

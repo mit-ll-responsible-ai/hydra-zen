@@ -7,6 +7,7 @@ from dataclasses import Field, dataclass, field, fields, is_dataclass, make_data
 from functools import partial
 from typing import (
     Any,
+    Callable,
     Dict,
     List,
     Mapping,
@@ -14,6 +15,7 @@ from typing import (
     Set,
     Tuple,
     Type,
+    TypeVar,
     Union,
     get_type_hints,
     overload,
@@ -26,6 +28,8 @@ from hydra_zen.structured_configs import _utils
 from hydra_zen.typing import Builds, Importable, Just, PartialBuilds
 
 __all__ = ["builds", "just", "hydrated_dataclass", "mutable_value"]
+
+_T = TypeVar("_T")
 
 _TARGET_FIELD_NAME: Final[str] = "_target_"
 _PARTIAL_TARGET_FIELD_NAME: Final[str] = "_partial_target_"
@@ -59,9 +63,63 @@ def mutable_value(x: Any) -> Field:
 Field_Entry = Tuple[str, type, Field]
 
 
-class hydrated_dataclass:
+def __dataclass_transform__(
+    *,
+    eq_default: bool = True,
+    order_default: bool = False,
+    kw_only_default: bool = False,
+    field_descriptors: Tuple[Union[type, Callable[..., Any]], ...] = (()),
+) -> Callable[[_T], _T]:
+    # If used within a stub file, the following implementation can be
+    # replaced with "...".
+    return lambda a: a
+
+
+@__dataclass_transform__()
+def hydrated_dataclass(
+    target: Callable,
+    *,
+    populate_full_signature: bool = False,
+    hydra_partial: bool = False,
+    hydra_recursive: bool = True,
+    hydra_convert: Literal["none", "partial", "all"] = "none",
+    frozen: bool = False,
+) -> Callable[[Type[_T]], Type[_T]]:
     """A decorator that uses `hydra_zen.builds` to create a dataclass with the appropriate
     hydra-specific fields for specifying a structured config.
+
+    Parameters
+    ----------
+    target : Union[Instantiable, Callable]
+        The object to be instantiated/called.
+
+    populate_full_signature : bool, optional (default=False)
+        If True, then the resulting dataclass's __init__ signature and fields
+        will be populated according to the signature of `target`.
+
+        Values specified in **kwargs_for_target take precedent over the corresponding
+        default values from the signature.
+
+    hydra_partial : bool, optional (default=False)
+        If True, then hydra-instantiation produces `functools.partial(target, **kwargs)`
+
+    hydra_recursive : bool, optional (default=True)
+        If True, then upon hydra will recursively instantiate all other
+        hydra-config objects nested within this dataclass [2]_.
+
+    hydra_convert: Literal["none", "partial", "all"], optional (default="none")
+        Determines how hydra handles the non-primitive objects passed to `target` [3]_.
+
+        - `"none"`: Passed objects are DictConfig and ListConfig, default
+        - `"partial"`: Passed objects are converted to dict and list, with
+          the exception of Structured Configs (and their fields).
+        - `"all"`: Passed objects are dicts, lists and primitives without
+          a trace of OmegaConf containers
+
+    frozen : bool, optional (default=False)
+        If `True`, the resulting dataclass will create frozen (i.e. immutable) instances.
+        I.e. setting/deleting an attribute of an instance will raise `FrozenInstanceError`
+        at runtime.
 
     Examples
     --------
@@ -113,51 +171,8 @@ class hydrated_dataclass:
     from a base class: wieght_decay
     """
 
-    def __init__(
-        self,
-        target: Any,
-        *,
-        populate_full_signature: bool = False,
-        hydra_partial: bool = False,
-        hydra_recursive: bool = True,
-        hydra_convert: Literal["none", "partial", "all"] = "none",
-    ):
-        """
-        Parameters
-        ----------
-        target : Union[Instantiable, Callable]
-            The object to be instantiated/called.
+    def wrapper(decorated_obj: Any) -> Any:
 
-        populate_full_signature : bool, optional (default=False)
-            If True, then the resulting dataclass's __init__ signature and fields
-            will be populated according to the signature of `target`.
-
-            Values specified in **kwargs_for_target take precedent over the corresponding
-            default values from the signature.
-
-        hydra_partial : bool, optional (default=False)
-            If True, then hydra-instantiation produces `functools.partial(target, **kwargs)`
-
-        hydra_recursive : bool, optional (default=True)
-            If True, then upon hydra will recursively instantiate all other
-            hydra-config objects nested within this dataclass [2]_.
-
-        hydra_convert: Literal["none", "partial", "all"], optional (default="none")
-            Determines how hydra handles the non-primitive objects passed to `target` [3]_.
-
-               none - Passed objects are DictConfig and ListConfig, default
-            partial - Passed objects are converted to dict and list, with
-                      the exception of Structured Configs (and their fields).
-                all - Passed objects are dicts, lists and primitives without
-                      a trace of OmegaConf containers
-        """
-        self._target = target
-        self._populate_full_signature = populate_full_signature
-        self._hydra_recursive = hydra_recursive
-        self._hydra_convert: Literal["none", "partial", "all"] = hydra_convert
-        self._hydra_partial = hydra_partial
-
-    def __call__(self, decorated_obj: Any) -> Type[Builds]:
         if not isinstance(decorated_obj, type):
             raise NotImplementedError(
                 "Class instances are not supported by `hydrated_dataclass` (yet)."
@@ -171,14 +186,17 @@ class hydrated_dataclass:
         decorated_obj = dataclass(decorated_obj)
 
         return builds(
-            self._target,
-            populate_full_signature=self._populate_full_signature,
-            hydra_recursive=self._hydra_recursive,
-            hydra_convert=self._hydra_convert,
-            hydra_partial=self._hydra_partial,
+            target,
+            populate_full_signature=populate_full_signature,
+            hydra_recursive=hydra_recursive,
+            hydra_convert=hydra_convert,
+            hydra_partial=hydra_partial,
             builds_bases=(decorated_obj,),
             dataclass_name=decorated_obj.__name__,
+            frozen=frozen,
         )
+
+    return wrapper
 
 
 def just(obj: Importable) -> Type[Just[Importable]]:
@@ -252,6 +270,7 @@ def builds(
     hydra_convert: Literal["none", "partial", "all"] = "none",
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
+    frozen: bool = False,
     **kwargs_for_target,
 ) -> Type[Builds[Importable]]:  # pragma: no cover
     ...
@@ -268,6 +287,7 @@ def builds(
     hydra_convert: Literal["none", "partial", "all"] = "none",
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
+    frozen: bool = False,
     **kwargs_for_target,
 ) -> Type[PartialBuilds[Importable]]:  # pragma: no cover
     ...
@@ -284,6 +304,7 @@ def builds(
     hydra_convert: Literal["none", "partial", "all"] = "none",
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
+    frozen: bool = False,
     **kwargs_for_target,
 ) -> Union[
     Type[Builds[Importable]], Type[PartialBuilds[Importable]]
@@ -298,6 +319,7 @@ def builds(
     hydra_partial: bool = False,
     hydra_recursive: bool = True,
     hydra_convert: Literal["none", "partial", "all"] = "none",
+    frozen: bool = False,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     **kwargs_for_target,
@@ -349,6 +371,11 @@ def builds(
           the exception of Structured Configs (and their fields).
         - `"all"`: Passed objects are dicts, lists and primitives without
           a trace of OmegaConf containers
+
+    frozen : bool, optional (default=False)
+        If `True`, the resulting dataclass will create frozen (i.e. immutable) instances.
+        I.e. setting/deleting an attribute of an instance will raise `FrozenInstanceError`
+        at runtime.
 
     builds_bases : Tuple[DataClass, ...]
         Specifies a tuple of parent classes that the resulting dataclass inherits from.
@@ -517,6 +544,7 @@ def builds(
      'optimizer': functools.partial(<class 'torch.optim.adam.Adam'>, lr=10.2),
      'model': Linear(in_features=10, out_features=2, bias=True)}
     """
+
     if not callable(target):
         raise TypeError(
             _utils.building_error_prefix(target)
@@ -747,7 +775,9 @@ def builds(
         else:
             dataclass_name = f"PartialBuilds_{target.__name__}"
 
-    out = make_dataclass(dataclass_name, fields=base_fields, bases=builds_bases)
+    out = make_dataclass(
+        dataclass_name, fields=base_fields, bases=builds_bases, frozen=frozen
+    )
 
     if hydra_partial is False and hasattr(out, _PARTIAL_TARGET_FIELD_NAME):
         # `out._partial_target_` has been inherited; this will lead to an error when
