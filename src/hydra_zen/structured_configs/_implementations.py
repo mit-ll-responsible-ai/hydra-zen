@@ -183,7 +183,7 @@ def hydrated_dataclass(
         #       from, which gets the job done for the most part but there are
         #       practical differences. E.g. you cannot delete an attribute that
         #       was declared in the definition of `decorated_obj`.
-        decorated_obj = dataclass(decorated_obj)
+        decorated_obj = dataclass(frozen=frozen)(decorated_obj)
 
         return builds(
             target,

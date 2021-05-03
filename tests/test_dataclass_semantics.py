@@ -7,7 +7,7 @@ import hypothesis.strategies as st
 import pytest
 from hypothesis import given
 
-from hydra_zen import builds, instantiate
+from hydra_zen import builds, hydrated_dataclass, instantiate
 
 
 def f_three_vars(x, y, z):
@@ -64,3 +64,25 @@ def test_chain_builds_of_targets_with_common_interfaces(full_sig, partial):
         out = out()  # resolve partial
 
     assert out == (1, 2, 3)
+
+
+def f_3(x):
+    pass
+
+
+def test_frozen():
+    from dataclasses import FrozenInstanceError
+
+    conf_f = builds(f, x=2, frozen=True)()
+
+    with pytest.raises(FrozenInstanceError):
+        conf_f.x = 3
+
+    @hydrated_dataclass(f, frozen=True)
+    class Conf_f:
+        x: int = 2
+
+    conf_f = Conf_f()
+
+    with pytest.raises(FrozenInstanceError):
+        conf_f.x = 3
