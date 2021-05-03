@@ -63,7 +63,11 @@ except ImportError:  # pragma: no cover
         """
         if hasattr(obj, "__origin__") and hasattr(obj, "__args__"):
             args = obj.__args__
-            if get_origin(obj) is collections.abc.Callable and args[0] is not Ellipsis:
+            if (
+                get_origin(obj) is collections.abc.Callable
+                and args
+                and args[0] is not Ellipsis
+            ):
                 args = (list(args[:-1]), args[-1])
             return args
         return ()
