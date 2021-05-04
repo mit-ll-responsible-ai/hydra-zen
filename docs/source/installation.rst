@@ -18,7 +18,7 @@ Basic Usage
 -----------
 
 The following is a simple example in which we use hydra-zen to create a structured config for a function.
-We will then launch multiple jobs that each run the function with a different set of configuration values.
+We will then launch multiple jobs – each on calls the function with a different set of configuration values.
 
 .. code-block:: python
 
