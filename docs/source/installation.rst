@@ -17,6 +17,9 @@ We strive to maintain as wide a window of backwards compatibility Hydra (and ome
 Basic Usage
 -----------
 
+The following is a simple example in which we use hydra-zen to create a structured config for a function.
+We will then launch multiple jobs that each run the function with a different set of configuration values.
+
 .. code-block:: python
 
    from hydra_zen import builds, instantiate, to_yaml
@@ -28,22 +31,25 @@ Basic Usage
 
 .. code-block:: pycon
 
-   # create structured config without defaults
-   >>> config = builds(repeat_text, populate_full_signature=True)
+   # Create structured config without providing default values.
+   # This is a dataclass object.
+   >>> Config = builds(repeat_text, populate_full_signature=True)
 
-   # instantiating the config "builds" `repeat_text`
-   >>> instantiate(config, num=2, text="hi")
+   # Instantiating the config builds `repeat_text`
+   # I.e. it calls `repeat_text(num=2, text="hi")`
+   >>> instantiate(Config(num=2, text="hi"))
    'hihi'
 
-   # type hints provide runtime validation
-   >>> instantiate(config, num=2.5, text="hi")
+   # `builds` retains the type hints from the function, which
+   # Hydra can use to provide runtime type validation
+   >>> instantiate(Config(num=2.5, text="hi"))
    ValidationError: Value '2.5' could not be converted to Integer
        full_key: num
        object_type=Builds_repeat_text
 
    # run multiple jobs over combination of parameter values
    >>> jobs, = hydra_multirun(
-   ...     config,
+   ...     Config,
    ...     task_function=instantiate,
    ...     overrides=["num=1,2,3", "text=hi,bye"],
    ... )
@@ -55,10 +61,12 @@ Basic Usage
    [2021-04-30 15:31:02,988][HYDRA] 	#4 : text=bye num=2
    [2021-04-30 15:31:03,063][HYDRA] 	#5 : text=bye num=3
 
-   >>> [j.return_value for j in jobs]  # access results of jobs
+   # access results of jobs
+   >>> [j.return_value for j in jobs]
    ['hi', 'hihi', 'hihihi', 'bye', 'byebye', 'byebyebye']
 
-   >>> print(to_yaml(jobs[0].cfg))  # get config of first run as yaml
+   # get the config of the first run as a yaml
+   >>> print(to_yaml(jobs[0].cfg))
    _target_: my_lib.repeat_text
    _recursive_: true
    _convert_: none

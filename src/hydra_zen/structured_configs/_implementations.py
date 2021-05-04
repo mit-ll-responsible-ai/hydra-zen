@@ -86,7 +86,7 @@ def hydrated_dataclass(
     frozen: bool = False,
 ) -> Callable[[Type[_T]], Type[_T]]:
     """A decorator that uses `hydra_zen.builds` to create a dataclass with the appropriate
-    hydra-specific fields for specifying a structured config.
+    hydra-specific fields for specifying a structured config [1]_.
 
     Parameters
     ----------
@@ -120,6 +120,12 @@ def hydrated_dataclass(
         If `True`, the resulting dataclass will create frozen (i.e. immutable) instances.
         I.e. setting/deleting an attribute of an instance will raise `FrozenInstanceError`
         at runtime.
+
+    References
+    ----------
+    .. [1] https://hydra.cc/docs/next/tutorials/structured_config/intro/
+    .. [2] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
+    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
 
     Examples
     --------

@@ -9,5 +9,6 @@ Creating Structured Configs
 
    builds
    just
+   hydrated_dataclass
 
 
