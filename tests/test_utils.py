@@ -1,5 +1,6 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+import collections.abc as abc
 import enum
 import sys
 from dataclasses import dataclass
@@ -142,9 +143,13 @@ class SomeProtocol(Protocol):
         (Literal[1, 2], Any),  # unsupported generics
         (Type[int], Any),
         (SomeProtocol, Any),
+        (Set, Any),
         (Set[int], Any),
         (Final[int], Any),
+        (Callable, Any),
         (Callable[[int], int], Any),
+        (abc.Callable, Any),
+        (abc.Mapping, Any),
         (Union[str, int], Any),
         (Optional[frozenset], Any),
         (Union[type(None), frozenset], Any),
