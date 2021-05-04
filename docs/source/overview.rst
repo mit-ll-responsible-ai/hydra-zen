@@ -51,13 +51,42 @@ code – the for-loops and other control-flow logic – associated with training
 Hydra with hydra-zen follows suite and eliminates the code you would write to, configure, orchestrate, organize the results of your various experiments.
 
 
-A structured config that you produce using, e.g., :func:`~hydra_zen.builds` is
+An Example Using PyTorch Lightning and hydra-zen
+-------------------------------------------------
 
-.. code:: python
 
-   def my_func(a_number: int, text: str):
-        pass
+Let's see what this looks like in practice.
+We'll use PyTorch Lightning to train multiple, simple, `arbitrary-width universal function approximators <https://en.wikipedia.org/wiki/Universal_approximation_theorem#Arbitrary-width_case>`_ (i.e. a single-layer neural network) to fit :math:`\cos{x}`
+on a restricted domain.
+In mathematical notation, we want to solve the following optimization problem:
 
+.. math::
+
+   F(\vec{v}, \vec{w}, \vec{b}; x) &= \sum_{i=1}^{N}{v_{i}\sigma(x \cdot w_i + b_i)}
+
+   \vec{v}^*, \vec{w}^*, \vec{b}^* &= \operatorname*{arg\,min}_{\vec{v}, \vec{w}, \vec{b}\in\mathbb{R}^{N}} \;  \|F(\vec{v}, \vec{w}, \vec{b}; x)\ - \cos{x}\|_{2}
+
+   x &\in [-2\pi, 2\pi]
+
+where :math:`N` – the number of "neurons" in our layer – is a hyperparameter.
+
+The following is the boilerplate-free code for defining our model, our training code, and the configuration for this code.
+
+.. code-block:: python
+
+   import math
+   from typing import Callable, Type
+
+   import pytorch_lightning as pl
+   import matplotlib.pyplot as plt
+   import torch as tr
+   import torch.nn as nn
+   import torch.nn.functional as F
+   import torch.optim as optim
+   from torch.utils.data import DataLoader, TensorDataset
+
+   from hydra_zen import builds, instantiate, just
+   from hydra_zen.experimental import hydra_multirun
 
 +-----------------------------------------------------------+------------------------------------------+
 | PyTorch Lightning Module                                  | hydra-zen Configuration                  |
@@ -104,3 +133,63 @@ A structured config that you produce using, e.g., :func:`~hydra_zen.builds` is
 +-----------------------------------------------------------+------------------------------------------+
 
 
+.. code-block:: python
+
+   def task(cfg: ExperimentConfig):
+       # Hydra recursively instantiates the lightning module, trainer,
+       # and all other instantiable aspects of the configuration
+       exp = instantiate(cfg)
+
+       # train the model
+       exp.trainer.fit(exp.lightning_module)
+
+       # evaluate the model over the domain to assess the fit
+       data = exp.lightning_module.training_domain
+       final_fit = exp.lightning_module.forward(data.reshape(-1, 1))
+
+       # return the trained model instance and the final fit
+       return (
+           exp.lightning_module,
+           final_fit.detach().numpy().ravel(),
+       )
+
+Now we will train our model using different batch-sizes and model-sizes (i.e. number of "neurons" in the layer):
+
+
+.. code-block:: python
+
+   >>> jobs, = hydra_multirun(
+   ...     ExperimentConfig,
+   ...     task,
+   ...     overrides=[
+   ...         "dataloader.batch_size=20, 200",
+   ...         "lightning_module.num_neurons=10, 100"
+   ...     ],
+   ... )
+   [2021-05-04 16:19:34,682][HYDRA] Launching 4 jobs locally
+   [2021-05-04 16:19:34,683][HYDRA] 	#0 : lightning_module.num_neurons=10 dataloader.batch_size=20
+   [2021-05-04 16:19:41,350][HYDRA] 	#1 : lightning_module.num_neurons=10 dataloader.batch_size=200
+   [2021-05-04 16:19:43,512][HYDRA] 	#2 : lightning_module.num_neurons=100 dataloader.batch_size=20
+   [2021-05-04 16:19:50,319][HYDRA] 	#3 : lightning_module.num_neurons=100 dataloader.batch_size=200
+
+Visualizing our results
+
+.. code-block:: python
+
+   x = instantiate(ExperimentConfig.lightning_module.training_domain)
+   target_fn = instantiate(ExperimentConfig.lightning_module.target_fn)
+
+   fig, ax = plt.subplots()
+   ax.plot(x, target_fn(x), ls="--", label="True")
+
+   for j in jobs:
+       out = j.return_value[1]
+       ax.plot(x, out, label=",".join(s.split(".")[-1] for s in j.overrides))
+
+   ax.grid(True)
+   ax.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
+
+
+.. image:: https://user-images.githubusercontent.com/29104956/117079795-7fc7a280-ad0a-11eb-9916-4fd63cd2e990.png
+   :width: 800
+   :alt: Alternative text
