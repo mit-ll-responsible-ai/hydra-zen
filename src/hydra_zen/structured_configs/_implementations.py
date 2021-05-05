@@ -259,6 +259,20 @@ def just(obj: Importable) -> Type[Just[Importable]]:
     return out_class
 
 
+def sanitized_default_value(value: Any) -> Union[Field, Type[Just]]:
+    if isinstance(value, _utils.KNOWN_MUTABLE_TYPES):
+        return mutable_value(value)
+
+    if inspect.isfunction(value) or (
+        inspect.isclass(value) and not is_dataclass(value)
+    ):
+        # Hydra can serialize dataclasses directly, thus we
+        # don't want to wrap these in `just`
+        return just(value)
+
+    return field(default=value)
+
+
 # overloads when `hydra_partial=False`
 @overload
 def builds(
@@ -699,11 +713,7 @@ def builds(
         name: (
             name,
             _utils.sanitized_type(type_hints.get(name, Any)),
-            (
-                field(default=value)
-                if not isinstance(value, _utils.KNOWN_MUTABLE_TYPES)
-                else mutable_value(value)
-            ),
+            sanitized_default_value(value),
         )
         for name, value in kwargs_for_target.items()
     }
@@ -755,11 +765,7 @@ def builds(
                         # because we assume that they want to fill these in by using partial
                         base_fields.append(param_field)
                 else:
-                    if isinstance(param.default, _utils.KNOWN_MUTABLE_TYPES):
-                        value = mutable_value(param.default)
-                    else:
-                        value = field(default=param.default)
-                    param_field += (value,)
+                    param_field += (sanitized_default_value(param.default),)
                     _fields_with_default_values.append(param_field)
 
         base_fields.extend(_fields_with_default_values)

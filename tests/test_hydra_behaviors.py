@@ -56,6 +56,11 @@ class NotSet:
     pass
 
 
+@dataclass
+class A:
+    x: Any = (1, 2)
+
+
 @pytest.mark.parametrize("via_hydrated_dataclass", [False, True])
 @pytest.mark.parametrize(
     "convert, expected_types",
@@ -77,10 +82,6 @@ def test_hydra_convert(
 ):
     """Tests that the `hydra_convert` parameter produces the expected/documented
     behavior in hydra."""
-
-    @dataclass
-    class A:
-        x: Any = (1, 2)
 
     kwargs = dict(hydra_convert=convert) if convert is not NotSet else {}
 
