@@ -76,6 +76,7 @@ The following is the boilerplate-free code.
 .. code-block:: python
 
    import math
+   from dataclasses import dataclass
    from typing import Callable, Type
 
    import pytorch_lightning as pl
