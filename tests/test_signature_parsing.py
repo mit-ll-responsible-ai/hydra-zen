@@ -3,14 +3,16 @@
 
 import inspect
 from abc import ABC
+from dataclasses import dataclass
 from inspect import Parameter
-from typing import Any, Optional, Tuple
+from typing import Any, Callable, Dict, Mapping, Optional, Tuple, Type
 
 import hypothesis.strategies as st
 import pytest
 from hypothesis import given, settings
 
 from hydra_zen import builds, hydrated_dataclass, mutable_value
+from hydra_zen.typing import Just
 from tests import valid_hydra_literals
 
 Empty = Parameter.empty
@@ -128,13 +130,27 @@ def test_builds_with_full_sig_mirrors_target_sig(
         assert conf.named_param == 2
 
 
+def func():
+    pass
+
+
+@dataclass
+class ADataClass:
+    x: int = 1
+
+
 def a_func(
     x: int,
     y: str,
     z: bool,
     a_tuple: Tuple[str] = ("hi",),
     optional: Optional[int] = None,
+    inferred_optional_str: str = None,
+    inferred_optional_any: Mapping = None,
     default: float = 100.0,
+    a_function: Callable = func,
+    a_class: Type[Dict] = dict,
+    a_dataclass: Type[ADataClass] = ADataClass,
 ):
     pass
 
@@ -147,7 +163,12 @@ class AClass:
         z: bool,
         a_tuple: Tuple[str] = ("hi",),
         optional: Optional[int] = None,
+        inferred_optional_str: str = None,
+        inferred_optional_any: Mapping = None,
         default: float = 100.0,
+        a_function: Callable = func,
+        a_class: Type[Dict] = dict,
+        a_dataclass: Type[ADataClass] = ADataClass,
     ):
         pass
 
@@ -160,7 +181,12 @@ class AMetaClass(ABC):
         z: bool,
         a_tuple: Tuple[str] = ("hi",),
         optional: Optional[int] = None,
+        inferred_optional_str: str = None,
+        inferred_optional_any: Mapping = None,
         default: float = 100.0,
+        a_function: Callable = func,
+        a_class: Type[Dict] = dict,
+        a_dataclass: Type[ADataClass] = ADataClass,
     ):
         pass
 
@@ -172,8 +198,7 @@ class AMetaClass(ABC):
     )
 )
 def test_builds_partial_with_full_sig_excludes_non_specified_params(
-    target,
-    user_specified_values,
+    target, user_specified_values
 ):
     name_to_type = dict(x=int, y=str, z=bool)
     Conf = builds(
@@ -189,7 +214,12 @@ def test_builds_partial_with_full_sig_excludes_non_specified_params(
     ] + [
         ("a_tuple", Tuple[str], ("hi",)),
         ("optional", Optional[int], None),
+        ("inferred_optional_str", Optional[str], None),
+        ("inferred_optional_any", Any, None),
         ("default", float, 100.0),
+        ("a_function", Any, Conf.a_function),
+        ("a_class", Any, Conf.a_class),
+        ("a_dataclass", Any, ADataClass),
     ]
 
     actual_sig = [
@@ -197,3 +227,6 @@ def test_builds_partial_with_full_sig_excludes_non_specified_params(
         for p in inspect.signature(Conf).parameters.values()
     ]
     assert expected_sig == actual_sig
+
+    assert isinstance(Conf.a_function, Just) and "func" in Conf.a_function.path
+    assert isinstance(Conf.a_class, Just) and "dict" in Conf.a_class.path

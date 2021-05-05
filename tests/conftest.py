@@ -32,7 +32,7 @@ if sys.version_info < (3, 9):
     collect_ignore_glob.append("*py39*")
 
 
-OPTIONAL_TEST_DEPENDENCIES = ("numpy", "torch", "jax")
+OPTIONAL_TEST_DEPENDENCIES = ("numpy", "torch", "jax", "pytorch_lightning")
 
 for module in OPTIONAL_TEST_DEPENDENCIES:
     if module not in sys.modules:
