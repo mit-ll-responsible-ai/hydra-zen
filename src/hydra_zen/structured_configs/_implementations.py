@@ -638,7 +638,7 @@ def builds(
     # this properly resolves forward references, whereas the annotations
     # from signature do not
     try:
-        if type(target) is type and hasattr(type, "__init__"):
+        if inspect.isclass(target) and hasattr(type, "__init__"):
             # target is class object...
             # calling `get_type_hints(target)` returns empty dict
             type_hints = get_type_hints(target.__init__)

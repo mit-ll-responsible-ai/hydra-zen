@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import inspect
+from abc import ABC
 from inspect import Parameter
 from typing import Any, Optional, Tuple
 
@@ -151,7 +152,20 @@ class AClass:
         pass
 
 
-@pytest.mark.parametrize("target", [a_func, AClass])
+class AMetaClass(ABC):
+    def __init__(
+        self,
+        x: int,
+        y: str,
+        z: bool,
+        a_tuple: Tuple[str] = ("hi",),
+        optional: Optional[int] = None,
+        default: float = 100.0,
+    ):
+        pass
+
+
+@pytest.mark.parametrize("target", [a_func, AClass, AMetaClass])
 @given(
     user_specified_values=st.dictionaries(
         keys=st.sampled_from(["x", "y", "z"]), values=st.integers(0, 3), max_size=3
