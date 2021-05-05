@@ -27,6 +27,12 @@ from hydra_zen.funcs import get_obj, partial
 from hydra_zen.structured_configs import _utils
 from hydra_zen.typing import Builds, Importable, Just, PartialBuilds
 
+try:
+    # used to check if default values are ufuncs
+    from numpy import ufunc
+except ImportError:
+    ufunc = None
+
 __all__ = ["builds", "just", "hydrated_dataclass", "mutable_value"]
 
 _T = TypeVar("_T")
@@ -270,6 +276,9 @@ def sanitized_default_value(value: Any) -> Union[Field, Type[Just]]:
         # don't want to wrap these in `just`
         return just(value)
 
+    if ufunc is not None and isinstance(value, ufunc):
+        # ufuncs are weird.. they aren't classes and they aren't functions
+        return just(value)
     return field(default=value)
 
 
