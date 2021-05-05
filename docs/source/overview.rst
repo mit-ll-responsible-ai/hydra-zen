@@ -47,7 +47,7 @@ While Hydra excels at configuring and launching traditional software application
 
 
 Libraries like `PyTorch Lightning <https://pytorch-lightning.readthedocs.io/en/latest/>`_ help to eliminate boilerplate
-code – the for-loops and other control-flow logic – associated with training and testing a neural network;
+code – for-loops and other control-flow logic – associated with training and testing a neural network;
 Hydra with hydra-zen follows suite and eliminates the code you would write to configure, orchestrate, and organize the results of your various experiments.
 
 
@@ -63,7 +63,7 @@ In mathematical notation, we want to solve the following optimization problem:
 
 .. math::
 
-   F(\vec{v}, \vec{w}, \vec{b}; x) &= \sum_{i=1}^{N}{v_{i}\sigma(x \cdot w_i + b_i)}
+   F(\vec{v}, \vec{w}, \vec{b}; x) &= \sum_{i=1}^{N}{v_{i}\sigma(x w_i + b_i)}
 
    \vec{v}^*, \vec{w}^*, \vec{b}^* &= \operatorname*{arg\,min}_{\vec{v}, \vec{w}, \vec{b}\in\mathbb{R}^{N}} \;  \|F(\vec{v}, \vec{w}, \vec{b}; x)\ - \cos{x}\|_{2}
 
