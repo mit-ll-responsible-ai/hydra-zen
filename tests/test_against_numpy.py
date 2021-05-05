@@ -70,3 +70,13 @@ def test_fuzz_build_validation_against_a_bunch_of_common_objects(
 
     if partial:
         instantiate(conf)  # ensure instantiable
+
+
+def f(reduction_fn=np.add):
+    return reduction_fn
+
+
+def test_ufunc_as_default_value():
+    conf = builds(f, populate_full_signature=True)
+    to_yaml(conf)  # check serializability
+    assert instantiate(conf) is np.add

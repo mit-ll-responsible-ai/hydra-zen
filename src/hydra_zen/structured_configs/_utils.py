@@ -4,7 +4,7 @@
 import sys
 from dataclasses import is_dataclass
 from enum import Enum
-from typing import Any, Callable, Dict, List, Tuple, TypeVar, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, TypeVar, Union
 
 from typing_extensions import Final
 
@@ -174,7 +174,12 @@ def interpolated(func: Union[str, Callable], *literals: Any) -> str:
     return f"${{{name}:{','.join(repr(i) for i in literals)}}}"
 
 
-def sanitized_type(type_: type, primitive_only: bool = False) -> type:
+NoneType = type(None)
+
+
+def sanitized_type(
+    type_: type, *, primitive_only: bool = False, wrap_optional: bool = False
+) -> type:
     """Returns ``type_`` unchanged if it is supported as an annotation by hydra,
     otherwise returns ``Any``.
 
@@ -186,8 +191,13 @@ def sanitized_type(type_: type, primitive_only: bool = False) -> type:
     >>> sanitized_type(frozenset)  # not supported by hydra
     typing.Any
 
+    >>> sanitized_type(int, wrap_optional=True)
+    Union[
     >>> sanitized_type(List[int])
     List[int]
+
+    >>> sanitized_type(List[int], primitive_only=True)
+    Any
 
     >>> sanitized_type(Dict[str, frozenset])
     Dict[str, Any]
@@ -211,12 +221,11 @@ def sanitized_type(type_: type, primitive_only: bool = False) -> type:
             optional_type, none_type = args
             if not isinstance(None, none_type):
                 optional_type = none_type
-                none_type = type(None)
             optional_type = sanitized_type(optional_type)
 
             if optional_type is Any:  # Union[Any, T] is just Any
                 return Any
-            return Union[optional_type, none_type]
+            return Union[optional_type, NoneType]
 
         if origin is list or origin is List:
             return List[sanitized_type(args[0], primitive_only=True)] if args else type_
@@ -257,10 +266,19 @@ def sanitized_type(type_: type, primitive_only: bool = False) -> type:
         or is_dataclass(type_)
         or (isinstance(type_, type) and issubclass(type_, Enum))
     ):
+        if wrap_optional and type_ is not Any:  # pragma: no cover
+            # normally get_type_hints automatically resolves Optional[...]
+            # when None is set as the default, but this has been flaky
+            # for some pytorch-lightning classes. So we just do it ourselves...
+            # It might be worth removing this later since none of our standard tests
+            # cover it.
+            type_ = Optional[type_]
         return type_
 
     # Needed to cover python 3.6 where __origin__ doesn't normalize to type
     if not primitive_only and type_ in {List, Tuple, Dict}:  # pragma: no cover
+        if wrap_optional and type_ is not Any:
+            type_ = Optional[type_]
         return type_
 
     return Any

@@ -87,8 +87,9 @@ The `just(<target>)` function creates a configuration that "just" returns the ta
 >>> instantiate(JustSquare)
 <function __main__.square(x)>
 
->>> NumberConf = builds(dict, initial_val=2., transform=just(square))
->>> instantiate(NumberConf)  # calls `dict(number_type=int)`
+# `builds` will automatically apply `just` to functions and classes
+>>> NumberConf = builds(dict, initial_val=2., transform=square)
+>>> instantiate(NumberConf)  # calls `dict(number_type=int, transform=square)`
 {'initial_val': 2.0, 'transform': <function __main__.square(x)>}
 ```
 
@@ -183,7 +184,7 @@ ConfigGradDesc = builds(
     # Not all of its required inputs are part of our configuration
     optim=builds(SGD, lr=0.3, momentum=0.0, hydra_partial=True),
 
-    landscape_fn=just(parabaloid),
+    landscape_fn=parabaloid,
     starting_xy=(-1.5, 0.5),
     num_steps=20,
 )

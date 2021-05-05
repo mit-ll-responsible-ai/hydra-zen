@@ -27,6 +27,12 @@ from hydra_zen.funcs import get_obj, partial
 from hydra_zen.structured_configs import _utils
 from hydra_zen.typing import Builds, Importable, Just, PartialBuilds
 
+try:
+    # used to check if default values are ufuncs
+    from numpy import ufunc
+except ImportError:  # pragma: no cover
+    ufunc = None
+
 __all__ = ["builds", "just", "hydrated_dataclass", "mutable_value"]
 
 _T = TypeVar("_T")
@@ -263,6 +269,23 @@ def just(obj: Importable) -> Type[Just[Importable]]:
     )
 
     return out_class
+
+
+def sanitized_default_value(value: Any) -> Union[Field, Type[Just]]:
+    if isinstance(value, _utils.KNOWN_MUTABLE_TYPES):
+        return mutable_value(value)
+
+    if inspect.isfunction(value) or (
+        inspect.isclass(value) and not is_dataclass(value)
+    ):
+        # Hydra can serialize dataclasses directly, thus we
+        # don't want to wrap these in `just`
+        return just(value)
+
+    if ufunc is not None and isinstance(value, ufunc):
+        # ufuncs are weird.. they aren't classes and they aren't functions
+        return just(value)
+    return field(default=value)
 
 
 # overloads when `hydra_partial=False`
@@ -644,7 +667,7 @@ def builds(
     # this properly resolves forward references, whereas the annotations
     # from signature do not
     try:
-        if type(target) is type and hasattr(type, "__init__"):
+        if inspect.isclass(target) and hasattr(type, "__init__"):
             # target is class object...
             # calling `get_type_hints(target)` returns empty dict
             type_hints = get_type_hints(target.__init__)
@@ -705,11 +728,7 @@ def builds(
         name: (
             name,
             _utils.sanitized_type(type_hints.get(name, Any)),
-            (
-                field(default=value)
-                if not isinstance(value, _utils.KNOWN_MUTABLE_TYPES)
-                else mutable_value(value)
-            ),
+            sanitized_default_value(value),
         )
         for name, value in kwargs_for_target.items()
     }
@@ -743,9 +762,15 @@ def builds(
                 # don't populate a parameter that can be derived from a base
                 continue
             else:
+                # any parameter whose default value is None is automatically
+                # annotated with `Optional[...]`. This improves flexibility with
+                # Hydra's type-validation
                 param_field = (
                     param.name,
-                    _utils.sanitized_type(type_hints.get(param.name, Any)),
+                    _utils.sanitized_type(
+                        type_hints.get(param.name, Any),
+                        wrap_optional=param.default is None,
+                    ),
                 )
 
                 if param.default is inspect.Parameter.empty:
@@ -755,11 +780,7 @@ def builds(
                         # because we assume that they want to fill these in by using partial
                         base_fields.append(param_field)
                 else:
-                    if isinstance(param.default, _utils.KNOWN_MUTABLE_TYPES):
-                        value = mutable_value(param.default)
-                    else:
-                        value = field(default=param.default)
-                    param_field += (value,)
+                    param_field += (sanitized_default_value(param.default),)
                     _fields_with_default_values.append(param_field)
 
         base_fields.extend(_fields_with_default_values)

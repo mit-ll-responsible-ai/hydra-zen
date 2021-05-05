@@ -17,10 +17,11 @@ from omegaconf.errors import (
     ConfigValueError,
     KeyValidationError,
 )
-from typing_extensions import Final, Literal, Protocol
+from typing_extensions import Final, Literal
 
 from hydra_zen import builds, instantiate, mutable_value
 from hydra_zen.structured_configs._utils import interpolated, safe_name, sanitized_type
+from hydra_zen.typing import Builds
 
 from . import valid_hydra_literals
 
@@ -120,10 +121,6 @@ class Color(enum.Enum):
     pass
 
 
-class SomeProtocol(Protocol):
-    pass
-
-
 @pytest.mark.parametrize(
     "in_type, expected_type",
     [
@@ -142,7 +139,9 @@ class SomeProtocol(Protocol):
         (T, Any),
         (Literal[1, 2], Any),  # unsupported generics
         (Type[int], Any),
-        (SomeProtocol, Any),
+        (Builds, Any),
+        (Builds[int], Any),
+        (Type[Builds[int]], Any),
         (Set, Any),
         (Set[int], Any),
         (Final[int], Any),
