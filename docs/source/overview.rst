@@ -77,7 +77,7 @@ The following is the boilerplate-free code.
 
    import math
    from dataclasses import dataclass
-   from typing import Callable, Type
+   from typing import Any, Callable, Type
 
    import pytorch_lightning as pl
    import matplotlib.pyplot as plt
@@ -130,7 +130,7 @@ The following is the boilerplate-free code.
 |                                                           |            pl.Trainer,                   |
 |        def train_dataloader(self):                        |            max_epochs=100,               |
 |            x = self.training_domain.reshape(-1, 1)        |            gpus=0,                       |
-|            y = self.target_fn(x)                          |            progress_bar_refresh_rate=0.1,|
+|            y = self.target_fn(x)                          |            progress_bar_refresh_rate=0,  |
 |            return self.dataloader(TensorDataset(x, y))    |        )                                 |
 +-----------------------------------------------------------+------------------------------------------+
 
