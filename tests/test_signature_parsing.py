@@ -4,7 +4,7 @@
 import inspect
 from abc import ABC
 from inspect import Parameter
-from typing import Any, Optional, Tuple
+from typing import Any, Mapping, Optional, Tuple
 
 import hypothesis.strategies as st
 import pytest
@@ -134,6 +134,8 @@ def a_func(
     z: bool,
     a_tuple: Tuple[str] = ("hi",),
     optional: Optional[int] = None,
+    inferred_optional_str: str = None,
+    inferred_optional_any: Mapping = None,
     default: float = 100.0,
 ):
     pass
@@ -147,6 +149,8 @@ class AClass:
         z: bool,
         a_tuple: Tuple[str] = ("hi",),
         optional: Optional[int] = None,
+        inferred_optional_str: str = None,
+        inferred_optional_any: Mapping = None,
         default: float = 100.0,
     ):
         pass
@@ -160,6 +164,8 @@ class AMetaClass(ABC):
         z: bool,
         a_tuple: Tuple[str] = ("hi",),
         optional: Optional[int] = None,
+        inferred_optional_str: str = None,
+        inferred_optional_any: Mapping = None,
         default: float = 100.0,
     ):
         pass
@@ -172,8 +178,7 @@ class AMetaClass(ABC):
     )
 )
 def test_builds_partial_with_full_sig_excludes_non_specified_params(
-    target,
-    user_specified_values,
+    target, user_specified_values
 ):
     name_to_type = dict(x=int, y=str, z=bool)
     Conf = builds(
@@ -189,6 +194,8 @@ def test_builds_partial_with_full_sig_excludes_non_specified_params(
     ] + [
         ("a_tuple", Tuple[str], ("hi",)),
         ("optional", Optional[int], None),
+        ("inferred_optional_str", Optional[str], None),
+        ("inferred_optional_any", Any, None),
         ("default", float, 100.0),
     ]
 

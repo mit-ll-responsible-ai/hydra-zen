@@ -737,9 +737,15 @@ def builds(
                 # don't populate a parameter that can be derived from a base
                 continue
             else:
+                # any parameter whose default value is None is automatically
+                # annotated with `Optional[...]`. This improves flexibility with
+                # Hydra's type-validation
                 param_field = (
                     param.name,
-                    _utils.sanitized_type(type_hints.get(param.name, Any)),
+                    _utils.sanitized_type(
+                        type_hints.get(param.name, Any),
+                        wrap_optional=param.default is None,
+                    ),
                 )
 
                 if param.default is inspect.Parameter.empty:
