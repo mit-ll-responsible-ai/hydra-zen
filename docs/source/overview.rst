@@ -48,15 +48,16 @@ While Hydra excels at configuring and launching traditional software application
 
 Libraries like `PyTorch Lightning <https://pytorch-lightning.readthedocs.io/en/latest/>`_ help to eliminate boilerplate
 code – the for-loops and other control-flow logic – associated with training and testing a neural network;
-Hydra with hydra-zen follows suite and eliminates the code you would write to, configure, orchestrate, organize the results of your various experiments.
+Hydra with hydra-zen follows suite and eliminates the code you would write to configure, orchestrate, and organize the results of your various experiments.
 
 
-An Example Using PyTorch Lightning and hydra-zen
+An Example Using hydra-zen and PyTorch Lightning
 -------------------------------------------------
 
 
 Let's see what this looks like in practice.
-We'll use PyTorch Lightning to train multiple, simple, `arbitrary-width universal function approximators <https://en.wikipedia.org/wiki/Universal_approximation_theorem#Arbitrary-width_case>`_ (i.e. a single-layer neural network) to fit :math:`\cos{x}`
+We'll use Hydra, hydra-zen, and PyTorch Lightning to configure and train multiple single-layer neural networks.
+In this example we will optimize `arbitrary-width universal function approximators <https://en.wikipedia.org/wiki/Universal_approximation_theorem#Arbitrary-width_case>`_  to fit :math:`\cos{x}`
 on a restricted domain.
 In mathematical notation, we want to solve the following optimization problem:
 
@@ -70,7 +71,7 @@ In mathematical notation, we want to solve the following optimization problem:
 
 where :math:`N` – the number of "neurons" in our layer – is a hyperparameter.
 
-The following is the boilerplate-free code for defining our model, our training code, and the configuration for this code.
+The following is the boilerplate-free code.
 
 .. code-block:: python
 
@@ -153,7 +154,7 @@ The following is the boilerplate-free code for defining our model, our training 
            final_fit.detach().numpy().ravel(),
        )
 
-Now we will train our model using different batch-sizes and model-sizes (i.e. number of "neurons" in the layer):
+Now we will train our model using different batch-sizes and model-sizes (i.e. number of "neurons" in the layer).
 
 
 .. code-block:: python
@@ -171,6 +172,26 @@ Now we will train our model using different batch-sizes and model-sizes (i.e. nu
    [2021-05-04 16:19:41,350][HYDRA] 	#1 : lightning_module.num_neurons=10 dataloader.batch_size=200
    [2021-05-04 16:19:43,512][HYDRA] 	#2 : lightning_module.num_neurons=100 dataloader.batch_size=20
    [2021-05-04 16:19:50,319][HYDRA] 	#3 : lightning_module.num_neurons=100 dataloader.batch_size=200
+
+Hydra will `automatically create an output/working directory <https://hydra.cc/docs/next/tutorials/basic/running_your_app/working_directory>`_ for each job and save an associated yaml configuration file that documents all of the settings that were used to run that job.
+The following shows the directories created associated with jobs **0**, **1**, etc.
+
+.. code-block:: shell
+
+   $ tree multirun/2021-05-04/16-19-17
+     ├── 0
+     │   ├── .hydra
+     │   │   ├── config.yaml
+     │   │   ├── hydra.yaml
+     │   │   └── overrides.yaml
+     │   └── lightning_logs/
+     ├── 1
+     │   ├── .hydra
+     │   │   ├── config.yaml
+     .   .   .
+     .   .   .
+
+Each ``config.yaml`` file can be used to repeat that particular job.
 
 Visualizing our results
 
