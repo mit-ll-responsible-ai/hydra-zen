@@ -30,7 +30,7 @@ from hydra_zen.typing import Builds, Importable, Just, PartialBuilds
 try:
     # used to check if default values are ufuncs
     from numpy import ufunc
-except ImportError:
+except ImportError:  # pragma: no cover
     ufunc = None
 
 __all__ = ["builds", "just", "hydrated_dataclass", "mutable_value"]

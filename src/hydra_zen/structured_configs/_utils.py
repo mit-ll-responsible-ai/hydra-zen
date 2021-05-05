@@ -266,7 +266,12 @@ def sanitized_type(
         or is_dataclass(type_)
         or (isinstance(type_, type) and issubclass(type_, Enum))
     ):
-        if wrap_optional and type_ is not Any:
+        if wrap_optional and type_ is not Any:  # pragma: no cover
+            # normally get_type_hints automatically resolves Optional[...]
+            # when None is set as the default, but this has been flaky
+            # for some pytorch-lightning classes. So we just do it ourselves...
+            # It might be worth removing this later since none of our standard tests
+            # cover it.
             type_ = Optional[type_]
         return type_
 
