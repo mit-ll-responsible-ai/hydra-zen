@@ -20,12 +20,12 @@ Basics of Structured Configs
 
 Hydra supports configurations that are written in a yaml format or in Python via `structured configs <https://hydra.cc/docs/next/tutorials/structured_config/intro>`_.
 Structured configs are `dataclasses <https://docs.python.org/3/library/dataclasses.html>`_ whose type annotations (up to a limited assortment) can be leveraged by Hydra to provide runtime type checking for your configurations.
+
 An important feature of these structured configs is that they too can be serialized to yaml files by Hydra.
-This is critical, as it ensures that each job is launched using Hydra is fully documented by – and can be reproduced from – a plaint text yaml configuration.
+This is critical, as it ensures that each job that is launched using Hydra is fully documented by – and can be reproduced from – a plain-text yaml configuration.
 
 A `targeted configuration <https://hydra.cc/docs/next/advanced/instantiate_objects/overview>`_ is designed to instantiate / call an object (a class-object or a function) with particular values.
 hydra-zen provides functions that are specifically designed to created targeted structured configs.
-
 For example, suppose that we want to configure the following class
 
 .. code:: python
@@ -72,7 +72,7 @@ The following table compares the two standard approaches for configuring ``DNN``
 +-------------------------------+---------------------------------------------------+------------------------------------------------------+
 
 Note that the result of ``builds(DNN, populate_full_signature=True)`` is *identical* to the manually-defined dataclass ``Builds_DNN``:
-`builds` returns a dataclass object with the parameters – along with their default values and type annotations – that are auto-populated based on the signature of ``DNN``.
+`builds` returns a dataclass object with parameters – along with their default values and type annotations – that are auto-populated based on the signature of ``DNN``.
 
 .. code:: python
 
@@ -126,7 +126,7 @@ hydra-zen's `builds` makes short work of generating nested configs.
    >>> instantiate(Conf)
    {'x': {'x': {'x': [1, 2, 3]}}}
 
-There are plenty of realistic examples where creating nested configurations, and leveraging Hydra's recursive instantiation, is very useful.
+There are plenty of realistic examples where creating nested configurations is called for.
 Consider this configuration of a data augmentation and transformation pipeline as an example:
 
 .. code:: python
