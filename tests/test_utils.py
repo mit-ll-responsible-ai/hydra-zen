@@ -165,6 +165,8 @@ class Color(enum.Enum):
         (Dict[str, C], Dict[str, Any]),
         (Dict[C, C], Dict[Any, Any]),
         (Dict[str, List[int]], Dict[str, Any]),
+        (Tuple[str], Tuple[str]),
+        (Tuple[str, ...], Tuple[str, ...]),
         (Tuple[str, str, str], Tuple[str, str, str]),
         (Tuple[List[int]], Tuple[Any]),
     ],
