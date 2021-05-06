@@ -250,14 +250,18 @@ def sanitized_type(
             if not args:
                 return Any  # bare Tuple not supported by hydra
             unique_args = set(args)
+            has_ellipses = Ellipsis in unique_args
 
             _unique_type = (
                 sanitized_type(args[0], primitive_only=True)
-                if len(unique_args) == 1
+                if len(unique_args) == 1 or (len(unique_args) == 2 and has_ellipses)
                 else Any
             )
+            if has_ellipses:
+                return Tuple[_unique_type, ...]
+            else:
+                return Tuple[(_unique_type,) * len(args)]
 
-            return Tuple[(_unique_type,) * len(args)]
         return Any
 
     if (
