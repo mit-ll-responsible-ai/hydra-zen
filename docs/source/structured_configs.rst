@@ -30,7 +30,7 @@ An important feature of these structured configs is that they too can be seriali
 This is critical, as it ensures that each job that is launched using Hydra is fully documented by – and can be reproduced from – a plain-text yaml configuration.
 
 A `targeted configuration <https://hydra.cc/docs/next/advanced/instantiate_objects/overview>`_ is designed to instantiate / call an object (a class-object or a function) with particular values.
-hydra-zen provides functions that are specifically designed to created targeted structured configs.
+hydra-zen provides functions that are specifically designed to dynamically generate targeted structured configs.
 For example, suppose that we want to configure the following class
 
 .. code:: python
