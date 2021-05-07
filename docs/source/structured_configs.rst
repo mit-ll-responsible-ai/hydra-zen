@@ -1,9 +1,14 @@
-***************************
-Creating Structured Configs
-***************************
+*****************************************
+Dynamically Generating Structured Configs
+*****************************************
+
 
 API Reference
 =============
+
+hydra-zen provides us with some simple but powerful tools for dynamically generating structured configs for our code.
+This helps to keep the process of configuring complex applications simple and intuitive.
+
 
 .. currentmodule:: hydra_zen
 
@@ -52,14 +57,14 @@ and that we want the default values in our configuration to reflect the values s
 Creating Hydra-Compatible Configurations
 ****************************************
 
-The following table compares the two standard approaches for configuring ``DNN`` – using a manually-written yaml file or a manually-defined structured config – along with hydra-zen's approach of **dynamically** generating a structured config.
+The following table compares the two standard approaches for configuring ``DNN`` – using a manually-written yaml file or a manually-defined structured config – along with hydra-zen's approach of **dynamically generating** a structured config.
 
 +-------------------------------+---------------------------------------------------+------------------------------------------------------+
 | (Hydra) Using a yaml file     | (Hydra) Using a structured config                 | (hydra-zen) Using `builds`                           |
 +===============================+===================================================+======================================================+
 | .. code:: yaml                | .. code:: python                                  | .. code:: python                                     |
 |                               |                                                   |                                                      |
-|    _target_: vision.model.DNN |   from omegaconf import MISSING                   |    >>> from vision.model import DNN                  |
+|    _target_: vision.model.DNN |    from omegaconf import MISSING                  |    >>> from vision.model import DNN                  |
 |    input_size: ???            |    from dataclasses import dataclass              |    >>> from hydra_zen import builds                  |
 |    output_size: ???           |                                                   |    >>> builds(target=DNN,                            |
 |    layer_widths:              |    @dataclass                                     |    ...        populate_full_signature=True,          |
@@ -100,7 +105,7 @@ And this dynamically generated configuration can still be serialized to a yaml f
 
    >>> from hydra_zen import to_yaml  # alias of `omegaconf.OmegaConf.to_yaml`
    >>> print(to_yaml(Conf(input_size=2, output_size=10, device="cuda:0")))
-   _target_: __main__.DNN
+   _target_: vision.model.DNN
    _recursive_: true
    _convert_: none
    input_size: 2
@@ -161,3 +166,98 @@ Consider this configuration of a data augmentation and transformation pipeline a
        ToTensor()
        Normalize(mean=[0.4914, 0.4822, 0.4465], std=[0.2023, 0.1994, 0.201])
    )
+
+
+Keeping DRY with Dynamically-Generated Configs 🌞
+=================================================
+
+**DRY – Don't Repeat Yourself** – is a `principle of software development <https://en.wikipedia.org/wiki/Don%27t_repeat_yourself>`_ that cautions against repetitive software patterns and workflows.
+Manually writing (or even statically generating) configs for your code will often leave you soaking **WET (Writing Everything Twice)**.
+
+To see this, let's revisit the previous example where we configured the ``DNN`` class.
+
+.. code:: python
+
+   # Class that we want to configure
+   class DNN:
+       def __init__(
+           self,
+           input_size: int,
+           output_size: int,
+           layer_widths: Tuple[int, ...] = (5, 10, 5),
+           device: str = "cpu",
+       ):
+           ...
+
+
+Statically-Defined Configs are WET
+**********************************
+
+Manually writing a structured config for ``DNN`` entails hard-coding its current import-path as a string, and mirroring its signature:
+
+.. code:: python
+
+   # statically defined configurations are WET
+   from omegaconf import MISSING
+   from dataclasses import dataclass
+
+   @dataclass
+   class Builds_DNN:
+      _target_: str = "vision.model.DNN"
+      input_size: int = MISSING
+      output_size: int = MISSING
+      layer_widths: Tuple[int, ...] = (5, 10, 5),
+      device: str = "cpu"
+
+Doing this once isn't so cumbersome, but consider that if we ever modify ``DNN`` by:
+
+  - changing its location (e.g. move it to ``vision.classifiers.DNN``)
+  - updating any of its parameters' names, default values, or annotations
+  - adding or removing a parameter to/from its signature
+
+then we will need to mirror this change in our configuration as well.
+I hope you brought your towel, because things are getting WET 🌊.
+Having to manually sync our configs with our code is not only tedious but it also creates a hot-spot for mistakes and bugs.
+
+
+Generating Configs with `builds` Keeps Us DRY
+*********************************************
+
+We can stay nice and DRY by dynamically generating our configurations with `builds`
+
+
+.. code:: python
+
+   # dynamically-generated configurations are DRY
+   from hydra_zen import builds
+   from vision.model import DNN
+
+
+   Builds_DNN = builds(DNN, populate_full_signature=True)
+
+Here we don't need to worry about repeating ourselves by keeping our configuration in sync with our code: the structured config (complete with type annotations and default values) is *automatically* and *dynamically* generated for us at runtime! 🌞
+
+
+What About Automatic Code Generation?
+*************************************
+
+Hydra provides a tool called `configen <https://github.com/facebookresearch/hydra/tree/master/tools/configen>`_ for automatically writing Python scripts with structured configs associated with your library's code.
+
+.. code:: shell
+
+   $ configen --config-dir conf --config-name configen
+   my_lib.my_module -> /home/AlwaysWet/tmp/configen/example/config/configen/samples/my_module.py
+
+This still means that we have to re-run this static code generation whenever we need to re-sync our configs with our updated code 🏊.
+
+Generating static configs also has issues at-scale.
+For example, `hydra-torch <https://github.com/pytorch/hydra-torch>`_ is a repository of statically generated configs for some parts of PyTorch's API.
+While this is convenient to an extent, this repository of configs has to be:
+ - actively maintained
+ - versioned in-sync with PyTorch
+ - included as an additional dependency in our projects
+
+Furthermore, such repositories don't exist for most other libraries!
+Thus this approach to code configuration is still a source of technical debt and repetitious work-flows.
+
+With hydra-zen, we simply **configure what we need from any library** in an ergonomic, automatic, and dynamic way ⛱️.
