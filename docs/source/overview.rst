@@ -11,7 +11,9 @@ These functions can be broken down into two categories:
 What is Hydra?
 --------------
 
-`Hydra <https://github.com/facebookresearch/hydra>`_ is a framework for elegantly configuring applications, such as a web app, and launching them from the commandline. It provides a specification for writing rich, yaml-serializable configurations for your code, and makes it simple to configure and launch instances of your application from the commandline using various launchers and parameter-sweeper plugins.
+`Hydra <https://github.com/facebookresearch/hydra>`_ is a framework for elegantly configuring applications, such as a web app, and launching them from the commandline.
+It provides a specification for writing rich, yaml-serializable configurations for your code.
+It also makes simple the process of configuring and launching instances of your application from the commandline using various launchers and parameter-sweeper plugins.
 
 +----------------------------+------------------------------------------+-------------------------------------------------+
 | Configuration (yaml)       | Application                              | Launch with Overrides                           |
@@ -40,7 +42,7 @@ What is hydra-zen?
 hydra-zen is fully compatible with Hydra.
 It provides tools that:
 
-  1. Make it easy and ergonomic to generate rich structured configurations of your code.
+  1. Make it easy and ergonomic to dynamically generate structured configurations of your code.
   2. Enable Hydra-based work flows that never leave Python.
 
 While Hydra excels at configuring and launching traditional software applications, hydra-zen is designed with data science and machine learning practitioners in mind: users whose code may have *many* intricately-configurable components, and whose end-goal is not necessarily to launch a configurable app from the command line, but to run experiments/analysis in a way that is repeatable, scalable, and self-documenting.
@@ -51,12 +53,12 @@ code – for-loops and other control-flow logic – associated with training and
 Hydra with hydra-zen follows suite and eliminates the code you would write to configure, orchestrate, and organize the results of your various experiments.
 
 
-An Example Using hydra-zen and PyTorch Lightning
--------------------------------------------------
+Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning
+---------------------------------------------------------------------
 
 
 Let's see what this looks like in practice.
-We'll use Hydra, hydra-zen, and PyTorch Lightning to configure and train multiple single-layer neural networks.
+We'll use Hydra, hydra-zen, and PyTorch Lightning to **configure and train multiple single-layer neural networks without any boilerplate code**.
 In this example we will optimize `arbitrary-width universal function approximators <https://en.wikipedia.org/wiki/Universal_approximation_theorem#Arbitrary-width_case>`_  to fit :math:`\cos{x}`
 on a restricted domain.
 In mathematical notation, we want to solve the following optimization problem:
@@ -215,3 +217,6 @@ Visualizing our results
 .. image:: https://user-images.githubusercontent.com/29104956/117079795-7fc7a280-ad0a-11eb-9916-4fd63cd2e990.png
    :width: 800
    :alt: Alternative text
+
+Voilà! We just configured, trained, saved, and documented multiple neural networks without writing any boilerplate code.
+Hydra + hydra-zen + PyTorch Lightning lets us focus on writing the essentials of our scientific software and keep us out of technical debt.
