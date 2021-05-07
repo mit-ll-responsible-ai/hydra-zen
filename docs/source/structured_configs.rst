@@ -209,7 +209,7 @@ Manually writing a structured config for ``DNN`` entails hard-coding its current
       layer_widths: Tuple[int, ...] = (5, 10, 5),
       device: str = "cpu"
 
-Doing this once isn't so cumbersome, but consider that if we ever modify ``DNN`` by:
+Doing this once isn't so cumbersome, but consider that any time we modify ``DNN`` by:
 
   - changing its location (e.g. move it to ``vision.classifiers.DNN``)
   - updating any of its parameters' names, default values, or annotations
@@ -217,6 +217,7 @@ Doing this once isn't so cumbersome, but consider that if we ever modify ``DNN``
 
 then we will need to mirror this change in our configuration as well.
 I hope you brought your towel, because things are getting WET 🌊.
+
 Having to manually sync our configs with our code is not only tedious but it also creates a hot-spot for mistakes and bugs.
 
 
