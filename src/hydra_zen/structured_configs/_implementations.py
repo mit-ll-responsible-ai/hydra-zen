@@ -63,7 +63,8 @@ def mutable_value(x: Any) -> Field:
     >>> @dataclass
     ... class HasMutableDefault
     ...     a_list: list  = mutable_value([1, 2, 3])  # ok"""
-    return field(default_factory=lambda: x)
+    cast = type(x)  # ensure that we return a copy of the default value
+    return field(default_factory=lambda: cast(x))
 
 
 Field_Entry = Tuple[str, type, Field]
