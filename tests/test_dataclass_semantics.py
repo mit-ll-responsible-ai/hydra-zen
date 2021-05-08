@@ -109,3 +109,10 @@ def test_mutable_defaults_generated_from_factory(mutable):
     # mutation via instance1 should not affect other instances of `Conf`
     instance2 = Conf()
     assert instance2.x == mutable
+
+    # make sure hydra behavior is appropriate
+    out_Conf = instantiate(Conf)["x"]
+    assert out_Conf == mutable
+
+    out_inst = instantiate(instance2)["x"]
+    assert out_inst == mutable
