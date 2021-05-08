@@ -96,7 +96,7 @@ def test_frozen():
     )
     | st.sets(st.integers(), min_size=1)
 )
-def test_mutable_values(mutable):
+def test_mutable_defaults_generated_from_factory(mutable):
     Conf = builds(dict, x=mutable)
     mutable = deepcopy(mutable)
 
@@ -106,5 +106,6 @@ def test_mutable_values(mutable):
     else:
         instance1.x.pop()
 
+    # mutation via instance1 should not affect other instances of `Conf`
     instance2 = Conf()
     assert instance2.x == mutable
