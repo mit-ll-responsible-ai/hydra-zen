@@ -1,6 +1,7 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
+from copy import deepcopy
 from dataclasses import is_dataclass
 
 import hypothesis.strategies as st
@@ -86,3 +87,32 @@ def test_frozen():
 
     with pytest.raises(FrozenInstanceError):
         conf_f.x = 3
+
+
+@given(
+    mutable=st.lists(st.integers(), min_size=1)
+    | st.dictionaries(st.integers(), st.integers(), min_size=1).map(
+        lambda x: {0: 0, **x}
+    )
+    | st.sets(st.integers(), min_size=1)
+)
+def test_mutable_defaults_generated_from_factory(mutable):
+    Conf = builds(dict, x=mutable)
+    mutable = deepcopy(mutable)
+
+    instance1 = Conf()
+    if isinstance(mutable, dict):
+        instance1.x.pop(0)
+    else:
+        instance1.x.pop()
+
+    # mutation via instance1 should not affect other instances of `Conf`
+    instance2 = Conf()
+    assert instance2.x == mutable
+
+    # make sure hydra behavior is appropriate
+    out_Conf = instantiate(Conf)["x"]
+    assert out_Conf == mutable
+
+    out_inst = instantiate(instance2)["x"]
+    assert out_inst == mutable
