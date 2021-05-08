@@ -219,7 +219,7 @@ but it is worthwhile for us to discuss these more deliberately.
 `builds` generates dataclass objects
 ====================================
 
-`builds` dynamically generates a dataclass object, and handles for us cumbersome cases like `specifying mutable default values <https://docs.python.org/3/library/dataclasses.html#mutable-default-values>`_ and excluding Hydra-specific parameters from the class' signature.
+`builds` dynamically generates a dataclass object, and handles for us cumbersome cases like safely `setting mutable default values <https://docs.python.org/3/library/dataclasses.html#mutable-default-values>`_ and excluding Hydra-specific "hidden" parameters from the class-init signature.
 
 +---------------------------------------------------+-------------------------------------------------------------------+
 | Example Using `builds`                            | Equivalent dataclass                                              |
