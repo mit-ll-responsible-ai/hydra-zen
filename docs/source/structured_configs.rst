@@ -260,7 +260,7 @@ Accordingly, `builds` accepts Hydra-specific parameters for tuning the behavior 
 .. code:: python
 
    >>> from hydra_zen import instantiate  # annotated alias of `hydra.utils.instantiate`
-   >>> instantiate(conf_instance)  # calls `dict(x=-100, y='hi')`
+   >>> instantiate(conf_instance)  # calls `dict(x=-100, y=[1, 2, 3])`
    {'x': -100, 'y': [1, 2, 3]}
 
 
