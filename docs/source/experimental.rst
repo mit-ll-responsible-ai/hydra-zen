@@ -13,7 +13,7 @@ API Reference
    hydra_run
    hydra_multirun
 
-Launching Hydra Job
+Launching Hydra Jobs
 ====================
 
 Using a defined task function and a configuration (we will focus on Structured Configs [1]_),
@@ -48,7 +48,7 @@ Using the Hydra Command Line Interface (CLI), the application can be run by::
     $  python my_app.py bar=mom
     hello mom
 
-hydra-zen provides functionality to execute Hydra for single or multirun mode in an interactive environment such as the Jupyter Notebook
+hydra-zen provides functionality to execute Hydra for both single or multirun mode in an interactive environment such as the Jupyter Notebook
 by providing two experimental functions, ``hydra_run`` and ``hydra_multirun``, that mimic the behavior of Hydra's CLI.
 Using ``hydra-run`` we can run our application in an interactive environment::
 
@@ -67,7 +67,7 @@ Hydra ``JobReturn`` object with the following attributes:
   - working_dir: The experiment working directory
   - task_name: The task name of the Hydra job
 
-Next, a Hydra Multirun to sweep over parameters using the Hydra CLI::
+Next, run a Hydra Multirun [3]_ to sweep over parameters using the Hydra CLI::
 
     $  python my_app.py bar=mom,dad --multirun
     [2021-05-08 21:07:10,209][HYDRA] Launching 2 jobs locally
@@ -76,7 +76,7 @@ Next, a Hydra Multirun to sweep over parameters using the Hydra CLI::
     [2021-05-08 21:07:10,279][HYDRA]        #1 : bar=dad
     hello dad
 
-becomes::
+The equivalent ``hydra_multirun`` is::
 
     >>> from my_app_zen import MyExperiment, task_function
     >>> from hydra_zen.experimental import hydra_multirun
@@ -87,14 +87,15 @@ becomes::
     [2021-05-08 21:04:35,980][HYDRA]        #1 : bar=dad
     hello dad
 
-An important note, since these functions end up executing Hydra we get all the benefits of Hydra's job configuration and logging.
+An important note, since these functions execute Hydra we get all the benefits of Hydra's job configuration and logging.
+Simply add the desired overrides as you would via the Hydra CLI.
 See Configuring Hydra [2]_ for more details on customizing Hydra.
 
 Examples
 ========
 
 Return a Simple Dictionary
-***********************************
+**************************
 
 Here we demonstrate some simple examples of running Hydra experiments with hydra-zen.
 First lets illustrate the behavior of using ``builds``, ``instantiate``, and ``hydra_run``:
@@ -108,7 +109,7 @@ First lets illustrate the behavior of using ``builds``, ``instantiate``, and ``h
     {'a': 1, 'b': 1}
 
 As expected, ``hydra_run`` simply instantiates and creates a dictionary object with the desired key and value pairs.
-Next, launch a Hydra multi-run [3]_ job to sweep over configuration parameters:
+Next, launch a Hydra Multirun [3]_ job to sweep over configuration parameters:
 
 .. code:: python
 
@@ -243,7 +244,7 @@ First lets build the Hydra Sweeper function:
             }
             return results_to_serialize, all_results
 
-If we are to configure our Hydra application to use this sweeper we must store the a configuration in Hydra's Config Store API [5]_
+If we are to configure our Hydra application to use this sweeper we must use Hydra's Config Store API [5]_ to ensure the configuration is available to your Hydra application.
 
 .. code:: python
 
@@ -257,7 +258,7 @@ If we are to configure our Hydra application to use this sweeper we must store t
     cs = ConfigStore.instance()
     cs.store(group="hydra/sweeper", name="test_sweeper", node=RandomSearchSweeperConf)
 
-Next lets build the function to minimize:
+Next lets build the function to minimize and define the task function:
 
 .. code:: python
 
