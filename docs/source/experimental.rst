@@ -78,7 +78,7 @@ Next, run a Hydra Multirun [3]_ to sweep over parameters using the Hydra CLI::
 
 The equivalent ``hydra_multirun`` is::
 
-    >>> from my_app_zen import MyExperiment, task_function
+    >>> from my_app import MyExperiment, task_function
     >>> from hydra_zen.experimental import hydra_multirun
     >>> job = hydra_multirun(MyExperiment, task_function, overrides=["bar=mom,dad"])
     [2021-05-08 21:04:35,898][HYDRA] Launching 2 jobs locally
