@@ -52,7 +52,7 @@ hydra-zen provides functionality to execute Hydra for both single or multirun mo
 by providing two experimental functions, ``hydra_run`` and ``hydra_multirun``, that mimic the behavior of Hydra's CLI.
 Using ``hydra-run`` we can run our application in an interactive environment::
 
-  >>> from my_app_zen import MyExperiment, task_function
+  >>> from my_app import MyExperiment, task_function
   >>> from hydra_zen.experimental import hydra_run
   >>> job = hydra_run(MyExperiment, task_function, overrides=["bar=mom"])
   hello mom
