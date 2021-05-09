@@ -91,6 +91,7 @@ An important note, since these functions execute Hydra we get all the benefits o
 Simply add the desired overrides as you would via the Hydra CLI.
 See Configuring Hydra [2]_ for more details on customizing Hydra.
 
+
 Examples
 ========
 
@@ -125,7 +126,7 @@ Next, launch a Hydra Multirun [3]_ job to sweep over configuration parameters:
 
 
 Using Partial Functions
-********************************
+***********************
 
 Now lets demonstrate the use of building partial configurations with hydra-zen.
 Here we build a configuration to square an input using the ``pow`` function:
@@ -154,8 +155,111 @@ Here is the same code using a multirun experiment:
     [4, 1, 0, 1, 4]
 
 
+Registering Configs for ``overrides``
+*************************************
+
+Consider the experiment demonstrated in the ``README`` to minimizing a function using gradient descent:
+
+.. code:: python
+
+    # Setting up our code...
+    # This does not involve hydra-zen in any way.
+    import torch
+    import numpy
+
+    # This is the function that we will run under various configurations
+    # in order to perform our analysis.
+    def gradient_descent(*, starting_xy, optim, num_steps, landscape_fn):
+        """
+        Parameters
+        ----------
+        starting_xy : Tuple[float, float]
+        optim : Type[torch.optim.Optimizer]
+        num_steps : int
+        landscape_fn : (x: Tensor, y: Tensor) -> Tensor
+
+        Returns
+        -------
+        xy_trajectory: ndarray, shape-(num_steps + 1, 2)
+        """
+        xy = torch.tensor(starting_xy, requires_grad=True)
+        trajectory = [xy.detach().clone().numpy()]
+
+        # `optim` needs to be instantiated with
+        # the tensor parameter(s) to be updated
+        optim: torch.optim.Optimizer = optim([xy])
+
+        for i in range(num_steps):
+            z = landscape_fn(*xy)
+            optim.zero_grad()
+            z.backward()
+            optim.step()
+            trajectory.append(xy.detach().clone().numpy())
+        return numpy.stack(trajectory)
+
+    # Using hydra-zen to configure our code
+    from hydra_zen import builds, just
+
+    # defines our surface that we will be descending
+    def parabaloid(x, y):
+        return 0.1 * x ** 2 + 0.2 * y ** 2
+
+Instead of running an experiment by varying the momentum of ``SGD``, what if we wanted to vary the optimizer itself?
+To do this without ever leaving Python we must take advantage of Hydra's Config Store API [5]_.
+
+.. code:: python
+
+    from hydra.core.config_store import ConfigStore
+    from torch.optim import Optimizer, SGD, Adam
+    from hydra_zen import builds
+
+    OptimConf = builds(Optimizer)
+    SGDConf = builds(SGD, lr=0.3, momentum=0.0, hydra_partial=True, builds_bases=(OptimConf,)),
+    AdamConf = builds(Adam, lr=0.3, hydra_partial=True, builds_bases=(OptimConf,)),
+
+    cs = ConfigStore.instance()
+    cs.store(group="optim", name="sgd", node=SGDConf)
+    cs.store(group="optim", name="adam", node=AdamConf)
+
+Note that both ``SGDConf`` and ``AdamConf`` must inherit ``OptimConf`` otherwise Hydra's config validation will raise a ``ConfigCompositionException``.
+Now define the experiment configuration.
+
+.. code:: python
+
+    ConfigGradDesc = builds(
+        gradient_descent,
+        optim=SGDConf,
+        landscape_fn=parabaloid,
+        starting_xy=(-1.5, 0.5),
+        num_steps=20,
+    )
+
+First, test running the default experiment.
+
+.. code:: python
+
+    >>> from hydra_zen.experimental import hydra_run
+    >>> jobs = hydra_multirun(
+    ...     ConfigGradDesc,
+    ...     task_function=instantiate,
+    ...     overrides=["optim=sgd"],
+    ... )
+
+
+Next run the experiment by varying the optimizer.
+
+.. code:: python
+
+    >>> from hydra_zen.experimental import hydra_multirun
+    >>> jobs = hydra_multirun(
+    ...     ConfigGradDesc,
+    ...     task_function=instantiate,
+    ...     overrides=["optim=sgd,adam"],
+    ... )
+
+
 Random Search Optimization
-************************************
+**************************
 
 This example shows how to build a Hydra Sweeper [4]_ for doing random search optimization with hydra-zen.
 First lets build the Hydra Sweeper function:
