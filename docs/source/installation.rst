@@ -29,10 +29,13 @@ We will then launch multiple jobs – each on calls the function with a differen
    def repeat_text(num: int, text: str) -> str:
        return text * num
 
+
+Configuring our code:
+
 .. code-block:: pycon
 
    # Create structured config without providing default values.
-   # This is a dataclass object.
+   # This is a dataclass object: `Builds_repeat_text(num: int, text: str)`
    >>> Config = builds(repeat_text, populate_full_signature=True)
 
    # Instantiating the config builds `repeat_text`
@@ -46,6 +49,11 @@ We will then launch multiple jobs – each on calls the function with a differen
    ValidationError: Value '2.5' could not be converted to Integer
        full_key: num
        object_type=Builds_repeat_text
+
+
+Running multiple jobs under various configurations:
+
+.. code-block:: pycon
 
    # run multiple jobs over combination of parameter values
    >>> jobs, = hydra_multirun(

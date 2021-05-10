@@ -198,9 +198,10 @@ This still means that we have to re-run this static code generation whenever we 
 Generating static configs also has issues at-scale.
 For example, `hydra-torch <https://github.com/pytorch/hydra-torch>`_ is a repository of statically generated configs for some parts of PyTorch's API.
 While this is convenient to an extent, this repository of configs has to be:
- - actively maintained
- - versioned in-sync with PyTorch
- - included as an additional dependency in our projects
+
+  - actively maintained
+  - versioned in-sync with PyTorch
+  - included as an additional dependency in our projects
 
 Furthermore, such repositories don't exist for most other libraries!
 Thus this approach to code configuration is still a source of technical debt and repetitious work-flows.
