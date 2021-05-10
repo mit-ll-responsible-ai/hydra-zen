@@ -111,6 +111,8 @@ And this dynamically generated configuration can still be serialized to a yaml f
    device: cuda:0
 
 
+.. _DRY:
+
 *************************************************
 Keeping DRY with Dynamically-Generated Configs 🌞
 *************************************************

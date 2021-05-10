@@ -16,7 +16,7 @@ hydra-zen offers:
   - Runtime validation of configurations to catch mistakes before your application launches.
   - Equal support for both object-oriented libraries (e.g., `torch.nn`) and functional ones (e.g., `jax` and `numpy`).
 
-These functions and capabilities can be used to great effect alongside PyTorch Lightning to design boilerplate-free machine learning projects!  
+These functions and capabilities can be used to great effect alongside [PyTorch Lightning](https://pytorch-lightning.readthedocs.io/en/latest/) to design boilerplate-free machine learning projects!  
 
 
 ## Installation
