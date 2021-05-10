@@ -149,11 +149,11 @@ Manually writing a structured config for ``DNN`` entails hard-coding its current
 
    @dataclass
    class Builds_DNN:
-      _target_: str = "vision.model.DNN"
-      input_size: int = MISSING
-      output_size: int = MISSING
-      layer_widths: Tuple[int, ...] = (5, 10, 5),
-      device: str = "cpu"
+       _target_: str = "vision.model.DNN"
+       input_size: int = MISSING
+       output_size: int = MISSING
+       layer_widths: Tuple[int, ...] = (5, 10, 5),
+       device: str = "cpu"
 
 Doing this once isn't so cumbersome, but consider that any time we modify ``DNN`` by:
 
@@ -511,6 +511,35 @@ In this way, we can still configure and build this function, but we also retain 
 In general, hydra-zen will broaden types as-needed so that dynamically-generated configs will never include annotations that would cause Hydra to error-out.
 
 
+Combining Static and Dynamic Configurations with `@hydrated_dataclass`
+======================================================================
+
+hydra-zen provides a decorator, `hydrated_dataclass`, which is similar to the standard `@dataclass` but can be used to auto-populate Hydra-specific parameters;
+it also exposes other features that are available in `builds`.
+
+.. code:: python
+
+   from hydra_zen import hydrated_dataclass
+
+   from torch.optim import Adam
+
+   @hydrated_dataclass(target=Adam, hydra_partial=True, frozen=True)
+   class BuildsAdam:
+       lr: float = 0.01
+       momentum: float = 0.9
+
+   BuildsAdam(lr="a string")  # static type-checker flags as invalid (invalid type)
+
+   conf = BuildsAdam()
+   conf.lr = 10.0  # static type-checker flags as invalid (mutating "frozen" dataclass)
+
+
+This has the benefit of making certain pertinent information (e.g. the dataclass' fields and that it is frozen) available to static type checkers, while still dynamically populating the resulting dataclass with Hydra-specific fields (e.g. ``_target_`` and ``_partial_target_``) and providing the same runtime validation as `builds`.
+
+Note that the ``@hydrated_dataclass`` decorator uses a `recently proposed <https://github.com/microsoft/pyright/blob/master/specs/dataclass_transforms.md>`_ mechanism for enabling static tools to "recognize" third-party dataclass decorators like this one.
+Presently, the above static inspection is only supported by pyright, but other type-checkers will likely add support for this soon.
+
+
 hydra_zen.typing
 ================
 
@@ -524,14 +553,14 @@ The following code block uses comments to indicate the types that will be inferr
        def __init__(self, x: int):
            pass
 
-   Conf = builds(MyClass, x=1)  # type: Type[Builds[TypeMyClass]]
-   conf = Conf(x=10)            # type: Builds[TypeMyClass]
+   Conf = builds(MyClass, x=1)  # type: Type[Builds[Type[MyClass]]]
+   conf = Conf(x=10)            # type: Builds[Type[MyClass]]
 
    my_class1 = instantiate(Conf)  # type: MyClass
    my_class2 = instantiate(conf)  # type: MyClass
 
-   PartialConf = builds(MyClass, hydra_partial=True)  # type: Type[PartialBuilds[TypeMyClass]]
-   partial_conf = PartialConf()                       # type: PartialBuilds[TypeMyClass]
+   PartialConf = builds(MyClass, hydra_partial=True)  # type: Type[PartialBuilds[Type[MyClass]]]
+   partial_conf = PartialConf()                       # type: PartialBuilds[Type[MyClass]]
 
    partiald_class = instantiate(PartialConf)   # type: Partial[MyClass]
    my_class3 = partiald_class(x=2)             # type: MyClass
@@ -539,8 +568,8 @@ The following code block uses comments to indicate the types that will be inferr
    partiald_class2 = instantiate(partial_conf) # type: Partial[MyClass]
    my_class4 = partiald_class2(x=2)            # type: MyClass
 
-   JustMyClass = just(MyClass)               # type: Type[Just[Type[MyClass]]
+   JustMyClass = just(MyClass)               # type: Type[Just[Type[MyClass]]]
    my_class_type = instantiate(JustMyClass)  # type: Type[MyClass]
 
 (Note that this behavior is verified using the static type checker `pyright <https://github.com/microsoft/pyright>`_, which is used by VSCode.
-PyCharm's type-checker appears to struggle with deeply-nested types like ``Type[Builds[TypeMyClass]]``, but this is an issue on their end.)
+PyCharm's type-checker appears to struggle with deeply-nested types like ``Type[Builds[Type[MyClass]]]``, but this is an issue on their end.)
