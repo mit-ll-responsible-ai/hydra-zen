@@ -70,6 +70,11 @@ def mutable_value(x: Any) -> Field:
 Field_Entry = Tuple[str, type, Field]
 
 
+# Alternate form, from PEP proposal:
+# https://github.com/microsoft/pyright/blob/master/specs/dataclass_transforms.md
+#
+# This enables static checkers to work with third-party decorators that create
+# dataclass-like objects
 def __dataclass_transform__(
     *,
     eq_default: bool = True,
