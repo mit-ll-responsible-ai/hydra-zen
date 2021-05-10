@@ -13,12 +13,16 @@ from typing import Any, Callable, Union
 from hydra._internal import utils as hydra_internal_utils
 from hydra.utils import log
 
+from hydra_zen.typing import Partial
+
 _T = _typing.TypeVar("_T")
 
 __all__ = ["partial", "get_obj"]
 
 
-def partial(_partial_target_: _typing.Callable, *args, **kwargs) -> _typing.Callable:
+def partial(
+    _partial_target_: Callable[..., _T], *args: Any, **kwargs: Any
+) -> Partial[_T]:
     """Equivalent to ``functools.partial`` but provides a named parameter for the callable."""
     return _functools.partial(_partial_target_, *args, **kwargs)
 
