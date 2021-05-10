@@ -25,7 +25,7 @@ Basics of Structured Configs
 ****************************
 
 Hydra supports configurations that are written in a yaml format or in Python via `structured configs <https://hydra.cc/docs/next/tutorials/structured_config/intro>`_.
-Structured configs are `dataclasses <https://docs.python.org/3/library/dataclasses.html>`_ whose type annotations (up to a limited assortment) can be leveraged by Hydra to provide runtime type checking for your configurations.
+Structured configs are `dataclasses <https://docs.python.org/3/library/dataclasses.html>`_ whose fields store the configuration values, and whose type annotations (up to a limited assortment) can be leveraged by Hydra to provide runtime type checking for of configuration values.
 
 An important feature of these structured configs is that they too can be serialized to yaml files by Hydra.
 This is critical, as it ensures that each job that is launched using Hydra is fully documented by – and can be reproduced from – a plain-text yaml configuration.
@@ -267,6 +267,64 @@ Accordingly, `builds` accepts Hydra-specific parameters for tuning the behavior 
    {'x': -100, 'y': [1, 2, 3]}
 
 
+Configuring a Target for Partial Instantiation
+==============================================
+
+`builds` is capable for configuring a target such that it will only be *partially* instantiated.
+This is very useful, as it is often the case that our configuration of a target can only partially describe its input parameters.
+
+For example, a ML-model optimizer must be provided the model parameters that it will be updating; however these parameters are typically created at runtime and thus *cannot be part of our configuration*.
+Fortunately, we can simply provide a partial configuration of the optimizer's other parameters.
+
+.. code:: python
+
+   >>> from torch.optim import Adam
+   >>> from torch import tensor
+
+   >>> PartialBuilds_Adam = builds(Adam, hydra_partial=True, lr=10.0)
+   >>> partial_optim = instantiate(PartialBuilds_Adam)
+   >>> partial_optim
+   functools.partial(<class 'torch.optim.adam.Adam'>, lr=10.0)
+
+
+Instantiating this config only partially-builds the optimizer; we can finish instantiating it once we have access to our model's parameters
+
+.. code:: python
+
+   >>> model_params = [tensor(1.0), tensor(-2.0)]
+   >>> partial_optim(model_params)
+   Adam (
+   Parameter Group 0
+       amsgrad: False
+       betas: (0.9, 0.999)
+       eps: 1e-08
+       lr: 10.0
+       weight_decay: 0
+   )
+
+
+Combining Auto-Populated and User-Specified Default Values
+==========================================================
+
+
+We can feed `builds` values for a subset of the target's parameters and then auto-populate the remaining parameters.
+
+.. code:: python
+
+   def func(x: int = 2, y: str = "hi"):
+       ...
+
+   # signature: `Builds_func(x: int = 10, y: str = "hi")`
+   builds(func, x=10, populate_full_signature=True)
+
+Or, we can intentionally exclude a target's parameter so that it is not available for configuration
+
+.. code:: python
+
+   # signature: `Builds_func(y: str = "dinosaur")`
+   builds(func, y="dinosaur")  # `x` is not configurable for building `func`
+
+
 Nesting configs for recursive instantiation
 ===========================================
 
@@ -318,8 +376,11 @@ Consider this configuration of a data augmentation and transformation pipeline a
    )
 
 
-`builds` is "smart" and will **automatically generate nested configurations** in order to configure a target.
-E.g. if a default-value in a target's signature is a function, `builds` will create a dataclass that configures
+Auto-generated nested configs
+-----------------------------
+
+`builds` will automatically generate nested configurations in order to configure a target.
+E.g. if a default-value in a target's signature is a function then `builds` will create a dataclass that configures
 that function.
 
 .. code:: python
@@ -376,3 +437,110 @@ The ``builds_bases`` argument enables us to compose configurations using inherit
 
    >>> issubclass(ChildConf, ParentConf)
    True
+
+
+**********************************
+The Bells and Whistles of `builds`
+**********************************
+
+There is more to `builds` than meets the eye; the following "bells and whistles" of `builds` are nice to know, but are not essential to using hydra-zen.
+
+
+Runtime validation
+==================
+
+Misspelled parameter names will be caught by `builds`, so that the error surfaces immediately while creating the configuration.
+
+.. code:: python
+
+   >>> def func(a_number: int): pass
+   >>> builds(func, a_nmbr=2)
+   ---------------------------------------------------------------------------
+   TypeError: Building: func ..
+   The following unexpected keyword argument(s) was specified for __main__.func via `builds`: a_nmbr
+
+Because `builds` automatically mirror's type annotations from a target's signature, we also benefit from Hydra's type-validation mechanism.
+
+
+.. code:: python
+
+   >>> def func(parameter: int): pass
+   >>> instantiate(builds(func, a_number="a string"))
+   ---------------------------------------------------------------------------
+   TypeError: Building: func ..
+   The following unexpected keyword argument(s) was specified for __main__.func via `builds`: a_number
+
+
+Automatic Type Refinement
+=========================
+
+Hydra permits only `a narrow subset of type annotations <https://hydra.cc/docs/next/tutorials/structured_config/intro#structured-configs-supports>`_:
+
+   - ``Any``
+   - Primitive types (``int``, ``bool``, ``float``, ``str``, ``Enums``)
+   - Nesting of Structured Configs
+   - Containers (List and Dict) containing primitives or Structured Configs
+   - Optional fields
+
+`builds` will automatically "broaden" the annotations associated with a target's signature so that it will be made compatible with Hydra.
+For example, suppose that we want to configure
+
+.. code:: python
+
+   # `Literal[...]` is not supported by Hydra
+   def func(ones_and_twos: List[Literal[1, 2]]):
+       ...
+
+``Literal[1, 2]`` is not supported by Hydra, so `builds` will "broaden" this type to ``Any``.
+
+.. code:: python
+
+   # signature: `Builds_func(ones_and_twos: List[Any] = <factory>)`
+   Builds_func = builds(func, ones_and_twos=[1, 2])
+
+In this way, we can still configure and build this function, but we also retain some level of type-validation
+
+.. code:: python
+
+   >>> instantiate(Builds_func("not a list"))
+   ---------------------------------------------------------------------------------
+   ValidationError: Invalid value assigned : str is not a ListConfig, list or tuple.
+    full_key:
+    object_type=None
+
+In general, hydra-zen will broaden types as-needed so that dynamically-generated configs will never include annotations that would cause Hydra to error-out.
+
+
+hydra_zen.typing
+================
+
+``hydra_zen.typing`` ships generic protocols that annotate the outputs of `builds` and `just`.
+These annotations are used to overload ``hydra_zen.instantiate`` so that static type checkers can "see" what is being instantiated.
+The following code block uses comments to indicate the types that will be inferred by static type checkers.
+
+.. code:: python
+
+   class MyClass:
+       def __init__(self, x: int):
+           pass
+
+   Conf = builds(MyClass, x=1)  # type: Type[Builds[TypeMyClass]]
+   conf = Conf(x=10)            # type: Builds[TypeMyClass]
+
+   my_class1 = instantiate(Conf)  # type: MyClass
+   my_class2 = instantiate(conf)  # type: MyClass
+
+   PartialConf = builds(MyClass, hydra_partial=True)  # type: Type[PartialBuilds[TypeMyClass]]
+   partial_conf = PartialConf()                       # type: PartialBuilds[TypeMyClass]
+
+   partiald_class = instantiate(PartialConf)   # type: Partial[MyClass]
+   my_class3 = partiald_class(x=2)             # type: MyClass
+
+   partiald_class2 = instantiate(partial_conf) # type: Partial[MyClass]
+   my_class4 = partiald_class2(x=2)            # type: MyClass
+
+   JustMyClass = just(MyClass)               # type: Type[Just[Type[MyClass]]
+   my_class_type = instantiate(JustMyClass)  # type: Type[MyClass]
+
+(Note that this behavior is verified using the static type checker `pyright <https://github.com/microsoft/pyright>`_, which is used by VSCode.
+PyCharm's type-checker appears to struggle with deeply-nested types like ``Type[Builds[TypeMyClass]]``, but this is an issue on their end.)

@@ -162,9 +162,9 @@ Visualizing our results
    :alt: Alternative text
 
 Voilà! We just configured, trained, saved, and documented multiple neural networks without writing any boilerplate code.
-Hydra + hydra-zen + PyTorch Lightning lets us focus on writing the essentials of our scientific software and keep us out of technical debt.
+Hydra + hydra-zen + PyTorch Lightning lets us focus on writing the essentials of our scientific software.
 
 
 More Examples of hydra-zen in ML Projects
 -----------------------------------------
-You can check out `this repository <https://github.com/mitll-SAFERai/hydra-zen-examples>`_ for examples of using hydra-zen in larger-scale ML projects.
+You can check out `this repository <https://github.com/mitll-SAFERai/hydra-zen-examples>`_ for examples of larger-scale ML projects using hydra-zen.
