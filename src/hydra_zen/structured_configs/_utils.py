@@ -142,38 +142,6 @@ def get_obj_path(obj: Any) -> str:
     return f"{module}.{name}"
 
 
-def interpolated(func: Union[str, Callable], *literals: Any) -> str:
-    """Produces an hydra-style interpolated string for calling the provided
-    function on the literals
-
-    Parameters
-    ----------
-    func : Union[str, Callable]
-        The name of the function to use in the interpolation. The name
-        will be inferred if a function is provided.
-
-    literals : Any
-        Position-only literals to be fed to the function.
-
-    Notes
-    -----
-    See https://omegaconf.readthedocs.io/en/latest/usage.html#custom-interpolations
-    for more details about leveraging custom interpolations in omegaconf/hydra.
-
-    Examples
-    --------
-    >>> def add(x, y): return x + y
-    >>> interpolated(add, 1, 2)
-    '${add:1,2}'
-    """
-    if not isinstance(func, str) and not hasattr(func, "__name__"):  # pragma: no cover
-        raise TypeError(
-            f"`func` must be a string or have a `__name__` field, got: {func}"
-        )
-    name = func if isinstance(func, str) else func.__name__
-    return f"${{{name}:{','.join(repr(i) for i in literals)}}}"
-
-
 NoneType = type(None)
 
 
