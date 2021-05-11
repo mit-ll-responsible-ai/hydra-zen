@@ -9,6 +9,7 @@ from typing import (
     Any,
     Callable,
     Dict,
+    FrozenSet,
     List,
     Mapping,
     Optional,
@@ -38,7 +39,25 @@ __all__ = ["builds", "just", "hydrated_dataclass", "mutable_value"]
 _T = TypeVar("_T")
 
 _TARGET_FIELD_NAME: Final[str] = "_target_"
+_RECURSIVE_FIELD_NAME: Final[str] = "_recursive_"
+_CONVERT_FIELD_NAME: Final[str] = "_convert_"
 _PARTIAL_TARGET_FIELD_NAME: Final[str] = "_partial_target_"
+_POS_ARG_FIELD_NAME: Final[str] = "_args_"
+_HYDRA_FIELD_NAMES: FrozenSet[str] = frozenset(
+    (
+        _TARGET_FIELD_NAME,
+        _RECURSIVE_FIELD_NAME,
+        _CONVERT_FIELD_NAME,
+        _PARTIAL_TARGET_FIELD_NAME,
+        _POS_ARG_FIELD_NAME,
+    )
+)
+
+_POSITIONAL_ONLY: Final = inspect.Parameter.POSITIONAL_ONLY
+_POSITIONAL_OR_KEYWORD: Final = inspect.Parameter.POSITIONAL_OR_KEYWORD
+_VAR_POSITIONAL: Final = inspect.Parameter.VAR_POSITIONAL
+_KEYWORD_ONLY: Final = inspect.Parameter.KEYWORD_ONLY
+_VAR_KEYWORD: Final = inspect.Parameter.VAR_KEYWORD
 
 
 def mutable_value(x: Any) -> Field:
@@ -292,7 +311,7 @@ def sanitized_default_value(value: Any) -> Union[Field, Type[Just]]:
 @overload
 def builds(
     target: Importable,
-    *,
+    *pos_args: Any,
     populate_full_signature: bool = False,
     hydra_partial: Literal[False] = False,
     hydra_recursive: bool = True,
@@ -309,7 +328,7 @@ def builds(
 @overload
 def builds(
     target: Importable,
-    *,
+    *pos_args: Any,
     populate_full_signature: bool = False,
     hydra_partial: Literal[True],
     hydra_recursive: bool = True,
@@ -326,7 +345,7 @@ def builds(
 @overload
 def builds(
     target: Importable,
-    *,
+    *pos_args: Any,
     populate_full_signature: bool = False,
     hydra_partial: bool,
     hydra_recursive: bool = True,
@@ -343,7 +362,7 @@ def builds(
 
 def builds(
     target: Importable,
-    *,
+    *pos_args: Any,
     populate_full_signature: bool = False,
     hydra_partial: bool = False,
     hydra_recursive: bool = True,
@@ -362,6 +381,9 @@ def builds(
     ----------
     target : Union[Instantiable, Callable]
         The object to be instantiated/called
+
+    pos_args: Any
+        Positional arguments passed to `target`
 
     kwargs_for_target : Any
         The keyword arguments passed to `target(...)`.
@@ -639,15 +661,19 @@ def builds(
 
     # `base_fields` stores the list of fields that will be present in our dataclass
     #
-    # Note: _args_ should be added here once hydra supports it in structured configs
     # TODO: should we always write these? Or is it more legible to only write them
     #       if they were explicitly specified by the user?
     #       - Presently we always need to write these, otherwise inheritance
     #         becomes an issue (as it is with _partial_target_
     base_fields: List[Tuple[str, type, Field_Entry]] = target_field + [
-        ("_recursive_", bool, field(default=hydra_recursive, init=False)),
+        (_RECURSIVE_FIELD_NAME, bool, field(default=hydra_recursive, init=False)),
         ("_convert_", str, field(default=hydra_convert, init=False)),
     ]
+
+    if pos_args:
+        base_fields.append(
+            (_POS_ARG_FIELD_NAME, Tuple[Any, ...], field(default=pos_args, init=False))
+        )
 
     try:
         signature_params = inspect.signature(target).parameters
@@ -677,45 +703,109 @@ def builds(
         # Covers case for ufuncs, which do not have inspectable type hints
         type_hints = defaultdict(lambda: Any)
 
-    # True if **kwargs is in the signature of `target`
-    sig_has_var_kwargs = any(
-        p.kind is inspect.Parameter.VAR_KEYWORD for p in signature_params.values()
-    )
+    sig_by_kind: Dict[Any, List[inspect.Parameter]] = {
+        _POSITIONAL_ONLY: [],
+        _POSITIONAL_OR_KEYWORD: [],
+        _VAR_POSITIONAL: [],
+        _KEYWORD_ONLY: [],
+        _VAR_KEYWORD: [],
+    }
+
+    for p in signature_params.values():
+        sig_by_kind[p.kind].append(p)
 
     # these are the names of the only parameters in the signature of `target` that can
     # be referenced by name
-    nameable_params_in_sig = set(
+    nameable_params_in_sig: Set[str] = set(
         p.name
         for p in signature_params.values()
         if p.kind
         in {inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.KEYWORD_ONLY}
     )
 
+    if not pos_args and builds_bases:
+        # pos_args is potentially inherited
+        for _base in builds_bases:
+            pos_args = getattr(_base, _POS_ARG_FIELD_NAME, ())
+            if pos_args:
+                break
+
     fields_set_by_bases: Set[str] = {
         _field.name
         for _base in builds_bases
         for _field in fields(_base)
-        if not _field.name.startswith("_")
+        if _field.name not in _HYDRA_FIELD_NAMES
     }
 
-    # Validate that user-specified arguments correspond to parameters in target's
-    # signature that can be specified by name
-    if target_has_valid_signature and not sig_has_var_kwargs:
-        if not set(kwargs_for_target) <= nameable_params_in_sig:
-            _unexpected = set(kwargs_for_target) - nameable_params_in_sig
-            raise TypeError(
-                _utils.building_error_prefix(target)
-                + f"The following unexpected keyword argument(s) was specified for {_utils.get_obj_path(target)} via `builds`: "
-                f"{', '.join(_unexpected)}"
+    # Validate that user-specified arguments satisfy target's signature.
+    # Should catch:
+    #    - bad parameter names
+    #    - too many parameters-by-position
+    #    - multiple values specified for parameter (via positional and by-name)
+    if target_has_valid_signature:
+
+        if not sig_by_kind[_VAR_KEYWORD]:
+            # check for unexpected kwargs
+            if not set(kwargs_for_target) <= nameable_params_in_sig:
+                _unexpected = set(kwargs_for_target) - nameable_params_in_sig
+                raise TypeError(
+                    _utils.building_error_prefix(target)
+                    + f"The following unexpected keyword argument(s) was specified for {_utils.get_obj_path(target)} via `builds`: "
+                    f"{', '.join(_unexpected)}"
+                )
+            if not fields_set_by_bases <= nameable_params_in_sig:
+                _unexpected = fields_set_by_bases - nameable_params_in_sig
+                raise TypeError(
+                    _utils.building_error_prefix(target)
+                    + f"The following unexpected keyword argument(s) for {_utils.get_obj_path(target)} "
+                    f"was specified via inheritance from a base class: "
+                    f"{', '.join(_unexpected)}"
+                )
+        if pos_args:
+            named_args = set(kwargs_for_target).union(fields_set_by_bases)
+
+            # indicates that number of parameters that could be specified by name,
+            # but are specified by position
+            _num_nameable_args_by_position = max(
+                0, len(pos_args) - len(sig_by_kind[_POSITIONAL_ONLY])
             )
-        if not fields_set_by_bases <= nameable_params_in_sig:
-            _unexpected = fields_set_by_bases - nameable_params_in_sig
-            raise TypeError(
-                _utils.building_error_prefix(target)
-                + f"The following unexpected keyword argument(s) for {_utils.get_obj_path(target)} "
-                f"was specified via inheritance from a base class: "
-                f"{', '.join(_unexpected)}"
-            )
+            if named_args:
+                # check for multiple values for arg, specified both via positional and kwarg
+                # E.g.: def f(x, y): ...
+                # f(1, 2, y=3)  # multiple values for `y`
+                for param in sig_by_kind[_POSITIONAL_OR_KEYWORD][
+                    :_num_nameable_args_by_position
+                ]:
+                    if param.name in named_args:
+                        raise TypeError(
+                            _utils.building_error_prefix(target)
+                            + f"multiple values for argument {param.name} were specified for "
+                            f"{_utils.get_obj_path(target)} via `builds`"
+                        )
+            if not sig_by_kind[
+                _VAR_POSITIONAL
+            ] and _num_nameable_args_by_position > len(
+                sig_by_kind[_POSITIONAL_OR_KEYWORD]
+            ):
+                #
+                _num_positional = len(sig_by_kind[_POSITIONAL_ONLY]) + len(
+                    sig_by_kind[_POSITIONAL_OR_KEYWORD]
+                )
+                _num_with_default = sum(
+                    p.default is not inspect.Parameter.empty
+                    and p.kind is _POSITIONAL_OR_KEYWORD
+                    for p in signature_params.values()
+                )
+                _permissible = (
+                    f"{_num_positional}"
+                    if not _num_with_default
+                    else f"{_num_positional - _num_with_default} to {_num_positional}"
+                )
+                raise TypeError(
+                    _utils.building_error_prefix(target)
+                    + f"{_utils.get_obj_path(target)} takes {_permissible} positional args, but "
+                    f"{len(pos_args)} were specified via `builds`"
+                )
 
     # Create valid dataclass fields from the user-specified values
     #
@@ -785,7 +875,7 @@ def builds(
 
         base_fields.extend(_fields_with_default_values)
 
-        if sig_has_var_kwargs:
+        if sig_by_kind[_VAR_KEYWORD]:
             # if the signature has **kwargs, then we need to add any user-specified
             # parameters that have not already been added
             base_fields.extend(
