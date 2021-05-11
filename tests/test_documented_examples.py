@@ -1,5 +1,6 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+import pytest
 
 from hydra_zen import builds, hydrated_dataclass, instantiate, just, to_yaml
 
@@ -30,6 +31,10 @@ def test_documented_builds_simple_roundtrip_example():
     assert {"a": 1, "b": "x"} == instantiate(builds(dict, a=1, b="x"))
 
 
+def test_documented_builds_pos_args_roundtrip_example():
+    assert [1, 2, 3] == instantiate(builds(list, (1, 2, 3)))
+
+
 def f():
     pass
 
@@ -42,8 +47,12 @@ def func(a_class, a_list=[1, 2], a_func=f):
     return a_class, a_list, a_func
 
 
-def test_auto_normalization_of_default_values():
-    conf = builds(func, a_class=C, populate_full_signature=True)
+@pytest.mark.parametrize("as_pos_arg", [True, False])
+def test_auto_normalization_of_default_values(as_pos_arg):
+    if as_pos_arg:
+        conf = builds(func, C, populate_full_signature=True)
+    else:
+        conf = builds(func, a_class=C, populate_full_signature=True)
     to_yaml(conf)  # raises if not serializable
     a_class, a_list, a_func = instantiate(conf)
     assert a_class is C
@@ -56,3 +65,10 @@ def test_nested_configs():
     assert d["x"] == dict(w=1)
     assert d["y"] is f
     assert d["z"] is f
+
+
+def test_nested_configs_pos_args():
+    x, y, z = instantiate(builds(list, (builds(dict, w=1), just(f), f)))
+    assert x == dict(w=1)
+    assert y is f
+    assert z is f

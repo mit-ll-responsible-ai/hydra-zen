@@ -291,21 +291,26 @@ def just(obj: Importable) -> Type[Just[Importable]]:
     return out_class
 
 
-def sanitized_default_value(value: Any) -> Union[Field, Type[Just]]:
-    if isinstance(value, _utils.KNOWN_MUTABLE_TYPES):
-        return mutable_value(value)
+def create_just_if_needed(value: _T) -> Union[_T, Type[Just[_T]]]:
+    # Hydra can serialize dataclasses directly, thus we
+    # don't want to wrap these in `just`
 
     if inspect.isfunction(value) or (
         inspect.isclass(value) and not is_dataclass(value)
     ):
-        # Hydra can serialize dataclasses directly, thus we
-        # don't want to wrap these in `just`
         return just(value)
 
     if ufunc is not None and isinstance(value, ufunc):
         # ufuncs are weird.. they aren't classes and they aren't functions
         return just(value)
-    return field(default=value)
+    return value
+
+
+def sanitized_default_value(value: Any) -> Union[Field, Type[Just]]:
+    if isinstance(value, _utils.KNOWN_MUTABLE_TYPES):
+        return mutable_value(value)
+    resolved_value = create_just_if_needed(value)
+    return field(default=value) if value is resolved_value else resolved_value
 
 
 # overloads when `hydra_partial=False`
@@ -673,7 +678,14 @@ def builds(
 
     if pos_args:
         base_fields.append(
-            (_POS_ARG_FIELD_NAME, Tuple[Any, ...], field(default=pos_args, init=False))
+            (
+                _POS_ARG_FIELD_NAME,
+                Tuple[Any, ...],
+                field(
+                    default=tuple(create_just_if_needed(x) for x in pos_args),
+                    init=False,
+                ),
+            )
         )
 
     try:
@@ -803,7 +815,9 @@ def builds(
             ] and _num_nameable_args_by_position > len(
                 sig_by_kind[_POSITIONAL_OR_KEYWORD]
             ):
-                #
+                # Too many positional args specified.
+                # E.g.: def f(x, y): ...
+                # f(1, 2, 3)
                 _num_positional = len(sig_by_kind[_POSITIONAL_ONLY]) + len(
                     sig_by_kind[_POSITIONAL_OR_KEYWORD]
                 )
