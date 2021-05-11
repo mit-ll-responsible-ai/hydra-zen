@@ -21,7 +21,7 @@ from ..typing import DataClass
 def _store_config(
     cfg: Union[DataClass, DictConfig, Mapping], config_name: str = "hydra_launch"
 ) -> str:
-    """Generates a Structured Config and registers it in the ConfigStore.
+    """Stores configuration object in Hydra's ConfigStore.
 
     Parameters
     ----------
@@ -29,7 +29,7 @@ def _store_config(
         A configuration as a dataclass, configuration object, or a dictionary.
 
     config_name: str (default: hydra_launch)
-        A default configuration name if available, otherwise a new object is
+        The configuration name used to store the configuration.
 
     Returns
     -------
@@ -66,6 +66,7 @@ def _load_config(
     Returns
     -------
     config: DictConfig
+        The configuration object including Hydra configuration.
 
     Notes
     -----
@@ -73,9 +74,9 @@ def _load_config(
 
     References
     ----------
-    .. [1] https://hydra.cc/docs/experimental/compose_api
-    .. [2] https://hydra.cc/docs/configure_hydra/intro
-    .. [3] https://hydra.cc/docs/advanced/override_grammar/basic
+    .. [1] https://hydra.cc/docs/next/advanced/compose_api
+    .. [2] https://hydra.cc/docs/next/configure_hydra/intro
+    .. [3] https://hydra.cc/docs/next/advanced/override_grammar/basic
     """
 
     with initialize(config_path=None):
@@ -143,8 +144,8 @@ def hydra_run(
 
     References
     ----------
-    .. [1] https://hydra.cc/docs/advanced/override_grammar/basic
-    .. [2] https://hydra.cc/docs/configure_hydra/intro
+    .. [1] https://hydra.cc/docs/next/advanced/override_grammar/basic
+    .. [2] https://hydra.cc/docs/next/configure_hydra/intro
 
     Examples
     --------
@@ -227,7 +228,7 @@ def hydra_multirun(
     config_dir: Optional[Union[str, Path]] = None,
     config_name: str = "hydra_multirun",
     job_name: str = "hydra_multirun",
-) -> List[JobReturn]:
+) -> List[Any]:
     """Launch a Hydra multi-run ([1]_) job defined by `task_function` using the configuration
     provided in `config`.
 
@@ -272,20 +273,14 @@ def hydra_multirun(
 
     Returns
     -------
-    result: List[List[JobReturn]]
-        The object storing the results of each Hydra experiment.
-            - overrides: From `overrides` and `multirun_overrides`
-            - return_value: The return value of the task function
-            - cfg: The configuration object sent to the task function
-            - hydra_cfg: The hydra configuration object
-            - working_dir: The experiment working directory
-            - task_name: The task name of the Hydra job
+    result: List[List[Any]]
+        The return values of all launched jobs (depends on the Sweeper implementation).
 
     References
     ----------
     .. [1] https://hydra.cc/docs/tutorials/basic/running_your_app/multi-run
-    .. [2] https://hydra.cc/docs/advanced/override_grammar/basic
-    .. [3] https://hydra.cc/docs/configure_hydra/intro
+    .. [2] https://hydra.cc/docs/next/advanced/override_grammar/basic
+    .. [3] https://hydra.cc/docs/next/configure_hydra/intro
 
     Examples
     --------
