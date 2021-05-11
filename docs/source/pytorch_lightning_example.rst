@@ -167,4 +167,4 @@ Hydra + hydra-zen + PyTorch Lightning lets us focus on writing the essentials of
 
 More Examples of hydra-zen in ML Projects
 -----------------------------------------
-You can check out `this repository <https://github.com/mitll-SAFERai/hydra-zen-examples>`_ for examples of larger-scale ML projects using hydra-zen.
+You can check out `this repository <https://github.com/mit-ll-responsible-ai/hydra-zen-examples>`_ for examples of larger-scale ML projects using hydra-zen.

@@ -1,7 +1,7 @@
 # hydra-zen
 
-[![Automated tests status](https://github.com/mitll-SAFERai/hydra-zen/workflows/Tests/badge.svg)](https://github.com/mitll-SAFERai/hydra-zen/actions?query=workflow%3ATests+branch%3Amain)
-[![Test coverage](https://img.shields.io/badge/coverage-100%25-green.svg)](https://github.com/mitll-SAFERai/hydra-zen/actions?query=workflow%3ATests+branch%3Amain)
+[![Automated tests status](https://github.com/mit-ll-responsible-ai/hydra-zen/workflows/Tests/badge.svg)](https://github.com/mit-ll-responsible-ai/hydra-zen/actions?query=workflow%3ATests+branch%3Amain)
+[![Test coverage](https://img.shields.io/badge/coverage-100%25-green.svg)](https://github.com/mit-ll-responsible-ai/hydra-zen/actions?query=workflow%3ATests+branch%3Amain)
 ![Python version support](https://img.shields.io/badge/python-3.6%20&#8208;%203.9-blue.svg)
 
 hydra-zen helps you configure your project using the power of [Hydra](https://github.com/facebookresearch/hydra), while enjoying the [Zen of Python](https://www.python.org/dev/peps/pep-0020/)!
