@@ -339,11 +339,12 @@ def hydra_multirun(
     # Separate Hydra overrides from experiment overrides
     hydra_overrides = []
     _overrides = []
-    for o in overrides:
-        if o.startswith("hydra"):
-            hydra_overrides.append(o)
-        else:
-            _overrides.append(o)
+    if overrides is not None:
+        for o in overrides:
+            if o.startswith("hydra"):
+                hydra_overrides.append(o)
+            else:
+                _overrides.append(o)
 
     # Only the hydra overrides are needed to extract the Hydra configuration for
     # the launcher and sweepers.

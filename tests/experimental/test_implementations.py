@@ -73,19 +73,27 @@ def test_hydra_run_job(
     "overrides",
     [None, [], ["hydra.sweep.dir=test_hydra_overrided"]],
 )
+@pytest.mark.parametrize(
+    "multirun_overrides",
+    [None, ["a=1,2"]],
+)
 @pytest.mark.parametrize("as_dataclass", [True, False])
 @pytest.mark.parametrize(
     "as_dictconfig, with_hydra", [(True, True), (True, False), (False, False)]
 )
 @pytest.mark.parametrize("use_default_dir", [True, False])
 def test_hydra_multirun(
-    overrides, as_dataclass, as_dictconfig, with_hydra, use_default_dir
+    overrides,
+    multirun_overrides,
+    as_dataclass,
+    as_dictconfig,
+    with_hydra,
+    use_default_dir,
 ):
     if not as_dataclass:
         cfg = dict(a=1, b=1)
     else:
         cfg = builds(dict, a=1, b=1)
-    multirun_overrides = ["a=1,2"]
     override_exists = overrides and len(overrides) > 1
 
     if as_dictconfig:
@@ -97,9 +105,15 @@ def test_hydra_multirun(
             overrides = []
 
     additl_kwargs = {} if use_default_dir else dict(config_dir=Path.cwd())
-    _overrides = (
-        multirun_overrides if overrides is None else (overrides + multirun_overrides)
-    )
+
+    _overrides = overrides
+    if multirun_overrides is not None:
+        _overrides = (
+            multirun_overrides
+            if overrides is None
+            else (overrides + multirun_overrides)
+        )
+
     job = hydra_multirun(
         cfg, task_function=instantiate, overrides=_overrides, **additl_kwargs
     )
