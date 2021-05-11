@@ -39,3 +39,11 @@ def test_chained_inheritance(conf2_sig, conf3_sig):
     assert issubclass(Conf3, Conf1)
     assert issubclass(Conf3, Conf2)
     assert instantiate(Conf3) == (1, 2, 3)
+
+
+def test_pos_args():
+    @hydrated_dataclass(f2, 1, 2)
+    class Conf:
+        z: int = 3
+
+    assert instantiate(Conf) == (1, 2, 3)

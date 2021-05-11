@@ -110,7 +110,7 @@ def __dataclass_transform__(
 @__dataclass_transform__()
 def hydrated_dataclass(
     target: Callable,
-    *,
+    *pos_args: Any,
     populate_full_signature: bool = False,
     hydra_partial: bool = False,
     hydra_recursive: bool = True,
@@ -124,6 +124,9 @@ def hydrated_dataclass(
     ----------
     target : Union[Instantiable, Callable]
         The object to be instantiated/called.
+
+    *pos_args: Any
+        Positional arguments passed to `target`
 
     populate_full_signature : bool, optional (default=False)
         If True, then the resulting dataclass's __init__ signature and fields
@@ -219,6 +222,7 @@ def hydrated_dataclass(
 
         return builds(
             target,
+            *pos_args,
             populate_full_signature=populate_full_signature,
             hydra_recursive=hydra_recursive,
             hydra_convert=hydra_convert,
@@ -388,10 +392,10 @@ def builds(
     target : Union[Instantiable, Callable]
         The object to be instantiated/called
 
-    pos_args: Any
+    *pos_args: Any
         Positional arguments passed to `target`
 
-    kwargs_for_target : Any
+    **kwargs_for_target : Any
         The keyword arguments passed to `target(...)`.
 
         The arguments specified here solely determine the fields and init-parameters of the
@@ -754,6 +758,9 @@ def builds(
     #    - too many parameters-by-position
     #    - multiple values specified for parameter (via positional and by-name)
     #    - too few required positional args (not enforced for hydra_partial=True)
+    #
+    # We don't raise on an under-specified signature because it is possible that the
+    # resulting dataclass will simply be inherited from and extended.
     if target_has_valid_signature:
 
         if not hydra_partial and len(pos_args) < len(sig_by_kind[_POSITIONAL_ONLY]):
