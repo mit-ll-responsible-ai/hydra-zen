@@ -62,14 +62,3 @@ def test_pos_only_with_partial_is_not_required(full_sig):
     )
     assert instantiate(cfg)(2) == (1, 2)
     assert len(inspect.signature(cfg).parameters) == 0
-
-
-@given(full_sig=st.booleans())
-def test_builds_runtime_validation_required_pos(full_sig: bool):
-    with pytest.raises(TypeError):
-        # 0 of 2 required positional args
-        builds(xy_are_pos_only, populate_full_signature=full_sig)
-
-    with pytest.raises(TypeError):
-        # 1 of 2 required positional args
-        builds(xy_are_pos_only, 1, populate_full_signature=full_sig)

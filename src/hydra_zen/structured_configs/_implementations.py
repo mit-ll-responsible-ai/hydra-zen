@@ -757,10 +757,10 @@ def builds(
     #    - bad parameter names
     #    - too many parameters-by-position
     #    - multiple values specified for parameter (via positional and by-name)
-    #    - too few required positional args (not enforced for hydra_partial=True)
     #
     # We don't raise on an under-specified signature because it is possible that the
     # resulting dataclass will simply be inherited from and extended.
+    # The issues we catch here cannot be fixed downstream.
     if target_has_valid_signature:
 
         if not sig_by_kind[_VAR_KEYWORD]:
@@ -780,22 +780,6 @@ def builds(
                     f"was specified via inheritance from a base class: "
                     f"{', '.join(_unexpected)}"
                 )
-
-        # check for insufficient required positional args
-        if not hydra_partial and len(pos_args) < len(sig_by_kind[_POSITIONAL_ONLY]):
-            _missing_var_names = ", ".join(
-                repr(p.name) for p in sig_by_kind[_POSITIONAL_ONLY][len(pos_args) :]
-            )
-            _num_missing = len(sig_by_kind[_POSITIONAL_ONLY][len(pos_args) :])
-            _plural_s = "" if _num_missing == 1 else "s"
-            _plural_was = "was" if _num_missing == 1 else "were"
-            raise TypeError(
-                _utils.building_error_prefix(target)
-                + f"{_utils.get_obj_path(target)} requires {_num_missing} positional "
-                f"argument{_plural_s} – {_missing_var_names} – that {_plural_was} not "
-                f"supplied to `builds`.\nYou can specify `hydra_partial=True` so that these parameters can be excluded "
-                f"from the configuration."
-            )
 
         if pos_args:
             named_args = set(kwargs_for_target).union(fields_set_by_bases)
