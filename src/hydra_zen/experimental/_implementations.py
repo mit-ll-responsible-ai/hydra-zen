@@ -3,13 +3,15 @@
 from pathlib import Path
 from typing import Any, Callable, List, Mapping, Optional, Union
 
+from hydra import compose, initialize
+from hydra._internal.callbacks import Callbacks
 from hydra._internal.hydra import Hydra
 from hydra._internal.utils import create_config_search_path
 from hydra.core.config_store import ConfigStore
 from hydra.core.global_hydra import GlobalHydra
 from hydra.core.utils import JobReturn, run_job
-from hydra.experimental import compose, initialize
 from hydra.plugins.sweeper import Sweeper
+from hydra.types import HydraContext
 from omegaconf import DictConfig
 
 from .._hydra_overloads import instantiate
@@ -323,7 +325,7 @@ def hydra_multirun(
 
     # Only the hydra overrides are needed to extract the Hydra configuration for
     # the launcher and sweepers.
-    # The sweeper handles the overides for each experiment
+    # The sweeper handles the overrides for each experiment
     config_name = _store_config(config, config_name)
     task_cfg = _load_config(config_name=config_name, overrides=hydra_overrides)
 
@@ -338,7 +340,9 @@ def hydra_multirun(
         assert isinstance(sweeper, Sweeper)
         sweeper.setup(
             config=task_cfg,
-            config_loader=hydra.config_loader,
+            hydra_context=HydraContext(
+                hydra.config_loader, callbacks=Callbacks(task_cfg)
+            ),
             task_function=task_function,
         )
 
