@@ -6,6 +6,7 @@ import inspect
 import hypothesis.strategies as st
 import pytest
 from hypothesis import given
+from omegaconf import OmegaConf
 
 from hydra_zen import builds, instantiate, to_yaml
 from tests import valid_hydra_literals
@@ -13,6 +14,10 @@ from tests import valid_hydra_literals
 
 def x_is_pos_only(x, /):
     return x
+
+
+def xy_are_pos_only(x, y, /):
+    return x, y
 
 
 @pytest.mark.parametrize("func", [x_is_pos_only])
@@ -31,15 +36,27 @@ def test_roundtrip_pos_only(x, full_sig: bool, partial: bool):
     cfg = builds(
         x_is_pos_only, x, populate_full_signature=full_sig, hydra_partial=partial
     )
-    to_yaml(cfg)  # shouldn't crash
+
     out = instantiate(cfg)
+
+    assert len(inspect.signature(cfg).parameters) == 0
 
     if partial:
         out = out()
     assert out == x
 
+    out = instantiate(OmegaConf.create(to_yaml(cfg)))
+    if partial:
+        out = out()
+    assert out == x
 
-@given(full_sig=st.booleans(), partial=st.booleans())
-def test_pos_only_sig_parsing(full_sig: bool, partial: bool):
-    cfg = builds(x_is_pos_only, populate_full_signature=full_sig, hydra_partial=partial)
-    assert len(inspect.signature(cfg).parameters) == 0
+
+@given(full_sig=st.booleans())
+def test_pos_only_runtime_validation(full_sig: bool):
+    with pytest.raises(TypeError):
+        # 0 of 2 required positional args
+        builds(xy_are_pos_only, populate_full_signature=full_sig)
+
+    with pytest.raises(TypeError):
+        # 1 of 2 required positional args
+        builds(xy_are_pos_only, 1, populate_full_signature=full_sig)

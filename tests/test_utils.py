@@ -114,7 +114,7 @@ def test_documented_instantiate_example():
     from hydra_zen import builds, instantiate
 
     assert instantiate(builds(dict, a=1, b=2), c=3) == dict(a=1, b=2, c=3)
-    assert instantiate(builds(list), (1, 2, 3)) == [1, 2, 3]
+    assert instantiate(builds(list, (1, 2, 3))) == [1, 2, 3]
 
 
 class Color(enum.Enum):

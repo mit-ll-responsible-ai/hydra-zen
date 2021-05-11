@@ -741,7 +741,24 @@ def builds(
     #    - bad parameter names
     #    - too many parameters-by-position
     #    - multiple values specified for parameter (via positional and by-name)
+    #    - too few required positional args (not enforced for hydra_partial=True)
     if target_has_valid_signature:
+
+        if not hydra_partial and len(pos_args) < len(sig_by_kind[_POSITIONAL_ONLY]):
+            # check for insufficient required positional args
+            _missing_var_names = ", ".join(
+                repr(p.name) for p in sig_by_kind[_POSITIONAL_ONLY][len(pos_args) :]
+            )
+            _num_missing = len(sig_by_kind[_POSITIONAL_ONLY][len(pos_args) :])
+            _plural_s = "" if _num_missing == 1 else "s"
+            _plural_was = "was" if _num_missing == 1 else "were"
+            raise TypeError(
+                _utils.building_error_prefix(target)
+                + f"{_utils.get_obj_path(target)} requires {_num_missing} positional "
+                f"argument{_plural_s} – {_missing_var_names} – that {_plural_was} not "
+                f"supplied to `builds`.\nYou can specify `hydra_partial=True` so that these parameters can be excluded "
+                f"from the configuration."
+            )
 
         if not sig_by_kind[_VAR_KEYWORD]:
             # check for unexpected kwargs

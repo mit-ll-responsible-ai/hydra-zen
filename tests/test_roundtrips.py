@@ -7,8 +7,9 @@ from typing import Any, Dict, List
 import hypothesis.strategies as st
 import pytest
 from hypothesis import given
+from omegaconf import OmegaConf
 
-from hydra_zen import builds, instantiate, just
+from hydra_zen import builds, instantiate, just, to_yaml
 from tests import valid_hydra_literals
 
 arbitrary_kwargs = st.dictionaries(
@@ -119,4 +120,6 @@ def local_function():
     ],
 )
 def test_just_roundtrip(obj):
-    assert instantiate(just(obj)) is obj
+    cfg = just(obj)
+    assert instantiate(cfg) is obj
+    assert instantiate(OmegaConf.create(to_yaml(cfg))) is obj
