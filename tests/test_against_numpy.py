@@ -80,3 +80,7 @@ def test_ufunc_as_default_value():
     conf = builds(f, populate_full_signature=True)
     to_yaml(conf)  # check serializability
     assert instantiate(conf) is np.add
+
+
+def test_ufunc_positional_args():
+    assert instantiate(builds(np.add, 1.0, 2.0)) == 3.0

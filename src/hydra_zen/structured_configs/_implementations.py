@@ -5,6 +5,7 @@ import inspect
 from collections import defaultdict
 from dataclasses import Field, dataclass, field, fields, is_dataclass, make_dataclass
 from functools import partial
+from itertools import chain
 from typing import (
     Any,
     Callable,
@@ -667,7 +668,7 @@ def builds(
     #         becomes an issue (as it is with _partial_target_
     base_fields: List[Tuple[str, type, Field_Entry]] = target_field + [
         (_RECURSIVE_FIELD_NAME, bool, field(default=hydra_recursive, init=False)),
-        ("_convert_", str, field(default=hydra_convert, init=False)),
+        (_CONVERT_FIELD_NAME, str, field(default=hydra_convert, init=False)),
     ]
 
     if pos_args:
@@ -718,9 +719,7 @@ def builds(
     # be referenced by name
     nameable_params_in_sig: Set[str] = set(
         p.name
-        for p in signature_params.values()
-        if p.kind
-        in {inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.KEYWORD_ONLY}
+        for p in chain(sig_by_kind[_POSITIONAL_OR_KEYWORD], sig_by_kind[_KEYWORD_ONLY])
     )
 
     if not pos_args and builds_bases:
@@ -750,8 +749,8 @@ def builds(
                 _unexpected = set(kwargs_for_target) - nameable_params_in_sig
                 raise TypeError(
                     _utils.building_error_prefix(target)
-                    + f"The following unexpected keyword argument(s) was specified for {_utils.get_obj_path(target)} via `builds`: "
-                    f"{', '.join(_unexpected)}"
+                    + f"The following unexpected keyword argument(s) was specified for {_utils.get_obj_path(target)} "
+                    f"via `builds`: {', '.join(_unexpected)}"
                 )
             if not fields_set_by_bases <= nameable_params_in_sig:
                 _unexpected = fields_set_by_bases - nameable_params_in_sig
@@ -814,7 +813,7 @@ def builds(
     #    and is resolved to one of the type-annotations supported by hydra if possible,
     #    otherwise, is Any
     #  - arg-value: mutable values are automatically specified using default-factory
-    user_specified_params: Dict[str, Tuple[str, type, Field]] = {
+    user_specified_named_params: Dict[str, Tuple[str, type, Field]] = {
         name: (
             name,
             _utils.sanitized_type(type_hints.get(name, Any)),
@@ -839,14 +838,23 @@ def builds(
 
         # we need to keep track of what user-specified params we have set
         _seen: Set[str] = set()
-        for param in signature_params.values():
+
+        for n, param in enumerate(signature_params.values()):
+            if n + 1 <= len(pos_args):
+                # Positional parameters are populated from "left to right" in the signature.
+                # We have already done validation, so we know that positional params aren't redundant
+                # with named params (including inherited params).
+                continue
+
             if param.name not in nameable_params_in_sig:
                 # parameter cannot be specified by name
                 continue
 
-            if param.name in user_specified_params:
+            if param.name in user_specified_named_params:
                 # user-specified parameter is preferred
-                _fields_with_default_values.append(user_specified_params[param.name])
+                _fields_with_default_values.append(
+                    user_specified_named_params[param.name]
+                )
                 _seen.add(param.name)
             elif param.name in fields_set_by_bases:
                 # don't populate a parameter that can be derived from a base
@@ -880,11 +888,11 @@ def builds(
             # parameters that have not already been added
             base_fields.extend(
                 entry
-                for name, entry in user_specified_params.items()
+                for name, entry in user_specified_named_params.items()
                 if name not in _seen
             )
     else:
-        base_fields.extend(user_specified_params.values())
+        base_fields.extend(user_specified_named_params.values())
 
     if dataclass_name is None:
         if hydra_partial is False:

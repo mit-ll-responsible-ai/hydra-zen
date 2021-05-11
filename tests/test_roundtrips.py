@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import string
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 import hypothesis.strategies as st
 import pytest
@@ -21,6 +21,10 @@ def pass_through_kwargs(**kwargs):
     return kwargs
 
 
+def pass_through_args(*args):
+    return args
+
+
 @given(kwargs=arbitrary_kwargs, full_sig=st.booleans())
 def test_builds_roundtrip(kwargs, full_sig: bool):
     assert kwargs == instantiate(
@@ -33,7 +37,7 @@ def test_builds_roundtrip(kwargs, full_sig: bool):
     call_kwargs=arbitrary_kwargs,
     full_sig=st.booleans(),
 )
-def test_builds_roundtrip_with_partial(
+def test_builds_kwargs_roundtrip_with_partial(
     partial_kwargs: Dict[str, Any],
     call_kwargs: Dict[str, Any],
     full_sig: bool,
@@ -49,6 +53,30 @@ def test_builds_roundtrip_with_partial(
     expected_kwargs = partial_kwargs.copy()
     expected_kwargs.update(call_kwargs)
     assert expected_kwargs == partial_struct(**call_kwargs)  # resolve partial
+
+
+@given(
+    partial_args=arbitrary_kwargs.map(lambda x: list(x.values())),
+    call_args=arbitrary_kwargs.map(lambda x: list(x.values())),
+    full_sig=st.booleans(),
+)
+def test_builds_args_roundtrip_with_partial(
+    partial_args: List[Any],
+    call_args: List[Any],
+    full_sig: bool,
+):
+    partial_struct = instantiate(
+        builds(
+            pass_through_args,
+            hydra_partial=True,
+            populate_full_signature=full_sig,
+            *partial_args,
+        ),
+    )
+
+    expected_args = partial_args.copy()
+    expected_args.extend(call_args)
+    assert tuple(expected_args) == partial_struct(*call_args)  # resolve partial
 
 
 def f(x, y=dict(a=2)):

@@ -72,7 +72,7 @@ def f_x_y2_str_z3(x, y=2, *, z=3):
     ],
 )
 @given(partial=st.booleans(), full_sig=st.booleans())
-def test_builds_raises_when_user_specified_arg_is_not_in_sig(
+def test_builds_raises_when_user_specified_args_violate_sig(
     func, args, kwargs, full_sig, partial
 ):
     with pytest.raises(TypeError):
@@ -82,6 +82,32 @@ def test_builds_raises_when_user_specified_arg_is_not_in_sig(
             **kwargs,
             hydra_partial=partial,
             populate_full_signature=full_sig
+        )
+
+    # test when **kwargs are inherited
+    with pytest.raises(TypeError):
+        kwarg_base = builds(
+            func, **kwargs, hydra_partial=partial, populate_full_signature=full_sig
+        )
+        builds(
+            func,
+            *args,
+            hydra_partial=partial,
+            populate_full_signature=full_sig,
+            builds_bases=(kwarg_base,)
+        )
+
+    # test when *args are inherited
+    with pytest.raises(TypeError):
+        args_base = builds(
+            func, *args, hydra_partial=partial, populate_full_signature=full_sig
+        )
+        builds(
+            func,
+            **kwargs,
+            hydra_partial=partial,
+            populate_full_signature=full_sig,
+            builds_bases=(args_base,)
         )
 
 
