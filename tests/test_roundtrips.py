@@ -86,17 +86,22 @@ def f(x, y=dict(a=2)):
 
 @pytest.mark.parametrize("full_sig", [True, False])
 @pytest.mark.parametrize("partial", [True, False])
-def test_builds_roundtrips_with_mutable_values(full_sig: bool, partial: bool):
+@pytest.mark.parametrize("named_arg", [True, False])
+def test_builds_roundtrips_with_mutable_values(
+    full_sig: bool, partial: bool, named_arg: bool
+):
     # tests mutable user-specified value and default value
-    result = instantiate(
-        builds(f, x=[1], populate_full_signature=full_sig, hydra_partial=partial)
-    )
+    if named_arg:
+        result = instantiate(
+            builds(f, x=[1], populate_full_signature=full_sig, hydra_partial=partial)
+        )
+    else:
+        result = instantiate(
+            builds(f, [1], populate_full_signature=full_sig, hydra_partial=partial)
+        )
     if partial:
         result = result()
-    assert result == (
-        [1],
-        dict(a=2),
-    )
+    assert result == ([1], {"a": 2})
 
 
 class LocalClass:
