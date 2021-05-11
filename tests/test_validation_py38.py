@@ -22,7 +22,7 @@ def xy_are_pos_only(x, y, /):
 
 @pytest.mark.parametrize("func", [x_is_pos_only])
 @given(partial=st.booleans(), full_sig=st.booleans())
-def test_builds_raises_when_user_specified_arg_is_not_in_sig(func, full_sig, partial):
+def test_builds_runtime_validation_pos_only_not_nameable(func, full_sig, partial):
     with pytest.raises(TypeError):
         builds(func, x=10, hydra_partial=partial, populate_full_signature=full_sig)
 
@@ -52,7 +52,20 @@ def test_roundtrip_pos_only(x, full_sig: bool, partial: bool):
 
 
 @given(full_sig=st.booleans())
-def test_pos_only_runtime_validation(full_sig: bool):
+def test_pos_only_with_partial_is_not_required(full_sig):
+    cfg = builds(x_is_pos_only, populate_full_signature=full_sig, hydra_partial=True)
+    assert instantiate(cfg)(1) == 1
+    assert len(inspect.signature(cfg).parameters) == 0
+
+    cfg = builds(
+        xy_are_pos_only, 1, populate_full_signature=full_sig, hydra_partial=True
+    )
+    assert instantiate(cfg)(2) == (1, 2)
+    assert len(inspect.signature(cfg).parameters) == 0
+
+
+@given(full_sig=st.booleans())
+def test_builds_runtime_validation_required_pos(full_sig: bool):
     with pytest.raises(TypeError):
         # 0 of 2 required positional args
         builds(xy_are_pos_only, populate_full_signature=full_sig)
