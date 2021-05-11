@@ -78,7 +78,7 @@ def _load_config(
     .. [3] https://hydra.cc/docs/advanced/override_grammar/basic
     """
 
-    with initialize(config_path="."):
+    with initialize(config_path=None):
         task_cfg = compose(
             config_name,
             overrides=[] if overrides is None else overrides,

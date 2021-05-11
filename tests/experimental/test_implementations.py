@@ -39,7 +39,10 @@ def test_store_config(as_dataclass, as_dictconfig):
 @pytest.mark.parametrize(
     "as_dictconfig, with_hydra", [(True, True), (True, False), (False, False)]
 )
-def test_hydra_run_job(overrides, as_dataclass, as_dictconfig, with_hydra):
+@pytest.mark.parametrize("use_default_dir", [True, False])
+def test_hydra_run_job(
+    overrides, as_dataclass, as_dictconfig, with_hydra, use_default_dir
+):
     if not as_dataclass:
         cfg = dict(a=1, b=1)
     else:
@@ -55,7 +58,10 @@ def test_hydra_run_job(overrides, as_dataclass, as_dictconfig, with_hydra):
             cfg = _load_config(cn, overrides=overrides)
             overrides = []
 
-    job = hydra_run(cfg, task_function=instantiate, overrides=overrides)
+    additl_kwargs = {} if use_default_dir else dict(config_dir=Path.cwd())
+    job = hydra_run(
+        cfg, task_function=instantiate, overrides=overrides, **additl_kwargs
+    )
     assert job.return_value == {"a": 1, "b": 1}
 
     if override_exists == 1:
