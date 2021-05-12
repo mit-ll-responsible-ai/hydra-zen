@@ -39,47 +39,15 @@ def test_store_config(as_dataclass, as_dictconfig):
 @pytest.mark.parametrize(
     "as_dictconfig, with_hydra", [(True, True), (True, False), (False, False)]
 )
-def test_hydra_run_job(overrides, as_dataclass, as_dictconfig, with_hydra):
-    if not as_dataclass:
-        cfg = dict(a=1, b=1)
-    else:
-        cfg = builds(dict, a=1, b=1)
-
-    override_exists = overrides and len(overrides) > 1
-
-    if as_dictconfig:
-        if not with_hydra:
-            cfg = OmegaConf.create(cfg)
-        else:
-            cn = _store_config(cfg)
-            cfg = _load_config(cn, overrides=overrides)
-            overrides = []
-
-    job = hydra_run(cfg, task_function=instantiate, overrides=overrides)
-    assert job.return_value == {"a": 1, "b": 1}
-
-    if override_exists == 1:
-        assert Path("test_hydra_overrided").exists()
-
-
-@pytest.mark.usefixtures("cleandir")
-@pytest.mark.parametrize(
-    "overrides",
-    [None, [], ["hydra.sweep.dir=test_hydra_overrided"]],
-)
-@pytest.mark.parametrize("as_dataclass", [True, False])
-@pytest.mark.parametrize(
-    "as_dictconfig, with_hydra", [(True, True), (True, False), (False, False)]
-)
 @pytest.mark.parametrize("use_default_dir", [True, False])
-def test_hydra_multirun(
+def test_hydra_run_job(
     overrides, as_dataclass, as_dictconfig, with_hydra, use_default_dir
 ):
     if not as_dataclass:
         cfg = dict(a=1, b=1)
     else:
         cfg = builds(dict, a=1, b=1)
-    multirun_overrides = ["a=1,2"]
+
     override_exists = overrides and len(overrides) > 1
 
     if as_dictconfig:
@@ -91,9 +59,61 @@ def test_hydra_multirun(
             overrides = []
 
     additl_kwargs = {} if use_default_dir else dict(config_dir=Path.cwd())
-    _overrides = (
-        multirun_overrides if overrides is None else (overrides + multirun_overrides)
+    job = hydra_run(
+        cfg, task_function=instantiate, overrides=overrides, **additl_kwargs
     )
+    assert job.return_value == {"a": 1, "b": 1}
+
+    if override_exists == 1:
+        assert Path("test_hydra_overrided").exists()
+
+
+@pytest.mark.usefixtures("cleandir")
+@pytest.mark.parametrize(
+    "overrides",
+    [None, [], ["hydra.sweep.dir=test_hydra_overrided"]],
+)
+@pytest.mark.parametrize(
+    "multirun_overrides",
+    [None, ["a=1,2"]],
+)
+@pytest.mark.parametrize("as_dataclass", [True, False])
+@pytest.mark.parametrize(
+    "as_dictconfig, with_hydra", [(True, True), (True, False), (False, False)]
+)
+@pytest.mark.parametrize("use_default_dir", [True, False])
+def test_hydra_multirun(
+    overrides,
+    multirun_overrides,
+    as_dataclass,
+    as_dictconfig,
+    with_hydra,
+    use_default_dir,
+):
+    if not as_dataclass:
+        cfg = dict(a=1, b=1)
+    else:
+        cfg = builds(dict, a=1, b=1)
+    override_exists = overrides and len(overrides) > 1
+
+    if as_dictconfig:
+        if not with_hydra:
+            cfg = OmegaConf.create(cfg)
+        else:
+            cn = _store_config(cfg)
+            cfg = _load_config(cn, overrides=overrides)
+            overrides = []
+
+    additl_kwargs = {} if use_default_dir else dict(config_dir=Path.cwd())
+
+    _overrides = overrides
+    if multirun_overrides is not None:
+        _overrides = (
+            multirun_overrides
+            if overrides is None
+            else (overrides + multirun_overrides)
+        )
+
     job = hydra_multirun(
         cfg, task_function=instantiate, overrides=_overrides, **additl_kwargs
     )
