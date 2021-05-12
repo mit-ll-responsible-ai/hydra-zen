@@ -72,11 +72,12 @@ Hydra's `instantiate` function is used to enact this build. This can be used in 
 
 # recursively instantiating nested builds
 >>> def square(x): return x ** 2
->>> instantiate(builds(square, x=builds(square, x=2)))  # calls `square(square(2))`
+>>> instantiate(builds(square, builds(square, 2)))  # calls `square(square(2))`
 16
 ```
 
 The `just(<target>)` function creates a configuration that "just" returns the target (a non-literal Python object), without calling/initializing it.
+`builds` will automatically apply `just` to created nested structured configs.
 
 ```python
 >>> from hydra_zen import just
@@ -88,6 +89,8 @@ The `just(<target>)` function creates a configuration that "just" returns the ta
 
 # `builds` will automatically apply `just` to functions and classes
 >>> NumberConf = builds(dict, initial_val=2., transform=square)
+>>> NumberConf.transform
+types.Just_square
 >>> instantiate(NumberConf)  # calls `dict(number_type=int, transform=square)`
 {'initial_val': 2.0, 'transform': <function __main__.square(x)>}
 ```

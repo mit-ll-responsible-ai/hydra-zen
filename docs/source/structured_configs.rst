@@ -325,6 +325,23 @@ Or, we can intentionally exclude a target's parameter so that it is not availabl
    builds(func, y="dinosaur")  # `x` is not configurable for building `func`
 
 
+We can provide positional arguments as well
+
+.. code:: python
+
+   >>> instantiate(builds(np.add, 1.0, 2.0))
+   3.0
+
+
+Arguments specified in a positional way are excluded from the dataclass' signature
+
+.. code:: python
+
+   # signature: `Builds_func(y: str = 'a string')`
+   builds(func, 2, y="a string")
+
+
+
 Nesting configs for recursive instantiation
 ===========================================
 
@@ -407,6 +424,23 @@ that function.
      _target_: hydra_zen.funcs.get_obj
      path: numpy.mean
 
+
+User-specified parameters will automatically be transformed as well
+
+.. code:: python
+
+   >>> print(to_yaml(builds(dict, io_fn=len, sequence=list)))
+   _target_: builtins.dict
+   _recursive_: true
+   _convert_: none
+   io_fn:
+     _target_: hydra_zen.funcs.get_obj
+     path: builtins.len
+   sequence:
+     _target_: hydra_zen.funcs.get_obj
+     path: builtins.list
+
+
 Creating immutable configs
 ==========================
 
@@ -449,17 +483,29 @@ There is more to `builds` than meets the eye; the following "bells and whistles"
 Runtime validation
 ==================
 
-Misspelled parameter names will be caught by `builds`, so that the error surfaces immediately while creating the configuration.
+Misspelled parameter names and other invalid configurations for the target's signature will be caught by `builds`, so that the error surfaces immediately while creating the configuration.
 
 .. code:: python
 
    >>> def func(a_number: int): pass
-   >>> builds(func, a_nmbr=2)
+   >>> builds(func, a_nmbr=2)  # misspelled parameter name
    ---------------------------------------------------------------------------
    TypeError: Building: func ..
    The following unexpected keyword argument(s) was specified for __main__.func via `builds`: a_nmbr
 
-Because `builds` automatically mirror's type annotations from a target's signature, we also benefit from Hydra's type-validation mechanism.
+   >>> BaseConf = builds(func, a_number=2)
+   >>> builds(func, 1, builds_bases=(BaseConf,))  # bad composition is caught upon construction
+   ---------------------------------------------------------------------------
+   TypeError: Building: func ..
+   multiple values for argument a_number were specified for __main__.func via `builds`
+
+   >>> builds(func, 1, 2)  # too many arguments
+   ---------------------------------------------------------------------------
+   TypeError: Building: func ..
+   __main__.func takes 1 positional args, but 2 were specified via `builds`
+
+
+Because `builds` automatically mirror's type annotations from the target's signature, we also benefit from Hydra's type-validation mechanism.
 
 
 .. code:: python
