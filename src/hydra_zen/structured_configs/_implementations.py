@@ -60,6 +60,8 @@ _VAR_POSITIONAL: Final = inspect.Parameter.VAR_POSITIONAL
 _KEYWORD_ONLY: Final = inspect.Parameter.KEYWORD_ONLY
 _VAR_KEYWORD: Final = inspect.Parameter.VAR_KEYWORD
 
+_builtin_function_or_method_type = type(len)
+
 
 def mutable_value(x: Any) -> Field:
     """Used to set a mutable object as a default value for a field
@@ -305,14 +307,14 @@ def create_just_if_needed(value: _T) -> Union[_T, Type[Just[_T]]]:
     # Hydra can serialize dataclasses directly, thus we
     # don't want to wrap these in `just`
 
-    if inspect.isfunction(value) or (
-        inspect.isclass(value) and not is_dataclass(value)
+    if callable(value) and (
+        inspect.isfunction(value)
+        or (inspect.isclass(value) and not is_dataclass(value))
+        or isinstance(value, _builtin_function_or_method_type)
+        or (ufunc is not None and isinstance(value, ufunc))
     ):
         return just(value)
 
-    if ufunc is not None and isinstance(value, ufunc):
-        # ufuncs are weird.. they aren't classes and they aren't functions
-        return just(value)
     return value
 
 
@@ -487,13 +489,19 @@ def builds(
 
     Examples
     --------
-    **Basic Usage**
+    Basic Usage:
 
     >>> from hydra_zen import builds, instantiate
     >>> builds(dict, a=1, b='x')  # makes a dataclass that will "build" a dictionary with the specified fields
     types.Builds_dict
     >>> instantiate(builds(dict, a=1, b='x'))  # using hydra to build the dictionary
     {'a': 1, 'b': 'x'}
+
+    >>> Conf = builds(len, [1, 2, 3])  # specifying positional arguments
+    >>> Conf._args_
+    ([1, 2, 3],)
+    >>> instantiate(Conf)
+    3
 
     Using `builds` with partial instantiation
 
@@ -715,7 +723,7 @@ def builds(
                     if param.name in named_args:
                         raise TypeError(
                             _utils.building_error_prefix(target)
-                            + f"multiple values for argument {param.name} were specified for "
+                            + f"Multiple values for argument {param.name} were specified for "
                             f"{_utils.get_obj_path(target)} via `builds`"
                         )
             if not sig_by_kind[

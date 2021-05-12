@@ -43,8 +43,8 @@ class C:
     pass
 
 
-def func(a_class, a_list=[1, 2], a_func=f):
-    return a_class, a_list, a_func
+def func(a_class, a_list=[1, 2], a_func=f, a_builtin_func=len):
+    return a_class, a_list, a_func, a_builtin_func
 
 
 @pytest.mark.parametrize("as_pos_arg", [True, False])
@@ -54,10 +54,11 @@ def test_auto_normalization_of_default_values(as_pos_arg):
     else:
         conf = builds(func, a_class=C, populate_full_signature=True)
     to_yaml(conf)  # raises if not serializable
-    a_class, a_list, a_func = instantiate(conf)
+    a_class, a_list, a_func, a_builtin_func = instantiate(conf)
     assert a_class is C
     assert a_list == [1, 2]
     assert a_func is f
+    assert a_builtin_func is len
 
 
 def test_nested_configs():
