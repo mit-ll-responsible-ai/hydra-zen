@@ -341,7 +341,7 @@ To configure our Hydra application with this sweeper we must use Hydra's Config 
     from hydra_zen import builds
 
     RandomSearchSweeperConf = builds(
-        RandomSearchSweeper, optim=dict(x=0, y=12, maximize=False, max_iter=10)
+        RandomSearchSweeper, optim=dict(x=0, y=12, max_iter=10)
     )
 
     cs = ConfigStore.instance()
