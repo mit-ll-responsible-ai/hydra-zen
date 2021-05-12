@@ -21,8 +21,10 @@ project = "hydra-zen"
 copyright = "2021 Massachusetts Institute of Technology"
 author = "Ryan Soklaski, Justin Goodwin"
 
+# The short X.Y version
+version = ".".join(hydra_zen.__version__.split(".")[:2])
 # The full version, including alpha/beta/rc tags
-release = "v0.1.0"
+release = hydra_zen.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -60,6 +62,11 @@ exclude_patterns = []
 # a list of builtin themes.
 #
 html_theme = "sphinx_rtd_theme"
+
+
+def setup(app):
+    app.add_css_file("my_theme.css")
+
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

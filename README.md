@@ -1,24 +1,23 @@
 # hydra-zen
 
-[![Automated tests status](https://github.com/mitll-SAFERai/hydra-zen/workflows/Tests/badge.svg)](https://github.com/mitll-SAFERai/hydra-zen/actions?query=workflow%3ATests+branch%3Amain)
-[![Test coverage](https://img.shields.io/badge/coverage-100%25-green.svg)](https://github.com/mitll-SAFERai/hydra-zen/actions?query=workflow%3ATests+branch%3Amain)
+[![Automated tests status](https://github.com/mit-ll-responsible-ai/hydra-zen/workflows/Tests/badge.svg)](https://github.com/mit-ll-responsible-ai/hydra-zen/actions?query=workflow%3ATests+branch%3Amain)
+[![Test coverage](https://img.shields.io/badge/coverage-100%25-green.svg)](https://github.com/mit-ll-responsible-ai/hydra-zen/actions?query=workflow%3ATests+branch%3Amain)
 ![Python version support](https://img.shields.io/badge/python-3.6%20&#8208;%203.9-blue.svg)
 
 hydra-zen helps you configure your project using the power of [Hydra](https://github.com/facebookresearch/hydra), while enjoying the [Zen of Python](https://www.python.org/dev/peps/pep-0020/)!
 
 hydra-zen provides simple, Hydra-compatible tools that enable Python-centric workflows for designing, configuring, and running large-scale projects, such as machine learning experiments.
-These will keep your configuration process sleek and easy to reason about by encouraging you to write concise, but expressive configs within your Python code rather than in yaml files.
-
-Ultimately, hydra-zen promotes workflows that are configurable, repeatable, and scalable, while eliminating boilerplate code and other sources of technical debt from your work.
+It eliminates helps to eliminate the boilerplate code you would write to configure, orchestrate, and organize the results of your various experiments.
 
 hydra-zen offers:
-  - Functions for dynamically and ergonomically creating [structured configs](https://hydra.cc/docs/next/tutorials/structured_config/schema/) 
-  that can be used to fully or partially instantiate objects in your application (or retrieve them without instantiation), using both user-specified and auto-populated parameter values.
-  - The ability to launch Hydra jobs, complete with parameter sweeps and multi-run configurations, from within a notebook or any
-  other Python environment.
+  - Functions for automatically and dynamically generating [structured configs](https://hydra.cc/docs/next/tutorials/structured_config/schema/) that can be used to fully or partially instantiate objects in your application.
+  - The ability to launch Hydra jobs, complete with parameter sweeps and multi-run configurations, from within a notebook or any other Python environment.
   - Incisive type annotations that provide enriched context about your project's configurations to IDEs, type checkers, and other tooling.
   - Runtime validation of configurations to catch mistakes before your application launches.
   - Equal support for both object-oriented libraries (e.g., `torch.nn`) and functional ones (e.g., `jax` and `numpy`).
+
+These functions and capabilities can be used to great effect alongside [PyTorch Lightning](https://pytorch-lightning.readthedocs.io/en/latest/) to design boilerplate-free machine learning projects!  
+
 
 ## Installation
 `hydra-zen` is lightweight: its only dependencies are `hydra-core` and `typing-extensions`.
