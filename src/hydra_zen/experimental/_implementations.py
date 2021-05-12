@@ -114,8 +114,8 @@ def hydra_run(
 
     Parameters
     ----------
-    config: Union[DataClass, DictConfig]
-        The experiment configuration.
+    config: Union[DataClass, DictConfig, Mapping]
+        A configuration as a dataclass, configuration object, or a dictionary.
 
     task_function: Callable[[DictConfig], Any]
         The function Hydra will execute with the given configuration.
@@ -255,7 +255,7 @@ def hydra_multirun(
     Parameters
     ----------
     config: Union[DataClass, DictConfig]
-        The experiment configuration.
+        A configuration as a dataclass, configuration object, or a dictionary.
 
     task_function: Callable[[DictConfig], Any]
         The function Hydra will execute with the given configuration.
