@@ -67,6 +67,29 @@ def test_chain_builds_of_targets_with_common_interfaces(full_sig, partial):
     assert out == (1, 2, 3)
 
 
+@pytest.mark.parametrize("full_sig", [True, False])
+@pytest.mark.parametrize("partial", [True, False])
+def test_pos_args_with_inheritance(full_sig, partial):
+
+    conf_1 = builds(f_three_vars, 1, 2)
+    conf_2 = builds(
+        f_three_vars,
+        z=3,
+        hydra_partial=partial,
+        populate_full_signature=full_sig,
+        builds_bases=(conf_1,),
+    )
+
+    # checks subclass relationships
+    assert conf_2.__mro__[:2] == (conf_2, conf_1)
+
+    out = instantiate(conf_2)
+    if partial:
+        out = out()  # resolve partial
+
+    assert out == (1, 2, 3)
+
+
 def f_3(x):
     pass
 

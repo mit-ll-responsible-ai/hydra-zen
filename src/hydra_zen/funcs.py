@@ -21,13 +21,13 @@ __all__ = ["partial", "get_obj"]
 
 
 def partial(
-    _partial_target_: Callable[..., _T], *args: Any, **kwargs: Any
+    *args: Any, _partial_target_: Callable[..., _T], **kwargs: Any
 ) -> Partial[_T]:
     """Equivalent to ``functools.partial`` but provides a named parameter for the callable."""
     return _functools.partial(_partial_target_, *args, **kwargs)
 
 
-def get_obj(path: str) -> Union[type, Callable[..., Any]]:
+def get_obj(*, path: str) -> Union[type, Callable[..., Any]]:
     """Imports an object given the specified path."""
     try:
         cl = hydra_internal_utils._locate(path)

@@ -182,11 +182,12 @@ def g2(x: List[C]):
 
 
 def test_type_checking():
-    conf = builds(f, populate_full_signature=True)(
-        x=("hi",)
-    )  # violates type annotation
+    conf = builds(f, populate_full_signature=True)(x=("hi",))
     with pytest.raises(ValidationError):
         instantiate(conf)
+
+    # should be ok
+    instantiate(builds(f, populate_full_signature=True)(x=(1,)))
 
     # nested configs should get validated too
     with pytest.raises(ValidationError):

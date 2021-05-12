@@ -11,7 +11,7 @@ import hypothesis.strategies as st
 import pytest
 from hypothesis import given, settings
 
-from hydra_zen import builds, hydrated_dataclass, mutable_value
+from hydra_zen import builds, hydrated_dataclass, instantiate, mutable_value, to_yaml
 from hydra_zen.typing import Just
 from tests import valid_hydra_literals
 
@@ -53,11 +53,25 @@ def f2(x, y, z, has_default=101):
     user_value_x=valid_hydra_literals,
     user_value_y=valid_hydra_literals,
     user_value_z=valid_hydra_literals,
-    specified_as_default=st.lists(st.sampled_from(["x", "y", "z"]), unique=True),
+    num_positional=st.integers(0, 3),
+    data=st.data(),
 )
 def test_builds_signature_shuffling_takes_least_path(
-    user_value_x, user_value_y, user_value_z, specified_as_default
+    user_value_x,
+    user_value_y,
+    user_value_z,
+    num_positional: int,
+    data: st.DataObject,
 ):
+    specified_as_positional = set(["x", "y", "z"][:num_positional])
+
+    if num_positional < 3:
+        specified_as_default = data.draw(
+            st.lists(st.sampled_from(["x", "y", "z"][num_positional:]), unique=True),
+            label="specified_as_default",
+        )
+    else:
+        specified_as_default = data.draw(st.just([]), label="specified_as_default")
 
     # We will specify an arbitrary selection of x, y, z via `builds`, and then specify the
     # remaining parameters via initializing the resulting dataclass. This ensures that we can
@@ -67,28 +81,42 @@ def test_builds_signature_shuffling_takes_least_path(
     # E.g.
     #  - `builds(f, populate_full_signature=True)`.__init__ -> (x, y, z, has_default=default_value)
     #  - `builds(f, x=1, populate_full_signature=True)`.__init__ -> (y, z, x=1, has_default=default_value)
-    #  - `builds(f, y=2, z=-1, populate_full_signature=True)`.__init__ -> (z, y=2, z=-1, has_default=default_value)
+    #  - `builds(f, y=2, z=-1, populate_full_signature=True)`.__init__ -> (x, y=2, z=-1, has_default=default_value)
+    #  - `builds(f, 1, 2, populate_full_signature=True)`.__init__ -> (z=-1, has_default=default_value)
 
     defaults = dict(x=user_value_x, y=user_value_y, z=user_value_z)
 
     default_override = {k: defaults[k] for k in specified_as_default}
+    positional = [defaults[k] for k in sorted(specified_as_positional)]
+
     specified_via_init = {
-        k: defaults[k] for k in set(defaults) - set(specified_as_default)
+        k: defaults[k]
+        for k in set(defaults) - set(specified_as_default) - specified_as_positional
     }
 
-    BuildsF = builds(f2, **default_override, populate_full_signature=True)
+    BuildsF = builds(f2, *positional, **default_override, populate_full_signature=True)
     sig_param_names = [p.name for p in inspect.signature(BuildsF).parameters.values()]
     expected_param_ordering = (
         sorted(specified_via_init) + sorted(specified_as_default) + ["has_default"]
     )
+    expected_param_ordering = [
+        p for p in expected_param_ordering if p not in specified_as_positional
+    ]
 
     assert sig_param_names == expected_param_ordering
 
     b = BuildsF(**specified_via_init)
-    assert b.x == user_value_x
-    assert b.y == user_value_y
-    assert b.z == user_value_z
+    assert "x" in specified_as_positional and not hasattr(b, "x") or b.x == user_value_x
+    assert "y" in specified_as_positional and not hasattr(b, "y") or b.y == user_value_y
+    assert "z" in specified_as_positional and not hasattr(b, "z") or b.z == user_value_z
     assert b.has_default == 101
+
+    to_yaml(b)  # should never crash
+    x, y, z, has_default = instantiate(b)  # should never crash
+    assert x == user_value_x
+    assert y == user_value_y
+    assert z == user_value_z
+    assert has_default == 101
 
 
 def f3(x: str, *args, y: int = 22, z=[2], **kwargs):

@@ -29,23 +29,86 @@ def test_builds_hydra_partial_raises_if_recursion_disabled():
         builds(dict, hydra_partial=True, hydra_recursive=False)
 
 
-def x_is_var_pos(*x):
+def f_starx(*x):
     pass
 
 
-def x_is_not_in_sig(y):
+def f_kwargs(**kwargs):
     pass
 
 
-def sig_is_empty():
+def f_y(y):
     pass
 
 
-@pytest.mark.parametrize("func", [x_is_var_pos, x_is_not_in_sig, sig_is_empty])
+def f_empty():
+    pass
+
+
+def f_x_y2_str_z3(x, y=2, *, z=3):
+    pass
+
+
+@pytest.mark.parametrize(
+    "func, args, kwargs",
+    [
+        # named param not in sig
+        (f_starx, (), dict(x=10)),
+        (f_starx, (), dict(y=10)),
+        (f_y, (), dict(x=10)),
+        (f_empty, (), dict(x=10)),
+        # too many pos args
+        (f_kwargs, (1, 2), dict(y=2)),
+        (f_x_y2_str_z3, (1, 2, 3), {}),
+        (f_empty, (1,), {}),
+        (f_y, (1, 2), {}),
+        # multiple values specified for param
+        (f_y, (1,), dict(y=1)),
+        (
+            f_x_y2_str_z3,
+            (1, 2),
+            dict(y=1, z=4),
+        ),
+    ],
+)
 @given(partial=st.booleans(), full_sig=st.booleans())
-def test_builds_raises_when_user_specified_arg_is_not_in_sig(func, full_sig, partial):
+def test_builds_raises_when_user_specified_args_violate_sig(
+    func, args, kwargs, full_sig, partial
+):
     with pytest.raises(TypeError):
-        builds(func, x=10, hydra_partial=partial, populate_full_signature=full_sig)
+        builds(
+            func,
+            *args,
+            **kwargs,
+            hydra_partial=partial,
+            populate_full_signature=full_sig
+        )
+
+    # test when **kwargs are inherited
+    with pytest.raises(TypeError):
+        kwarg_base = builds(
+            func, **kwargs, hydra_partial=partial, populate_full_signature=full_sig
+        )
+        builds(
+            func,
+            *args,
+            hydra_partial=partial,
+            populate_full_signature=full_sig,
+            builds_bases=(kwarg_base,)
+        )
+
+    # test when *args are inherited
+    with pytest.raises(TypeError):
+        args_base = builds(
+            func, *args, hydra_partial=partial, populate_full_signature=full_sig
+        )
+        builds(
+            func,
+            **kwargs,
+            hydra_partial=partial,
+            populate_full_signature=full_sig,
+            builds_bases=(args_base,)
+        )
 
 
 @dataclass
@@ -78,17 +141,17 @@ def test_builds_raises_when_base_has_invalid_arg(full_sig, partial):
         Counter,
         zip_longest,
         dataclass,
-        x_is_var_pos,
-        sig_is_empty,
+        f_starx,
+        f_empty,
         given,
         assume,
         hydrated_dataclass,
         inspect.signature,
     ],
 )
-@given(partial=st.booleans(), full_sig=st.booleans())
+@given(full_sig=st.booleans())
 def test_fuzz_build_validation_against_a_bunch_of_common_objects(
-    target, partial: bool, full_sig: bool
+    target, full_sig: bool
 ):
     doesnt_have_sig = False
     try:
@@ -99,12 +162,10 @@ def test_fuzz_build_validation_against_a_bunch_of_common_objects(
     if doesnt_have_sig and full_sig:
         assume(False)
 
-    conf = builds(target, hydra_partial=partial, populate_full_signature=full_sig)
+    conf = builds(target, hydra_partial=True, populate_full_signature=full_sig)
 
     OmegaConf.create(to_yaml(conf))  # ensure serializable
-
-    if partial:
-        instantiate(conf)  # ensure instantiable
+    instantiate(conf)  # ensure instantiable
 
 
 def f2():

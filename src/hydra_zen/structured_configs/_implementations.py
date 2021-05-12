@@ -5,10 +5,12 @@ import inspect
 from collections import defaultdict
 from dataclasses import Field, dataclass, field, fields, is_dataclass, make_dataclass
 from functools import partial
+from itertools import chain
 from typing import (
     Any,
     Callable,
     Dict,
+    FrozenSet,
     List,
     Mapping,
     Optional,
@@ -38,7 +40,27 @@ __all__ = ["builds", "just", "hydrated_dataclass", "mutable_value"]
 _T = TypeVar("_T")
 
 _TARGET_FIELD_NAME: Final[str] = "_target_"
+_RECURSIVE_FIELD_NAME: Final[str] = "_recursive_"
+_CONVERT_FIELD_NAME: Final[str] = "_convert_"
 _PARTIAL_TARGET_FIELD_NAME: Final[str] = "_partial_target_"
+_POS_ARG_FIELD_NAME: Final[str] = "_args_"
+_HYDRA_FIELD_NAMES: FrozenSet[str] = frozenset(
+    (
+        _TARGET_FIELD_NAME,
+        _RECURSIVE_FIELD_NAME,
+        _CONVERT_FIELD_NAME,
+        _PARTIAL_TARGET_FIELD_NAME,
+        _POS_ARG_FIELD_NAME,
+    )
+)
+
+_POSITIONAL_ONLY: Final = inspect.Parameter.POSITIONAL_ONLY
+_POSITIONAL_OR_KEYWORD: Final = inspect.Parameter.POSITIONAL_OR_KEYWORD
+_VAR_POSITIONAL: Final = inspect.Parameter.VAR_POSITIONAL
+_KEYWORD_ONLY: Final = inspect.Parameter.KEYWORD_ONLY
+_VAR_KEYWORD: Final = inspect.Parameter.VAR_KEYWORD
+
+_builtin_function_or_method_type = type(len)
 
 
 def mutable_value(x: Any) -> Field:
@@ -90,7 +112,7 @@ def __dataclass_transform__(
 @__dataclass_transform__()
 def hydrated_dataclass(
     target: Callable,
-    *,
+    *pos_args: Any,
     populate_full_signature: bool = False,
     hydra_partial: bool = False,
     hydra_recursive: bool = True,
@@ -104,6 +126,9 @@ def hydrated_dataclass(
     ----------
     target : Union[Instantiable, Callable]
         The object to be instantiated/called.
+
+    *pos_args: Any
+        Positional arguments passed to `target`
 
     populate_full_signature : bool, optional (default=False)
         If True, then the resulting dataclass's __init__ signature and fields
@@ -193,7 +218,7 @@ def hydrated_dataclass(
 
         if not isinstance(decorated_obj, type):
             raise NotImplementedError(
-                "Class instances are not supported by `hydrated_dataclass` (yet)."
+                "Class instances are not supported by `hydrated_dataclass`."
             )
 
         # TODO: We should mutate `decorated_obj` directly like @dataclass does.
@@ -205,6 +230,7 @@ def hydrated_dataclass(
 
         return builds(
             target,
+            *pos_args,
             populate_full_signature=populate_full_signature,
             hydra_recursive=hydra_recursive,
             hydra_convert=hydra_convert,
@@ -277,28 +303,33 @@ def just(obj: Importable) -> Type[Just[Importable]]:
     return out_class
 
 
+def create_just_if_needed(value: _T) -> Union[_T, Type[Just[_T]]]:
+    # Hydra can serialize dataclasses directly, thus we
+    # don't want to wrap these in `just`
+
+    if callable(value) and (
+        inspect.isfunction(value)
+        or (inspect.isclass(value) and not is_dataclass(value))
+        or isinstance(value, _builtin_function_or_method_type)
+        or (ufunc is not None and isinstance(value, ufunc))
+    ):
+        return just(value)
+
+    return value
+
+
 def sanitized_default_value(value: Any) -> Union[Field, Type[Just]]:
     if isinstance(value, _utils.KNOWN_MUTABLE_TYPES):
         return mutable_value(value)
-
-    if inspect.isfunction(value) or (
-        inspect.isclass(value) and not is_dataclass(value)
-    ):
-        # Hydra can serialize dataclasses directly, thus we
-        # don't want to wrap these in `just`
-        return just(value)
-
-    if ufunc is not None and isinstance(value, ufunc):
-        # ufuncs are weird.. they aren't classes and they aren't functions
-        return just(value)
-    return field(default=value)
+    resolved_value = create_just_if_needed(value)
+    return field(default=value) if value is resolved_value else resolved_value
 
 
 # overloads when `hydra_partial=False`
 @overload
 def builds(
     target: Importable,
-    *,
+    *pos_args: Any,
     populate_full_signature: bool = False,
     hydra_partial: Literal[False] = False,
     hydra_recursive: bool = True,
@@ -315,7 +346,7 @@ def builds(
 @overload
 def builds(
     target: Importable,
-    *,
+    *pos_args: Any,
     populate_full_signature: bool = False,
     hydra_partial: Literal[True],
     hydra_recursive: bool = True,
@@ -332,7 +363,7 @@ def builds(
 @overload
 def builds(
     target: Importable,
-    *,
+    *pos_args: Any,
     populate_full_signature: bool = False,
     hydra_partial: bool,
     hydra_recursive: bool = True,
@@ -349,7 +380,7 @@ def builds(
 
 def builds(
     target: Importable,
-    *,
+    *pos_args: Any,
     populate_full_signature: bool = False,
     hydra_partial: bool = False,
     hydra_recursive: bool = True,
@@ -369,7 +400,10 @@ def builds(
     target : Union[Instantiable, Callable]
         The object to be instantiated/called
 
-    kwargs_for_target : Any
+    *pos_args: Any
+        Positional arguments passed to `target`
+
+    **kwargs_for_target : Any
         The keyword arguments passed to `target(...)`.
 
         The arguments specified here solely determine the fields and init-parameters of the
@@ -455,13 +489,19 @@ def builds(
 
     Examples
     --------
-    **Basic Usage**
+    Basic Usage:
 
     >>> from hydra_zen import builds, instantiate
     >>> builds(dict, a=1, b='x')  # makes a dataclass that will "build" a dictionary with the specified fields
     types.Builds_dict
     >>> instantiate(builds(dict, a=1, b='x'))  # using hydra to build the dictionary
     {'a': 1, 'b': 'x'}
+
+    >>> Conf = builds(len, [1, 2, 3])  # specifying positional arguments
+    >>> Conf._args_
+    ([1, 2, 3],)
+    >>> instantiate(Conf)
+    3
 
     Using `builds` with partial instantiation
 
@@ -555,15 +595,26 @@ def builds(
 
     # `base_fields` stores the list of fields that will be present in our dataclass
     #
-    # Note: _args_ should be added here once hydra supports it in structured configs
     # TODO: should we always write these? Or is it more legible to only write them
     #       if they were explicitly specified by the user?
     #       - Presently we always need to write these, otherwise inheritance
     #         becomes an issue (as it is with _partial_target_
     base_fields: List[Tuple[str, type, Field_Entry]] = target_field + [
-        ("_recursive_", bool, field(default=hydra_recursive, init=False)),
-        ("_convert_", str, field(default=hydra_convert, init=False)),
+        (_RECURSIVE_FIELD_NAME, bool, field(default=hydra_recursive, init=False)),
+        (_CONVERT_FIELD_NAME, str, field(default=hydra_convert, init=False)),
     ]
+
+    if pos_args:
+        base_fields.append(
+            (
+                _POS_ARG_FIELD_NAME,
+                Tuple[Any, ...],
+                field(
+                    default=tuple(create_just_if_needed(x) for x in pos_args),
+                    init=False,
+                ),
+            )
+        )
 
     try:
         signature_params = inspect.signature(target).parameters
@@ -593,45 +644,114 @@ def builds(
         # Covers case for ufuncs, which do not have inspectable type hints
         type_hints = defaultdict(lambda: Any)
 
-    # True if **kwargs is in the signature of `target`
-    sig_has_var_kwargs = any(
-        p.kind is inspect.Parameter.VAR_KEYWORD for p in signature_params.values()
-    )
+    sig_by_kind: Dict[Any, List[inspect.Parameter]] = {
+        _POSITIONAL_ONLY: [],
+        _POSITIONAL_OR_KEYWORD: [],
+        _VAR_POSITIONAL: [],
+        _KEYWORD_ONLY: [],
+        _VAR_KEYWORD: [],
+    }
+
+    for p in signature_params.values():
+        sig_by_kind[p.kind].append(p)
 
     # these are the names of the only parameters in the signature of `target` that can
     # be referenced by name
-    nameable_params_in_sig = set(
+    nameable_params_in_sig: Set[str] = set(
         p.name
-        for p in signature_params.values()
-        if p.kind
-        in {inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.KEYWORD_ONLY}
+        for p in chain(sig_by_kind[_POSITIONAL_OR_KEYWORD], sig_by_kind[_KEYWORD_ONLY])
     )
+
+    if not pos_args and builds_bases:
+        # pos_args is potentially inherited
+        for _base in builds_bases:
+            pos_args = getattr(_base, _POS_ARG_FIELD_NAME, ())
+            if pos_args:
+                break
 
     fields_set_by_bases: Set[str] = {
         _field.name
         for _base in builds_bases
         for _field in fields(_base)
-        if not _field.name.startswith("_")
+        if _field.name not in _HYDRA_FIELD_NAMES
     }
 
-    # Validate that user-specified arguments correspond to parameters in target's
-    # signature that can be specified by name
-    if target_has_valid_signature and not sig_has_var_kwargs:
-        if not set(kwargs_for_target) <= nameable_params_in_sig:
-            _unexpected = set(kwargs_for_target) - nameable_params_in_sig
-            raise TypeError(
-                _utils.building_error_prefix(target)
-                + f"The following unexpected keyword argument(s) was specified for {_utils.get_obj_path(target)} via `builds`: "
-                f"{', '.join(_unexpected)}"
+    # Validate that user-specified arguments satisfy target's signature.
+    # Should catch:
+    #    - bad parameter names
+    #    - too many parameters-by-position
+    #    - multiple values specified for parameter (via positional and by-name)
+    #
+    # We don't raise on an under-specified signature because it is possible that the
+    # resulting dataclass will simply be inherited from and extended.
+    # The issues we catch here cannot be fixed downstream.
+    if target_has_valid_signature:
+
+        if not sig_by_kind[_VAR_KEYWORD]:
+            # check for unexpected kwargs
+            if not set(kwargs_for_target) <= nameable_params_in_sig:
+                _unexpected = set(kwargs_for_target) - nameable_params_in_sig
+                raise TypeError(
+                    _utils.building_error_prefix(target)
+                    + f"The following unexpected keyword argument(s) was specified for {_utils.get_obj_path(target)} "
+                    f"via `builds`: {', '.join(_unexpected)}"
+                )
+            if not fields_set_by_bases <= nameable_params_in_sig:
+                _unexpected = fields_set_by_bases - nameable_params_in_sig
+                raise TypeError(
+                    _utils.building_error_prefix(target)
+                    + f"The following unexpected keyword argument(s) for {_utils.get_obj_path(target)} "
+                    f"was specified via inheritance from a base class: "
+                    f"{', '.join(_unexpected)}"
+                )
+
+        if pos_args:
+            named_args = set(kwargs_for_target).union(fields_set_by_bases)
+
+            # indicates that number of parameters that could be specified by name,
+            # but are specified by position
+            _num_nameable_args_by_position = max(
+                0, len(pos_args) - len(sig_by_kind[_POSITIONAL_ONLY])
             )
-        if not fields_set_by_bases <= nameable_params_in_sig:
-            _unexpected = fields_set_by_bases - nameable_params_in_sig
-            raise TypeError(
-                _utils.building_error_prefix(target)
-                + f"The following unexpected keyword argument(s) for {_utils.get_obj_path(target)} "
-                f"was specified via inheritance from a base class: "
-                f"{', '.join(_unexpected)}"
-            )
+            if named_args:
+                # check for multiple values for arg, specified both via positional and kwarg
+                # E.g.: def f(x, y): ...
+                # f(1, 2, y=3)  # multiple values for `y`
+                for param in sig_by_kind[_POSITIONAL_OR_KEYWORD][
+                    :_num_nameable_args_by_position
+                ]:
+                    if param.name in named_args:
+                        raise TypeError(
+                            _utils.building_error_prefix(target)
+                            + f"Multiple values for argument {param.name} were specified for "
+                            f"{_utils.get_obj_path(target)} via `builds`"
+                        )
+            if not sig_by_kind[
+                _VAR_POSITIONAL
+            ] and _num_nameable_args_by_position > len(
+                sig_by_kind[_POSITIONAL_OR_KEYWORD]
+            ):
+                # Too many positional args specified.
+                # E.g.: def f(x, y): ...
+                # f(1, 2, 3)
+                _num_positional = len(sig_by_kind[_POSITIONAL_ONLY]) + len(
+                    sig_by_kind[_POSITIONAL_OR_KEYWORD]
+                )
+                _num_with_default = sum(
+                    p.default is not inspect.Parameter.empty
+                    and p.kind is _POSITIONAL_OR_KEYWORD
+                    for p in signature_params.values()
+                )
+                _permissible = (
+                    f"{_num_positional}"
+                    if not _num_with_default
+                    else f"{_num_positional - _num_with_default} to {_num_positional}"
+                )
+                raise TypeError(
+                    _utils.building_error_prefix(target)
+                    + f"{_utils.get_obj_path(target)} takes {_permissible} positional args, but "
+                    f"{len(pos_args)} were specified via `builds`"
+                )
 
     # Create valid dataclass fields from the user-specified values
     #
@@ -640,7 +760,7 @@ def builds(
     #    and is resolved to one of the type-annotations supported by hydra if possible,
     #    otherwise, is Any
     #  - arg-value: mutable values are automatically specified using default-factory
-    user_specified_params: Dict[str, Tuple[str, type, Field]] = {
+    user_specified_named_params: Dict[str, Tuple[str, type, Field]] = {
         name: (
             name,
             _utils.sanitized_type(type_hints.get(name, Any)),
@@ -665,14 +785,23 @@ def builds(
 
         # we need to keep track of what user-specified params we have set
         _seen: Set[str] = set()
-        for param in signature_params.values():
+
+        for n, param in enumerate(signature_params.values()):
+            if n + 1 <= len(pos_args):
+                # Positional parameters are populated from "left to right" in the signature.
+                # We have already done validation, so we know that positional params aren't redundant
+                # with named params (including inherited params).
+                continue
+
             if param.name not in nameable_params_in_sig:
                 # parameter cannot be specified by name
                 continue
 
-            if param.name in user_specified_params:
+            if param.name in user_specified_named_params:
                 # user-specified parameter is preferred
-                _fields_with_default_values.append(user_specified_params[param.name])
+                _fields_with_default_values.append(
+                    user_specified_named_params[param.name]
+                )
                 _seen.add(param.name)
             elif param.name in fields_set_by_bases:
                 # don't populate a parameter that can be derived from a base
@@ -701,16 +830,16 @@ def builds(
 
         base_fields.extend(_fields_with_default_values)
 
-        if sig_has_var_kwargs:
+        if sig_by_kind[_VAR_KEYWORD]:
             # if the signature has **kwargs, then we need to add any user-specified
             # parameters that have not already been added
             base_fields.extend(
                 entry
-                for name, entry in user_specified_params.items()
+                for name, entry in user_specified_named_params.items()
                 if name not in _seen
             )
     else:
-        base_fields.extend(user_specified_params.values())
+        base_fields.extend(user_specified_named_params.values())
 
     if dataclass_name is None:
         if hydra_partial is False:
