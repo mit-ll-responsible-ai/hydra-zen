@@ -215,7 +215,7 @@ def hydra_run(
             configure_logging=False,
         )
 
-        callbacks.on_run_end(config=task_cfg, config_name=config_name, job_return=job)
+        callbacks.on_run_end(config=task_cfg, config_name=config_name)
     finally:
         GlobalHydra.instance().clear()
     return job
