@@ -13,8 +13,8 @@ API Reference
    hydra_run
    hydra_multirun
 
-Launching Hydra Jobs
-====================
+Launching Hydra Jobs in Python
+==============================
 
 hydra-zen includes experimental code to run Hydra jobs purely in Python for both single and multirun experiments.
 These functions, ``hydra_run`` and ``hydra_multirun``, are python functions with the following signature:
@@ -252,8 +252,8 @@ Next run the experiment by varying the optimizer.
     ... )
 
 
-Random Search Optimization
-**************************
+Example Sweeper Application
+***************************
 
 This example shows how to build a Hydra Sweeper [4]_ for doing random search optimization with hydra-zen.
 First let's build the Hydra Sweeper function:
