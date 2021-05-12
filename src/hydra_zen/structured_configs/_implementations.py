@@ -128,7 +128,10 @@ def hydrated_dataclass(
         The object to be instantiated/called.
 
     *pos_args: Any
-        Positional arguments passed to `target`
+        Positional arguments passed to `target`.
+
+        Arguments specified positionally are not included in the dataclass' signature and
+        are stored as a tuple bound to in the ``_args_`` field.
 
     populate_full_signature : bool, optional (default=False)
         If True, then the resulting dataclass's __init__ signature and fields
@@ -401,7 +404,10 @@ def builds(
         The object to be instantiated/called
 
     *pos_args: Any
-        Positional arguments passed to `target`
+        Positional arguments passed to `target`.
+
+        Arguments specified positionally are not included in the dataclass' signature and
+        are stored as a tuple bound to in the ``_args_`` field.
 
     **kwargs_for_target : Any
         The keyword arguments passed to `target(...)`.
@@ -470,11 +476,10 @@ def builds(
     Type annotations are inferred from the target's signature and are only retained if they are compatible
     with hydra's limited set of supported annotations; otherwise `Any` is specified.
 
-    `builds` provides runtime validation of user-specified named arguments against
-    the target's signature. This helps to ensure that typos in field names fail
-    early and explicitly.
+    `builds` provides runtime validation of user-specified named arguments against the target's signature.
+    This helps to ensure that typos in field names fail early and explicitly.
 
-    Mutable values are automatically specified using `field(default_factory=lambda: <value>)` [4]_.
+    Mutable values are automatically specified using a default factory [4]_.
 
     `builds(...)` is annotated to return the generic protocols `Builds` and `PartialBuilds`, which are
     available in `hydra_zen.typing`. These are leveraged by `hydra_zen.instantiate` to provide static
