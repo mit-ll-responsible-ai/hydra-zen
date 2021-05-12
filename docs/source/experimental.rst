@@ -95,10 +95,10 @@ The equivalent ``hydra_multirun`` commands are::
     [2021-05-08 21:04:35,980][HYDRA]        #1 : bar=dad
     hello dad
 
-Configurations
-**************
+Configure with ``builds`` and ``dict``
+**************************************
 
-The simplest way to create configuration is to use ``builds`` to generate dataclasses or just use simple dictionaries.
+The simplest way to create configuration is to use ``builds`` to generate Structured Configs [1]_ or just use simple dictionaries.
 First let's demonstrate using ``builds``.
 
 .. code:: python
@@ -160,7 +160,16 @@ Here is the same code using a multirun experiment:
 Registering Configs for ``overrides``
 *************************************
 
-Consider the experiment demonstrated in the ``README`` to minimizing a function using gradient descent:
+Consider the experiment demonstrated in the ``README`` to minimizing the ``parabaloid`` function,
+
+.. code:: python
+
+    # defines our surface that we will be descending
+    def parabaloid(x, y):
+        return 0.1 * x ** 2 + 0.2 * y ** 2
+
+
+using gradient descent.
 
 .. code:: python
 
@@ -197,9 +206,6 @@ Consider the experiment demonstrated in the ``README`` to minimizing a function 
             trajectory.append(xy.detach().clone().numpy())
         return numpy.stack(trajectory)
 
-    # defines our surface that we will be descending
-    def parabaloid(x, y):
-        return 0.1 * x ** 2 + 0.2 * y ** 2
 
 Instead of running an experiment by varying the momentum of ``SGD``, what if we wanted to vary the optimizer itself?
 To do this without ever leaving Python we must take advantage of Hydra's Config Store API [5]_.
@@ -229,16 +235,23 @@ Now define the experiment configuration.
         num_steps=20,
     )
 
-First, test running the default experiment.
+Notice that we have not set a default for the optimizer.
+This is the safest way to avoid Hydra raising a ``ConfigCompositionException``.
+To run the default experiment with ``SGD``, simply set the optimizer using ``overrides``:
 
 .. code:: python
 
     >>> from hydra_zen.experimental import hydra_run
-    >>> jobs = hydra_multirun(
+    >>> jobs = hydra_run(
     ...     ConfigGradDesc,
     ...     task_function=instantiate,
     ...     overrides=["optim=sgd"],
     ... )
+    >>> job.return_value
+    array([[-1.5000000e+00,  5.0000000e-01],
+       [-1.3500000e+00,  4.0000001e-01],
+       ...
+       [ 5.2183308e-04,  1.3997487e-04]], dtype=float32)
 
 
 Next run the experiment by varying the optimizer.
@@ -251,6 +264,14 @@ Next run the experiment by varying the optimizer.
     ...     task_function=instantiate,
     ...     overrides=["optim=sgd,adam"],
     ... )
+    [2021-05-12 10:07:41,554][HYDRA] Launching 2 jobs locally
+    [2021-05-12 10:07:41,554][HYDRA] 	#0 : +optim=sgd
+    [2021-05-12 10:07:41,652][HYDRA] 	#1 : +optim=adam
+    >>> jobs[0][1].return_value  # the result for the Adam optimizer
+    array([[-1.50000000e+00,  5.00000000e-01],
+       [-1.40999997e+00,  4.39999998e-01],
+       ...
+       [-8.69980082e-02, -7.18786498e-04]], dtype=float32)
 
 
 Example Sweeper Application
