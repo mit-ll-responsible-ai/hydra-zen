@@ -118,7 +118,7 @@ def hydrated_dataclass(
     frozen: bool = False,
 ) -> Callable[[Type[_T]], Type[_T]]:
     """A decorator that uses `hydra_zen.builds` to create a dataclass with the appropriate
-    hydra-specific fields for specifying a structured config.
+    hydra-specific fields for specifying a structured config [1]_.
 
     Parameters
     ----------
@@ -155,6 +155,12 @@ def hydrated_dataclass(
         If `True`, the resulting dataclass will create frozen (i.e. immutable) instances.
         I.e. setting/deleting an attribute of an instance will raise `FrozenInstanceError`
         at runtime.
+
+    References
+    ----------
+    .. [1] https://hydra.cc/docs/next/tutorials/structured_config/intro/
+    .. [2] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
+    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
 
     Examples
     --------
@@ -499,111 +505,21 @@ def builds(
     >>> partial_func(y=22)
     (1, 22)
 
-    Using `builds` makes it easy to compose configurations:
+    Auto-populating parameters:
 
-    >>> import numpy as np
-    >>> LoadsData = builds(np.array, object=[1., 2.])
-    >>> BuildsDict = builds(dict, data=LoadsData, units="meters")
-    >>> instantiate(BuildsDict)
-    {'data': array([1., 2.]), 'units': 'meters'}
+    >>> # signature: `Builds_a_two_tuple(x: int, y: float)`
+    >>> Conf = builds(a_two_tuple, populate_full_signature)
+    >>> instantiate(Conf(x=1, y=10.0))
+    (1, 10.0)
 
+    Inheritance:
 
-    **Understanding What builds is Doing**
-
-    It is important to gain some insight into the dataclass that `builds` creates.
-    Let's dig a bit deeper into the first example.
-
-    >>> from dataclasses import is_dataclass
-    >>> import inspect
-    >>> DictConf = builds(dict, a=1, b='x')  # creates a (uninstantiated) dataclass
-    >>> DictConf
-    types.Builds_dict
-    >>> is_dataclass(DictConf)
+    >>> ParentConf = builds(dict, a=1, b=2)
+    >>> ChildConf = builds(dict, b=-2, c=-3, builds_bases=(ParentConf,))
+    >>> instantiate(ChildConf)
+    {'a': 1, 'b': -2, 'c': -3}
+    >>> issubclass(ChildConf, ParentConf)
     True
-    >>> inspect.signature(DictConf)  # the dataclass' signature reflects the arguments passed to `builds`
-    <Signature (a: Any = 1, b: Any = 'x') -> None>
-    >>> DictConf.a  # class attribute of `Builds_dict`
-    1
-    >>> DictConf.b  # class attribute of `Builds_dict`
-    "x"
-
-    We can create an instance `DictConf` dataclass to overrides its default values
-
-    >>> DictConf(a=-10)  # creates an instance of `DictConf`
-    Builds_dict(_target_='builtins.dict', _recursive_=True, _convert_='none', a=-10, b='x')
-    >>> instantiate(DictConf(a=-10))
-    {'a': -10, 'b': 'x'}
-
-    What is going on under the hood is that `builds` is defining a dataclass that is compatible with
-    hydra's mechanism for instantiating/calling objects; the dataclass can be serialized to, and recreated from, a yaml:
-
-    >>> from omegaconf import OmegaConf
-    >>> print(OmegaConf.to_yaml(DictConf))
-    _target_: builtins.dict
-    _recursive_: true
-    _convert_: none
-    a: 1
-    b: x
-
-    `_target_`, `_recursive_`, and `_convert_` are hydra-specific fields that are automatically created by
-    `builds`. These are be controlled via `builds(<target>, hydra_convert=<>, hydra_recursive=<>)`.
-
-    **Additional Features and Functionality**
-
-    Auto-populating the fields of the dataclass using the target's signature:
-
-    >>> def a_function(a: int, b: str, c: float=-10.): return (a, b, c)
-    >>> inspect.signature(builds(a_function)) # no arguments are specified -> signature is empty by default
-    <Signature () -> None>
-    >>> builds_a_function = builds(a_function, populate_full_signature=True)  # auto-populate signature
-    >>> inspect.signature(builds_a_function)  # hydra-compatible annotations and default values are preserved
-    <Signature (a: int, b: str, c: float = -10.0) -> None>
-    >>> instantiate(builds_a_function(a=1, b="hi"))
-    (1, 'hi', -10.0)
-
-    **Botched Configs Fail Quickly and Loudly**
-
-    `builds` will raise if you specify an argument that is incompatible with the target's signature.
-    This means that you will catch mistakes before you try to instantiate your configurations
-
-    >>> builds(a_function, z=10)  # `z` is not in the signature of `a_function`
-    TypeError: Building: a_function ..
-    The following unexpected keyword argument(s) was specified for __main__.a_function via `builds`: z
-
-    **Some Examples of Using builds for Configuring ML Workflows**
-
-    >>> from torch.optim import Adam
-    >>> from torch.nn import Linear
-
-    Demonstrating how to use `builds` to configure a torch-optimizer with a
-    specified learning rate in your structured config:
-
-    >>> from dataclasses import dataclass
-    >>> @dataclass
-    ... class ModuleConfig:
-    ...     # hydra-instantiation produces a config where `config.optimizer`
-    ...     # is: `functools.partial(Adam, lr=1e-5)`
-    ...     optimizer: Any = builds(Adam, lr=1e-5, hydra_partial=True)
-    ...     model: Any = builds(Linear, in_features=10, out_features=2)
-
-    Note that omegaconf/hydra-style interpolation works too:
-
-    >>> @dataclass
-    ... class ModuleConfig:
-    ...     # hydra-instantiation produces a config where `config.optimizer`
-    ...     # is: `functools.partial(Adam, lr=10.2)`
-    ...     learning_rate : float = 10.2
-    ...     in_features : int = 10
-    ...     out_features : int = 2
-    ...     optimizer: Any = builds(Adam, lr="${learning_rate}", hydra_partial=True)
-    ...     model: Any = builds(Linear, in_features="${in_features}", out_features="${out_features}")
-
-    >>> instantiate(ModuleConfig)
-    {'learning_rate': 10.2,
-     'in_features': 10,
-     'out_features': 2,
-     'optimizer': functools.partial(<class 'torch.optim.adam.Adam'>, lr=10.2),
-     'model': Linear(in_features=10, out_features=2, bias=True)}
     """
 
     if not callable(target):

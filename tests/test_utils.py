@@ -20,10 +20,8 @@ from omegaconf.errors import (
 from typing_extensions import Final, Literal
 
 from hydra_zen import builds, instantiate, mutable_value
-from hydra_zen.structured_configs._utils import interpolated, safe_name, sanitized_type
+from hydra_zen.structured_configs._utils import safe_name, sanitized_type
 from hydra_zen.typing import Builds
-
-from . import valid_hydra_literals
 
 T = TypeVar("T")
 
@@ -36,31 +34,6 @@ def pass_through(*args):
 
 def pass_through_kwargs(**kwargs):
     return kwargs
-
-
-omegaconf.OmegaConf.register_new_resolver("_test_pass_through", pass_through)
-
-
-@given(st.lists(valid_hydra_literals))
-def test_interpolate_roundtrip(literals):
-    interpolated_string = interpolated("_test_pass_through", *literals)
-
-    note(interpolated_string)
-
-    interpolated_literals = OmegaConf.create({"x": interpolated_string}).x
-
-    assert len(literals) == len(interpolated_literals)
-
-    for lit, interp in zip(literals, interpolated_literals):
-        assert lit == interp
-
-
-OmegaConf.register_new_resolver("len", len)
-
-
-def test_interpolation_with_string_literal():
-    cc = instantiate(builds(dict, total=interpolated(len, "9")))
-    assert cc["total"] == 1
 
 
 class C:

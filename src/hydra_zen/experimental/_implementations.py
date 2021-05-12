@@ -3,13 +3,15 @@
 from pathlib import Path
 from typing import Any, Callable, List, Mapping, Optional, Union
 
+from hydra import compose, initialize
+from hydra._internal.callbacks import Callbacks
 from hydra._internal.hydra import Hydra
 from hydra._internal.utils import create_config_search_path
 from hydra.core.config_store import ConfigStore
 from hydra.core.global_hydra import GlobalHydra
 from hydra.core.utils import JobReturn, run_job
-from hydra.experimental import compose, initialize
 from hydra.plugins.sweeper import Sweeper
+from hydra.types import HydraContext
 from omegaconf import DictConfig
 
 from .._hydra_overloads import instantiate
@@ -19,7 +21,7 @@ from ..typing import DataClass
 def _store_config(
     cfg: Union[DataClass, DictConfig, Mapping], config_name: str = "hydra_launch"
 ) -> str:
-    """Generates a Structured Config and registers it in the ConfigStore.
+    """Stores configuration object in Hydra's ConfigStore.
 
     Parameters
     ----------
@@ -27,7 +29,7 @@ def _store_config(
         A configuration as a dataclass, configuration object, or a dictionary.
 
     config_name: str (default: hydra_launch)
-        A default configuration name if available, otherwise a new object is
+        The configuration name used to store the configuration.
 
     Returns
     -------
@@ -64,6 +66,7 @@ def _load_config(
     Returns
     -------
     config: DictConfig
+        The configuration object including Hydra configuration.
 
     Notes
     -----
@@ -71,12 +74,12 @@ def _load_config(
 
     References
     ----------
-    .. [1] https://hydra.cc/docs/experimental/compose_api
-    .. [2] https://hydra.cc/docs/configure_hydra/intro
-    .. [3] https://hydra.cc/docs/advanced/override_grammar/basic
+    .. [1] https://hydra.cc/docs/next/advanced/compose_api
+    .. [2] https://hydra.cc/docs/next/configure_hydra/intro
+    .. [3] https://hydra.cc/docs/next/advanced/override_grammar/basic
     """
 
-    with initialize():
+    with initialize(config_path=None):
         task_cfg = compose(
             config_name,
             overrides=[] if overrides is None else overrides,
@@ -90,7 +93,9 @@ def hydra_run(
     config: Union[DataClass, DictConfig, Mapping],
     task_function: Callable[[DictConfig], Any],
     overrides: Optional[List[str]] = None,
+    config_dir: Optional[Union[str, Path]] = None,
     config_name: str = "hydra_run",
+    job_name: str = "hydra_run",
 ) -> JobReturn:
     """Launch a Hydra job defined by `task_function` using the configuration
     provided in `config`.
@@ -121,6 +126,9 @@ def hydra_run(
     config_dir: Optional[Union[str, Path]] (default: None)
         Add configuration directories if needed.
 
+    config_name: str (default: "hydra_run")
+        Name of the stored configuration in Hydra's ConfigStore API.
+
     job_name: str (default: "hydra_run")
 
     Returns
@@ -136,8 +144,8 @@ def hydra_run(
 
     References
     ----------
-    .. [1] https://hydra.cc/docs/advanced/override_grammar/basic
-    .. [2] https://hydra.cc/docs/configure_hydra/intro
+    .. [1] https://hydra.cc/docs/next/advanced/override_grammar/basic
+    .. [2] https://hydra.cc/docs/next/configure_hydra/intro
 
     Examples
     --------
@@ -186,14 +194,28 @@ def hydra_run(
     config_name = _store_config(config, config_name)
     task_cfg = _load_config(config_name=config_name, overrides=overrides)
 
+    if config_dir is not None:
+        config_dir = str(Path(config_dir).absolute())
+    search_path = create_config_search_path(config_dir)
+
+    hydra = Hydra.create_main_hydra2(task_name=job_name, config_search_path=search_path)
+
     try:
+        callbacks = Callbacks(task_cfg)
+        callbacks.on_run_start(config=task_cfg, config_name=config_name)
+
         job = run_job(
+            hydra_context=HydraContext(
+                config_loader=hydra.config_loader, callbacks=callbacks
+            ),
             config=task_cfg,
             task_function=task_function,
             job_dir_key="hydra.run.dir",
             job_subdir_key=None,
             configure_logging=False,
         )
+
+        callbacks.on_run_end(config=task_cfg, config_name=config_name)
     finally:
         GlobalHydra.instance().clear()
     return job
@@ -206,7 +228,7 @@ def hydra_multirun(
     config_dir: Optional[Union[str, Path]] = None,
     config_name: str = "hydra_multirun",
     job_name: str = "hydra_multirun",
-) -> List[JobReturn]:
+) -> List[Any]:
     """Launch a Hydra multi-run ([1]_) job defined by `task_function` using the configuration
     provided in `config`.
 
@@ -244,24 +266,21 @@ def hydra_multirun(
     config_dir: Optional[Union[str, Path]] (default: None)
         Add configuration directories if needed.
 
+    config_name: str (default: "hydra_run")
+        Name of the stored configuration in Hydra's ConfigStore API.
+
     job_name: str (default: "hydra_multirun")
 
     Returns
     -------
-    result: List[List[JobReturn]]
-        The object storing the results of each Hydra experiment.
-            - overrides: From `overrides` and `multirun_overrides`
-            - return_value: The return value of the task function
-            - cfg: The configuration object sent to the task function
-            - hydra_cfg: The hydra configuration object
-            - working_dir: The experiment working directory
-            - task_name: The task name of the Hydra job
+    result: List[List[Any]]
+        The return values of all launched jobs (depends on the Sweeper implementation).
 
     References
     ----------
     .. [1] https://hydra.cc/docs/tutorials/basic/running_your_app/multi-run
-    .. [2] https://hydra.cc/docs/advanced/override_grammar/basic
-    .. [3] https://hydra.cc/docs/configure_hydra/intro
+    .. [2] https://hydra.cc/docs/next/advanced/override_grammar/basic
+    .. [3] https://hydra.cc/docs/next/configure_hydra/intro
 
     Examples
     --------
@@ -315,15 +334,16 @@ def hydra_multirun(
     # Separate Hydra overrides from experiment overrides
     hydra_overrides = []
     _overrides = []
-    for o in overrides:
-        if o.startswith("hydra"):
-            hydra_overrides.append(o)
-        else:
-            _overrides.append(o)
+    if overrides is not None:
+        for o in overrides:
+            if o.startswith("hydra"):
+                hydra_overrides.append(o)
+            else:
+                _overrides.append(o)
 
     # Only the hydra overrides are needed to extract the Hydra configuration for
     # the launcher and sweepers.
-    # The sweeper handles the overides for each experiment
+    # The sweeper handles the overrides for each experiment
     config_name = _store_config(config, config_name)
     task_cfg = _load_config(config_name=config_name, overrides=hydra_overrides)
 
@@ -333,12 +353,15 @@ def hydra_multirun(
 
     hydra = Hydra.create_main_hydra2(task_name=job_name, config_search_path=search_path)
     try:
+        callbacks = Callbacks(task_cfg)
+        callbacks.on_multirun_start(config=task_cfg, config_name=config_name)
+
         # Instantiate sweeper without using Hydra's Plugin discovery
         sweeper = instantiate(task_cfg.hydra.sweeper)
         assert isinstance(sweeper, Sweeper)
         sweeper.setup(
             config=task_cfg,
-            config_loader=hydra.config_loader,
+            hydra_context=HydraContext(hydra.config_loader, callbacks=callbacks),
             task_function=task_function,
         )
 
@@ -348,6 +371,7 @@ def hydra_multirun(
         # just ensures repeats are removed
         _overrides = list(set(_overrides))
         job = sweeper.sweep(arguments=_overrides)
+        callbacks.on_multirun_end(config=task_cfg, config_name=config_name)
     finally:
         GlobalHydra.instance().clear()
     return job

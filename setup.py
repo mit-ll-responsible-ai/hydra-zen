@@ -9,7 +9,7 @@ DISTNAME = "hydra_zen"
 LICENSE = "MIT"
 AUTHOR = "Justin Goodwin, Ryan Soklaski"
 AUTHOR_EMAIL = "ryan.soklaski@ll.mit.edu"
-URL = "https://github.com/mitll-SAFERai/hydra_zen"
+URL = "https://github.com/mit-ll-responsible-ai/hydra_zen"
 CLASSIFIERS = [
     "Development Status :: 4 - Beta",
     "License :: OSI Approved :: MIT License",
@@ -22,7 +22,7 @@ CLASSIFIERS = [
 ]
 KEYWORDS = "machine learning research configuration scalable reproducible"
 INSTALL_REQUIRES = [
-    "hydra-core >= 1.1.0dev5",
+    "hydra-core >= 1.1.0dev7",
     "typing-extensions >= 3.7.4.1",
 ]
 TESTS_REQUIRE = [
@@ -50,7 +50,7 @@ setup(
     install_requires=INSTALL_REQUIRES,
     tests_require=TESTS_REQUIRE,
     url=URL,
-    download_url="https://github.com/mitll-SAFERai/hydra-zen/tarball/"
+    download_url="https://github.com/mit-ll-responsible-ai/hydra-zen/tarball/"
     + versioneer.get_version(),
     python_requires=">=3.6",
     packages=find_packages(where="src", exclude=["tests", "tests.*"]),
