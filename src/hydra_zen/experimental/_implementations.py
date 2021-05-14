@@ -10,12 +10,11 @@ from hydra._internal.utils import create_config_search_path
 from hydra.core.config_store import ConfigStore
 from hydra.core.global_hydra import GlobalHydra
 from hydra.core.utils import JobReturn
-from hydra.plugins.sweeper import Sweeper
 from hydra.types import HydraContext, RunMode
 from omegaconf import DictConfig
 
-from .._hydra_overloads import instantiate
 from ..typing import DataClass
+from .plugins import PluginsZen
 
 
 def _store_config(
@@ -96,6 +95,7 @@ def hydra_run(
     config_dir: Optional[Union[str, Path]] = None,
     config_name: str = "hydra_run",
     job_name: str = "hydra_run",
+    with_log_configuration: bool = True,
 ) -> JobReturn:
     """Launch a Hydra job defined by `task_function` using the configuration
     provided in `config`.
@@ -130,6 +130,9 @@ def hydra_run(
         Name of the stored configuration in Hydra's ConfigStore API.
 
     job_name: str (default: "hydra_run")
+
+    with_log_configuration: bool (default: True)
+        Flag to configure logging subsystem from the loaded config
 
     Returns
     -------
@@ -203,6 +206,7 @@ def hydra_run(
             config_name=config_name,
             task_function=task_function,
             overrides=overrides if overrides is not None else [],
+            with_log_configuration=with_log_configuration,
         )
     finally:
         GlobalHydra.instance().clear()
@@ -216,6 +220,7 @@ def hydra_multirun(
     config_dir: Optional[Union[str, Path]] = None,
     config_name: str = "hydra_multirun",
     job_name: str = "hydra_multirun",
+    with_log_configuration: bool = True,
 ) -> List[Any]:
     """Launch a Hydra multi-run ([1]_) job defined by `task_function` using the configuration
     provided in `config`.
@@ -258,6 +263,9 @@ def hydra_multirun(
         Name of the stored configuration in Hydra's ConfigStore API.
 
     job_name: str (default: "hydra_multirun")
+
+    with_log_configuration: bool (default: True)
+        Flag to configure logging subsystem from the loaded config
 
     Returns
     -------
@@ -331,20 +339,19 @@ def hydra_multirun(
         cfg = hydra.compose_config(
             config_name=config_name,
             overrides=overrides if overrides is not None else [],
-            with_log_configuration=True,
+            with_log_configuration=with_log_configuration,
             run_mode=RunMode.MULTIRUN,
         )
 
         callbacks = Callbacks(cfg)
         callbacks.on_multirun_start(config=cfg, config_name=config_name)
-        hydra_context = HydraContext(hydra.config_loader, callbacks=callbacks)
 
-        # Instantiate sweeper without using Hydra's Plugin discovery
-        sweeper = instantiate(cfg.hydra.sweeper)
-        assert isinstance(sweeper, Sweeper)
-        sweeper.setup(
+        # Instantiate sweeper without using Hydra's Plugin discovery (Zen!)
+        sweeper = PluginsZen.instance().instantiate_sweeper(
             config=cfg,
-            hydra_context=hydra_context,
+            hydra_context=HydraContext(
+                config_loader=hydra.config_loader, callbacks=callbacks
+            ),
             task_function=task_function,
         )
 
