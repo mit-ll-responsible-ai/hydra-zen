@@ -10,11 +10,12 @@ from hydra._internal.utils import create_config_search_path
 from hydra.core.config_store import ConfigStore
 from hydra.core.global_hydra import GlobalHydra
 from hydra.core.utils import JobReturn
+from hydra.plugins.sweeper import Sweeper
 from hydra.types import HydraContext, RunMode
 from omegaconf import DictConfig
 
+from .._hydra_overloads import instantiate
 from ..typing import DataClass
-from .plugins import PluginsZen
 
 
 def _store_config(
@@ -347,7 +348,9 @@ def hydra_multirun(
         callbacks.on_multirun_start(config=cfg, config_name=config_name)
 
         # Instantiate sweeper without using Hydra's Plugin discovery (Zen!)
-        sweeper = PluginsZen.instance().instantiate_sweeper(
+        sweeper = instantiate(cfg.hydra.sweeper)
+        assert isinstance(sweeper, Sweeper)
+        sweeper.setup(
             config=cfg,
             hydra_context=HydraContext(
                 config_loader=hydra.config_loader, callbacks=callbacks
