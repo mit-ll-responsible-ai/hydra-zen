@@ -12,7 +12,7 @@ from hydra.core.global_hydra import GlobalHydra
 from hydra.core.utils import JobReturn
 from hydra.plugins.sweeper import Sweeper
 from hydra.types import HydraContext, RunMode
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 
 from .._hydra_overloads import instantiate
 from ..typing import DataClass
@@ -335,8 +335,6 @@ def hydra_multirun(
 
     hydra = Hydra.create_main_hydra2(task_name=job_name, config_search_path=search_path)
     try:
-        from omegaconf import OmegaConf
-
         cfg = hydra.compose_config(
             config_name=config_name,
             overrides=overrides if overrides is not None else [],
