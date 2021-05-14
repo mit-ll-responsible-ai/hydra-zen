@@ -9,9 +9,9 @@ from hydra._internal.hydra import Hydra
 from hydra._internal.utils import create_config_search_path
 from hydra.core.config_store import ConfigStore
 from hydra.core.global_hydra import GlobalHydra
-from hydra.core.utils import JobReturn, run_job
+from hydra.core.utils import JobReturn
 from hydra.plugins.sweeper import Sweeper
-from hydra.types import HydraContext
+from hydra.types import HydraContext, RunMode
 from omegaconf import DictConfig
 
 from .._hydra_overloads import instantiate
@@ -192,30 +192,18 @@ def hydra_run(
     0.3054758310317993
     """
     config_name = _store_config(config, config_name)
-    task_cfg = _load_config(config_name=config_name, overrides=overrides)
 
     if config_dir is not None:
         config_dir = str(Path(config_dir).absolute())
     search_path = create_config_search_path(config_dir)
 
     hydra = Hydra.create_main_hydra2(task_name=job_name, config_search_path=search_path)
-
     try:
-        callbacks = Callbacks(task_cfg)
-        callbacks.on_run_start(config=task_cfg, config_name=config_name)
-
-        job = run_job(
-            hydra_context=HydraContext(
-                config_loader=hydra.config_loader, callbacks=callbacks
-            ),
-            config=task_cfg,
+        job = hydra.run(
+            config_name=config_name,
             task_function=task_function,
-            job_dir_key="hydra.run.dir",
-            job_subdir_key=None,
-            configure_logging=False,
+            overrides=overrides if overrides is not None else [],
         )
-
-        callbacks.on_run_end(config=task_cfg, config_name=config_name)
     finally:
         GlobalHydra.instance().clear()
     return job
@@ -330,22 +318,7 @@ def hydra_multirun(
     >>> [j.return_value for j in jobs[0]]
     [0.3054758310317993, 0.28910207748413086]
     """
-
-    # Separate Hydra overrides from experiment overrides
-    hydra_overrides = []
-    _overrides = []
-    if overrides is not None:
-        for o in overrides:
-            if o.startswith("hydra"):
-                hydra_overrides.append(o)
-            else:
-                _overrides.append(o)
-
-    # Only the hydra overrides are needed to extract the Hydra configuration for
-    # the launcher and sweepers.
-    # The sweeper handles the overrides for each experiment
     config_name = _store_config(config, config_name)
-    task_cfg = _load_config(config_name=config_name, overrides=hydra_overrides)
 
     if config_dir is not None:
         config_dir = str(Path(config_dir).absolute())
@@ -353,25 +326,34 @@ def hydra_multirun(
 
     hydra = Hydra.create_main_hydra2(task_name=job_name, config_search_path=search_path)
     try:
-        callbacks = Callbacks(task_cfg)
-        callbacks.on_multirun_start(config=task_cfg, config_name=config_name)
+        from omegaconf import OmegaConf
+
+        cfg = hydra.compose_config(
+            config_name=config_name,
+            overrides=overrides if overrides is not None else [],
+            with_log_configuration=True,
+            run_mode=RunMode.MULTIRUN,
+        )
+
+        callbacks = Callbacks(cfg)
+        callbacks.on_multirun_start(config=cfg, config_name=config_name)
+        hydra_context = HydraContext(hydra.config_loader, callbacks=callbacks)
 
         # Instantiate sweeper without using Hydra's Plugin discovery
-        sweeper = instantiate(task_cfg.hydra.sweeper)
+        sweeper = instantiate(cfg.hydra.sweeper)
         assert isinstance(sweeper, Sweeper)
         sweeper.setup(
-            config=task_cfg,
-            hydra_context=HydraContext(hydra.config_loader, callbacks=callbacks),
+            config=cfg,
+            hydra_context=hydra_context,
             task_function=task_function,
         )
 
-        # Obtain any overrides set by user (need all + multirun params)
-        _overrides += task_cfg.hydra.overrides.task
+        task_overrides = OmegaConf.to_container(cfg.hydra.overrides.task, resolve=False)
+        assert isinstance(task_overrides, list)
 
-        # just ensures repeats are removed
-        _overrides = list(set(_overrides))
-        job = sweeper.sweep(arguments=_overrides)
-        callbacks.on_multirun_end(config=task_cfg, config_name=config_name)
+        job = sweeper.sweep(arguments=task_overrides)
+        callbacks.on_multirun_end(config=cfg, config_name=config_name)
+
     finally:
         GlobalHydra.instance().clear()
     return job
