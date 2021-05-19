@@ -284,12 +284,14 @@ First let's build the Hydra Sweeper function:
     import random
     from typing import List, Optional
 
+    from omegaconf import DictConfig
     from hydra import TaskFunction
     from hydra.core.config_loader import ConfigLoader
     from hydra.core.override_parser.overrides_parser import OverridesParser
     from hydra.plugins.sweeper import Sweeper
+    from hydra.types import HydraContext
+
     from hydra_zen import instantiate
-    from omegaconf import DictConfig
 
 
     class RandomSearchSweeper(Sweeper):
@@ -398,7 +400,7 @@ The return value is the solution along with all the intermediate results:
 
 .. code:: python
 
-    >>> job.return_value
+    >>> job
     ({'best_evaluated_params': {'x': 1.4667823674518203, 'y': -1.193575968925213},
     'best_evaluated_result': 15.547488823704768},
     [{'x': 6.677158827229356, 'y': 9.118453646915974},
