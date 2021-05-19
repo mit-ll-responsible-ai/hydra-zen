@@ -245,9 +245,9 @@ To run the default experiment with ``SGD``, simply set the optimizer using ``ove
     >>> jobs = hydra_run(
     ...     ConfigGradDesc,
     ...     task_function=instantiate,
-    ...     overrides=["optim=sgd"],
+    ...     overrides=["+optim=sgd"],
     ... )
-    >>> job.return_value
+    >>> jobs.return_value
     array([[-1.5000000e+00,  5.0000000e-01],
        [-1.3500000e+00,  4.0000001e-01],
        ...
@@ -258,16 +258,15 @@ Next run the experiment by varying the optimizer.
 
 .. code:: python
 
-    >>> from hydra_zen.experimental import hydra_multirun
-    >>> jobs = hydra_multirun(
+    >>> jobs, = hydra_multirun(
     ...     ConfigGradDesc,
     ...     task_function=instantiate,
-    ...     overrides=["optim=sgd,adam"],
+    ...     overrides=["+optim=sgd,adam"],
     ... )
     [2021-05-12 10:07:41,554][HYDRA] Launching 2 jobs locally
     [2021-05-12 10:07:41,554][HYDRA] 	#0 : +optim=sgd
     [2021-05-12 10:07:41,652][HYDRA] 	#1 : +optim=adam
-    >>> jobs[0][1].return_value  # the result for the Adam optimizer
+    >>> jobs[1].return_value  # the result for the Adam optimizer
     array([[-1.50000000e+00,  5.00000000e-01],
        [-1.40999997e+00,  4.39999998e-01],
        ...
