@@ -59,7 +59,7 @@ None
 
 # overriding `goodbye` by making an instance of the dataclass
 >>> BuildsDict(goodbye=2)
-Builds_dict(_target_='builtins.dict', _recursive_=True, _convert_='none', hello=1, goodbye=2)
+Builds_dict(_target_='builtins.dict', hello=1, goodbye=2)
 ```
 
 Hydra's `instantiate` function is used to enact this build. This can be used in a recursive fashion:
@@ -101,8 +101,6 @@ The dataclasses produced by `builds` and `just` are valid [structured configs](h
 >>> from hydra_zen import to_yaml  # alias of `omegaconf.OmegaCong.to_yaml`
 >>> print(to_yaml(NumberConf))
 _target_: builtins.dict
-_recursive_: true
-_convert_: none
 initial_val: 2.0
 transform:
   _target_: hydra_zen.funcs.get_obj
