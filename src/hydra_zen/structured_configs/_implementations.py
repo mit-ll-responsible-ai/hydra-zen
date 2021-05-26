@@ -115,8 +115,8 @@ def hydrated_dataclass(
     *pos_args: Any,
     populate_full_signature: bool = False,
     hydra_partial: bool = False,
-    hydra_recursive: bool = True,
-    hydra_convert: Literal["none", "partial", "all"] = "none",
+    hydra_recursive: Optional[bool] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     frozen: bool = False,
 ) -> Callable[[Type[_T]], Type[_T]]:
     """A decorator that uses `hydra_zen.builds` to create a dataclass with the appropriate
@@ -140,14 +140,16 @@ def hydrated_dataclass(
         Values specified in **kwargs_for_target take precedent over the corresponding
         default values from the signature.
 
-    hydra_partial : bool, optional (default=False)
+    hydra_partial : Optional[bool] (default=False)
         If True, then hydra-instantiation produces `functools.partial(target, **kwargs)`
 
     hydra_recursive : bool, optional (default=True)
         If True, then upon hydra will recursively instantiate all other
         hydra-config objects nested within this dataclass [2]_.
 
-    hydra_convert: Literal["none", "partial", "all"], optional (default="none")
+        If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.
+
+    hydra_convert: Optional[Literal["none", "partial", "all"]] (default="none")
         Determines how hydra handles the non-primitive objects passed to `target` [3]_.
 
         - `"none"`: Passed objects are DictConfig and ListConfig, default
@@ -155,6 +157,8 @@ def hydrated_dataclass(
           the exception of Structured Configs (and their fields).
         - `"all"`: Passed objects are dicts, lists and primitives without
           a trace of OmegaConf containers
+
+        If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.
 
     frozen : bool, optional (default=False)
         If `True`, the resulting dataclass will create frozen (i.e. immutable) instances.
@@ -335,8 +339,8 @@ def builds(
     *pos_args: Any,
     populate_full_signature: bool = False,
     hydra_partial: Literal[False] = False,
-    hydra_recursive: bool = True,
-    hydra_convert: Literal["none", "partial", "all"] = "none",
+    hydra_recursive: Optional[bool] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
@@ -352,8 +356,8 @@ def builds(
     *pos_args: Any,
     populate_full_signature: bool = False,
     hydra_partial: Literal[True],
-    hydra_recursive: bool = True,
-    hydra_convert: Literal["none", "partial", "all"] = "none",
+    hydra_recursive: Optional[bool] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
@@ -369,8 +373,8 @@ def builds(
     *pos_args: Any,
     populate_full_signature: bool = False,
     hydra_partial: bool,
-    hydra_recursive: bool = True,
-    hydra_convert: Literal["none", "partial", "all"] = "none",
+    hydra_recursive: Optional[bool] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
@@ -386,8 +390,8 @@ def builds(
     *pos_args: Any,
     populate_full_signature: bool = False,
     hydra_partial: bool = False,
-    hydra_recursive: bool = True,
-    hydra_convert: Literal["none", "partial", "all"] = "none",
+    hydra_recursive: Optional[bool] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     frozen: bool = False,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
@@ -434,11 +438,13 @@ def builds(
         user or that have default values specified in the target's signature. I.e. it is
         presumed that un-specified parameters are to be excluded from the partial configuration.
 
-    hydra_recursive : bool, optional (default=True)
-        If True, then upon hydra will recursively instantiate all other
+    hydra_recursive : Optional[bool], optional (default=True)
+        If ``True``, then upon hydra will recursively instantiate all other
         hydra-config objects nested within this dataclass [2]_.
 
-    hydra_convert: Literal["none", "partial", "all"], optional (default="none")
+        If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.
+
+    hydra_convert: Optional[Literal["none", "partial", "all"]], optional (default="none")
         Determines how hydra handles the non-primitive objects passed to `target` [3]_.
 
         - `"none"`: Passed objects are DictConfig and ListConfig, default
@@ -446,6 +452,8 @@ def builds(
           the exception of Structured Configs (and their fields).
         - `"all"`: Passed objects are dicts, lists and primitives without
           a trace of OmegaConf containers
+
+        If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.
 
     frozen : bool, optional (default=False)
         If `True`, the resulting dataclass will create frozen (i.e. immutable) instances.
@@ -546,7 +554,7 @@ def builds(
             f"`populate_full_signature` must be a boolean type, got: {populate_full_signature}"
         )
 
-    if not isinstance(hydra_recursive, bool):
+    if hydra_recursive is not None and not isinstance(hydra_recursive, bool):
         raise TypeError(
             f"`hydra_recursive` must be a boolean type, got {hydra_recursive}"
         )
@@ -554,14 +562,7 @@ def builds(
     if not isinstance(hydra_partial, bool):
         raise TypeError(f"`hydra_partial` must be a boolean type, got: {hydra_partial}")
 
-    if not isinstance(hydra_convert, str):
-        raise TypeError(
-            f"`hydra_convert` must be 'none', 'partial', or 'all', got: {hydra_convert}"
-        )
-
-    hydra_convert = hydra_convert.lower()  # normalize casing
-
-    if hydra_convert not in {"none", "partial", "all"}:
+    if hydra_convert is not None and hydra_convert not in {"none", "partial", "all"}:
         raise ValueError(
             f"`hydra_convert` must be 'none', 'partial', or 'all', got: {hydra_convert}"
         )
@@ -598,16 +599,17 @@ def builds(
             )
         ]
 
-    # `base_fields` stores the list of fields that will be present in our dataclass
-    #
-    # TODO: should we always write these? Or is it more legible to only write them
-    #       if they were explicitly specified by the user?
-    #       - Presently we always need to write these, otherwise inheritance
-    #         becomes an issue (as it is with _partial_target_
-    base_fields: List[Tuple[str, type, Field_Entry]] = target_field + [
-        (_RECURSIVE_FIELD_NAME, bool, field(default=hydra_recursive, init=False)),
-        (_CONVERT_FIELD_NAME, str, field(default=hydra_convert, init=False)),
-    ]
+    base_fields: List[Tuple[str, type, Field_Entry]] = target_field
+
+    if hydra_recursive is not None:
+        base_fields.append(
+            (_RECURSIVE_FIELD_NAME, bool, field(default=hydra_recursive, init=False))
+        )
+
+    if hydra_convert is not None:
+        base_fields.append(
+            (_CONVERT_FIELD_NAME, str, field(default=hydra_convert, init=False))
+        )
 
     if pos_args:
         base_fields.append(
