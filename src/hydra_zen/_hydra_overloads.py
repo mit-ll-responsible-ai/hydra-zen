@@ -22,11 +22,11 @@ E.g.
 from typing import Any, Callable, Type, TypeVar, overload
 
 from hydra.utils import instantiate as hydra_instantiate
-from omegaconf import OmegaConf
+from omegaconf import MISSING, OmegaConf
 
 from .typing import Builds, Just, Partial, PartialBuilds
 
-__all__ = ["instantiate", "to_yaml"]
+__all__ = ["instantiate", "to_yaml", "MISSING"]
 
 
 T = TypeVar("T")

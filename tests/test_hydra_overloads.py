@@ -3,9 +3,9 @@
 
 import hypothesis.strategies as st
 from hypothesis import given
-from omegaconf import OmegaConf
+from omegaconf import MISSING as omega_MISSING, OmegaConf
 
-from hydra_zen import builds, to_yaml
+from hydra_zen import MISSING as zen_MISSING, builds, to_yaml
 
 
 @given(resolve=st.none() | st.booleans(), sort_keys=st.none() | st.booleans())
@@ -20,3 +20,7 @@ def test_to_yaml_matches_omegaconf(resolve, sort_keys):
     actual = to_yaml(builds(dict, a="1", b="${a}"), **kwargs)
     expected = OmegaConf.to_yaml(builds(dict, a="1", b="${a}"), **kwargs)
     assert actual == expected
+
+
+def test_MISSING_is_alias_from_omegaconf():
+    assert omega_MISSING is zen_MISSING
