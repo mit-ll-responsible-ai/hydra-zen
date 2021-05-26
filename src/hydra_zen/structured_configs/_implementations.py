@@ -435,8 +435,10 @@ def builds(
         presumed that un-specified parameters are to be excluded from the partial configuration.
 
     hydra_recursive : Optional[bool], optional (default=True)
-        If True, then upon hydra will recursively instantiate all other
+        If ``True``, then upon hydra will recursively instantiate all other
         hydra-config objects nested within this dataclass [2]_.
+
+        If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.
 
     hydra_convert: Optional[Literal["none", "partial", "all"]], optional (default="none")
         Determines how hydra handles the non-primitive objects passed to `target` [3]_.
@@ -446,6 +448,8 @@ def builds(
           the exception of Structured Configs (and their fields).
         - `"all"`: Passed objects are dicts, lists and primitives without
           a trace of OmegaConf containers
+
+        If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.
 
     frozen : bool, optional (default=False)
         If `True`, the resulting dataclass will create frozen (i.e. immutable) instances.
