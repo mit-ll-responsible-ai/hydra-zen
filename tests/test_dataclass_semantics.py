@@ -139,3 +139,42 @@ def test_mutable_defaults_generated_from_factory(mutable):
 
     out_inst = instantiate(instance2)["x"]
     assert out_inst == mutable
+
+
+class NotSet:
+    pass
+
+
+@pytest.mark.parametrize("recursive", [True, False, NotSet])
+@pytest.mark.parametrize("convert", ["none", "partial", "all", NotSet])
+@pytest.mark.parametrize("via_builds", [True, False])
+def test_hydra_settings_can_be_inherited(recursive, convert, via_builds):
+    kwargs = {}
+    if recursive is not NotSet:
+        kwargs["hydra_recursive"] = recursive
+
+    if convert is not NotSet:
+        kwargs["hydra_convert"] = convert
+
+    if via_builds:
+        Base = builds(dict, **kwargs)
+        Child = builds(dict, builds_bases=(Base,))
+    else:
+
+        @hydrated_dataclass(target=dict, **kwargs)
+        class Base:
+            pass
+
+        @hydrated_dataclass(target=dict)
+        class Child(Base):
+            pass
+
+    if recursive is not NotSet:
+        assert Child._recursive_ is Base._recursive_
+    else:
+        assert not hasattr(Child, "_recursive_")
+
+    if convert is not NotSet:
+        assert Child._convert_ is Base._convert_
+    else:
+        assert not hasattr(Child, "_convert_")

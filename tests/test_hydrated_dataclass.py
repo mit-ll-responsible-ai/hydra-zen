@@ -47,31 +47,3 @@ def test_pos_args():
         z: int = 3
 
     assert instantiate(Conf) == (1, 2, 3)
-
-
-class NotSet:
-    pass
-
-
-@pytest.mark.parametrize("recursive", [True, False, NotSet])
-@pytest.mark.parametrize("convert", ["none", "partial", "all", NotSet])
-def test_hydra_settings_can_be_inherited(recursive, convert):
-    kwargs = {}
-    if recursive is not NotSet:
-        kwargs["hydra_recursive"] = recursive
-
-    if convert is not NotSet:
-        kwargs["hydra_convert"] = convert
-
-    Base = builds(dict, **kwargs)
-    Child = builds(dict, builds_bases=(Base,))
-
-    if recursive is not NotSet:
-        assert Child._recursive_ is Base._recursive_
-    else:
-        assert not hasattr(Child, "_recursive_")
-
-    if convert is not NotSet:
-        assert Child._convert_ is Base._convert_
-    else:
-        assert not hasattr(Child, "_convert_")
