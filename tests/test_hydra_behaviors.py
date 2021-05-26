@@ -126,16 +126,18 @@ def f_for_recursive(**kwargs):
 
 
 @pytest.mark.parametrize("via_hydrated_dataclass", [False, True])
-@pytest.mark.parametrize("recursive", [False, True])
+@pytest.mark.parametrize("recursive", [False, True, NotSet])
 def test_recursive(recursive: bool, via_hydrated_dataclass: bool):
     target_path = get_obj_path(f_for_recursive)
+
+    kwargs = dict(hydra_recursive=recursive) if recursive is not NotSet else {}
 
     if not via_hydrated_dataclass:
         out = instantiate(
             builds(
                 f_for_recursive,
                 x=builds(f_for_recursive, y=1),
-                hydra_recursive=recursive,
+                **kwargs,
             )
         )
 
@@ -145,13 +147,13 @@ def test_recursive(recursive: bool, via_hydrated_dataclass: bool):
         class B:
             y: int = 1
 
-        @hydrated_dataclass(f_for_recursive, hydra_recursive=recursive)
+        @hydrated_dataclass(f_for_recursive, **kwargs)
         class A:
             x: Any = B
 
         out = instantiate(A)
 
-    if recursive:
+    if recursive is NotSet or recursive:
         assert out == {"x": {"y": 1}}
     else:
         assert out == {"x": {"_target_": target_path, "y": 1}}
