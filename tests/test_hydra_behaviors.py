@@ -154,14 +154,7 @@ def test_recursive(recursive: bool, via_hydrated_dataclass: bool):
     if recursive:
         assert out == {"x": {"y": 1}}
     else:
-        assert out == {
-            "x": {
-                "_target_": target_path,
-                "_recursive_": True,
-                "_convert_": "none",
-                "y": 1,
-            }
-        }
+        assert out == {"x": {"_target_": target_path, "y": 1}}
 
 
 def f(x: Tuple[int]):
