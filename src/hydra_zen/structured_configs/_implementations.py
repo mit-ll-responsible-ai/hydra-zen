@@ -562,11 +562,6 @@ def builds(
     if not isinstance(hydra_partial, bool):
         raise TypeError(f"`hydra_partial` must be a boolean type, got: {hydra_partial}")
 
-    if hydra_convert is not None and not isinstance(hydra_convert, str):
-        raise TypeError(
-            f"`hydra_convert` must be 'none', 'partial', or 'all', got: {hydra_convert}"
-        )
-
     if hydra_convert is not None and hydra_convert not in {"none", "partial", "all"}:
         raise ValueError(
             f"`hydra_convert` must be 'none', 'partial', or 'all', got: {hydra_convert}"
