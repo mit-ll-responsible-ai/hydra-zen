@@ -6,8 +6,7 @@
 
 hydra-zen helps you configure your project using the power of [Hydra](https://github.com/facebookresearch/hydra), while enjoying the [Zen of Python](https://www.python.org/dev/peps/pep-0020/)!
 
-hydra-zen provides simple, Hydra-compatible tools that enable Python-centric workflows for designing, configuring, and running large-scale projects, such as machine learning experiments.
-It eliminates helps to eliminate the boilerplate code you would write to configure, orchestrate, and organize the results of your various experiments.
+hydra-zen eliminates the boilerplate code that you write to configure, orchestrate, and organize the results of large-scale projects, such as machine learning experiments. It does so by providing Hydra-compatible tools that dynamically generate "structured configurations" of your code, and enables Python-centric workflows for running configured instances of your code.
 
 hydra-zen offers:
   - Functions for automatically and dynamically generating [structured configs](https://hydra.cc/docs/next/tutorials/structured_config/schema/) that can be used to fully or partially instantiate objects in your application.
