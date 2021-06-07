@@ -1,12 +1,13 @@
 from typing import Protocol, TypeVar, Type
 
-T = TypeVar("T")
+T1 = TypeVar("T1", covariant=True)
+T2 = TypeVar("T2")
 
-class A(Protocol[T]):
+class A(Protocol[T1]):
     pass
 
 
-def f(x: T) -> Type[A[T]]:
+def f(x: T2) -> Type[A[T2]]:
     ...
 
 a_class = f(1)
