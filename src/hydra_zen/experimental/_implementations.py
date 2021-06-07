@@ -222,7 +222,7 @@ def hydra_multirun(
     config_name: str = "hydra_multirun",
     job_name: str = "hydra_multirun",
     with_log_configuration: bool = True,
-) -> List[Any]:
+) -> Any:
     """Launch a Hydra multi-run ([1]_) job defined by `task_function` using the configuration
     provided in `config`.
 
@@ -270,7 +270,7 @@ def hydra_multirun(
 
     Returns
     -------
-    result: List[List[Any]]
+    result: Any
         The return values of all launched jobs (depends on the Sweeper implementation).
 
     References
