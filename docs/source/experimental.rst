@@ -282,7 +282,7 @@ First let's build the Hydra Sweeper function:
 .. code:: python
 
     import random
-    from typing import List, Optional
+    from typing import Dist, List, Optional, Tuple
 
     from omegaconf import DictConfig
     from hydra import TaskFunction
@@ -319,7 +319,7 @@ First let's build the Hydra Sweeper function:
                 hydra_context=hydra_context,
             )
 
-        def sweep(self, arguments: List[str]) -> None:
+        def sweep(self, arguments: List[str]) -> Tuple[Dict, List]:
             parser = OverridesParser.create()
             parsed = parser.parse_overrides(arguments)
 
