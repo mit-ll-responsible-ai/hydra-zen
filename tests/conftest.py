@@ -1,6 +1,7 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
+import logging
 import os
 import sys
 import tempfile
@@ -47,3 +48,4 @@ def cleandir():
         os.chdir(tmpdirname)  # change cwd to the temp-directory
         yield tmpdirname  # yields control to the test to be run
         os.chdir(old_dir)
+        logging.shutdown()

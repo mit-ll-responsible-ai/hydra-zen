@@ -31,36 +31,56 @@ def test_store_config(as_dataclass, as_dictconfig):
 
 
 @pytest.mark.usefixtures("cleandir")
-@pytest.mark.parametrize(
-    "overrides",
-    [None, [], ["hydra.run.dir=test_hydra_overrided"]],
-)
+@pytest.mark.parametrize("runmode", [hydra_run, hydra_multirun])
 @pytest.mark.parametrize("as_dataclass", [True, False])
 @pytest.mark.parametrize(
     "as_dictconfig, with_hydra", [(True, True), (True, False), (False, False)]
 )
-@pytest.mark.parametrize("use_default_dir", [True, False])
-def test_hydra_run_job(
-    overrides, as_dataclass, as_dictconfig, with_hydra, use_default_dir
+def test_hydra_run_config_type(
+    runmode,
+    as_dataclass,
+    as_dictconfig,
+    with_hydra,
 ):
     if not as_dataclass:
         cfg = dict(a=1, b=1)
     else:
         cfg = builds(dict, a=1, b=1)
 
-    override_exists = overrides and len(overrides) > 1
-
     if as_dictconfig:
         if not with_hydra:
             cfg = OmegaConf.create(cfg)
         else:
             cn = _store_config(cfg)
-            cfg = _load_config(cn, overrides=overrides)
-            overrides = []
+            cfg = _load_config(cn)
 
-    additl_kwargs = {} if use_default_dir else dict(config_dir=Path.cwd())
+    job = runmode(cfg, task_function=instantiate)
+    if isinstance(job, list):
+        job = job[0][0]
+
+    assert job.return_value == {"a": 1, "b": 1}
+
+
+@pytest.mark.usefixtures("cleandir")
+@pytest.mark.parametrize(
+    "overrides", [None, [], ["hydra.run.dir=test_hydra_overrided"]]
+)
+@pytest.mark.parametrize("config_dir", [Path.cwd(), None])
+@pytest.mark.parametrize("with_log_configuration", [False, True])
+def test_hydra_run_job(
+    overrides,
+    config_dir,
+    with_log_configuration,
+):
+    cfg = dict(a=1, b=1)
+    override_exists = overrides and len(overrides) > 1
+
     job = hydra_run(
-        cfg, task_function=instantiate, overrides=overrides, **additl_kwargs
+        cfg,
+        task_function=instantiate,
+        overrides=overrides,
+        config_dir=config_dir,
+        with_log_configuration=with_log_configuration,
     )
     assert job.return_value == {"a": 1, "b": 1}
 
@@ -70,41 +90,19 @@ def test_hydra_run_job(
 
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize(
-    "overrides",
-    [None, [], ["hydra.sweep.dir=test_hydra_overrided"]],
+    "overrides", [None, [], ["hydra.sweep.dir=test_hydra_overrided"]]
 )
-@pytest.mark.parametrize(
-    "multirun_overrides",
-    [None, ["a=1,2"]],
-)
-@pytest.mark.parametrize("as_dataclass", [True, False])
-@pytest.mark.parametrize(
-    "as_dictconfig, with_hydra", [(True, True), (True, False), (False, False)]
-)
-@pytest.mark.parametrize("use_default_dir", [True, False])
+@pytest.mark.parametrize("multirun_overrides", [None, ["a=1,2"]])
+@pytest.mark.parametrize("config_dir", [Path.cwd(), None])
+@pytest.mark.parametrize("with_log_configuration", [False, True])
 def test_hydra_multirun(
     overrides,
     multirun_overrides,
-    as_dataclass,
-    as_dictconfig,
-    with_hydra,
-    use_default_dir,
+    config_dir,
+    with_log_configuration,
 ):
-    if not as_dataclass:
-        cfg = dict(a=1, b=1)
-    else:
-        cfg = builds(dict, a=1, b=1)
+    cfg = dict(a=1, b=1)
     override_exists = overrides and len(overrides) > 1
-
-    if as_dictconfig:
-        if not with_hydra:
-            cfg = OmegaConf.create(cfg)
-        else:
-            cn = _store_config(cfg)
-            cfg = _load_config(cn, overrides=overrides)
-            overrides = []
-
-    additl_kwargs = {} if use_default_dir else dict(config_dir=Path.cwd())
 
     _overrides = overrides
     if multirun_overrides is not None:
@@ -115,7 +113,11 @@ def test_hydra_multirun(
         )
 
     job = hydra_multirun(
-        cfg, task_function=instantiate, overrides=_overrides, **additl_kwargs
+        cfg,
+        task_function=instantiate,
+        overrides=_overrides,
+        config_dir=config_dir,
+        with_log_configuration=with_log_configuration,
     )
     for i, j in enumerate(job[0]):
         assert j.return_value == {"a": i + 1, "b": 1}

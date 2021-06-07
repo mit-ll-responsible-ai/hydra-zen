@@ -7,9 +7,6 @@ from typing import Any, Callable, Dict, Generic, Tuple, TypeVar
 from typing_extensions import Literal, Protocol, runtime_checkable
 
 __all__ = [
-    "Importable",
-    "DataClass",
-    "Instantiable",
     "Just",
     "Builds",
     "PartialBuilds",
@@ -47,20 +44,15 @@ class DataClass(Protocol):
     __dataclass_params__: _DataclassParams
 
 
-class Instantiable(DataClass, Protocol[_T]):  # pragma: no cover
+@runtime_checkable
+class Builds(DataClass, Protocol[_T]):  # pragma: no cover
     _target_: str
 
 
 @runtime_checkable
-class Just(Instantiable, Protocol[_T]):
+class Just(Builds, Protocol[_T]):
     path: str  # interpolated string for importing obj
     _target_: str = "hydra_utils.funcs.get_obj"
-
-
-@runtime_checkable
-class Builds(Instantiable, Protocol[_T]):  # pragma: no cover
-    _convert_: Literal["none", "partial", "all"]
-    _recursive_: bool
 
 
 @runtime_checkable

@@ -6,8 +6,7 @@
 
 hydra-zen helps you configure your project using the power of [Hydra](https://github.com/facebookresearch/hydra), while enjoying the [Zen of Python](https://www.python.org/dev/peps/pep-0020/)!
 
-hydra-zen provides simple, Hydra-compatible tools that enable Python-centric workflows for designing, configuring, and running large-scale projects, such as machine learning experiments.
-It eliminates helps to eliminate the boilerplate code you would write to configure, orchestrate, and organize the results of your various experiments.
+hydra-zen eliminates the boilerplate code that you write to configure, orchestrate, and organize the results of large-scale projects, such as machine learning experiments. It does so by providing Hydra-compatible tools that dynamically generate "structured configurations" of your code, and enables Python-centric workflows for running configured instances of your code.
 
 hydra-zen offers:
   - Functions for automatically and dynamically generating [structured configs](https://hydra.cc/docs/next/tutorials/structured_config/schema/) that can be used to fully or partially instantiate objects in your application.
@@ -59,7 +58,7 @@ None
 
 # overriding `goodbye` by making an instance of the dataclass
 >>> BuildsDict(goodbye=2)
-Builds_dict(_target_='builtins.dict', _recursive_=True, _convert_='none', hello=1, goodbye=2)
+Builds_dict(_target_='builtins.dict', hello=1, goodbye=2)
 ```
 
 Hydra's `instantiate` function is used to enact this build. This can be used in a recursive fashion:
@@ -101,8 +100,6 @@ The dataclasses produced by `builds` and `just` are valid [structured configs](h
 >>> from hydra_zen import to_yaml  # alias of `omegaconf.OmegaCong.to_yaml`
 >>> print(to_yaml(NumberConf))
 _target_: builtins.dict
-_recursive_: true
-_convert_: none
 initial_val: 2.0
 transform:
   _target_: hydra_zen.funcs.get_obj

@@ -48,7 +48,6 @@ For example, suppose that we want to configure the following class
            layer_widths: Tuple[int, ...] = (5, 10, 5),
            device: str = "cpu",
        ):
-
            print(
                f"DNN(input_size={input_size}, output_size={output_size}, layer_widths={layer_widths}, device={device})"
            )
@@ -100,8 +99,6 @@ And this dynamically generated configuration can still be serialized to a yaml f
    >>> from hydra_zen import to_yaml  # alias of `omegaconf.OmegaConf.to_yaml`
    >>> print(to_yaml(conf_instance))
    _target_: vision.model.DNN
-   _recursive_: true
-   _convert_: none
    input_size: 2
    output_size: 10
    layer_widths:
@@ -250,7 +247,7 @@ but it is worthwhile for us to discuss these more deliberately.
    # creating an instance of the dataclass with an updated configuration
    >>> conf_instance = Builds_dict(x=-100)
    >>> conf_instance
-   Builds_dict(_target_='builtins.dict', _recursive_=True, _convert_='none', x=-100, y=[1, 2, 3])
+   Builds_dict(_target_='builtins.dict', x=-100, y=[1, 2, 3])
 
    >>> conf_instance.x
    -100
@@ -416,8 +413,6 @@ that function.
 
    >>> print(to_yaml(Builds_loss))
    _target_: __main__.objective_function
-   _recursive_: true
-   _convert_: none
    prediction: ???
    score: ???
    reduction_fn:
@@ -431,8 +426,6 @@ User-specified parameters will automatically be transformed as well
 
    >>> print(to_yaml(builds(dict, io_fn=len, sequence=list)))
    _target_: builtins.dict
-   _recursive_: true
-   _convert_: none
    io_fn:
      _target_: hydra_zen.funcs.get_obj
      path: builtins.len
