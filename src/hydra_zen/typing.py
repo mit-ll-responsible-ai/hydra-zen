@@ -43,6 +43,10 @@ class DataClass(Protocol):
     __dataclass_fields__: Dict[str, Field]
     __dataclass_params__: _DataclassParams
 
+    def __init__(
+        self, *args: Any, **kwargs: Any
+    ) -> None:  # pragma: no cover
+        ...
 
 @runtime_checkable
 class Builds(DataClass, Protocol[_T]):  # pragma: no cover
