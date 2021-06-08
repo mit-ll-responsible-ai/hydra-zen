@@ -1,0 +1,270 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Welcome to hydra-zen’s documentation! &mdash; hydra-zen 0+untagged.1.g641c38c documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/my_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation and Basic Usage" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home"> hydra-zen
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation and Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview of hydra-zen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pytorch_lightning_example.html">Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structured_configs.html">Dynamically Generating Structured Configs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="experimental.html">Running Experiments with Hydra</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">hydra-zen</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Welcome to hydra-zen’s documentation!</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="welcome-to-hydra-zen-s-documentation">
+<h1>Welcome to hydra-zen’s documentation!<a class="headerlink" href="#welcome-to-hydra-zen-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>hydra-zen helps you configure your project using the power of <a class="reference external" href="https://github.com/facebookresearch/hydra">Hydra</a>, while enjoying the <a class="reference external" href="https://www.python.org/dev/peps/pep-0020/">Zen of Python</a>!</p>
+<p>hydra-zen provides simple, Hydra-compatible tools that enable Python-centric workflows for designing, configuring, and running large-scale projects, such as machine learning experiments.
+It helps to eliminate the boilerplate code you would write to configure, orchestrate, and organize the results of your various experiments.</p>
+<dl class="simple">
+<dt>hydra-zen offers:</dt><dd><ul class="simple">
+<li><p>Functions for automatically and dynamically generating <a class="reference external" href="https://hydra.cc/docs/next/tutorials/structured_config/schema/">structured configs</a> that can be used to fully or partially instantiate objects in your application.</p></li>
+<li><p>The ability to launch Hydra jobs, complete with parameter sweeps and multi-run configurations, from within a notebook or any other Python environment.</p></li>
+<li><p>Incisive type annotations that provide enriched context about your project’s configurations to IDEs, type checkers, and other tooling.</p></li>
+<li><p>Runtime validation of configurations to catch mistakes before your application launches.</p></li>
+<li><p>Equal support for both object-oriented libraries (e.g., <code class="docutils literal notranslate"><span class="pre">torch.nn</span></code>) and functional ones (e.g., <code class="docutils literal notranslate"><span class="pre">jax</span></code> and <code class="docutils literal notranslate"><span class="pre">numpy</span></code>).</p></li>
+</ul>
+</dd>
+</dl>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation and Basic Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installing-hydra-zen">Installing hydra-zen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#basic-usage">Basic Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview of hydra-zen</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#what-is-hydra">What is Hydra?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#what-is-hydra-zen">What is hydra-zen?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pytorch_lightning_example.html">Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pytorch_lightning_example.html#more-examples-of-hydra-zen-in-ml-projects">More Examples of hydra-zen in ML Projects</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="structured_configs.html">Dynamically Generating Structured Configs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="structured_configs.html#api-reference">API Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structured_configs.html#basics-of-structured-configs">Basics of Structured Configs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structured_configs.html#keeping-dry-with-dynamically-generated-configs">Keeping DRY with Dynamically-Generated Configs 🌞</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structured_configs.html#the-essentials-of-builds">The Essentials of <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="structured_configs.html#the-bells-and-whistles-of-builds">The Bells and Whistles of <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="experimental.html">Running Experiments with Hydra</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="experimental.html#api-reference">API Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="experimental.html#launching-hydra-jobs-in-python">Launching Hydra Jobs in Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="experimental.html#references">References</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation and Basic Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021 Massachusetts Institute of Technology.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

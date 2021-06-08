@@ -1,0 +1,414 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning &mdash; hydra-zen 0+untagged.1.g641c38c documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/my_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Dynamically Generating Structured Configs" href="structured_configs.html" />
+    <link rel="prev" title="Overview of hydra-zen" href="overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> hydra-zen
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation and Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview of hydra-zen</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#more-examples-of-hydra-zen-in-ml-projects">More Examples of hydra-zen in ML Projects</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="structured_configs.html">Dynamically Generating Structured Configs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="experimental.html">Running Experiments with Hydra</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">hydra-zen</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/pytorch_lightning_example.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="boilerplate-free-ml-an-example-using-hydra-zen-and-pytorch-lightning">
+<h1>Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning<a class="headerlink" href="#boilerplate-free-ml-an-example-using-hydra-zen-and-pytorch-lightning" title="Permalink to this headline">¶</a></h1>
+<p>Let’s use Hydra, hydra-zen, and PyTorch Lightning to <strong>configure and train multiple single-layer neural networks without any boilerplate code</strong>.
+In this example we will optimize <a class="reference external" href="https://en.wikipedia.org/wiki/Universal_approximation_theorem#Arbitrary-width_case">arbitrary-width universal function approximators</a>  to fit <span class="math notranslate nohighlight">\(\cos{x}\)</span>
+on a restricted domain.
+In mathematical notation, we want to solve the following optimization problem:</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}F(\vec{v}, \vec{w}, \vec{b}; x) &amp;= \sum_{i=1}^{N}{v_{i}\sigma(x w_i + b_i)}\\\vec{v}^*, \vec{w}^*, \vec{b}^* &amp;= \operatorname*{arg\,min}_{\vec{v}, \vec{w}, \vec{b}\in\mathbb{R}^{N}} \;  \|F(\vec{v}, \vec{w}, \vec{b}; x)\ - \cos{x}\|_{2}\\x &amp;\in [-2\pi, 2\pi]\end{aligned}\end{align} \]</div>
+<p>where <span class="math notranslate nohighlight">\(N\)</span> – the number of “neurons” in our layer – is a hyperparameter.</p>
+<p>The following is the boilerplate-free code.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Type</span>
+
+<span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">TensorDataset</span>
+
+<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">builds</span><span class="p">,</span> <span class="n">instantiate</span><span class="p">,</span> <span class="n">just</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.experimental</span> <span class="kn">import</span> <span class="n">hydra_multirun</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 58%" />
+<col style="width: 42%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>PyTorch Lightning Module</p></th>
+<th class="head"><p>hydra-zen Configuration</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">UniversalFuncModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; y = sum(V sigmoid(X W + b))&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">num_neurons</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">optim</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">],</span>
+        <span class="n">dataloader</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataLoader</span><span class="p">],</span>
+        <span class="n">target_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">tr</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">tr</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+        <span class="n">training_domain</span><span class="p">:</span> <span class="n">tr</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optim</span> <span class="o">=</span> <span class="n">optim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataloader</span> <span class="o">=</span> <span class="n">dataloader</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">training_domain</span> <span class="o">=</span> <span class="n">training_domain</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_fn</span> <span class="o">=</span> <span class="n">target_fn</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_neurons</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Sigmoid</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">num_neurons</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">batch</span>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">training_domain</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_fn</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataloader</span><span class="p">(</span><span class="n">TensorDataset</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+</pre></div>
+</div>
+</td>
+<td><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">ExperimentConfig</span><span class="p">:</span>
+    <span class="n">optim</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span>
+        <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">,</span>
+        <span class="n">hydra_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">dataloader</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span>
+        <span class="n">DataLoader</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+        <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">drop_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">hydra_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">lightning_module</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span>
+        <span class="n">UniversalFuncModule</span><span class="p">,</span>
+        <span class="n">num_neurons</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">optim</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{optim}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">dataloader</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{dataloader}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">target_fn</span><span class="o">=</span><span class="n">just</span><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">cos</span><span class="p">),</span>
+        <span class="n">training_domain</span><span class="o">=</span><span class="n">builds</span><span class="p">(</span>
+            <span class="n">tr</span><span class="o">.</span><span class="n">linspace</span><span class="p">,</span>
+            <span class="n">start</span><span class="o">=-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span>
+            <span class="n">end</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span>
+            <span class="n">steps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">trainer</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">Trainer</span><span class="p">,</span>
+        <span class="n">max_epochs</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">gpus</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">progress_bar_refresh_rate</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">ExperimentConfig</span><span class="p">):</span>
+    <span class="c1"># Hydra recursively instantiates the lightning module, trainer,</span>
+    <span class="c1"># and all other instantiable aspects of the configuration</span>
+    <span class="n">exp</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+
+    <span class="c1"># train the model</span>
+    <span class="n">exp</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">exp</span><span class="o">.</span><span class="n">lightning_module</span><span class="p">)</span>
+
+    <span class="c1"># evaluate the model over the domain to assess the fit</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">lightning_module</span><span class="o">.</span><span class="n">training_domain</span>
+    <span class="n">final_fit</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">lightning_module</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># return the trained model instance and the final fit</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">exp</span><span class="o">.</span><span class="n">lightning_module</span><span class="p">,</span>
+        <span class="n">final_fit</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>Now we will train our model using different batch-sizes and model-sizes (i.e. number of “neurons” in the layer).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">jobs</span><span class="p">,</span> <span class="o">=</span> <span class="n">hydra_multirun</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">ExperimentConfig</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">task</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">overrides</span><span class="o">=</span><span class="p">[</span>
+<span class="gp">... </span>        <span class="s2">&quot;dataloader.batch_size=20, 200&quot;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="s2">&quot;lightning_module.num_neurons=10, 100&quot;</span>
+<span class="gp">... </span>    <span class="p">],</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="go">[2021-05-04 16:19:34,682][HYDRA] Launching 4 jobs locally</span>
+<span class="go">[2021-05-04 16:19:34,683][HYDRA]     #0 : lightning_module.num_neurons=10 dataloader.batch_size=20</span>
+<span class="go">[2021-05-04 16:19:41,350][HYDRA]     #1 : lightning_module.num_neurons=10 dataloader.batch_size=200</span>
+<span class="go">[2021-05-04 16:19:43,512][HYDRA]     #2 : lightning_module.num_neurons=100 dataloader.batch_size=20</span>
+<span class="go">[2021-05-04 16:19:50,319][HYDRA]     #3 : lightning_module.num_neurons=100 dataloader.batch_size=200</span>
+</pre></div>
+</div>
+<p>Hydra will <a class="reference external" href="https://hydra.cc/docs/next/tutorials/basic/running_your_app/working_directory">automatically create an output/working directory</a> for each job and save an associated yaml configuration file that documents all of the settings that were used to run that job.
+The following shows the directories created associated with jobs <strong>0</strong>, <strong>1</strong>, etc.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ tree multirun/2021-05-04/16-19-17
+  ├── <span class="m">0</span>
+  │   ├── .hydra
+  │   │   ├── config.yaml
+  │   │   ├── hydra.yaml
+  │   │   └── overrides.yaml
+  │   └── lightning_logs/
+  ├── <span class="m">1</span>
+  │   ├── .hydra
+  │   │   ├── config.yaml
+  .   .   .
+  .   .   .
+</pre></div>
+</div>
+<p>Each <code class="docutils literal notranslate"><span class="pre">config.yaml</span></code> file can be used to repeat that particular job.</p>
+<p>Visualizing our results</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">ExperimentConfig</span><span class="o">.</span><span class="n">lightning_module</span><span class="o">.</span><span class="n">training_domain</span><span class="p">)</span>
+<span class="n">target_fn</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">ExperimentConfig</span><span class="o">.</span><span class="n">lightning_module</span><span class="o">.</span><span class="n">target_fn</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">target_fn</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;True&quot;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">jobs</span><span class="p">:</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">return_value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">j</span><span class="o">.</span><span class="n">overrides</span><span class="p">))</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.04</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper left&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="https://user-images.githubusercontent.com/29104956/117079795-7fc7a280-ad0a-11eb-9916-4fd63cd2e990.png"><img alt="Alternative text" src="https://user-images.githubusercontent.com/29104956/117079795-7fc7a280-ad0a-11eb-9916-4fd63cd2e990.png" style="width: 800px;" /></a>
+<p>Voilà! We just configured, trained, saved, and documented multiple neural networks without writing any boilerplate code.
+Hydra + hydra-zen + PyTorch Lightning lets us focus on writing the essentials of our scientific software.</p>
+<div class="section" id="more-examples-of-hydra-zen-in-ml-projects">
+<h2>More Examples of hydra-zen in ML Projects<a class="headerlink" href="#more-examples-of-hydra-zen-in-ml-projects" title="Permalink to this headline">¶</a></h2>
+<p>You can check out <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen-examples">this repository</a> for examples of larger-scale ML projects using hydra-zen.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="structured_configs.html" class="btn btn-neutral float-right" title="Dynamically Generating Structured Configs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="overview.html" class="btn btn-neutral float-left" title="Overview of hydra-zen" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021 Massachusetts Institute of Technology.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

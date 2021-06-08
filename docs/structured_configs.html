@@ -1,0 +1,814 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Dynamically Generating Structured Configs &mdash; hydra-zen 0+untagged.1.g641c38c documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/my_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="builds" href="generated/hydra_zen.builds.html" />
+    <link rel="prev" title="Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning" href="pytorch_lightning_example.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> hydra-zen
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation and Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview of hydra-zen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pytorch_lightning_example.html">Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Dynamically Generating Structured Configs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#api-reference">API Reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/hydra_zen.builds.html">builds</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/hydra_zen.just.html">just</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/hydra_zen.hydrated_dataclass.html">hydrated_dataclass</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#basics-of-structured-configs">Basics of Structured Configs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#creating-hydra-compatible-configurations">Creating Hydra-Compatible Configurations</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#keeping-dry-with-dynamically-generated-configs">Keeping DRY with Dynamically-Generated Configs 🌞</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#statically-defined-configs-are-wet">Statically-Defined Configs are WET</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#generating-configs-with-builds-keeps-us-dry">Generating Configs with <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code> Keeps Us DRY</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#what-about-automatic-code-generation">What About Automatic Code Generation?</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#the-essentials-of-builds">The Essentials of <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#builds-generates-dataclass-objects"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code> generates dataclass objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuring-a-target-for-partial-instantiation">Configuring a Target for Partial Instantiation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#combining-auto-populated-and-user-specified-default-values">Combining Auto-Populated and User-Specified Default Values</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nesting-configs-for-recursive-instantiation">Nesting configs for recursive instantiation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#auto-generated-nested-configs">Auto-generated nested configs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#creating-immutable-configs">Creating immutable configs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#composing-configs-via-inheritance">Composing configs via inheritance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#the-bells-and-whistles-of-builds">The Bells and Whistles of <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#runtime-validation">Runtime validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#automatic-type-refinement">Automatic Type Refinement</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#combining-static-and-dynamic-configurations-with-hydrated-dataclass">Combining Static and Dynamic Configurations with <code class="xref py py-obj docutils literal notranslate"><span class="pre">&#64;hydrated_dataclass</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hydra-zen-typing">hydra_zen.typing</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="experimental.html">Running Experiments with Hydra</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">hydra-zen</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Dynamically Generating Structured Configs</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/structured_configs.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="dynamically-generating-structured-configs">
+<h1>Dynamically Generating Structured Configs<a class="headerlink" href="#dynamically-generating-structured-configs" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="api-reference">
+<h2>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h2>
+<p>hydra-zen provides us with some simple but powerful tools for dynamically generating structured configs for our code.
+This helps to keep the process of configuring complex applications simple, intuitive, and free of technical debt.</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>(target, *pos_args[, …])</p></td>
+<td><p>Returns a dataclass object that configures <code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code> with user-specified and auto-populated parameter values.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a>(obj)</p></td>
+<td><p>Produces a structured config that, when instantiated by hydra, ‘just’ returns <code class="xref py py-obj docutils literal notranslate"><span class="pre">obj</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.hydrated_dataclass.html#hydra_zen.hydrated_dataclass" title="hydra_zen.hydrated_dataclass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydrated_dataclass</span></code></a>(target, *pos_args[, …])</p></td>
+<td><p>A decorator that uses <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.builds</span></code></a> to create a dataclass with the appropriate hydra-specific fields for specifying a structured config <a class="reference internal" href="generated/hydra_zen.hydrated_dataclass.html#r8dd265aa7612-1" id="id1"><span>[R8dd265aa7612-1]</span></a>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="basics-of-structured-configs">
+<h2>Basics of Structured Configs<a class="headerlink" href="#basics-of-structured-configs" title="Permalink to this headline">¶</a></h2>
+<p>Hydra supports configurations that are written in a yaml format or in Python via <a class="reference external" href="https://hydra.cc/docs/next/tutorials/structured_config/intro">structured configs</a>.
+Structured configs are <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html">dataclasses</a> whose fields store the configuration values, and whose type annotations (up to a limited assortment) can be leveraged by Hydra to provide runtime type checking for of configuration values.</p>
+<p>An important feature of these structured configs is that they too can be serialized to yaml files by Hydra.
+This is critical, as it ensures that each job that is launched using Hydra is fully documented by – and can be reproduced from – a plain-text yaml configuration.</p>
+<p>A <a class="reference external" href="https://hydra.cc/docs/next/advanced/instantiate_objects/overview">targeted configuration</a> is designed to instantiate / call an object (a class-object or a function) with particular values.
+hydra-zen provides functions that are specifically designed to dynamically generate targeted structured configs.
+For example, suppose that we want to configure the following class</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># contents of vision/model.py</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
+
+<span class="c1"># this is a class that we want to configure</span>
+<span class="k">class</span> <span class="nc">DNN</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">input_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">output_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">layer_widths</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+        <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;DNN(input_size=</span><span class="si">{</span><span class="n">input_size</span><span class="si">}</span><span class="s2">, output_size=</span><span class="si">{</span><span class="n">output_size</span><span class="si">}</span><span class="s2">, layer_widths=</span><span class="si">{</span><span class="n">layer_widths</span><span class="si">}</span><span class="s2">, device=</span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
+</pre></div>
+</div>
+<p>and that we want the default values in our configuration to reflect the values specified in the class’ signature.</p>
+<div class="section" id="creating-hydra-compatible-configurations">
+<h3>Creating Hydra-Compatible Configurations<a class="headerlink" href="#creating-hydra-compatible-configurations" title="Permalink to this headline">¶</a></h3>
+<p>The following table compares the two standard approaches for configuring <code class="docutils literal notranslate"><span class="pre">DNN</span></code> – using a manually-written yaml file or a manually-defined structured config – along with hydra-zen’s approach of <strong>dynamically generating</strong> a structured config.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 38%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>(Hydra) Using a yaml file</p></th>
+<th class="head"><p>(Hydra) Using a structured config</p></th>
+<th class="head"><p>(hydra-zen) Using <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">_target_</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">vision.model.DNN</span>
+<span class="nt">input_size</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">???</span>
+<span class="nt">output_size</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">???</span>
+<span class="nt">layer_widths</span><span class="p">:</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">5</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">10</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">5</span>
+<span class="nt">device</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpu</span>
+</pre></div>
+</div>
+</td>
+<td><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">MISSING</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Builds_DNN</span><span class="p">:</span>
+   <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;vision.model.DNN&quot;</span>
+   <span class="n">input_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">MISSING</span>
+   <span class="n">output_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">MISSING</span>
+   <span class="n">layer_widths</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+   <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span>
+</pre></div>
+</div>
+</td>
+<td><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">vision.model</span> <span class="kn">import</span> <span class="n">DNN</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">builds</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">builds</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">DNN</span><span class="p">,</span>
+<span class="gp">... </span>       <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>       <span class="p">)</span>
+<span class="go">types.Builds_DNN</span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Note that the result of <code class="docutils literal notranslate"><span class="pre">builds(DNN,</span> <span class="pre">populate_full_signature=True)</span></code> is equivalent to the manually-defined dataclass <code class="docutils literal notranslate"><span class="pre">Builds_DNN</span></code>:
+<a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> returns a dataclass object with parameters – along with their default values and type annotations – that are auto-populated based on the signature of <code class="docutils literal notranslate"><span class="pre">DNN</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">builds</span><span class="p">,</span> <span class="n">instantiate</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Builds_DNN</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">DNN</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">inspect</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">Builds_DNN</span><span class="p">)</span>  <span class="c1"># annotations and default values have been auto-populated</span>
+<span class="go">&lt;Signature (input_size: int, output_size: int, layer_widths: Tuple[int, ...] = (5, 10, 5), device: str = &#39;cpu&#39;) -&gt; None&gt;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conf_instance</span> <span class="o">=</span> <span class="n">Builds_DNN</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">output_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda:0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">conf_instance</span><span class="p">)</span>  <span class="c1"># &quot;builds&quot; DNN with particular config values</span>
+<span class="go">DNN(input_size=2, output_size=10, layer_widths=[5, 10, 5], device=cuda:0)</span>
+</pre></div>
+</div>
+<p>And this dynamically generated configuration can still be serialized to a yaml file by Hydra:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">to_yaml</span>  <span class="c1"># alias of `omegaconf.OmegaConf.to_yaml`</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">conf_instance</span><span class="p">))</span>
+<span class="go">_target_: vision.model.DNN</span>
+<span class="go">input_size: 2</span>
+<span class="go">output_size: 10</span>
+<span class="go">layer_widths:</span>
+<span class="go">- 5</span>
+<span class="go">- 10</span>
+<span class="go">- 5</span>
+<span class="go">device: cuda:0</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="keeping-dry-with-dynamically-generated-configs">
+<span id="dry"></span><h2>Keeping DRY with Dynamically-Generated Configs 🌞<a class="headerlink" href="#keeping-dry-with-dynamically-generated-configs" title="Permalink to this headline">¶</a></h2>
+<p><strong>DRY – Don’t Repeat Yourself</strong> – is a <a class="reference external" href="https://en.wikipedia.org/wiki/Don%27t_repeat_yourself">principle of software development</a> that cautions against repetitive software patterns and workflows.
+Manually writing (or even statically generating) configs for your code will often leave you soaking <strong>WET (Writing Everything Twice)</strong>.</p>
+<p>To see this, let’s revisit the previous example where we configured the <code class="docutils literal notranslate"><span class="pre">DNN</span></code> class.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Class that we want to configure</span>
+<span class="k">class</span> <span class="nc">DNN</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">input_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">output_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">layer_widths</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+        <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="o">...</span>
+</pre></div>
+</div>
+<div class="section" id="statically-defined-configs-are-wet">
+<h3>Statically-Defined Configs are WET<a class="headerlink" href="#statically-defined-configs-are-wet" title="Permalink to this headline">¶</a></h3>
+<p>Manually writing a structured config for <code class="docutils literal notranslate"><span class="pre">DNN</span></code> entails hard-coding its current import-path as a string, and mirroring its signature:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># statically defined configurations are WET</span>
+<span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">MISSING</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Builds_DNN</span><span class="p">:</span>
+    <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;vision.model.DNN&quot;</span>
+    <span class="n">input_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">MISSING</span>
+    <span class="n">output_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">MISSING</span>
+    <span class="n">layer_widths</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+    <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span>
+</pre></div>
+</div>
+<p>Doing this once isn’t so cumbersome, but consider that any time we modify <code class="docutils literal notranslate"><span class="pre">DNN</span></code> by:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>changing its location (e.g. move it to <code class="docutils literal notranslate"><span class="pre">vision.classifiers.DNN</span></code>)</p></li>
+<li><p>updating any of its parameters’ names, default values, or annotations</p></li>
+<li><p>adding or removing a parameter to/from its signature</p></li>
+</ul>
+</div></blockquote>
+<p>then we will need to mirror this change in our configuration as well.
+I hope you brought your towel, because things are getting WET 🌊.</p>
+<p>Having to manually sync our configs with our code is not only tedious but it also creates a hot-spot for mistakes and bugs.</p>
+</div>
+<div class="section" id="generating-configs-with-builds-keeps-us-dry">
+<h3>Generating Configs with <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> Keeps Us DRY<a class="headerlink" href="#generating-configs-with-builds-keeps-us-dry" title="Permalink to this headline">¶</a></h3>
+<p>We can stay nice and DRY by dynamically generating our configurations with <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># dynamically-generated configurations are DRY</span>
+<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">builds</span>
+<span class="kn">from</span> <span class="nn">vision.model</span> <span class="kn">import</span> <span class="n">DNN</span>
+
+
+<span class="n">Builds_DNN</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">DNN</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here we don’t need to worry about repeating ourselves by keeping our configuration in sync with our code: the structured config (complete with type annotations and default values) is <em>automatically</em> and <em>dynamically</em> generated for us at runtime! 🌞</p>
+</div>
+<div class="section" id="what-about-automatic-code-generation">
+<h3>What About Automatic Code Generation?<a class="headerlink" href="#what-about-automatic-code-generation" title="Permalink to this headline">¶</a></h3>
+<p>Hydra provides a tool called <a class="reference external" href="https://github.com/facebookresearch/hydra/tree/master/tools/configen">configen</a> for automatically writing Python scripts with structured configs associated with your library’s code.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ configen --config-dir conf --config-name configen
+my_lib.my_module -&gt; /home/AlwaysWet/tmp/configen/example/config/configen/samples/my_module.py
+</pre></div>
+</div>
+<p>This still means that we have to re-run this static code generation whenever we need to re-sync our configs with our updated code 🏊.</p>
+<p>Generating static configs also has issues at-scale.
+For example, <a class="reference external" href="https://github.com/pytorch/hydra-torch">hydra-torch</a> is a repository of statically generated configs for some parts of PyTorch’s API.
+While this is convenient to an extent, this repository of configs has to be:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>actively maintained</p></li>
+<li><p>versioned in-sync with PyTorch</p></li>
+<li><p>included as an additional dependency in our projects</p></li>
+</ul>
+</div></blockquote>
+<p>Furthermore, such repositories don’t exist for most other libraries!
+Thus this approach to code configuration is still a source of technical debt and repetitious work-flows.</p>
+<p>With hydra-zen, we simply <strong>configure what we need from any library</strong> in an ergonomic, automatic, and dynamic way ⛱️.</p>
+</div>
+</div>
+<div class="section" id="the-essentials-of-builds">
+<h2>The Essentials of <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a><a class="headerlink" href="#the-essentials-of-builds" title="Permalink to this headline">¶</a></h2>
+<p>Learning the essentials of <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> is all the average user needs to use it in their project.
+You likely have already gleaned most of its essential functionality from the examples that you have read thus far,
+but it is worthwhile for us to discuss these more deliberately.</p>
+<div class="section" id="builds-generates-dataclass-objects">
+<h3><a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> generates dataclass objects<a class="headerlink" href="#builds-generates-dataclass-objects" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> dynamically generates a dataclass object, and handles for us cumbersome cases like <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#mutable-default-values">safely setting mutable default values</a> and excluding Hydra-specific “hidden” parameters from the class-init signature.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 43%" />
+<col style="width: 57%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Example Using <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a></p></th>
+<th class="head"><p>Equivalent dataclass</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">builds</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="go">types.Builds_dict</span>
+</pre></div>
+</div>
+</td>
+<td><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Builds_dict</span><span class="p">:</span>
+    <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;builtins.dict&#39;</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">x</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">y</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">list</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]))</span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">is_dataclass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Builds_dict</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>  <span class="c1"># signature: Builds_dict(x: Any = 2, y: Any = &lt;factory&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_dataclass</span><span class="p">(</span><span class="n">Builds_dict</span><span class="p">)</span>
+<span class="go">True</span>
+
+<span class="go"># creating an instance of the dataclass with an updated configuration</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conf_instance</span> <span class="o">=</span> <span class="n">Builds_dict</span><span class="p">(</span><span class="n">x</span><span class="o">=-</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conf_instance</span>
+<span class="go">Builds_dict(_target_=&#39;builtins.dict&#39;, x=-100, y=[1, 2, 3])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conf_instance</span><span class="o">.</span><span class="n">x</span>
+<span class="go">-100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conf_instance</span><span class="o">.</span><span class="n">y</span>
+<span class="go">[1, 2, 3]</span>
+</pre></div>
+</div>
+<p>These <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html">dataclass objects</a> are designed specifically to behave as <a class="reference external" href="https://hydra.cc/docs/next/advanced/instantiate_objects/overview">targeted structured configs</a> that can be instantiated by Hydra.
+Accordingly, <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> accepts Hydra-specific parameters for tuning the behavior of the structured config (e.g. disabling <a class="reference external" href="https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation">recursive instantiation</a>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">instantiate</span>  <span class="c1"># annotated alias of `hydra.utils.instantiate`</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">conf_instance</span><span class="p">)</span>  <span class="c1"># calls `dict(x=-100, y=[1, 2, 3])`</span>
+<span class="go">{&#39;x&#39;: -100, &#39;y&#39;: [1, 2, 3]}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="configuring-a-target-for-partial-instantiation">
+<h3>Configuring a Target for Partial Instantiation<a class="headerlink" href="#configuring-a-target-for-partial-instantiation" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> is capable for configuring a target such that it will only be <em>partially</em> instantiated.
+This is very useful, as it is often the case that our configuration of a target can only partially describe its input parameters.</p>
+<p>For example, a ML-model optimizer must be provided the model parameters that it will be updating; however these parameters are typically created at runtime and thus <em>cannot be part of our configuration</em>.
+Fortunately, we can simply provide a partial configuration of the optimizer’s other parameters.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">Adam</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">tensor</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">PartialBuilds_Adam</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">Adam</span><span class="p">,</span> <span class="n">hydra_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">partial_optim</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">PartialBuilds_Adam</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">partial_optim</span>
+<span class="go">functools.partial(&lt;class &#39;torch.optim.adam.Adam&#39;&gt;, lr=10.0)</span>
+</pre></div>
+</div>
+<p>Instantiating this config only partially-builds the optimizer; we can finish instantiating it once we have access to our model’s parameters</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model_params</span> <span class="o">=</span> <span class="p">[</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">tensor</span><span class="p">(</span><span class="o">-</span><span class="mf">2.0</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">partial_optim</span><span class="p">(</span><span class="n">model_params</span><span class="p">)</span>
+<span class="go">Adam (</span>
+<span class="go">Parameter Group 0</span>
+<span class="go">    amsgrad: False</span>
+<span class="go">    betas: (0.9, 0.999)</span>
+<span class="go">    eps: 1e-08</span>
+<span class="go">    lr: 10.0</span>
+<span class="go">    weight_decay: 0</span>
+<span class="go">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="combining-auto-populated-and-user-specified-default-values">
+<h3>Combining Auto-Populated and User-Specified Default Values<a class="headerlink" href="#combining-auto-populated-and-user-specified-default-values" title="Permalink to this headline">¶</a></h3>
+<p>We can feed <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> values for a subset of the target’s parameters and then auto-populate the remaining parameters.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;hi&quot;</span><span class="p">):</span>
+    <span class="o">...</span>
+
+<span class="c1"># signature: `Builds_func(x: int = 10, y: str = &quot;hi&quot;)`</span>
+<span class="n">builds</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Or, we can intentionally exclude a target’s parameter so that it is not available for configuration</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># signature: `Builds_func(y: str = &quot;dinosaur&quot;)`</span>
+<span class="n">builds</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;dinosaur&quot;</span><span class="p">)</span>  <span class="c1"># `x` is not configurable for building `func`</span>
+</pre></div>
+</div>
+<p>We can provide positional arguments as well</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">builds</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">))</span>
+<span class="go">3.0</span>
+</pre></div>
+</div>
+<p>Arguments specified in a positional way are excluded from the dataclass’ signature</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># signature: `Builds_func(y: str = &#39;a string&#39;)`</span>
+<span class="n">builds</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;a string&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="nesting-configs-for-recursive-instantiation">
+<h3>Nesting configs for recursive instantiation<a class="headerlink" href="#nesting-configs-for-recursive-instantiation" title="Permalink to this headline">¶</a></h3>
+<p>Hydra’s instantiation mechanism is very powerful;
+it is capable of recursively instantiating targets from nested configs.
+hydra-zen’s <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> makes short work of generating nested configs.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># demonstrating recursive instantiation</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">Conf</span><span class="p">)</span>
+<span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]}}}</span>
+</pre></div>
+</div>
+<p>There are plenty of realistic examples where creating nested configurations is called for.
+Consider this configuration of a data augmentation and transformation pipeline as an example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">transforms</span>
+
+<span class="c1"># imagine recreating this with seven manually-defined dataclasses...</span>
+<span class="n">TrainTransformsConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span>
+    <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">,</span>
+    <span class="n">transforms</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">builds</span><span class="p">(</span><span class="n">transforms</span><span class="o">.</span><span class="n">RandomCrop</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span>
+        <span class="n">builds</span><span class="p">(</span><span class="n">transforms</span><span class="o">.</span><span class="n">RandomHorizontalFlip</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">builds</span><span class="p">(</span><span class="n">transforms</span><span class="o">.</span><span class="n">ColorJitter</span><span class="p">,</span> <span class="n">brightness</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">contrast</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">saturation</span><span class="o">=</span><span class="mf">0.25</span><span class="p">),</span>
+        <span class="n">builds</span><span class="p">(</span><span class="n">transforms</span><span class="o">.</span><span class="n">RandomRotation</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+        <span class="n">builds</span><span class="p">(</span><span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">),</span>
+        <span class="n">builds</span><span class="p">(</span>
+            <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">,</span>
+            <span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mf">0.4914</span><span class="p">,</span> <span class="mf">0.4822</span><span class="p">,</span> <span class="mf">0.4465</span><span class="p">],</span>
+            <span class="n">std</span><span class="o">=</span><span class="p">[</span><span class="mf">0.2023</span><span class="p">,</span> <span class="mf">0.1994</span><span class="p">,</span> <span class="mf">0.2010</span><span class="p">],</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">TrainTransformsConf</span><span class="p">)</span>
+<span class="go">Compose(</span>
+<span class="go">    RandomCrop(size=(32, 32), padding=4)</span>
+<span class="go">    RandomHorizontalFlip(p=0.5)</span>
+<span class="go">    ColorJitter(brightness=[0.75, 1.25], contrast=[0.75, 1.25], saturation=[0.75, 1.25], hue=None)</span>
+<span class="go">    RandomRotation(degrees=[-2.0, 2.0], interpolation=nearest, expand=False, fill=0)</span>
+<span class="go">    ToTensor()</span>
+<span class="go">    Normalize(mean=[0.4914, 0.4822, 0.4465], std=[0.2023, 0.1994, 0.201])</span>
+<span class="go">)</span>
+</pre></div>
+</div>
+<div class="section" id="auto-generated-nested-configs">
+<h4>Auto-generated nested configs<a class="headerlink" href="#auto-generated-nested-configs" title="Permalink to this headline">¶</a></h4>
+<p><a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> will automatically generate nested configurations in order to configure a target.
+E.g. if a default-value in a target’s signature is a function then <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> will create a dataclass that configures
+that function.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># The default value for `reduction_fn` needs its own structured config</span>
+<span class="c1"># in order for it to be included in this function&#39;s configuration</span>
+<span class="k">def</span> <span class="nf">objective_function</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="n">reduction_fn</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">):</span>
+     <span class="o">...</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Builds_loss</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">objective_function</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Builds_loss</span><span class="o">.</span><span class="n">reduction_fn</span>  <span class="c1"># `just(np.mean)` was automatically created</span>
+<span class="go">types.Just_mean</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">Builds_loss</span><span class="p">))</span>
+<span class="go">_target_: __main__.objective_function</span>
+<span class="go">prediction: ???</span>
+<span class="go">score: ???</span>
+<span class="go">reduction_fn:</span>
+<span class="go">  _target_: hydra_zen.funcs.get_obj</span>
+<span class="go">  path: numpy.mean</span>
+</pre></div>
+</div>
+<p>User-specified parameters will automatically be transformed as well</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">io_fn</span><span class="o">=</span><span class="nb">len</span><span class="p">,</span> <span class="n">sequence</span><span class="o">=</span><span class="nb">list</span><span class="p">)))</span>
+<span class="go">_target_: builtins.dict</span>
+<span class="go">io_fn:</span>
+<span class="go">  _target_: hydra_zen.funcs.get_obj</span>
+<span class="go">  path: builtins.len</span>
+<span class="go">sequence:</span>
+<span class="go">  _target_: hydra_zen.funcs.get_obj</span>
+<span class="go">  path: builtins.list</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="creating-immutable-configs">
+<h3>Creating immutable configs<a class="headerlink" href="#creating-immutable-configs" title="Permalink to this headline">¶</a></h3>
+<p>Dataclasses can be made to be “frozen” such that their instances are immutable.
+Thus we can use <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> to create immutable configs.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">RouterConfig</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">ip_address</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_router</span> <span class="o">=</span> <span class="n">RouterConfig</span><span class="p">(</span><span class="n">ip_address</span><span class="o">=</span><span class="s2">&quot;192.168.56.1&quot;</span><span class="p">)</span>  <span class="c1"># an immutable instance</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_router</span><span class="o">.</span><span class="n">ip_address</span> <span class="o">=</span> <span class="s2">&quot;a bad address&quot;</span>
+<span class="go">---------------------------------------------------------</span>
+<span class="go">FrozenInstanceError: cannot assign to field &#39;ip_address&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="composing-configs-via-inheritance">
+<h3>Composing configs via inheritance<a class="headerlink" href="#composing-configs-via-inheritance" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">builds_bases</span></code> argument enables us to compose configurations using inheritance</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ParentConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ChildConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">b</span><span class="o">=-</span><span class="mi">2</span><span class="p">,</span> <span class="n">c</span><span class="o">=-</span><span class="mi">3</span><span class="p">,</span> <span class="n">builds_bases</span><span class="o">=</span><span class="p">(</span><span class="n">ParentConf</span><span class="p">,))</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">ChildConf</span><span class="p">)</span>
+<span class="go">{&#39;a&#39;: 1, &#39;b&#39;: -2, &#39;c&#39;: -3}</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">issubclass</span><span class="p">(</span><span class="n">ChildConf</span><span class="p">,</span> <span class="n">ParentConf</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="the-bells-and-whistles-of-builds">
+<h2>The Bells and Whistles of <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a><a class="headerlink" href="#the-bells-and-whistles-of-builds" title="Permalink to this headline">¶</a></h2>
+<p>There is more to <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> than meets the eye; the following “bells and whistles” of <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> are nice to know, but are not essential to using hydra-zen.</p>
+<div class="section" id="runtime-validation">
+<h3>Runtime validation<a class="headerlink" href="#runtime-validation" title="Permalink to this headline">¶</a></h3>
+<p>Misspelled parameter names and other invalid configurations for the target’s signature will be caught by <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>, so that the error surfaces immediately while creating the configuration.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">a_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">builds</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">a_nmbr</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># misspelled parameter name</span>
+<span class="go">---------------------------------------------------------------------------</span>
+<span class="go">TypeError: Building: func ..</span>
+<span class="go">The following unexpected keyword argument(s) was specified for __main__.func via `builds`: a_nmbr</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">BaseConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">a_number</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">builds</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">builds_bases</span><span class="o">=</span><span class="p">(</span><span class="n">BaseConf</span><span class="p">,))</span>  <span class="c1"># bad composition is caught upon construction</span>
+<span class="go">---------------------------------------------------------------------------</span>
+<span class="go">TypeError: Building: func ..</span>
+<span class="go">multiple values for argument a_number were specified for __main__.func via `builds`</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">builds</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># too many arguments</span>
+<span class="go">---------------------------------------------------------------------------</span>
+<span class="go">TypeError: Building: func ..</span>
+<span class="go">__main__.func takes 1 positional args, but 2 were specified via `builds`</span>
+</pre></div>
+</div>
+<p>Because <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> automatically mirror’s type annotations from the target’s signature, we also benefit from Hydra’s type-validation mechanism.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">parameter</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">builds</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">a_number</span><span class="o">=</span><span class="s2">&quot;a string&quot;</span><span class="p">))</span>
+<span class="go">---------------------------------------------------------------------------</span>
+<span class="go">TypeError: Building: func ..</span>
+<span class="go">The following unexpected keyword argument(s) was specified for __main__.func via `builds`: a_number</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="automatic-type-refinement">
+<h3>Automatic Type Refinement<a class="headerlink" href="#automatic-type-refinement" title="Permalink to this headline">¶</a></h3>
+<p>Hydra permits only <a class="reference external" href="https://hydra.cc/docs/next/tutorials/structured_config/intro#structured-configs-supports">a narrow subset of type annotations</a>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Any</span></code></p></li>
+<li><p>Primitive types (<code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">bool</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code>, <code class="docutils literal notranslate"><span class="pre">Enums</span></code>)</p></li>
+<li><p>Nesting of Structured Configs</p></li>
+<li><p>Containers (List and Dict) containing primitives or Structured Configs</p></li>
+<li><p>Optional fields</p></li>
+</ul>
+</div></blockquote>
+<p><a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> will automatically “broaden” the annotations associated with a target’s signature so that it will be made compatible with Hydra.
+For example, suppose that we want to configure</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># `Literal[...]` is not supported by Hydra</span>
+<span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">ones_and_twos</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]):</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Literal[1,</span> <span class="pre">2]</span></code> is not supported by Hydra, so <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> will “broaden” this type to <code class="docutils literal notranslate"><span class="pre">Any</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># signature: `Builds_func(ones_and_twos: List[Any] = &lt;factory&gt;)`</span>
+<span class="n">Builds_func</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">ones_and_twos</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>In this way, we can still configure and build this function, but we also retain some level of type-validation</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Builds_func</span><span class="p">(</span><span class="s2">&quot;not a list&quot;</span><span class="p">))</span>
+<span class="go">---------------------------------------------------------------------------------</span>
+<span class="go">ValidationError: Invalid value assigned : str is not a ListConfig, list or tuple.</span>
+<span class="go"> full_key:</span>
+<span class="go"> object_type=None</span>
+</pre></div>
+</div>
+<p>In general, hydra-zen will broaden types as-needed so that dynamically-generated configs will never include annotations that would cause Hydra to error-out.</p>
+</div>
+<div class="section" id="combining-static-and-dynamic-configurations-with-hydrated-dataclass">
+<h3>Combining Static and Dynamic Configurations with <code class="xref py py-obj docutils literal notranslate"><span class="pre">&#64;hydrated_dataclass</span></code><a class="headerlink" href="#combining-static-and-dynamic-configurations-with-hydrated-dataclass" title="Permalink to this headline">¶</a></h3>
+<p>hydra-zen provides a decorator, <a class="reference internal" href="generated/hydra_zen.hydrated_dataclass.html#hydra_zen.hydrated_dataclass" title="hydra_zen.hydrated_dataclass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydrated_dataclass</span></code></a>, which is similar to the standard <code class="xref py py-obj docutils literal notranslate"><span class="pre">&#64;dataclass</span></code> but can be used to auto-populate Hydra-specific parameters;
+it also exposes other features that are available in <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">hydrated_dataclass</span>
+
+<span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">Adam</span>
+
+<span class="nd">@hydrated_dataclass</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">Adam</span><span class="p">,</span> <span class="n">hydra_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">BuildsAdam</span><span class="p">:</span>
+    <span class="n">lr</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="n">momentum</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.9</span>
+
+<span class="n">BuildsAdam</span><span class="p">(</span><span class="n">lr</span><span class="o">=</span><span class="s2">&quot;a string&quot;</span><span class="p">)</span>  <span class="c1"># static type-checker flags as invalid (invalid type)</span>
+
+<span class="n">conf</span> <span class="o">=</span> <span class="n">BuildsAdam</span><span class="p">()</span>
+<span class="n">conf</span><span class="o">.</span><span class="n">lr</span> <span class="o">=</span> <span class="mf">10.0</span>  <span class="c1"># static type-checker flags as invalid (mutating &quot;frozen&quot; dataclass)</span>
+</pre></div>
+</div>
+<p>This has the benefit of making certain pertinent information (e.g. the dataclass’ fields and that it is frozen) available to static type checkers, while still dynamically populating the resulting dataclass with Hydra-specific fields (e.g. <code class="docutils literal notranslate"><span class="pre">_target_</span></code> and <code class="docutils literal notranslate"><span class="pre">_partial_target_</span></code>) and providing the same runtime validation as <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>.</p>
+<p>Note that the <code class="docutils literal notranslate"><span class="pre">&#64;hydrated_dataclass</span></code> decorator uses a <a class="reference external" href="https://github.com/microsoft/pyright/blob/master/specs/dataclass_transforms.md">recently proposed</a> mechanism for enabling static tools to “recognize” third-party dataclass decorators like this one.
+Presently, the above static inspection is only supported by pyright, but other type-checkers will likely add support for this soon.</p>
+</div>
+<div class="section" id="hydra-zen-typing">
+<h3>hydra_zen.typing<a class="headerlink" href="#hydra-zen-typing" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">hydra_zen.typing</span></code> ships generic protocols that annotate the outputs of <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> and <a class="reference internal" href="generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a>.
+These annotations are used to overload <code class="docutils literal notranslate"><span class="pre">hydra_zen.instantiate</span></code> so that static type checkers can “see” what is being instantiated.
+The following code block uses comments to indicate the types that will be inferred by static type checkers.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyClass</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">MyClass</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># type: Type[Builds[Type[MyClass]]]</span>
+<span class="n">conf</span> <span class="o">=</span> <span class="n">Conf</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>            <span class="c1"># type: Builds[Type[MyClass]]</span>
+
+<span class="n">my_class1</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">Conf</span><span class="p">)</span>  <span class="c1"># type: MyClass</span>
+<span class="n">my_class2</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>  <span class="c1"># type: MyClass</span>
+
+<span class="n">PartialConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">MyClass</span><span class="p">,</span> <span class="n">hydra_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># type: Type[PartialBuilds[Type[MyClass]]]</span>
+<span class="n">partial_conf</span> <span class="o">=</span> <span class="n">PartialConf</span><span class="p">()</span>                       <span class="c1"># type: PartialBuilds[Type[MyClass]]</span>
+
+<span class="n">partiald_class</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">PartialConf</span><span class="p">)</span>   <span class="c1"># type: Partial[MyClass]</span>
+<span class="n">my_class3</span> <span class="o">=</span> <span class="n">partiald_class</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>             <span class="c1"># type: MyClass</span>
+
+<span class="n">partiald_class2</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">partial_conf</span><span class="p">)</span> <span class="c1"># type: Partial[MyClass]</span>
+<span class="n">my_class4</span> <span class="o">=</span> <span class="n">partiald_class2</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>            <span class="c1"># type: MyClass</span>
+
+<span class="n">JustMyClass</span> <span class="o">=</span> <span class="n">just</span><span class="p">(</span><span class="n">MyClass</span><span class="p">)</span>               <span class="c1"># type: Type[Just[Type[MyClass]]]</span>
+<span class="n">my_class_type</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">JustMyClass</span><span class="p">)</span>  <span class="c1"># type: Type[MyClass]</span>
+</pre></div>
+</div>
+<p>(Note that this behavior is verified using the static type checker <a class="reference external" href="https://github.com/microsoft/pyright">pyright</a>, which is used by VSCode.
+PyCharm’s type-checker appears to struggle with deeply-nested types like <code class="docutils literal notranslate"><span class="pre">Type[Builds[Type[MyClass]]]</span></code>, but this is an issue on their end.)</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="generated/hydra_zen.builds.html" class="btn btn-neutral float-right" title="builds" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pytorch_lightning_example.html" class="btn btn-neutral float-left" title="Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021 Massachusetts Institute of Technology.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

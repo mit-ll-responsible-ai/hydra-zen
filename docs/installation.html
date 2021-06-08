@@ -1,0 +1,290 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Installation and Basic Usage &mdash; hydra-zen 0+untagged.1.g641c38c documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/my_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Overview of hydra-zen" href="overview.html" />
+    <link rel="prev" title="Welcome to hydra-zen’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> hydra-zen
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation and Basic Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installing-hydra-zen">Installing hydra-zen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview of hydra-zen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pytorch_lightning_example.html">Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structured_configs.html">Dynamically Generating Structured Configs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="experimental.html">Running Experiments with Hydra</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">hydra-zen</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Installation and Basic Usage</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="installation-and-basic-usage">
+<h1>Installation and Basic Usage<a class="headerlink" href="#installation-and-basic-usage" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="installing-hydra-zen">
+<h2>Installing hydra-zen<a class="headerlink" href="#installing-hydra-zen" title="Permalink to this headline">¶</a></h2>
+<p>hydra-zen is lightweight: its only dependencies are <code class="docutils literal notranslate"><span class="pre">hydra-core</span></code> and <code class="docutils literal notranslate"><span class="pre">typing-extensions</span></code>.
+It is available for installation via pip:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip install hydra-zen
+</pre></div>
+</div>
+<p>We strive to maintain as wide a window of backwards compatibility Hydra (and omegaconf) as possible.</p>
+</div>
+<div class="section" id="basic-usage">
+<h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h2>
+<p>The following is a simple example in which we use hydra-zen to create a structured config for a function.
+We will then launch multiple jobs – each on calls the function with a different set of configuration values.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">builds</span><span class="p">,</span> <span class="n">instantiate</span><span class="p">,</span> <span class="n">to_yaml</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.experimental</span> <span class="kn">import</span> <span class="n">hydra_multirun</span>
+
+<span class="c1"># some code to configure and run</span>
+<span class="k">def</span> <span class="nf">repeat_text</span><span class="p">(</span><span class="n">num</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">text</span> <span class="o">*</span> <span class="n">num</span>
+</pre></div>
+</div>
+<p>Configuring our code:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="go"># Create structured config without providing default values.</span>
+<span class="go"># This is a dataclass object: `Builds_repeat_text(num: int, text: str)`</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Config</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">repeat_text</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="go"># Instantiating the config builds `repeat_text`</span>
+<span class="go"># I.e. it calls `repeat_text(num=2, text=&quot;hi&quot;)`</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Config</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;hi&quot;</span><span class="p">))</span>
+<span class="go">&#39;hihi&#39;</span>
+
+<span class="go"># `builds` retains the type hints from the function, which</span>
+<span class="go"># Hydra can use to provide runtime type validation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Config</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;hi&quot;</span><span class="p">))</span>
+<span class="go">ValidationError: Value &#39;2.5&#39; could not be converted to Integer</span>
+<span class="go">    full_key: num</span>
+<span class="go">    object_type=Builds_repeat_text</span>
+</pre></div>
+</div>
+<p>Running multiple jobs under various configurations:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="go"># run multiple jobs over combination of parameter values</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">jobs</span><span class="p">,</span> <span class="o">=</span> <span class="n">hydra_multirun</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">Config</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">task_function</span><span class="o">=</span><span class="n">instantiate</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">overrides</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;num=1,2,3&quot;</span><span class="p">,</span> <span class="s2">&quot;text=hi,bye&quot;</span><span class="p">],</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="go">[2021-04-30 15:31:02,688][HYDRA] Launching 6 jobs locally</span>
+<span class="go">[2021-04-30 15:31:02,689][HYDRA]     #0 : text=hi num=1</span>
+<span class="go">[2021-04-30 15:31:02,764][HYDRA]     #1 : text=hi num=2</span>
+<span class="go">[2021-04-30 15:31:02,838][HYDRA]     #2 : text=hi num=3</span>
+<span class="go">[2021-04-30 15:31:02,915][HYDRA]     #3 : text=bye num=1</span>
+<span class="go">[2021-04-30 15:31:02,988][HYDRA]     #4 : text=bye num=2</span>
+<span class="go">[2021-04-30 15:31:03,063][HYDRA]     #5 : text=bye num=3</span>
+
+<span class="go"># access results of jobs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">j</span><span class="o">.</span><span class="n">return_value</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">jobs</span><span class="p">]</span>
+<span class="go">[&#39;hi&#39;, &#39;hihi&#39;, &#39;hihihi&#39;, &#39;bye&#39;, &#39;byebye&#39;, &#39;byebyebye&#39;]</span>
+
+<span class="go"># get the config of the first run as a yaml</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">jobs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cfg</span><span class="p">))</span>
+<span class="go">_target_: my_lib.repeat_text</span>
+<span class="go">_recursive_: true</span>
+<span class="go">_convert_: none</span>
+<span class="go">text: hi</span>
+<span class="go">num: 1</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="overview.html" class="btn btn-neutral float-right" title="Overview of hydra-zen" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to hydra-zen’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021 Massachusetts Institute of Technology.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

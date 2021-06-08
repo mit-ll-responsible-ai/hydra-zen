@@ -1,0 +1,1089 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0+untagged.1.g641c38c documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/my_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> hydra-zen
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation and Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Overview of hydra-zen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pytorch_lightning_example.html">Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structured_configs.html">Dynamically Generating Structured Configs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../experimental.html">Running Experiments with Hydra</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">hydra-zen</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>hydra_zen.structured_configs._implementations</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for hydra_zen.structured_configs._implementations</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2021 Massachusetts Institute of Technology</span>
+<span class="c1"># SPDX-License-Identifier: MIT</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">is_dataclass</span><span class="p">,</span> <span class="n">make_dataclass</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Any</span><span class="p">,</span>
+    <span class="n">Callable</span><span class="p">,</span>
+    <span class="n">Dict</span><span class="p">,</span>
+    <span class="n">FrozenSet</span><span class="p">,</span>
+    <span class="n">List</span><span class="p">,</span>
+    <span class="n">Mapping</span><span class="p">,</span>
+    <span class="n">Optional</span><span class="p">,</span>
+    <span class="n">Set</span><span class="p">,</span>
+    <span class="n">Tuple</span><span class="p">,</span>
+    <span class="n">Type</span><span class="p">,</span>
+    <span class="n">TypeVar</span><span class="p">,</span>
+    <span class="n">Union</span><span class="p">,</span>
+    <span class="n">get_type_hints</span><span class="p">,</span>
+    <span class="n">overload</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Final</span><span class="p">,</span> <span class="n">Literal</span>
+
+<span class="kn">from</span> <span class="nn">hydra_zen.funcs</span> <span class="kn">import</span> <span class="n">get_obj</span><span class="p">,</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.structured_configs</span> <span class="kn">import</span> <span class="n">_utils</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">Builds</span><span class="p">,</span> <span class="n">Importable</span><span class="p">,</span> <span class="n">Just</span><span class="p">,</span> <span class="n">PartialBuilds</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1"># used to check if default values are ufuncs</span>
+    <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">ufunc</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="n">ufunc</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;builds&quot;</span><span class="p">,</span> <span class="s2">&quot;just&quot;</span><span class="p">,</span> <span class="s2">&quot;hydrated_dataclass&quot;</span><span class="p">,</span> <span class="s2">&quot;mutable_value&quot;</span><span class="p">]</span>
+
+<span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T&quot;</span><span class="p">)</span>
+
+<span class="n">_TARGET_FIELD_NAME</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_target_&quot;</span>
+<span class="n">_RECURSIVE_FIELD_NAME</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_recursive_&quot;</span>
+<span class="n">_CONVERT_FIELD_NAME</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_convert_&quot;</span>
+<span class="n">_PARTIAL_TARGET_FIELD_NAME</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_partial_target_&quot;</span>
+<span class="n">_POS_ARG_FIELD_NAME</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_args_&quot;</span>
+<span class="n">_HYDRA_FIELD_NAMES</span><span class="p">:</span> <span class="n">FrozenSet</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span>
+    <span class="p">(</span>
+        <span class="n">_TARGET_FIELD_NAME</span><span class="p">,</span>
+        <span class="n">_RECURSIVE_FIELD_NAME</span><span class="p">,</span>
+        <span class="n">_CONVERT_FIELD_NAME</span><span class="p">,</span>
+        <span class="n">_PARTIAL_TARGET_FIELD_NAME</span><span class="p">,</span>
+        <span class="n">_POS_ARG_FIELD_NAME</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">_POSITIONAL_ONLY</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">POSITIONAL_ONLY</span>
+<span class="n">_POSITIONAL_OR_KEYWORD</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">POSITIONAL_OR_KEYWORD</span>
+<span class="n">_VAR_POSITIONAL</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">VAR_POSITIONAL</span>
+<span class="n">_KEYWORD_ONLY</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">KEYWORD_ONLY</span>
+<span class="n">_VAR_KEYWORD</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">VAR_KEYWORD</span>
+
+<span class="n">_builtin_function_or_method_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="nb">len</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">mutable_value</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Used to set a mutable object as a default value for a field</span>
+<span class="sd">    in a dataclass.</span>
+
+<span class="sd">    This is an alias for `field(default_factory=lambda: x)`</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from hydra_zen import mutable_value</span>
+<span class="sd">    &gt;&gt;&gt; from dataclasses import dataclass</span>
+
+<span class="sd">    See https://docs.python.org/3/library/dataclasses.html#mutable-default-values</span>
+
+<span class="sd">    &gt;&gt;&gt; @dataclass</span>
+<span class="sd">    ... class HasMutableDefault</span>
+<span class="sd">    ...     a_list: list  = [1, 2, 3]  # error: mutable default</span>
+
+<span class="sd">    Using `mutable_value` to specify the default list:</span>
+
+<span class="sd">    &gt;&gt;&gt; @dataclass</span>
+<span class="sd">    ... class HasMutableDefault</span>
+<span class="sd">    ...     a_list: list  = mutable_value([1, 2, 3])  # ok&quot;&quot;&quot;</span>
+    <span class="n">cast</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  <span class="c1"># ensure that we return a copy of the default value</span>
+    <span class="k">return</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+
+<span class="n">Field_Entry</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">Field</span><span class="p">]</span>
+
+
+<span class="c1"># Alternate form, from PEP proposal:</span>
+<span class="c1"># https://github.com/microsoft/pyright/blob/master/specs/dataclass_transforms.md</span>
+<span class="c1">#</span>
+<span class="c1"># This enables static checkers to work with third-party decorators that create</span>
+<span class="c1"># dataclass-like objects</span>
+<span class="k">def</span> <span class="nf">__dataclass_transform__</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">eq_default</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">order_default</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">kw_only_default</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">field_descriptors</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(()),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_T</span><span class="p">],</span> <span class="n">_T</span><span class="p">]:</span>
+    <span class="c1"># If used within a stub file, the following implementation can be</span>
+    <span class="c1"># replaced with &quot;...&quot;.</span>
+    <span class="k">return</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span>
+
+
+<div class="viewcode-block" id="hydrated_dataclass"><a class="viewcode-back" href="../../../generated/hydra_zen.hydrated_dataclass.html#hydra_zen.hydrated_dataclass">[docs]</a><span class="nd">@__dataclass_transform__</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">hydrated_dataclass</span><span class="p">(</span>
+    <span class="n">target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">hydra_partial</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">]],</span> <span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;A decorator that uses `hydra_zen.builds` to create a dataclass with the appropriate</span>
+<span class="sd">    hydra-specific fields for specifying a structured config [1]_.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    target : Union[Instantiable, Callable]</span>
+<span class="sd">        The object to be instantiated/called.</span>
+
+<span class="sd">    *pos_args: Any</span>
+<span class="sd">        Positional arguments passed to `target`.</span>
+
+<span class="sd">        Arguments specified positionally are not included in the dataclass&#39; signature and</span>
+<span class="sd">        are stored as a tuple bound to in the ``_args_`` field.</span>
+
+<span class="sd">    populate_full_signature : bool, optional (default=False)</span>
+<span class="sd">        If True, then the resulting dataclass&#39;s __init__ signature and fields</span>
+<span class="sd">        will be populated according to the signature of `target`.</span>
+
+<span class="sd">        Values specified in **kwargs_for_target take precedent over the corresponding</span>
+<span class="sd">        default values from the signature.</span>
+
+<span class="sd">    hydra_partial : Optional[bool] (default=False)</span>
+<span class="sd">        If True, then hydra-instantiation produces `functools.partial(target, **kwargs)`</span>
+
+<span class="sd">    hydra_recursive : bool, optional (default=True)</span>
+<span class="sd">        If True, then upon hydra will recursively instantiate all other</span>
+<span class="sd">        hydra-config objects nested within this dataclass [2]_.</span>
+
+<span class="sd">        If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.</span>
+
+<span class="sd">    hydra_convert: Optional[Literal[&quot;none&quot;, &quot;partial&quot;, &quot;all&quot;]] (default=&quot;none&quot;)</span>
+<span class="sd">        Determines how hydra handles the non-primitive objects passed to `target` [3]_.</span>
+
+<span class="sd">        - `&quot;none&quot;`: Passed objects are DictConfig and ListConfig, default</span>
+<span class="sd">        - `&quot;partial&quot;`: Passed objects are converted to dict and list, with</span>
+<span class="sd">          the exception of Structured Configs (and their fields).</span>
+<span class="sd">        - `&quot;all&quot;`: Passed objects are dicts, lists and primitives without</span>
+<span class="sd">          a trace of OmegaConf containers</span>
+
+<span class="sd">        If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.</span>
+
+<span class="sd">    frozen : bool, optional (default=False)</span>
+<span class="sd">        If `True`, the resulting dataclass will create frozen (i.e. immutable) instances.</span>
+<span class="sd">        I.e. setting/deleting an attribute of an instance will raise `FrozenInstanceError`</span>
+<span class="sd">        at runtime.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] https://hydra.cc/docs/next/tutorials/structured_config/intro/</span>
+<span class="sd">    .. [2] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation</span>
+<span class="sd">    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    A simple usage of `hydrated_dataclass`. Here, we specify a structured config</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydra_zen import hydrated_dataclass, instantiate</span>
+<span class="sd">    &gt;&gt;&gt; @hydrated_dataclass(target=dict)</span>
+<span class="sd">    ... class DictConf:</span>
+<span class="sd">    ...     x : int = 2</span>
+<span class="sd">    ...     y : str = &#39;hello&#39;</span>
+
+<span class="sd">    &gt;&gt;&gt; instantiate(DictConf(x=10))  # override default `x`</span>
+<span class="sd">    {&#39;x&#39;: 10, &#39;y&#39;: &#39;hello&#39;}</span>
+
+<span class="sd">    We can also design a configuration that only partially instantiates our target.</span>
+
+<span class="sd">    &gt;&gt;&gt; def power(x: float, exponent: float) -&gt; float: return x ** exponent</span>
+<span class="sd">    &gt;&gt;&gt; @hydrated_dataclass(target=power, hydra_partial=True)</span>
+<span class="sd">    ... class PowerConf:</span>
+<span class="sd">    ...     exponent : float = 2.0</span>
+
+<span class="sd">    &gt;&gt;&gt; partiald_power = instantiate(PowerConf)</span>
+<span class="sd">    &gt;&gt;&gt; partiald_power(10.0)</span>
+<span class="sd">    100.0</span>
+
+<span class="sd">    Inheritance can be used to compose configurations</span>
+
+<span class="sd">    &gt;&gt;&gt; from dataclasses import dataclass</span>
+<span class="sd">    &gt;&gt;&gt; from torch.optim import AdamW</span>
+<span class="sd">    &gt;&gt;&gt; @dataclass</span>
+<span class="sd">    ... class AdamBaseConfig:</span>
+<span class="sd">    ...     lr : float = 0.001</span>
+<span class="sd">    ...     eps : float = 1e-8</span>
+
+<span class="sd">    &gt;&gt;&gt; @hydrated_dataclass(target=AdamW, hydra_partial=True)</span>
+<span class="sd">    ... class AdamWConfig(AdamBaseConfig):</span>
+<span class="sd">    ...     weight_decay : float = 0.01</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(AdamWConfig)</span>
+<span class="sd">    functools.partial(&lt;class &#39;torch.optim.adamw.AdamW&#39;&gt;, lr=0.001, eps=1e-08, weight_decay=0.01)</span>
+
+<span class="sd">    Because this decorator uses `hyda_utils.builds` under the hood, common mistakes like misspelled</span>
+<span class="sd">    parameters will be caught upon constructing the structured config.</span>
+
+<span class="sd">    &gt;&gt;&gt; @hydrated_dataclass(target=AdamW, hydra_partial=True)</span>
+<span class="sd">    ... class AdamWConfig(AdamBaseConfig):</span>
+<span class="sd">    ...     wieght_decay : float = 0.01  # i before e, right!?</span>
+<span class="sd">    TypeError: Building: AdamW ..</span>
+<span class="sd">    The following unexpected keyword argument(s) for torch.optim.adamw.AdamW was specified via inheritance</span>
+<span class="sd">    from a base class: wieght_decay</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">decorated_obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">decorated_obj</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;Class instances are not supported by `hydrated_dataclass`.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># TODO: We should mutate `decorated_obj` directly like @dataclass does.</span>
+        <span class="c1">#       Presently, we create an intermediate dataclass that we inherit</span>
+        <span class="c1">#       from, which gets the job done for the most part but there are</span>
+        <span class="c1">#       practical differences. E.g. you cannot delete an attribute that</span>
+        <span class="c1">#       was declared in the definition of `decorated_obj`.</span>
+        <span class="n">decorated_obj</span> <span class="o">=</span> <span class="n">dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="n">frozen</span><span class="p">)(</span><span class="n">decorated_obj</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">builds</span><span class="p">(</span>
+            <span class="n">target</span><span class="p">,</span>
+            <span class="o">*</span><span class="n">pos_args</span><span class="p">,</span>
+            <span class="n">populate_full_signature</span><span class="o">=</span><span class="n">populate_full_signature</span><span class="p">,</span>
+            <span class="n">hydra_recursive</span><span class="o">=</span><span class="n">hydra_recursive</span><span class="p">,</span>
+            <span class="n">hydra_convert</span><span class="o">=</span><span class="n">hydra_convert</span><span class="p">,</span>
+            <span class="n">hydra_partial</span><span class="o">=</span><span class="n">hydra_partial</span><span class="p">,</span>
+            <span class="n">builds_bases</span><span class="o">=</span><span class="p">(</span><span class="n">decorated_obj</span><span class="p">,),</span>
+            <span class="n">dataclass_name</span><span class="o">=</span><span class="n">decorated_obj</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="n">frozen</span><span class="o">=</span><span class="n">frozen</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+<div class="viewcode-block" id="just"><a class="viewcode-back" href="../../../generated/hydra_zen.just.html#hydra_zen.just">[docs]</a><span class="k">def</span> <span class="nf">just</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Importable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;Produces a structured config that, when instantiated by hydra, &#39;just&#39;</span>
+<span class="sd">    returns `obj`.</span>
+
+<span class="sd">    This is convenient for specifying a particular, un-instantiated object as part of your</span>
+<span class="sd">    configuration.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    obj : Importable</span>
+<span class="sd">        The object that will be instantiated from this config.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    types.JustObj</span>
+<span class="sd">        The dataclass object that is designed as a structured config.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from hydra_zen import just, instantiate, to_yaml</span>
+<span class="sd">    &gt;&gt;&gt; just_range = just(range)</span>
+<span class="sd">    &gt;&gt;&gt; range is instantiate(just_range)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; just_range._target_</span>
+<span class="sd">    &#39;hydra_zen.funcs.identity&#39;</span>
+<span class="sd">    &gt;&gt;&gt; just_range.path</span>
+<span class="sd">    &#39;builtins.range&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">obj_path</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;`just(</span><span class="si">{</span><span class="n">obj</span><span class="si">}</span><span class="s2">)`: `obj` is not importable; it is missing the attributes `__module__` and/or `__qualname__`&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">out_class</span> <span class="o">=</span> <span class="n">make_dataclass</span><span class="p">(</span>
+        <span class="p">(</span><span class="s2">&quot;Just_&quot;</span> <span class="o">+</span> <span class="n">_utils</span><span class="o">.</span><span class="n">safe_name</span><span class="p">(</span><span class="n">obj</span><span class="p">)),</span>
+        <span class="p">[</span>
+            <span class="p">(</span>
+                <span class="n">_TARGET_FIELD_NAME</span><span class="p">,</span>
+                <span class="nb">str</span><span class="p">,</span>
+                <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">get_obj</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="p">(</span>
+                <span class="s2">&quot;path&quot;</span><span class="p">,</span>
+                <span class="nb">str</span><span class="p">,</span>
+                <span class="n">field</span><span class="p">(</span>
+                    <span class="n">default</span><span class="o">=</span><span class="n">obj_path</span><span class="p">,</span>
+                    <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">out_class</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;A structured config designed to return </span><span class="si">{</span><span class="n">obj</span><span class="si">}</span><span class="s2"> when it is instantiated by hydra&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">out_class</span></div>
+
+
+<span class="k">def</span> <span class="nf">create_just_if_needed</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">_T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">_T</span><span class="p">]]]:</span>
+    <span class="c1"># Hydra can serialize dataclasses directly, thus we</span>
+    <span class="c1"># don&#39;t want to wrap these in `just`</span>
+
+    <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+        <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">_builtin_function_or_method_type</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="p">(</span><span class="n">ufunc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ufunc</span><span class="p">))</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="n">just</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">value</span>
+
+
+<span class="k">def</span> <span class="nf">sanitized_default_value</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Field</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">Just</span><span class="p">]]:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">_utils</span><span class="o">.</span><span class="n">KNOWN_MUTABLE_TYPES</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">mutable_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="n">resolved_value</span> <span class="o">=</span> <span class="n">create_just_if_needed</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">value</span><span class="p">)</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">resolved_value</span> <span class="k">else</span> <span class="n">resolved_value</span>
+
+
+<span class="c1"># overloads when `hydra_partial=False`</span>
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
+    <span class="n">target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
+    <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">hydra_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
+    <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="o">...</span>
+
+
+<span class="c1"># overloads when `hydra_partial=True`</span>
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
+    <span class="n">target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
+    <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">hydra_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">],</span>
+    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
+    <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="o">...</span>
+
+
+<span class="c1"># overloads when `hydra_partial: bool`</span>
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
+    <span class="n">target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
+    <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">hydra_partial</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
+    <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
+    <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]</span>
+<span class="p">]:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="o">...</span>
+
+
+<div class="viewcode-block" id="builds"><a class="viewcode-back" href="../../../generated/hydra_zen.builds.html#hydra_zen.builds">[docs]</a><span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
+    <span class="n">target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
+    <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">hydra_partial</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
+    <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]]:</span>
+    <span class="sd">&quot;&quot;&quot;Returns a dataclass object that configures `target` with user-specified and auto-populated parameter values.</span>
+
+<span class="sd">    The resulting dataclass is specifically a structured config [1]_ that enables Hydra to initialize/call</span>
+<span class="sd">    `target` either fully or partially. See Notes for additional features and explanation of implementation details.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    target : Union[Instantiable, Callable]</span>
+<span class="sd">        The object to be instantiated/called</span>
+
+<span class="sd">    *pos_args: Any</span>
+<span class="sd">        Positional arguments passed to `target`.</span>
+
+<span class="sd">        Arguments specified positionally are not included in the dataclass&#39; signature and</span>
+<span class="sd">        are stored as a tuple bound to in the ``_args_`` field.</span>
+
+<span class="sd">    **kwargs_for_target : Any</span>
+<span class="sd">        The keyword arguments passed to `target(...)`.</span>
+
+<span class="sd">        The arguments specified here solely determine the fields and init-parameters of the</span>
+<span class="sd">        resulting dataclass, unless `populate_full_signature=True` is specified (see below).</span>
+
+<span class="sd">    populate_full_signature : bool, optional (default=False)</span>
+<span class="sd">        If `True`, then the resulting dataclass&#39;s signature and fields will be populated</span>
+<span class="sd">        according to the signature of `target`.</span>
+
+<span class="sd">        Values specified in **kwargs_for_target take precedent over the corresponding</span>
+<span class="sd">        default values from the signature.</span>
+
+<span class="sd">        This option is not available for objects with inaccessible signatures, such as</span>
+<span class="sd">        NumPy&#39;s various ufuncs.</span>
+
+<span class="sd">    hydra_partial : bool, optional (default=False)</span>
+<span class="sd">        If True, then hydra-instantiation produces `functools.partial(target, **kwargs_for_target)`,</span>
+<span class="sd">        this enables the partial-configuration of objects.</span>
+
+<span class="sd">        Specifying `hydra_partial=True` and `populate_full_signature=True` together will</span>
+<span class="sd">        populate the dataclass&#39; signature only with parameters that are specified by the</span>
+<span class="sd">        user or that have default values specified in the target&#39;s signature. I.e. it is</span>
+<span class="sd">        presumed that un-specified parameters are to be excluded from the partial configuration.</span>
+
+<span class="sd">    hydra_recursive : Optional[bool], optional (default=True)</span>
+<span class="sd">        If ``True``, then upon hydra will recursively instantiate all other</span>
+<span class="sd">        hydra-config objects nested within this dataclass [2]_.</span>
+
+<span class="sd">        If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.</span>
+
+<span class="sd">    hydra_convert: Optional[Literal[&quot;none&quot;, &quot;partial&quot;, &quot;all&quot;]], optional (default=&quot;none&quot;)</span>
+<span class="sd">        Determines how hydra handles the non-primitive objects passed to `target` [3]_.</span>
+
+<span class="sd">        - `&quot;none&quot;`: Passed objects are DictConfig and ListConfig, default</span>
+<span class="sd">        - `&quot;partial&quot;`: Passed objects are converted to dict and list, with</span>
+<span class="sd">          the exception of Structured Configs (and their fields).</span>
+<span class="sd">        - `&quot;all&quot;`: Passed objects are dicts, lists and primitives without</span>
+<span class="sd">          a trace of OmegaConf containers</span>
+
+<span class="sd">        If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.</span>
+
+<span class="sd">    frozen : bool, optional (default=False)</span>
+<span class="sd">        If `True`, the resulting dataclass will create frozen (i.e. immutable) instances.</span>
+<span class="sd">        I.e. setting/deleting an attribute of an instance will raise `FrozenInstanceError`</span>
+<span class="sd">        at runtime.</span>
+
+<span class="sd">    builds_bases : Tuple[DataClass, ...]</span>
+<span class="sd">        Specifies a tuple of parent classes that the resulting dataclass inherits from.</span>
+<span class="sd">        A `PartialBuilds` class (resulting from `hydra_partial=True`) cannot be a parent</span>
+<span class="sd">        of a `Builds` class (i.e. where `hydra_partial=False` was specified).</span>
+
+<span class="sd">    dataclass_name : Optional[str]</span>
+<span class="sd">        If specified, determines the name of the returned class object.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    builder : Builds[target]</span>
+<span class="sd">        The structured config (a dataclass with the field: _target_ populated).</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    TypeError</span>
+<span class="sd">        One or more unexpected arguments were specified via **kwargs_for_target, which</span>
+<span class="sd">        are not compatible with the signature of `target`.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Type annotations are inferred from the target&#39;s signature and are only retained if they are compatible</span>
+<span class="sd">    with hydra&#39;s limited set of supported annotations; otherwise `Any` is specified.</span>
+
+<span class="sd">    `builds` provides runtime validation of user-specified named arguments against the target&#39;s signature.</span>
+<span class="sd">    This helps to ensure that typos in field names fail early and explicitly.</span>
+
+<span class="sd">    Mutable values are automatically specified using a default factory [4]_.</span>
+
+<span class="sd">    `builds(...)` is annotated to return the generic protocols `Builds` and `PartialBuilds`, which are</span>
+<span class="sd">    available in `hydra_zen.typing`. These are leveraged by `hydra_zen.instantiate` to provide static</span>
+<span class="sd">    analysis tooling with enhanced context.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] https://hydra.cc/docs/next/tutorials/structured_config/intro/</span>
+<span class="sd">    .. [2] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation</span>
+<span class="sd">    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies</span>
+<span class="sd">    .. [4] https://docs.python.org/3/library/dataclasses.html#mutable-default-values</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Basic Usage:</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydra_zen import builds, instantiate</span>
+<span class="sd">    &gt;&gt;&gt; builds(dict, a=1, b=&#39;x&#39;)  # makes a dataclass that will &quot;build&quot; a dictionary with the specified fields</span>
+<span class="sd">    types.Builds_dict</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(builds(dict, a=1, b=&#39;x&#39;))  # using hydra to build the dictionary</span>
+<span class="sd">    {&#39;a&#39;: 1, &#39;b&#39;: &#39;x&#39;}</span>
+
+<span class="sd">    &gt;&gt;&gt; Conf = builds(len, [1, 2, 3])  # specifying positional arguments</span>
+<span class="sd">    &gt;&gt;&gt; Conf._args_</span>
+<span class="sd">    ([1, 2, 3],)</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(Conf)</span>
+<span class="sd">    3</span>
+
+<span class="sd">    Using `builds` with partial instantiation</span>
+
+<span class="sd">    &gt;&gt;&gt; def a_two_tuple(x: int, y: float): return x, y</span>
+<span class="sd">    &gt;&gt;&gt; PartialBuildsFunc = builds(a_two_tuple, x=1, hydra_partial=True)  # specifies only `x`</span>
+<span class="sd">    &gt;&gt;&gt; partial_func = instantiate(PartialBuildsFunc)</span>
+<span class="sd">    &gt;&gt;&gt; partial_func</span>
+<span class="sd">    functools.partial(&lt;function a_two_tuple at 0x00000220A7820EE0&gt;, x=1)</span>
+<span class="sd">    &gt;&gt;&gt; partial_func(y=22)</span>
+<span class="sd">    (1, 22)</span>
+
+<span class="sd">    Auto-populating parameters:</span>
+
+<span class="sd">    &gt;&gt;&gt; # signature: `Builds_a_two_tuple(x: int, y: float)`</span>
+<span class="sd">    &gt;&gt;&gt; Conf = builds(a_two_tuple, populate_full_signature)</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(Conf(x=1, y=10.0))</span>
+<span class="sd">    (1, 10.0)</span>
+
+<span class="sd">    Inheritance:</span>
+
+<span class="sd">    &gt;&gt;&gt; ParentConf = builds(dict, a=1, b=2)</span>
+<span class="sd">    &gt;&gt;&gt; ChildConf = builds(dict, b=-2, c=-3, builds_bases=(ParentConf,))</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(ChildConf)</span>
+<span class="sd">    {&#39;a&#39;: 1, &#39;b&#39;: -2, &#39;c&#39;: -3}</span>
+<span class="sd">    &gt;&gt;&gt; issubclass(ChildConf, ParentConf)</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="n">_utils</span><span class="o">.</span><span class="n">building_error_prefix</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot;In `builds(target, ...), `target` must be callable/instantiable&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">populate_full_signature</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;`populate_full_signature` must be a boolean type, got: </span><span class="si">{</span><span class="n">populate_full_signature</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">hydra_recursive</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hydra_recursive</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;`hydra_recursive` must be a boolean type, got </span><span class="si">{</span><span class="n">hydra_recursive</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hydra_partial</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`hydra_partial` must be a boolean type, got: </span><span class="si">{</span><span class="n">hydra_partial</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">hydra_convert</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">hydra_convert</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">}:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;`hydra_convert` must be &#39;none&#39;, &#39;partial&#39;, or &#39;all&#39;, got: </span><span class="si">{</span><span class="n">hydra_convert</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">dataclass_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataclass_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;`dataclass_name` must be a string or None, got: </span><span class="si">{</span><span class="n">dataclass_name</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="n">is_dataclass</span><span class="p">(</span><span class="n">_b</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_b</span><span class="p">,</span> <span class="nb">type</span><span class="p">))</span> <span class="k">for</span> <span class="n">_b</span> <span class="ow">in</span> <span class="n">builds_bases</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;All `build_bases` must be a tuple of dataclass types&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">hydra_partial</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> <span class="n">hydra_recursive</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="n">_utils</span><span class="o">.</span><span class="n">building_error_prefix</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot;`builds(..., hydra_partial=True)` requires that `hydra_recursive=True`&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">hydra_partial</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">target_field</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span>
+                <span class="n">_TARGET_FIELD_NAME</span><span class="p">,</span>
+                <span class="nb">str</span><span class="p">,</span>
+                <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">partial</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="p">(</span><span class="n">_PARTIAL_TARGET_FIELD_NAME</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">just</span><span class="p">(</span><span class="n">target</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)),</span>
+        <span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">target_field</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span>
+                <span class="n">_TARGET_FIELD_NAME</span><span class="p">,</span>
+                <span class="nb">str</span><span class="p">,</span>
+                <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">target</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+
+    <span class="n">base_fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">Field_Entry</span><span class="p">]]</span> <span class="o">=</span> <span class="n">target_field</span>
+
+    <span class="k">if</span> <span class="n">hydra_recursive</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">base_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">_RECURSIVE_FIELD_NAME</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">hydra_recursive</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">hydra_convert</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">base_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">_CONVERT_FIELD_NAME</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">hydra_convert</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">pos_args</span><span class="p">:</span>
+        <span class="n">base_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">_POS_ARG_FIELD_NAME</span><span class="p">,</span>
+                <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+                <span class="n">field</span><span class="p">(</span>
+                    <span class="n">default</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">create_just_if_needed</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pos_args</span><span class="p">),</span>
+                    <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">signature_params</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
+        <span class="n">target_has_valid_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">populate_full_signature</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="n">_utils</span><span class="o">.</span><span class="n">building_error_prefix</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2"> does not have an inspectable signature. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;`builds(</span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, populate_full_signature=True)` is not supported&quot;</span>
+            <span class="p">)</span>
+        <span class="n">signature_params</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># We will turn off signature validation for objects that didn&#39;t have</span>
+        <span class="c1"># a valid signature. This will enable us to do things like `build(dict, a=1)`</span>
+        <span class="n">target_has_valid_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># this properly resolves forward references, whereas the annotations</span>
+    <span class="c1"># from signature do not</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="s2">&quot;__init__&quot;</span><span class="p">):</span>
+            <span class="c1"># target is class object...</span>
+            <span class="c1"># calling `get_type_hints(target)` returns empty dict</span>
+            <span class="n">type_hints</span> <span class="o">=</span> <span class="n">get_type_hints</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">type_hints</span> <span class="o">=</span> <span class="n">get_type_hints</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="c1"># Covers case for ufuncs, which do not have inspectable type hints</span>
+        <span class="n">type_hints</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span>
+
+    <span class="n">sig_by_kind</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">_POSITIONAL_ONLY</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="n">_POSITIONAL_OR_KEYWORD</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="n">_VAR_POSITIONAL</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="n">_KEYWORD_ONLY</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="n">_VAR_KEYWORD</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">signature_params</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="n">sig_by_kind</span><span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">kind</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+    <span class="c1"># these are the names of the only parameters in the signature of `target` that can</span>
+    <span class="c1"># be referenced by name</span>
+    <span class="n">nameable_params_in_sig</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">chain</span><span class="p">(</span><span class="n">sig_by_kind</span><span class="p">[</span><span class="n">_POSITIONAL_OR_KEYWORD</span><span class="p">],</span> <span class="n">sig_by_kind</span><span class="p">[</span><span class="n">_KEYWORD_ONLY</span><span class="p">])</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">pos_args</span> <span class="ow">and</span> <span class="n">builds_bases</span><span class="p">:</span>
+        <span class="c1"># pos_args is potentially inherited</span>
+        <span class="k">for</span> <span class="n">_base</span> <span class="ow">in</span> <span class="n">builds_bases</span><span class="p">:</span>
+            <span class="n">pos_args</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">_base</span><span class="p">,</span> <span class="n">_POS_ARG_FIELD_NAME</span><span class="p">,</span> <span class="p">())</span>
+            <span class="k">if</span> <span class="n">pos_args</span><span class="p">:</span>
+                <span class="k">break</span>
+
+    <span class="n">fields_set_by_bases</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">_field</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">for</span> <span class="n">_base</span> <span class="ow">in</span> <span class="n">builds_bases</span>
+        <span class="k">for</span> <span class="n">_field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">(</span><span class="n">_base</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_field</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_HYDRA_FIELD_NAMES</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Validate that user-specified arguments satisfy target&#39;s signature.</span>
+    <span class="c1"># Should catch:</span>
+    <span class="c1">#    - bad parameter names</span>
+    <span class="c1">#    - too many parameters-by-position</span>
+    <span class="c1">#    - multiple values specified for parameter (via positional and by-name)</span>
+    <span class="c1">#</span>
+    <span class="c1"># We don&#39;t raise on an under-specified signature because it is possible that the</span>
+    <span class="c1"># resulting dataclass will simply be inherited from and extended.</span>
+    <span class="c1"># The issues we catch here cannot be fixed downstream.</span>
+    <span class="k">if</span> <span class="n">target_has_valid_signature</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">sig_by_kind</span><span class="p">[</span><span class="n">_VAR_KEYWORD</span><span class="p">]:</span>
+            <span class="c1"># check for unexpected kwargs</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs_for_target</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">nameable_params_in_sig</span><span class="p">:</span>
+                <span class="n">_unexpected</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs_for_target</span><span class="p">)</span> <span class="o">-</span> <span class="n">nameable_params_in_sig</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="n">_utils</span><span class="o">.</span><span class="n">building_error_prefix</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+                    <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;The following unexpected keyword argument(s) was specified for </span><span class="si">{</span><span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;via `builds`: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_unexpected</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">fields_set_by_bases</span> <span class="o">&lt;=</span> <span class="n">nameable_params_in_sig</span><span class="p">:</span>
+                <span class="n">_unexpected</span> <span class="o">=</span> <span class="n">fields_set_by_bases</span> <span class="o">-</span> <span class="n">nameable_params_in_sig</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="n">_utils</span><span class="o">.</span><span class="n">building_error_prefix</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+                    <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;The following unexpected keyword argument(s) for </span><span class="si">{</span><span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;was specified via inheritance from a base class: &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_unexpected</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pos_args</span><span class="p">:</span>
+            <span class="n">named_args</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs_for_target</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">fields_set_by_bases</span><span class="p">)</span>
+
+            <span class="c1"># indicates that number of parameters that could be specified by name,</span>
+            <span class="c1"># but are specified by position</span>
+            <span class="n">_num_nameable_args_by_position</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">pos_args</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">sig_by_kind</span><span class="p">[</span><span class="n">_POSITIONAL_ONLY</span><span class="p">])</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">named_args</span><span class="p">:</span>
+                <span class="c1"># check for multiple values for arg, specified both via positional and kwarg</span>
+                <span class="c1"># E.g.: def f(x, y): ...</span>
+                <span class="c1"># f(1, 2, y=3)  # multiple values for `y`</span>
+                <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">sig_by_kind</span><span class="p">[</span><span class="n">_POSITIONAL_OR_KEYWORD</span><span class="p">][</span>
+                    <span class="p">:</span><span class="n">_num_nameable_args_by_position</span>
+                <span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">named_args</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                            <span class="n">_utils</span><span class="o">.</span><span class="n">building_error_prefix</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+                            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;Multiple values for argument </span><span class="si">{</span><span class="n">param</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> were specified for &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2"> via `builds`&quot;</span>
+                        <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">sig_by_kind</span><span class="p">[</span>
+                <span class="n">_VAR_POSITIONAL</span>
+            <span class="p">]</span> <span class="ow">and</span> <span class="n">_num_nameable_args_by_position</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="n">sig_by_kind</span><span class="p">[</span><span class="n">_POSITIONAL_OR_KEYWORD</span><span class="p">]</span>
+            <span class="p">):</span>
+                <span class="c1"># Too many positional args specified.</span>
+                <span class="c1"># E.g.: def f(x, y): ...</span>
+                <span class="c1"># f(1, 2, 3)</span>
+                <span class="n">_num_positional</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sig_by_kind</span><span class="p">[</span><span class="n">_POSITIONAL_ONLY</span><span class="p">])</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span>
+                    <span class="n">sig_by_kind</span><span class="p">[</span><span class="n">_POSITIONAL_OR_KEYWORD</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="n">_num_with_default</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+                    <span class="n">p</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">empty</span>
+                    <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">kind</span> <span class="ow">is</span> <span class="n">_POSITIONAL_OR_KEYWORD</span>
+                    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">signature_params</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="n">_permissible</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_num_positional</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">_num_with_default</span>
+                    <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_num_positional</span> <span class="o">-</span> <span class="n">_num_with_default</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">_num_positional</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="n">_utils</span><span class="o">.</span><span class="n">building_error_prefix</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+                    <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2"> takes </span><span class="si">{</span><span class="n">_permissible</span><span class="si">}</span><span class="s2"> positional args, but &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">pos_args</span><span class="p">)</span><span class="si">}</span><span class="s2"> were specified via `builds`&quot;</span>
+                <span class="p">)</span>
+
+    <span class="c1"># Create valid dataclass fields from the user-specified values</span>
+    <span class="c1">#</span>
+    <span class="c1"># user_specified_params: arg-name -&gt; (arg-name, arg-type, field-w-value)</span>
+    <span class="c1">#  - arg-type: taken from the parameter&#39;s annotation in the target&#39;s signature</span>
+    <span class="c1">#    and is resolved to one of the type-annotations supported by hydra if possible,</span>
+    <span class="c1">#    otherwise, is Any</span>
+    <span class="c1">#  - arg-value: mutable values are automatically specified using default-factory</span>
+    <span class="n">user_specified_named_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">Field</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">name</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">_utils</span><span class="o">.</span><span class="n">sanitized_type</span><span class="p">(</span><span class="n">type_hints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">Any</span><span class="p">)),</span>
+            <span class="n">sanitized_default_value</span><span class="p">(</span><span class="n">value</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs_for_target</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">populate_full_signature</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="c1"># Populate dataclass fields based on the target&#39;s signature.</span>
+        <span class="c1">#</span>
+        <span class="c1"># A user-specified parameter value (via `kwargs_for_target`) takes precedent over</span>
+        <span class="c1"># the default-value from the signature</span>
+
+        <span class="c1"># Fields with default values must come after those without defaults,</span>
+        <span class="c1"># so we will collect these as we loop through the parameters and</span>
+        <span class="c1"># add them to the fields at the end.</span>
+        <span class="c1">#</span>
+        <span class="c1"># Parameter ordering should only differ from the target&#39;s signature</span>
+        <span class="c1"># if the user specified a value for a parameter that had no default</span>
+        <span class="n">_fields_with_default_values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Field_Entry</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># we need to keep track of what user-specified params we have set</span>
+        <span class="n">_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">signature_params</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pos_args</span><span class="p">):</span>
+                <span class="c1"># Positional parameters are populated from &quot;left to right&quot; in the signature.</span>
+                <span class="c1"># We have already done validation, so we know that positional params aren&#39;t redundant</span>
+                <span class="c1"># with named params (including inherited params).</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">nameable_params_in_sig</span><span class="p">:</span>
+                <span class="c1"># parameter cannot be specified by name</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">user_specified_named_params</span><span class="p">:</span>
+                <span class="c1"># user-specified parameter is preferred</span>
+                <span class="n">_fields_with_default_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">user_specified_named_params</span><span class="p">[</span><span class="n">param</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="n">_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">param</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">fields_set_by_bases</span><span class="p">:</span>
+                <span class="c1"># don&#39;t populate a parameter that can be derived from a base</span>
+                <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># any parameter whose default value is None is automatically</span>
+                <span class="c1"># annotated with `Optional[...]`. This improves flexibility with</span>
+                <span class="c1"># Hydra&#39;s type-validation</span>
+                <span class="n">param_field</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">param</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">_utils</span><span class="o">.</span><span class="n">sanitized_type</span><span class="p">(</span>
+                        <span class="n">type_hints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">Any</span><span class="p">),</span>
+                        <span class="n">wrap_optional</span><span class="o">=</span><span class="n">param</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">hydra_partial</span><span class="p">:</span>
+                        <span class="c1"># No default value specified in signature or by the user.</span>
+                        <span class="c1"># We don&#39;t include these fields if the user specified a partial build</span>
+                        <span class="c1"># because we assume that they want to fill these in by using partial</span>
+                        <span class="n">base_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param_field</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">param_field</span> <span class="o">+=</span> <span class="p">(</span><span class="n">sanitized_default_value</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">default</span><span class="p">),)</span>
+                    <span class="n">_fields_with_default_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param_field</span><span class="p">)</span>
+
+        <span class="n">base_fields</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">_fields_with_default_values</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">sig_by_kind</span><span class="p">[</span><span class="n">_VAR_KEYWORD</span><span class="p">]:</span>
+            <span class="c1"># if the signature has **kwargs, then we need to add any user-specified</span>
+            <span class="c1"># parameters that have not already been added</span>
+            <span class="n">base_fields</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="n">entry</span>
+                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">user_specified_named_params</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_seen</span>
+            <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">base_fields</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">user_specified_named_params</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+    <span class="k">if</span> <span class="n">dataclass_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">hydra_partial</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">dataclass_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Builds_</span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dataclass_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;PartialBuilds_</span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="n">make_dataclass</span><span class="p">(</span>
+        <span class="n">dataclass_name</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">base_fields</span><span class="p">,</span> <span class="n">bases</span><span class="o">=</span><span class="n">builds_bases</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="n">frozen</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">hydra_partial</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">_PARTIAL_TARGET_FIELD_NAME</span><span class="p">):</span>
+        <span class="c1"># `out._partial_target_` has been inherited; this will lead to an error when</span>
+        <span class="c1"># hydra-instantiation occurs, since it will be passed to target.</span>
+        <span class="c1"># There is not an easy way to delete this, since it comes from a parent class</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="n">_utils</span><span class="o">.</span><span class="n">building_error_prefix</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot;`builds(..., hydra_partial=False, builds_bases=(...))` does not &quot;</span>
+            <span class="s2">&quot;permit `builds_bases` where a partial target has been specified.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">out</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;A structured config designed to </span><span class="si">{</span><span class="s1">&#39;partially &#39;</span> <span class="k">if</span> <span class="n">hydra_partial</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">initialize/call &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2">` upon instantiation by hydra.&quot;</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;__doc__&quot;</span><span class="p">):</span>
+        <span class="n">target_doc</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="vm">__doc__</span>
+        <span class="k">if</span> <span class="n">target_doc</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">The docstring for </span><span class="si">{</span><span class="n">_utils</span><span class="o">.</span><span class="n">safe_name</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2"> :</span><span class="se">\n\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">target_doc</span>
+            <span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021 Massachusetts Institute of Technology.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

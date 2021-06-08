@@ -1,0 +1,296 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Overview of hydra-zen &mdash; hydra-zen 0+untagged.1.g641c38c documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/my_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning" href="pytorch_lightning_example.html" />
+    <link rel="prev" title="Installation and Basic Usage" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> hydra-zen
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation and Basic Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Overview of hydra-zen</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-hydra">What is Hydra?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-hydra-zen">What is hydra-zen?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pytorch_lightning_example.html">Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structured_configs.html">Dynamically Generating Structured Configs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="experimental.html">Running Experiments with Hydra</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">hydra-zen</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Overview of hydra-zen</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/overview.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="overview-of-hydra-zen">
+<h1>Overview of hydra-zen<a class="headerlink" href="#overview-of-hydra-zen" title="Permalink to this headline">¶</a></h1>
+<p>hydra-zen provides simple, Hydra-compatible tools that enable Python-centric workflows for designing, configuring, and running large-scale projects, such as machine learning experiments.
+These functions can be broken down into two categories:</p>
+<ol class="arabic simple">
+<li><p>Functions like <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> and <a class="reference internal" href="generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-func docutils literal notranslate"><span class="pre">just()</span></code></a> make it simple to dynamically <a class="reference internal" href="structured_configs.html"><span class="doc">generate and compose structured configurations</span></a> of your code.</p></li>
+<li><p><a class="reference internal" href="generated/hydra_zen.experimental.hydra_run.html#hydra_zen.experimental.hydra_run" title="hydra_zen.experimental.hydra_run"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_run()</span></code></a> and <a class="reference internal" href="generated/hydra_zen.experimental.hydra_multirun.html#hydra_zen.experimental.hydra_multirun" title="hydra_zen.experimental.hydra_multirun"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_multirun()</span></code></a> make it possible to <a class="reference internal" href="experimental.html"><span class="doc">launch Hydra jobs</span></a> and access their results from within a Python session instead of from the commandline. This means that Hydra’s powerful plugins – <a class="reference external" href="https://hydra.cc/docs/next/plugins/ax_sweeper">parameter sweepers</a> and various <a class="reference external" href="https://hydra.cc/docs/next/plugins/submitit_launcher">job-launchers</a> – can be leveraged within a Jupyter notebook or any other Python process.</p></li>
+</ol>
+<p>Libraries like <a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/latest/">PyTorch Lightning</a> help to eliminate boilerplate
+code – for-loops and other control-flow logic – associated with training and testing a neural network;
+Hydra with hydra-zen follows suite and eliminates the code you would write to configure, orchestrate, and organize the results of your various experiments.</p>
+<div class="section" id="what-is-hydra">
+<h2>What is Hydra?<a class="headerlink" href="#what-is-hydra" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/facebookresearch/hydra">Hydra</a> is a framework for elegantly configuring applications, such as a web app, and launching them from the commandline.
+It provides a specification for writing rich, yaml-serializable configurations for your code.
+It also makes simple the process of configuring and launching instances of your application from the commandline using various launchers and parameter-sweeper plugins.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 35%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Configuration (yaml)</p></th>
+<th class="head"><p>Application</p></th>
+<th class="head"><p>Launch with Overrides</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">db</span><span class="p">:</span>
+ <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">postgres</span>
+ <span class="nt">host</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">localhost</span>
+ <span class="nt">port</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5342</span>
+</pre></div>
+</div>
+</td>
+<td><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hydra</span>
+<span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">OmegaConf</span>
+
+<span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">config_name</span><span class="o">=</span><span class="s2">&quot;config&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">my_app</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">OmegaConf</span><span class="o">.</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">cfg</span><span class="p">))</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">my_app</span><span class="p">()</span>
+</pre></div>
+</div>
+</td>
+<td><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python my_app.py db.port<span class="o">=</span><span class="m">8888</span>
+db:
+  type: postgres
+  host: localhost
+  port: <span class="m">8888</span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Hydra will also handle directory management so that logs and results from a given job are organized automatically.</p>
+<p>Check out Hydra’s <a class="reference external" href="https://hydra.cc/">great documentation</a> that explains its design and purpose; it has detailed tutorials as well. And give it a star <a class="reference external" href="https://github.com/facebookresearch/hydra">on Github</a> if you haven’t already!</p>
+</div>
+<div class="section" id="what-is-hydra-zen">
+<h2>What is hydra-zen?<a class="headerlink" href="#what-is-hydra-zen" title="Permalink to this headline">¶</a></h2>
+<p>hydra-zen is fully compatible with Hydra.
+It provides tools that:</p>
+<p><strong>Make it easy and ergonomic to dynamically generate structured configurations of your code as well as code from third-party libraries.</strong></p>
+<blockquote>
+<div><p>This replaces the cumbersome process of manually-defining configs or relying on statically-generated code.
+While Hydra excels at configuring and launching traditional software applications, hydra-zen is designed with data science and machine learning practitioners in mind: users whose code may have <em>many</em> intricately-configurable components and where manually-defined configs become a <a class="reference internal" href="structured_configs.html#dry"><span class="std std-ref">hotspot for repetitious and error-prone workflows</span></a></p>
+</div></blockquote>
+<p><strong>Enable Hydra-based work flows that are Python-centric rather than being CLI-centric.</strong></p>
+<blockquote>
+<div><p>hydra-zen targets the user whose end goal is not necessarily to launch a configurable app from the command line, but to run experiments/analysis in a way that is repeatable, scalable, and self-documenting.</p>
+</div></blockquote>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="pytorch_lightning_example.html" class="btn btn-neutral float-right" title="Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation and Basic Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021 Massachusetts Institute of Technology.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
