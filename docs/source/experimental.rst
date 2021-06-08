@@ -14,11 +14,14 @@ API Reference
    hydra_multirun
 
 
-Launching Hydra Jobs
-====================
+Launching Hydra Jobs in Python
+==============================
 
-Using a defined task function and a configuration (we will focus on Structured Configs [1]_),
-a Hydra application is defined by decorating the task function with ``@hydra.main`` with a configuration name.
+hydra-zen includes experimental code for running Hydra jobs purely in Python for both single and multi-run jobs.
+`hydra_run` and `hydra_multirun` both initialize and run Hydra and therefore provide all the benefits of Hydra's job and logging configurations.
+See Configuring Hydra [2]_ for more details on customizing Hydra.
+
+To demonstrate the difference between running Hydra CLI and hydra-zen start by defining a Hydra application:
 
 .. code-block:: python
    :caption: my_app.py
@@ -44,68 +47,62 @@ a Hydra application is defined by decorating the task function with ``@hydra.mai
     if __name__ == "__main__":
         task_function()
 
-Using the Hydra Command Line Interface (CLI), the application can be run by::
+Using the Hydra CLI, the application can be run with following command::
 
     $  python my_app.py bar=mom
     hello mom
 
-hydra-zen provides functionality to execute Hydra for both single or multirun mode in an interactive environment such as the Jupyter Notebook
-by providing two experimental functions, ``hydra_run`` and ``hydra_multirun``, that mimic the behavior of Hydra's CLI.
-Using ``hydra-run`` we can run our application in an interactive environment::
+To execute the same command in a Python environment using `hydra_run`, simply execute the following:
 
   >>> from my_app import MyExperiment, task_function
   >>> from hydra_zen.experimental import hydra_run
   >>> job = hydra_run(MyExperiment, task_function, overrides=["bar=mom"])
   hello mom
 
-In addition to running the experiments we also have the return object. For the above application the return object is a
-Hydra ``JobReturn`` object with the following attributes:
+In addition to running the experiments in a Pythonic way, we also have the return object from the experiment.
+For the above application the return object is a Hydra ``JobReturn`` object with the following attributes:
 
-  - overrides: From `overrides` input
-  - return_value: The return value of the task function
-  - cfg: The configuration object sent to the task function
-  - hydra_cfg: The hydra configuration object
-  - working_dir: The experiment working directory
-  - task_name: The task name of the Hydra job
+  - ``overrides``: Reflects the ``overrides`` input
+  - ``return_value``: The return value of the task function
+  - ``cfg``: The configuration object sent to the task function
+  - ``hydra_cfg``: The hydra configuration object
+  - ``working_dir``: The experiment working directory
+  - ``task_name``: The task name of the Hydra job
 
-Next, run a Hydra Multirun [3]_ to sweep over parameters using the Hydra CLI::
+Next, the following executes a Hydra Multirun [3]_ job from the CLI and sweeps over parameters
 
-    $  python my_app.py bar=mom,dad --multirun
-    [2021-05-08 21:07:10,209][HYDRA] Launching 2 jobs locally
-    [2021-05-08 21:07:10,209][HYDRA]        #0 : bar=mom
-    hello mom
-    [2021-05-08 21:07:10,279][HYDRA]        #1 : bar=dad
-    hello dad
+.. code-block:: shell
 
-The equivalent ``hydra_multirun`` is::
+   $  python my_app.py bar=mom,dad --multirun
+   [2021-05-08 21:07:10,209][HYDRA] Launching 2 jobs locally
+   [2021-05-08 21:07:10,209][HYDRA]        #0 : bar=mom
+   hello mom
+   [2021-05-08 21:07:10,279][HYDRA]        #1 : bar=dad
+   hello dad
 
-    >>> from my_app import MyExperiment, task_function
-    >>> from hydra_zen.experimental import hydra_multirun
-    >>> job = hydra_multirun(MyExperiment, task_function, overrides=["bar=mom,dad"])
-    [2021-05-08 21:04:35,898][HYDRA] Launching 2 jobs locally
-    [2021-05-08 21:04:35,899][HYDRA]        #0 : bar=mom
-    hello mom
-    [2021-05-08 21:04:35,980][HYDRA]        #1 : bar=dad
-    hello dad
+The equivalent ``hydra_multirun`` commands are
 
-An important note, since these functions execute Hydra we get all the benefits of Hydra's job configuration and logging.
-Simply add the desired overrides as you would via the Hydra CLI.
-See Configuring Hydra [2]_ for more details on customizing Hydra.
+.. code-block:: python
+
+   >>> from my_app import MyExperiment, task_function
+   >>> from hydra_zen.experimental import hydra_multirun
+   >>> job = hydra_multirun(MyExperiment, task_function, overrides=["bar=mom,dad"])
+   [2021-05-08 21:04:35,898][HYDRA] Launching 2 jobs locally
+   [2021-05-08 21:04:35,899][HYDRA]        #0 : bar=mom
+   hello mom
+   [2021-05-08 21:04:35,980][HYDRA]        #1 : bar=dad
+   hello dad
 
 
-Examples
-========
+Configure with ``builds`` and ``dict``
+**************************************
 
-Return a Simple Dictionary
-**************************
-
-Here we demonstrate some simple examples of running Hydra experiments with hydra-zen.
-First lets illustrate the behavior of using ``builds``, ``instantiate``, and ``hydra_run``:
+The simplest way to create configuration is to use ``builds`` to generate Structured Configs [1]_ or just use simple dictionaries.
+First let's demonstrate using ``builds``.
 
 .. code:: python
 
     >>> from hydra_zen import instantiate, builds
-    >>> from hydra_zen.experimental import hydra_run
     >>> job = hydra_run(builds(dict, a=1, b=1), task_function=instantiate)
     >>> job.return_value
     {'a': 1, 'b': 1}
@@ -115,56 +112,68 @@ Next, launch a Hydra Multirun [3]_ job to sweep over configuration parameters:
 
 .. code:: python
 
-    >>> from hydra_zen import builds, instantiate
-    >>> from hydra_zen.experimental import hydra_multirun
-    >>> job = hydra_multirun(
-    ...     builds(dict, a=1, b=1),
-    ...     task_function=instantiate,
-    ...     overrides=["a=1,2"],
-    ... )
-    >>> [j.return_value for j in job[0]]
-    [{'a': 1, 'b': 1}, {'a': 2, 'b': 1}]
+   >>> job = hydra_multirun(
+   ...     builds(dict, a=1, b=1),
+   ...     task_function=instantiate,
+   ...     overrides=["a=1,2"],
+   ... )
+   [2021-05-19 17:39:46,260][HYDRA] Launching 2 jobs locally
+   [2021-05-19 17:39:46,261][HYDRA] 	#0 : a=1
+   [2021-05-19 17:39:46,350][HYDRA] 	#1 : a=2
+   >>> [j.return_value for j in job[0]]
+   [{'a': 1, 'b': 1}, {'a': 2, 'b': 1}]
 
 
-Using Partial Functions
-***********************
-
-Now lets demonstrate the use of building partial configurations with hydra-zen.
+Now let's demonstrate building a dictionary configuration.
 Here we build a configuration to square an input using the ``pow`` function:
 
 .. code:: python
 
-    >>> from hydra_zen.experimental import hydra_run
-    >>> from hydra_zen import builds, instantiate
-    >>> cfg = dict(f=builds(pow, exp=2, hydra_partial=True), x=10)
-    >>> def task_function(cfg):
-    ...    return instantiate(cfg.f)(cfg.x)
-    >>> job = hydra_run(cfg, task_function)
-    >>> job.return_value
-    100
+   >>> from omegaconf import DictConfig
+   >>> cfg = dict(f=builds(pow, exp=2, hydra_partial=True), x=10)
+   >>> def task_function(cfg: DictConfig):
+   ...     return instantiate(cfg.f)(cfg.x) # computes x ** 2
+   >>> job = hydra_run(cfg, task_function)
+   >>> job.return_value
+   100
 
-Notice the task function must instantiate the partial function and then evaluate on the desired parameter ``x``.
-Here is the same code using a multirun experiment:
+First note that the input to the task function is a configuration object, ``DictConfig``: Hydra will automatically transform our dictionary in this way.
+Also, this task function is responsible for instantiating the partial function and then evaluating it on the desired configured value for ``x``.
+
+Here we perform a multi-run for a range of values of ``x``:
 
 .. code:: python
 
-    >>> cfg = dict(f=builds(pow, exp=2, hydra_partial=True), x=1)
-    >>> def task_function(cfg):
-    ...    return instantiate(cfg.f)(cfg.x)
-    >>> jobs = hydra_multirun(cfg, task_function, overrides=["x=range(-2,3)"])
-    >>> [j.return_value for j in jobs[0]]
-    [4, 1, 0, 1, 4]
+   >>> cfg = dict(f=builds(pow, exp=2, hydra_partial=True), x=1)
+   >>> def task_function(cfg: DictConfig):
+   ...    return instantiate(cfg.f)(cfg.x)
+   >>> jobs = hydra_multirun(cfg, task_function, overrides=["x=range(-2,3)"])
+   [2021-05-19 17:40:38,966][HYDRA] Launching 5 jobs locally
+   [2021-05-19 17:40:38,967][HYDRA] 	#0 : x=-2
+   [2021-05-19 17:40:39,054][HYDRA] 	#1 : x=-1
+   [2021-05-19 17:40:39,184][HYDRA] 	#2 : x=0
+   [2021-05-19 17:40:39,276][HYDRA] 	#3 : x=1
+   [2021-05-19 17:40:39,365][HYDRA] 	#4 : x=2
+   >>> [j.return_value for j in jobs[0]]
+   [4, 1, 0, 1, 4]
 
 
 Registering Configs for ``overrides``
 *************************************
 
-Consider the experiment demonstrated in the ``README`` to minimizing a function using gradient descent:
+Consider the experiment demonstrated in the `README <https://github.com/mit-ll-responsible-ai/hydra-zen>`_ to minimizing the following ``parabaloid`` function,
 
 .. code:: python
 
-    # Setting up our code...
-    # This does not involve hydra-zen in any way.
+    # defines our surface that we will be descending
+    def parabaloid(x, y):
+        return 0.1 * x ** 2 + 0.2 * y ** 2
+
+
+using gradient descent.
+
+.. code:: python
+
     import torch
     import numpy
 
@@ -198,12 +207,6 @@ Consider the experiment demonstrated in the ``README`` to minimizing a function 
             trajectory.append(xy.detach().clone().numpy())
         return numpy.stack(trajectory)
 
-    # Using hydra-zen to configure our code
-    from hydra_zen import builds, just
-
-    # defines our surface that we will be descending
-    def parabaloid(x, y):
-        return 0.1 * x ** 2 + 0.2 * y ** 2
 
 Instead of running an experiment by varying the momentum of ``SGD``, what if we wanted to vary the optimizer itself?
 To do this without ever leaving Python we must take advantage of Hydra's Config Store API [5]_.
@@ -214,68 +217,81 @@ To do this without ever leaving Python we must take advantage of Hydra's Config 
     from torch.optim import Optimizer, SGD, Adam
     from hydra_zen import builds
 
-    OptimConf = builds(Optimizer)
-    SGDConf = builds(SGD, lr=0.3, momentum=0.0, hydra_partial=True, builds_bases=(OptimConf,)),
-    AdamConf = builds(Adam, lr=0.3, hydra_partial=True, builds_bases=(OptimConf,)),
+    SGDConf = builds(SGD, lr=0.3, momentum=0.0, hydra_partial=True)
+    AdamConf = builds(Adam, lr=0.3, hydra_partial=True)
 
     cs = ConfigStore.instance()
     cs.store(group="optim", name="sgd", node=SGDConf)
     cs.store(group="optim", name="adam", node=AdamConf)
 
-Note that both ``SGDConf`` and ``AdamConf`` must inherit ``OptimConf`` otherwise Hydra's config validation will raise a ``ConfigCompositionException``.
 Now define the experiment configuration.
 
 .. code:: python
 
     ConfigGradDesc = builds(
         gradient_descent,
-        optim=SGDConf,
+        optim=None,  # not defined yet
         landscape_fn=parabaloid,
         starting_xy=(-1.5, 0.5),
         num_steps=20,
     )
 
-First, test running the default experiment.
+Notice that we have not set a default for the optimizer.
+This is the safest way to avoid Hydra raising a ``ConfigCompositionException``.
+To run the default experiment with ``SGD``, simply set the optimizer using ``overrides``:
 
 .. code:: python
 
-    >>> from hydra_zen.experimental import hydra_run
-    >>> jobs = hydra_multirun(
+    >>> jobs = hydra_run(
     ...     ConfigGradDesc,
     ...     task_function=instantiate,
-    ...     overrides=["optim=sgd"],
+    ...     overrides=["+optim=sgd"],
     ... )
+    >>> jobs.return_value
+    array([[-1.5000000e+00,  5.0000000e-01],
+       [-1.3500000e+00,  4.0000001e-01],
+       ...
+       [ 5.2183308e-04,  1.3997487e-04]], dtype=float32)
 
 
 Next run the experiment by varying the optimizer.
 
 .. code:: python
 
-    >>> from hydra_zen.experimental import hydra_multirun
-    >>> jobs = hydra_multirun(
+    >>> jobs, = hydra_multirun(
     ...     ConfigGradDesc,
     ...     task_function=instantiate,
-    ...     overrides=["optim=sgd,adam"],
+    ...     overrides=["+optim=sgd,adam"],
     ... )
+    [2021-05-12 10:07:41,554][HYDRA] Launching 2 jobs locally
+    [2021-05-12 10:07:41,554][HYDRA] 	#0 : +optim=sgd
+    [2021-05-12 10:07:41,652][HYDRA] 	#1 : +optim=adam
+    >>> jobs[1].return_value  # the result for the Adam optimizer
+    array([[-1.50000000e+00,  5.00000000e-01],
+       [-1.40999997e+00,  4.39999998e-01],
+       ...
+       [-8.69980082e-02, -7.18786498e-04]], dtype=float32)
 
 
-Random Search Optimization
-**************************
+Example Sweeper Application
+***************************
 
 This example shows how to build a Hydra Sweeper [4]_ for doing random search optimization with hydra-zen.
-First lets build the Hydra Sweeper function:
+First let's build the Hydra Sweeper function:
 
 .. code:: python
 
     import random
-    from typing import List, Optional
+    from typing import Dist, List, Optional, Tuple
 
+    from omegaconf import DictConfig
     from hydra import TaskFunction
     from hydra.core.config_loader import ConfigLoader
     from hydra.core.override_parser.overrides_parser import OverridesParser
     from hydra.plugins.sweeper import Sweeper
+    from hydra.types import HydraContext
+
     from hydra_zen import instantiate
-    from omegaconf import DictConfig
 
 
     class RandomSearchSweeper(Sweeper):
@@ -287,23 +303,23 @@ First lets build the Hydra Sweeper function:
 
         def setup(
             self,
-            config: DictConfig,
-            config_loader: ConfigLoader,
+            *,
+            hydra_context: HydraContext,
             task_function: TaskFunction,
+            config: DictConfig,
         ) -> None:
             self.job_idx = 0
+            self.hydra_context = hydra_context
             self.config = config
-            self.config_loader = config_loader
 
             self.launcher = instantiate(config.hydra.launcher)
-            # assert isinstance(launcher, Launcher)
             self.launcher.setup(
                 config=config,
-                config_loader=config_loader,
                 task_function=task_function,
+                hydra_context=hydra_context,
             )
 
-        def sweep(self, arguments: List[str]) -> None:
+        def sweep(self, arguments: List[str]) -> Tuple[Dict, List]:
             parser = OverridesParser.create()
             parsed = parser.parse_overrides(arguments)
 
@@ -313,9 +329,6 @@ First lets build the Hydra Sweeper function:
                 val = override.value()
                 if override.is_interval_sweep():
                     param_bounds[key] = [val.start, val.end]
-
-            direction = -1 if self.opt_config.maximize else 1
-            name = "maximization" if self.opt_config.maximize else "minimization"
 
             all_results = []
             best_score = None
@@ -329,13 +342,7 @@ First lets build the Hydra Sweeper function:
                 returns = self.launcher.launch(overrides, initial_job_idx=self.job_idx)
                 score = returns[0].return_value
 
-                if best_score is None:
-                    best_score = score
-                    best_solution = new_solution
-                elif score > best_score and self.opt_config.maximize:
-                    best_score = score
-                    best_solution = new_solution
-                elif score < best_score and not self.opt_config.maximize:
+                if best_score is None or score < best_score:
                     best_score = score
                     best_solution = new_solution
 
@@ -349,7 +356,7 @@ First lets build the Hydra Sweeper function:
             }
             return results_to_serialize, all_results
 
-If we are to configure our Hydra application to use this sweeper we must use Hydra's Config Store API [5]_ to ensure the configuration is available to your Hydra application.
+To configure our Hydra application with this sweeper we must use Hydra's Config Store API [5]_ to ensure the configuration is available to our Hydra application.
 
 .. code:: python
 
@@ -357,13 +364,13 @@ If we are to configure our Hydra application to use this sweeper we must use Hyd
     from hydra_zen import builds
 
     RandomSearchSweeperConf = builds(
-        RandomSearchSweeper, optim=dict(x=0, y=12, maximize=False, max_iter=10)
+        RandomSearchSweeper, optim=dict(x=0, y=12, max_iter=10)
     )
 
     cs = ConfigStore.instance()
     cs.store(group="hydra/sweeper", name="test_sweeper", node=RandomSearchSweeperConf)
 
-Next lets build the function to minimize and define the task function:
+Next let's build the function to minimize and define the task function:
 
 .. code:: python
 
@@ -393,7 +400,7 @@ The return value is the solution along with all the intermediate results:
 
 .. code:: python
 
-    >>> job.return_value
+    >>> job
     ({'best_evaluated_params': {'x': 1.4667823674518203, 'y': -1.193575968925213},
     'best_evaluated_result': 15.547488823704768},
     [{'x': 6.677158827229356, 'y': 9.118453646915974},

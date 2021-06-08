@@ -4,12 +4,13 @@
 import os
 
 import pytest
+from hydra import compose, initialize
 from hydra.core.config_store import ConfigStore
 from hydra.errors import ConfigCompositionException
 
 from hydra_zen import builds, instantiate
 from hydra_zen.experimental import hydra_multirun, hydra_run
-from hydra_zen.experimental._implementations import _load_config, _store_config
+from hydra_zen.experimental._implementations import _store_config
 
 
 @pytest.mark.usefixtures("cleandir")
@@ -23,14 +24,18 @@ from hydra_zen.experimental._implementations import _load_config, _store_config
         ],
     ],
 )
-@pytest.mark.parametrize("hydra_overrides", [None, ["hydra.run.dir=test"]])
+@pytest.mark.parametrize("hydra_overrides", [[], ["hydra.run.dir=test"]])
 def test_hydra_run_with_hydra_in_config(overrides, hydra_overrides, expected):
     # validate hydra_launch executes properly if config contains
     # hydra configuration object
     cn = _store_config(builds(dict, a=1, b=1))
-    task_cfg = _load_config(cn, overrides=hydra_overrides)
+    with initialize(config_path=None):
+        task_cfg = compose(
+            config_name=cn, overrides=hydra_overrides, return_hydra_config=True
+        )
+
     assert "hydra" in task_cfg
-    if hydra_overrides is not None:
+    if len(hydra_overrides) > 0:
         assert task_cfg.hydra.run.dir == "test"
 
     # Provide user override
@@ -56,14 +61,18 @@ def test_hydra_run_with_hydra_in_config(overrides, hydra_overrides, expected):
         ],
     ],
 )
-@pytest.mark.parametrize("hydra_overrides", [None, ["hydra.sweep.dir=test"]])
+@pytest.mark.parametrize("hydra_overrides", [[], ["hydra.sweep.dir=test"]])
 def test_hydra_multirun_with_hydra_in_config(overrides, hydra_overrides, expected):
     # validate hydra_launch executes properly if config contains
     # hydra configuration object
     cn = _store_config(builds(dict, a=1, b=1))
-    task_cfg = _load_config(cn, overrides=hydra_overrides)
+    with initialize(config_path=None):
+        task_cfg = compose(
+            config_name=cn, overrides=hydra_overrides, return_hydra_config=True
+        )
+
     assert "hydra" in task_cfg
-    if hydra_overrides is not None:
+    if len(hydra_overrides) > 0:
         assert task_cfg.hydra.sweep.dir == "test"
 
     # Provide user override
