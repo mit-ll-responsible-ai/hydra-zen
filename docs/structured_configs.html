@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Dynamically Generating Structured Configs &mdash; hydra-zen 0+untagged.1.g641c38c documentation</title>
+  <title>Dynamically Generating Structured Configs &mdash; hydra-zen 0+untagged.1.g191c188 documentation</title>
   
 
   
@@ -663,12 +663,11 @@ Thus we can use <a class="reference internal" href="generated/hydra_zen.builds.h
 <span class="go">__main__.func takes 1 positional args, but 2 were specified via `builds`</span>
 </pre></div>
 </div>
-<p>Because <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> automatically mirror’s type annotations from the target’s signature, we also benefit from Hydra’s type-validation mechanism.</p>
+<p>Because <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> automatically mirrors type annotations from the target’s signature, we also benefit from Hydra’s type-validation mechanism.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">parameter</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span> <span class="k">pass</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">builds</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">a_number</span><span class="o">=</span><span class="s2">&quot;a string&quot;</span><span class="p">))</span>
-<span class="go">---------------------------------------------------------------------------</span>
-<span class="go">TypeError: Building: func ..</span>
-<span class="go">The following unexpected keyword argument(s) was specified for __main__.func via `builds`: a_number</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">builds</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">parameter</span><span class="o">=</span><span class="s2">&quot;a string&quot;</span><span class="p">))</span>
+<span class="go">---------------------------------------------------------------------------------</span>
+<span class="go">ValidationError: Invalid value assigned : str is not a int.</span>
 </pre></div>
 </div>
 </div>

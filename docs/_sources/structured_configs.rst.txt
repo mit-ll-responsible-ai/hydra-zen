@@ -498,17 +498,15 @@ Misspelled parameter names and other invalid configurations for the target's sig
    __main__.func takes 1 positional args, but 2 were specified via `builds`
 
 
-Because `builds` automatically mirror's type annotations from the target's signature, we also benefit from Hydra's type-validation mechanism.
+Because `builds` automatically mirrors type annotations from the target's signature, we also benefit from Hydra's type-validation mechanism.
 
 
 .. code:: python
 
    >>> def func(parameter: int): pass
-   >>> instantiate(builds(func, a_number="a string"))
-   ---------------------------------------------------------------------------
-   TypeError: Building: func ..
-   The following unexpected keyword argument(s) was specified for __main__.func via `builds`: a_number
-
+   >>> instantiate(builds(func, parameter="a string"))
+   ---------------------------------------------------------------------------------
+   ValidationError: Invalid value assigned : str is not a int.
 
 Automatic Type Refinement
 =========================
