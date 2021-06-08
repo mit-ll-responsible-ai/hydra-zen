@@ -3,7 +3,6 @@
 from pathlib import Path
 from typing import Any, Callable, List, Mapping, Optional, Union
 
-from hydra import compose, initialize
 from hydra._internal.callbacks import Callbacks
 from hydra._internal.hydra import Hydra
 from hydra._internal.utils import create_config_search_path
@@ -48,45 +47,6 @@ def _store_config(
     cs = ConfigStore().instance()
     cs.store(name=config_name, node=cfg)
     return config_name
-
-
-def _load_config(
-    config_name: Optional[str] = None, overrides: Optional[List[str]] = None
-) -> DictConfig:
-    """Generates the configuration object including Hydra configurations.
-
-    Parameters
-    ----------
-    config_name: Optional[str] (default: None)
-        The configuration name used to store the default configuration.
-
-    overrides: Optional[List[str]] (default: None)
-        If provided, overrides default configurations, see [2]_ and [3]_.
-
-    Returns
-    -------
-    config: DictConfig
-        The configuration object including Hydra configuration.
-
-    Notes
-    -----
-    This function uses Hydra's Compose API [1]_
-
-    References
-    ----------
-    .. [1] https://hydra.cc/docs/next/advanced/compose_api
-    .. [2] https://hydra.cc/docs/next/configure_hydra/intro
-    .. [3] https://hydra.cc/docs/next/advanced/override_grammar/basic
-    """
-
-    with initialize(config_path=None):
-        task_cfg = compose(
-            config_name,
-            overrides=[] if overrides is None else overrides,
-            return_hydra_config=True,
-        )
-
-    return task_cfg
 
 
 def hydra_run(

@@ -4,12 +4,13 @@
 from pathlib import Path
 
 import pytest
+from hydra import compose, initialize
 from hydra.core.config_store import ConfigStore
 from omegaconf.omegaconf import OmegaConf
 
 from hydra_zen import builds, instantiate
 from hydra_zen.experimental import hydra_multirun, hydra_run
-from hydra_zen.experimental._implementations import _load_config, _store_config
+from hydra_zen.experimental._implementations import _store_config
 
 
 @pytest.mark.parametrize("as_dataclass", [True, False])
@@ -52,7 +53,8 @@ def test_hydra_run_config_type(
             cfg = OmegaConf.create(cfg)
         else:
             cn = _store_config(cfg)
-            cfg = _load_config(cn)
+            with initialize(config_path=None):
+                cfg = compose(config_name=cn)
 
     job = runmode(cfg, task_function=instantiate)
     if isinstance(job, list):
