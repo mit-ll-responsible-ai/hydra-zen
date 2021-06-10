@@ -39,14 +39,17 @@ partial_out_f_via_instance: Partial[f_sig] = instantiate(conf_f_partial_instance
 conf_A_1: Type[Builds[Type[A]]] = builds(A, hydra_partial=False)
 should_be_a_again: A = instantiate(conf_A_1)
 
-conf_f_1: Builds[f_sig] = builds(f, hydra_partial=False)
+conf_f_1: Type[Builds[f_sig]] = builds(f, hydra_partial=False)
 should_be_int: int = instantiate(conf_f_1)
 
 # test builds(...)
-conf_A_2: Builds[Type[A]] = builds(A)
+conf_A_2: Type[Builds[Type[A]]] = builds(A)
 should_be_a_again_again: A = instantiate(conf_A_2)
 
-conf_f_2: Builds[f_sig] = builds(f)
+conf_a_instance: Builds[Type[A]] = conf_A_2()
+should_be_a_via_instance: A = instantiate(conf_a_instance)
+
+conf_f_2: Type[Builds[f_sig]] = builds(f)
 should_be_int_again: int = instantiate(conf_f_2)
 
 # test just(...)
