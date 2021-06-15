@@ -22,7 +22,7 @@ CLASSIFIERS = [
 ]
 KEYWORDS = "machine learning research configuration scalable reproducible"
 INSTALL_REQUIRES = [
-    "hydra-core >= 1.1.0dev7",
+    "hydra-core >= 1.1.0",
     "typing-extensions >= 3.7.4.1",
 ]
 TESTS_REQUIRE = [
