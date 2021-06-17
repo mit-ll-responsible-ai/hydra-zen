@@ -15,6 +15,7 @@ CLASSIFIERS = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
@@ -32,7 +33,19 @@ TESTS_REQUIRE = [
 
 DESCRIPTION = "Utilities for making hydra scale to ML workflows"
 LONG_DESCRIPTION = """
-TBD
+hydra-zen helps you configure your project using the power of Hydra, while enjoying the Zen of Python!
+
+hydra-zen eliminates the boilerplate code that you write to configure, orchestrate, and organize the results of large-scale projects, such as machine learning experiments. It does so by providing Hydra-compatible tools that dynamically generate "structured configurations" of your code, and enables Python-centric workflows for running configured instances of your code.
+
+hydra-zen offers:
+
+    - Functions for automatically and dynamically generating structured configs that can be used to fully or partially instantiate objects in your application.
+    - The ability to launch Hydra jobs, complete with parameter sweeps and multi-run configurations, from within a notebook or any other Python environment.
+    - Incisive type annotations that provide enriched context about your project's configurations to IDEs, type checkers, and other tooling.
+    - Runtime validation of configurations to catch mistakes before your application launches.
+    - Equal support for both object-oriented libraries (e.g., torch.nn) and functional ones (e.g., jax and numpy).
+
+These functions and capabilities can be used to great effect alongside PyTorch Lightning to design boilerplate-free machine learning projects!
 """
 
 
