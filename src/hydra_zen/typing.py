@@ -48,6 +48,7 @@ class DataClass(Protocol):
 class Builds(DataClass, Protocol[_T]):  # pragma: no cover
     def __init__(self, *args, **kwargs) -> None:
         ...
+
     _target_: str
 
 

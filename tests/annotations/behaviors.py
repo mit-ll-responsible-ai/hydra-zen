@@ -85,7 +85,7 @@ b.x = 3
 
 # Check that `Builds` constructor can take arguments
 X = builds(dict, a=1)
-y = X(a=10)  # Error: Expected no arguments to Builds constructor
+y = X(a=10)
 
 
 def g(x: int, y: float) -> str:
