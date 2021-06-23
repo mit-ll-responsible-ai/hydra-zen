@@ -81,5 +81,10 @@ class B:
     x: int
 
 
+# Check that @hydrated_dataclass reveals init/attr info
 b = B(x=2)
 b.x = 3
+
+# Check that `Builds` constructor can take arguments
+X = builds(dict, a=1)
+y = X(a=10)   # Error: Expected no arguments to Builds constructor
