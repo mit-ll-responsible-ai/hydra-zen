@@ -63,8 +63,8 @@ def instantiate(
 
 @overload
 def instantiate(
-    config: PartialBuilds[Callable_T], *args: Any, **kwargs: Any
-) -> Partial[Callable_T]:  # pragma: no cover
+    config: PartialBuilds[Callable[..., T]], *args: Any, **kwargs: Any
+) -> Partial[T]:  # pragma: no cover
     ...
 
 
