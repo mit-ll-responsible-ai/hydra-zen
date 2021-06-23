@@ -32,8 +32,6 @@ __all__ = ["instantiate", "to_yaml", "save_as_yaml", "load_from_yaml", "MISSING"
 
 T = TypeVar("T")
 
-Callable_T = TypeVar("Callable_T", bound=Callable)
-
 
 @overload
 def instantiate(
@@ -63,8 +61,8 @@ def instantiate(
 
 @overload
 def instantiate(
-    config: PartialBuilds[Callable_T], *args: Any, **kwargs: Any
-) -> Partial[Callable_T]:  # pragma: no cover
+    config: PartialBuilds[Callable[..., T]], *args: Any, **kwargs: Any
+) -> Partial[T]:  # pragma: no cover
     ...
 
 

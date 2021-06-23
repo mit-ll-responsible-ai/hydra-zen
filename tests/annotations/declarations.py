@@ -32,8 +32,8 @@ out_a: A = partial_out()
 f_sig = Callable[[int], int]
 conf_f_partial: Type[PartialBuilds[f_sig]] = builds(f, hydra_partial=True)
 conf_f_partial_instance = conf_f_partial()
-partial_out_f: Partial[f_sig] = instantiate(conf_f_partial)
-partial_out_f_via_instance: Partial[f_sig] = instantiate(conf_f_partial_instance)
+partial_out_f: Partial[int] = instantiate(conf_f_partial)
+partial_out_f_via_instance: Partial[int] = instantiate(conf_f_partial_instance)
 
 # test builds(..., hydra_partial=False)
 conf_A_1: Type[Builds[Type[A]]] = builds(A, hydra_partial=False)

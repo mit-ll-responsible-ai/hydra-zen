@@ -35,14 +35,12 @@ out_2: Tuple[int, str] = should_be_a_2.x
 
 conf_f_partial = builds(f, hydra_partial=True)
 partial_out_f = instantiate(conf_f_partial)
-should_be_f = partial_out_f()
-should_be_int_output_of_f: int = should_be_f(2)
+should_be_int_output_of_f: int = partial_out_f()
 
 
 conf_f_partial_instance = builds(f, hydra_partial=True)()
 partial_out_f_2 = instantiate(conf_f_partial_instance)
-should_be_f_2 = partial_out_f_2()
-should_be_int_output_of_f_2: int = should_be_f_2(2)
+should_be_int_output_of_f_2: int = partial_out_f_2()
 
 # test builds(..., hydra_partial=False)
 conf_A = builds(A)
@@ -81,5 +79,19 @@ class B:
     x: int
 
 
+# Check that @hydrated_dataclass reveals init/attr info
 b = B(x=2)
 b.x = 3
+
+# Check that `Builds` constructor can take arguments
+X = builds(dict, a=1)
+y = X(a=10)
+
+
+def g(x: int, y: float) -> str:
+    ...
+
+
+PartialBuild_g = builds(g, x=1, hydra_partial=True)
+partial_g = instantiate(PartialBuild_g)
+g_out: str = partial_g(y=10)
