@@ -647,8 +647,9 @@ def builds(
             type_hints = get_type_hints(target.__init__)
         else:
             type_hints = get_type_hints(target)
-    except TypeError:
-        # Covers case for ufuncs, which do not have inspectable type hints
+    except (TypeError, NameError):
+        # TypeError: Covers case for ufuncs, which do not have inspectable type hints
+        # NameError: Covers case for unresolved forward reference
         type_hints = defaultdict(lambda: Any)
 
     sig_by_kind: Dict[Any, List[inspect.Parameter]] = {
