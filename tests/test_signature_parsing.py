@@ -265,11 +265,11 @@ def f_with_fwd_ref(x: "torch.optim.Optimizer"):  # noqa: F821
 
 
 class A_w_fwd_ref:
-    def __init__(self, a: "torch.optim.Optimizer"):  # noqa: F821
+    def __init__(self, x: "torch.optim.Optimizer"):  # noqa: F821
         pass
 
 
 @pytest.mark.parametrize("obj", [f_with_fwd_ref, A_w_fwd_ref])
 def test_sig_with_unresolved_fwd_ref(obj):
     # builds should gracefully skip signature parsing for unresolved fwd-references
-    builds(obj)
+    instantiate(builds(obj, x=1))
