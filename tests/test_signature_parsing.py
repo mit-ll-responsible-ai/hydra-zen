@@ -258,3 +258,18 @@ def test_builds_partial_with_full_sig_excludes_non_specified_params(
 
     assert isinstance(Conf.a_function, Just) and "func" in Conf.a_function.path
     assert isinstance(Conf.a_class, Just) and "dict" in Conf.a_class.path
+
+
+def f_with_fwd_ref(x: "torch.optim.Optimizer"):  # noqa: F821
+    return
+
+
+class A_w_fwd_ref:
+    def __init__(self, a: "torch.optim.Optimizer"):  # noqa: F821
+        pass
+
+
+@pytest.mark.parametrize("obj", [f_with_fwd_ref, A_w_fwd_ref])
+def test_sig_with_unresolved_fwd_ref(obj):
+    # builds should gracefully skip signature parsing for unresolved fwd-references
+    builds(obj)
