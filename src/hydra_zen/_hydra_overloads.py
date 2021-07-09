@@ -47,6 +47,20 @@ def instantiate(config: Just[T], *args: Any, **kwargs: Any) -> T:  # pragma: no 
 
 @overload
 def instantiate(
+    config: PartialBuilds[Callable[..., T]], *args: Any, **kwargs: Any
+) -> Partial[T]:  # pragma: no cover
+    ...
+
+
+@overload
+def instantiate(
+    config: Type[PartialBuilds[Callable[..., T]]], *args: Any, **kwargs: Any
+) -> Partial[T]:  # pragma: no cover
+    ...
+
+
+@overload
+def instantiate(
     config: Type[PartialBuilds[Type[T]]], *args: Any, **kwargs: Any
 ) -> Partial[T]:  # pragma: no cover
     ...
@@ -55,13 +69,6 @@ def instantiate(
 @overload
 def instantiate(
     config: PartialBuilds[Type[T]], *args: Any, **kwargs: Any
-) -> Partial[T]:  # pragma: no cover
-    ...
-
-
-@overload
-def instantiate(
-    config: PartialBuilds[Callable[..., T]], *args: Any, **kwargs: Any
 ) -> Partial[T]:  # pragma: no cover
     ...
 
