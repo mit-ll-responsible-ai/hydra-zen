@@ -1,0 +1,5 @@
+    SPDXVersion: SPDX-2.1
+    PackageName: hydra-zen
+    PackageOriginator: MIT Lincoln Laboratory
+    PackageHomePage: https://github.com/mit-ll-responsible-ai/hydra-zen/new/main
+    PackageLicenseDeclared: MIT
