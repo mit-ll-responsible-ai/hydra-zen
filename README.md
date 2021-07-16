@@ -17,6 +17,9 @@ hydra-zen offers:
 
 These functions and capabilities can be used to great effect alongside [PyTorch Lightning](https://pytorch-lightning.readthedocs.io/en/latest/) to design boilerplate-free machine learning projects!  
 
+Check out [this example](https://mit-ll-responsible-ai.github.io/hydra-zen/pytorch_lightning_example.html) to see how hydra-zen and PyTorch-Lightning can be used to create a boilerplate-free ML extension.
+
+[This repo](https://github.com/mit-ll-responsible-ai/hydra-zen-examples) contains some end-to-end ML projects that are configured using hydra-zen. This can provide guidance for how to organize a project to make use of hydra-zen.  
 
 ## Installation
 `hydra-zen` is lightweight: its only dependencies are `hydra-core` and `typing-extensions`.
