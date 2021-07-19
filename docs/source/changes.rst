@@ -17,4 +17,4 @@ Its test suite makes keen use of the property-based testing library `Hypothesis 
 Furthermore, 100% code coverage is enforced on all commits into `main`.
 
 We plan to have an aggressive release schedule for compatibility-preserving patches of bug-fixes and quality-of-life improvements (e.g. improved type annotations).
-hydra-zen will maintain wide a window of compatibility with Hydra versions; we test against pre-releases of Hydra and will maintain compatibility with its future releases.
+hydra-zen will maintain a wide window of compatibility with Hydra versions; we test against pre-releases of Hydra and will maintain compatibility with its future releases.
