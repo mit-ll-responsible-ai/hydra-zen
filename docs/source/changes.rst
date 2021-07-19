@@ -16,5 +16,5 @@ Although we have not yet released version `v1.0.0`, it should be noted that hydr
 Its test suite makes keen use of the property-based testing library `Hypothesis <https://hypothesis.readthedocs.io/en/latest/>`_. 
 Furthermore, 100% code coverage is enforced on all commits into `main`.
 
-We plan to have aggressive release schedule for compatibility-preserving patches of bug-fixes and quality-of-life improvements (e.g. improved type annotations).
+We plan to have an aggressive release schedule for compatibility-preserving patches of bug-fixes and quality-of-life improvements (e.g. improved type annotations).
 hydra-zen will maintain wide a window of compatibility with Hydra versions; we test against pre-releases of Hydra and will maintain compatibility with its future releases.
