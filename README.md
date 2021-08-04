@@ -1,5 +1,6 @@
 # hydra-zen
 
+[![PyPi version](https://img.shields.io/pypi/v/hydra-zen.svg)](https://pypi.python.org/pypi/hydra-zen)
 [![Automated tests status](https://github.com/mit-ll-responsible-ai/hydra-zen/workflows/Tests/badge.svg)](https://github.com/mit-ll-responsible-ai/hydra-zen/actions?query=workflow%3ATests+branch%3Amain)
 [![Test coverage](https://img.shields.io/badge/coverage-100%25-green.svg)](https://github.com/mit-ll-responsible-ai/hydra-zen/actions?query=workflow%3ATests+branch%3Amain)
 [![Docs status](https://github.com/mit-ll-responsible-ai/hydra-zen/actions/workflows/publish_docs.yml/badge.svg)](https://mit-ll-responsible-ai.github.io/hydra-zen/)
