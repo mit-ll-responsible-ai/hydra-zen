@@ -1,3 +1,5 @@
+.. _Lightning:
+
 Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning
 =====================================================================
 
@@ -15,6 +17,12 @@ In mathematical notation, we want to solve the following optimization problem:
    x &\in [-2\pi, 2\pi]
 
 where :math:`N` – the number of "neurons" in our layer – is a hyperparameter.
+
+We will create a dataclass, ``ExperimentConfig``, which will house configurations for our experiment's optimizer, dataloader,
+trainer, and pytorch-lightning module.
+Note that each of these configurations are created via :func:`~hydra_zen.builds`, and that we
+are taking advantage of its ability to :ref:`only partially configure an object <Partial>` (see the configuration
+of the optimizer) and to incorporate :ref:`both automatically-inferred and manually-specified configuration parameter values <Auto>`.
 
 The following is the boilerplate-free code.
 
@@ -84,7 +92,13 @@ The following is the boilerplate-free code.
 
    def task(cfg: ExperimentConfig):
        # Hydra recursively instantiates the lightning module, trainer,
-       # and all other instantiable aspects of the configuration
+       # and all other instantiable attributes of `cfg`.
+       #
+       # `exp` is a dataclass commensurate with `ExperimentConfig` but whose
+       # attributes are associated with instantiated objects.
+       #
+       # E.g. `exp.lightning_module` is an instance of `UniversalFuncModule`,
+       # that was "built" according to `ExperimentConfig.lightning_module`.
        exp = instantiate(cfg)
 
        # train the model
@@ -162,7 +176,8 @@ Visualizing our results
    :alt: Alternative text
 
 Voilà! We just configured, trained, saved, and documented multiple neural networks without writing any boilerplate code.
-Hydra + hydra-zen + PyTorch Lightning lets us focus on writing the essentials of our scientific software.
+Hydra + hydra-zen + PyTorch Lightning lets us focus on writing the essentials of our scientific software while automatically
+standardizing our workflows to adopt best-practices for configuring and organizing our experiments.
 
 
 More Examples of hydra-zen in ML Projects

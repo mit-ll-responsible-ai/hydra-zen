@@ -12,7 +12,7 @@ hydra-zen provides simple, Hydra-compatible tools that enable Python-centric wor
 It helps to eliminate the boilerplate code you would write to configure, orchestrate, and organize the results of your various experiments.
 
 hydra-zen offers:
-  - Functions for automatically and dynamically generating `structured configs <https://hydra.cc/docs/next/tutorials/structured_config/schema/>`_ that can be used to fully or partially instantiate objects in your application.
+  - Functions for automatically and dynamically generating `structured configs <https://hydra.cc/docs/next/tutorials/structured_config/schema/>`_ that can be used to fully or partially configure parts of your application.
   - The ability to launch Hydra jobs, complete with parameter sweeps and multi-run configurations, from within a notebook or any other Python environment.
   - Incisive type annotations that provide enriched context about your project's configurations to IDEs, type checkers, and other tooling.
   - Runtime validation of configurations to catch mistakes before your application launches.

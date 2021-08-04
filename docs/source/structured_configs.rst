@@ -25,9 +25,9 @@ Basics of Structured Configs
 ****************************
 
 Hydra supports configurations that are written in a yaml format or in Python via `structured configs <https://hydra.cc/docs/next/tutorials/structured_config/intro>`_.
-Structured configs are `dataclasses <https://docs.python.org/3/library/dataclasses.html>`_ whose fields store the configuration values, and whose type annotations (up to a limited assortment) can be leveraged by Hydra to provide runtime type checking for of configuration values.
+Structured configs are `dataclasses <https://docs.python.org/3/library/dataclasses.html>`_ whose attributes store the configuration values, and whose type annotations (up to a limited assortment) can be leveraged by Hydra to provide runtime type checking of user-specified configuration values.
 
-An important feature of these structured configs is that they too can be serialized to yaml files by Hydra.
+An important feature of these structured configs is that they too can be used in replacement of, and can be serialized to, yaml files by Hydra.
 This is critical, as it ensures that each job that is launched using Hydra is fully documented by – and can be reproduced from – a plain-text yaml configuration.
 
 A `targeted configuration <https://hydra.cc/docs/next/advanced/instantiate_objects/overview>`_ is designed to instantiate / call an object (a class-object or a function) with particular values.
@@ -204,9 +204,9 @@ While this is convenient to an extent, this repository of configs has to be:
 
 Furthermore, such repositories don't exist for most other libraries!
 Thus this approach to code configuration is still a source of technical debt and repetitious work-flows.
+With hydra-zen, **we simply configure what we need from any library** in an ergonomic, automatic, and dynamic way ⛱️.
 
-With hydra-zen, we simply **configure what we need from any library** in an ergonomic, automatic, and dynamic way ⛱️.
-
+.. _Builds:
 
 **************************
 The Essentials of `builds`
@@ -219,50 +219,67 @@ but it is worthwhile for us to discuss these more deliberately.
 `builds` generates dataclass objects
 ====================================
 
-`builds` dynamically generates a dataclass object, and handles for us cumbersome cases like `safely setting mutable default values <https://docs.python.org/3/library/dataclasses.html#mutable-default-values>`_ and excluding Hydra-specific "hidden" parameters from the class-init signature.
+`builds` dynamically generates a dataclass object that configures a particular target.
+Let's generate a targeted configuration for the following function
 
-+---------------------------------------------------+-------------------------------------------------------------------+
-| Example Using `builds`                            | Equivalent dataclass                                              |
-+===================================================+===================================================================+
-| .. code:: python                                  | .. code:: python                                                  |
-|                                                   |                                                                   |
-|    >>> from hydra_zen import builds               |    from dataclasses import dataclass, field                       |
-|    >>> builds(dict, x=2, y=[1, 2, 3])             |                                                                   |
-|    types.Builds_dict                              |    @dataclass                                                     |
-|                                                   |    class Builds_dict:                                             |
-|                                                   |        _target_: str = field(default='builtins.dict', init=False) |
-|                                                   |        x: Any = 2                                                 |
-|                                                   |        y: Any = field(default_factory=lambda: list([1, 2, 3]))    |
-|                                                   |                                                                   |
-+---------------------------------------------------+-------------------------------------------------------------------+
+.. code:: python
 
+   # contents of my_funcs.py
+
+   from typing import List
+
+   def make_a_dict(x: int, y: List[int]):
+       return {"x": x, "y": y}
+
+
+Here is what `builds` effectively defines for us "under the hood"
+
++---------------------------------------------------+--------------------------------------------------------------------------+
+| Example Using `builds`                            | Equivalent dataclass                                                     |
++===================================================+==========================================================================+
+| .. code:: python                                  | .. code:: python                                                         |
+|                                                   |                                                                          |
+|    >>> from hydra_zen import builds               |    from dataclasses import dataclass, field                              |
+|    >>> builds(make_a_dict, x=2, y=[1, 2, 3])      |                                                                          |
+|    types.Builds_make_a_dict                       |    @dataclass                                                            |
+|                                                   |    class Builds_dict:                                                    |
+|                                                   |        _target_: str = field(default='my_funcs.make_a_dict', init=False) |
+|                                                   |        x: int = 2                                                        |
+|                                                   |        y: List[int] = field(default_factory=lambda: list([1, 2, 3]))     |
+|                                                   |                                                                          |
++---------------------------------------------------+--------------------------------------------------------------------------+
+
+Note how `builds` handles for us the cumbersome tasks of `safely setting mutable default values <https://docs.python.org/3/library/dataclasses.html#mutable-default-values>`_, excluding Hydra-specific "hidden" parameters from the class-init signature,
+and mirroring the target's type annotations.
+As we study more of `builds`'s features, we will see that there are many "wins" that we will enjoy by leveraging this function to generate our configurations.
+
+The resulting `dataclass object <https://docs.python.org/3/library/dataclasses.html>`_ is designed specifically to behave as `targeted structured configs  <https://hydra.cc/docs/next/advanced/instantiate_objects/overview>`_ that can be instantiated by Hydra.
 
 .. code:: python
 
    >>> from dataclasses import is_dataclass
-   >>> Builds_dict = builds(dict, x=2, y=[1, 2, 3])  # signature: Builds_dict(x: Any = 2, y: Any = <factory>)
+   >>> Builds_dict = builds(make_a_dict, x=2, y=[1, 2, 3])  # signature: Builds_dict(x: Any = 2, y: Any = <factory>)
    >>> is_dataclass(Builds_dict)
    True
 
    # creating an instance of the dataclass with an updated configuration
    >>> conf_instance = Builds_dict(x=-100)
    >>> conf_instance
-   Builds_dict(_target_='builtins.dict', x=-100, y=[1, 2, 3])
+   Builds_make_a_dict(_target_='my_funcs.make_a_dict', x=-100, y=[1, 2, 3])
 
    >>> conf_instance.x
    -100
    >>> conf_instance.y
    [1, 2, 3]
 
-These `dataclass objects <https://docs.python.org/3/library/dataclasses.html>`_ are designed specifically to behave as `targeted structured configs  <https://hydra.cc/docs/next/advanced/instantiate_objects/overview>`_ that can be instantiated by Hydra.
-Accordingly, `builds` accepts Hydra-specific parameters for tuning the behavior of the structured config (e.g. disabling `recursive instantiation <https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation>`_).
-
-.. code:: python
-
    >>> from hydra_zen import instantiate  # annotated alias of `hydra.utils.instantiate`
    >>> instantiate(conf_instance)  # calls `dict(x=-100, y=[1, 2, 3])`
    {'x': -100, 'y': [1, 2, 3]}
 
+Accordingly, `builds` accepts Hydra-specific parameters for tuning the behavior of the structured config (e.g. disabling `recursive instantiation <https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation>`_).
+
+
+.. _Partial:
 
 Configuring a Target for Partial Instantiation
 ==============================================
@@ -270,8 +287,10 @@ Configuring a Target for Partial Instantiation
 `builds` is capable for configuring a target such that it will only be *partially* instantiated.
 This is very useful, as it is often the case that our configuration of a target can only partially describe its input parameters.
 
-For example, a ML-model optimizer must be provided the model parameters that it will be updating; however these parameters are typically created at runtime and thus *cannot be part of our configuration*.
-Fortunately, we can simply provide a partial configuration of the optimizer's other parameters.
+For example, ``Adam`` is an gradient-based optimizer that is popular in the PyTorch library and that will frequently appear as a configurable component to a deep learning experiment.
+This optimizer has configurable parameters, such as a "learning rate" (``lr``), which must be provided by the user in order to instantiate ``Adam``.
+The optimizer must *also* be initialized with the parameters that it will optimizing, however these parameters are typically created after we have started running our program and thus *they are not available to / cannot be part of our configuration*.
+Fortunately, we can use ``builds(..., hydra_partial=True)`` to configure ``Adam`` to be only partially-built using those values that we have access to at configuration time.
 
 .. code:: python
 
@@ -280,11 +299,11 @@ Fortunately, we can simply provide a partial configuration of the optimizer's ot
 
    >>> PartialBuilds_Adam = builds(Adam, hydra_partial=True, lr=10.0)
    >>> partial_optim = instantiate(PartialBuilds_Adam)
-   >>> partial_optim
+   >>> partial_optim  # a partially-instantiated Adam
    functools.partial(<class 'torch.optim.adam.Adam'>, lr=10.0)
 
 
-Instantiating this config only partially-builds the optimizer; we can finish instantiating it once we have access to our model's parameters
+As promised, instantiating this config only partially-builds the ``Adam`` optimizer; we can finish instantiating it once we have access to our model's parameters
 
 .. code:: python
 
@@ -299,6 +318,7 @@ Instantiating this config only partially-builds the optimizer; we can finish ins
        weight_decay: 0
    )
 
+.. _Auto:
 
 Combining Auto-Populated and User-Specified Default Values
 ==========================================================
@@ -393,9 +413,9 @@ Consider this configuration of a data augmentation and transformation pipeline a
 Auto-generated nested configs
 -----------------------------
 
-`builds` will automatically generate nested configurations in order to configure a target.
-E.g. if a default-value in a target's signature is a function then `builds` will create a dataclass that configures
-that function.
+`builds` will automatically generate nested configurations in order to configure a target and its signature's default values.
+E.g. if a default-value in a target's signature is a function, then `builds` will create a dataclass that configures
+this function and then nest it within the target's configuration.
 
 .. code:: python
 
@@ -511,7 +531,7 @@ Because `builds` automatically mirrors type annotations from the target's signat
 Automatic Type Refinement
 =========================
 
-Hydra permits only `a narrow subset of type annotations <https://hydra.cc/docs/next/tutorials/structured_config/intro#structured-configs-supports>`_:
+Hydra permits only `a narrow subset of type annotations <https://hydra.cc/docs/next/tutorials/structured_config/intro#structured-configs-supports>`_ to be present in a target's signature:
 
    - ``Any``
    - Primitive types (``int``, ``bool``, ``float``, ``str``, ``Enums``)
@@ -519,7 +539,8 @@ Hydra permits only `a narrow subset of type annotations <https://hydra.cc/docs/n
    - Containers (List and Dict) containing primitives or Structured Configs
    - Optional fields
 
-`builds` will automatically "broaden" the annotations associated with a target's signature so that it will be made compatible with Hydra.
+Annotations that fall outside of this subset will cause Hydra's runtime validation to raise an error.
+As such, `builds` will automatically "broaden" the annotations associated with a target's signature so that it will be made compatible with Hydra.
 For example, suppose that we want to configure
 
 .. code:: python
