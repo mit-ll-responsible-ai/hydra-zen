@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from copy import deepcopy
-from dataclasses import is_dataclass
+from dataclasses import FrozenInstanceError, is_dataclass
 
 import hypothesis.strategies as st
 import pytest
@@ -94,14 +94,15 @@ def f_3(x):
     pass
 
 
-def test_frozen():
-    from dataclasses import FrozenInstanceError
+def test_frozen_via_builds():
 
     conf_f = builds(f, x=2, frozen=True)()
 
     with pytest.raises(FrozenInstanceError):
         conf_f.x = 3
 
+
+def test_frozen_via_hydrated_dataclass():
     @hydrated_dataclass(f, frozen=True)
     class Conf_f:
         x: int = 2
