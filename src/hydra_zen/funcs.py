@@ -8,12 +8,11 @@ that these functions have a legible module-path when they appear in configuratio
 
 import functools as _functools
 import typing as _typing
-from typing import Any, Callable, Union
 
-from hydra._internal import utils as hydra_internal_utils
-from hydra.utils import log
+from hydra._internal import utils as _hydra_internal_utils
+from hydra.utils import log as _log
 
-from hydra_zen.typing import Partial
+from hydra_zen.typing import Partial as _Partial
 
 _T = _typing.TypeVar("_T")
 
@@ -21,17 +20,17 @@ __all__ = ["partial", "get_obj"]
 
 
 def partial(
-    *args: Any, _partial_target_: Callable[..., _T], **kwargs: Any
-) -> Partial[_T]:
+    *args: _typing.Any, _partial_target_: _typing.Callable[..., _T], **kwargs: _typing.Any
+) -> _Partial[_T]:
     """Equivalent to ``functools.partial`` but provides a named parameter for the callable."""
     return _functools.partial(_partial_target_, *args, **kwargs)
 
 
-def get_obj(*, path: str) -> Union[type, Callable[..., Any]]:
+def get_obj(*, path: str) -> _typing.Union[type, _typing.Callable[..., _typing.Any]]:
     """Imports an object given the specified path."""
     try:
-        cl = hydra_internal_utils._locate(path)
+        cl = _hydra_internal_utils._locate(path)
         return cl
     except Exception as e:  # pragma: no cover
-        log.error(f"Error getting callable at {path} : {e}")
+        _log.error(f"Error getting callable at {path} : {e}")
         raise e
