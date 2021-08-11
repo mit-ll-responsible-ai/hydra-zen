@@ -281,7 +281,7 @@ def returns_int() -> int:
 
 
 def expects_int(x: int) -> int:
-    pass
+    return x
 
 
 @pytest.mark.parametrize(
@@ -297,8 +297,8 @@ def test_setting_default_with_Builds_widens_type(builds_as_default, hydra_recurs
     # via auto type-widening
     kwargs = {} if hydra_recursive is None else dict(hydra_recursive=hydra_recursive)
     b = builds(expects_int, x=builds_as_default, **kwargs)
-    instantiate(b)  # should not raise type
+    assert 1 == instantiate(b)  # should not raise ValidationError
 
     with pytest.raises(ValidationError):
-        # ensure that type validation is broadened only when hydra_recursive=False
+        # ensure that type annotation is broadened only when hydra_recursive=False
         instantiate(builds(expects_int, x=builds_as_default, hydra_recursive=False))
