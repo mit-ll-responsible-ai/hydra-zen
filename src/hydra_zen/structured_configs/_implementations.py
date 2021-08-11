@@ -780,7 +780,7 @@ def builds(
             #    https://github.com/facebookresearch/hydra/issues/1759
             # Thus we will auto-broaden the annotation when we see that the user
             # has specified a `Builds` as a default value.
-            if not isinstance(value, Builds) else Any,
+            if not isinstance(value, Builds) or hydra_recursive is False else Any,
             sanitized_default_value(value),
         )
         for name, value in kwargs_for_target.items()

@@ -291,12 +291,14 @@ def expects_int(x: int) -> int:
         builds(returns_int)(),  # instance
     ],
 )
-def test_setting_default_with_Builds_widens_type(builds_as_default):
+@pytest.mark.parametrize("hydra_recursive", [True, None])
+def test_setting_default_with_Builds_widens_type(builds_as_default, hydra_recursive):
     # tests that we address https://github.com/facebookresearch/hydra/issues/1759
     # via auto type-widening
-    b = builds(expects_int, x=builds_as_default)
+    kwargs = {} if hydra_recursive is None else dict(hydra_recursive=hydra_recursive)
+    b = builds(expects_int, x=builds_as_default, **kwargs)
     instantiate(b)  # should not raise type
 
     with pytest.raises(ValidationError):
-        # ensure that non-Builds/int gets caught by type validation
-        instantiate(builds(expects_int, x="hi"))
+        # ensure that type validation is broadened only when hydra_recursive=False
+        instantiate(builds(expects_int, x=builds_as_default, hydra_recursive=False))
