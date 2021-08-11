@@ -1,6 +1,7 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
+from dataclasses import dataclass
 from functools import partial
 
 import pytest
@@ -31,3 +32,18 @@ def test_Builds_is_not_PartialBuilds():
 
     PConf = builds(dict, hydra_partial=True)
     assert isinstance(PConf, Builds)
+
+
+def test_targeted_dataclass_is_Builds():
+    @dataclass
+    class NonTargeted:
+        pass
+
+    @dataclass
+    class Targeted:
+        _target_: str = "hello"
+
+    assert not isinstance(NonTargeted, Builds)
+    assert not isinstance(NonTargeted(), Builds)
+    assert isinstance(Targeted, Builds)
+    assert isinstance(Targeted(), Builds)

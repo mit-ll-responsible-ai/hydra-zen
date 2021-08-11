@@ -10,6 +10,7 @@ from typing import Any, Callable, Dict, Mapping, Optional, Tuple, Type
 import hypothesis.strategies as st
 import pytest
 from hypothesis import given, settings
+from omegaconf.errors import ValidationError
 
 from hydra_zen import builds, hydrated_dataclass, instantiate, mutable_value, to_yaml
 from hydra_zen.typing import Just
@@ -273,3 +274,29 @@ class A_w_fwd_ref:
 def test_sig_with_unresolved_fwd_ref(obj):
     # builds should gracefully skip signature parsing for unresolved fwd-references
     instantiate(builds(obj, x=1))
+
+
+def returns_int() -> int:
+    return 1
+
+
+def expects_int(x: int) -> int:
+    pass
+
+
+@pytest.mark.parametrize(
+    "builds_as_default",
+    [
+        builds(returns_int),  # type
+        builds(returns_int)(),  # instance
+    ],
+)
+def test_setting_default_with_Builds_widens_type(builds_as_default):
+    # tests that we address https://github.com/facebookresearch/hydra/issues/1759
+    # via auto type-widening
+    b = builds(expects_int, x=builds_as_default)
+    instantiate(b)  # should not raise type
+
+    with pytest.raises(ValidationError):
+        # ensure that non-Builds/int gets caught by type validation
+        instantiate(builds(expects_int, x="hi"))

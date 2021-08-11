@@ -771,7 +771,16 @@ def builds(
     user_specified_named_params: Dict[str, Tuple[str, type, Field]] = {
         name: (
             name,
-            _utils.sanitized_type(type_hints.get(name, Any)),
+            _utils.sanitized_type(type_hints.get(name, Any))
+            # OmegaConf's type-checking occurs before instantiation occurs.
+            # This means that, e.g., passing `Builds[int]` to a field `x: int`
+            # will fail Hydra's type-checking upon instantiation, even though
+            # the recursive instantiation will appropriately produce `int` for
+            # that field. This will not be addressed by hydra/omegaconf:
+            #    https://github.com/facebookresearch/hydra/issues/1759
+            # Thus we will auto-broaden the annotation when we see that the user
+            # has specified a `Builds` as a default value.
+            if not isinstance(value, Builds) else Any,
             sanitized_default_value(value),
         )
         for name, value in kwargs_for_target.items()
