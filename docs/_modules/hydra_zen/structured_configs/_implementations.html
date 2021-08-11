@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.1.0+7.gc83c9f4 documentation</title>
+  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.1.0+11.g571666d documentation</title>
   
 
   
@@ -934,7 +934,16 @@
     <span class="n">user_specified_named_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">Field</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">name</span><span class="p">:</span> <span class="p">(</span>
             <span class="n">name</span><span class="p">,</span>
-            <span class="n">_utils</span><span class="o">.</span><span class="n">sanitized_type</span><span class="p">(</span><span class="n">type_hints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">Any</span><span class="p">)),</span>
+            <span class="n">_utils</span><span class="o">.</span><span class="n">sanitized_type</span><span class="p">(</span><span class="n">type_hints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">Any</span><span class="p">))</span>
+            <span class="c1"># OmegaConf&#39;s type-checking occurs before instantiation occurs.</span>
+            <span class="c1"># This means that, e.g., passing `Builds[int]` to a field `x: int`</span>
+            <span class="c1"># will fail Hydra&#39;s type-checking upon instantiation, even though</span>
+            <span class="c1"># the recursive instantiation will appropriately produce `int` for</span>
+            <span class="c1"># that field. This will not be addressed by hydra/omegaconf:</span>
+            <span class="c1">#    https://github.com/facebookresearch/hydra/issues/1759</span>
+            <span class="c1"># Thus we will auto-broaden the annotation when we see that the user</span>
+            <span class="c1"># has specified a `Builds` as a default value.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Builds</span><span class="p">)</span> <span class="ow">or</span> <span class="n">hydra_recursive</span> <span class="ow">is</span> <span class="kc">False</span> <span class="k">else</span> <span class="n">Any</span><span class="p">,</span>
             <span class="n">sanitized_default_value</span><span class="p">(</span><span class="n">value</span><span class="p">),</span>
         <span class="p">)</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs_for_target</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
