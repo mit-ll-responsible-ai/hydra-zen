@@ -13,8 +13,8 @@ from hydra.plugins.sweeper import Sweeper
 from hydra.types import HydraContext, RunMode
 from omegaconf import DictConfig, OmegaConf
 
-from .._hydra_overloads import instantiate
-from ..typing import DataClass
+from hydra_zen._hydra_overloads import instantiate
+from hydra_zen.typing._implementations import DataClass
 
 
 def _store_config(
