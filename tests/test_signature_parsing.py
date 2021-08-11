@@ -10,6 +10,7 @@ from typing import Any, Callable, Dict, Mapping, Optional, Tuple, Type
 import hypothesis.strategies as st
 import pytest
 from hypothesis import given, settings
+from omegaconf.errors import ValidationError
 
 from hydra_zen import builds, hydrated_dataclass, instantiate, mutable_value, to_yaml
 from hydra_zen.typing import Just
@@ -273,3 +274,31 @@ class A_w_fwd_ref:
 def test_sig_with_unresolved_fwd_ref(obj):
     # builds should gracefully skip signature parsing for unresolved fwd-references
     instantiate(builds(obj, x=1))
+
+
+def returns_int() -> int:
+    return 1
+
+
+def expects_int(x: int) -> int:
+    return x
+
+
+@pytest.mark.parametrize(
+    "builds_as_default",
+    [
+        builds(returns_int),  # type
+        builds(returns_int)(),  # instance
+    ],
+)
+@pytest.mark.parametrize("hydra_recursive", [True, None])
+def test_setting_default_with_Builds_widens_type(builds_as_default, hydra_recursive):
+    # tests that we address https://github.com/facebookresearch/hydra/issues/1759
+    # via auto type-widening
+    kwargs = {} if hydra_recursive is None else dict(hydra_recursive=hydra_recursive)
+    b = builds(expects_int, x=builds_as_default, **kwargs)
+    assert 1 == instantiate(b)  # should not raise ValidationError
+
+    with pytest.raises(ValidationError):
+        # ensure that type annotation is broadened only when hydra_recursive=False
+        instantiate(builds(expects_int, x=builds_as_default, hydra_recursive=False))
