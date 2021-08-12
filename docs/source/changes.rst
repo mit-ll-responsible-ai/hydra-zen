@@ -5,6 +5,20 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse chronological order.
 All previous releases should still be available on pip.
 
+.. _v0.2.0:
+
+------------------
+0.2.0 - 2021-08-12
+------------------
+
+This release:
+- Improves hydra-zen's `automatic type refinement <https://mit-ll-responsible-ai.github.io/hydra-zen/structured_configs.html#automatic-type-refinement>`_. See `#84 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/84>`_ for details
+- Cleans up the namespace of `hydra_zen.typing`. See `#85 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/85>`_ for details
+
+**Compatibility-Breaking Changes**
+- The protocol ``hydra_zen.typing.DataClass`` is not longer available in the public namespace, as it is not intended for public use. To continue using this protocol, you can import it from ``hydra_zen.typing._implementations``, but note that it is potentially subject to future changes or removal.
+
+
 .. _v0.1.0:
 
 ------------------
