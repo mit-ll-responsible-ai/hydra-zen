@@ -18,7 +18,7 @@ This release:
 
 **Compatibility-Breaking Changes**
 
-- The protocol ``hydra_zen.typing.DataClass`` is not longer available in the public namespace, as it is not intended for public use. To continue using this protocol, you can import it from ``hydra_zen.typing._implementations``, but note that it is potentially subject to future changes or removal.
+- The protocol ``hydra_zen.typing.DataClass`` is no longer available in the public namespace, as it is not intended for public use. To continue using this protocol, you can import it from ``hydra_zen.typing._implementations``, but note that it is potentially subject to future changes or removal.
 
 
 .. _v0.1.0:
