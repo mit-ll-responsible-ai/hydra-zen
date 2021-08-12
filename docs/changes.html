@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Changelog &mdash; hydra-zen 0.1.0+13.g80e73d8 documentation</title>
+  <title>Changelog &mdash; hydra-zen 0.1.0+17.g546206a documentation</title>
   
 
   
@@ -96,6 +96,7 @@
 <li class="toctree-l1"><a class="reference internal" href="structured_configs.html">Dynamically Generating Structured Configs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="experimental.html">Running Experiments with Hydra</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#v0-2-0">0.2.0 - 2021-08-12</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-1-0">0.1.0 - 2021-08-04</a></li>
 </ul>
 </li>
@@ -170,8 +171,20 @@
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
 <p>This is a record of all past hydra-zen releases and what went into them, in reverse chronological order.
 All previous releases should still be available on pip.</p>
+<div class="section" id="v0-2-0">
+<span id="id1"></span><h2>0.2.0 - 2021-08-12<a class="headerlink" href="#v0-2-0" title="Permalink to this headline">¶</a></h2>
+<p>This release:</p>
+<ul class="simple">
+<li><p>Improves hydra-zen’s <a class="reference external" href="https://mit-ll-responsible-ai.github.io/hydra-zen/structured_configs.html#automatic-type-refinement">automatic type refinement</a>. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/84">#84</a> for details</p></li>
+<li><p>Cleans up the namespace of <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.typing</span></code>. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/85">#85</a> for details</p></li>
+</ul>
+<p><strong>Compatibility-Breaking Changes</strong></p>
+<ul class="simple">
+<li><p>The protocol <code class="docutils literal notranslate"><span class="pre">hydra_zen.typing.DataClass</span></code> is no longer available in the public namespace, as it is not intended for public use. To continue using this protocol, you can import it from <code class="docutils literal notranslate"><span class="pre">hydra_zen.typing._implementations</span></code>, but note that it is potentially subject to future changes or removal.</p></li>
+</ul>
+</div>
 <div class="section" id="v0-1-0">
-<span id="id1"></span><h2>0.1.0 - 2021-08-04<a class="headerlink" href="#v0-1-0" title="Permalink to this headline">¶</a></h2>
+<span id="id4"></span><h2>0.1.0 - 2021-08-04<a class="headerlink" href="#v0-1-0" title="Permalink to this headline">¶</a></h2>
 <p>This is hydra-zen’s first stable release on PyPI!
 Although we have not yet released version <code class="xref py py-obj docutils literal notranslate"><span class="pre">v1.0.0</span></code>, it should be noted that hydra-zen’s codebase is thoroughly tested.
 Its test suite makes keen use of the property-based testing library <a class="reference external" href="https://hypothesis.readthedocs.io/en/latest/">Hypothesis</a>.
