@@ -62,8 +62,4 @@ conf_just_A: Type[Just[Type[A]]] = just(A)
 class SomeDataClass:
     pass
 
-def requires_dataclass(x: DataClass):
-    pass
-
-some_dataclass = SomeDataClass()
-requires_dataclass(some_dataclass)  # should satisfy DataClass protocol
+some_dataclass: DataClass = SomeDataClass()
