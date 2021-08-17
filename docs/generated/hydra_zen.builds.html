@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>builds &mdash; hydra-zen 0.2.0+4.g81775fb documentation</title>
+  <title>builds &mdash; hydra-zen 0.2.0+6.gc2fa072 documentation</title>
   
 
   
@@ -305,7 +305,7 @@ analysis tooling with enhanced context.</p>
 </div>
 <p>Auto-populating parameters:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># signature: `Builds_a_two_tuple(x: int, y: float)`</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">a_two_tuple</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">a_two_tuple</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">10.0</span><span class="p">))</span>
 <span class="go">(1, 10.0)</span>
 </pre></div>
