@@ -1,6 +1,7 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
+import importlib
 import logging
 import os
 import sys
@@ -8,36 +9,22 @@ import tempfile
 
 import pytest
 
-try:
-    import numpy  # add to sys.modules
-except ImportError:
-    pass
-
-try:
-    import torch
-except ImportError:
-    pass
-
-try:
-    import jax
-except ImportError:
-    pass
-
 # Skip collection of tests that don't work on the current version of Python.
 collect_ignore_glob = []
+
+OPTIONAL_TEST_DEPENDENCIES = ("numpy", "torch", "jax", "pytorch_lightning")
+
+for _module_name in OPTIONAL_TEST_DEPENDENCIES:
+    try:
+        importlib.import_module(_module_name)
+    except ModuleNotFoundError:
+        collect_ignore_glob.append(_module_name)
 
 if sys.version_info < (3, 8):
     collect_ignore_glob.append("*py38*")
 
 if sys.version_info < (3, 9):
     collect_ignore_glob.append("*py39*")
-
-
-OPTIONAL_TEST_DEPENDENCIES = ("numpy", "torch", "jax", "pytorch_lightning")
-
-for module in OPTIONAL_TEST_DEPENDENCIES:
-    if module not in sys.modules:
-        collect_ignore_glob.append(f"*{module}*")
 
 
 @pytest.fixture()
