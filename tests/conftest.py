@@ -18,7 +18,7 @@ for _module_name in OPTIONAL_TEST_DEPENDENCIES:
     try:
         importlib.import_module(_module_name)
     except ModuleNotFoundError:
-        collect_ignore_glob.append(f"*{_module_name}*")
+        collect_ignore_glob.append(f"**/*{_module_name}*.py")
 
 if sys.version_info < (3, 8):
     collect_ignore_glob.append("*py38*")
