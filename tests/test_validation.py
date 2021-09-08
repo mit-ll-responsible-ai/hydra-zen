@@ -49,6 +49,10 @@ def f_x_y2_str_z3(x, y=2, *, z=3):
     pass
 
 
+def passthrough(*args, **kwargs):
+    pass
+
+
 @pytest.mark.parametrize(
     "func, args, kwargs",
     [
@@ -85,10 +89,8 @@ def test_builds_raises_when_user_specified_args_violate_sig(
         )
 
     # test when **kwargs are inherited
+    kwarg_base = builds(passthrough, **kwargs, hydra_partial=partial)
     with pytest.raises(TypeError):
-        kwarg_base = builds(
-            func, **kwargs, hydra_partial=partial, populate_full_signature=full_sig
-        )
         builds(
             func,
             *args,
@@ -98,13 +100,21 @@ def test_builds_raises_when_user_specified_args_violate_sig(
         )
 
     # test when *args are inherited
+    args_base = builds(passthrough, *args, hydra_partial=partial)
     with pytest.raises(TypeError):
-        args_base = builds(
-            func, *args, hydra_partial=partial, populate_full_signature=full_sig
-        )
         builds(
             func,
             **kwargs,
+            hydra_partial=partial,
+            populate_full_signature=full_sig,
+            builds_bases=(args_base,)
+        )
+
+    # test when *args and **kwargs are inherited
+    args_base = builds(passthrough, *args, **kwargs, hydra_partial=partial)
+    with pytest.raises(TypeError):
+        builds(
+            func,
             hydra_partial=partial,
             populate_full_signature=full_sig,
             builds_bases=(args_base,)
