@@ -889,3 +889,59 @@ def builds(
                 f"\n\nThe docstring for {_utils.safe_name(target)} :\n\n" + target_doc
             )
     return out
+
+
+from typing_extensions import Protocol, runtime_checkable
+
+
+@runtime_checkable
+class HasTarget(Protocol):  # pragma: no cover
+    _target_: Union[str, Callable, type]
+
+
+@runtime_checkable
+class HasPartialTarget(HasTarget):  # pragma: no cover
+    _partial_target_: Union[str, Callable, type]
+
+
+assert hasattr(HasTarget, _TARGET_FIELD_NAME)
+assert hasattr(HasPartialTarget, _PARTIAL_TARGET_FIELD_NAME)
+
+
+@overload
+def get_target(obj: Type[PartialBuilds[_T]]) -> _T:
+    ...
+
+
+@overload
+def get_target(obj: Type[Builds[_T]]) -> _T:
+    ...
+
+
+@overload
+def get_target(obj: PartialBuilds[_T]) -> _T:
+    ...
+
+
+@overload
+def get_target(obj: Builds[_T]) -> _T:
+    ...
+
+
+def get_target(obj: Union[HasTarget, HasPartialTarget]):
+    if isinstance(obj, HasPartialTarget):
+        field_name = _PARTIAL_TARGET_FIELD_NAME
+    elif isinstance(obj, HasTarget):
+        field_name = _TARGET_FIELD_NAME
+    else:
+        raise TypeError(
+            f"`obj` must specify a target; i.e. it must have an attribute named"
+            f" {_TARGET_FIELD_NAME} or named {_PARTIAL_TARGET_FIELD_NAME} that"
+            f" points to a target-object or target-string"
+        )
+    target = getattr(obj, field_name)
+
+    if isinstance(target, str):
+        target = get_obj(path=target)
+
+    return target
