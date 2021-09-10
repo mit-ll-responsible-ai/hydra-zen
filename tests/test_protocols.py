@@ -3,11 +3,19 @@
 
 from dataclasses import dataclass
 from functools import partial
+from typing import Any
 
 import pytest
 
-from hydra_zen import builds, just
+from hydra_zen import builds, just, instantiate
 from hydra_zen.typing import Builds, Just, PartialBuilds
+from hydra_zen.funcs import get_obj
+from hydra_zen.funcs import partial as hydra_partial
+from hydra_zen.structured_configs._implementations import (
+    is_builds,
+    is_just,
+    is_partial_builds,
+)
 
 
 @pytest.mark.parametrize(
@@ -47,3 +55,69 @@ def test_targeted_dataclass_is_Builds():
     assert not isinstance(NonTargeted(), Builds)
     assert isinstance(Targeted, Builds)
     assert isinstance(Targeted(), Builds)
+
+
+@pytest.mark.parametrize(
+    "fn,protocol",
+    [
+        (just, Just),
+        (partial(builds, hydra_partial=True), PartialBuilds),
+    ],
+)
+def test_protocol_target_is_correct(fn, protocol):
+    assert fn(int)._target_ == protocol._target_
+
+
+@dataclass
+class ABuilds:
+    _target_: Any = int
+
+
+@dataclass
+class AJust:
+    _target_: Any = get_obj
+    path: Any = "builtins.int"
+
+
+@dataclass
+class APartial:
+    _target_: Any = hydra_partial
+    _partial_target_: Any = just(int)
+
+@dataclass
+class NotJust:
+    _target_: Any = "builtins.dict"
+    path: Any = "builtins.int"
+
+
+@dataclass
+class NotPartial:
+    _target_: Any = "builtins.dict"
+    _partial_target_: Any = just(int)
+
+@dataclass
+class NotPartial2:
+    _target_: Any = hydra_partial
+    _partial_target_: Any = int
+
+@pytest.mark.parametrize(
+    "x,yes_builds,yes_just,yes_partial",
+    [
+        (1, False, False, False),
+        (builds(int), True, False, False),
+        (just(int), True, True, False),
+        (AJust, True, True, False),
+        (builds(int, hydra_partial=True), True, False, True),
+        (APartial, True, False, True),
+        (NotJust, True, False, False),
+        (NotPartial, True, False, False),
+        (NotPartial2, True, False, False),
+    ],
+)
+def test_protocol_checkers(x, yes_builds, yes_just, yes_partial):
+    assert is_builds(x) is yes_builds
+    assert is_just(x) is yes_just
+    assert is_partial_builds(x) is yes_partial
+
+    if yes_builds or yes_just or yes_partial:
+        instantiate(x)
