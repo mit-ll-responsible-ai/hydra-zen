@@ -966,7 +966,7 @@ def get_target(obj: Builds[_T]) -> _T:  # pragma: no cover
 
 
 @overload
-def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:
+def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:   # pragma: no cover
     ...
 
 
