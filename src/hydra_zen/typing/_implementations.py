@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import Field
-from typing import Any, Callable, Dict, Generic, Tuple, TypeVar
+from typing import Any, Callable, Dict, Generic, Tuple, TypeVar, Union
 
 from typing_extensions import Protocol, runtime_checkable
 
@@ -16,6 +16,7 @@ __all__ = [
 
 
 _T = TypeVar("_T", covariant=True)
+_T2 = TypeVar("_T2", covariant=False, contravariant=False)
 
 
 class Partial(Generic[_T]):
@@ -53,11 +54,22 @@ class Builds(DataClass, Protocol[_T]):  # pragma: no cover
 
 
 @runtime_checkable
-class Just(Builds, Protocol[_T]):
+class Just(Builds, Protocol[_T]):  # pragma: no cover
     path: str  # interpolated string for importing obj
-    _target_: str = "hydra_utils.funcs.get_obj"
+    _target_: str = "hydra_zen.funcs.get_obj"
 
 
 @runtime_checkable
-class PartialBuilds(Builds, Protocol[_T]):
-    _partial_target_: str
+class PartialBuilds(Builds, Protocol[_T2]):  # pragma: no cover
+    _partial_target_: Just[_T2]
+    _target_: str = "hydra_zen.funcs.partial"
+
+
+@runtime_checkable
+class HasTarget(Protocol):  # pragma: no cover
+    _target_: str
+
+
+@runtime_checkable
+class HasPartialTarget(Protocol):  # pragma: no cover
+    _partial_target_: Just

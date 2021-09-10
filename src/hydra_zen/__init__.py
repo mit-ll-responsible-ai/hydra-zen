@@ -10,6 +10,7 @@ from ._hydra_overloads import (
 )
 from ._version import get_versions
 from .structured_configs import builds, hydrated_dataclass, just, mutable_value
+from .structured_configs._implementations import get_target
 
 __version__ = get_versions()["version"]
 del get_versions
