@@ -1,7 +1,7 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
-from dataclasses import Field, _DataclassParams
+from dataclasses import Field
 from typing import Any, Callable, Dict, Generic, Tuple, TypeVar
 
 from typing_extensions import Protocol, runtime_checkable
@@ -42,7 +42,6 @@ Importable = TypeVar("Importable")
 
 class DataClass(Protocol):
     __dataclass_fields__: Dict[str, Field]
-    __dataclass_params__: _DataclassParams
 
 
 @runtime_checkable

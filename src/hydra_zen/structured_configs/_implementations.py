@@ -529,7 +529,7 @@ def builds(
     Auto-populating parameters:
 
     >>> # signature: `Builds_a_two_tuple(x: int, y: float)`
-    >>> Conf = builds(a_two_tuple, populate_full_signature)
+    >>> Conf = builds(a_two_tuple, populate_full_signature=True)
     >>> instantiate(Conf(x=1, y=10.0))
     (1, 10.0)
 

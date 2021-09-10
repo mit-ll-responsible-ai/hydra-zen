@@ -2,9 +2,10 @@
 # SPDX-License-Identifier: MIT
 
 from typing import Callable, Tuple, Type
-
+from dataclasses import dataclass
 from hydra_zen import builds, instantiate, just
 from hydra_zen.typing import Builds, Just, Partial, PartialBuilds
+from hydra_zen.typing._implementations import DataClass
 
 
 class A:
@@ -55,3 +56,10 @@ should_be_int_again: int = instantiate(conf_f_2)
 # test just(...)
 conf_just_f: Type[Just[f_sig]] = just(f)
 conf_just_A: Type[Just[Type[A]]] = just(A)
+
+
+@dataclass
+class SomeDataClass:
+    pass
+
+some_dataclass: DataClass = SomeDataClass()
