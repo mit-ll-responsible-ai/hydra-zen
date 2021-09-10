@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import string
+from dataclasses import dataclass
 from typing import Any, Dict, List
 
 import hypothesis.strategies as st
@@ -10,6 +11,7 @@ from hypothesis import given
 from omegaconf import OmegaConf
 
 from hydra_zen import builds, get_target, instantiate, just, to_yaml
+from hydra_zen.typing._implementations import HasTarget
 from tests import valid_hydra_literals
 
 arbitrary_kwargs = st.dictionaries(
@@ -142,4 +144,15 @@ def test_just_roundtrip(obj):
 def test_get_target_roundtrip(x, fn):
     conf = fn(x)
     assert x is get_target(conf)
-    assert x is get_target(OmegaConf.create(to_yaml(conf)))
+
+    loaded = OmegaConf.create(to_yaml(conf))
+    assert x is get_target(loaded)
+
+
+@dataclass
+class A:
+    _target_: Any = int
+
+
+def test_get_target_with_non_string_target():
+    assert get_target(A) is int
