@@ -26,6 +26,7 @@ from hydra.utils import instantiate as hydra_instantiate
 from omegaconf import MISSING, DictConfig, ListConfig, OmegaConf
 
 from .typing import Builds, Just, Partial, PartialBuilds
+from .typing._implementations import DataClass
 
 __all__ = ["instantiate", "to_yaml", "save_as_yaml", "load_from_yaml", "MISSING"]
 
@@ -98,6 +99,13 @@ def instantiate(
 def instantiate(
     config: Builds[Callable[..., T]], *args: Any, **kwargs: Any
 ) -> T:  # pragma: no cover
+    ...
+
+
+@overload
+def instantiate(
+    config: Union[ListConfig, DictConfig, DataClass], *args, **kwargs
+) -> Any:
     ...
 
 
