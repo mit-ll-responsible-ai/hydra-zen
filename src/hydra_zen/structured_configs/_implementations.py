@@ -965,7 +965,12 @@ def get_target(obj: Builds[_T]) -> _T:  # pragma: no cover
     ...
 
 
-def get_target(obj: Union[HasTarget, HasPartialTarget]):
+@overload
+def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:
+    ...
+
+
+def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:
     """
     Returns the target-object from a targeted structured config.
 
