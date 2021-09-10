@@ -11,7 +11,7 @@ import pytest
 from hypothesis import assume, given
 from omegaconf import OmegaConf
 
-from hydra_zen import builds, hydrated_dataclass, instantiate, just, to_yaml
+from hydra_zen import builds, get_target, hydrated_dataclass, instantiate, just, to_yaml
 
 
 def test_builds_with_populate_sig_raises_on_target_without_sig():
@@ -117,7 +117,7 @@ def test_builds_raises_when_user_specified_args_violate_sig(
             func,
             hydra_partial=partial,
             populate_full_signature=full_sig,
-            builds_bases=(args_base,)
+            builds_bases=(args_base,),
         )
 
 
@@ -281,3 +281,8 @@ def test_just_raises_for_unimportable_target():
 
     with pytest.raises(ModuleNotFoundError):
         just(unreachable)
+
+
+def test_get_target_on_non_builds():
+    with pytest.raises(TypeError):
+        get_target(1)

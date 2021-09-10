@@ -7,15 +7,14 @@ from typing import Any
 
 import pytest
 
-from hydra_zen import builds, just, instantiate
-from hydra_zen.typing import Builds, Just, PartialBuilds
-from hydra_zen.funcs import get_obj
-from hydra_zen.funcs import partial as hydra_partial
+from hydra_zen import builds, instantiate, just
+from hydra_zen.funcs import get_obj, partial as hydra_partial
 from hydra_zen.structured_configs._implementations import (
     is_builds,
     is_just,
     is_partial_builds,
 )
+from hydra_zen.typing import Builds, Just, PartialBuilds
 
 
 @pytest.mark.parametrize(
@@ -84,6 +83,7 @@ class APartial:
     _target_: Any = hydra_partial
     _partial_target_: Any = just(int)
 
+
 @dataclass
 class NotJust:
     _target_: Any = "builtins.dict"
@@ -95,10 +95,12 @@ class NotPartial:
     _target_: Any = "builtins.dict"
     _partial_target_: Any = just(int)
 
+
 @dataclass
 class NotPartial2:
     _target_: Any = hydra_partial
     _partial_target_: Any = int
+
 
 @pytest.mark.parametrize(
     "x,yes_builds,yes_just,yes_partial",

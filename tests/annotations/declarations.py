@@ -1,8 +1,9 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
-from typing import Callable, Tuple, Type
 from dataclasses import dataclass
+from typing import Callable, Tuple, Type
+
 from hydra_zen import builds, instantiate, just
 from hydra_zen.typing import Builds, Just, Partial, PartialBuilds
 from hydra_zen.typing._implementations import DataClass
@@ -61,5 +62,6 @@ conf_just_A: Type[Just[Type[A]]] = just(A)
 @dataclass
 class SomeDataClass:
     pass
+
 
 some_dataclass: DataClass = SomeDataClass()

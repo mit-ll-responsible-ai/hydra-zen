@@ -9,7 +9,7 @@ import pytest
 from hypothesis import given
 from omegaconf import OmegaConf
 
-from hydra_zen import builds, instantiate, just, to_yaml
+from hydra_zen import builds, get_target, instantiate, just, to_yaml
 from tests import valid_hydra_literals
 
 arbitrary_kwargs = st.dictionaries(
@@ -112,19 +112,34 @@ def local_function():
     pass
 
 
-@pytest.mark.parametrize(
-    "obj",
-    [
-        local_function,
-        LocalClass,
-        int,
-        str,
-        list,
-        set,
-        complex,
-    ],
-)
+a_bunch_of_objects = [
+    local_function,
+    LocalClass,
+    int,
+    str,
+    list,
+    set,
+    complex,
+]
+
+
+@pytest.mark.parametrize("obj", a_bunch_of_objects)
 def test_just_roundtrip(obj):
     cfg = just(obj)
     assert instantiate(cfg) is obj
     assert instantiate(OmegaConf.create(to_yaml(cfg))) is obj
+
+
+@pytest.mark.parametrize("x", a_bunch_of_objects)
+@pytest.mark.parametrize(
+    "fn",
+    [
+        builds,
+        just,
+        lambda x: builds(x, hydra_partial=True),
+    ],
+)
+def test_get_target_roundtrip(x, fn):
+    conf = fn(x)
+    assert x is get_target(conf)
+    assert x is get_target(OmegaConf.create(to_yaml(conf)))
