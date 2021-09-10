@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass
-from typing import Callable, Tuple, Type
+from typing import Any, Callable, Tuple, Type
 
-from hydra_zen import builds, instantiate, just
+from hydra_zen import builds, get_target, instantiate, just
 from hydra_zen.typing import Builds, Just, Partial, PartialBuilds
 from hydra_zen.typing._implementations import DataClass
 
@@ -65,3 +65,11 @@ class SomeDataClass:
 
 
 some_dataclass: DataClass = SomeDataClass()
+
+out1: Any = instantiate(SomeDataClass)
+out2: Any = instantiate(some_dataclass)
+
+out3: Type[str] = get_target(builds(str))
+out4: Type[str] = get_target(builds(str, hydra_partial=False))
+out5: Type[str] = get_target(builds(str, hydra_partial=True))
+out6: Type[str] = get_target(just(str))
