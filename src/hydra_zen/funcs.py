@@ -20,7 +20,9 @@ __all__ = ["partial", "get_obj"]
 
 
 def partial(
-    *args: _typing.Any, _partial_target_: _typing.Callable[..., _T], **kwargs: _typing.Any
+    *args: _typing.Any,
+    _partial_target_: _typing.Callable[..., _T],
+    **kwargs: _typing.Any,
 ) -> _Partial[_T]:
     """Equivalent to ``functools.partial`` but provides a named parameter for the callable."""
     return _functools.partial(_partial_target_, *args, **kwargs)

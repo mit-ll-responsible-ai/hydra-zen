@@ -28,6 +28,7 @@ from typing_extensions import Final, Literal
 from hydra_zen.funcs import get_obj, partial
 from hydra_zen.structured_configs import _utils
 from hydra_zen.typing import Builds, Importable, Just, PartialBuilds
+from hydra_zen.typing._implementations import HasPartialTarget, HasTarget
 
 try:
     # used to check if default values are ufuncs
@@ -35,7 +36,6 @@ try:
 except ImportError:  # pragma: no cover
     ufunc = None
 
-__all__ = ["builds", "just", "hydrated_dataclass", "mutable_value"]
 
 _T = TypeVar("_T")
 
@@ -44,6 +44,7 @@ _RECURSIVE_FIELD_NAME: Final[str] = "_recursive_"
 _CONVERT_FIELD_NAME: Final[str] = "_convert_"
 _PARTIAL_TARGET_FIELD_NAME: Final[str] = "_partial_target_"
 _POS_ARG_FIELD_NAME: Final[str] = "_args_"
+_JUST_FIELD_NAME: Final[str] = "path"
 _HYDRA_FIELD_NAMES: FrozenSet[str] = frozenset(
     (
         _TARGET_FIELD_NAME,
@@ -61,6 +62,10 @@ _KEYWORD_ONLY: Final = inspect.Parameter.KEYWORD_ONLY
 _VAR_KEYWORD: Final = inspect.Parameter.VAR_KEYWORD
 
 _builtin_function_or_method_type = type(len)
+
+
+def _get_target(x):
+    return getattr(x, _TARGET_FIELD_NAME)
 
 
 def mutable_value(x: Any) -> Field:
@@ -889,3 +894,130 @@ def builds(
                 f"\n\nThe docstring for {_utils.safe_name(target)} :\n\n" + target_doc
             )
     return out
+
+
+# We need to check if things are Builds, Just, PartialBuilds to a higher
+# fidelity than is provided by `isinstance(..., <Protocol>)`. I.e. we want to
+# check that the desired attributes *and* that their values match those of the
+# protocols. Failing to heed this would, for example, lead to any `Builds` that
+# happens to have a `path` attribute to be treated as `Just` in `get_target`.
+#
+# The following functions perform these desired checks. Note that they do not
+# require that the provided object be a dataclass; this enables compatibility
+# with omegaconf containers.
+#
+# These are not part of the public API for now, but they may be in the future.
+def is_builds(x: Any) -> bool:
+    return hasattr(x, _TARGET_FIELD_NAME)
+
+
+def is_just(x: Any) -> bool:
+    if is_builds(x) and hasattr(x, _JUST_FIELD_NAME):
+        attr = _get_target(x)
+        if attr == _get_target(Just) or attr is get_obj:
+            return True
+        else:
+            # ensures we conver this branch in tests
+            False
+    return False
+
+
+def is_partial_builds(x: Any) -> bool:
+    if is_builds(x) and hasattr(x, _PARTIAL_TARGET_FIELD_NAME):
+        attr = _get_target(x)
+        if (attr == _get_target(PartialBuilds) or attr is partial) and is_just(
+            getattr(x, _PARTIAL_TARGET_FIELD_NAME)
+        ):
+            return True
+        else:
+            # ensures we conver this branch in tests
+            return False
+    return False
+
+
+@overload
+def get_target(obj: Type[PartialBuilds[_T]]) -> _T:  # pragma: no cover
+    ...
+
+
+@overload
+def get_target(obj: Type[Just[_T]]) -> _T:  # pragma: no cover
+    ...
+
+
+@overload
+def get_target(obj: Type[Builds[_T]]) -> _T:  # pragma: no cover
+    ...
+
+
+@overload
+def get_target(obj: PartialBuilds[_T]) -> _T:  # pragma: no cover
+    ...
+
+
+@overload
+def get_target(obj: Just[_T]) -> _T:  # pragma: no cover
+    ...
+
+
+@overload
+def get_target(obj: Builds[_T]) -> _T:  # pragma: no cover
+    ...
+
+
+@overload
+def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:   # pragma: no cover
+    ...
+
+
+def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:
+    """
+    Returns the target-object from a targeted structured config.
+
+    Parameters
+    ----------
+    obj : HasTarget | HasPartialTarget
+
+    Returns
+    -------
+    target : Any
+
+    Examples
+    --------
+    >>> from hydra_zen import builds, just, get_target, load_from_yaml
+    >>> get_target(builds(int))
+    int
+    >>> get_target(just(str))
+    str
+
+    This function is useful for accessing a target's type from a config
+    without having to instantiate the target. For example, suppose we want
+    to access a type from a yaml-serialized config.
+
+    >>> ModelConfig = load_from_yaml("model.yaml")
+    >>> get_target(ModelConfig)
+    CustomClassifier
+    """
+    if is_partial_builds(obj):
+        # obj._partial_target_ is `Just[obj]`
+        return get_target(getattr(obj, _PARTIAL_TARGET_FIELD_NAME))
+    elif is_just(obj):
+        field_name = _JUST_FIELD_NAME
+    elif is_builds(obj):
+        field_name = _TARGET_FIELD_NAME
+    else:
+        raise TypeError(
+            f"`obj` must specify a target; i.e. it must have an attribute named"
+            f" {_TARGET_FIELD_NAME} or named {_PARTIAL_TARGET_FIELD_NAME} that"
+            f" points to a target-object or target-string"
+        )
+    target = getattr(obj, field_name)
+
+    if isinstance(target, str):
+        target = get_obj(path=target)
+    else:
+        # Hydra 1.1.0 permits objects-as-_target_ instead of strings
+        # https://github.com/facebookresearch/hydra/issues/1017
+        pass  # makes sure we cover this branch in tests
+
+    return target

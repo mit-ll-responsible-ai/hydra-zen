@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import inspect
+from functools import partial
 
 import hypothesis.strategies as st
 import numpy as np
@@ -9,7 +10,7 @@ import pytest
 from hypothesis import assume, given
 from omegaconf import OmegaConf
 
-from hydra_zen import builds, instantiate, just, to_yaml
+from hydra_zen import builds, get_target, instantiate, just, to_yaml
 from hydra_zen.structured_configs._utils import safe_name
 
 
@@ -31,6 +32,16 @@ numpy_objects = [
     np.polynomial.Polynomial,
     np.polynomial.polynomial.polyadd,
 ]
+
+
+@pytest.mark.parametrize("obj", numpy_objects)
+@pytest.mark.parametrize(
+    "hydra_zen_func", [builds, partial(builds, hydra_partial=True), just]
+)
+def test_get_target_roundtrip(obj, hydra_zen_func):
+    conf = hydra_zen_func(obj)
+    assert get_target(conf) is obj
+    assert get_target(OmegaConf.create(to_yaml(conf))) is obj
 
 
 @pytest.mark.parametrize("obj", numpy_objects)
