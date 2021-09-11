@@ -14,6 +14,7 @@ from omegaconf.errors import ValidationError
 
 from hydra_zen import builds, hydrated_dataclass, instantiate, mutable_value, to_yaml
 from hydra_zen.typing import Just
+
 from tests import valid_hydra_literals
 
 Empty = Parameter.empty
@@ -234,7 +235,7 @@ def test_builds_partial_with_full_sig_excludes_non_specified_params(
         target,
         **user_specified_values,
         populate_full_signature=True,
-        hydra_partial=True
+        hydra_partial=True,
     )
 
     expected_sig = [

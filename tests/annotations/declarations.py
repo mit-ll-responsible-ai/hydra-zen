@@ -2,10 +2,10 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass
-from typing import Any, Callable, Tuple, Type, Literal
+from typing import Any, Callable, Literal, Tuple, Type
 
 from hydra_zen import builds, get_target, instantiate, just
-from hydra_zen.typing import Builds, Just, Partial, PartialBuilds
+from hydra_zen.typing import Builds
 from hydra_zen.typing._implementations import DataClass
 
 

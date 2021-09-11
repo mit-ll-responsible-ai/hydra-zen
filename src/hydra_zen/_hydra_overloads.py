@@ -105,7 +105,7 @@ def instantiate(
 @overload
 def instantiate(
     config: Union[ListConfig, DictConfig, DataClass], *args, **kwargs
-) -> Any:   # pragma: no cover
+) -> Any:  # pragma: no cover
     ...
 
 
