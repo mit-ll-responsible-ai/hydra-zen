@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.2.0+10.g3b91d05 documentation</title>
+  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.2.0+22.gdfe7d4b documentation</title>
   
 
   
@@ -191,6 +191,7 @@
 <span class="kn">from</span> <span class="nn">hydra_zen.funcs</span> <span class="kn">import</span> <span class="n">get_obj</span><span class="p">,</span> <span class="n">partial</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.structured_configs</span> <span class="kn">import</span> <span class="n">_utils</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">Builds</span><span class="p">,</span> <span class="n">Importable</span><span class="p">,</span> <span class="n">Just</span><span class="p">,</span> <span class="n">PartialBuilds</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">HasPartialTarget</span><span class="p">,</span> <span class="n">HasTarget</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="c1"># used to check if default values are ufuncs</span>
@@ -198,7 +199,6 @@
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="n">ufunc</span> <span class="o">=</span> <span class="kc">None</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;builds&quot;</span><span class="p">,</span> <span class="s2">&quot;just&quot;</span><span class="p">,</span> <span class="s2">&quot;hydrated_dataclass&quot;</span><span class="p">,</span> <span class="s2">&quot;mutable_value&quot;</span><span class="p">]</span>
 
 <span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T&quot;</span><span class="p">)</span>
 
@@ -207,6 +207,7 @@
 <span class="n">_CONVERT_FIELD_NAME</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_convert_&quot;</span>
 <span class="n">_PARTIAL_TARGET_FIELD_NAME</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_partial_target_&quot;</span>
 <span class="n">_POS_ARG_FIELD_NAME</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_args_&quot;</span>
+<span class="n">_JUST_FIELD_NAME</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;path&quot;</span>
 <span class="n">_HYDRA_FIELD_NAMES</span><span class="p">:</span> <span class="n">FrozenSet</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span>
     <span class="p">(</span>
         <span class="n">_TARGET_FIELD_NAME</span><span class="p">,</span>
@@ -224,6 +225,10 @@
 <span class="n">_VAR_KEYWORD</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">VAR_KEYWORD</span>
 
 <span class="n">_builtin_function_or_method_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="nb">len</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_target</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_TARGET_FIELD_NAME</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">mutable_value</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
@@ -1052,6 +1057,133 @@
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">The docstring for </span><span class="si">{</span><span class="n">_utils</span><span class="o">.</span><span class="n">safe_name</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2"> :</span><span class="se">\n\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">target_doc</span>
             <span class="p">)</span>
     <span class="k">return</span> <span class="n">out</span></div>
+
+
+<span class="c1"># We need to check if things are Builds, Just, PartialBuilds to a higher</span>
+<span class="c1"># fidelity than is provided by `isinstance(..., &lt;Protocol&gt;)`. I.e. we want to</span>
+<span class="c1"># check that the desired attributes *and* that their values match those of the</span>
+<span class="c1"># protocols. Failing to heed this would, for example, lead to any `Builds` that</span>
+<span class="c1"># happens to have a `path` attribute to be treated as `Just` in `get_target`.</span>
+<span class="c1">#</span>
+<span class="c1"># The following functions perform these desired checks. Note that they do not</span>
+<span class="c1"># require that the provided object be a dataclass; this enables compatibility</span>
+<span class="c1"># with omegaconf containers.</span>
+<span class="c1">#</span>
+<span class="c1"># These are not part of the public API for now, but they may be in the future.</span>
+<span class="k">def</span> <span class="nf">is_builds</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_TARGET_FIELD_NAME</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">is_just</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">is_builds</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_JUST_FIELD_NAME</span><span class="p">):</span>
+        <span class="n">attr</span> <span class="o">=</span> <span class="n">_get_target</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">attr</span> <span class="o">==</span> <span class="n">_get_target</span><span class="p">(</span><span class="n">Just</span><span class="p">)</span> <span class="ow">or</span> <span class="n">attr</span> <span class="ow">is</span> <span class="n">get_obj</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># ensures we conver this branch in tests</span>
+            <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span> <span class="nf">is_partial_builds</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">is_builds</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_PARTIAL_TARGET_FIELD_NAME</span><span class="p">):</span>
+        <span class="n">attr</span> <span class="o">=</span> <span class="n">_get_target</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">attr</span> <span class="o">==</span> <span class="n">_get_target</span><span class="p">(</span><span class="n">PartialBuilds</span><span class="p">)</span> <span class="ow">or</span> <span class="n">attr</span> <span class="ow">is</span> <span class="n">partial</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_just</span><span class="p">(</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_PARTIAL_TARGET_FIELD_NAME</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># ensures we conver this branch in tests</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">_T</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">_T</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">_T</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">PartialBuilds</span><span class="p">[</span><span class="n">_T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Just</span><span class="p">[</span><span class="n">_T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Builds</span><span class="p">[</span><span class="n">_T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">HasTarget</span><span class="p">,</span> <span class="n">HasPartialTarget</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>   <span class="c1"># pragma: no cover</span>
+    <span class="o">...</span>
+
+
+<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">HasTarget</span><span class="p">,</span> <span class="n">HasPartialTarget</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the target-object from a targeted structured config.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    obj : HasTarget | HasPartialTarget</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    target : Any</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from hydra_zen import builds, just, get_target, load_from_yaml</span>
+<span class="sd">    &gt;&gt;&gt; get_target(builds(int))</span>
+<span class="sd">    int</span>
+<span class="sd">    &gt;&gt;&gt; get_target(just(str))</span>
+<span class="sd">    str</span>
+
+<span class="sd">    This function is useful for accessing a target&#39;s type from a config</span>
+<span class="sd">    without having to instantiate the target. For example, suppose we want</span>
+<span class="sd">    to access a type from a yaml-serialized config.</span>
+
+<span class="sd">    &gt;&gt;&gt; ModelConfig = load_from_yaml(&quot;model.yaml&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; get_target(ModelConfig)</span>
+<span class="sd">    CustomClassifier</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">is_partial_builds</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="c1"># obj._partial_target_ is `Just[obj]`</span>
+        <span class="k">return</span> <span class="n">get_target</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">_PARTIAL_TARGET_FIELD_NAME</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">is_just</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="n">field_name</span> <span class="o">=</span> <span class="n">_JUST_FIELD_NAME</span>
+    <span class="k">elif</span> <span class="n">is_builds</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="n">field_name</span> <span class="o">=</span> <span class="n">_TARGET_FIELD_NAME</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;`obj` must specify a target; i.e. it must have an attribute named&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">_TARGET_FIELD_NAME</span><span class="si">}</span><span class="s2"> or named </span><span class="si">{</span><span class="n">_PARTIAL_TARGET_FIELD_NAME</span><span class="si">}</span><span class="s2"> that&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot; points to a target-object or target-string&quot;</span>
+        <span class="p">)</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">field_name</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">get_obj</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Hydra 1.1.0 permits objects-as-_target_ instead of strings</span>
+        <span class="c1"># https://github.com/facebookresearch/hydra/issues/1017</span>
+        <span class="k">pass</span>  <span class="c1"># makes sure we cover this branch in tests</span>
+
+    <span class="k">return</span> <span class="n">target</span>
 </pre></div>
 
            </div>
