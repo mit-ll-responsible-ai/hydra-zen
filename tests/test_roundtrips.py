@@ -11,7 +11,7 @@ from hypothesis import given
 from omegaconf import OmegaConf
 
 from hydra_zen import builds, get_target, instantiate, just, to_yaml
-from hydra_zen.typing._implementations import HasTarget
+
 from tests import valid_hydra_literals
 
 arbitrary_kwargs = st.dictionaries(

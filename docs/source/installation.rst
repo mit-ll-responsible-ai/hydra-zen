@@ -22,9 +22,6 @@ We will then launch multiple jobs – each on calls the function with a differen
 
 .. code-block:: python
 
-   from hydra_zen import builds, instantiate, to_yaml
-   from hydra_zen.experimental import hydra_multirun
-
    # some code to configure and run
    def repeat_text(num: int, text: str) -> str:
        return text * num

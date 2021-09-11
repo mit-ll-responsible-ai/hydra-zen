@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import Field
-from typing import Any, Callable, Dict, Generic, Tuple, TypeVar, Union
+from typing import Any, Callable, Dict, Generic, Tuple, TypeVar
 
 from typing_extensions import Protocol, runtime_checkable
 

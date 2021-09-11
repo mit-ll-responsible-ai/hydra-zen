@@ -4,7 +4,7 @@
 import sys
 from dataclasses import is_dataclass
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Tuple, TypeVar, Union
+from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
 
 from typing_extensions import Final
 

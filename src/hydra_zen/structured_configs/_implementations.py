@@ -670,10 +670,10 @@ def builds(
 
     # these are the names of the only parameters in the signature of `target` that can
     # be referenced by name
-    nameable_params_in_sig: Set[str] = set(
+    nameable_params_in_sig: Set[str] = {
         p.name
         for p in chain(sig_by_kind[_POSITIONAL_OR_KEYWORD], sig_by_kind[_KEYWORD_ONLY])
-    )
+    }
 
     if not pos_args and builds_bases:
         # pos_args is potentially inherited
@@ -966,7 +966,7 @@ def get_target(obj: Builds[_T]) -> _T:  # pragma: no cover
 
 
 @overload
-def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:   # pragma: no cover
+def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:  # pragma: no cover
     ...
 
 

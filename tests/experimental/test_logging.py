@@ -23,13 +23,13 @@ def test_consecutive_logs():
     job2 = hydra_run(builds(dict, message="2"), task_function=task)
 
     if job1.working_dir == job2.working_dir:
-        with open(Path(job1.working_dir) / "hydra_run.log", "r") as f:
+        with open(Path(job1.working_dir) / "hydra_run.log") as f:
             line1, line2 = f.readlines()
         assert "message: 1" in line1
         assert "message: 2" in line2
 
     else:
         for n, job in enumerate([job1, job2]):
-            with open(Path(job.working_dir) / "hydra_run.log", "r") as f:
+            with open(Path(job.working_dir) / "hydra_run.log") as f:
                 (line,) = f.readlines()
             assert f"message: {n + 1}" in line

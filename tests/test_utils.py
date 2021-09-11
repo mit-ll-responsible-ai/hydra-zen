@@ -7,9 +7,8 @@ from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Type, TypeVar, Union
 
 import hypothesis.strategies as st
-import omegaconf
 import pytest
-from hypothesis import given, note
+from hypothesis import given
 from omegaconf import OmegaConf, ValidationError
 from omegaconf.errors import (
     ConfigIndexError,

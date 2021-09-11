@@ -85,7 +85,7 @@ def test_builds_raises_when_user_specified_args_violate_sig(
             *args,
             **kwargs,
             hydra_partial=partial,
-            populate_full_signature=full_sig
+            populate_full_signature=full_sig,
         )
 
     # test when **kwargs are inherited
@@ -96,7 +96,7 @@ def test_builds_raises_when_user_specified_args_violate_sig(
             *args,
             hydra_partial=partial,
             populate_full_signature=full_sig,
-            builds_bases=(kwarg_base,)
+            builds_bases=(kwarg_base,),
         )
 
     # test when *args are inherited
@@ -107,7 +107,7 @@ def test_builds_raises_when_user_specified_args_violate_sig(
             **kwargs,
             hydra_partial=partial,
             populate_full_signature=full_sig,
-            builds_bases=(args_base,)
+            builds_bases=(args_base,),
         )
 
     # test when *args and **kwargs are inherited
