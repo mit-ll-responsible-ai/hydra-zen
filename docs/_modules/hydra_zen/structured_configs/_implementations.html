@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.2.0+22.gdfe7d4b documentation</title>
+  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.2.0+23.gdbabacf documentation</title>
   
 
   
@@ -833,10 +833,10 @@
 
     <span class="c1"># these are the names of the only parameters in the signature of `target` that can</span>
     <span class="c1"># be referenced by name</span>
-    <span class="n">nameable_params_in_sig</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+    <span class="n">nameable_params_in_sig</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">p</span><span class="o">.</span><span class="n">name</span>
         <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">chain</span><span class="p">(</span><span class="n">sig_by_kind</span><span class="p">[</span><span class="n">_POSITIONAL_OR_KEYWORD</span><span class="p">],</span> <span class="n">sig_by_kind</span><span class="p">[</span><span class="n">_KEYWORD_ONLY</span><span class="p">])</span>
-    <span class="p">)</span>
+    <span class="p">}</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">pos_args</span> <span class="ow">and</span> <span class="n">builds_bases</span><span class="p">:</span>
         <span class="c1"># pos_args is potentially inherited</span>
@@ -1129,7 +1129,7 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">HasTarget</span><span class="p">,</span> <span class="n">HasPartialTarget</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>   <span class="c1"># pragma: no cover</span>
+<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">HasTarget</span><span class="p">,</span> <span class="n">HasPartialTarget</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="o">...</span>
 
 
