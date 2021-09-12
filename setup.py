@@ -68,4 +68,5 @@ setup(
     python_requires=">=3.6",
     packages=find_packages(where="src", exclude=["tests", "tests.*"]),
     package_dir={"": "src"},
+    package_data={"hydra_zen": ["py.typed"]}
 )
