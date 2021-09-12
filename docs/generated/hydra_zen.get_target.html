@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>get_target &mdash; hydra-zen 0.3.0rc1+1.g44aca0e documentation</title>
+  <title>get_target &mdash; hydra-zen 0.3.0rc1+2.g61b991e documentation</title>
   
 
   
@@ -185,6 +185,8 @@
 <dt id="hydra_zen.get_target">
 <code class="sig-prename descclassname"><span class="pre">hydra_zen.</span></code><code class="sig-name descname"><span class="pre">get_target</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/structured_configs/_implementations.html#get_target"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.get_target" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the target-object from a targeted structured config.</p>
+<p>The target is imported and returned if the config’s <code class="docutils literal notranslate"><span class="pre">_target_</span></code>
+field is a string that indicates its location.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -203,6 +205,15 @@
 <span class="go">int</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">get_target</span><span class="p">(</span><span class="n">just</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
 <span class="go">str</span>
+</pre></div>
+</div>
+<p>This works even if the <code class="docutils literal notranslate"><span class="pre">_target_</span></code> field specifies a string.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nd">@dataclass</span>
+<span class="gp">... </span><span class="k">class</span> <span class="nc">A</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;builtins.dict&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_target</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="go">dict</span>
 </pre></div>
 </div>
 <p>This function is useful for accessing a target’s type from a config

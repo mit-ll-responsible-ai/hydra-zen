@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.3.0rc1+1.g44aca0e documentation</title>
+  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.3.0rc1+2.g61b991e documentation</title>
   
 
   
@@ -1137,6 +1137,9 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the target-object from a targeted structured config.</span>
 
+<span class="sd">    The target is imported and returned if the config&#39;s ``_target_``</span>
+<span class="sd">    field is a string that indicates its location.</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    obj : HasTarget | HasPartialTarget</span>
@@ -1152,6 +1155,15 @@
 <span class="sd">    int</span>
 <span class="sd">    &gt;&gt;&gt; get_target(just(str))</span>
 <span class="sd">    str</span>
+
+<span class="sd">    This works even if the ``_target_`` field specifies a string.</span>
+
+<span class="sd">    &gt;&gt;&gt; from dataclasses import dataclass</span>
+<span class="sd">    &gt;&gt;&gt; @dataclass</span>
+<span class="sd">    ... class A:</span>
+<span class="sd">    ...     _target_: str = &quot;builtins.dict&quot;</span>
+<span class="sd">    &gt;&gt;&gt; get_target(A)</span>
+<span class="sd">    dict</span>
 
 <span class="sd">    This function is useful for accessing a target&#39;s type from a config</span>
 <span class="sd">    without having to instantiate the target. For example, suppose we want</span>
