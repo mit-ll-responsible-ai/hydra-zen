@@ -13,9 +13,9 @@ All previous releases should still be available on pip.
 
 This release:
 
-- Adds the `get_target` function for retrieving target-objects from structured configs. `#94 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/94>`_
-- Adds PEP 561 compliance (e.g. hydra-zen is now compatible with mypy). `#97 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/97>`_`
-- Refactores hydra-zen's internals using `shed <https://pypi.org/project/shed/>_`. `#95 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/95>`_
+- Adds the :func:`~hydra_zen.get_target` function for retrieving target-objects from structured configs. `#94 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/94>`_
+- Adds PEP 561 compliance (e.g. hydra-zen is now compatible with mypy). `#97 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/97>`_
+- Refactores hydra-zen's internals using `shed <https://pypi.org/project/shed/>`_. `#95 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/95>`_
 - Makes improvements to hydra-zen's test suite. `#90 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/90>`_ and `#91 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/91>`_.
 
 .. _v0.2.0:
