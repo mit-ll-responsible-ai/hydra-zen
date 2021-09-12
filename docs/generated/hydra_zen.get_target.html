@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>just &mdash; hydra-zen 0.3.0rc1 documentation</title>
+  <title>get_target &mdash; hydra-zen 0.3.0rc1 documentation</title>
   
 
   
@@ -39,8 +39,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="hydrated_dataclass" href="hydra_zen.hydrated_dataclass.html" />
-    <link rel="prev" title="builds" href="hydra_zen.builds.html" /> 
+    <link rel="next" title="Running Experiments with Hydra" href="../experimental.html" />
+    <link rel="prev" title="hydrated_dataclass" href="hydra_zen.hydrated_dataclass.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -97,9 +97,9 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../structured_configs.html">Dynamically Generating Structured Configs</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../structured_configs.html#api-reference">API Reference</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="hydra_zen.builds.html">builds</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">just</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hydra_zen.just.html">just</a></li>
 <li class="toctree-l3"><a class="reference internal" href="hydra_zen.hydrated_dataclass.html">hydrated_dataclass</a></li>
-<li class="toctree-l3"><a class="reference internal" href="hydra_zen.get_target.html">get_target</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">get_target</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../structured_configs.html#basics-of-structured-configs">Basics of Structured Configs</a></li>
@@ -160,13 +160,13 @@
         
           <li><a href="../structured_configs.html">Dynamically Generating Structured Configs</a> &raquo;</li>
         
-      <li>just</li>
+      <li>get_target</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/generated/hydra_zen.just.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/generated/hydra_zen.get_target.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -179,38 +179,38 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="just">
-<h1>just<a class="headerlink" href="#just" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="get-target">
+<h1>get_target<a class="headerlink" href="#get-target" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="hydra_zen.just">
-<code class="sig-prename descclassname"><span class="pre">hydra_zen.</span></code><code class="sig-name descname"><span class="pre">just</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/structured_configs/_implementations.html#just"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.just" title="Permalink to this definition">¶</a></dt>
-<dd><p>Produces a structured config that, when instantiated by hydra, ‘just’
-returns <code class="xref py py-obj docutils literal notranslate"><span class="pre">obj</span></code>.</p>
-<p>This is convenient for specifying a particular, un-instantiated object as part of your
-configuration.</p>
+<dt id="hydra_zen.get_target">
+<code class="sig-prename descclassname"><span class="pre">hydra_zen.</span></code><code class="sig-name descname"><span class="pre">get_target</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/structured_configs/_implementations.html#get_target"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.get_target" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the target-object from a targeted structured config.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>obj</strong><span class="classifier">Importable</span></dt><dd><p>The object that will be instantiated from this config.</p>
-</dd>
+<dt><strong>obj</strong><span class="classifier">HasTarget | HasPartialTarget</span></dt><dd></dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>types.JustObj</dt><dd><p>The dataclass object that is designed as a structured config.</p>
-</dd>
+<dt><strong>target</strong><span class="classifier">Any</span></dt><dd></dd>
 </dl>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">just</span><span class="p">,</span> <span class="n">instantiate</span><span class="p">,</span> <span class="n">to_yaml</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">just_range</span> <span class="o">=</span> <span class="n">just</span><span class="p">(</span><span class="nb">range</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">range</span> <span class="ow">is</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">just_range</span><span class="p">)</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">just_range</span><span class="o">.</span><span class="n">_target_</span>
-<span class="go">&#39;hydra_zen.funcs.identity&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">just_range</span><span class="o">.</span><span class="n">path</span>
-<span class="go">&#39;builtins.range&#39;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">builds</span><span class="p">,</span> <span class="n">just</span><span class="p">,</span> <span class="n">get_target</span><span class="p">,</span> <span class="n">load_from_yaml</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_target</span><span class="p">(</span><span class="n">builds</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span>
+<span class="go">int</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_target</span><span class="p">(</span><span class="n">just</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
+<span class="go">str</span>
+</pre></div>
+</div>
+<p>This function is useful for accessing a target’s type from a config
+without having to instantiate the target. For example, suppose we want
+to access a type from a yaml-serialized config.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ModelConfig</span> <span class="o">=</span> <span class="n">load_from_yaml</span><span class="p">(</span><span class="s2">&quot;model.yaml&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_target</span><span class="p">(</span><span class="n">ModelConfig</span><span class="p">)</span>
+<span class="go">CustomClassifier</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -223,8 +223,8 @@ configuration.</p>
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="hydra_zen.hydrated_dataclass.html" class="btn btn-neutral float-right" title="hydrated_dataclass" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="hydra_zen.builds.html" class="btn btn-neutral float-left" title="builds" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../experimental.html" class="btn btn-neutral float-right" title="Running Experiments with Hydra" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="hydra_zen.hydrated_dataclass.html" class="btn btn-neutral float-left" title="hydrated_dataclass" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

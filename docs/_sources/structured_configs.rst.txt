@@ -18,6 +18,7 @@ This helps to keep the process of configuring complex applications simple, intui
    builds
    just
    hydrated_dataclass
+   get_target
 
 
 ****************************
