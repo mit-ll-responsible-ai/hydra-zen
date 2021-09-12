@@ -974,6 +974,9 @@ def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:
     """
     Returns the target-object from a targeted structured config.
 
+    The target is imported and returned if the config's ``_target_``
+    field is a string that indicates its location.
+
     Parameters
     ----------
     obj : HasTarget | HasPartialTarget
@@ -989,6 +992,15 @@ def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:
     int
     >>> get_target(just(str))
     str
+
+    This works even if the ``_target_`` field specifies a string.
+
+    >>> from dataclasses import dataclass
+    >>> @dataclass
+    ... class A:
+    ...     _target_: str = "builtins.dict"
+    >>> get_target(A)
+    dict
 
     This function is useful for accessing a target's type from a config
     without having to instantiate the target. For example, suppose we want
