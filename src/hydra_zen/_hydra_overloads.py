@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-Provides annotation overloads for various hydra functions, using the types defined in `hydra_utils.typing`.
+Provides annotation overloads for various hydra functions, using the types defined in `hydra_zen.typing`.
 This enables tools like IDEs to be more incisive during static analysis and to provide users with additional
 context about their code.
 
@@ -10,7 +10,7 @@ E.g.
 
 .. code::
 
-   from hydra_utils import builds, instantiate
+   from hydra_zen import builds, instantiate
    DictConfig = builds(dict, a=1, b=2)  # type: Builds[Type[dict]]
 
    # static analysis tools can provide useful type information
@@ -116,7 +116,7 @@ def instantiate(config: Any, *args, **kwargs) -> Any:
     Calls `hydra.utils.instantiate(config, *args, **kwargs)`
 
     This functions is identical to `hydra.utils.instantiate`, but it provides
-    useful static type information by leveraging the types defined in `hydra_utils.typing`.
+    useful static type information by leveraging the types defined in `hydra_zen.typing`.
 
     Parameters
     ----------
