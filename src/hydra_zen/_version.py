@@ -41,8 +41,8 @@ def get_config():
     cfg.VCS = "git"
     cfg.style = "pep440"
     cfg.tag_prefix = "v"
-    cfg.parentdir_prefix = "hydra_utils-"
-    cfg.versionfile_source = "src/hydra_utils/_version.py"
+    cfg.parentdir_prefix = "hydra_zen-"
+    cfg.versionfile_source = "src/hydra_zen/_version.py"
     cfg.verbose = False
     return cfg
 
