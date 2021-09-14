@@ -7,9 +7,9 @@ All previous releases should still be available on pip.
 
 .. _v0.3.0:
 
-------------------
+---------------------
 0.3.0rc1 - 2021-09-12
-------------------
+---------------------
 
 This release:
 
