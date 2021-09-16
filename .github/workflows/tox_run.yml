@@ -170,4 +170,4 @@ jobs:
         python -m pip install --upgrade pip
         pip install -e .
     - name: Run pyright
-      run: pyright --lib tests/annotations/
+      run: pyright --lib tests/annotations/ src/
