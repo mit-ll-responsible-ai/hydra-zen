@@ -16,7 +16,7 @@ from hydra_zen.typing import Partial as _Partial
 
 _T = _typing.TypeVar("_T")
 
-__all__ = ["partial", "get_obj"]
+__all__ = ["partial", "get_obj", "pass_it"]
 
 
 def partial(
@@ -38,3 +38,12 @@ def get_obj(*, path: str) -> _typing.Union[type, _typing.Callable[..., _typing.A
     except Exception as e:  # pragma: no cover
         _log.error(f"Error getting callable at {path} : {e}")
         raise e
+
+
+def pass_it(
+    *args, _true_target_: str, _excluded_: _typing.Sequence[str], **kwargs
+) -> _typing.Any:
+    excluded_set = set(_excluded_)
+    kwargs = {k: v for k, v in kwargs.items() if k not in excluded_set}
+    target = get_obj(path=_true_target_)
+    return target(*args, **kwargs)

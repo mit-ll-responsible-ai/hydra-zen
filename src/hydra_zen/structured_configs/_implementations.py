@@ -26,7 +26,7 @@ from typing import (
 
 from typing_extensions import Final, Literal
 
-from hydra_zen.funcs import get_obj, partial
+from hydra_zen.funcs import get_obj, partial, pass_it
 from hydra_zen.structured_configs import _utils
 from hydra_zen.typing import Builds, Importable, Just, PartialBuilds
 from hydra_zen.typing._implementations import HasPartialTarget, HasTarget
@@ -352,6 +352,7 @@ def builds(
     hydra_partial: Literal[False] = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_meta: Optional[Dict[str, Any]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
@@ -369,6 +370,7 @@ def builds(
     hydra_partial: Literal[True],
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_meta: Optional[Dict[str, Any]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
@@ -386,6 +388,7 @@ def builds(
     hydra_partial: bool,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_meta: Optional[Dict[str, Any]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
@@ -403,6 +406,7 @@ def builds(
     hydra_partial: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_meta: Optional[Dict[str, Any]] = None,
     frozen: bool = False,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
@@ -607,6 +611,24 @@ def builds(
                 _utils.field(default=just(target), init=False),
             ),
         ]
+    elif hydra_meta:
+        target_field = [
+            (
+                _TARGET_FIELD_NAME,
+                str,
+                _utils.field(default=_utils.get_obj_path(pass_it), init=False),
+            ),
+            (
+                "_true_target_",  # TODO: replace with global constant
+                str,
+                _utils.field(default=_utils.get_obj_path(target), init=False),
+            ),
+            (
+                "_excluded_",
+                Tuple[str],
+                _utils.field(default=tuple(hydra_meta), init=False),
+            ),
+        ]
     else:
         target_field = [
             (
@@ -807,6 +829,16 @@ def builds(
         for name, value in kwargs_for_target.items()
     }
 
+    # TODO: validate to ensure no collision with named arguments or
+    # with named arguments in signature. Also check inherited case
+    if hydra_meta:
+        user_specified_named_params.update(
+            {
+                name: (name, Any, sanitized_default_value(value))
+                for name, value in hydra_meta.items()
+            }
+        )
+
     if populate_full_signature is True:
         # Populate dataclass fields based on the target's signature.
         #
@@ -984,6 +1016,9 @@ def get_target(obj: Builds[_T]) -> _T:  # pragma: no cover
 @overload
 def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:  # pragma: no cover
     ...
+
+
+# TODO: add case for new namespace build flavor
 
 
 def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:
