@@ -111,7 +111,7 @@ def field(
     hash: Optional[bool] = ...,
     compare: bool = ...,
     metadata: Optional[Mapping[Any, Any]] = ...,
-) -> Field:
+) -> Field:  # pragma: no cover
     ...
 
 
@@ -124,7 +124,7 @@ def field(
     hash: Optional[bool] = ...,
     compare: bool = ...,
     metadata: Optional[Mapping[Any, Any]] = ...,
-) -> Field:
+) -> Field:  # pragma: no cover
     ...
 
 
