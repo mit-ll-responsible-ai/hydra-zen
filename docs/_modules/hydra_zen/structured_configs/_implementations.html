@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.3.0rc1+5.g40111ba documentation</title>
+  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.3.0rc1+6.ge997b21 documentation</title>
   
 
   
@@ -166,7 +166,7 @@
 
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">is_dataclass</span><span class="p">,</span> <span class="n">make_dataclass</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">is_dataclass</span><span class="p">,</span> <span class="n">make_dataclass</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
@@ -182,6 +182,7 @@
     <span class="n">Type</span><span class="p">,</span>
     <span class="n">TypeVar</span><span class="p">,</span>
     <span class="n">Union</span><span class="p">,</span>
+    <span class="n">cast</span><span class="p">,</span>
     <span class="n">get_type_hints</span><span class="p">,</span>
     <span class="n">overload</span><span class="p">,</span>
 <span class="p">)</span>
@@ -195,7 +196,7 @@
 
 <span class="k">try</span><span class="p">:</span>
     <span class="c1"># used to check if default values are ufuncs</span>
-    <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">ufunc</span>
+    <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">ufunc</span>  <span class="c1"># type: ignore</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="n">ufunc</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -254,7 +255,7 @@
 <span class="sd">    ... class HasMutableDefault</span>
 <span class="sd">    ...     a_list: list  = mutable_value([1, 2, 3])  # ok&quot;&quot;&quot;</span>
     <span class="n">cast</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  <span class="c1"># ensure that we return a copy of the default value</span>
-    <span class="k">return</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 
 
 <span class="n">Field_Entry</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">Field</span><span class="p">]</span>
@@ -401,6 +402,7 @@
         <span class="c1">#       from, which gets the job done for the most part but there are</span>
         <span class="c1">#       practical differences. E.g. you cannot delete an attribute that</span>
         <span class="c1">#       was declared in the definition of `decorated_obj`.</span>
+        <span class="n">decorated_obj</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">decorated_obj</span><span class="p">)</span>
         <span class="n">decorated_obj</span> <span class="o">=</span> <span class="n">dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="n">frozen</span><span class="p">)(</span><span class="n">decorated_obj</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">builds</span><span class="p">(</span>
@@ -459,12 +461,12 @@
             <span class="p">(</span>
                 <span class="n">_TARGET_FIELD_NAME</span><span class="p">,</span>
                 <span class="nb">str</span><span class="p">,</span>
-                <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">get_obj</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+                <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">get_obj</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
             <span class="p">),</span>
             <span class="p">(</span>
                 <span class="s2">&quot;path&quot;</span><span class="p">,</span>
                 <span class="nb">str</span><span class="p">,</span>
-                <span class="n">field</span><span class="p">(</span>
+                <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span>
                     <span class="n">default</span><span class="o">=</span><span class="n">obj_path</span><span class="p">,</span>
                     <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="p">),</span>
@@ -475,10 +477,10 @@
         <span class="sa">f</span><span class="s2">&quot;A structured config designed to return </span><span class="si">{</span><span class="n">obj</span><span class="si">}</span><span class="s2"> when it is instantiated by hydra&quot;</span>
     <span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">out_class</span></div>
+    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Type</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">out_class</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">create_just_if_needed</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">_T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">_T</span><span class="p">]]]:</span>
+<span class="k">def</span> <span class="nf">create_just_if_needed</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">_T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">Just</span><span class="p">]]:</span>
     <span class="c1"># Hydra can serialize dataclasses directly, thus we</span>
     <span class="c1"># don&#39;t want to wrap these in `just`</span>
 
@@ -493,11 +495,15 @@
     <span class="k">return</span> <span class="n">value</span>
 
 
-<span class="k">def</span> <span class="nf">sanitized_default_value</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Field</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">Just</span><span class="p">]]:</span>
+<span class="k">def</span> <span class="nf">sanitized_default_value</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">_utils</span><span class="o">.</span><span class="n">KNOWN_MUTABLE_TYPES</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">mutable_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
     <span class="n">resolved_value</span> <span class="o">=</span> <span class="n">create_just_if_needed</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">value</span><span class="p">)</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">resolved_value</span> <span class="k">else</span> <span class="n">resolved_value</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">resolved_value</span>
+        <span class="k">else</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">resolved_value</span><span class="p">)</span>
+    <span class="p">)</span>
 
 
 <span class="c1"># overloads when `hydra_partial=False`</span>
@@ -749,34 +755,44 @@
             <span class="o">+</span> <span class="s2">&quot;`builds(..., hydra_partial=True)` requires that `hydra_recursive=True`&quot;</span>
         <span class="p">)</span>
 
+    <span class="n">target_field</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Field</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]]</span>
+
     <span class="k">if</span> <span class="n">hydra_partial</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
         <span class="n">target_field</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">(</span>
                 <span class="n">_TARGET_FIELD_NAME</span><span class="p">,</span>
                 <span class="nb">str</span><span class="p">,</span>
-                <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">partial</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+                <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">partial</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
             <span class="p">),</span>
-            <span class="p">(</span><span class="n">_PARTIAL_TARGET_FIELD_NAME</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">just</span><span class="p">(</span><span class="n">target</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)),</span>
+            <span class="p">(</span>
+                <span class="n">_PARTIAL_TARGET_FIELD_NAME</span><span class="p">,</span>
+                <span class="n">Any</span><span class="p">,</span>
+                <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">just</span><span class="p">(</span><span class="n">target</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+            <span class="p">),</span>
         <span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">target_field</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">(</span>
                 <span class="n">_TARGET_FIELD_NAME</span><span class="p">,</span>
                 <span class="nb">str</span><span class="p">,</span>
-                <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">target</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+                <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">target</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
             <span class="p">)</span>
         <span class="p">]</span>
 
-    <span class="n">base_fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">Field_Entry</span><span class="p">]]</span> <span class="o">=</span> <span class="n">target_field</span>
+    <span class="n">base_fields</span> <span class="o">=</span> <span class="n">target_field</span>
 
     <span class="k">if</span> <span class="n">hydra_recursive</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">base_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="p">(</span><span class="n">_RECURSIVE_FIELD_NAME</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">hydra_recursive</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+            <span class="p">(</span>
+                <span class="n">_RECURSIVE_FIELD_NAME</span><span class="p">,</span>
+                <span class="nb">bool</span><span class="p">,</span>
+                <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">hydra_recursive</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+            <span class="p">)</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">hydra_convert</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">base_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="p">(</span><span class="n">_CONVERT_FIELD_NAME</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">hydra_convert</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+            <span class="p">(</span><span class="n">_CONVERT_FIELD_NAME</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">hydra_convert</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">pos_args</span><span class="p">:</span>
@@ -784,7 +800,7 @@
             <span class="p">(</span>
                 <span class="n">_POS_ARG_FIELD_NAME</span><span class="p">,</span>
                 <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
-                <span class="n">field</span><span class="p">(</span>
+                <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span>
                     <span class="n">default</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">create_just_if_needed</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pos_args</span><span class="p">),</span>
                     <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="p">),</span>
@@ -799,7 +815,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="n">_utils</span><span class="o">.</span><span class="n">building_error_prefix</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
                 <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2"> does not have an inspectable signature. &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;`builds(</span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, populate_full_signature=True)` is not supported&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;`builds(</span><span class="si">{</span><span class="n">_utils</span><span class="o">.</span><span class="n">safe_name</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2">, populate_full_signature=True)` is not supported&quot;</span>
             <span class="p">)</span>
         <span class="n">signature_params</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="c1"># We will turn off signature validation for objects that didn&#39;t have</span>
@@ -1028,9 +1044,9 @@
 
     <span class="k">if</span> <span class="n">dataclass_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">hydra_partial</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="n">dataclass_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Builds_</span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">dataclass_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Builds_</span><span class="si">{</span><span class="n">_utils</span><span class="o">.</span><span class="n">safe_name</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">dataclass_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;PartialBuilds_</span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">dataclass_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;PartialBuilds_</span><span class="si">{</span><span class="n">_utils</span><span class="o">.</span><span class="n">safe_name</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="n">out</span> <span class="o">=</span> <span class="n">make_dataclass</span><span class="p">(</span>
         <span class="n">dataclass_name</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">base_fields</span><span class="p">,</span> <span class="n">bases</span><span class="o">=</span><span class="n">builds_bases</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="n">frozen</span>
@@ -1056,7 +1072,7 @@
             <span class="n">out</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">The docstring for </span><span class="si">{</span><span class="n">_utils</span><span class="o">.</span><span class="n">safe_name</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2"> :</span><span class="se">\n\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">target_doc</span>
             <span class="p">)</span>
-    <span class="k">return</span> <span class="n">out</span></div>
+    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">out</span><span class="p">)</span></div>
 
 
 <span class="c1"># We need to check if things are Builds, Just, PartialBuilds to a higher</span>
