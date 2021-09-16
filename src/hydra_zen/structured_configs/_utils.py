@@ -2,9 +2,21 @@
 # SPDX-License-Identifier: MIT
 
 import sys
-from dataclasses import is_dataclass
+from dataclasses import MISSING, Field, field as _field, is_dataclass
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union, cast
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    TypeVar,
+    Union,
+    cast,
+    overload,
+)
 
 from typing_extensions import Final
 
@@ -81,6 +93,74 @@ HYDRA_SUPPORTED_PRIMITIVES: Final = {int, float, bool, str, Enum}
 KNOWN_MUTABLE_TYPES = (list, dict, set)
 
 T = TypeVar("T")
+
+
+# The typeshed definition of `field` has an inaccurate annotation:
+#  https://github.com/python/typeshed/blob/b9e1d7d522fe90b98e07d43a764bbe60216bc2c4/stdlib/dataclasses.pyi#L109
+# This makes it impossible for make_dataclass to by type-correct in the eyes of
+# static checkers. See https://github.com/microsoft/pyright/issues/1680 for discussion
+#
+# Thus we..*sigh*.. we provide our own overloads for `field`.
+@overload  # `default` and `default_factory` are optional and mutually exclusive.
+def field(
+    *,
+    default: Any,
+    init: bool = ...,
+    repr: bool = ...,
+    hash: Optional[bool] = ...,
+    compare: bool = ...,
+    metadata: Optional[Mapping[Any, Any]] = ...,
+) -> Field:
+    ...
+
+
+@overload
+def field(
+    *,
+    default_factory: Callable[[], Any],
+    init: bool = ...,
+    repr: bool = ...,
+    hash: Optional[bool] = ...,
+    compare: bool = ...,
+    metadata: Optional[Mapping[Any, Any]] = ...,
+) -> Field:
+    ...
+
+
+def field(
+    *,
+    default=MISSING,
+    default_factory=MISSING,
+    init=True,
+    repr=True,
+    hash=None,
+    compare=True,
+    metadata=None,
+) -> Field:
+    if default is MISSING:
+        return cast(
+            Field,
+            _field(
+                default_factory=default_factory,
+                init=init,
+                repr=repr,
+                hash=hash,
+                compare=compare,
+                metadata=metadata,
+            ),
+        )
+    else:
+        return cast(
+            Field,
+            _field(
+                default=default,
+                init=init,
+                repr=repr,
+                hash=hash,
+                compare=compare,
+                metadata=metadata,
+            ),
+        )
 
 
 def safe_name(obj: Any, repr_allowed=True) -> str:

@@ -3,7 +3,7 @@
 
 import inspect
 from collections import defaultdict
-from dataclasses import Field, dataclass, field, fields, is_dataclass, make_dataclass
+from dataclasses import Field, dataclass, fields, is_dataclass, make_dataclass
 from functools import partial
 from itertools import chain
 from typing import (
@@ -19,6 +19,7 @@ from typing import (
     Type,
     TypeVar,
     Union,
+    cast,
     get_type_hints,
     overload,
 )
@@ -91,7 +92,7 @@ def mutable_value(x: Any) -> Field:
     ... class HasMutableDefault
     ...     a_list: list  = mutable_value([1, 2, 3])  # ok"""
     cast = type(x)  # ensure that we return a copy of the default value
-    return field(default_factory=lambda: cast(x))
+    return _utils.field(default_factory=lambda: cast(x))
 
 
 Field_Entry = Tuple[str, type, Field]
@@ -238,6 +239,7 @@ def hydrated_dataclass(
         #       from, which gets the job done for the most part but there are
         #       practical differences. E.g. you cannot delete an attribute that
         #       was declared in the definition of `decorated_obj`.
+        decorated_obj = cast(Any, decorated_obj)
         decorated_obj = dataclass(frozen=frozen)(decorated_obj)
 
         return builds(
@@ -296,12 +298,12 @@ def just(obj: Importable) -> Type[Just[Importable]]:
             (
                 _TARGET_FIELD_NAME,
                 str,
-                field(default=_utils.get_obj_path(get_obj), init=False),
+                _utils.field(default=_utils.get_obj_path(get_obj), init=False),
             ),
             (
                 "path",
                 str,
-                field(
+                _utils.field(
                     default=obj_path,
                     init=False,
                 ),
@@ -312,10 +314,10 @@ def just(obj: Importable) -> Type[Just[Importable]]:
         f"A structured config designed to return {obj} when it is instantiated by hydra"
     )
 
-    return out_class
+    return cast(Type[Just[Importable]], out_class)
 
 
-def create_just_if_needed(value: _T) -> Union[_T, Type[Just[_T]]]:
+def create_just_if_needed(value: _T) -> Union[_T, Type[Just]]:
     # Hydra can serialize dataclasses directly, thus we
     # don't want to wrap these in `just`
 
@@ -330,11 +332,15 @@ def create_just_if_needed(value: _T) -> Union[_T, Type[Just[_T]]]:
     return value
 
 
-def sanitized_default_value(value: Any) -> Union[Field, Type[Just]]:
+def sanitized_default_value(value: Any) -> Field:
     if isinstance(value, _utils.KNOWN_MUTABLE_TYPES):
         return mutable_value(value)
     resolved_value = create_just_if_needed(value)
-    return field(default=value) if value is resolved_value else resolved_value
+    return (
+        _utils.field(default=value)
+        if value is resolved_value
+        else _utils.field(default=resolved_value)
+    )
 
 
 # overloads when `hydra_partial=False`
@@ -586,34 +592,44 @@ def builds(
             + "`builds(..., hydra_partial=True)` requires that `hydra_recursive=True`"
         )
 
+    target_field: List[Union[Tuple[str, Type[Any]], Tuple[str, Type[Any], Field[Any]]]]
+
     if hydra_partial is True:
         target_field = [
             (
                 _TARGET_FIELD_NAME,
                 str,
-                field(default=_utils.get_obj_path(partial), init=False),
+                _utils.field(default=_utils.get_obj_path(partial), init=False),
             ),
-            (_PARTIAL_TARGET_FIELD_NAME, Any, field(default=just(target), init=False)),
+            (
+                _PARTIAL_TARGET_FIELD_NAME,
+                Any,
+                _utils.field(default=just(target), init=False),
+            ),
         ]
     else:
         target_field = [
             (
                 _TARGET_FIELD_NAME,
                 str,
-                field(default=_utils.get_obj_path(target), init=False),
+                _utils.field(default=_utils.get_obj_path(target), init=False),
             )
         ]
 
-    base_fields: List[Tuple[str, type, Field_Entry]] = target_field
+    base_fields = target_field
 
     if hydra_recursive is not None:
         base_fields.append(
-            (_RECURSIVE_FIELD_NAME, bool, field(default=hydra_recursive, init=False))
+            (
+                _RECURSIVE_FIELD_NAME,
+                bool,
+                _utils.field(default=hydra_recursive, init=False),
+            )
         )
 
     if hydra_convert is not None:
         base_fields.append(
-            (_CONVERT_FIELD_NAME, str, field(default=hydra_convert, init=False))
+            (_CONVERT_FIELD_NAME, str, _utils.field(default=hydra_convert, init=False))
         )
 
     if pos_args:
@@ -621,7 +637,7 @@ def builds(
             (
                 _POS_ARG_FIELD_NAME,
                 Tuple[Any, ...],
-                field(
+                _utils.field(
                     default=tuple(create_just_if_needed(x) for x in pos_args),
                     init=False,
                 ),
@@ -636,7 +652,7 @@ def builds(
             raise ValueError(
                 _utils.building_error_prefix(target)
                 + f"{target} does not have an inspectable signature. "
-                f"`builds({target.__name__}, populate_full_signature=True)` is not supported"
+                f"`builds({_utils.safe_name(target)}, populate_full_signature=True)` is not supported"
             )
         signature_params: Mapping[str, inspect.Parameter] = {}
         # We will turn off signature validation for objects that didn't have
@@ -865,9 +881,9 @@ def builds(
 
     if dataclass_name is None:
         if hydra_partial is False:
-            dataclass_name = f"Builds_{target.__name__}"
+            dataclass_name = f"Builds_{_utils.safe_name(target)}"
         else:
-            dataclass_name = f"PartialBuilds_{target.__name__}"
+            dataclass_name = f"PartialBuilds_{_utils.safe_name(target)}"
 
     out = make_dataclass(
         dataclass_name, fields=base_fields, bases=builds_bases, frozen=frozen
@@ -893,7 +909,7 @@ def builds(
             out.__doc__ += (
                 f"\n\nThe docstring for {_utils.safe_name(target)} :\n\n" + target_doc
             )
-    return out
+    return cast(Type[Builds[Importable]], out)
 
 
 # We need to check if things are Builds, Just, PartialBuilds to a higher

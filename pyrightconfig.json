@@ -1,0 +1,10 @@
+{
+    "include": [
+        "src"
+    ],
+    "exclude": [
+        "**/node_modules",
+        "**/__pycache__",
+        "src/hydra_zen/_version.py",
+    ],
+}
