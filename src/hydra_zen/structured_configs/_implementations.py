@@ -33,7 +33,7 @@ from hydra_zen.typing._implementations import HasPartialTarget, HasTarget
 
 try:
     # used to check if default values are ufuncs
-    from numpy import ufunc
+    from numpy import ufunc  # type: ignore
 except ImportError:  # pragma: no cover
     ufunc = None
 
