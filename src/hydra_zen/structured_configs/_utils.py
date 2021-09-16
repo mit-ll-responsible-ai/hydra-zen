@@ -97,10 +97,11 @@ T = TypeVar("T")
 
 # The typeshed definition of `field` has an inaccurate annotation:
 #  https://github.com/python/typeshed/blob/b9e1d7d522fe90b98e07d43a764bbe60216bc2c4/stdlib/dataclasses.pyi#L109
-# This makes it impossible for make_dataclass to by type-correct in the eyes of
-# static checkers. See https://github.com/microsoft/pyright/issues/1680 for discussion
+# This makes it impossible for `make_dataclass` to by type-correct in the eyes of
+# static checkers. See https://github.com/microsoft/pyright/issues/1680 for discussion.
 #
-# Thus we..*sigh*.. we provide our own overloads for `field`.
+# We happen to make rather heavy use of `make_dataclass`, thus we..*sigh*.. we provide
+# our own overloads for `field`.
 @overload  # `default` and `default_factory` are optional and mutually exclusive.
 def field(
     *,
