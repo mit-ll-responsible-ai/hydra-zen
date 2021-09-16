@@ -4,7 +4,7 @@
 import sys
 from dataclasses import is_dataclass
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
+from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union, cast
 
 from typing_extensions import Final
 
@@ -12,7 +12,7 @@ try:
     from typing import get_args, get_origin
 except ImportError:  # pragma: no cover
     # remove at Python 3.7 end-of-life
-    import collections
+    from collections.abc import Callable as _Callable
 
     def get_origin(obj: Any) -> Union[None, type]:
         """Get the unsubscripted version of a type.
@@ -63,11 +63,7 @@ except ImportError:  # pragma: no cover
         """
         if hasattr(obj, "__origin__") and hasattr(obj, "__args__"):
             args = obj.__args__
-            if (
-                get_origin(obj) is collections.abc.Callable
-                and args
-                and args[0] is not Ellipsis
-            ):
+            if get_origin(obj) is _Callable and args and args[0] is not Ellipsis:
                 args = (list(args[:-1]), args[-1])
             return args
         return ()
@@ -186,23 +182,26 @@ def sanitized_type(
                 # isn't Optional[<type>]
                 return Any
 
+            args = cast(Tuple[type, type], args)
+
             optional_type, none_type = args
             if not isinstance(None, none_type):
                 optional_type = none_type
+            optional_type: Optional[Any]
             optional_type = sanitized_type(optional_type)
 
             if optional_type is Any:  # Union[Any, T] is just Any
                 return Any
-            return Union[optional_type, NoneType]
+            return Union[optional_type, NoneType]  # type: ignore
 
         if origin is list or origin is List:
-            return List[sanitized_type(args[0], primitive_only=True)] if args else type_
+            return List[sanitized_type(args[0], primitive_only=True)] if args else type_  # type: ignore
 
         if origin is dict or origin is Dict:
             return (
                 Dict[
-                    sanitized_type(args[0], primitive_only=True),
-                    sanitized_type(args[1], primitive_only=True),
+                    sanitized_type(args[0], primitive_only=True),  # type: ignore
+                    sanitized_type(args[1], primitive_only=True),  # type: ignore
                 ]
                 if args
                 else type_
@@ -217,6 +216,7 @@ def sanitized_type(
             # Otherwise we preserve the annotation as accurately as possible
             if not args:
                 return Any  # bare Tuple not supported by hydra
+            args = cast(Tuple[type, ...], args)
             unique_args = set(args)
             has_ellipses = Ellipsis in unique_args
 
@@ -226,9 +226,9 @@ def sanitized_type(
                 else Any
             )
             if has_ellipses:
-                return Tuple[_unique_type, ...]
+                return Tuple[_unique_type, ...]  # type: ignore
             else:
-                return Tuple[(_unique_type,) * len(args)]
+                return Tuple[(_unique_type,) * len(args)]  # type: ignore
 
         return Any
 
@@ -244,13 +244,13 @@ def sanitized_type(
             # for some pytorch-lightning classes. So we just do it ourselves...
             # It might be worth removing this later since none of our standard tests
             # cover it.
-            type_ = Optional[type_]
+            type_ = Optional[type_]  # type: ignore
         return type_
 
     # Needed to cover python 3.6 where __origin__ doesn't normalize to type
     if not primitive_only and type_ in {List, Tuple, Dict}:  # pragma: no cover
         if wrap_optional and type_ is not Any:
-            type_ = Optional[type_]
+            type_ = Optional[type_]  # type: ignore
         return type_
 
     return Any
