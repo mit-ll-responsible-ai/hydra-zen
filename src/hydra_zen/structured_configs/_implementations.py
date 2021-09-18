@@ -382,7 +382,7 @@ def sanitized_default_value(value: Any) -> Field:
     )
 
 
-if sys.version_info >= (3, 8):
+if sys.version_info >= (3, 8):  # pragma: no cover
 
     # overloads when `hydra_partial=False`
     @overload
@@ -438,7 +438,7 @@ if sys.version_info >= (3, 8):
         ...
 
 
-else:
+else:  # pragma: no cover
     # overloads when `hydra_partial=False`
     @overload
     def builds(
