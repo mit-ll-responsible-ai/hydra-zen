@@ -319,6 +319,10 @@ As promised, instantiating this config only partially-builds the ``Adam`` optimi
        weight_decay: 0
    )
 
+.. note::
+   Leveraging ``builds(..., hydra_partial=True)`` will produce a config that depends explicitly
+   on hydra-zen. I.e. hydra-zen must be installed in order to instantiate the resulting config.
+
 .. _Auto:
 
 Combining Auto-Populated and User-Specified Default Values
@@ -453,6 +457,10 @@ User-specified parameters will automatically be transformed as well
    sequence:
      _target_: hydra_zen.funcs.get_obj
      path: builtins.list
+
+.. note::
+   Leveraging this feature will produce a config that depends explicitly
+   on hydra-zen. I.e. hydra-zen must be installed in order to instantiate the resulting config.
 
 
 Creating immutable configs
