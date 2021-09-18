@@ -1,6 +1,5 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-
 import inspect
 from collections import Counter
 from dataclasses import dataclass, is_dataclass
@@ -12,6 +11,32 @@ from hypothesis import assume, given
 from omegaconf import OmegaConf
 
 from hydra_zen import builds, get_target, hydrated_dataclass, instantiate, just, to_yaml
+from hydra_zen.errors import HydraZenDeprecationWarning
+
+
+def test_target_required_arg():
+    with pytest.raises(TypeError):
+        builds()
+
+    with pytest.raises(TypeError):
+        builds(populate_full_signature=True)
+
+
+@pytest.mark.filterwarnings("ignore:Specifying the target of")
+def test_target_as_kwarg_is_deprecated():
+    with pytest.warns(HydraZenDeprecationWarning):
+        builds(target=int)
+
+
+@pytest.mark.filterwarnings("ignore:Specifying the target of")
+def test_builds_target_as_kwarg_is_still_correct():
+    out = instantiate(builds(target=dict, a=2, b=3, hydra_partial=True))()
+    assert out == {"a": 2, "b": 3}
+
+
+def test_builds_with_target_as_named_arg_works():
+    out = instantiate(builds(dict, target=1, b=2))
+    assert out == {"target": 1, "b": 2}
 
 
 def test_builds_with_populate_sig_raises_on_target_without_sig():
@@ -227,14 +252,6 @@ class Class:
 def test_builds_raises_on_non_callable_target(not_callable, partial, full_sig):
     with pytest.raises(TypeError):
         builds(not_callable, populate_full_signature=full_sig, hydra_partial=partial)
-
-
-def test_target_required_arg():
-    with pytest.raises(TypeError):
-        builds()
-
-    with pytest.raises(TypeError):
-        builds(populate_full_signature=True)
 
 
 @pytest.mark.parametrize(

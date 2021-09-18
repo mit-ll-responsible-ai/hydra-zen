@@ -1,10 +1,11 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-
 import inspect
+import sys
+import warnings
 from collections import defaultdict
 from dataclasses import Field, dataclass, fields, is_dataclass, make_dataclass
-from functools import partial
+from functools import partial, wraps
 from itertools import chain
 from typing import (
     Any,
@@ -14,7 +15,6 @@ from typing import (
     List,
     Mapping,
     Optional,
-    Sequence,
     Set,
     Tuple,
     Type,
@@ -27,6 +27,7 @@ from typing import (
 
 from typing_extensions import Final, Literal
 
+from hydra_zen.errors import HydraZenDeprecationWarning
 from hydra_zen.funcs import get_obj, partial
 from hydra_zen.structured_configs import _utils
 from hydra_zen.typing import Builds, Importable, Just, PartialBuilds
@@ -68,6 +69,31 @@ _builtin_function_or_method_type = type(len)
 
 def _get_target(x):
     return getattr(x, _TARGET_FIELD_NAME)
+
+
+_T2 = TypeVar("_T2", bound=Callable)
+
+
+def _target_as_kwarg_deprecation(func: _T2) -> Callable[..., _T2]:
+    @wraps(func)
+    def wrapped(*args, **kwargs):
+        if not args and "target" in kwargs:
+            # builds(target=<>, ...) is deprecated
+            warnings.warn(
+                HydraZenDeprecationWarning(
+                    "Specifying the target of `builds` as a keyword argument is deprecated "
+                    "as of 2021-09-18. Change `builds(target=<target>, ...)` to `builds(<target>, ...)`."
+                    "\n\nThis will be an error in hydra-zen 1.0.0, or by 2021-12-18 — whichever "
+                    "comes first.\n\nNote: This deprecation does not impact yaml configs "
+                    "produced by `builds`."
+                ),
+                stacklevel=2,
+            )
+            target = kwargs.pop("target")
+            return func(target, *args, **kwargs)
+        return func(*args, **kwargs)
+
+    return wrapped
 
 
 def mutable_value(x: Any) -> Field:
@@ -356,59 +382,115 @@ def sanitized_default_value(value: Any) -> Field:
     )
 
 
-# overloads when `hydra_partial=False`
-@overload
-def builds(
-    target: Importable,
-    *pos_args: Any,
-    populate_full_signature: bool = False,
-    hydra_partial: Literal[False] = False,
-    hydra_recursive: Optional[bool] = None,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
-    dataclass_name: Optional[str] = None,
-    builds_bases: Tuple[Any, ...] = (),
-    frozen: bool = False,
-    **kwargs_for_target,
-) -> Type[Builds[Importable]]:  # pragma: no cover
-    ...
+if sys.version_info >= (3, 8):
+
+    # overloads when `hydra_partial=False`
+    @overload
+    def builds(
+        target: Importable,
+        /,
+        *pos_args: Any,
+        populate_full_signature: bool = False,
+        hydra_partial: Literal[False] = False,
+        hydra_recursive: Optional[bool] = None,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+        dataclass_name: Optional[str] = None,
+        builds_bases: Tuple[Any, ...] = (),
+        frozen: bool = False,
+        **kwargs_for_target,
+    ) -> Type[Builds[Importable]]:  # pragma: no cover
+        ...
+
+    # overloads when `hydra_partial=True`
+    @overload
+    def builds(
+        target: Importable,
+        /,
+        *pos_args: Any,
+        populate_full_signature: bool = False,
+        hydra_partial: Literal[True],
+        hydra_recursive: Optional[bool] = None,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+        dataclass_name: Optional[str] = None,
+        builds_bases: Tuple[Any, ...] = (),
+        frozen: bool = False,
+        **kwargs_for_target,
+    ) -> Type[PartialBuilds[Importable]]:  # pragma: no cover
+        ...
+
+    # overloads when `hydra_partial: bool`
+    @overload
+    def builds(
+        target: Importable,
+        /,
+        *pos_args: Any,
+        populate_full_signature: bool = False,
+        hydra_partial: bool,
+        hydra_recursive: Optional[bool] = None,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+        dataclass_name: Optional[str] = None,
+        builds_bases: Tuple[Any, ...] = (),
+        frozen: bool = False,
+        **kwargs_for_target,
+    ) -> Union[
+        Type[Builds[Importable]], Type[PartialBuilds[Importable]]
+    ]:  # pragma: no cover
+        ...
 
 
-# overloads when `hydra_partial=True`
-@overload
-def builds(
-    target: Importable,
-    *pos_args: Any,
-    populate_full_signature: bool = False,
-    hydra_partial: Literal[True],
-    hydra_recursive: Optional[bool] = None,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
-    dataclass_name: Optional[str] = None,
-    builds_bases: Tuple[Any, ...] = (),
-    frozen: bool = False,
-    **kwargs_for_target,
-) -> Type[PartialBuilds[Importable]]:  # pragma: no cover
-    ...
+else:
+    # overloads when `hydra_partial=False`
+    @overload
+    def builds(
+        target: Importable,
+        *pos_args: Any,
+        populate_full_signature: bool = False,
+        hydra_partial: Literal[False] = False,
+        hydra_recursive: Optional[bool] = None,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+        dataclass_name: Optional[str] = None,
+        builds_bases: Tuple[Any, ...] = (),
+        frozen: bool = False,
+        **kwargs_for_target,
+    ) -> Type[Builds[Importable]]:  # pragma: no cover
+        ...
+
+    # overloads when `hydra_partial=True`
+    @overload
+    def builds(
+        target: Importable,
+        *pos_args: Any,
+        populate_full_signature: bool = False,
+        hydra_partial: Literal[True],
+        hydra_recursive: Optional[bool] = None,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+        dataclass_name: Optional[str] = None,
+        builds_bases: Tuple[Any, ...] = (),
+        frozen: bool = False,
+        **kwargs_for_target,
+    ) -> Type[PartialBuilds[Importable]]:  # pragma: no cover
+        ...
+
+    # overloads when `hydra_partial: bool`
+    @overload
+    def builds(
+        target: Importable,
+        *pos_args: Any,
+        populate_full_signature: bool = False,
+        hydra_partial: bool,
+        hydra_recursive: Optional[bool] = None,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+        dataclass_name: Optional[str] = None,
+        builds_bases: Tuple[Any, ...] = (),
+        frozen: bool = False,
+        **kwargs_for_target,
+    ) -> Union[
+        Type[Builds[Importable]], Type[PartialBuilds[Importable]]
+    ]:  # pragma: no cover
+        ...
 
 
-# overloads when `hydra_partial: bool`
-@overload
-def builds(
-    target: Importable,
-    *pos_args: Any,
-    populate_full_signature: bool = False,
-    hydra_partial: bool,
-    hydra_recursive: Optional[bool] = None,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
-    dataclass_name: Optional[str] = None,
-    builds_bases: Tuple[Any, ...] = (),
-    frozen: bool = False,
-    **kwargs_for_target,
-) -> Union[
-    Type[Builds[Importable]], Type[PartialBuilds[Importable]]
-]:  # pragma: no cover
-    ...
-
-
+@_target_as_kwarg_deprecation
 def builds(
     *pos_args: Any,
     populate_full_signature: bool = False,
