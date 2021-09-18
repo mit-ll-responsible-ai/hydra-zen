@@ -14,6 +14,7 @@ from typing import (
     List,
     Mapping,
     Optional,
+    Sequence,
     Set,
     Tuple,
     Type,
@@ -409,7 +410,6 @@ def builds(
 
 
 def builds(
-    target: Importable,
     *pos_args: Any,
     populate_full_signature: bool = False,
     hydra_partial: bool = False,
@@ -424,13 +424,13 @@ def builds(
 
     Returns a dataclass object that configures ``target`` with user-specified and auto-populated parameter values.
 
-    The resulting dataclass is specifically a structured config [1]_ that enables Hydra to initialize/call
+    The resulting dataclass is specifically a structured co nfig [1]_ that enables Hydra to initialize/call
     `target` either fully or partially. See Notes for additional features and explanation of implementation details.
 
     Parameters
     ----------
     target : Union[Instantiable, Callable]
-        The object to be instantiated/called.
+        The object to be instantiated/called. This is a required positional-only argument.
 
     *pos_args: Any
         Positional arguments passed to ``target``.
@@ -571,6 +571,13 @@ def builds(
     True
     """
 
+    if not pos_args:
+        raise TypeError("builds() missing 1 required positional argument: 'target'")
+
+    target, *_pos_args = pos_args
+
+    del pos_args
+
     if not callable(target):
         raise TypeError(
             _utils.building_error_prefix(target)
@@ -649,13 +656,13 @@ def builds(
             (_CONVERT_FIELD_NAME, str, _utils.field(default=hydra_convert, init=False))
         )
 
-    if pos_args:
+    if _pos_args:
         base_fields.append(
             (
                 _POS_ARG_FIELD_NAME,
                 Tuple[Any, ...],
                 _utils.field(
-                    default=tuple(create_just_if_needed(x) for x in pos_args),
+                    default=tuple(create_just_if_needed(x) for x in _pos_args),
                     init=False,
                 ),
             )
@@ -708,11 +715,11 @@ def builds(
         for p in chain(sig_by_kind[_POSITIONAL_OR_KEYWORD], sig_by_kind[_KEYWORD_ONLY])
     }
 
-    if not pos_args and builds_bases:
+    if not _pos_args and builds_bases:
         # pos_args is potentially inherited
         for _base in builds_bases:
-            pos_args = getattr(_base, _POS_ARG_FIELD_NAME, ())
-            if pos_args:
+            _pos_args = getattr(_base, _POS_ARG_FIELD_NAME, ())
+            if _pos_args:
                 break
 
     fields_set_by_bases: Set[str] = {
@@ -751,13 +758,13 @@ def builds(
                     f"{', '.join(_unexpected)}"
                 )
 
-        if pos_args:
+        if _pos_args:
             named_args = set(kwargs_for_target).union(fields_set_by_bases)
 
             # indicates that number of parameters that could be specified by name,
             # but are specified by position
             _num_nameable_args_by_position = max(
-                0, len(pos_args) - len(sig_by_kind[_POSITIONAL_ONLY])
+                0, len(_pos_args) - len(sig_by_kind[_POSITIONAL_ONLY])
             )
             if named_args:
                 # check for multiple values for arg, specified both via positional and kwarg
@@ -796,7 +803,7 @@ def builds(
                 raise TypeError(
                     _utils.building_error_prefix(target)
                     + f"{_utils.get_obj_path(target)} takes {_permissible} positional args, but "
-                    f"{len(pos_args)} were specified via `builds`"
+                    f"{len(_pos_args)} were specified via `builds`"
                 )
 
     # Create valid dataclass fields from the user-specified values
@@ -842,7 +849,7 @@ def builds(
         _seen: Set[str] = set()
 
         for n, param in enumerate(signature_params.values()):
-            if n + 1 <= len(pos_args):
+            if n + 1 <= len(_pos_args):
                 # Positional parameters are populated from "left to right" in the signature.
                 # We have already done validation, so we know that positional params aren't redundant
                 # with named params (including inherited params).

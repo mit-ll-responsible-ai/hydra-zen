@@ -229,6 +229,14 @@ def test_builds_raises_on_non_callable_target(not_callable, partial, full_sig):
         builds(not_callable, populate_full_signature=full_sig, hydra_partial=partial)
 
 
+def test_target_required_arg():
+    with pytest.raises(TypeError):
+        builds()
+
+    with pytest.raises(TypeError):
+        builds(populate_full_signature=True)
+
+
 @pytest.mark.parametrize(
     "param_name, value",
     [
