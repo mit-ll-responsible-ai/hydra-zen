@@ -451,7 +451,7 @@ def builds(
 
     Returns a dataclass object that configures ``target`` with user-specified and auto-populated parameter values.
 
-    The resulting dataclass is specifically a structured co nfig [1]_ that enables Hydra to initialize/call
+    The resulting dataclass is specifically a structured config [1]_ that enables Hydra to initialize/call
     `target` either fully or partially. See Notes for additional features and explanation of implementation details.
 
     Parameters
