@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>just &mdash; hydra-zen 0.3.0rc1+6.ge997b21 documentation</title>
+  <title>just &mdash; hydra-zen 0.3.0rc1+7.g20b4967 documentation</title>
   
 
   
@@ -197,18 +197,21 @@ configuration.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>types.JustObj</dt><dd><p>The dataclass object that is designed as a structured config.</p>
+<dt>Type[Just[Importable]]</dt><dd><p>The dataclass object that is designed as a structured config.</p>
 </dd>
 </dl>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>The configs produced by <a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> introduce an explicit dependency on hydra-zen. I.e.
+hydra-zen must be installed in order to instantiate the config.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">just</span><span class="p">,</span> <span class="n">instantiate</span><span class="p">,</span> <span class="n">to_yaml</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">just_range</span> <span class="o">=</span> <span class="n">just</span><span class="p">(</span><span class="nb">range</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">range</span> <span class="ow">is</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">just_range</span><span class="p">)</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">just_range</span><span class="o">.</span><span class="n">_target_</span>
-<span class="go">&#39;hydra_zen.funcs.identity&#39;</span>
+<span class="go">&#39;hydra_zen.funcs.get_obj&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">just_range</span><span class="o">.</span><span class="n">path</span>
 <span class="go">&#39;builtins.range&#39;</span>
 </pre></div>

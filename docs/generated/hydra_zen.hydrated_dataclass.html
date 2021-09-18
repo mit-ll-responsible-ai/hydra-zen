@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>hydrated_dataclass &mdash; hydra-zen 0.3.0rc1+6.ge997b21 documentation</title>
+  <title>hydrated_dataclass &mdash; hydra-zen 0.3.0rc1+7.g20b4967 documentation</title>
   
 
   
@@ -191,27 +191,27 @@ hydra-specific fields for specifying a structured config <a class="reference int
 <dd class="field-odd"><dl>
 <dt><strong>target</strong><span class="classifier">Union[Instantiable, Callable]</span></dt><dd><p>The object to be instantiated/called.</p>
 </dd>
-<dt><strong>*pos_args: Any</strong></dt><dd><p>Positional arguments passed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code>.</p>
+<dt><strong>*pos_args: Any</strong></dt><dd><p>Positional arguments passed to <code class="docutils literal notranslate"><span class="pre">target</span></code>.</p>
 <p>Arguments specified positionally are not included in the dataclass’ signature and
 are stored as a tuple bound to in the <code class="docutils literal notranslate"><span class="pre">_args_</span></code> field.</p>
 </dd>
-<dt><strong>populate_full_signature</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If True, then the resulting dataclass’s __init__ signature and fields
+<dt><strong>populate_full_signature</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If True, then the resulting dataclass’s <code class="docutils literal notranslate"><span class="pre">__init__</span></code> signature and fields
 will be populated according to the signature of <code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code>.</p>
-<p>Values specified in <a href="#id2"><span class="problematic" id="id3">**</span></a>kwargs_for_target take precedent over the corresponding
+<p>Values specified in <code class="docutils literal notranslate"><span class="pre">**kwargs_for_target</span></code> take precedent over the corresponding
 default values from the signature.</p>
 </dd>
-<dt><strong>hydra_partial</strong><span class="classifier">Optional[bool] (default=False)</span></dt><dd><p>If True, then hydra-instantiation produces <code class="xref py py-obj docutils literal notranslate"><span class="pre">functools.partial(target,</span> <span class="pre">**kwargs)</span></code></p>
+<dt><strong>hydra_partial</strong><span class="classifier">Optional[bool] (default=False)</span></dt><dd><p>If True, then hydra-instantiation produces <code class="docutils literal notranslate"><span class="pre">functools.partial(target,</span> <span class="pre">**kwargs)</span></code></p>
 </dd>
 <dt><strong>hydra_recursive</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>If True, then upon hydra will recursively instantiate all other
-hydra-config objects nested within this dataclass <a class="reference internal" href="#r8dd265aa7612-2" id="id4">[2]</a>.</p>
+hydra-config objects nested within this dataclass <a class="reference internal" href="#r8dd265aa7612-2" id="id2">[2]</a>.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_recursive_</span></code> attribute is not set on the resulting dataclass.</p>
 </dd>
-<dt><strong>hydra_convert: Optional[Literal[“none”, “partial”, “all”]] (default=”none”)</strong></dt><dd><p>Determines how hydra handles the non-primitive objects passed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code> <a class="reference internal" href="#r8dd265aa7612-3" id="id5">[3]</a>.</p>
+<dt><strong>hydra_convert: Optional[Literal[“none”, “partial”, “all”]] (default=”none”)</strong></dt><dd><p>Determines how hydra handles the non-primitive objects passed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code> <a class="reference internal" href="#r8dd265aa7612-3" id="id3">[3]</a>.</p>
 <ul class="simple">
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code>: Passed objects are DictConfig and ListConfig, default</p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">&quot;partial&quot;</span></code>: Passed objects are converted to dict and list, with
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code>: Passed objects are DictConfig and ListConfig, default</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;partial&quot;</span></code>: Passed objects are converted to dict and list, with
 the exception of Structured Configs (and their fields).</p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>: Passed objects are dicts, lists and primitives without
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>: Passed objects are dicts, lists and primitives without
 a trace of OmegaConf containers</p></li>
 </ul>
 <p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_convert_</span></code> attribute is not set on the resulting dataclass.</p>
@@ -223,15 +223,23 @@ at runtime.</p>
 </dl>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>Using any of the following features will result in a config that depends explicitly on hydra-zen</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">hydra_partial=True</span></code></p></li>
+<li><p>Providing a class-object or function argument to target, which will automatically be wrapped by <a class="reference internal" href="hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a>.</p></li>
+</ul>
+</div></blockquote>
 <p class="rubric">References</p>
 <dl class="citation">
 <dt class="label" id="r8dd265aa7612-1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
 <dd><p><a class="reference external" href="https://hydra.cc/docs/next/tutorials/structured_config/intro/">https://hydra.cc/docs/next/tutorials/structured_config/intro/</a></p>
 </dd>
-<dt class="label" id="r8dd265aa7612-2"><span class="brackets"><a class="fn-backref" href="#id4">2</a></span></dt>
+<dt class="label" id="r8dd265aa7612-2"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
 <dd><p><a class="reference external" href="https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation">https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation</a></p>
 </dd>
-<dt class="label" id="r8dd265aa7612-3"><span class="brackets"><a class="fn-backref" href="#id5">3</a></span></dt>
+<dt class="label" id="r8dd265aa7612-3"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
 <dd><p><a class="reference external" href="https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies">https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies</a></p>
 </dd>
 </dl>
