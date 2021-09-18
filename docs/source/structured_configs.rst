@@ -63,7 +63,7 @@ The following table compares the two standard approaches for configuring ``DNN``
 +-------------------------------+---------------------------------------------------+------------------------------------------------------+
 | (Hydra) Using a yaml file     | (Hydra) Using a structured config                 | (hydra-zen) Using `builds`                           |
 +===============================+===================================================+======================================================+
-| .. code:: yaml                | .. code:: python                                  | .. code:: python                                     |
+| .. code:: yaml                | .. code:: python                                  | .. code:: pycon                                      |
 |                               |                                                   |                                                      |
 |    _target_: vision.model.DNN |    from omegaconf import MISSING                  |    >>> from vision.model import DNN                  |
 |    input_size: ???            |    from dataclasses import dataclass              |    >>> from hydra_zen import builds                  |
@@ -95,7 +95,7 @@ Note that the result of ``builds(DNN, populate_full_signature=True)`` is equival
 
 And this dynamically generated configuration can still be serialized to a yaml file by Hydra:
 
-.. code:: python
+.. code:: pycon
 
    >>> from hydra_zen import to_yaml  # alias of `omegaconf.OmegaConf.to_yaml`
    >>> print(to_yaml(conf_instance))
@@ -238,7 +238,7 @@ Here is what `builds` effectively defines for us "under the hood"
 +---------------------------------------------------+--------------------------------------------------------------------------+
 | Example Using `builds`                            | Equivalent dataclass                                                     |
 +===================================================+==========================================================================+
-| .. code:: python                                  | .. code:: python                                                         |
+| .. code:: pycon                                   | .. code:: python                                                         |
 |                                                   |                                                                          |
 |    >>> from hydra_zen import builds               |    from dataclasses import dataclass, field                              |
 |    >>> builds(make_a_dict, x=2, y=[1, 2, 3])      |                                                                          |
@@ -256,7 +256,7 @@ As we study more of `builds`'s features, we will see that there are many "wins" 
 
 The resulting `dataclass object <https://docs.python.org/3/library/dataclasses.html>`_ is designed specifically to behave as `targeted structured configs  <https://hydra.cc/docs/next/advanced/instantiate_objects/overview>`_ that can be instantiated by Hydra.
 
-.. code:: python
+.. code:: pycon
 
    >>> from dataclasses import is_dataclass
    >>> Builds_dict = builds(make_a_dict, x=2, y=[1, 2, 3])  # signature: Builds_dict(x: Any = 2, y: Any = <factory>)
@@ -293,7 +293,7 @@ This optimizer has configurable parameters, such as a "learning rate" (``lr``), 
 The optimizer must *also* be initialized with the parameters that it will optimizing, however these parameters are typically created after we have started running our program and thus *they are not available to / cannot be part of our configuration*.
 Fortunately, we can use ``builds(..., hydra_partial=True)`` to configure ``Adam`` to be only partially-built using those values that we have access to at configuration time.
 
-.. code:: python
+.. code:: pycon
 
    >>> from torch.optim import Adam
    >>> from torch import tensor
@@ -306,7 +306,7 @@ Fortunately, we can use ``builds(..., hydra_partial=True)`` to configure ``Adam`
 
 As promised, instantiating this config only partially-builds the ``Adam`` optimizer; we can finish instantiating it once we have access to our model's parameters
 
-.. code:: python
+.. code:: pycon
 
    >>> model_params = [tensor(1.0), tensor(-2.0)]
    >>> partial_optim(model_params)
@@ -345,7 +345,7 @@ Or, we can intentionally exclude a target's parameter so that it is not availabl
 
 We can provide positional arguments as well
 
-.. code:: python
+.. code:: pycon
 
    >>> instantiate(builds(np.add, 1.0, 2.0))
    3.0
@@ -425,7 +425,7 @@ this function and then nest it within the target's configuration.
    def objective_function(prediction, score, reduction_fn=np.mean):
         ...
 
-.. code:: python
+.. code:: pycon
 
    >>> Builds_loss = builds(objective_function, populate_full_signature=True)
 
@@ -443,7 +443,7 @@ this function and then nest it within the target's configuration.
 
 User-specified parameters will automatically be transformed as well
 
-.. code:: python
+.. code:: pycon
 
    >>> print(to_yaml(builds(dict, io_fn=len, sequence=list)))
    _target_: builtins.dict
@@ -461,7 +461,7 @@ Creating immutable configs
 Dataclasses can be made to be "frozen" such that their instances are immutable.
 Thus we can use `builds` to create immutable configs.
 
-.. code:: python
+.. code:: pycon
 
    >>> RouterConfig = builds(dict, ip_address=None, frozen=True)
    >>> my_router = RouterConfig(ip_address="192.168.56.1")  # an immutable instance
@@ -475,7 +475,7 @@ Composing configs via inheritance
 
 The ``builds_bases`` argument enables us to compose configurations using inheritance
 
-.. code:: python
+.. code:: pycon
 
    >>> ParentConf = builds(dict, a=1, b=2)
    >>> ChildConf = builds(dict, b=-2, c=-3, builds_bases=(ParentConf,))
@@ -499,7 +499,7 @@ Runtime validation
 
 Misspelled parameter names and other invalid configurations for the target's signature will be caught by `builds`, so that the error surfaces immediately while creating the configuration.
 
-.. code:: python
+.. code:: pycon
 
    >>> def func(a_number: int): pass
    >>> builds(func, a_nmbr=2)  # misspelled parameter name
@@ -522,7 +522,7 @@ Misspelled parameter names and other invalid configurations for the target's sig
 Because `builds` automatically mirrors type annotations from the target's signature, we also benefit from Hydra's type-validation mechanism.
 
 
-.. code:: python
+.. code:: pycon
 
    >>> def func(parameter: int): pass
    >>> instantiate(builds(func, parameter="a string"))
@@ -559,7 +559,7 @@ For example, suppose that we want to configure
 
 In this way, we can still configure and build this function, but we also retain some level of type-validation
 
-.. code:: python
+.. code:: pycon
 
    >>> instantiate(Builds_func("not a list"))
    ---------------------------------------------------------------------------------
