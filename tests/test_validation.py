@@ -14,10 +14,12 @@ from hydra_zen import builds, get_target, hydrated_dataclass, instantiate, just,
 from hydra_zen.errors import HydraZenDeprecationWarning
 
 
-def test_target_required_arg():
+def test_builds_no_args_raises():
     with pytest.raises(TypeError):
         builds()
 
+
+def test_builds_no_positional_target_raises():
     with pytest.raises(TypeError):
         builds(hydra_target=dict)
 
