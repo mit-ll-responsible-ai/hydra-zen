@@ -1,7 +1,6 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import inspect
-import sys
 import warnings
 from collections import defaultdict
 from dataclasses import Field, dataclass, fields, is_dataclass, make_dataclass
