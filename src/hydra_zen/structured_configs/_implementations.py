@@ -385,7 +385,7 @@ def sanitized_default_value(value: Any) -> Field:
 # overloads when `hydra_partial=False`
 @overload
 def builds(
-    target: Importable,
+    hydra_target: Importable,
     *pos_args: Any,
     populate_full_signature: bool = False,
     hydra_partial: Literal[False] = False,
@@ -402,7 +402,7 @@ def builds(
 # overloads when `hydra_partial=True`
 @overload
 def builds(
-    target: Importable,
+    hydra_target: Importable,
     *pos_args: Any,
     populate_full_signature: bool = False,
     hydra_partial: Literal[True],
@@ -419,7 +419,7 @@ def builds(
 # overloads when `hydra_partial: bool`
 @overload
 def builds(
-    target: Importable,
+    hydra_target: Importable,
     *pos_args: Any,
     populate_full_signature: bool = False,
     hydra_partial: bool,
@@ -447,17 +447,17 @@ def builds(
     builds_bases: Tuple[Any, ...] = (),
     **kwargs_for_target,
 ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]:
-    """builds(target, /, *pos_args, populate_full_signature=False, hydra_partial=False, hydra_recursive=None, hydra_convert=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
+    """builds(hydra_target, /, *pos_args, populate_full_signature=False, hydra_partial=False, hydra_recursive=None, hydra_convert=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
 
-    Returns a dataclass object that configures ``target`` with user-specified and auto-populated parameter values.
+    Returns a dataclass object that configures ``<hydra_target>`` with user-specified and auto-populated parameter values.
 
     The resulting dataclass is specifically a structured co nfig [1]_ that enables Hydra to initialize/call
     `target` either fully or partially. See Notes for additional features and explanation of implementation details.
 
     Parameters
     ----------
-    target : Union[Instantiable, Callable]
-        The object to be instantiated/called. This is a required positional-only argument.
+    hydra_target : Union[Instantiable, Callable]
+        The object to be instantiated/called. This is a required, positional-only argument.
 
     *pos_args: Any
         Positional arguments passed to ``target``.
@@ -598,8 +598,17 @@ def builds(
     True
     """
 
-    if not pos_args:
-        raise TypeError("builds() missing 1 required positional argument: 'target'")
+    if not pos_args and not kwargs_for_target:
+        # `builds()`
+        raise TypeError(
+            "builds() missing 1 required positional argument: 'hydra_target'"
+        )
+    elif not pos_args:
+        # `builds(hydra_target=int)`
+        raise TypeError(
+            "builds() missing 1 required positional-only argument: 'hydra_target'"
+            "\nChange `builds(hydra_target=<target>, ...)` to `builds(<target>, ...)`"
+        )
 
     target, *_pos_args = pos_args
 
@@ -608,7 +617,7 @@ def builds(
     if not callable(target):
         raise TypeError(
             _utils.building_error_prefix(target)
-            + "In `builds(target, ...), `target` must be callable/instantiable"
+            + "In `builds(<target>, ...), `<target>` must be callable/instantiable"
         )
 
     if not isinstance(populate_full_signature, bool):

@@ -19,7 +19,7 @@ def test_target_required_arg():
         builds()
 
     with pytest.raises(TypeError):
-        builds(populate_full_signature=True)
+        builds(hydra_target=dict)
 
 
 @pytest.mark.filterwarnings("ignore:Specifying the target of")
