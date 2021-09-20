@@ -99,7 +99,9 @@ def mutable_value(x: Any) -> Field:
     """Used to set a mutable object as a default value for a field
     in a dataclass.
 
-    This is an alias for `field(default_factory=lambda: x)`
+    This is an alias for ``field(default_factory=lambda: type(x)(x))``
+
+    Note that ``type(x)(...)`` serves to make a copy
 
     Examples
     --------
@@ -109,14 +111,21 @@ def mutable_value(x: Any) -> Field:
     See https://docs.python.org/3/library/dataclasses.html#mutable-default-values
 
     >>> @dataclass
-    ... class HasMutableDefault
+    ... class HasMutableDefault:
     ...     a_list: list  = [1, 2, 3]  # error: mutable default
 
     Using `mutable_value` to specify the default list:
 
     >>> @dataclass
-    ... class HasMutableDefault
-    ...     a_list: list  = mutable_value([1, 2, 3])  # ok"""
+    ... class HasMutableDefault:
+    ...     a_list: list  = mutable_value([1, 2, 3])  # ok
+
+    >>> x = HasMutableDefault()
+    >>> x.a_list.append(-1)  # does not append to `HasMutableDefault.a_list`
+    >>> x
+    HasMutableDefault(a_list=[1, 2, 3, -1])
+    >>> HasMutableDefault()
+    HasMutableDefault(a_list=[1, 2, 3])"""
     cast = type(x)  # ensure that we return a copy of the default value
     return _utils.field(default_factory=lambda: cast(x))
 
