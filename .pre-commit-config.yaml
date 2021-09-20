@@ -1,0 +1,16 @@
+repos:
+-   repo: https://github.com/psf/black
+    rev: 21.8b0
+    hooks:
+    - id: black
+      language_version: python3.8
+-   repo: https://gitlab.com/pycqa/flake8
+    rev: 3.9.2
+    hooks:
+    - id: flake8
+      args: [--ignore, "F811,D1,D205,D209,D213,D400,D401,D999,D202,E203,E501,W503,E721,F403,F405,F401",
+      --exclude, "versioneer.py,docs/*"]
+-   repo: https://github.com/pre-commit/mirrors-isort
+    rev: v5.9.3
+    hooks:
+    -   id: isort

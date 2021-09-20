@@ -1,10 +1,10 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-
 import inspect
+import warnings
 from collections import defaultdict
 from dataclasses import Field, dataclass, fields, is_dataclass, make_dataclass
-from functools import partial
+from functools import partial, wraps
 from itertools import chain
 from typing import (
     Any,
@@ -26,6 +26,7 @@ from typing import (
 
 from typing_extensions import Final, Literal
 
+from hydra_zen.errors import HydraZenDeprecationWarning
 from hydra_zen.funcs import get_obj, partial
 from hydra_zen.structured_configs import _utils
 from hydra_zen.typing import Builds, Importable, Just, PartialBuilds
@@ -67,6 +68,31 @@ _builtin_function_or_method_type = type(len)
 
 def _get_target(x):
     return getattr(x, _TARGET_FIELD_NAME)
+
+
+_T2 = TypeVar("_T2", bound=Callable)
+
+
+def _target_as_kwarg_deprecation(func: _T2) -> Callable[..., _T2]:
+    @wraps(func)
+    def wrapped(*args, **kwargs):
+        if not args and "target" in kwargs:
+            # builds(target=<>, ...) is deprecated
+            warnings.warn(
+                HydraZenDeprecationWarning(
+                    "Specifying the target of `builds` as a keyword argument is deprecated "
+                    "as of 2021-09-18. Change `builds(target=<target>, ...)` to `builds(<target>, ...)`."
+                    "\n\nThis will be an error in hydra-zen 1.0.0, or by 2021-12-18 — whichever "
+                    "comes first.\n\nNote: This deprecation does not impact yaml configs "
+                    "produced by `builds`."
+                ),
+                stacklevel=2,
+            )
+            target = kwargs.pop("target")
+            return func(target, *args, **kwargs)
+        return func(*args, **kwargs)
+
+    return wrapped
 
 
 def mutable_value(x: Any) -> Field:
@@ -358,7 +384,7 @@ def sanitized_default_value(value: Any) -> Field:
 # overloads when `hydra_partial=False`
 @overload
 def builds(
-    target: Importable,
+    hydra_target: Importable,
     *pos_args: Any,
     populate_full_signature: bool = False,
     hydra_partial: Literal[False] = False,
@@ -375,7 +401,7 @@ def builds(
 # overloads when `hydra_partial=True`
 @overload
 def builds(
-    target: Importable,
+    hydra_target: Importable,
     *pos_args: Any,
     populate_full_signature: bool = False,
     hydra_partial: Literal[True],
@@ -392,7 +418,7 @@ def builds(
 # overloads when `hydra_partial: bool`
 @overload
 def builds(
-    target: Importable,
+    hydra_target: Importable,
     *pos_args: Any,
     populate_full_signature: bool = False,
     hydra_partial: bool,
@@ -408,8 +434,8 @@ def builds(
     ...
 
 
+@_target_as_kwarg_deprecation
 def builds(
-    target: Importable,
     *pos_args: Any,
     populate_full_signature: bool = False,
     hydra_partial: bool = False,
@@ -420,17 +446,17 @@ def builds(
     builds_bases: Tuple[Any, ...] = (),
     **kwargs_for_target,
 ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]:
-    """builds(target, /, *pos_args, populate_full_signature=False, hydra_partial=False, hydra_recursive=None, hydra_convert=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
+    """builds(hydra_target, /, *pos_args, populate_full_signature=False, hydra_partial=False, hydra_recursive=None, hydra_convert=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
 
-    Returns a dataclass object that configures ``target`` with user-specified and auto-populated parameter values.
+    Returns a dataclass object that configures ``<hydra_target>`` with user-specified and auto-populated parameter values.
 
     The resulting dataclass is specifically a structured config [1]_ that enables Hydra to initialize/call
     `target` either fully or partially. See Notes for additional features and explanation of implementation details.
 
     Parameters
     ----------
-    target : Union[Instantiable, Callable]
-        The object to be instantiated/called.
+    hydra_target : Union[Instantiable, Callable]
+        The object to be instantiated/called. This is a required, positional-only argument.
 
     *pos_args: Any
         Positional arguments passed to ``target``.
@@ -571,10 +597,26 @@ def builds(
     True
     """
 
+    if not pos_args and not kwargs_for_target:
+        # `builds()`
+        raise TypeError(
+            "builds() missing 1 required positional argument: 'hydra_target'"
+        )
+    elif not pos_args:
+        # `builds(hydra_target=int)`
+        raise TypeError(
+            "builds() missing 1 required positional-only argument: 'hydra_target'"
+            "\nChange `builds(hydra_target=<target>, ...)` to `builds(<target>, ...)`"
+        )
+
+    target, *_pos_args = pos_args
+
+    del pos_args
+
     if not callable(target):
         raise TypeError(
             _utils.building_error_prefix(target)
-            + "In `builds(target, ...), `target` must be callable/instantiable"
+            + "In `builds(<target>, ...), `<target>` must be callable/instantiable"
         )
 
     if not isinstance(populate_full_signature, bool):
@@ -649,13 +691,13 @@ def builds(
             (_CONVERT_FIELD_NAME, str, _utils.field(default=hydra_convert, init=False))
         )
 
-    if pos_args:
+    if _pos_args:
         base_fields.append(
             (
                 _POS_ARG_FIELD_NAME,
                 Tuple[Any, ...],
                 _utils.field(
-                    default=tuple(create_just_if_needed(x) for x in pos_args),
+                    default=tuple(create_just_if_needed(x) for x in _pos_args),
                     init=False,
                 ),
             )
@@ -708,11 +750,11 @@ def builds(
         for p in chain(sig_by_kind[_POSITIONAL_OR_KEYWORD], sig_by_kind[_KEYWORD_ONLY])
     }
 
-    if not pos_args and builds_bases:
+    if not _pos_args and builds_bases:
         # pos_args is potentially inherited
         for _base in builds_bases:
-            pos_args = getattr(_base, _POS_ARG_FIELD_NAME, ())
-            if pos_args:
+            _pos_args = getattr(_base, _POS_ARG_FIELD_NAME, ())
+            if _pos_args:
                 break
 
     fields_set_by_bases: Set[str] = {
@@ -751,13 +793,13 @@ def builds(
                     f"{', '.join(_unexpected)}"
                 )
 
-        if pos_args:
+        if _pos_args:
             named_args = set(kwargs_for_target).union(fields_set_by_bases)
 
             # indicates that number of parameters that could be specified by name,
             # but are specified by position
             _num_nameable_args_by_position = max(
-                0, len(pos_args) - len(sig_by_kind[_POSITIONAL_ONLY])
+                0, len(_pos_args) - len(sig_by_kind[_POSITIONAL_ONLY])
             )
             if named_args:
                 # check for multiple values for arg, specified both via positional and kwarg
@@ -796,7 +838,7 @@ def builds(
                 raise TypeError(
                     _utils.building_error_prefix(target)
                     + f"{_utils.get_obj_path(target)} takes {_permissible} positional args, but "
-                    f"{len(pos_args)} were specified via `builds`"
+                    f"{len(_pos_args)} were specified via `builds`"
                 )
 
     # Create valid dataclass fields from the user-specified values
@@ -842,7 +884,7 @@ def builds(
         _seen: Set[str] = set()
 
         for n, param in enumerate(signature_params.values()):
-            if n + 1 <= len(pos_args):
+            if n + 1 <= len(_pos_args):
                 # Positional parameters are populated from "left to right" in the signature.
                 # We have already done validation, so we know that positional params aren't redundant
                 # with named params (including inherited params).
