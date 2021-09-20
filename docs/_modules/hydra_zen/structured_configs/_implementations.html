@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.3.0rc1+7.g20b4967 documentation</title>
+  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.3.0rc1+8.g0ce4dd9 documentation</title>
   
 
   
@@ -163,11 +163,11 @@
   <h1>Source code for hydra_zen.structured_configs._implementations</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) 2021 Massachusetts Institute of Technology</span>
 <span class="c1"># SPDX-License-Identifier: MIT</span>
-
 <span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">is_dataclass</span><span class="p">,</span> <span class="n">make_dataclass</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span><span class="p">,</span> <span class="n">wraps</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Any</span><span class="p">,</span>
@@ -189,6 +189,7 @@
 
 <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Final</span><span class="p">,</span> <span class="n">Literal</span>
 
+<span class="kn">from</span> <span class="nn">hydra_zen.errors</span> <span class="kn">import</span> <span class="n">HydraZenDeprecationWarning</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.funcs</span> <span class="kn">import</span> <span class="n">get_obj</span><span class="p">,</span> <span class="n">partial</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.structured_configs</span> <span class="kn">import</span> <span class="n">_utils</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">Builds</span><span class="p">,</span> <span class="n">Importable</span><span class="p">,</span> <span class="n">Just</span><span class="p">,</span> <span class="n">PartialBuilds</span>
@@ -230,6 +231,31 @@
 
 <span class="k">def</span> <span class="nf">_get_target</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_TARGET_FIELD_NAME</span><span class="p">)</span>
+
+
+<span class="n">_T2</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T2&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_target_as_kwarg_deprecation</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">_T2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">_T2</span><span class="p">]:</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span> <span class="ow">and</span> <span class="s2">&quot;target&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="c1"># builds(target=&lt;&gt;, ...) is deprecated</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="n">HydraZenDeprecationWarning</span><span class="p">(</span>
+                    <span class="s2">&quot;Specifying the target of `builds` as a keyword argument is deprecated &quot;</span>
+                    <span class="s2">&quot;as of 2021-09-18. Change `builds(target=&lt;target&gt;, ...)` to `builds(&lt;target&gt;, ...)`.&quot;</span>
+                    <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">This will be an error in hydra-zen 1.0.0, or by 2021-12-18 — whichever &quot;</span>
+                    <span class="s2">&quot;comes first.</span><span class="se">\n\n</span><span class="s2">Note: This deprecation does not impact yaml configs &quot;</span>
+                    <span class="s2">&quot;produced by `builds`.&quot;</span>
+                <span class="p">),</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;target&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">wrapped</span>
 
 
 <span class="k">def</span> <span class="nf">mutable_value</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
@@ -521,7 +547,7 @@
 <span class="c1"># overloads when `hydra_partial=False`</span>
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-    <span class="n">target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
+    <span class="n">hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
     <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">hydra_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -538,7 +564,7 @@
 <span class="c1"># overloads when `hydra_partial=True`</span>
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-    <span class="n">target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
+    <span class="n">hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
     <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">hydra_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">],</span>
@@ -555,7 +581,7 @@
 <span class="c1"># overloads when `hydra_partial: bool`</span>
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-    <span class="n">target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
+    <span class="n">hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
     <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">hydra_partial</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -571,8 +597,8 @@
     <span class="o">...</span>
 
 
-<div class="viewcode-block" id="builds"><a class="viewcode-back" href="../../../generated/hydra_zen.builds.html#hydra_zen.builds">[docs]</a><span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-    <span class="n">target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
+<div class="viewcode-block" id="builds"><a class="viewcode-back" href="../../../generated/hydra_zen.builds.html#hydra_zen.builds">[docs]</a><span class="nd">@_target_as_kwarg_deprecation</span>
+<span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
     <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">hydra_partial</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -583,17 +609,17 @@
     <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
     <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]]:</span>
-    <span class="sd">&quot;&quot;&quot;builds(target, /, *pos_args, populate_full_signature=False, hydra_partial=False, hydra_recursive=None, hydra_convert=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)</span>
+    <span class="sd">&quot;&quot;&quot;builds(hydra_target, /, *pos_args, populate_full_signature=False, hydra_partial=False, hydra_recursive=None, hydra_convert=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)</span>
 
-<span class="sd">    Returns a dataclass object that configures ``target`` with user-specified and auto-populated parameter values.</span>
+<span class="sd">    Returns a dataclass object that configures ``&lt;hydra_target&gt;`` with user-specified and auto-populated parameter values.</span>
 
 <span class="sd">    The resulting dataclass is specifically a structured config [1]_ that enables Hydra to initialize/call</span>
 <span class="sd">    `target` either fully or partially. See Notes for additional features and explanation of implementation details.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    target : Union[Instantiable, Callable]</span>
-<span class="sd">        The object to be instantiated/called.</span>
+<span class="sd">    hydra_target : Union[Instantiable, Callable]</span>
+<span class="sd">        The object to be instantiated/called. This is a required, positional-only argument.</span>
 
 <span class="sd">    *pos_args: Any</span>
 <span class="sd">        Positional arguments passed to ``target``.</span>
@@ -734,10 +760,26 @@
 <span class="sd">    True</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">pos_args</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">kwargs_for_target</span><span class="p">:</span>
+        <span class="c1"># `builds()`</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;builds() missing 1 required positional argument: &#39;hydra_target&#39;&quot;</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">pos_args</span><span class="p">:</span>
+        <span class="c1"># `builds(hydra_target=int)`</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;builds() missing 1 required positional-only argument: &#39;hydra_target&#39;&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Change `builds(hydra_target=&lt;target&gt;, ...)` to `builds(&lt;target&gt;, ...)`&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">target</span><span class="p">,</span> <span class="o">*</span><span class="n">_pos_args</span> <span class="o">=</span> <span class="n">pos_args</span>
+
+    <span class="k">del</span> <span class="n">pos_args</span>
+
     <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
             <span class="n">_utils</span><span class="o">.</span><span class="n">building_error_prefix</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-            <span class="o">+</span> <span class="s2">&quot;In `builds(target, ...), `target` must be callable/instantiable&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;In `builds(&lt;target&gt;, ...), `&lt;target&gt;` must be callable/instantiable&quot;</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">populate_full_signature</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
@@ -812,13 +854,13 @@
             <span class="p">(</span><span class="n">_CONVERT_FIELD_NAME</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">hydra_convert</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
         <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">pos_args</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">_pos_args</span><span class="p">:</span>
         <span class="n">base_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="p">(</span>
                 <span class="n">_POS_ARG_FIELD_NAME</span><span class="p">,</span>
                 <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
                 <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span>
-                    <span class="n">default</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">create_just_if_needed</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pos_args</span><span class="p">),</span>
+                    <span class="n">default</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">create_just_if_needed</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_pos_args</span><span class="p">),</span>
                     <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="p">),</span>
             <span class="p">)</span>
@@ -871,11 +913,11 @@
         <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">chain</span><span class="p">(</span><span class="n">sig_by_kind</span><span class="p">[</span><span class="n">_POSITIONAL_OR_KEYWORD</span><span class="p">],</span> <span class="n">sig_by_kind</span><span class="p">[</span><span class="n">_KEYWORD_ONLY</span><span class="p">])</span>
     <span class="p">}</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">pos_args</span> <span class="ow">and</span> <span class="n">builds_bases</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_pos_args</span> <span class="ow">and</span> <span class="n">builds_bases</span><span class="p">:</span>
         <span class="c1"># pos_args is potentially inherited</span>
         <span class="k">for</span> <span class="n">_base</span> <span class="ow">in</span> <span class="n">builds_bases</span><span class="p">:</span>
-            <span class="n">pos_args</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">_base</span><span class="p">,</span> <span class="n">_POS_ARG_FIELD_NAME</span><span class="p">,</span> <span class="p">())</span>
-            <span class="k">if</span> <span class="n">pos_args</span><span class="p">:</span>
+            <span class="n">_pos_args</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">_base</span><span class="p">,</span> <span class="n">_POS_ARG_FIELD_NAME</span><span class="p">,</span> <span class="p">())</span>
+            <span class="k">if</span> <span class="n">_pos_args</span><span class="p">:</span>
                 <span class="k">break</span>
 
     <span class="n">fields_set_by_bases</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
@@ -914,13 +956,13 @@
                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_unexpected</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">pos_args</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">_pos_args</span><span class="p">:</span>
             <span class="n">named_args</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs_for_target</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">fields_set_by_bases</span><span class="p">)</span>
 
             <span class="c1"># indicates that number of parameters that could be specified by name,</span>
             <span class="c1"># but are specified by position</span>
             <span class="n">_num_nameable_args_by_position</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
-                <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">pos_args</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">sig_by_kind</span><span class="p">[</span><span class="n">_POSITIONAL_ONLY</span><span class="p">])</span>
+                <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">_pos_args</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">sig_by_kind</span><span class="p">[</span><span class="n">_POSITIONAL_ONLY</span><span class="p">])</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="n">named_args</span><span class="p">:</span>
                 <span class="c1"># check for multiple values for arg, specified both via positional and kwarg</span>
@@ -959,7 +1001,7 @@
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                     <span class="n">_utils</span><span class="o">.</span><span class="n">building_error_prefix</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
                     <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2"> takes </span><span class="si">{</span><span class="n">_permissible</span><span class="si">}</span><span class="s2"> positional args, but &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">pos_args</span><span class="p">)</span><span class="si">}</span><span class="s2"> were specified via `builds`&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">_pos_args</span><span class="p">)</span><span class="si">}</span><span class="s2"> were specified via `builds`&quot;</span>
                 <span class="p">)</span>
 
     <span class="c1"># Create valid dataclass fields from the user-specified values</span>
@@ -1005,7 +1047,7 @@
         <span class="n">_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">signature_params</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
-            <span class="k">if</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pos_args</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">_pos_args</span><span class="p">):</span>
                 <span class="c1"># Positional parameters are populated from &quot;left to right&quot; in the signature.</span>
                 <span class="c1"># We have already done validation, so we know that positional params aren&#39;t redundant</span>
                 <span class="c1"># with named params (including inherited params).</span>
