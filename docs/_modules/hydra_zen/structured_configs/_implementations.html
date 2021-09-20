@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.3.0rc2 documentation</title>
+  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.3.0rc2+1.gcff79a7 documentation</title>
   
 
   
@@ -704,12 +704,11 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    Using any of the following features will result in a config that depends explicitly on hydra-zen</span>
+<span class="sd">    Using any of the following features will result in a config that depends explicitly on hydra-zen.</span>
+<span class="sd">    (i.e. hydra-zen must be installed in order to instantiate the resulting config, including its yaml version).</span>
 
 <span class="sd">       - ``hydra_partial=True``</span>
-<span class="sd">       - Providing a class-object or function argument to target, which will automatically be wrapped by `just`.</span>
-
-<span class="sd">    I.e. hydra-zen must be installed in order to instantiate the resulting config, including its yaml version</span>
+<span class="sd">       - Providing a class-object or function argument to ``&lt;hydra_target&gt;``, which will automatically be wrapped by `just`. E.g. ``builds(dict, fn=len)``</span>
 
 <span class="sd">    Type annotations are inferred from the target&#39;s signature and are only retained if they are compatible</span>
 <span class="sd">    with hydra&#39;s limited set of supported annotations; otherwise `Any` is specified.</span>
@@ -731,26 +730,27 @@
 <span class="sd">    Basic Usage:</span>
 
 <span class="sd">    &gt;&gt;&gt; from hydra_zen import builds, instantiate</span>
-<span class="sd">    &gt;&gt;&gt; builds(dict, a=1, b=&#39;x&#39;)  # makes a dataclass that will &quot;build&quot; a dictionary with the specified fields</span>
+<span class="sd">    &gt;&gt;&gt; Conf = builds(dict, a=1, b=&#39;x&#39;)  # makes a dataclass that will &quot;build&quot; a dictionary with the specified fields</span>
+<span class="sd">    &gt;&gt;&gt; Conf  # signature: c(a: Any = 1, b: Any = &#39;x&#39;)</span>
 <span class="sd">    types.Builds_dict</span>
-<span class="sd">    &gt;&gt;&gt; instantiate(builds(dict, a=1, b=&#39;x&#39;))  # using hydra to build the dictionary</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(Conf)  # using Hydra to &quot;instantiate&quot; this build</span>
 <span class="sd">    {&#39;a&#39;: 1, &#39;b&#39;: &#39;x&#39;}</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(Conf(a=10, b=&quot;hi&quot;))  # overriding configuration values</span>
+<span class="sd">    {&#39;a&#39;: 10, &#39;b&#39;: &#39;hi&#39;}</span>
 
 <span class="sd">    &gt;&gt;&gt; Conf = builds(len, [1, 2, 3])  # specifying positional arguments</span>
-<span class="sd">    &gt;&gt;&gt; Conf._args_</span>
-<span class="sd">    ([1, 2, 3],)</span>
 <span class="sd">    &gt;&gt;&gt; instantiate(Conf)</span>
 <span class="sd">    3</span>
 
-<span class="sd">    Using `builds` with partial instantiation</span>
+<span class="sd">    Using `builds` to partially-configure a target</span>
 
 <span class="sd">    &gt;&gt;&gt; def a_two_tuple(x: int, y: float): return x, y</span>
-<span class="sd">    &gt;&gt;&gt; PartialBuildsFunc = builds(a_two_tuple, x=1, hydra_partial=True)  # specifies only `x`</span>
-<span class="sd">    &gt;&gt;&gt; partial_func = instantiate(PartialBuildsFunc)</span>
+<span class="sd">    &gt;&gt;&gt; PartialConf = builds(a_two_tuple, x=1, hydra_partial=True)  # configures only `x`</span>
+<span class="sd">    &gt;&gt;&gt; partial_func = instantiate(PartialConf)</span>
 <span class="sd">    &gt;&gt;&gt; partial_func</span>
 <span class="sd">    functools.partial(&lt;function a_two_tuple at 0x00000220A7820EE0&gt;, x=1)</span>
-<span class="sd">    &gt;&gt;&gt; partial_func(y=22)</span>
-<span class="sd">    (1, 22)</span>
+<span class="sd">    &gt;&gt;&gt; partial_func(y=22.0)  # y can be provided after configuration &amp; instantiation</span>
+<span class="sd">    (1, 22.0)</span>
 
 <span class="sd">    Auto-populating parameters:</span>
 
