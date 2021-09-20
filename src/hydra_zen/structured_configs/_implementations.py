@@ -541,12 +541,11 @@ def builds(
 
     Notes
     -----
-    Using any of the following features will result in a config that depends explicitly on hydra-zen
+    Using any of the following features will result in a config that depends explicitly on hydra-zen.
+    (i.e. hydra-zen must be installed in order to instantiate the resulting config, including its yaml version).
 
        - ``hydra_partial=True``
-       - Providing a class-object or function argument to target, which will automatically be wrapped by `just`.
-
-    I.e. hydra-zen must be installed in order to instantiate the resulting config, including its yaml version
+       - Providing a class-object or function argument to ``<hydra_target>``, which will automatically be wrapped by `just`. E.g. ``builds(dict, fn=len)``
 
     Type annotations are inferred from the target's signature and are only retained if they are compatible
     with hydra's limited set of supported annotations; otherwise `Any` is specified.
@@ -568,26 +567,27 @@ def builds(
     Basic Usage:
 
     >>> from hydra_zen import builds, instantiate
-    >>> builds(dict, a=1, b='x')  # makes a dataclass that will "build" a dictionary with the specified fields
+    >>> Conf = builds(dict, a=1, b='x')  # makes a dataclass that will "build" a dictionary with the specified fields
+    >>> Conf  # signature: c(a: Any = 1, b: Any = 'x')
     types.Builds_dict
-    >>> instantiate(builds(dict, a=1, b='x'))  # using hydra to build the dictionary
+    >>> instantiate(Conf)  # using Hydra to "instantiate" this build
     {'a': 1, 'b': 'x'}
+    >>> instantiate(Conf(a=10, b="hi"))  # overriding configuration values
+    {'a': 10, 'b': 'hi'}
 
     >>> Conf = builds(len, [1, 2, 3])  # specifying positional arguments
-    >>> Conf._args_
-    ([1, 2, 3],)
     >>> instantiate(Conf)
     3
 
-    Using `builds` with partial instantiation
+    Using `builds` to partially-configure a target
 
     >>> def a_two_tuple(x: int, y: float): return x, y
-    >>> PartialBuildsFunc = builds(a_two_tuple, x=1, hydra_partial=True)  # specifies only `x`
-    >>> partial_func = instantiate(PartialBuildsFunc)
+    >>> PartialConf = builds(a_two_tuple, x=1, hydra_partial=True)  # configures only `x`
+    >>> partial_func = instantiate(PartialConf)
     >>> partial_func
     functools.partial(<function a_two_tuple at 0x00000220A7820EE0>, x=1)
-    >>> partial_func(y=22)
-    (1, 22)
+    >>> partial_func(y=22.0)  # y can be provided after configuration & instantiation
+    (1, 22.0)
 
     Auto-populating parameters:
 
