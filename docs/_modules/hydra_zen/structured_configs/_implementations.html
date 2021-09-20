@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.3.0rc1+8.g0ce4dd9 documentation</title>
+  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.3.0rc2 documentation</title>
   
 
   
@@ -262,7 +262,9 @@
     <span class="sd">&quot;&quot;&quot;Used to set a mutable object as a default value for a field</span>
 <span class="sd">    in a dataclass.</span>
 
-<span class="sd">    This is an alias for `field(default_factory=lambda: x)`</span>
+<span class="sd">    This is an alias for ``field(default_factory=lambda: type(x)(x))``</span>
+
+<span class="sd">    Note that ``type(x)(...)`` serves to make a copy</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -272,14 +274,21 @@
 <span class="sd">    See https://docs.python.org/3/library/dataclasses.html#mutable-default-values</span>
 
 <span class="sd">    &gt;&gt;&gt; @dataclass</span>
-<span class="sd">    ... class HasMutableDefault</span>
+<span class="sd">    ... class HasMutableDefault:</span>
 <span class="sd">    ...     a_list: list  = [1, 2, 3]  # error: mutable default</span>
 
 <span class="sd">    Using `mutable_value` to specify the default list:</span>
 
 <span class="sd">    &gt;&gt;&gt; @dataclass</span>
-<span class="sd">    ... class HasMutableDefault</span>
-<span class="sd">    ...     a_list: list  = mutable_value([1, 2, 3])  # ok&quot;&quot;&quot;</span>
+<span class="sd">    ... class HasMutableDefault:</span>
+<span class="sd">    ...     a_list: list  = mutable_value([1, 2, 3])  # ok</span>
+
+<span class="sd">    &gt;&gt;&gt; x = HasMutableDefault()</span>
+<span class="sd">    &gt;&gt;&gt; x.a_list.append(-1)  # does not append to `HasMutableDefault.a_list`</span>
+<span class="sd">    &gt;&gt;&gt; x</span>
+<span class="sd">    HasMutableDefault(a_list=[1, 2, 3, -1])</span>
+<span class="sd">    &gt;&gt;&gt; HasMutableDefault()</span>
+<span class="sd">    HasMutableDefault(a_list=[1, 2, 3])&quot;&quot;&quot;</span>
     <span class="n">cast</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  <span class="c1"># ensure that we return a copy of the default value</span>
     <span class="k">return</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 
