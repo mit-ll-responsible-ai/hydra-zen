@@ -82,7 +82,7 @@ Next, the following executes a Hydra Multirun [3]_ job from the CLI and sweeps o
 
 The equivalent ``hydra_multirun`` commands are
 
-.. code-block:: python
+.. code-block:: pycon
 
    >>> from my_app import MyExperiment, task_function
    >>> from hydra_zen.experimental import hydra_multirun
@@ -110,7 +110,7 @@ First let's demonstrate using ``builds``.
 As expected, ``hydra_run`` simply instantiates and creates a dictionary object with the desired key and value pairs.
 Next, launch a Hydra Multirun [3]_ job to sweep over configuration parameters:
 
-.. code:: python
+.. code:: pycon
 
    >>> job = hydra_multirun(
    ...     builds(dict, a=1, b=1),
@@ -127,7 +127,7 @@ Next, launch a Hydra Multirun [3]_ job to sweep over configuration parameters:
 Now let's demonstrate building a dictionary configuration.
 Here we build a configuration to square an input using the ``pow`` function:
 
-.. code:: python
+.. code:: pycon
 
    >>> from omegaconf import DictConfig
    >>> cfg = dict(f=builds(pow, exp=2, hydra_partial=True), x=10)
@@ -142,7 +142,7 @@ Also, this task function is responsible for instantiating the partial function a
 
 Here we perform a multi-run for a range of values of ``x``:
 
-.. code:: python
+.. code:: pycon
 
    >>> cfg = dict(f=builds(pow, exp=2, hydra_partial=True), x=1)
    >>> def task_function(cfg: DictConfig):
@@ -240,7 +240,7 @@ Notice that we have not set a default for the optimizer.
 This is the safest way to avoid Hydra raising a ``ConfigCompositionException``.
 To run the default experiment with ``SGD``, simply set the optimizer using ``overrides``:
 
-.. code:: python
+.. code:: pycon
 
     >>> jobs = hydra_run(
     ...     ConfigGradDesc,
@@ -256,7 +256,7 @@ To run the default experiment with ``SGD``, simply set the optimizer using ``ove
 
 Next run the experiment by varying the optimizer.
 
-.. code:: python
+.. code:: pycon
 
     >>> jobs, = hydra_multirun(
     ...     ConfigGradDesc,
@@ -398,7 +398,7 @@ Now we can use ``hydra_multirun`` to minimize this function via random search:
 
 The return value is the solution along with all the intermediate results:
 
-.. code:: python
+.. code:: pycon
 
     >>> job
     ({'best_evaluated_params': {'x': 1.4667823674518203, 'y': -1.193575968925213},

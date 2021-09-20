@@ -67,7 +67,7 @@ to dynamically generate a "structured configuration" for this function for us.
 This structured configuration can be "instantiated" by Hydra, which means that `repeat_text` will be "built" using the specified configuration values;
 this instantiation will recurse through
 
-.. code-block:: python
+.. code-block:: pycon
 
    >>> from hydra_zen import instantiate
    >>> config_instance = Config(num=3, text="world ")

@@ -127,3 +127,16 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# hydra-zen docs
+
+docs/source/_build
+docs/builds
+
+# pycharm
+.idea/
+
+# pyright
+node_modules/
+
+scratch/
