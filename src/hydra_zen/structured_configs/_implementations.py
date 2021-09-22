@@ -1002,7 +1002,7 @@ def is_just(x: Any) -> bool:
             return True
         else:
             # ensures we conver this branch in tests
-            False
+            return False
     return False
 
 
