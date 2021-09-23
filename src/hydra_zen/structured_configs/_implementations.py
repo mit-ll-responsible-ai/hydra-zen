@@ -3,7 +3,7 @@
 import inspect
 import warnings
 from collections import defaultdict
-from dataclasses import Field, dataclass, fields, is_dataclass, make_dataclass
+from dataclasses import Field, dataclass, field, fields, is_dataclass, make_dataclass
 from functools import partial, wraps
 from itertools import chain
 from typing import (
@@ -70,6 +70,7 @@ def _get_target(x):
     return getattr(x, _TARGET_FIELD_NAME)
 
 
+_T = TypeVar("_T")
 _T2 = TypeVar("_T2", bound=Callable)
 
 
@@ -95,7 +96,7 @@ def _target_as_kwarg_deprecation(func: _T2) -> Callable[..., _T2]:
     return wrapped
 
 
-def mutable_value(x: Any) -> Field:
+def mutable_value(x: _T) -> _T:
     """Used to set a mutable object as a default value for a field
     in a dataclass.
 
@@ -127,7 +128,7 @@ def mutable_value(x: Any) -> Field:
     >>> HasMutableDefault()
     HasMutableDefault(a_list=[1, 2, 3])"""
     cast = type(x)  # ensure that we return a copy of the default value
-    return _utils.field(default_factory=lambda: cast(x))
+    return field(default_factory=lambda: cast(x))
 
 
 Field_Entry = Tuple[str, type, Field]
@@ -381,7 +382,7 @@ def create_just_if_needed(value: _T) -> Union[_T, Type[Just]]:
 
 def sanitized_default_value(value: Any) -> Field:
     if isinstance(value, _utils.KNOWN_MUTABLE_TYPES):
-        return mutable_value(value)
+        return cast(Field, mutable_value(value))
     resolved_value = create_just_if_needed(value)
     return (
         _utils.field(default=value)
