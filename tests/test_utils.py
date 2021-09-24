@@ -3,7 +3,7 @@
 import collections.abc as abc
 import enum
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field as dataclass_field
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Type, TypeVar, Union
 
 import hypothesis.strategies as st
@@ -19,7 +19,7 @@ from omegaconf.errors import (
 from typing_extensions import Final, Literal
 
 from hydra_zen import builds, instantiate, mutable_value
-from hydra_zen.structured_configs._utils import safe_name, sanitized_type
+from hydra_zen.structured_configs._utils import field, safe_name, sanitized_type
 from hydra_zen.typing import Builds
 
 T = TypeVar("T")
@@ -199,3 +199,23 @@ def test_bare_generics(func, value):
     # we have to write a separate test for them here where we don't
     # check the output of sanitize_type
     assert instantiate(builds(func, populate_full_signature=True, x=value)) == value
+
+
+def test_vendored_field():
+    # The case where `default` is specified instead of `default_factory`
+    # is already covered via our other tests
+
+    our_field = field(default_factory=lambda: list([1, 2]))
+    their_field = dataclass_field(default_factory=lambda: list([1, 2]))
+
+    @dataclass
+    class A:
+        x: Any = our_field
+
+    @dataclass
+    class B:
+        x: Any = their_field
+
+    assert isinstance(our_field, type(their_field))
+    assert hasattr(A, "x") is hasattr(B, "x")
+    assert A().x == B().x
