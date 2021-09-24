@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.3.0rc2+3.ge52d3ac documentation</title>
+  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.3.0rc2+6.g7d14aaf documentation</title>
   
 
   
@@ -166,7 +166,7 @@
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">is_dataclass</span><span class="p">,</span> <span class="n">make_dataclass</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">is_dataclass</span><span class="p">,</span> <span class="n">make_dataclass</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span><span class="p">,</span> <span class="n">wraps</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
@@ -233,6 +233,7 @@
     <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_TARGET_FIELD_NAME</span><span class="p">)</span>
 
 
+<span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T&quot;</span><span class="p">)</span>
 <span class="n">_T2</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T2&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">)</span>
 
 
@@ -258,7 +259,7 @@
     <span class="k">return</span> <span class="n">wrapped</span>
 
 
-<span class="k">def</span> <span class="nf">mutable_value</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">mutable_value</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">_T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Used to set a mutable object as a default value for a field</span>
 <span class="sd">    in a dataclass.</span>
 
@@ -290,7 +291,7 @@
 <span class="sd">    &gt;&gt;&gt; HasMutableDefault()</span>
 <span class="sd">    HasMutableDefault(a_list=[1, 2, 3])&quot;&quot;&quot;</span>
     <span class="n">cast</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  <span class="c1"># ensure that we return a copy of the default value</span>
-    <span class="k">return</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 
 
 <span class="n">Field_Entry</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">Field</span><span class="p">]</span>
@@ -544,7 +545,7 @@
 
 <span class="k">def</span> <span class="nf">sanitized_default_value</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">_utils</span><span class="o">.</span><span class="n">KNOWN_MUTABLE_TYPES</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">mutable_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Field</span><span class="p">,</span> <span class="n">mutable_value</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
     <span class="n">resolved_value</span> <span class="o">=</span> <span class="n">create_just_if_needed</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
