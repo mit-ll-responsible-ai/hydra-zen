@@ -25,7 +25,9 @@ def partial(
     **kwargs: _typing.Any,
 ) -> _Partial[_T]:
     """Equivalent to ``functools.partial`` but provides a named parameter for the callable."""
-    return _functools.partial(_partial_target_, *args, **kwargs)
+    return _typing.cast(
+        _Partial[_T], _functools.partial(_partial_target_, *args, **kwargs)
+    )
 
 
 def get_obj(*, path: str) -> _typing.Union[type, _typing.Callable[..., _typing.Any]]:

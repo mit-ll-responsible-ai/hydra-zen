@@ -8,5 +8,4 @@ __all__ = [
     "just",
     "hydrated_dataclass",
     "mutable_value",
-    "get_target",
 ]

@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass
-from typing import Any, Callable, Literal, Tuple, Type
+from typing import Any, Callable, List, Literal, Tuple, Type
 
-from hydra_zen import builds, get_target, instantiate, just
+from hydra_zen import builds, get_target, instantiate, just, mutable_value
 from hydra_zen.typing import Builds
 from hydra_zen.typing._implementations import DataClass
 
@@ -114,3 +114,9 @@ def f7():
         get_target(builds(f, hydra_partial=True))
     )
     b4: Literal["(x: int) -> int"] = reveal_type(get_target(just(f)))
+
+
+def f8():
+    @dataclass
+    class A:
+        x: List[int] = mutable_value([1, 2])

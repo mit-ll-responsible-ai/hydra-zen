@@ -16,7 +16,7 @@ __all__ = [
 
 
 _T = TypeVar("_T", covariant=True)
-_T2 = TypeVar("_T2", covariant=False, contravariant=False)
+_T2 = TypeVar("_T2")
 
 
 class Partial(Generic[_T]):

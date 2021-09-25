@@ -11,7 +11,11 @@ E.g.
 .. code::
 
    from hydra_zen import builds, instantiate
+<<<<<<< HEAD
    DictConfig = builds(dict, a=1, b=2)  # type: Builds[Type[dict]]
+=======
+   DictConfig = builds(dict, a=1, b=2)  # type: Type[Builds[Type[dict]]]
+>>>>>>> 7d14aaf1bb181388d88d1867f419b33a7e4ab251
 
    # static analysis tools can provide useful type information
    # about the object that is instantiated from the config
