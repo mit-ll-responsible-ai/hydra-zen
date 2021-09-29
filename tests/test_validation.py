@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 import inspect
 from collections import Counter
+from collections.abc import Mapping
 from dataclasses import dataclass, is_dataclass
 from itertools import zip_longest
 
@@ -16,6 +17,7 @@ from hydra_zen.structured_configs._implementations import (
     _HYDRA_FIELD_NAMES,
     _ZEN_TARGET_FIELD_NAME,
 )
+from tests import everything_except
 
 
 def test_builds_no_args_raises():
@@ -58,6 +60,17 @@ def test_builds_returns_a_dataclass_type():
 def test_builds_hydra_partial_raises_if_recursion_disabled():
     with pytest.raises(ValueError):
         builds(dict, hydra_partial=True, hydra_recursive=False)
+
+
+@given(everything_except(Mapping, type(None)))
+def test_builds_hydra_meta_not_mapping_raises(not_a_mapping):
+    with pytest.raises(TypeError):
+        builds(int, hydra_meta=not_a_mapping)
+
+
+def test_builds_hydra_meta_with_non_string_keys_raises():
+    with pytest.raises(TypeError):
+        builds(int, hydra_meta={1: None})
 
 
 def f_starx(*x):
@@ -331,3 +344,14 @@ def test_reserved_names_are_reserved(field: str):
     kwargs = {field: True}
     with pytest.raises(ValueError):
         builds(dict, **kwargs)
+
+
+@pytest.mark.parametrize(
+    "field",
+    list(_HYDRA_FIELD_NAMES)
+    + [_ZEN_TARGET_FIELD_NAME, "_zen_some_new_feature", "hydra_some_new_feature"],
+)
+def test_reserved_names_are_reserved_by_hydra_meta(field: str):
+    kwargs = {field: True}
+    with pytest.raises(ValueError):
+        builds(dict, hydra_meta=kwargs)
