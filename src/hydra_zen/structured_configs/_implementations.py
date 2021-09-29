@@ -674,7 +674,8 @@ def builds(
                 raise ValueError(err_msg)
         if name.startswith(("hydra_", "_zen_")):
             raise ValueError(
-                f"The field-name specified via `builds(..., {name}=<...>)` is reserved by hydra-zen. You can manually create a dataclass to utilize this name in a structured config."
+                f"The field-name specified via `builds(..., {name}=<...>)` is reserved by hydra-zen."
+                " You can manually create a dataclass to utilize this name in a structured config."
             )
 
     target_field: List[Union[Tuple[str, Type[Any]], Tuple[str, Type[Any], Field[Any]]]]
