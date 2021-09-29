@@ -129,6 +129,7 @@ def test_builds_raises_when_user_specified_args_violate_sig(
             populate_full_signature=full_sig,
             builds_bases=(kwarg_base,),
         )
+    del kwarg_base
 
     # test when *args are inherited
     args_base = builds(passthrough, *args, hydra_partial=partial)
@@ -140,16 +141,18 @@ def test_builds_raises_when_user_specified_args_violate_sig(
             populate_full_signature=full_sig,
             builds_bases=(args_base,),
         )
+    del args_base
 
     # test when *args and **kwargs are inherited
-    args_base = builds(passthrough, *args, **kwargs, hydra_partial=partial)
+    args_kwargs_base = builds(passthrough, *args, **kwargs, hydra_partial=partial)
     with pytest.raises(TypeError):
         builds(
             func,
             hydra_partial=partial,
             populate_full_signature=full_sig,
-            builds_bases=(args_base,),
+            builds_bases=(args_kwargs_base,),
         )
+    del args_kwargs_base
 
 
 @dataclass
