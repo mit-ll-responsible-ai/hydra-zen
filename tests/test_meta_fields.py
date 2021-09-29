@@ -48,3 +48,13 @@ def test_basic_meta_behavior(
     assert out_args == args
     assert out_kwargs == kwargs
     assert set(kwargs).isdisjoint(hydra_meta)
+
+
+def test_mutable_meta_value_gets_wrapped():
+    Conf = builds(int, hydra_meta=dict(a=[1, 2]))
+    conf1 = Conf()
+    assert conf1.a == [1, 2]
+    conf1.a.append(3)
+
+    conf2 = Conf()
+    assert conf2.a == [1, 2]
