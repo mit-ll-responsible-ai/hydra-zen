@@ -4,7 +4,7 @@ import inspect
 import warnings
 from collections import defaultdict
 from dataclasses import Field, dataclass, field, fields, is_dataclass, make_dataclass
-from functools import partial, wraps
+from functools import wraps
 from itertools import chain
 from typing import (
     Any,
@@ -27,7 +27,7 @@ from typing import (
 from typing_extensions import Final, Literal
 
 from hydra_zen.errors import HydraZenDeprecationWarning
-from hydra_zen.funcs import get_obj, partial
+from hydra_zen.funcs import get_obj, partial, zen_processing
 from hydra_zen.structured_configs import _utils
 from hydra_zen.typing import Builds, Importable, Just, PartialBuilds
 from hydra_zen.typing._implementations import HasPartialTarget, HasTarget
@@ -44,7 +44,8 @@ _T = TypeVar("_T")
 _TARGET_FIELD_NAME: Final[str] = "_target_"
 _RECURSIVE_FIELD_NAME: Final[str] = "_recursive_"
 _CONVERT_FIELD_NAME: Final[str] = "_convert_"
-_PARTIAL_TARGET_FIELD_NAME: Final[str] = "_partial_target_"
+_PARTIAL_TARGET_FIELD_NAME: Final[str] = "_zen_partial"
+_ZEN_TARGET_FIELD_NAME: Final[str] = "_zen_target"
 _POS_ARG_FIELD_NAME: Final[str] = "_args_"
 _JUST_FIELD_NAME: Final[str] = "path"
 _HYDRA_FIELD_NAMES: FrozenSet[str] = frozenset(
@@ -52,7 +53,6 @@ _HYDRA_FIELD_NAMES: FrozenSet[str] = frozenset(
         _TARGET_FIELD_NAME,
         _RECURSIVE_FIELD_NAME,
         _CONVERT_FIELD_NAME,
-        _PARTIAL_TARGET_FIELD_NAME,
         _POS_ARG_FIELD_NAME,
     )
 )
@@ -668,12 +668,17 @@ def builds(
             (
                 _TARGET_FIELD_NAME,
                 str,
-                _utils.field(default=_utils.get_obj_path(partial), init=False),
+                _utils.field(default=_utils.get_obj_path(zen_processing), init=False),
+            ),
+            (
+                _ZEN_TARGET_FIELD_NAME,
+                str,
+                _utils.field(default=_utils.get_obj_path(target), init=False),
             ),
             (
                 _PARTIAL_TARGET_FIELD_NAME,
-                Any,
-                _utils.field(default=just(target), init=False),
+                bool,
+                _utils.field(default=True, init=False),
             ),
         ]
     else:
@@ -771,7 +776,7 @@ def builds(
         _field.name
         for _base in builds_bases
         for _field in fields(_base)
-        if _field.name not in _HYDRA_FIELD_NAMES
+        if _field.name not in _HYDRA_FIELD_NAMES and not _field.name.startswith("_zen_")
     }
 
     # Validate that user-specified arguments satisfy target's signature.
@@ -1007,7 +1012,7 @@ def is_just(x: Any) -> bool:
     return False
 
 
-def is_partial_builds(x: Any) -> bool:
+def _is_old_partial_builds(x: Any) -> bool:
     if is_builds(x) and hasattr(x, _PARTIAL_TARGET_FIELD_NAME):
         attr = _get_target(x)
         if (attr == _get_target(PartialBuilds) or attr is partial) and is_just(
@@ -1018,6 +1023,10 @@ def is_partial_builds(x: Any) -> bool:
             # ensures we conver this branch in tests
             return False
     return False
+
+
+def is_partial_builds(x: Any) -> bool:
+    return is_builds(x) and getattr(x, _PARTIAL_TARGET_FIELD_NAME, False) is True
 
 
 @overload
@@ -1095,9 +1104,11 @@ def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:
     >>> get_target(ModelConfig)
     CustomClassifier
     """
-    if is_partial_builds(obj):
+    if _is_old_partial_builds(obj):
         # obj._partial_target_ is `Just[obj]`
         return get_target(getattr(obj, _PARTIAL_TARGET_FIELD_NAME))
+    elif is_partial_builds(obj):
+        field_name = _ZEN_TARGET_FIELD_NAME
     elif is_just(obj):
         field_name = _JUST_FIELD_NAME
     elif is_builds(obj):

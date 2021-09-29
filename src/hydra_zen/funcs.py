@@ -38,3 +38,10 @@ def get_obj(*, path: str) -> _typing.Union[type, _typing.Callable[..., _typing.A
     except Exception as e:  # pragma: no cover
         _log.error(f"Error getting callable at {path} : {e}")
         raise e
+
+
+def zen_processing(*args, _zen_target: str, _zen_partial: bool = False, **kwargs):
+    obj = get_obj(path=_zen_target)
+    if _zen_partial is True:
+        return _functools.partial(obj, *args, **kwargs)
+    return obj(*args, **kwargs)
