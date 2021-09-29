@@ -661,6 +661,22 @@ def builds(
             + "`builds(..., hydra_partial=True)` requires that `hydra_recursive=True`"
         )
 
+    # Check for reserved names
+    for name in kwargs_for_target:
+        if name in _HYDRA_FIELD_NAMES:
+            err_msg = f"The field-name specified via `builds(..., {name}=<...>)` is reserved by Hydra."
+            if name != _TARGET_FIELD_NAME:
+                raise ValueError(
+                    err_msg
+                    + f" You can set this parameter via `builds(..., hydra_{name[1:-1]}=<...>)`"
+                )
+            else:
+                raise ValueError(err_msg)
+        if name.startswith(("hydra_", "_zen_")):
+            raise ValueError(
+                f"The field-name specified via `builds(..., {name}=<...>)` is reserved by hydra-zen. You can manually create a dataclass to utilize this name in a structured config."
+            )
+
     target_field: List[Union[Tuple[str, Type[Any]], Tuple[str, Type[Any], Field[Any]]]]
 
     if hydra_partial is True:
