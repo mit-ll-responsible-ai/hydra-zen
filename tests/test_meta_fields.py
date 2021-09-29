@@ -28,12 +28,22 @@ def f(*args, **kwargs):
         st.integers(),
     ),
     hydra_partial=st.booleans(),
+    pop_sig=st.booleans(),
 )
-def test_basic_meta_behavior(
-    args: tuple, kwargs: dict, hydra_meta: dict, hydra_partial: bool
+def test_basic_hydra_meta_behavior(
+    args: tuple,
+    kwargs: dict,
+    hydra_meta: dict,
+    hydra_partial: bool,
+    pop_sig: bool,
 ):
     Conf = builds(
-        f, *args, **kwargs, hydra_meta=hydra_meta, hydra_partial=hydra_partial
+        f,
+        *args,
+        **kwargs,
+        hydra_meta=hydra_meta,
+        hydra_partial=hydra_partial,
+        populate_full_signature=pop_sig
     )
 
     conf = Conf()
@@ -61,7 +71,6 @@ def test_mutable_meta_value_gets_wrapped():
     assert conf2.a == [1, 2]
 
 
-# TEST DELETE
 def f2(*, x):
     return x
 
@@ -80,6 +89,7 @@ def test_deletion_by_inheritance():
             # by our signature verification since it is now
             # a meta field.
             # We have effectively "deleted" `not_compat_with_f`
+            # from this config.
             hydra_meta=dict(not_compat_with_f=None),
             builds_bases=(Conf,),
         )
