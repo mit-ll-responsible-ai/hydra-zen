@@ -1,7 +1,6 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import inspect
-import re
 import warnings
 from collections import defaultdict
 from dataclasses import Field, dataclass, field, fields, is_dataclass, make_dataclass
@@ -25,7 +24,6 @@ from typing import (
     overload,
 )
 
-from attr import attr
 from typing_extensions import Final, Literal
 
 from hydra_zen.errors import HydraZenDeprecationWarning

@@ -8,7 +8,7 @@ from typing import Any
 import pytest
 
 from hydra_zen import builds, instantiate, just
-from hydra_zen.funcs import get_obj, zen_processing, partial as hydra_partial
+from hydra_zen.funcs import get_obj, zen_processing
 from hydra_zen.structured_configs._implementations import (
     is_builds,
     is_just,
@@ -78,12 +78,6 @@ class AJust:
     path: Any = "builtins.int"
 
 
-# @dataclass
-# class APartial:
-#     _target_: Any = hydra_partial
-#     _partial_target_: Any = just(int)
-
-
 @dataclass
 class APartial:
     _target_: Any = zen_processing
@@ -108,7 +102,8 @@ class NotPartial:
 class NotPartial2:
     _target_: Any = "builtins.dict"
     # MISSING _zen_target
-    _zen_partial: bool = True 
+    _zen_partial: bool = True
+
 
 @dataclass
 class NotPartial3:
@@ -116,6 +111,7 @@ class NotPartial3:
     _target_: Any = zen_processing
     _zen_target: Any = "builtins.int"
     _zen_partial: bool = False  # <- False!
+
 
 @pytest.mark.parametrize(
     "x,yes_builds,yes_just,yes_partial",
