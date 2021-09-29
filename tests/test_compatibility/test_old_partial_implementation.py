@@ -13,6 +13,8 @@ def f(*args, **kwargs):
     return args, kwargs
 
 
+# These tests ensure that the implementation of hydra_partial=True
+# for hydra_zen < 0.3.0 still works
 @dataclass
 class OldPartial:
     _target_: str = "hydra_zen.funcs.partial"
