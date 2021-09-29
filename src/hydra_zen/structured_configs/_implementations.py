@@ -1,6 +1,7 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import inspect
+import re
 import warnings
 from collections import defaultdict
 from dataclasses import Field, dataclass, field, fields, is_dataclass, make_dataclass
@@ -25,6 +26,8 @@ from typing import (
 )
 
 from typing_extensions import Final, Literal
+
+from attr import attr
 
 from hydra_zen.errors import HydraZenDeprecationWarning
 from hydra_zen.funcs import get_obj, partial, zen_processing
@@ -1026,8 +1029,13 @@ def _is_old_partial_builds(x: Any) -> bool:
 
 
 def is_partial_builds(x: Any) -> bool:
-    return is_builds(x) and getattr(x, _PARTIAL_TARGET_FIELD_NAME, False) is True
-
+    if not is_builds(x) or not hasattr(x, _ZEN_TARGET_FIELD_NAME):
+        return False
+    attr = _get_target(x)
+    if attr != _get_target(PartialBuilds) and attr is not zen_processing:
+        return False
+    return getattr(x, _PARTIAL_TARGET_FIELD_NAME, False) is True
+    
 
 @overload
 def get_target(obj: Type[PartialBuilds[_T]]) -> _T:  # pragma: no cover
