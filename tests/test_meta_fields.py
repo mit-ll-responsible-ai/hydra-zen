@@ -4,6 +4,7 @@
 import string
 
 import hypothesis.strategies as st
+import pytest
 from hypothesis import given
 
 from hydra_zen import builds, instantiate
@@ -58,3 +59,29 @@ def test_mutable_meta_value_gets_wrapped():
 
     conf2 = Conf()
     assert conf2.a == [1, 2]
+
+
+# TEST DELETE
+def f2(*, x):
+    return x
+
+
+def test_deletion_by_inheritance():
+    Conf = builds(dict, not_compat_with_f=1, x=3)
+
+    with pytest.raises(TypeError):
+        # presence of `not_compat_with_f` should raise
+        builds(f2, builds_bases=(Conf,))
+
+    out = instantiate(
+        builds(
+            f2,
+            # `not_compat_with_f` should no longer be flagged
+            # by our signature verification since it is now
+            # a meta field.
+            # We have effectively "deleted" `not_compat_with_f`
+            hydra_meta=dict(not_compat_with_f=None),
+            builds_bases=(Conf,),
+        )
+    )
+    assert out == 3
