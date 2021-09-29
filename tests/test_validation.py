@@ -12,6 +12,10 @@ from omegaconf import OmegaConf
 
 from hydra_zen import builds, get_target, hydrated_dataclass, instantiate, just, to_yaml
 from hydra_zen.errors import HydraZenDeprecationWarning
+from hydra_zen.structured_configs._implementations import (
+    _HYDRA_FIELD_NAMES,
+    _ZEN_TARGET_FIELD_NAME,
+)
 
 
 def test_builds_no_args_raises():
@@ -313,3 +317,14 @@ def test_just_raises_for_unimportable_target():
 def test_get_target_on_non_builds():
     with pytest.raises(TypeError):
         get_target(1)
+
+
+@pytest.mark.parametrize(
+    "field",
+    list(_HYDRA_FIELD_NAMES)
+    + [_ZEN_TARGET_FIELD_NAME, "_zen_some_new_feature", "hydra_some_new_feature"],
+)
+def test_reserved_names_are_reserved(field: str):
+    kwargs = {field: True}
+    with pytest.raises(ValueError):
+        builds(dict, **kwargs)

@@ -60,9 +60,10 @@ class Just(Builds, Protocol[_T]):  # pragma: no cover
 
 
 @runtime_checkable
-class PartialBuilds(Builds, Protocol[_T2]):  # pragma: no cover
-    _partial_target_: Just[_T2]
-    _target_: str = "hydra_zen.funcs.partial"
+class PartialBuilds(Builds, Protocol[_T]):  # pragma: no cover
+    _target_: str = "hydra_zen.funcs.zen_processing"
+    _zen_target: str
+    _zen_partial: bool = True
 
 
 @runtime_checkable
@@ -72,4 +73,4 @@ class HasTarget(Protocol):  # pragma: no cover
 
 @runtime_checkable
 class HasPartialTarget(Protocol):  # pragma: no cover
-    _partial_target_: Just
+    _zen_partial: bool = True
