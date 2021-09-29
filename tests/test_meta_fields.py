@@ -8,7 +8,6 @@ from hypothesis import given
 
 from hydra_zen import builds, instantiate
 from hydra_zen.structured_configs._implementations import is_partial_builds
-from hydra_zen.typing import Builds, PartialBuilds
 
 
 def f(*args, **kwargs):

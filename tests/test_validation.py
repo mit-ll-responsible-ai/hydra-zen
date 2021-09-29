@@ -355,3 +355,50 @@ def test_reserved_names_are_reserved_by_hydra_meta(field: str):
     kwargs = {field: True}
     with pytest.raises(ValueError):
         builds(dict, hydra_meta=kwargs)
+
+
+def f_meta_sig(x, *args, y, **kwargs):
+    pass
+
+
+@given(
+    meta_fields=st.dictionaries(
+        st.sampled_from(["x", "y", "args", "kwargs", "z"]), st.integers()
+    ),
+    pop_sig=st.booleans(),
+    partial=st.booleans(),
+)
+def test_meta_fields_colliding_with_sig_raises(
+    meta_fields, pop_sig: bool, partial: bool
+):
+    if {"x", "y"} & set(meta_fields):
+        with pytest.raises(ValueError):
+            builds(
+                f_meta_sig,
+                hydra_meta=meta_fields,
+                populate_full_signature=pop_sig,
+                hydra_partial=partial,
+            )
+    else:
+        builds(
+            f_meta_sig,
+            hydra_meta=meta_fields,
+            populate_full_signature=pop_sig,
+            hydra_partial=partial,
+        )
+
+
+@given(
+    meta_fields=st.dictionaries(
+        st.sampled_from(["x", "y", "args", "kwargs", "z"]), st.integers()
+    ),
+    partial=st.booleans(),
+)
+def test_meta_fields_colliding_with_user_provided_kwargs_raises(
+    meta_fields, partial: bool
+):
+    if {"x", "y"} & set(meta_fields):
+        with pytest.raises(ValueError):
+            builds(dict, x=1, y=2, hydra_meta=meta_fields, hydra_partial=partial)
+    else:
+        builds(dict, x=1, y=2, hydra_meta=meta_fields, hydra_partial=partial)

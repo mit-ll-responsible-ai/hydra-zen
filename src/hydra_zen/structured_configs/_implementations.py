@@ -935,11 +935,11 @@ def builds(
     if hydra_meta:
         _meta_names = set(hydra_meta)
 
-        if _meta_names & set(signature_params):
+        if _meta_names & nameable_params_in_sig:
             raise ValueError(
                 f"`builds(..., hydra_meta=<...>)`: `hydra_meta` cannot not specify "
                 f"names that exist in the target's signature: "
-                f"{','.join(_meta_names & set(signature_params))}"
+                f"{','.join(_meta_names & nameable_params_in_sig)}"
             )
 
         if _meta_names & set(user_specified_named_params):
