@@ -25,9 +25,8 @@ from typing import (
     overload,
 )
 
-from typing_extensions import Final, Literal
-
 from attr import attr
+from typing_extensions import Final, Literal
 
 from hydra_zen.errors import HydraZenDeprecationWarning
 from hydra_zen.funcs import get_obj, partial, zen_processing
@@ -1015,11 +1014,13 @@ def is_just(x: Any) -> bool:
     return False
 
 
-def _is_old_partial_builds(x: Any) -> bool:
-    if is_builds(x) and hasattr(x, _PARTIAL_TARGET_FIELD_NAME):
+def _is_old_partial_builds(x: Any) -> bool:  # pragma: no cover
+    # We don't care about coverage here.
+    # This will only be used in `get_target` and we'll be sure to cover that branch
+    if is_builds(x) and hasattr(x, "_partial_target_"):
         attr = _get_target(x)
-        if (attr == _get_target(PartialBuilds) or attr is partial) and is_just(
-            getattr(x, _PARTIAL_TARGET_FIELD_NAME)
+        if (attr == "hydra_zen.funcs.partial" or attr is partial) and is_just(
+            getattr(x, "_partial_target_")
         ):
             return True
         else:
@@ -1035,7 +1036,7 @@ def is_partial_builds(x: Any) -> bool:
     if attr != _get_target(PartialBuilds) and attr is not zen_processing:
         return False
     return getattr(x, _PARTIAL_TARGET_FIELD_NAME, False) is True
-    
+
 
 @overload
 def get_target(obj: Type[PartialBuilds[_T]]) -> _T:  # pragma: no cover
@@ -1114,7 +1115,7 @@ def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:
     """
     if _is_old_partial_builds(obj):
         # obj._partial_target_ is `Just[obj]`
-        return get_target(getattr(obj, _PARTIAL_TARGET_FIELD_NAME))
+        return get_target(getattr(obj, "_partial_target_"))
     elif is_partial_builds(obj):
         field_name = _ZEN_TARGET_FIELD_NAME
     elif is_just(obj):
