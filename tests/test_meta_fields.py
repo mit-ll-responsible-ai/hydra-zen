@@ -47,6 +47,8 @@ def test_basic_hydra_meta_behavior(
     )
 
     conf = Conf()
+
+    # ensure all meta-fields are present
     for meta_name, meta_val in hydra_meta.items():
         assert getattr(conf, meta_name) == meta_val
 
@@ -58,7 +60,7 @@ def test_basic_hydra_meta_behavior(
 
     assert out_args == args
     assert out_kwargs == kwargs
-    assert set(kwargs).isdisjoint(hydra_meta)
+    assert set(out_kwargs).isdisjoint(hydra_meta)
 
 
 def test_hydra_meta_via_hydrated_dataclass():
