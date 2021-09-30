@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.3.0rc3+1.gbe833dd documentation</title>
+  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.3.0rc3+2.g22a470f documentation</title>
   
 
   
@@ -843,12 +843,6 @@
 
     <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="n">is_dataclass</span><span class="p">(</span><span class="n">_b</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_b</span><span class="p">,</span> <span class="nb">type</span><span class="p">))</span> <span class="k">for</span> <span class="n">_b</span> <span class="ow">in</span> <span class="n">builds_bases</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;All `build_bases` must be a tuple of dataclass types&quot;</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">hydra_partial</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> <span class="n">hydra_recursive</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="n">_utils</span><span class="o">.</span><span class="n">building_error_prefix</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-            <span class="o">+</span> <span class="s2">&quot;`builds(..., hydra_partial=True)` requires that `hydra_recursive=True`&quot;</span>
-        <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">hydra_meta</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">hydra_meta</span> <span class="o">=</span> <span class="p">{}</span>
