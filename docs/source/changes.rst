@@ -14,9 +14,10 @@ All previous releases should still be available on pip.
 This release:
 
 - Makes the "target" of `builds` a positional-only argument. Code that specifies ``builds(target=<target>, ...)`` will now raise a deprecation warning. Now, e.g., ``builds(dict, target=1)`` will work. `#104 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/104>`_
+- Adds the ability to set "meta" fields via `builds`. See `#112 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/112>`_
 - Adds the :func:`~hydra_zen.get_target` function for retrieving target-objects from structured configs. `#94 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/94>`_
 - Improves type-annotations on `builds`. Now, e.g., ``builds("hi")`` will be marked as invalid by static checkers (the target of `builds` must be callable). `#104 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/104>`_.
-- Migrates zen-specific fields to a new naming-scheme, and zen-specific processing to a universal mechanism. See `#110 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/110>_` for more details.
+- Migrates zen-specific fields to a new naming-scheme, and zen-specific processing to a universal mechanism. See `#110 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/110>`_ for more details.
 - Ensures that hydra-zen's source code is "pyright-clean", under `pyright's basic type-checking mode <https://github.com/microsoft/pyright/blob/main/docs/configuration.md#diagnostic-rule-defaults>`_. `#101 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/101>`_
 - Adds to all public modules/packages an ``__all__`` field. `#99 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/99>`_
 - Adds PEP 561 compliance (e.g. hydra-zen is now compatible with mypy). `#97 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/97>`_

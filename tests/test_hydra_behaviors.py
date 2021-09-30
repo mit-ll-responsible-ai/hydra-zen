@@ -23,10 +23,11 @@ def f_three_vars(x, y, z):
     recursive=st.booleans(),
     sig=st.booleans(),
     partial=st.booleans(),
+    meta=st.none() | st.just(dict(meta=1)),
     kwargs=st.dictionaries(keys=st.sampled_from(["x", "y", "z"]), values=st.floats()),
     name=st.none() | st.sampled_from(["NameA", "NameB"]),
 )
-def test_builds_sets_hydra_params(convert, recursive, sig, partial, name, kwargs):
+def test_builds_sets_hydra_params(convert, recursive, sig, partial, name, meta, kwargs):
     if partial and not recursive:
         assume(False)
 
@@ -36,6 +37,7 @@ def test_builds_sets_hydra_params(convert, recursive, sig, partial, name, kwargs
         hydra_recursive=recursive,
         populate_full_signature=sig,
         hydra_partial=partial,
+        hydra_meta=meta,
         dataclass_name=name,
         **kwargs,
     )

@@ -24,7 +24,7 @@ from typing import (
     overload,
 )
 
-from typing_extensions import Final, Literal
+from typing_extensions import Final, Literal, TypeGuard
 
 from hydra_zen.errors import HydraZenDeprecationWarning
 from hydra_zen.funcs import get_obj, partial, zen_processing
@@ -45,6 +45,7 @@ _TARGET_FIELD_NAME: Final[str] = "_target_"
 _RECURSIVE_FIELD_NAME: Final[str] = "_recursive_"
 _CONVERT_FIELD_NAME: Final[str] = "_convert_"
 _PARTIAL_TARGET_FIELD_NAME: Final[str] = "_zen_partial"
+_META_FIELD_NAME: Final[str] = "_zen_exclude"
 _ZEN_TARGET_FIELD_NAME: Final[str] = "_zen_target"
 _POS_ARG_FIELD_NAME: Final[str] = "_args_"
 _JUST_FIELD_NAME: Final[str] = "path"
@@ -159,6 +160,7 @@ def hydrated_dataclass(
     hydra_partial: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_meta: Optional[Mapping[str, Any]] = None,
     frozen: bool = False,
 ) -> Callable[[Type[_T]], Type[_T]]:
     """A decorator that uses `hydra_zen.builds` to create a dataclass with the appropriate
@@ -202,17 +204,19 @@ def hydrated_dataclass(
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.
 
+    hydra_meta: Optional[Mapping[str, Any]]
+        Specifies field-names and corresponding values that will be included in the
+        resulting dataclass, but that will *not* be used to build ``hydra_target``
+        via instantiation. These are called "meta" fields.
+
     frozen : bool, optional (default=False)
         If `True`, the resulting dataclass will create frozen (i.e. immutable) instances.
         I.e. setting/deleting an attribute of an instance will raise `FrozenInstanceError`
         at runtime.
 
-    Notes
-    -----
-    Using any of the following features will result in a config that depends explicitly on hydra-zen
-
-       - ``hydra_partial=True``
-       - Providing a class-object or function argument to target, which will automatically be wrapped by `just`.
+    See Also
+    --------
+    builds
 
     References
     ----------
@@ -292,6 +296,7 @@ def hydrated_dataclass(
             hydra_recursive=hydra_recursive,
             hydra_convert=hydra_convert,
             hydra_partial=hydra_partial,
+            hydra_meta=hydra_meta,
             builds_bases=(decorated_obj,),
             dataclass_name=decorated_obj.__name__,
             frozen=frozen,
@@ -400,6 +405,7 @@ def builds(
     hydra_partial: Literal[False] = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_meta: Optional[Mapping[str, Any]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
@@ -417,6 +423,7 @@ def builds(
     hydra_partial: Literal[True],
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_meta: Optional[Mapping[str, Any]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
@@ -434,6 +441,7 @@ def builds(
     hydra_partial: bool,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_meta: Optional[Mapping[str, Any]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
@@ -451,6 +459,7 @@ def builds(
     hydra_partial: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_meta: Optional[Mapping[str, Any]] = None,
     frozen: bool = False,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
@@ -516,6 +525,11 @@ def builds(
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.
 
+    hydra_meta: Optional[Mapping[str, Any]]
+        Specifies field-names and corresponding values that will be included in the
+        resulting dataclass, but that will *not* be used to build ``hydra_target``
+        via instantiation. These are called "meta" fields.
+
     frozen : bool, optional (default=False)
         If ``True``, the resulting dataclass will create frozen (i.e. immutable) instances.
         I.e. setting/deleting an attribute of an instance will raise ``FrozenInstanceError``
@@ -542,17 +556,21 @@ def builds(
 
     Notes
     -----
-    Using any of the following features will result in a config that depends explicitly on hydra-zen.
-    (i.e. hydra-zen must be installed in order to instantiate the resulting config, including its yaml version).
+    Using any of the following features will result in a config that depends
+    explicitly on hydra-zen. (i.e. hydra-zen must be installed in order to
+    instantiate the resulting config, including its yaml version).
 
-       - ``hydra_partial=True``
+       - Specifying: ``hydra_partial=True``
+       - Specifying meta fields via ``hydra_meta=<...>``
        - Providing a class-object or function argument to ``<hydra_target>``, which will automatically be wrapped by `just`. E.g. ``builds(dict, fn=len)``
 
-    Type annotations are inferred from the target's signature and are only retained if they are compatible
-    with hydra's limited set of supported annotations; otherwise `Any` is specified.
+    Type annotations are inferred from the target's signature and are only
+    retained if they are compatible with hydra's limited set of supported
+    annotations; otherwise `Any` is specified.
 
-    `builds` provides runtime validation of user-specified named arguments against the target's signature.
-    This helps to ensure that typos in field names fail early and explicitly.
+    `builds` provides runtime validation of user-specified named arguments against
+    the target's signature. This helps to ensure that typos in field names
+    fail early and explicitly.
 
     Mutable values are automatically transformed to use a default factory [4]_.
 
@@ -605,6 +623,14 @@ def builds(
     {'a': 1, 'b': -2, 'c': -3}
     >>> issubclass(ChildConf, ParentConf)
     True
+
+    Leveraging meta-fields for portable, relative interpolation:
+
+    >>> Conf = builds(dict, a="${.s}", b="${.s}", hydra_meta=dict(s=-10))
+    >>> instantiate(Conf)
+    {'a': -10, 'b': -10}
+    >>> instantiate(Conf, s=2)
+    {'a': 2, 'b': 2}
     """
 
     if not pos_args and not kwargs_for_target:
@@ -661,26 +687,40 @@ def builds(
             + "`builds(..., hydra_partial=True)` requires that `hydra_recursive=True`"
         )
 
+    if hydra_meta is None:
+        hydra_meta = {}
+
+    if not isinstance(hydra_meta, Mapping):
+        raise TypeError(
+            f"`hydra_meta` must be a mapping (e.g. a dictionary), got: {hydra_meta}"
+        )
+
+    for _key in hydra_meta:
+        if not isinstance(_key, str):
+            raise TypeError(
+                f"`hydra_meta` must be a mapping whose keys are strings, got key: {_key}"
+            )
+
     # Check for reserved names
-    for name in kwargs_for_target:
-        if name in _HYDRA_FIELD_NAMES:
-            err_msg = f"The field-name specified via `builds(..., {name}=<...>)` is reserved by Hydra."
-            if name != _TARGET_FIELD_NAME:
+    for _name in chain(kwargs_for_target, hydra_meta):
+        if _name in _HYDRA_FIELD_NAMES:
+            err_msg = f"The field-name specified via `builds(..., {_name}=<...>)` is reserved by Hydra."
+            if _name != _TARGET_FIELD_NAME:
                 raise ValueError(
                     err_msg
-                    + f" You can set this parameter via `builds(..., hydra_{name[1:-1]}=<...>)`"
+                    + f" You can set this parameter via `builds(..., hydra_{_name[1:-1]}=<...>)`"
                 )
             else:
                 raise ValueError(err_msg)
-        if name.startswith(("hydra_", "_zen_")):
+        if _name.startswith(("hydra_", "_zen_")):
             raise ValueError(
-                f"The field-name specified via `builds(..., {name}=<...>)` is reserved by hydra-zen."
+                f"The field-name specified via `builds(..., {_name}=<...>)` is reserved by hydra-zen."
                 " You can manually create a dataclass to utilize this name in a structured config."
             )
 
     target_field: List[Union[Tuple[str, Type[Any]], Tuple[str, Type[Any], Field[Any]]]]
 
-    if hydra_partial is True:
+    if hydra_partial or hydra_meta:
         target_field = [
             (
                 _TARGET_FIELD_NAME,
@@ -692,12 +732,23 @@ def builds(
                 str,
                 _utils.field(default=_utils.get_obj_path(target), init=False),
             ),
-            (
-                _PARTIAL_TARGET_FIELD_NAME,
-                bool,
-                _utils.field(default=True, init=False),
-            ),
         ]
+        if hydra_partial:
+            target_field.append(
+                (
+                    _PARTIAL_TARGET_FIELD_NAME,
+                    bool,
+                    _utils.field(default=True, init=False),
+                ),
+            )
+        if hydra_meta:
+            target_field.append(
+                (
+                    _META_FIELD_NAME,
+                    bool,
+                    _utils.field(default=tuple(hydra_meta), init=False),
+                ),
+            )
     else:
         target_field = [
             (
@@ -816,7 +867,11 @@ def builds(
                     + f"The following unexpected keyword argument(s) was specified for {_utils.get_obj_path(target)} "
                     f"via `builds`: {', '.join(_unexpected)}"
                 )
-            if not fields_set_by_bases <= nameable_params_in_sig:
+            if not fields_set_by_bases <= nameable_params_in_sig and not (
+                fields_set_by_bases - nameable_params_in_sig
+            ) <= set(hydra_meta):
+                # field inherited by base is not present in sig
+                # AND it is not excluded via `hydra_meta`
                 _unexpected = fields_set_by_bases - nameable_params_in_sig
                 raise TypeError(
                     _utils.building_error_prefix(target)
@@ -897,6 +952,34 @@ def builds(
         )
         for name, value in kwargs_for_target.items()
     }
+
+    if hydra_meta:
+        _meta_names = set(hydra_meta)
+
+        if _meta_names & nameable_params_in_sig:
+            raise ValueError(
+                f"`builds(..., hydra_meta=<...>)`: `hydra_meta` cannot not specify "
+                f"names that exist in the target's signature: "
+                f"{','.join(_meta_names & nameable_params_in_sig)}"
+            )
+
+        if _meta_names & set(user_specified_named_params):
+            raise ValueError(
+                f"`builds(..., hydra_meta=<...>)`: `hydra_meta` cannot not specify "
+                f"names that are common with those specified in **kwargs_for_target: "
+                f"{','.join(_meta_names & set(user_specified_named_params))}"
+            )
+
+        # We don't check for collisions between `hydra_meta` names and the
+        # names of inherited fields. Thus `hydra_meta` can effectively be used
+        # to "delete" names from a config, via inheritance.
+
+        user_specified_named_params.update(
+            {
+                name: (name, Any, sanitized_default_value(value))
+                for name, value in hydra_meta.items()
+            }
+        )
 
     if populate_full_signature is True:
         # Populate dataclass fields based on the target's signature.
@@ -1014,11 +1097,11 @@ def builds(
 # with omegaconf containers.
 #
 # These are not part of the public API for now, but they may be in the future.
-def is_builds(x: Any) -> bool:
+def is_builds(x: Any) -> TypeGuard[Builds]:
     return hasattr(x, _TARGET_FIELD_NAME)
 
 
-def is_just(x: Any) -> bool:
+def is_just(x: Any) -> TypeGuard[Just]:
     if is_builds(x) and hasattr(x, _JUST_FIELD_NAME):
         attr = _get_target(x)
         if attr == _get_target(Just) or attr is get_obj:
@@ -1044,7 +1127,7 @@ def _is_old_partial_builds(x: Any) -> bool:  # pragma: no cover
     return False
 
 
-def is_partial_builds(x: Any) -> bool:
+def is_partial_builds(x: Any) -> TypeGuard[PartialBuilds]:
     if not is_builds(x) or not hasattr(x, _ZEN_TARGET_FIELD_NAME):
         return False
     attr = _get_target(x)

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 import inspect
 from collections import Counter
+from collections.abc import Mapping
 from dataclasses import dataclass, is_dataclass
 from itertools import zip_longest
 
@@ -16,6 +17,7 @@ from hydra_zen.structured_configs._implementations import (
     _HYDRA_FIELD_NAMES,
     _ZEN_TARGET_FIELD_NAME,
 )
+from tests import everything_except
 
 
 def test_builds_no_args_raises():
@@ -58,6 +60,17 @@ def test_builds_returns_a_dataclass_type():
 def test_builds_hydra_partial_raises_if_recursion_disabled():
     with pytest.raises(ValueError):
         builds(dict, hydra_partial=True, hydra_recursive=False)
+
+
+@given(everything_except(Mapping, type(None)))
+def test_builds_hydra_meta_not_mapping_raises(not_a_mapping):
+    with pytest.raises(TypeError):
+        builds(int, hydra_meta=not_a_mapping)
+
+
+def test_builds_hydra_meta_with_non_string_keys_raises():
+    with pytest.raises(TypeError):
+        builds(int, hydra_meta={1: None})
 
 
 def f_starx(*x):
@@ -129,6 +142,7 @@ def test_builds_raises_when_user_specified_args_violate_sig(
             populate_full_signature=full_sig,
             builds_bases=(kwarg_base,),
         )
+    del kwarg_base
 
     # test when *args are inherited
     args_base = builds(passthrough, *args, hydra_partial=partial)
@@ -140,16 +154,18 @@ def test_builds_raises_when_user_specified_args_violate_sig(
             populate_full_signature=full_sig,
             builds_bases=(args_base,),
         )
+    del args_base
 
     # test when *args and **kwargs are inherited
-    args_base = builds(passthrough, *args, **kwargs, hydra_partial=partial)
+    args_kwargs_base = builds(passthrough, *args, **kwargs, hydra_partial=partial)
     with pytest.raises(TypeError):
         builds(
             func,
             hydra_partial=partial,
             populate_full_signature=full_sig,
-            builds_bases=(args_base,),
+            builds_bases=(args_kwargs_base,),
         )
+    del args_kwargs_base
 
 
 @dataclass
@@ -328,3 +344,61 @@ def test_reserved_names_are_reserved(field: str):
     kwargs = {field: True}
     with pytest.raises(ValueError):
         builds(dict, **kwargs)
+
+
+@pytest.mark.parametrize(
+    "field",
+    list(_HYDRA_FIELD_NAMES)
+    + [_ZEN_TARGET_FIELD_NAME, "_zen_some_new_feature", "hydra_some_new_feature"],
+)
+def test_reserved_names_are_reserved_by_hydra_meta(field: str):
+    kwargs = {field: True}
+    with pytest.raises(ValueError):
+        builds(dict, hydra_meta=kwargs)
+
+
+def f_meta_sig(x, *args, y, **kwargs):
+    pass
+
+
+@given(
+    meta_fields=st.dictionaries(
+        st.sampled_from(["x", "y", "args", "kwargs", "z"]), st.integers()
+    ),
+    pop_sig=st.booleans(),
+    partial=st.booleans(),
+)
+def test_meta_fields_colliding_with_sig_raises(
+    meta_fields, pop_sig: bool, partial: bool
+):
+    if {"x", "y"} & set(meta_fields):
+        with pytest.raises(ValueError):
+            builds(
+                f_meta_sig,
+                hydra_meta=meta_fields,
+                populate_full_signature=pop_sig,
+                hydra_partial=partial,
+            )
+    else:
+        builds(
+            f_meta_sig,
+            hydra_meta=meta_fields,
+            populate_full_signature=pop_sig,
+            hydra_partial=partial,
+        )
+
+
+@given(
+    meta_fields=st.dictionaries(
+        st.sampled_from(["x", "y", "args", "kwargs", "z"]), st.integers()
+    ),
+    partial=st.booleans(),
+)
+def test_meta_fields_colliding_with_user_provided_kwargs_raises(
+    meta_fields, partial: bool
+):
+    if {"x", "y"} & set(meta_fields):
+        with pytest.raises(ValueError):
+            builds(dict, x=1, y=2, hydra_meta=meta_fields, hydra_partial=partial)
+    else:
+        builds(dict, x=1, y=2, hydra_meta=meta_fields, hydra_partial=partial)
