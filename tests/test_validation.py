@@ -8,6 +8,7 @@ from itertools import zip_longest
 
 import hypothesis.strategies as st
 import pytest
+from hydra import __version__ as HYDRA_VERSION
 from hypothesis import assume, given
 from omegaconf import OmegaConf
 
@@ -42,6 +43,9 @@ def test_builds_target_as_kwarg_is_still_correct():
     assert out == {"a": 2, "b": 3}
 
 
+@pytest.mark.skipif(
+    HYDRA_VERSION < "1.1.1", reason="Hydra squatted on the name 'target' until v1.1.1"
+)
 def test_builds_with_target_as_named_arg_works():
     out = instantiate(builds(dict, target=1, b=2))
     assert out == {"target": 1, "b": 2}

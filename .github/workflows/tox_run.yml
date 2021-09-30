@@ -93,7 +93,7 @@ jobs:
     - name: Test with tox
       run: tox -e ml-env
 
-  test-minimum-hydra:
+  test-minimum-dependencies:
     runs-on: ubuntu-latest
 
     strategy:
@@ -113,7 +113,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install tox tox-gh-actions
     - name: Test with tox
-      run: tox -e min-hydra
+      run: tox -e min-deps
 
 
   test-against-pre-releases-of-dependencies:
