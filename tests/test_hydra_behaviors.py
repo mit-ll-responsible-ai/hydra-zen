@@ -28,9 +28,6 @@ def f_three_vars(x, y, z):
     name=st.none() | st.sampled_from(["NameA", "NameB"]),
 )
 def test_builds_sets_hydra_params(convert, recursive, sig, partial, name, meta, kwargs):
-    if partial and not recursive:
-        assume(False)
-
     out = builds(
         f_three_vars,
         hydra_convert=convert,

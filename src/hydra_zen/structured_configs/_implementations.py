@@ -681,12 +681,6 @@ def builds(
     if any(not (is_dataclass(_b) and isinstance(_b, type)) for _b in builds_bases):
         raise TypeError("All `build_bases` must be a tuple of dataclass types")
 
-    if hydra_partial is True and hydra_recursive is False:
-        raise ValueError(
-            _utils.building_error_prefix(target)
-            + "`builds(..., hydra_partial=True)` requires that `hydra_recursive=True`"
-        )
-
     if hydra_meta is None:
         hydra_meta = {}
 
