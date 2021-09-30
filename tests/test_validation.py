@@ -61,11 +61,6 @@ def test_builds_returns_a_dataclass_type():
     assert is_dataclass(conf) and isinstance(conf, type)
 
 
-def test_builds_hydra_partial_raises_if_recursion_disabled():
-    with pytest.raises(ValueError):
-        builds(dict, hydra_partial=True, hydra_recursive=False)
-
-
 @given(everything_except(Mapping, type(None)))
 def test_builds_hydra_meta_not_mapping_raises(not_a_mapping):
     with pytest.raises(TypeError):
