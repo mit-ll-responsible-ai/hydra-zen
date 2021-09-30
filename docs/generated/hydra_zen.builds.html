@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>builds &mdash; hydra-zen 0.3.0rc2+7.g5f48f4b documentation</title>
+  <title>builds &mdash; hydra-zen 0.3.0rc2+8.g40b08ae documentation</title>
   
 
   
@@ -228,6 +228,10 @@ a trace of OmegaConf containers</p></li>
 </ul>
 <p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_convert_</span></code> attribute is not set on the resulting dataclass.</p>
 </dd>
+<dt><strong>hydra_meta: Optional[Mapping[str, Any]]</strong></dt><dd><p>Specifies field-names and corresponding values that will be included in the
+resulting dataclass, but that will <em>not</em> be used to build <code class="docutils literal notranslate"><span class="pre">hydra_target</span></code>
+via instantiation. These are called “meta” fields.</p>
+</dd>
 <dt><strong>frozen</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the resulting dataclass will create frozen (i.e. immutable) instances.
 I.e. setting/deleting an attribute of an instance will raise <code class="docutils literal notranslate"><span class="pre">FrozenInstanceError</span></code>
 at runtime.</p>
@@ -255,18 +259,22 @@ are not compatible with the signature of <code class="docutils literal notransla
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>Using any of the following features will result in a config that depends explicitly on hydra-zen.
-(i.e. hydra-zen must be installed in order to instantiate the resulting config, including its yaml version).</p>
+<p>Using any of the following features will result in a config that depends
+explicitly on hydra-zen. (i.e. hydra-zen must be installed in order to
+instantiate the resulting config, including its yaml version).</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">hydra_partial=True</span></code></p></li>
+<li><p>Specifying: <code class="docutils literal notranslate"><span class="pre">hydra_partial=True</span></code></p></li>
+<li><p>Specifying meta fields via <code class="docutils literal notranslate"><span class="pre">hydra_meta=&lt;...&gt;</span></code></p></li>
 <li><p>Providing a class-object or function argument to <code class="docutils literal notranslate"><span class="pre">&lt;hydra_target&gt;</span></code>, which will automatically be wrapped by <a class="reference internal" href="hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a>. E.g. <code class="docutils literal notranslate"><span class="pre">builds(dict,</span> <span class="pre">fn=len)</span></code></p></li>
 </ul>
 </div></blockquote>
-<p>Type annotations are inferred from the target’s signature and are only retained if they are compatible
-with hydra’s limited set of supported annotations; otherwise <code class="xref py py-obj docutils literal notranslate"><span class="pre">Any</span></code> is specified.</p>
-<p><a class="reference internal" href="#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> provides runtime validation of user-specified named arguments against the target’s signature.
-This helps to ensure that typos in field names fail early and explicitly.</p>
+<p>Type annotations are inferred from the target’s signature and are only
+retained if they are compatible with hydra’s limited set of supported
+annotations; otherwise <code class="xref py py-obj docutils literal notranslate"><span class="pre">Any</span></code> is specified.</p>
+<p><a class="reference internal" href="#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> provides runtime validation of user-specified named arguments against
+the target’s signature. This helps to ensure that typos in field names
+fail early and explicitly.</p>
 <p>Mutable values are automatically transformed to use a default factory <a class="reference internal" href="#rbd228efbc5f2-4" id="id8">[4]</a>.</p>
 <p class="rubric">References</p>
 <dl class="citation">
@@ -324,6 +332,14 @@ This helps to ensure that typos in field names fail early and explicitly.</p>
 <span class="go">{&#39;a&#39;: 1, &#39;b&#39;: -2, &#39;c&#39;: -3}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">issubclass</span><span class="p">(</span><span class="n">ChildConf</span><span class="p">,</span> <span class="n">ParentConf</span><span class="p">)</span>
 <span class="go">True</span>
+</pre></div>
+</div>
+<p>Leveraging meta-fields for portable, relative interpolation:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="s2">&quot;${.s}&quot;</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="s2">&quot;${.s}&quot;</span><span class="p">,</span> <span class="n">hydra_meta</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">s</span><span class="o">=-</span><span class="mi">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf</span><span class="p">)</span>
+<span class="go">{&#39;a&#39;: -10, &#39;b&#39;: -10}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">{&#39;a&#39;: 2, &#39;b&#39;: 2}</span>
 </pre></div>
 </div>
 </dd></dl>
