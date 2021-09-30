@@ -7,7 +7,7 @@ import hypothesis.strategies as st
 import pytest
 from hypothesis import given
 
-from hydra_zen import builds, instantiate
+from hydra_zen import builds, hydrated_dataclass, instantiate
 from hydra_zen.structured_configs._implementations import is_partial_builds
 
 
@@ -59,6 +59,17 @@ def test_basic_hydra_meta_behavior(
     assert out_args == args
     assert out_kwargs == kwargs
     assert set(kwargs).isdisjoint(hydra_meta)
+
+
+def test_hydra_meta_via_hydrated_dataclass():
+    @hydrated_dataclass(dict, hydra_meta=dict(a=1))
+    class Conf:
+        b: int = 2
+
+    conf = Conf()
+    assert conf.a == 1
+    assert conf.b == 2
+    assert instantiate(conf) == dict(b=2)
 
 
 def test_mutable_meta_value_gets_wrapped():

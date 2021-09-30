@@ -160,6 +160,7 @@ def hydrated_dataclass(
     hydra_partial: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_meta: Optional[Mapping[str, Any]] = None,
     frozen: bool = False,
 ) -> Callable[[Type[_T]], Type[_T]]:
     """A decorator that uses `hydra_zen.builds` to create a dataclass with the appropriate
@@ -203,17 +204,19 @@ def hydrated_dataclass(
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.
 
+    hydra_meta: Optional[Mapping[str, Any]]
+        Specifies field-names and corresponding values that will be included in the
+        resulting dataclass, but that will *not* be used to build ``hydra_target``
+        via instantiation. These are called "meta" fields.
+
     frozen : bool, optional (default=False)
         If `True`, the resulting dataclass will create frozen (i.e. immutable) instances.
         I.e. setting/deleting an attribute of an instance will raise `FrozenInstanceError`
         at runtime.
 
-    Notes
-    -----
-    Using any of the following features will result in a config that depends explicitly on hydra-zen
-
-       - ``hydra_partial=True``
-       - Providing a class-object or function argument to target, which will automatically be wrapped by `just`.
+    See Also
+    --------
+    builds
 
     References
     ----------
@@ -293,6 +296,7 @@ def hydrated_dataclass(
             hydra_recursive=hydra_recursive,
             hydra_convert=hydra_convert,
             hydra_partial=hydra_partial,
+            hydra_meta=hydra_meta,
             builds_bases=(decorated_obj,),
             dataclass_name=decorated_obj.__name__,
             frozen=frozen,
@@ -521,6 +525,11 @@ def builds(
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.
 
+    hydra_meta: Optional[Mapping[str, Any]]
+        Specifies field-names and corresponding values that will be included in the
+        resulting dataclass, but that will *not* be used to build ``hydra_target``
+        via instantiation. These are called "meta" fields.
+
     frozen : bool, optional (default=False)
         If ``True``, the resulting dataclass will create frozen (i.e. immutable) instances.
         I.e. setting/deleting an attribute of an instance will raise ``FrozenInstanceError``
@@ -547,17 +556,21 @@ def builds(
 
     Notes
     -----
-    Using any of the following features will result in a config that depends explicitly on hydra-zen.
-    (i.e. hydra-zen must be installed in order to instantiate the resulting config, including its yaml version).
+    Using any of the following features will result in a config that depends
+    explicitly on hydra-zen. (i.e. hydra-zen must be installed in order to
+    instantiate the resulting config, including its yaml version).
 
-       - ``hydra_partial=True``
+       - Specifying: ``hydra_partial=True``
+       - Specifying meta fields via ``hydra_meta=<...>``
        - Providing a class-object or function argument to ``<hydra_target>``, which will automatically be wrapped by `just`. E.g. ``builds(dict, fn=len)``
 
-    Type annotations are inferred from the target's signature and are only retained if they are compatible
-    with hydra's limited set of supported annotations; otherwise `Any` is specified.
+    Type annotations are inferred from the target's signature and are only
+    retained if they are compatible with hydra's limited set of supported
+    annotations; otherwise `Any` is specified.
 
-    `builds` provides runtime validation of user-specified named arguments against the target's signature.
-    This helps to ensure that typos in field names fail early and explicitly.
+    `builds` provides runtime validation of user-specified named arguments against
+    the target's signature. This helps to ensure that typos in field names
+    fail early and explicitly.
 
     Mutable values are automatically transformed to use a default factory [4]_.
 
@@ -610,6 +623,14 @@ def builds(
     {'a': 1, 'b': -2, 'c': -3}
     >>> issubclass(ChildConf, ParentConf)
     True
+
+    Leveraging meta-fields to for portable, relative interpolation:
+
+    >>> Conf = builds(dict, a="${.s}", b="${.s}", hydra_meta=dict(s=-10))
+    >>> instantiate(Conf)
+    {'a': -10, 'b': -10}
+    >>> instantiate(Conf, s=2)
+    {'a': 2, 'b': 2}
     """
 
     if not pos_args and not kwargs_for_target:
