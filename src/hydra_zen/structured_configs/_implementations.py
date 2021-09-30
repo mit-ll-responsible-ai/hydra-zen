@@ -624,7 +624,7 @@ def builds(
     >>> issubclass(ChildConf, ParentConf)
     True
 
-    Leveraging meta-fields to for portable, relative interpolation:
+    Leveraging meta-fields for portable, relative interpolation:
 
     >>> Conf = builds(dict, a="${.s}", b="${.s}", hydra_meta=dict(s=-10))
     >>> instantiate(Conf)
