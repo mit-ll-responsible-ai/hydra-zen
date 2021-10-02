@@ -168,8 +168,6 @@ def field(
 def safe_name(obj: Any, repr_allowed=True) -> str:
     """Tries to get a descriptive name for an object. Returns '<unknown>`
     instead of raising - useful for writing descriptive/dafe error messages."""
-    # if hasattr(obj, "__qualname__"):
-    #     return obj.__qualname__
 
     if hasattr(obj, "__name__"):
         return obj.__name__
