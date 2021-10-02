@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import inspect
+import random
 from functools import partial
 
 import hypothesis.strategies as st
@@ -95,3 +96,17 @@ def test_ufunc_as_default_value():
 
 def test_ufunc_positional_args():
     assert instantiate(builds(np.add, 1.0, 2.0)) == 3.0
+
+
+def test_obfuscated_modules_dont_get_mixed_up():
+    # Both `numpy.random.random` and `random.random` have missing
+    # __module__ attributes, and we have to use specialized logic
+    # to fetch these.
+    #
+    # This test ensures that we never misattribute functions with
+    # the same name, to the wrong module
+    assert builds(np.random.random)._target_.startswith("numpy")
+    assert builds(random.random)._target_.startswith("random")
+
+    assert get_target(builds(np.random.random)) is np.random.random
+    assert get_target(builds(random.random)) is random.random
