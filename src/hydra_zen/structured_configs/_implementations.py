@@ -14,6 +14,7 @@ from typing import (
     List,
     Mapping,
     Optional,
+    Sequence,
     Set,
     Tuple,
     Type,
@@ -406,6 +407,7 @@ def builds(
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     hydra_meta: Optional[Mapping[str, Any]] = None,
+    zen_wrappers: Optional[Union[Callable, Sequence[Callable]]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
@@ -424,6 +426,7 @@ def builds(
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     hydra_meta: Optional[Mapping[str, Any]] = None,
+    zen_wrappers: Optional[Union[Callable, Sequence[Callable]]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
@@ -442,6 +445,7 @@ def builds(
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     hydra_meta: Optional[Mapping[str, Any]] = None,
+    zen_wrappers: Optional[Union[Callable, Sequence[Callable]]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
@@ -460,6 +464,7 @@ def builds(
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     hydra_meta: Optional[Mapping[str, Any]] = None,
+    zen_wrappers: Optional[Union[Callable, Sequence[Callable]]] = None,
     frozen: bool = False,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
@@ -695,6 +700,16 @@ def builds(
                 f"`hydra_meta` must be a mapping whose keys are strings, got key: {_key}"
             )
 
+    if zen_wrappers is not None:
+        if not isinstance(zen_wrappers, Sequence):
+            zen_wrappers = (zen_wrappers,)
+        else:
+            zen_wrappers = tuple(zen_wrappers)
+
+        # TODO: do proper error handling
+        # TODO: Builds[Callable] should be permitted too
+        assert all(callable(x) for x in zen_wrappers)
+
     # Check for reserved names
     for _name in chain(kwargs_for_target, hydra_meta):
         if _name in _HYDRA_FIELD_NAMES:
@@ -706,7 +721,7 @@ def builds(
                 )
             else:
                 raise ValueError(err_msg)
-        if _name.startswith(("hydra_", "_zen_")):
+        if _name.startswith(("hydra_", "_zen_", "zen_")):
             raise ValueError(
                 f"The field-name specified via `builds(..., {_name}=<...>)` is reserved by hydra-zen."
                 " You can manually create a dataclass to utilize this name in a structured config."
@@ -714,7 +729,7 @@ def builds(
 
     target_field: List[Union[Tuple[str, Type[Any]], Tuple[str, Type[Any], Field[Any]]]]
 
-    if hydra_partial or hydra_meta:
+    if hydra_partial or hydra_meta or zen_wrappers:
         target_field = [
             (
                 _TARGET_FIELD_NAME,
@@ -739,10 +754,29 @@ def builds(
             target_field.append(
                 (
                     _META_FIELD_NAME,
-                    bool,
+                    Dict[str, Any],
                     _utils.field(default=tuple(hydra_meta), init=False),
                 ),
             )
+        if zen_wrappers:
+            # TODO: handle config'd - callables
+            _callable_paths = tuple(_utils.get_obj_path(z) for z in zen_wrappers)
+            if len(zen_wrappers) == 1:
+                target_field.append(
+                    (
+                        "_zen_wrappers",
+                        str,
+                        _utils.field(default=_callable_paths[0], init=False),
+                    ),
+                )
+            else:
+                target_field.append(
+                    (
+                        "_zen_wrappers",
+                        Tuple[str, ...],
+                        _utils.field(default=_callable_paths, init=False),
+                    ),
+                )
     else:
         target_field = [
             (
