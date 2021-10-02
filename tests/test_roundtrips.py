@@ -140,9 +140,8 @@ a_bunch_of_objects = [
     datetime.time,
     datetime.timezone,
     math.sin,
-    math.perm,
     operator.add,
-    statistics.median_grouped,
+    statistics.mean,
     os.getcwd,
 ]
 
