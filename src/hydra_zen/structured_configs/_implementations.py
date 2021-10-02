@@ -754,18 +754,20 @@ def builds(
             target_field.append(
                 (
                     _META_FIELD_NAME,
-                    Dict[str, Any],
+                    Tuple[str, ...],
                     _utils.field(default=tuple(hydra_meta), init=False),
                 ),
             )
         if zen_wrappers:
             # TODO: handle config'd - callables
-            _callable_paths = tuple(_utils.get_obj_path(z) for z in zen_wrappers)
+            _callable_paths = tuple(
+                z if is_builds(z) else _utils.get_obj_path(z) for z in zen_wrappers
+            )
             if len(zen_wrappers) == 1:
                 target_field.append(
                     (
                         "_zen_wrappers",
-                        str,
+                        Any,
                         _utils.field(default=_callable_paths[0], init=False),
                     ),
                 )
@@ -773,7 +775,7 @@ def builds(
                 target_field.append(
                     (
                         "_zen_wrappers",
-                        Tuple[str, ...],
+                        Tuple[Any, ...],
                         _utils.field(default=_callable_paths, init=False),
                     ),
                 )

@@ -48,11 +48,15 @@ def zen_processing(
     _zen_wrappers: _typing.Union[str, _typing.Sequence[str]] = tuple(),
     **kwargs,
 ):
-    if isinstance(_zen_wrappers, str):
+    if isinstance(_zen_wrappers, str) or not isinstance(
+        _zen_wrappers, _typing.Sequence
+    ):
         _zen_wrappers = (_zen_wrappers,)
 
     # flip order: first wrapper listed should be called first
-    wrappers = tuple(get_obj(path=z) for z in _zen_wrappers)[::-1]
+    wrappers = tuple(
+        get_obj(path=z) if isinstance(z, str) else z for z in _zen_wrappers
+    )[::-1]
 
     obj = get_obj(path=_zen_target)
 
