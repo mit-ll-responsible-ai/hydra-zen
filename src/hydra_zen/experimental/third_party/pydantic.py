@@ -21,8 +21,8 @@ def _validates_then_passes(obj):
     # to perform the validation, and then simply call/instantiation `obj`
     # with the arguments as-is.
     #
-    # This helps to ensure that `obj(*arg, **kwargs)` will always never
-    # be actually affected by pydantic, once the validation is complete.
+    # This helps to ensure that the returned `obj(*arg, **kwargs)` will
+    # never be affected by pydantic.
     #
     # NOTE: This means that we *do not* gain the use of pydantic's coercion
     # at this point.
