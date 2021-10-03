@@ -12,7 +12,14 @@ import pytest
 # Skip collection of tests that don't work on the current version of Python.
 collect_ignore_glob = []
 
-OPTIONAL_TEST_DEPENDENCIES = ("numpy", "torch", "jax", "pytorch_lightning", "pydantic")
+OPTIONAL_TEST_DEPENDENCIES = (
+    "numpy",
+    "torch",
+    "jax",
+    "pytorch_lightning",
+    "pydantic",
+    "beartype",
+)
 
 for _module_name in OPTIONAL_TEST_DEPENDENCIES:
     try:
