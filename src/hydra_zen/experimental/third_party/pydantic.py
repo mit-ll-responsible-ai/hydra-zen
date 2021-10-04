@@ -9,7 +9,7 @@ _T = TypeVar("_T", bound=Callable)
 __all__ = ["validates_with_pydantic"]
 
 
-def _validates_then_passes(obj):
+def validates_with_pydantic(obj: _T) -> _T:  # pragma: no cover
     # `pydantic.validate_arguments` doesn't support instance-methods.
     # https://github.com/samuelcolvin/pydantic/issues/1222
     # and it doesn't seem like this is going to get fixed any time soon.
@@ -33,7 +33,7 @@ def _validates_then_passes(obj):
         target = obj
         NEEDS_SELF = False
 
-    pydantified = _pyd.validate_arguments(
+    pydantified = _pyd.validate_arguments(  # type: ignore
         target, config={"arbitrary_types_allowed": True}
     )
 
@@ -45,13 +45,4 @@ def _validates_then_passes(obj):
             pydantified.validate(*args, **kwargs)
         return obj(*args, **kwargs)
 
-    return wrapper
-
-
-def validates_with_pydantic(func: _T) -> _T:  # pragma: no cover
-    # NOTE: currently *does not* utilize pydantic's coercion mechanism
-    # https://pydantic-docs.helpmanual.io/usage/models/#data-conversion
-    #
-    # It should be straightforward to expose a version of this that does,
-    # but that will be riskier to use
-    return cast(_T, _validates_then_passes(func))
+    return cast(_T, wrapper)
