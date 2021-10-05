@@ -382,22 +382,22 @@ def test_get_target_on_non_builds():
         get_target(1)
 
 
-@pytest.mark.parametrize(
-    "field",
-    sorted(_HYDRA_FIELD_NAMES)
-    + [_ZEN_TARGET_FIELD_NAME, "_zen_some_new_feature", "hydra_some_new_feature"],
-)
+RESERVED_FIELD_NAMES = sorted(_HYDRA_FIELD_NAMES) + [
+    _ZEN_TARGET_FIELD_NAME,
+    "_zen_some_new_feature",
+    "hydra_some_new_feature",
+    "zen_some_new_feature",
+]
+
+
+@pytest.mark.parametrize("field", RESERVED_FIELD_NAMES)
 def test_reserved_names_are_reserved(field: str):
     kwargs = {field: True}
     with pytest.raises(ValueError):
         builds(dict, **kwargs)
 
 
-@pytest.mark.parametrize(
-    "field",
-    sorted(_HYDRA_FIELD_NAMES)
-    + [_ZEN_TARGET_FIELD_NAME, "_zen_some_new_feature", "hydra_some_new_feature"],
-)
+@pytest.mark.parametrize("field", RESERVED_FIELD_NAMES)
 def test_reserved_names_are_reserved_by_zen_meta(field: str):
     kwargs = {field: True}
     with pytest.raises(ValueError):

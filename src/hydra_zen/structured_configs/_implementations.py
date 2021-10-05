@@ -734,7 +734,7 @@ def builds(
                 )
             else:
                 raise ValueError(err_msg)
-        if _name.startswith(("hydra_", "_zen_")):
+        if _name.startswith(("hydra_", "_zen_", "zen_")):
             raise ValueError(
                 f"The field-name specified via `builds(..., {_name}=<...>)` is reserved by hydra-zen."
                 " You can manually create a dataclass to utilize this name in a structured config."
