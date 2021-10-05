@@ -1,6 +1,13 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
+import datetime
+import math
+import operator
+import os
+import random
+import re
+import statistics
 import string
 from dataclasses import dataclass
 from typing import Any, Dict, List
@@ -11,7 +18,6 @@ from hypothesis import given
 from omegaconf import OmegaConf
 
 from hydra_zen import builds, get_target, instantiate, just, to_yaml
-
 from tests import valid_hydra_literals
 
 arbitrary_kwargs = st.dictionaries(
@@ -122,6 +128,21 @@ a_bunch_of_objects = [
     list,
     set,
     complex,
+    isinstance,
+    all,
+    Exception,
+    random.random,
+    random.uniform,
+    random.choice,
+    random.choices,
+    re.compile,
+    re.match,
+    datetime.time,
+    datetime.timezone,
+    math.sin,
+    operator.add,
+    statistics.mean,
+    os.getcwd,
 ]
 
 
@@ -139,6 +160,7 @@ def test_just_roundtrip(obj):
         builds,
         just,
         lambda x: builds(x, hydra_partial=True),
+        lambda x: builds(x, hydra_meta=dict(_some_obscure_name=1)),
     ],
 )
 def test_get_target_roundtrip(x, fn):

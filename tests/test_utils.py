@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 import collections.abc as abc
 import enum
+import random
 import sys
 from dataclasses import dataclass, field as dataclass_field
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Type, TypeVar, Union
@@ -53,7 +54,6 @@ def f():
         (1, "1"),
         (dict, "dict"),
         (C, "C"),
-        (C.f, "C.f"),
         (C(), "C as a repr"),
         ("moo", "'moo'"),
         (None, "None"),
@@ -226,3 +226,8 @@ def test_vendored_field():
     assert isinstance(our_field, type(their_field))
     assert hasattr(A, "x") is hasattr(B, "x")
     assert A().x == B().x
+
+
+def test_builds_random_regression():
+    # was broken in `0.3.0rc3`
+    assert 1 <= instantiate(builds(random.uniform, 1, 2)) <= 2

@@ -82,6 +82,7 @@ except ImportError:  # pragma: no cover
 
 
 COMMON_MODULES_WITH_OBFUSCATED_IMPORTS: Tuple[str, ...] = (
+    "random",
     "numpy",
     "numpy.random",
     "jax.numpy",
@@ -167,8 +168,6 @@ def field(
 def safe_name(obj: Any, repr_allowed=True) -> str:
     """Tries to get a descriptive name for an object. Returns '<unknown>`
     instead of raising - useful for writing descriptive/dafe error messages."""
-    if hasattr(obj, "__qualname__"):
-        return obj.__qualname__
 
     if hasattr(obj, "__name__"):
         return obj.__name__
@@ -190,8 +189,9 @@ def get_obj_path(obj: Any) -> str:
         raise AttributeError(f"{obj} does not have a `__name__` attribute")
 
     module = getattr(obj, "__module__", None)
+    qualname = getattr(obj, "__qualname__", None)
 
-    if "<" in name or module is None:
+    if (qualname is not None and "<" in qualname) or module is None:
         # NumPy's ufuncs do not have an inspectable `__module__` attribute, so we
         # check to see if the object lives in NumPy's top-level namespace.
         #
@@ -204,16 +204,16 @@ def get_obj_path(obj: Any) -> str:
         #
         # or...
         #
-        # module is None, which is apparently a thing..: numpy.random.rand.__module__ is None
+        # module is None, which is apparently a thing..:
+        # __module__ is None for both numpy.random.rand and random.random
+        #
 
         # don't use qualname for obfuscated paths
-        name = obj.__name__
         for new_module in COMMON_MODULES_WITH_OBFUSCATED_IMPORTS:
             if getattr(sys.modules.get(new_module), name, None) is obj:
                 module = new_module
                 break
-        else:  # pragma: no cover
-            name = safe_name(obj)
+        else:
             raise ModuleNotFoundError(f"{name} is not importable")
 
     return f"{module}.{name}"
