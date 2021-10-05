@@ -129,13 +129,25 @@ def test_convert_sequence_on_various_inputs():
     def f(x: MyNamedTuple, y: tuple, *args: tuple, z: Deque, **kwargs: tuple):
         return (x, y, *args, z) + tuple(kwargs.values())
 
-    assert f(0, [1, 2], z=[3, 4]) == (0, (1, 2), deque([3, 4]))
-    assert f(0, y=[1, 2], z=[3, 4]) == (0, (1, 2), deque([3, 4]))
-    assert f(0, [1, 2], [-1], z=[3, 4]) == (0, (1, 2), [-1], deque([3, 4]))
-    assert f(0, [1, 2], [-1], z=[3, 4], extra=[5, 6]) == (
+    assert f(0, [1, 2], z=[3, 4]) == (0, (1, 2), deque([3, 4]))  # type: ignore
+    assert f(0, y=[1, 2], z=[3, 4]) == (0, (1, 2), deque([3, 4]))  # type: ignore
+    assert f(0, [1, 2], [-1], z=[3, 4]) == (0, (1, 2), [-1], deque([3, 4]))  # type: ignore
+    assert f(0, [1, 2], [-1], z=[3, 4], extra=[5, 6]) == (  # type: ignore
         0,
         (1, 2),
         [-1],
         deque([3, 4]),
         [5, 6],
     )
+
+
+def test_convert_sequences_on_class():
+    @convert_sequences
+    class AClass:
+        def __init__(self, x: tuple, y) -> None:
+            self.x = x
+            self.y = y
+
+    out = AClass([1, 2], [3])  # type: ignore
+    assert out.x == (1, 2)
+    assert out.y == [3]

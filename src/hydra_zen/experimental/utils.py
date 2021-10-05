@@ -22,7 +22,7 @@ _T = TypeVar("_T", bound=Callable)
 __all__ = ["convert_sequences"]
 
 
-def _is_namedtuple_type(x) -> TypeGuard[Type[NamedTuple]]:
+def _is_namedtuple_type(x) -> TypeGuard[Type[NamedTuple]]:  # pragma: no cover
 
     try:
         bases = x.__bases__
@@ -124,11 +124,13 @@ def convert_sequences(obj: _T) -> _T:
                     annotation = _args[1]
                 elif _args[1] is _NoneType:
                     annotation = _args[0]
-                else:
+                else:  # pragma: no cover
                     # E.g. Union[A, B]
+                    # we cover this  in tests coverage-tooling struggles here
                     continue
-            else:
+            else:  # pragma: no cover
                 # E.g. Union[A, B, C]
+                # we cover this in tests but coverage-tooling struggles here
                 continue
         del _origin
 
@@ -156,7 +158,8 @@ def convert_sequences(obj: _T) -> _T:
                     return annotation(*x)  # type: ignore
 
                 caster = _unpack
-            else:
+            else:  # pragma: no cover
+                # covered in tests but coverage-tooling struggles here
                 continue
 
             if param.kind is not _KEYWORD_ONLY:
