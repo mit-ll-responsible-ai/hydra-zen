@@ -56,8 +56,8 @@ def convert_sequences(obj: _T) -> _T:
     This wrapper will cast these lists to their desired type, based
     on the annotated-type associated with that sequence.
 
-    This is a no-op for objects that don't have any annotated sequence
-    types.
+    This is a no-op for objects that don't have any annotated non-string
+    sequence types.
 
     This is strictly an experimental utility. Use at your own risk.
 
@@ -76,6 +76,9 @@ def convert_sequences(obj: _T) -> _T:
     - deques
     - lists
     - named-tuples
+
+    The only Union-based types that are supported are of the form
+    ``Optional[<sequence-type>]``.
 
     Examples
     --------
