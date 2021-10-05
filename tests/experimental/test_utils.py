@@ -153,7 +153,7 @@ def test_convert_sequences_on_class():
     assert out.y == [3]
 
 
-def test_hacked_type():
+def test_invalid_type_annotation_doesnt_cause_internal_error():
     def f(x):
         return x
 
