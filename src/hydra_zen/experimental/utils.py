@@ -76,6 +76,7 @@ def convert_sequences(obj: _T) -> _T:
         if (
             not inspect.isabstract(caster)  # E.g. caster = Sequence
             and issubclass(caster, Sequence)
+            and not issubclass(caster, str)  # strings don't need to be cast
             and caster is not list  # annotation is list to begin with
         ):
             list_caster_by_pos[n] = caster
