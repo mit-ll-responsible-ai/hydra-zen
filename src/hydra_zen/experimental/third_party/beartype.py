@@ -2,6 +2,7 @@ import inspect
 from typing import Callable, TypeVar, cast
 
 import beartype as bt
+from beartype import beartype
 
 from hydra_zen.experimental.utils import convert_sequences
 
