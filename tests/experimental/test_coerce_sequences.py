@@ -7,7 +7,7 @@ from hypothesis import assume, given, settings
 from omegaconf.errors import GrammarParseError
 
 from hydra_zen import builds, instantiate, to_yaml
-from hydra_zen.experimental.utils import convert_sequences
+from hydra_zen.experimental.utils import coerce_sequences
 
 
 class MyNamedTuple(NamedTuple):
@@ -72,7 +72,7 @@ def test_convert_sequences_against_many_types(in_type, expected_type):
             args = (cast_x,)
 
         conf = builds(
-            f, *args, **kwargs, hydra_convert="all", zen_wrappers=convert_sequences
+            f, *args, **kwargs, hydra_convert="all", zen_wrappers=coerce_sequences
         )
 
         try:
@@ -121,11 +121,11 @@ def kwargs_only(x, **kwargs: tuple):
     "target_fn", [no_annotation, no_sequences, args_only, kwargs_only]
 )
 def test_convert_sequences_no_annotations_is_noop(target_fn):
-    assert target_fn is convert_sequences(target_fn)
+    assert target_fn is coerce_sequences(target_fn)
 
 
 def test_convert_sequence_on_various_inputs():
-    @convert_sequences
+    @coerce_sequences
     def f(x: MyNamedTuple, y: tuple, *args: tuple, z: Deque, **kwargs: tuple):
         return (x, y, *args, z) + tuple(kwargs.values())
 
@@ -142,7 +142,7 @@ def test_convert_sequence_on_various_inputs():
 
 
 def test_convert_sequences_on_class():
-    @convert_sequences
+    @coerce_sequences
     class AClass:
         def __init__(self, x: tuple, y) -> None:
             self.x = x
@@ -158,4 +158,4 @@ def test_invalid_type_annotation_doesnt_cause_internal_error():
         return x
 
     f.__annotations__["x"] = 1  # an unexpected type hint
-    assert convert_sequences(f)(x=10) == 10
+    assert coerce_sequences(f)(x=10) == 10

@@ -3,7 +3,7 @@ from typing import Callable, TypeVar, cast
 
 import beartype as bt
 
-from hydra_zen.experimental.utils import convert_sequences
+from hydra_zen.experimental.utils import coerce_sequences
 
 _T = TypeVar("_T", bound=Callable)
 
@@ -16,5 +16,5 @@ def validates_with_beartype(obj: _T) -> _T:
         target = obj
     else:
         target = bt.beartype(obj)
-    target = convert_sequences(target)
+    target = coerce_sequences(target)
     return cast(_T, target)

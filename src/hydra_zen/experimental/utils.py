@@ -19,7 +19,7 @@ from hydra_zen.structured_configs._utils import get_args, get_origin
 
 _T = TypeVar("_T", bound=Callable)
 
-__all__ = ["convert_sequences"]
+__all__ = ["coerce_sequences"]
 
 
 def _is_namedtuple_type(x) -> TypeGuard[Type[NamedTuple]]:  # pragma: no cover
@@ -50,7 +50,7 @@ _KEYWORD_ONLY = inspect.Parameter.KEYWORD_ONLY
 _VAR_KEYWORD = inspect.Parameter.VAR_KEYWORD
 
 
-def convert_sequences(obj: _T) -> _T:
+def coerce_sequences(obj: _T) -> _T:
     """
     Hydra is only able to read non-string sequences as lists (or ListConfig).
     This wrapper will cast these lists to their desired type, based
