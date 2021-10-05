@@ -44,7 +44,7 @@ def test_multiple_wraps_on_func(
 
     wrapped_f = f
     for _ in range(num_compositions):
-        wrapped_f = validator(f)
+        wrapped_f = validator(wrapped_f)
 
     assert f([1, 2]) == [1, 2]  # type: ignore
 
@@ -69,7 +69,7 @@ def test_multiple_wraps_on_class(
 
     wrapped_A = A
     for _ in range(num_compositions):
-        wrapped_A = validator(A)
+        wrapped_A = validator(wrapped_A)
 
     assert wrapped_A is A, "decoration should occur in-place"
 
