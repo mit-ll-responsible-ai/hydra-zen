@@ -7,7 +7,7 @@ from hypothesis import assume, given, settings
 from omegaconf.errors import GrammarParseError
 
 from hydra_zen import builds, instantiate, to_yaml
-from hydra_zen.experimental.utils import coerce_sequences
+from hydra_zen.experimental.coerce import coerce_sequences
 
 
 class MyNamedTuple(NamedTuple):

@@ -27,6 +27,10 @@ for _module_name in OPTIONAL_TEST_DEPENDENCIES:
     except ModuleNotFoundError:
         collect_ignore_glob.append(f"**/*{_module_name}*.py")
 
+
+if sys.version_info > (3, 6):
+    collect_ignore_glob.append("*py36*")
+
 if sys.version_info < (3, 7):
     collect_ignore_glob.append("tests/experimental/test_coerce_sequences.py")
 

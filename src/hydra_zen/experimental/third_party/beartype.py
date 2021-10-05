@@ -3,7 +3,7 @@ from typing import Callable, TypeVar, cast
 
 import beartype as bt
 
-from hydra_zen.experimental.utils import coerce_sequences
+from hydra_zen.experimental.coerce import coerce_sequences
 
 _T = TypeVar("_T", bound=Callable)
 
