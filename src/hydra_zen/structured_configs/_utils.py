@@ -259,14 +259,14 @@ def sanitized_type(
         args = get_args(type_)
         if origin is Union:
             # Hydra only supports Optional[<type>] unions
-            if len(args) != 2 or type(None) not in args:
+            if len(args) != 2 or NoneType not in args:
                 # isn't Optional[<type>]
                 return Any
 
             args = cast(Tuple[type, type], args)
 
             optional_type, none_type = args
-            if not isinstance(None, none_type):
+            if none_type is not NoneType:
                 optional_type = none_type
             optional_type: Optional[Any]
             optional_type = sanitized_type(optional_type)
