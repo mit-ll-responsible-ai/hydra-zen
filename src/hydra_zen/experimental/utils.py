@@ -1,17 +1,58 @@
 import inspect
+from collections import deque
 from functools import wraps
-from typing import Callable, Sequence, TypeVar, cast, get_type_hints
+from typing import (
+    Callable,
+    NamedTuple,
+    Sequence,
+    Type,
+    TypeVar,
+    Union,
+    cast,
+    get_type_hints,
+)
 
 from omegaconf import ListConfig
+from typing_extensions import TypeGuard
+
+from hydra_zen.structured_configs._utils import get_args, get_origin
 
 _T = TypeVar("_T", bound=Callable)
 
 __all__ = ["convert_sequences"]
 
 
+def _is_namedtuple_type(x) -> TypeGuard[Type[NamedTuple]]:
+
+    try:
+        bases = x.__bases__
+        fields = x._fields
+    except AttributeError:
+        return False
+
+    if bases is None:
+        return False
+
+    if len(bases) != 1 or bases[0] is not tuple:
+        return False
+
+    if not isinstance(fields, tuple):
+        return False
+
+    return all(isinstance(fieldname, str) for fieldname in fields)
+
+
+_NoneType = type(None)
+
+_POSITIONAL_ONLY = inspect.Parameter.POSITIONAL_ONLY
+_VAR_POSITIONAL = inspect.Parameter.VAR_POSITIONAL
+_KEYWORD_ONLY = inspect.Parameter.KEYWORD_ONLY
+_VAR_KEYWORD = inspect.Parameter.VAR_KEYWORD
+
+
 def convert_sequences(obj: _T) -> _T:
     """
-    Hydra is only able to read sequences as lists (or ListConfig).
+    Hydra is only able to read non-string sequences as lists (or ListConfig).
     This wrapper will cast these lists to their desired type, based
     on the annotated-type associated with that sequence.
 
@@ -27,6 +68,14 @@ def convert_sequences(obj: _T) -> _T:
     Returns
     -------
     wrapped_obj
+
+    Notes
+    -----
+    The supported non-string sequence types are:
+    - tuples
+    - deques
+    - lists
+    - named-tuples
 
     Examples
     --------
@@ -59,14 +108,34 @@ def convert_sequences(obj: _T) -> _T:
     list_caster_by_name = {}  # by param-name in the signature
 
     sig = inspect.signature(obj)
-    for n, name in enumerate(sig.parameters):
-        if name not in hints:
+    for n, (name, param) in enumerate(sig.parameters.items()):
+        if name not in hints or param.kind in {_VAR_KEYWORD, _VAR_POSITIONAL}:
             continue
+
         annotation = hints[name]
+
+        _origin = get_origin(annotation)
+
+        if _origin is not None and _origin is Union:
+            # Check for Optional[A]
+            _args = get_args(annotation)
+            if len(_args) == 2:
+                if _args[0] is _NoneType:
+                    annotation = _args[1]
+                elif _args[1] is _NoneType:
+                    annotation = _args[0]
+                else:
+                    # E.g. Union[A, B]
+                    continue
+            else:
+                # E.g. Union[A, B, C]
+                continue
+        del _origin
+
         if not isinstance(annotation, type):
             # E.g. annotation = Tuple[int, int]
             # Tuple[int, int].__origin__ -> tuple
-            caster = getattr(annotation, "__origin__", None)
+            caster = get_origin(annotation)
             if caster is None:
                 continue
         else:
@@ -74,30 +143,46 @@ def convert_sequences(obj: _T) -> _T:
             caster = annotation
 
         if (
-            not inspect.isabstract(caster)  # E.g. caster = Sequence
-            and issubclass(caster, Sequence)
+            issubclass(caster, Sequence)
+            # and not inspect.isabstract(caster)  # E.g. caster = Sequence
             and not issubclass(caster, str)  # strings don't need to be cast
             and caster is not list  # annotation is list to begin with
         ):
-            list_caster_by_pos[n] = caster
-            list_caster_by_name[name] = caster
+            if caster in {tuple, deque}:
+                pass
+            elif _is_namedtuple_type(annotation):
+
+                def _unpack(x):
+                    return annotation(*x)  # type: ignore
+
+                caster = _unpack
+            else:
+                continue
+
+            if param.kind is not _KEYWORD_ONLY:
+                list_caster_by_pos[n] = caster
+            if param.kind is not _POSITIONAL_ONLY:
+                list_caster_by_name[name] = caster
+
     min_pos = min(list_caster_by_pos) if list_caster_by_pos else 0
 
-    assert len(list_caster_by_name) == len(list_caster_by_pos)
-
-    if not list_caster_by_name:
+    if not list_caster_by_name and not list_caster_by_pos:
         # no annotations associated with sequences
         return cast(_T, obj)
 
     @wraps(obj)
     def wrapper(*args, **kwargs):
-        if min_pos < len(args):
+        if list_caster_by_pos and min_pos < len(args):
             # at least one positional argument needs to be cast
             args = list(args)
             for pos in list_caster_by_pos:
-                if pos < len(args) and isinstance(args[pos], (list, ListConfig)):
-                    args[pos] = list_caster_by_pos[pos](args[pos])
-        if kwargs:
+                if pos < len(args):
+                    if isinstance(args[pos], (list, ListConfig)):
+                        args[pos] = list_caster_by_pos[pos](args[pos])
+                else:
+                    # pos is inserted in dict in ascending order
+                    break
+        if list_caster_by_name and kwargs:
             named = set(list_caster_by_name).intersection(kwargs)
             for name in named:
                 # at least one named-arg needs to be cast
