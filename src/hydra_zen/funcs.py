@@ -14,9 +14,9 @@ from hydra.utils import log as _log
 
 from hydra_zen.typing import Partial as _Partial
 
-_T = _typing.TypeVar("_T")
+__all__ = ["partial", "get_obj", "zen_processing"]
 
-__all__ = ["partial", "get_obj"]
+_T = _typing.TypeVar("_T")
 
 
 def partial(
@@ -45,9 +45,28 @@ def zen_processing(
     _zen_target: str,
     _zen_partial: bool = False,
     _zen_exclude: _typing.Sequence[str] = tuple(),
+    _zen_wrappers: _typing.Union[str, _typing.Sequence[str]] = tuple(),
     **kwargs,
 ):
+    if isinstance(_zen_wrappers, str) or not isinstance(
+        _zen_wrappers, _typing.Sequence
+    ):
+        _zen_wrappers = (_zen_wrappers,)
+
+    # first wrapper listed should be called first
+    # [f1, f2, f3, ...] ->
+    #    target = f1(target)
+    #    target = f2(target)
+    #    target = f3(target)
+    #    ...
+    wrappers = tuple(
+        get_obj(path=z) if isinstance(z, str) else z for z in _zen_wrappers
+    )
+
     obj = get_obj(path=_zen_target)
+
+    for wrapper in wrappers:
+        obj = wrapper(obj)
 
     if _zen_exclude:
         excluded_set = set(_zen_exclude)
