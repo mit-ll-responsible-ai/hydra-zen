@@ -93,6 +93,9 @@ class Color(enum.Enum):
     pass
 
 
+NoneType = type(None)
+
+
 @pytest.mark.parametrize(
     "in_type, expected_type",
     [
@@ -123,8 +126,8 @@ class Color(enum.Enum):
         (abc.Mapping, Any),
         (Union[str, int], Any),
         (Optional[frozenset], Any),
-        (Union[type(None), frozenset], Any),
-        (Union[type(None), int], Optional[int]),  # supported Optional
+        (Union[NoneType, frozenset], Any),
+        (Union[NoneType, int], Optional[int]),  # supported Optional
         (Optional[Color], Optional[Color]),
         (Optional[List[Color]], Optional[List[Color]]),
         (Optional[List[List[int]]], Optional[List[Any]]),
@@ -141,6 +144,8 @@ class Color(enum.Enum):
         (Tuple[str, ...], Tuple[str, ...]),
         (Tuple[str, str, str], Tuple[str, str, str]),
         (Tuple[List[int]], Tuple[Any]),
+        (Union[NoneType, Tuple[int, int]], Optional[Tuple[int, int]]),
+        (Union[Tuple[int, int], NoneType], Optional[Tuple[int, int]]),
     ],
 )
 def test_sanitized_type_expected_behavior(in_type, expected_type):
