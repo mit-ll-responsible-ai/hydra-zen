@@ -41,7 +41,7 @@ except ImportError:  # pragma: no cover
 
 _T = TypeVar("_T")
 
-_ZEN_PROCESSING_LOCATION = _utils.get_obj_path(zen_processing)
+_ZEN_PROCESSING_LOCATION: Final[str] = _utils.get_obj_path(zen_processing)
 _TARGET_FIELD_NAME: Final[str] = "_target_"
 _RECURSIVE_FIELD_NAME: Final[str] = "_recursive_"
 _CONVERT_FIELD_NAME: Final[str] = "_convert_"
