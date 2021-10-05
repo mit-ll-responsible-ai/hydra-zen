@@ -39,7 +39,7 @@ def test_target_as_kwarg_is_deprecated():
 
 @pytest.mark.filterwarnings("ignore:Specifying the target of")
 def test_builds_target_as_kwarg_is_still_correct():
-    out = instantiate(builds(target=dict, a=2, b=3, hydra_partial=True))()
+    out = instantiate(builds(target=dict, a=2, b=3, zen_partial=True))()
     assert out == {"a": 2, "b": 3}
 
 
@@ -127,40 +127,40 @@ def test_builds_raises_when_user_specified_args_violate_sig(
             func,
             *args,
             **kwargs,
-            hydra_partial=partial,
+            zen_partial=partial,
             populate_full_signature=full_sig,
         )
 
     # test when **kwargs are inherited
-    kwarg_base = builds(passthrough, **kwargs, hydra_partial=partial)
+    kwarg_base = builds(passthrough, **kwargs, zen_partial=partial)
     with pytest.raises(TypeError):
         builds(
             func,
             *args,
-            hydra_partial=partial,
+            zen_partial=partial,
             populate_full_signature=full_sig,
             builds_bases=(kwarg_base,),
         )
     del kwarg_base
 
     # test when *args are inherited
-    args_base = builds(passthrough, *args, hydra_partial=partial)
+    args_base = builds(passthrough, *args, zen_partial=partial)
     with pytest.raises(TypeError):
         builds(
             func,
             **kwargs,
-            hydra_partial=partial,
+            zen_partial=partial,
             populate_full_signature=full_sig,
             builds_bases=(args_base,),
         )
     del args_base
 
     # test when *args and **kwargs are inherited
-    args_kwargs_base = builds(passthrough, *args, **kwargs, hydra_partial=partial)
+    args_kwargs_base = builds(passthrough, *args, **kwargs, zen_partial=partial)
     with pytest.raises(TypeError):
         builds(
             func,
-            hydra_partial=partial,
+            zen_partial=partial,
             populate_full_signature=full_sig,
             builds_bases=(args_kwargs_base,),
         )
@@ -182,7 +182,7 @@ def test_builds_raises_when_base_has_invalid_arg(full_sig, partial):
     with pytest.raises(TypeError):
         builds(
             f,
-            hydra_partial=partial,
+            zen_partial=partial,
             populate_full_signature=full_sig,
             builds_bases=(A,),
         )
@@ -218,7 +218,7 @@ def test_fuzz_build_validation_against_a_bunch_of_common_objects(
     if doesnt_have_sig and full_sig:
         assume(False)
 
-    conf = builds(target, hydra_partial=True, populate_full_signature=full_sig)
+    conf = builds(target, zen_partial=True, populate_full_signature=full_sig)
 
     OmegaConf.create(to_yaml(conf))  # ensure serializable
     instantiate(conf)  # ensure instantiable
@@ -233,21 +233,21 @@ def test_builds_raises_when_base_with_partial_target_is_specified(
     partial: bool, full_sig: bool
 ):
 
-    partiald_conf = builds(f2, hydra_partial=True)
+    partiald_conf = builds(f2, zen_partial=True)
 
     if not partial:
         with pytest.raises(TypeError):
             builds(
                 f2,
                 populate_full_signature=full_sig,
-                hydra_partial=partial,
+                zen_partial=partial,
                 builds_bases=(partiald_conf,),
             )
     else:
         builds(
             f2,
             populate_full_signature=full_sig,
-            hydra_partial=partial,
+            zen_partial=partial,
             builds_bases=(partiald_conf,),
         )
 
@@ -272,7 +272,7 @@ class Class:
 @given(partial=st.booleans(), full_sig=st.booleans())
 def test_builds_raises_on_non_callable_target(not_callable, partial, full_sig):
     with pytest.raises(TypeError):
-        builds(not_callable, populate_full_signature=full_sig, hydra_partial=partial)
+        builds(not_callable, populate_full_signature=full_sig, zen_partial=partial)
 
 
 @pytest.mark.parametrize(
@@ -280,7 +280,7 @@ def test_builds_raises_on_non_callable_target(not_callable, partial, full_sig):
     [
         ("populate_full_signature", None),
         ("hydra_recursive", 1),
-        ("hydra_partial", 1),
+        ("zen_partial", 1),
         ("hydra_convert", 1),
         ("hydra_convert", "wrong value"),
         ("dataclass_name", 1),
@@ -318,7 +318,7 @@ def test_builds_raises_for_unimportable_target(partial, full_sig):
         pass
 
     with pytest.raises(ModuleNotFoundError):
-        builds(unreachable, hydra_partial=partial, populate_full_signature=full_sig)
+        builds(unreachable, zen_partial=partial, populate_full_signature=full_sig)
 
 
 def test_just_raises_for_unimportable_target():
@@ -376,14 +376,14 @@ def test_meta_fields_colliding_with_sig_raises(
                 f_meta_sig,
                 zen_meta=meta_fields,
                 populate_full_signature=pop_sig,
-                hydra_partial=partial,
+                zen_partial=partial,
             )
     else:
         builds(
             f_meta_sig,
             zen_meta=meta_fields,
             populate_full_signature=pop_sig,
-            hydra_partial=partial,
+            zen_partial=partial,
         )
 
 
@@ -398,6 +398,6 @@ def test_meta_fields_colliding_with_user_provided_kwargs_raises(
 ):
     if {"x", "y"} & set(meta_fields):
         with pytest.raises(ValueError):
-            builds(dict, x=1, y=2, zen_meta=meta_fields, hydra_partial=partial)
+            builds(dict, x=1, y=2, zen_meta=meta_fields, zen_partial=partial)
     else:
-        builds(dict, x=1, y=2, zen_meta=meta_fields, hydra_partial=partial)
+        builds(dict, x=1, y=2, zen_meta=meta_fields, zen_partial=partial)

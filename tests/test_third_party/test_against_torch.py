@@ -73,7 +73,7 @@ def test_fuzz_build_validation_against_a_bunch_of_common_objects(
 
     if doesnt_have_sig and full_sig:
         assume(False)
-    conf = builds(target, hydra_partial=partial, populate_full_signature=full_sig)
+    conf = builds(target, zen_partial=partial, populate_full_signature=full_sig)
 
     OmegaConf.create(to_yaml(conf))  # ensure serializable
 
@@ -88,7 +88,7 @@ def test_documented_builds_roundtrip_partial_with_interpolation_example():
     @dataclass
     class ModuleConfig:
         learning_rate: float = 100.2
-        optimizer: Any = builds(Adam, lr="${learning_rate}", hydra_partial=True)
+        optimizer: Any = builds(Adam, lr="${learning_rate}", zen_partial=True)
 
     params = [tr.tensor(1.0)]
     config = instantiate(ModuleConfig)
@@ -103,7 +103,7 @@ def test_documented_inheritance_example():
         lr: float = 0.001
         eps: float = 1e-8
 
-    @hydrated_dataclass(target=AdamW, hydra_partial=True)
+    @hydrated_dataclass(target=AdamW, zen_partial=True)
     class AdamWConfig(AdamBaseConfig):
         weight_decay: float = 0.01
 

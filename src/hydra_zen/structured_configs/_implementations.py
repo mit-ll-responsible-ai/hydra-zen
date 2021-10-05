@@ -158,7 +158,7 @@ def hydrated_dataclass(
     target: Callable,
     *pos_args: Any,
     populate_full_signature: bool = False,
-    hydra_partial: bool = False,
+    zen_partial: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     zen_meta: Optional[Mapping[str, Any]] = None,
@@ -185,7 +185,7 @@ def hydrated_dataclass(
         Values specified in ``**kwargs_for_target`` take precedent over the corresponding
         default values from the signature.
 
-    hydra_partial : Optional[bool] (default=False)
+    zen_partial : Optional[bool] (default=False)
         If True, then hydra-instantiation produces ``functools.partial(target, **kwargs)``
 
     hydra_recursive : bool, optional (default=True)
@@ -241,7 +241,7 @@ def hydrated_dataclass(
     We can also design a configuration that only partially instantiates our target.
 
     >>> def power(x: float, exponent: float) -> float: return x ** exponent
-    >>> @hydrated_dataclass(target=power, hydra_partial=True)
+    >>> @hydrated_dataclass(target=power, zen_partial=True)
     ... class PowerConf:
     ...     exponent : float = 2.0
 
@@ -258,7 +258,7 @@ def hydrated_dataclass(
     ...     lr : float = 0.001
     ...     eps : float = 1e-8
 
-    >>> @hydrated_dataclass(target=AdamW, hydra_partial=True)
+    >>> @hydrated_dataclass(target=AdamW, zen_partial=True)
     ... class AdamWConfig(AdamBaseConfig):
     ...     weight_decay : float = 0.01
     >>> instantiate(AdamWConfig)
@@ -267,7 +267,7 @@ def hydrated_dataclass(
     Because this decorator uses `hyda_utils.builds` under the hood, common mistakes like misspelled
     parameters will be caught upon constructing the structured config.
 
-    >>> @hydrated_dataclass(target=AdamW, hydra_partial=True)
+    >>> @hydrated_dataclass(target=AdamW, zen_partial=True)
     ... class AdamWConfig(AdamBaseConfig):
     ...     wieght_decay : float = 0.01  # i before e, right!?
     TypeError: Building: AdamW ..
@@ -296,7 +296,7 @@ def hydrated_dataclass(
             populate_full_signature=populate_full_signature,
             hydra_recursive=hydra_recursive,
             hydra_convert=hydra_convert,
-            hydra_partial=hydra_partial,
+            zen_partial=zen_partial,
             zen_meta=zen_meta,
             builds_bases=(decorated_obj,),
             dataclass_name=decorated_obj.__name__,
@@ -397,15 +397,15 @@ def sanitized_default_value(value: Any) -> Field:
     )
 
 
-# overloads when `hydra_partial=False`
+# overloads when `zen_partial=False`
 @overload
 def builds(
     hydra_target: Importable,
     *pos_args: Any,
     populate_full_signature: bool = False,
-    hydra_partial: Literal[False] = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    zen_partial: Literal[False] = False,
     zen_meta: Optional[Mapping[str, Any]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
@@ -415,15 +415,15 @@ def builds(
     ...
 
 
-# overloads when `hydra_partial=True`
+# overloads when `zen_partial=True`
 @overload
 def builds(
     hydra_target: Importable,
     *pos_args: Any,
     populate_full_signature: bool = False,
-    hydra_partial: Literal[True],
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    zen_partial: Literal[True],
     zen_meta: Optional[Mapping[str, Any]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
@@ -433,15 +433,15 @@ def builds(
     ...
 
 
-# overloads when `hydra_partial: bool`
+# overloads when `zen_partial: bool`
 @overload
 def builds(
     hydra_target: Importable,
     *pos_args: Any,
     populate_full_signature: bool = False,
-    hydra_partial: bool,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    zen_partial: bool,
     zen_meta: Optional[Mapping[str, Any]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
@@ -457,16 +457,16 @@ def builds(
 def builds(
     *pos_args: Any,
     populate_full_signature: bool = False,
-    hydra_partial: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    zen_partial: bool = False,
     zen_meta: Optional[Mapping[str, Any]] = None,
     frozen: bool = False,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     **kwargs_for_target,
 ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]:
-    """builds(hydra_target, /, *pos_args, populate_full_signature=False, hydra_partial=False, hydra_recursive=None, hydra_convert=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
+    """builds(hydra_target, /, *pos_args, populate_full_signature=False, zen_partial=False, hydra_recursive=None, hydra_convert=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
 
     Returns a dataclass object that configures ``<hydra_target>`` with user-specified and auto-populated parameter values.
 
@@ -500,11 +500,11 @@ def builds(
         This option is not available for objects with inaccessible signatures, such as
         NumPy's various ufuncs.
 
-    hydra_partial : bool, optional (default=False)
+    zen_partial : bool, optional (default=False)
         If True, then Hydra-instantiation produces ``functools.partial(target, *pos_args, **kwargs_for_target)``,
         this enables the partial-configuration of objects.
 
-        Specifying ``hydra_partial=True`` and ``populate_full_signature=True`` together will
+        Specifying ``zen_partial=True`` and ``populate_full_signature=True`` together will
         populate the dataclass' signature only with parameters that are specified by the
         user or that have default values specified in the target's signature. I.e. it is
         presumed that un-specified parameters are to be excluded from the partial configuration.
@@ -538,8 +538,8 @@ def builds(
 
     builds_bases : Tuple[DataClass, ...]
         Specifies a tuple of parent classes that the resulting dataclass inherits from.
-        A ``PartialBuilds`` class (resulting from ``hydra_partial=True``) cannot be a parent
-        of a ``Builds`` class (i.e. where `hydra_partial=False` was specified).
+        A ``PartialBuilds`` class (resulting from ``zen_partial=True``) cannot be a parent
+        of a ``Builds`` class (i.e. where `zen_partial=False` was specified).
 
     dataclass_name : Optional[str]
         If specified, determines the name of the returned class object.
@@ -598,7 +598,7 @@ def builds(
     Using `builds` to partially-configure a target
 
     >>> def a_two_tuple(x: int, y: float): return x, y
-    >>> PartialConf = builds(a_two_tuple, x=1, hydra_partial=True)  # configures only `x`
+    >>> PartialConf = builds(a_two_tuple, x=1, zen_partial=True)  # configures only `x`
     >>> partial_func = instantiate(PartialConf)
     >>> partial_func
     functools.partial(<function a_two_tuple at 0x00000220A7820EE0>, x=1)
@@ -662,8 +662,8 @@ def builds(
             f"`hydra_recursive` must be a boolean type, got {hydra_recursive}"
         )
 
-    if not isinstance(hydra_partial, bool):
-        raise TypeError(f"`hydra_partial` must be a boolean type, got: {hydra_partial}")
+    if not isinstance(zen_partial, bool):
+        raise TypeError(f"`zen_partial` must be a boolean type, got: {zen_partial}")
 
     if hydra_convert is not None and hydra_convert not in {"none", "partial", "all"}:
         raise ValueError(
@@ -711,7 +711,7 @@ def builds(
 
     target_field: List[Union[Tuple[str, Type[Any]], Tuple[str, Type[Any], Field[Any]]]]
 
-    if hydra_partial or zen_meta:
+    if zen_partial or zen_meta:
         target_field = [
             (
                 _TARGET_FIELD_NAME,
@@ -724,7 +724,7 @@ def builds(
                 _utils.field(default=_utils.get_obj_path(target), init=False),
             ),
         ]
-        if hydra_partial:
+        if zen_partial:
             target_field.append(
                 (
                     _PARTIAL_TARGET_FIELD_NAME,
@@ -1022,7 +1022,7 @@ def builds(
                 )
 
                 if param.default is inspect.Parameter.empty:
-                    if not hydra_partial:
+                    if not zen_partial:
                         # No default value specified in signature or by the user.
                         # We don't include these fields if the user specified a partial build
                         # because we assume that they want to fill these in by using partial
@@ -1045,7 +1045,7 @@ def builds(
         base_fields.extend(user_specified_named_params.values())
 
     if dataclass_name is None:
-        if hydra_partial is False:
+        if zen_partial is False:
             dataclass_name = f"Builds_{_utils.safe_name(target)}"
         else:
             dataclass_name = f"PartialBuilds_{_utils.safe_name(target)}"
@@ -1054,18 +1054,18 @@ def builds(
         dataclass_name, fields=base_fields, bases=builds_bases, frozen=frozen
     )
 
-    if hydra_partial is False and hasattr(out, _PARTIAL_TARGET_FIELD_NAME):
+    if zen_partial is False and hasattr(out, _PARTIAL_TARGET_FIELD_NAME):
         # `out._partial_target_` has been inherited; this will lead to an error when
         # hydra-instantiation occurs, since it will be passed to target.
         # There is not an easy way to delete this, since it comes from a parent class
         raise TypeError(
             _utils.building_error_prefix(target)
-            + "`builds(..., hydra_partial=False, builds_bases=(...))` does not "
+            + "`builds(..., zen_partial=False, builds_bases=(...))` does not "
             "permit `builds_bases` where a partial target has been specified."
         )
 
     out.__doc__ = (
-        f"A structured config designed to {'partially ' if hydra_partial else ''}initialize/call "
+        f"A structured config designed to {'partially ' if zen_partial else ''}initialize/call "
         f"`{_utils.get_obj_path(target)}` upon instantiation by hydra."
     )
     if hasattr(target, "__doc__"):

@@ -166,7 +166,7 @@ def gradient_descent(*, starting_xy, optim, num_steps, landscape_fn):
 
 We will use `build` and `just` to configure `gradient_descent`
 as well as the parameter values that we want to pass to it.
-Note that we want our optimizer, `SGD`, to only be *partially* built by our config given that it is fully initialized within `gradient_descent`; `builds` makes simple work of this. 
+Note that we want our optimizer, `SGD`, to only be *partially* built by our config given that it is fully initialized within `gradient_descent`; `builds` makes simple work of this.
 
 ```python
 # Using hydra-zen to configure our code
@@ -174,6 +174,7 @@ Note that we want our optimizer, `SGD`, to only be *partially* built by our conf
 from torch.optim import SGD
 
 from hydra_zen import builds, just
+
 
 # defines our surface that we will be descending
 def parabaloid(x, y):
@@ -187,7 +188,7 @@ ConfigGradDesc = builds(
 
     # Configured to only partially build `SGD`.
     # Not all of its required inputs are part of our configuration
-    optim=builds(SGD, lr=0.3, momentum=0.0, hydra_partial=True),
+    optim=builds(SGD, lr=0.3, momentum=0.0, zen_partial=True),
 
     landscape_fn=parabaloid,
     starting_xy=(-1.5, 0.5),

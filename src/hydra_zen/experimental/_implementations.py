@@ -126,7 +126,7 @@ def hydra_run(
 
     >>> from hydra_zen.experimental import hydra_run
     >>> from hydra_zen import builds, instantiate
-    >>> cfg = dict(f=builds(pow, exp=2, hydra_partial=True), x=10)
+    >>> cfg = dict(f=builds(pow, exp=2, zen_partial=True), x=10)
     >>> def task_function(cfg):
     ...    return instantiate(cfg.f)(cfg.x)
 
@@ -140,7 +140,7 @@ def hydra_run(
 
     >>> from torch.optim import Adam
     >>> from torch.nn import Linear
-    >>> AdamConfig = builds(Adam, lr=0.001, hydra_partial=True)
+    >>> AdamConfig = builds(Adam, lr=0.001, zen_partial=True)
     >>> ModelConfig = builds(Linear, in_features=1, out_features=1)
     >>> cfg = dict(optim=AdamConfig(), model=ModelConfig())
     >>> def task_function(cfg):
@@ -255,7 +255,7 @@ def hydra_multirun(
     Using a more complex `task_function`
 
     >>> from hydra_zen import builds, instantiate
-    >>> cfg = dict(f=builds(pow, exp=2, hydra_partial=True), x=1)
+    >>> cfg = dict(f=builds(pow, exp=2, zen_partial=True), x=1)
     >>> def task_function(cfg):
     ...    return instantiate(cfg.f)(cfg.x)
 
@@ -269,7 +269,7 @@ def hydra_multirun(
 
     >>> from torch.optim import Adam
     >>> from torch.nn import Linear
-    >>> AdamConfig = builds(Adam, lr=0.001, hydra_partial=True)
+    >>> AdamConfig = builds(Adam, lr=0.001, zen_partial=True)
     >>> ModelConfig = builds(Linear, in_features=1, out_features=1)
     >>> cfg = dict(optim=AdamConfig(), model=ModelConfig())
     >>> def task_function(cfg):

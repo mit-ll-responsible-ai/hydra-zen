@@ -19,7 +19,7 @@ def power(x: float, exponent: float) -> float:
 
 
 def test_hydrated_with_partial_exampled():
-    @hydrated_dataclass(target=power, hydra_partial=True)
+    @hydrated_dataclass(target=power, zen_partial=True)
     class PowerConf:
         exponent: float = 2.0
 

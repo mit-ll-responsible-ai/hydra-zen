@@ -13,7 +13,7 @@ from hydra_zen import builds, instantiate, just, to_yaml
 
 
 def test_builds_roundtrip_with_ufunc():
-    assert instantiate(builds(jnp.add, hydra_partial=True))(1.0, 2.0) == jnp.array(3.0)
+    assert instantiate(builds(jnp.add, zen_partial=True))(1.0, 2.0) == jnp.array(3.0)
 
 
 jax_objects = [
@@ -49,7 +49,7 @@ def test_fuzz_build_validation_against_a_bunch_of_common_objects(
 
     if doesnt_have_sig and full_sig:
         assume(False)
-    conf = builds(target, hydra_partial=partial, populate_full_signature=full_sig)
+    conf = builds(target, zen_partial=partial, populate_full_signature=full_sig)
 
     OmegaConf.create(to_yaml(conf))  # ensure serializable
 

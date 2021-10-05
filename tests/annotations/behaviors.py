@@ -21,28 +21,28 @@ def requires_A(x: int):
 
 # test type behaviors
 
-# test builds(..., hydra_partial=True)
-conf_a_partial = builds(A, hydra_partial=True)
+# test builds(..., zen_partial=True)
+conf_a_partial = builds(A, zen_partial=True)
 partial_out = instantiate(conf_a_partial)
 should_be_a = partial_out()
 out: Tuple[int, str] = should_be_a.x
 
-conf_a_partial_instance = builds(A, hydra_partial=True)()
+conf_a_partial_instance = builds(A, zen_partial=True)()
 partial_out_2 = instantiate(conf_a_partial_instance)
 should_be_a_2 = partial_out_2()
 out_2: Tuple[int, str] = should_be_a_2.x
 
 
-conf_f_partial = builds(f, hydra_partial=True)
+conf_f_partial = builds(f, zen_partial=True)
 partial_out_f = instantiate(conf_f_partial)
 should_be_int_output_of_f: int = partial_out_f()
 
 
-conf_f_partial_instance = builds(f, hydra_partial=True)()
+conf_f_partial_instance = builds(f, zen_partial=True)()
 partial_out_f_2 = instantiate(conf_f_partial_instance)
 should_be_int_output_of_f_2: int = partial_out_f_2()
 
-# test builds(..., hydra_partial=False)
+# test builds(..., zen_partial=False)
 conf_A = builds(A)
 should_be_a_again = instantiate(conf_A)
 out2: Tuple[int, str] = should_be_a_again.x
@@ -92,6 +92,6 @@ def g(x: int, y: float) -> str:
     ...
 
 
-PartialBuild_g = builds(g, x=1, hydra_partial=True)
+PartialBuild_g = builds(g, x=1, zen_partial=True)
 partial_g = instantiate(PartialBuild_g)
 g_out: str = partial_g(y=10)

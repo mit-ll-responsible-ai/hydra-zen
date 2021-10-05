@@ -27,14 +27,14 @@ def f(*args, **kwargs):
         ),
         st.integers(),
     ),
-    hydra_partial=st.booleans(),
+    zen_partial=st.booleans(),
     pop_sig=st.booleans(),
 )
 def test_basic_zen_meta_behavior(
     args: tuple,
     kwargs: dict,
     zen_meta: dict,
-    hydra_partial: bool,
+    zen_partial: bool,
     pop_sig: bool,
 ):
     Conf = builds(
@@ -42,7 +42,7 @@ def test_basic_zen_meta_behavior(
         *args,
         **kwargs,
         zen_meta=zen_meta,
-        hydra_partial=hydra_partial,
+        zen_partial=zen_partial,
         populate_full_signature=pop_sig
     )
 
@@ -52,7 +52,7 @@ def test_basic_zen_meta_behavior(
     for meta_name, meta_val in zen_meta.items():
         assert getattr(conf, meta_name) == meta_val
 
-    if not hydra_partial:
+    if not zen_partial:
         out_args, out_kwargs = instantiate(Conf)
     else:
         assert is_partial_builds(Conf)
