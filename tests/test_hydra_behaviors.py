@@ -34,7 +34,7 @@ def test_builds_sets_hydra_params(convert, recursive, sig, partial, name, meta, 
         hydra_recursive=recursive,
         populate_full_signature=sig,
         hydra_partial=partial,
-        hydra_meta=meta,
+        zen_meta=meta,
         dataclass_name=name,
         **kwargs,
     )

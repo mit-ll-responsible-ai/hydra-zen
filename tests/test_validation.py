@@ -62,14 +62,14 @@ def test_builds_returns_a_dataclass_type():
 
 
 @given(everything_except(Mapping, type(None)))
-def test_builds_hydra_meta_not_mapping_raises(not_a_mapping):
+def test_builds_zen_meta_not_mapping_raises(not_a_mapping):
     with pytest.raises(TypeError):
-        builds(int, hydra_meta=not_a_mapping)
+        builds(int, zen_meta=not_a_mapping)
 
 
-def test_builds_hydra_meta_with_non_string_keys_raises():
+def test_builds_zen_meta_with_non_string_keys_raises():
     with pytest.raises(TypeError):
-        builds(int, hydra_meta={1: None})
+        builds(int, zen_meta={1: None})
 
 
 def f_starx(*x):
@@ -336,7 +336,7 @@ def test_get_target_on_non_builds():
 
 @pytest.mark.parametrize(
     "field",
-    list(_HYDRA_FIELD_NAMES)
+    sorted(_HYDRA_FIELD_NAMES)
     + [_ZEN_TARGET_FIELD_NAME, "_zen_some_new_feature", "hydra_some_new_feature"],
 )
 def test_reserved_names_are_reserved(field: str):
@@ -347,13 +347,13 @@ def test_reserved_names_are_reserved(field: str):
 
 @pytest.mark.parametrize(
     "field",
-    list(_HYDRA_FIELD_NAMES)
+    sorted(_HYDRA_FIELD_NAMES)
     + [_ZEN_TARGET_FIELD_NAME, "_zen_some_new_feature", "hydra_some_new_feature"],
 )
-def test_reserved_names_are_reserved_by_hydra_meta(field: str):
+def test_reserved_names_are_reserved_by_zen_meta(field: str):
     kwargs = {field: True}
     with pytest.raises(ValueError):
-        builds(dict, hydra_meta=kwargs)
+        builds(dict, zen_meta=kwargs)
 
 
 def f_meta_sig(x, *args, y, **kwargs):
@@ -374,14 +374,14 @@ def test_meta_fields_colliding_with_sig_raises(
         with pytest.raises(ValueError):
             builds(
                 f_meta_sig,
-                hydra_meta=meta_fields,
+                zen_meta=meta_fields,
                 populate_full_signature=pop_sig,
                 hydra_partial=partial,
             )
     else:
         builds(
             f_meta_sig,
-            hydra_meta=meta_fields,
+            zen_meta=meta_fields,
             populate_full_signature=pop_sig,
             hydra_partial=partial,
         )
@@ -398,6 +398,6 @@ def test_meta_fields_colliding_with_user_provided_kwargs_raises(
 ):
     if {"x", "y"} & set(meta_fields):
         with pytest.raises(ValueError):
-            builds(dict, x=1, y=2, hydra_meta=meta_fields, hydra_partial=partial)
+            builds(dict, x=1, y=2, zen_meta=meta_fields, hydra_partial=partial)
     else:
-        builds(dict, x=1, y=2, hydra_meta=meta_fields, hydra_partial=partial)
+        builds(dict, x=1, y=2, zen_meta=meta_fields, hydra_partial=partial)

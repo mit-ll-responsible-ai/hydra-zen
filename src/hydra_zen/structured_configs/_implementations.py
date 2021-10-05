@@ -161,7 +161,7 @@ def hydrated_dataclass(
     hydra_partial: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
-    hydra_meta: Optional[Mapping[str, Any]] = None,
+    zen_meta: Optional[Mapping[str, Any]] = None,
     frozen: bool = False,
 ) -> Callable[[Type[_T]], Type[_T]]:
     """A decorator that uses `hydra_zen.builds` to create a dataclass with the appropriate
@@ -205,7 +205,7 @@ def hydrated_dataclass(
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.
 
-    hydra_meta: Optional[Mapping[str, Any]]
+    zen_meta: Optional[Mapping[str, Any]]
         Specifies field-names and corresponding values that will be included in the
         resulting dataclass, but that will *not* be used to build ``hydra_target``
         via instantiation. These are called "meta" fields.
@@ -297,7 +297,7 @@ def hydrated_dataclass(
             hydra_recursive=hydra_recursive,
             hydra_convert=hydra_convert,
             hydra_partial=hydra_partial,
-            hydra_meta=hydra_meta,
+            zen_meta=zen_meta,
             builds_bases=(decorated_obj,),
             dataclass_name=decorated_obj.__name__,
             frozen=frozen,
@@ -406,7 +406,7 @@ def builds(
     hydra_partial: Literal[False] = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
-    hydra_meta: Optional[Mapping[str, Any]] = None,
+    zen_meta: Optional[Mapping[str, Any]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
@@ -424,7 +424,7 @@ def builds(
     hydra_partial: Literal[True],
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
-    hydra_meta: Optional[Mapping[str, Any]] = None,
+    zen_meta: Optional[Mapping[str, Any]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
@@ -442,7 +442,7 @@ def builds(
     hydra_partial: bool,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
-    hydra_meta: Optional[Mapping[str, Any]] = None,
+    zen_meta: Optional[Mapping[str, Any]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
@@ -460,7 +460,7 @@ def builds(
     hydra_partial: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
-    hydra_meta: Optional[Mapping[str, Any]] = None,
+    zen_meta: Optional[Mapping[str, Any]] = None,
     frozen: bool = False,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
@@ -526,7 +526,7 @@ def builds(
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.
 
-    hydra_meta: Optional[Mapping[str, Any]]
+    zen_meta: Optional[Mapping[str, Any]]
         Specifies field-names and corresponding values that will be included in the
         resulting dataclass, but that will *not* be used to build ``hydra_target``
         via instantiation. These are called "meta" fields.
@@ -557,13 +557,9 @@ def builds(
 
     Notes
     -----
-    Using any of the following features will result in a config that depends
+    Using any of the `zen_xx` features will result in a config that depends
     explicitly on hydra-zen. (i.e. hydra-zen must be installed in order to
     instantiate the resulting config, including its yaml version).
-
-       - Specifying: ``hydra_partial=True``
-       - Specifying meta fields via ``hydra_meta=<...>``
-       - Providing a class-object or function argument to ``<hydra_target>``, which will automatically be wrapped by `just`. E.g. ``builds(dict, fn=len)``
 
     Type annotations are inferred from the target's signature and are only
     retained if they are compatible with hydra's limited set of supported
@@ -627,7 +623,7 @@ def builds(
 
     Leveraging meta-fields for portable, relative interpolation:
 
-    >>> Conf = builds(dict, a="${.s}", b="${.s}", hydra_meta=dict(s=-10))
+    >>> Conf = builds(dict, a="${.s}", b="${.s}", zen_meta=dict(s=-10))
     >>> instantiate(Conf)
     {'a': -10, 'b': -10}
     >>> instantiate(Conf, s=2)
@@ -682,22 +678,22 @@ def builds(
     if any(not (is_dataclass(_b) and isinstance(_b, type)) for _b in builds_bases):
         raise TypeError("All `build_bases` must be a tuple of dataclass types")
 
-    if hydra_meta is None:
-        hydra_meta = {}
+    if zen_meta is None:
+        zen_meta = {}
 
-    if not isinstance(hydra_meta, Mapping):
+    if not isinstance(zen_meta, Mapping):
         raise TypeError(
-            f"`hydra_meta` must be a mapping (e.g. a dictionary), got: {hydra_meta}"
+            f"`zen_meta` must be a mapping (e.g. a dictionary), got: {zen_meta}"
         )
 
-    for _key in hydra_meta:
+    for _key in zen_meta:
         if not isinstance(_key, str):
             raise TypeError(
-                f"`hydra_meta` must be a mapping whose keys are strings, got key: {_key}"
+                f"`zen_meta` must be a mapping whose keys are strings, got key: {_key}"
             )
 
     # Check for reserved names
-    for _name in chain(kwargs_for_target, hydra_meta):
+    for _name in chain(kwargs_for_target, zen_meta):
         if _name in _HYDRA_FIELD_NAMES:
             err_msg = f"The field-name specified via `builds(..., {_name}=<...>)` is reserved by Hydra."
             if _name != _TARGET_FIELD_NAME:
@@ -715,7 +711,7 @@ def builds(
 
     target_field: List[Union[Tuple[str, Type[Any]], Tuple[str, Type[Any], Field[Any]]]]
 
-    if hydra_partial or hydra_meta:
+    if hydra_partial or zen_meta:
         target_field = [
             (
                 _TARGET_FIELD_NAME,
@@ -736,12 +732,12 @@ def builds(
                     _utils.field(default=True, init=False),
                 ),
             )
-        if hydra_meta:
+        if zen_meta:
             target_field.append(
                 (
                     _META_FIELD_NAME,
                     bool,
-                    _utils.field(default=tuple(hydra_meta), init=False),
+                    _utils.field(default=tuple(zen_meta), init=False),
                 ),
             )
     else:
@@ -864,9 +860,9 @@ def builds(
                 )
             if not fields_set_by_bases <= nameable_params_in_sig and not (
                 fields_set_by_bases - nameable_params_in_sig
-            ) <= set(hydra_meta):
+            ) <= set(zen_meta):
                 # field inherited by base is not present in sig
-                # AND it is not excluded via `hydra_meta`
+                # AND it is not excluded via `zen_meta`
                 _unexpected = fields_set_by_bases - nameable_params_in_sig
                 raise TypeError(
                     _utils.building_error_prefix(target)
@@ -948,31 +944,31 @@ def builds(
         for name, value in kwargs_for_target.items()
     }
 
-    if hydra_meta:
-        _meta_names = set(hydra_meta)
+    if zen_meta:
+        _meta_names = set(zen_meta)
 
         if _meta_names & nameable_params_in_sig:
             raise ValueError(
-                f"`builds(..., hydra_meta=<...>)`: `hydra_meta` cannot not specify "
+                f"`builds(..., zen_meta=<...>)`: `zen_meta` cannot not specify "
                 f"names that exist in the target's signature: "
                 f"{','.join(_meta_names & nameable_params_in_sig)}"
             )
 
         if _meta_names & set(user_specified_named_params):
             raise ValueError(
-                f"`builds(..., hydra_meta=<...>)`: `hydra_meta` cannot not specify "
+                f"`builds(..., zen_meta=<...>)`: `zen_meta` cannot not specify "
                 f"names that are common with those specified in **kwargs_for_target: "
                 f"{','.join(_meta_names & set(user_specified_named_params))}"
             )
 
-        # We don't check for collisions between `hydra_meta` names and the
-        # names of inherited fields. Thus `hydra_meta` can effectively be used
+        # We don't check for collisions between `zen_meta` names and the
+        # names of inherited fields. Thus `zen_meta` can effectively be used
         # to "delete" names from a config, via inheritance.
 
         user_specified_named_params.update(
             {
                 name: (name, Any, sanitized_default_value(value))
-                for name, value in hydra_meta.items()
+                for name, value in zen_meta.items()
             }
         )
 
