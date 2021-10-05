@@ -160,6 +160,7 @@ def test_just_roundtrip(obj):
         builds,
         just,
         lambda x: builds(x, hydra_partial=True),
+        lambda x: builds(x, hydra_meta=dict(a=1)),
     ],
 )
 def test_get_target_roundtrip(x, fn):
