@@ -151,3 +151,11 @@ def test_convert_sequences_on_class():
     out = AClass([1, 2], [3])  # type: ignore
     assert out.x == (1, 2)
     assert out.y == [3]
+
+
+def test_hacked_type():
+    def f(x):
+        return x
+
+    f.__annotations__["x"] = 1  # an unexpected type hint
+    assert convert_sequences(f)(x=10) == 10

@@ -138,7 +138,7 @@ def convert_sequences(obj: _T) -> _T:
             # E.g. annotation = Tuple[int, int]
             # Tuple[int, int].__origin__ -> tuple
             caster = get_origin(annotation)
-            if caster is None:
+            if caster is None:  # pragma: no cover
                 continue
         else:
             # E.g. annotation = tuple
