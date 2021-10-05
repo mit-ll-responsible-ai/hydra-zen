@@ -41,6 +41,7 @@ except ImportError:  # pragma: no cover
 
 _T = TypeVar("_T")
 
+_ZEN_PROCESSING_LOCATION = _utils.get_obj_path(zen_processing)
 _TARGET_FIELD_NAME: Final[str] = "_target_"
 _RECURSIVE_FIELD_NAME: Final[str] = "_recursive_"
 _CONVERT_FIELD_NAME: Final[str] = "_convert_"
@@ -1121,13 +1122,19 @@ def _is_old_partial_builds(x: Any) -> bool:  # pragma: no cover
     return False
 
 
-def is_partial_builds(x: Any) -> TypeGuard[PartialBuilds]:
+def uses_zen_processing(x: Any) -> bool:
     if not is_builds(x) or not hasattr(x, _ZEN_TARGET_FIELD_NAME):
         return False
     attr = _get_target(x)
-    if attr != _get_target(PartialBuilds) and attr is not zen_processing:
+    if attr != _ZEN_PROCESSING_LOCATION and attr is not zen_processing:
         return False
-    return getattr(x, _PARTIAL_TARGET_FIELD_NAME, False) is True
+    return True
+
+
+def is_partial_builds(x: Any) -> TypeGuard[PartialBuilds]:
+    return (
+        uses_zen_processing(x) and getattr(x, _PARTIAL_TARGET_FIELD_NAME, False) is True
+    )
 
 
 @overload
@@ -1208,7 +1215,7 @@ def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:
     if _is_old_partial_builds(obj):
         # obj._partial_target_ is `Just[obj]`
         return get_target(getattr(obj, "_partial_target_"))
-    elif is_partial_builds(obj):
+    elif uses_zen_processing(obj):
         field_name = _ZEN_TARGET_FIELD_NAME
     elif is_just(obj):
         field_name = _JUST_FIELD_NAME
