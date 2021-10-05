@@ -98,6 +98,34 @@ def _target_as_kwarg_deprecation(func: _T2) -> Callable[..., _T2]:
     return wrapped
 
 
+def _hydra_partial_deprecation(func: _T2) -> Callable[..., _T2]:
+    @wraps(func)
+    def wrapped(*args, **kwargs):
+        if "hydra_partial" in kwargs:
+            if "zen_partial" in kwargs:
+                raise TypeError(
+                    "Both `hydra_partial` and `zen_partial` are specified. "
+                    "Specifying `hydra_partial` is deprecated, use `zen_partial` "
+                    "instead."
+                )
+
+            # builds(..., hydra_partial=...) is deprecated
+            warnings.warn(
+                HydraZenDeprecationWarning(
+                    "The argument `hydra_partial` is deprecated as of 2021-10-10.\n"
+                    "Change `builds(..., hydra_partial=<..>)` to `builds(..., zen_partial=<..>)`."
+                    "\n\nThis will be an error in hydra-zen 1.0.0, or by 2022-01-10 — whichever "
+                    "comes first.\n\nNote: This deprecation does not impact yaml configs "
+                    "produced by `builds`."
+                ),
+                stacklevel=2,
+            )
+            kwargs["zen_partial"] = kwargs.pop("hydra_partial")
+        return func(*args, **kwargs)
+
+    return wrapped
+
+
 def mutable_value(x: _T) -> _T:
     """Used to set a mutable object as a default value for a field
     in a dataclass.
@@ -153,6 +181,7 @@ def __dataclass_transform__(
     return lambda a: a
 
 
+@_hydra_partial_deprecation
 @__dataclass_transform__()
 def hydrated_dataclass(
     target: Callable,
@@ -453,6 +482,7 @@ def builds(
     ...
 
 
+@_hydra_partial_deprecation
 @_target_as_kwarg_deprecation
 def builds(
     *pos_args: Any,
@@ -466,9 +496,10 @@ def builds(
     builds_bases: Tuple[Any, ...] = (),
     **kwargs_for_target,
 ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]:
-    """builds(hydra_target, /, *pos_args, populate_full_signature=False, zen_partial=False, hydra_recursive=None, hydra_convert=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
+    """builds(hydra_target, /, *pos_args, populate_full_signature=False, zen_partial=False, hydra_recursive=None, zen_meta=None, hydra_convert=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
 
-    Returns a dataclass object that configures ``<hydra_target>`` with user-specified and auto-populated parameter values.
+    Returns a dataclass object that configures ``<hydra_target>`` with user-specified and auto-populated parameter
+    values.
 
     The resulting dataclass is specifically a structured config [1]_ that enables Hydra to initialize/call
     `target` either fully or partially. See Notes for additional features and explanation of implementation details.
