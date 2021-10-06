@@ -41,7 +41,7 @@ except ImportError:  # pragma: no cover
 
 _T = TypeVar("_T")
 _T2 = TypeVar("_T2", bound=Callable)
-_Wrapper = Callable[[_T2], Callable[..., _T2]]
+_Wrapper = Callable[[_T2], _T2]
 ZenWrapper = Union[Builds[_Wrapper], _Wrapper, str]
 
 # Hydra-specific fields
@@ -66,6 +66,7 @@ _PARTIAL_TARGET_FIELD_NAME: Final[str] = "_zen_partial"
 _META_FIELD_NAME: Final[str] = "_zen_exclude"
 _ZEN_WRAPPERS_FIELD_NAME: Final[str] = "_zen_wrappers"
 _JUST_FIELD_NAME: Final[str] = "path"
+# TODO: add _JUST_Target
 
 # signature param-types
 _POSITIONAL_ONLY: Final = inspect.Parameter.POSITIONAL_ONLY
@@ -191,6 +192,7 @@ def hydrated_dataclass(
     target: Callable,
     *pos_args: Any,
     zen_partial: bool = False,
+    zen_wrappers: Optional[Union[ZenWrapper, Sequence[ZenWrapper]]] = None,
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -355,6 +357,7 @@ def hydrated_dataclass(
             populate_full_signature=populate_full_signature,
             hydra_recursive=hydra_recursive,
             hydra_convert=hydra_convert,
+            zen_wrappers=zen_wrappers,
             zen_partial=zen_partial,
             zen_meta=zen_meta,
             builds_bases=(decorated_obj,),
@@ -760,15 +763,52 @@ def builds(
         )
 
     if zen_wrappers is not None:
-        if not isinstance(zen_wrappers, Sequence):
+        if not isinstance(zen_wrappers, Sequence) or isinstance(zen_wrappers, str):
             zen_wrappers = (zen_wrappers,)
-        else:
-            zen_wrappers = tuple(zen_wrappers)
 
-        # TODO: do proper error handling
-        # TODO: Builds[Callable] should be permitted too
+        validated_wrappers: Sequence[Union[str, Builds]] = []
+        for wrapper in zen_wrappers:
+            # We are intentionally keeping each condition branched
+            # so that test-coverage will be checked for each one
 
-        assert all(callable(x) for x in zen_wrappers)
+            if is_builds(wrapper):
+                if hydra_recursive is False:
+                    warnings.warn(
+                        "A structured config was supplied for `zen_wrappers` in a config for which"
+                        "`hydra_recursive=False`.\n If this value is not toggled to `True`, the config's "
+                        "instantiation will result in an error"
+                    )
+
+                # If Hydra's locate function starts supporting importing literals
+                # – or if we decide to ship our own locate function –
+                # then we should get the target of `wrapper` and make sure it is callable
+
+                if is_just(wrapper):
+                    # `zen_wrappers` handles importing string; we can
+                    # elimintate the indirection of Just and "flatten" this
+                    # config
+                    validated_wrappers.append(getattr(wrapper, _JUST_FIELD_NAME))
+                else:
+                    validated_wrappers.append(wrapper)
+
+            elif callable(wrapper):
+                validated_wrappers.append(_utils.get_obj_path(wrapper))
+
+            elif isinstance(wrapper, str):
+                # Assumed that wrapper is either a valid omegaconf-style interpolation string
+                # or a "valid" path for importing an object. The latter seems hopeless for validating:
+                # https://stackoverflow.com/a/47538106/6592114
+                # so we can't make any assurances here.
+                validated_wrappers.append(wrapper)
+            else:
+                raise TypeError(
+                    f"`zen_wrappers` requires a callable, targeted config, or a string, got: {wrapper}"
+                )
+
+        del zen_wrappers
+        validated_wrappers = tuple(validated_wrappers)
+    else:
+        validated_wrappers = ()
 
     # Check for reserved names
     for _name in chain(kwargs_for_target, zen_meta):
@@ -789,7 +829,7 @@ def builds(
 
     target_field: List[Union[Tuple[str, Type[Any]], Tuple[str, Type[Any], Field[Any]]]]
 
-    if zen_partial or zen_meta or zen_wrappers:
+    if zen_partial or zen_meta or validated_wrappers:
         target_field = [
             (
                 _TARGET_FIELD_NAME,
@@ -821,25 +861,22 @@ def builds(
                 ),
             )
 
-        if zen_wrappers:
-            # TODO: handle config'd - callables
-            _callable_paths = tuple(
-                z if is_builds(z) else _utils.get_obj_path(z) for z in zen_wrappers
-            )
-            if len(zen_wrappers) == 1:
+        if validated_wrappers:
+            if len(validated_wrappers) == 1:
+                # we flatten the config to avoid unnecessary list
                 target_field.append(
                     (
                         _ZEN_WRAPPERS_FIELD_NAME,
-                        _utils.sanitized_type(ZenWrapper),
-                        _utils.field(default=_callable_paths[0], init=False),
+                        _utils.sanitized_type(Union[str, Builds]),
+                        _utils.field(default=validated_wrappers[0], init=False),
                     ),
                 )
             else:
                 target_field.append(
                     (
                         _ZEN_WRAPPERS_FIELD_NAME,
-                        _utils.sanitized_type(Tuple[ZenWrapper, ...]),
-                        _utils.field(default=_callable_paths, init=False),
+                        _utils.sanitized_type(Tuple[Union[str, Builds], ...]),
+                        _utils.field(default=validated_wrappers, init=False),
                     ),
                 )
     else:
