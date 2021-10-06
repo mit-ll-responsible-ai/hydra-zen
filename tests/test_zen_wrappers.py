@@ -139,7 +139,7 @@ def test_zen_wrappers_expected_behavior(
     - wrappers as PartialBuilds
     - wrappers as Just
     - wrappers as interpolated strings
-    - one or more wrappers
+    - zero or more wrappers
     - that each wrapper is called once, in order, from left to right
     - that each wrapper is passed the output of the previous wrapper
     - that the args and kwargs passed to the target are passed as-expected
@@ -165,6 +165,7 @@ def test_zen_wrappers_expected_behavior(
 
     out_args, out_kwargs = instantiated() if zen_partial else instantiated  # type: ignore
 
+    # ensure arguments passed-through as-expected
     assert out_args == args
     assert out_kwargs == kwargs
 
@@ -174,6 +175,8 @@ def test_zen_wrappers_expected_behavior(
 
     resolved_wrappers = _resolve_wrappers(wrappers)
 
+    # ensure wrappers called in expected order and that
+    # each one wrapped the expected target
     if wrappers:
         assert len(resolved_wrappers) == target.num_decorated
         assert TRACKED == [w.tracked_id for w in resolved_wrappers]
