@@ -42,7 +42,9 @@ except ImportError:  # pragma: no cover
 _T = TypeVar("_T")
 _T2 = TypeVar("_T2", bound=Callable)
 _Wrapper = Callable[[_T2], _T2]
-ZenWrapper = Union[Builds[_Wrapper], _Wrapper, str]
+ZenWrapper = Union[
+    Builds[_Wrapper], PartialBuilds[_Wrapper], Just[_Wrapper], _Wrapper, str
+]
 
 # Hydra-specific fields
 _TARGET_FIELD_NAME: Final[str] = "_target_"
@@ -772,13 +774,7 @@ def builds(
             # so that test-coverage will be checked for each one
 
             if is_builds(wrapper):
-                if hydra_recursive is False:
-                    warnings.warn(
-                        "A structured config was supplied for `zen_wrappers` in a config for which"
-                        "`hydra_recursive=False`.\n If this value is not toggled to `True`, the config's "
-                        "instantiation will result in an error"
-                    )
-
+                print(1)
                 # If Hydra's locate function starts supporting importing literals
                 # – or if we decide to ship our own locate function –
                 # then we should get the target of `wrapper` and make sure it is callable
@@ -789,6 +785,13 @@ def builds(
                     # config
                     validated_wrappers.append(getattr(wrapper, _JUST_FIELD_NAME))
                 else:
+                    print(hydra_recursive)
+                    if hydra_recursive is False:
+                        warnings.warn(
+                            "A structured config was supplied for `zen_wrappers`. Its parent config has "
+                            "`hydra_recursive=False`.\n If this value is not toggled to `True`, the config's "
+                            "instantiation will result in an error"
+                        )
                     validated_wrappers.append(wrapper)
 
             elif callable(wrapper):

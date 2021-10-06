@@ -238,3 +238,11 @@ def test_unresolved_interpolated_value_gets_caught(bad_wrapper):
     conf = builds(int, zen_wrappers=bad_wrapper)
     with pytest.raises(InterpolationKeyError):
         instantiate(conf)
+
+
+@pytest.mark.filterwarnings(
+    "ignore:A structured config was supplied for `zen_wrappers`"
+)
+def test_wrapper_via_builds_with_recusive_False():
+    with pytest.warns(Warning):
+        builds(int, zen_wrappers=builds(f1, zen_partial=True), hydra_recursive=False)
