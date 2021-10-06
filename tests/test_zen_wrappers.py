@@ -221,7 +221,8 @@ def test_zen_wrappers_validation_during_builds(bad_wrapper):
     [
         NotAWrapper,  # doesn't instantiate to a callable
         (NotAWrapper,),
-        (tracked_decorator, NotAWrapper),
+        (builds(NotAWrapper),),
+        (tracked_decorator, builds(NotAWrapper)),
     ],
 )
 def test_zen_wrappers_validation_during_instantiation(bad_wrapper):
