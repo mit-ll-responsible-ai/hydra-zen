@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>builds &mdash; hydra-zen 0.3.0rc3+13.g50abc07 documentation</title>
+  <title>builds &mdash; hydra-zen 0.3.0rc3+14.g7344678 documentation</title>
   
 
   
@@ -183,7 +183,7 @@
 <h1>builds<a class="headerlink" href="#builds" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="hydra_zen.builds">
-<code class="sig-prename descclassname"><span class="pre">hydra_zen.</span></code><code class="sig-name descname"><span class="pre">builds</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hydra_target</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">pos_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">populate_full_signature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_partial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_recursive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frozen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataclass_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">builds_bases</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs_for_target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/structured_configs/_implementations.html#builds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.builds" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">hydra_zen.</span></code><code class="sig-name descname"><span class="pre">builds</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hydra_target</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">pos_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_partial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_recursive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">populate_full_signature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frozen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataclass_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">builds_bases</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs_for_target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/structured_configs/_implementations.html#builds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.builds" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a dataclass object that configures <code class="docutils literal notranslate"><span class="pre">&lt;hydra_target&gt;</span></code> with user-specified and auto-populated parameter
 values.</p>
 <p>The resulting dataclass is specifically a structured config <a class="reference internal" href="#rbd228efbc5f2-1" id="id1">[1]</a> that enables Hydra to initialize/call
@@ -201,19 +201,23 @@ are stored as a tuple bound to in the <code class="docutils literal notranslate"
 <p>The arguments specified here solely determine the fields and init-parameters of the
 resulting dataclass, unless <code class="docutils literal notranslate"><span class="pre">populate_full_signature=True</span></code> is specified (see below).</p>
 </dd>
-<dt><strong>populate_full_signature</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then the resulting dataclass’s signature and fields will be populated
-according to the signature of <code class="docutils literal notranslate"><span class="pre">target</span></code>.</p>
-<p>Values specified in <a href="#id2"><span class="problematic" id="id3">**</span></a>kwargs_for_target take precedent over the corresponding
-default values from the signature.</p>
-<p>This option is not available for objects with inaccessible signatures, such as
-NumPy’s various ufuncs.</p>
-</dd>
 <dt><strong>zen_partial</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If True, then Hydra-instantiation produces <code class="docutils literal notranslate"><span class="pre">functools.partial(target,</span> <span class="pre">*pos_args,</span> <span class="pre">**kwargs_for_target)</span></code>,
 this enables the partial-configuration of objects.</p>
 <p>Specifying <code class="docutils literal notranslate"><span class="pre">zen_partial=True</span></code> and <code class="docutils literal notranslate"><span class="pre">populate_full_signature=True</span></code> together will
 populate the dataclass’ signature only with parameters that are specified by the
 user or that have default values specified in the target’s signature. I.e. it is
 presumed that un-specified parameters are to be excluded from the partial configuration.</p>
+</dd>
+<dt><strong>zen_meta: Optional[Mapping[str, Any]]</strong></dt><dd><p>Specifies field-names and corresponding values that will be included in the
+resulting dataclass, but that will <em>not</em> be used to build <code class="docutils literal notranslate"><span class="pre">hydra_target</span></code>
+via instantiation. These are called “meta” fields.</p>
+</dd>
+<dt><strong>populate_full_signature</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then the resulting dataclass’s signature and fields will be populated
+according to the signature of <code class="docutils literal notranslate"><span class="pre">target</span></code>.</p>
+<p>Values specified in <a href="#id2"><span class="problematic" id="id3">**</span></a>kwargs_for_target take precedent over the corresponding
+default values from the signature.</p>
+<p>This option is not available for objects with inaccessible signatures, such as
+NumPy’s various ufuncs.</p>
 </dd>
 <dt><strong>hydra_recursive</strong><span class="classifier">Optional[bool], optional (default=True)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then Hydra will recursively instantiate all other
 hydra-config objects nested within this dataclass <a class="reference internal" href="#rbd228efbc5f2-2" id="id4">[2]</a>.</p>
@@ -228,10 +232,6 @@ the exception of Structured Configs (and their fields).</p></li>
 a trace of OmegaConf containers</p></li>
 </ul>
 <p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_convert_</span></code> attribute is not set on the resulting dataclass.</p>
-</dd>
-<dt><strong>zen_meta: Optional[Mapping[str, Any]]</strong></dt><dd><p>Specifies field-names and corresponding values that will be included in the
-resulting dataclass, but that will <em>not</em> be used to build <code class="docutils literal notranslate"><span class="pre">hydra_target</span></code>
-via instantiation. These are called “meta” fields.</p>
 </dd>
 <dt><strong>frozen</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the resulting dataclass will create frozen (i.e. immutable) instances.
 I.e. setting/deleting an attribute of an instance will raise <code class="docutils literal notranslate"><span class="pre">FrozenInstanceError</span></code>

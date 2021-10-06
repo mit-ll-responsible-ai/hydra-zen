@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.3.0rc3+13.g50abc07 documentation</title>
+  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.3.0rc3+14.g7344678 documentation</title>
   
 
   
@@ -348,11 +348,11 @@
 <span class="k">def</span> <span class="nf">hydrated_dataclass</span><span class="p">(</span>
     <span class="n">target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
     <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-    <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="o">**</span><span class="n">_kw</span><span class="p">,</span>  <span class="c1"># reserved to deprecate hydra_partial</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">]],</span> <span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">]]:</span>
@@ -370,6 +370,9 @@
 <span class="sd">        Arguments specified positionally are not included in the dataclass&#39; signature and</span>
 <span class="sd">        are stored as a tuple bound to in the ``_args_`` field.</span>
 
+<span class="sd">    zen_partial : Optional[bool] (default=False)</span>
+<span class="sd">        If True, then hydra-instantiation produces ``functools.partial(target, **kwargs)``</span>
+
 <span class="sd">    populate_full_signature : bool, optional (default=False)</span>
 <span class="sd">        If True, then the resulting dataclass&#39;s ``__init__`` signature and fields</span>
 <span class="sd">        will be populated according to the signature of `target`.</span>
@@ -377,8 +380,10 @@
 <span class="sd">        Values specified in ``**kwargs_for_target`` take precedent over the corresponding</span>
 <span class="sd">        default values from the signature.</span>
 
-<span class="sd">    zen_partial : Optional[bool] (default=False)</span>
-<span class="sd">        If True, then hydra-instantiation produces ``functools.partial(target, **kwargs)``</span>
+<span class="sd">    zen_meta: Optional[Mapping[str, Any]]</span>
+<span class="sd">        Specifies field-names and corresponding values that will be included in the</span>
+<span class="sd">        resulting dataclass, but that will *not* be used to build ``hydra_target``</span>
+<span class="sd">        via instantiation. These are called &quot;meta&quot; fields.</span>
 
 <span class="sd">    hydra_recursive : bool, optional (default=True)</span>
 <span class="sd">        If True, then upon hydra will recursively instantiate all other</span>
@@ -396,11 +401,6 @@
 <span class="sd">          a trace of OmegaConf containers</span>
 
 <span class="sd">        If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.</span>
-
-<span class="sd">    zen_meta: Optional[Mapping[str, Any]]</span>
-<span class="sd">        Specifies field-names and corresponding values that will be included in the</span>
-<span class="sd">        resulting dataclass, but that will *not* be used to build ``hydra_target``</span>
-<span class="sd">        via instantiation. These are called &quot;meta&quot; fields.</span>
 
 <span class="sd">    frozen : bool, optional (default=False)</span>
 <span class="sd">        If `True`, the resulting dataclass will create frozen (i.e. immutable) instances.</span>
@@ -619,11 +619,11 @@
 <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
     <span class="n">hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
     <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -637,11 +637,11 @@
 <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
     <span class="n">hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
     <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">],</span>
+    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">],</span>
-    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -655,11 +655,11 @@
 <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
     <span class="n">hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
     <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">zen_partial</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">zen_partial</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -674,17 +674,17 @@
 <span class="nd">@_target_as_kwarg_deprecation</span>
 <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
     <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">zen_partial</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">zen_partial</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
+    <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]]:</span>
-    <span class="sd">&quot;&quot;&quot;builds(hydra_target, /, *pos_args, populate_full_signature=False, zen_partial=False, hydra_recursive=None, zen_meta=None, hydra_convert=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)</span>
+    <span class="sd">&quot;&quot;&quot;builds(hydra_target, /, *pos_args, zen_partial=False, zen_meta=None, hydra_recursive=None, populate_full_signature=False, hydra_convert=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)</span>
 
 <span class="sd">    Returns a dataclass object that configures ``&lt;hydra_target&gt;`` with user-specified and auto-populated parameter</span>
 <span class="sd">    values.</span>
@@ -709,6 +709,20 @@
 <span class="sd">        The arguments specified here solely determine the fields and init-parameters of the</span>
 <span class="sd">        resulting dataclass, unless ``populate_full_signature=True`` is specified (see below).</span>
 
+<span class="sd">    zen_partial : bool, optional (default=False)</span>
+<span class="sd">        If True, then Hydra-instantiation produces ``functools.partial(target, *pos_args, **kwargs_for_target)``,</span>
+<span class="sd">        this enables the partial-configuration of objects.</span>
+
+<span class="sd">        Specifying ``zen_partial=True`` and ``populate_full_signature=True`` together will</span>
+<span class="sd">        populate the dataclass&#39; signature only with parameters that are specified by the</span>
+<span class="sd">        user or that have default values specified in the target&#39;s signature. I.e. it is</span>
+<span class="sd">        presumed that un-specified parameters are to be excluded from the partial configuration.</span>
+
+<span class="sd">    zen_meta: Optional[Mapping[str, Any]]</span>
+<span class="sd">        Specifies field-names and corresponding values that will be included in the</span>
+<span class="sd">        resulting dataclass, but that will *not* be used to build ``hydra_target``</span>
+<span class="sd">        via instantiation. These are called &quot;meta&quot; fields.</span>
+
 <span class="sd">    populate_full_signature : bool, optional (default=False)</span>
 <span class="sd">        If ``True``, then the resulting dataclass&#39;s signature and fields will be populated</span>
 <span class="sd">        according to the signature of ``target``.</span>
@@ -718,15 +732,6 @@
 
 <span class="sd">        This option is not available for objects with inaccessible signatures, such as</span>
 <span class="sd">        NumPy&#39;s various ufuncs.</span>
-
-<span class="sd">    zen_partial : bool, optional (default=False)</span>
-<span class="sd">        If True, then Hydra-instantiation produces ``functools.partial(target, *pos_args, **kwargs_for_target)``,</span>
-<span class="sd">        this enables the partial-configuration of objects.</span>
-
-<span class="sd">        Specifying ``zen_partial=True`` and ``populate_full_signature=True`` together will</span>
-<span class="sd">        populate the dataclass&#39; signature only with parameters that are specified by the</span>
-<span class="sd">        user or that have default values specified in the target&#39;s signature. I.e. it is</span>
-<span class="sd">        presumed that un-specified parameters are to be excluded from the partial configuration.</span>
 
 <span class="sd">    hydra_recursive : Optional[bool], optional (default=True)</span>
 <span class="sd">        If ``True``, then Hydra will recursively instantiate all other</span>
@@ -744,11 +749,6 @@
 <span class="sd">          a trace of OmegaConf containers</span>
 
 <span class="sd">        If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.</span>
-
-<span class="sd">    zen_meta: Optional[Mapping[str, Any]]</span>
-<span class="sd">        Specifies field-names and corresponding values that will be included in the</span>
-<span class="sd">        resulting dataclass, but that will *not* be used to build ``hydra_target``</span>
-<span class="sd">        via instantiation. These are called &quot;meta&quot; fields.</span>
 
 <span class="sd">    frozen : bool, optional (default=False)</span>
 <span class="sd">        If ``True``, the resulting dataclass will create frozen (i.e. immutable) instances.</span>
