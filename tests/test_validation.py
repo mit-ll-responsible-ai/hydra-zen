@@ -39,8 +39,75 @@ def test_target_as_kwarg_is_deprecated():
 
 @pytest.mark.filterwarnings("ignore:Specifying the target of")
 def test_builds_target_as_kwarg_is_still_correct():
-    out = instantiate(builds(target=dict, a=2, b=3, hydra_partial=True))()
+    out = instantiate(builds(target=dict, a=2, b=3, zen_partial=True))()
     assert out == {"a": 2, "b": 3}
+
+
+@pytest.mark.filterwarnings("ignore:The argument `hydra_partial` is deprecated")
+def test_hydra_partial_is_deprecated():
+    with pytest.warns(HydraZenDeprecationWarning):
+        builds(int, hydra_partial=True)
+
+
+@pytest.mark.filterwarnings("ignore:The argument `hydra_partial` is deprecated")
+@given(st.booleans())
+def test_hydra_partial_is_still_works(as_partial):
+    out = instantiate(builds(int, hydra_partial=as_partial))
+
+    if as_partial:
+        assert out() == 0
+    else:
+        assert out == 0
+
+
+@pytest.mark.filterwarnings("ignore:The argument `hydra_partial` is deprecated")
+def test_hydra_partial_via_hydrated_dataclass_is_deprecated():
+    with pytest.warns(HydraZenDeprecationWarning):
+
+        @hydrated_dataclass(int, hydra_partial=True)
+        class A:
+            pass
+
+
+@pytest.mark.filterwarnings("ignore:The argument `hydra_partial` is deprecated")
+@given(st.booleans())
+def test_hydra_partial_via_hydrated_dataclass_still_works(as_partial):
+    @hydrated_dataclass(int, hydra_partial=as_partial)
+    class A:
+        pass
+
+    out = instantiate(A)
+    if as_partial:
+        assert out() == 0
+    else:
+        assert out == 0
+
+
+@given(hydra_partial=st.booleans(), zen_partial=st.booleans())
+def test_specifying_hydra_partial_and_zen_partial_raises(
+    hydra_partial: bool, zen_partial: bool
+):
+    with pytest.raises(TypeError):
+        builds(int, hydra_partial=hydra_partial, zen_partial=zen_partial)
+
+
+@given(hydra_partial=st.booleans(), zen_partial=st.just(True))
+def test_specifying_hydra_partial_and_zen_partial_raises_in_hydrated(
+    hydra_partial: bool, zen_partial: bool
+):
+    with pytest.raises(TypeError):
+
+        @hydrated_dataclass(int, hydra_partial=hydra_partial, zen_partial=zen_partial)
+        class A:
+            pass
+
+
+def test_deprecation_shim_for_hydrated_dataclass_doesnt_permit_new_kwargs():
+    with pytest.raises(TypeError):
+
+        @hydrated_dataclass(int, some_arg=1)
+        class A:
+            pass
 
 
 @pytest.mark.skipif(
@@ -62,14 +129,14 @@ def test_builds_returns_a_dataclass_type():
 
 
 @given(everything_except(Mapping, type(None)))
-def test_builds_hydra_meta_not_mapping_raises(not_a_mapping):
+def test_builds_zen_meta_not_mapping_raises(not_a_mapping):
     with pytest.raises(TypeError):
-        builds(int, hydra_meta=not_a_mapping)
+        builds(int, zen_meta=not_a_mapping)
 
 
-def test_builds_hydra_meta_with_non_string_keys_raises():
+def test_builds_zen_meta_with_non_string_keys_raises():
     with pytest.raises(TypeError):
-        builds(int, hydra_meta={1: None})
+        builds(int, zen_meta={1: None})
 
 
 def f_starx(*x):
@@ -127,40 +194,40 @@ def test_builds_raises_when_user_specified_args_violate_sig(
             func,
             *args,
             **kwargs,
-            hydra_partial=partial,
+            zen_partial=partial,
             populate_full_signature=full_sig,
         )
 
     # test when **kwargs are inherited
-    kwarg_base = builds(passthrough, **kwargs, hydra_partial=partial)
+    kwarg_base = builds(passthrough, **kwargs, zen_partial=partial)
     with pytest.raises(TypeError):
         builds(
             func,
             *args,
-            hydra_partial=partial,
+            zen_partial=partial,
             populate_full_signature=full_sig,
             builds_bases=(kwarg_base,),
         )
     del kwarg_base
 
     # test when *args are inherited
-    args_base = builds(passthrough, *args, hydra_partial=partial)
+    args_base = builds(passthrough, *args, zen_partial=partial)
     with pytest.raises(TypeError):
         builds(
             func,
             **kwargs,
-            hydra_partial=partial,
+            zen_partial=partial,
             populate_full_signature=full_sig,
             builds_bases=(args_base,),
         )
     del args_base
 
     # test when *args and **kwargs are inherited
-    args_kwargs_base = builds(passthrough, *args, **kwargs, hydra_partial=partial)
+    args_kwargs_base = builds(passthrough, *args, **kwargs, zen_partial=partial)
     with pytest.raises(TypeError):
         builds(
             func,
-            hydra_partial=partial,
+            zen_partial=partial,
             populate_full_signature=full_sig,
             builds_bases=(args_kwargs_base,),
         )
@@ -182,7 +249,7 @@ def test_builds_raises_when_base_has_invalid_arg(full_sig, partial):
     with pytest.raises(TypeError):
         builds(
             f,
-            hydra_partial=partial,
+            zen_partial=partial,
             populate_full_signature=full_sig,
             builds_bases=(A,),
         )
@@ -218,7 +285,7 @@ def test_fuzz_build_validation_against_a_bunch_of_common_objects(
     if doesnt_have_sig and full_sig:
         assume(False)
 
-    conf = builds(target, hydra_partial=True, populate_full_signature=full_sig)
+    conf = builds(target, zen_partial=True, populate_full_signature=full_sig)
 
     OmegaConf.create(to_yaml(conf))  # ensure serializable
     instantiate(conf)  # ensure instantiable
@@ -233,21 +300,21 @@ def test_builds_raises_when_base_with_partial_target_is_specified(
     partial: bool, full_sig: bool
 ):
 
-    partiald_conf = builds(f2, hydra_partial=True)
+    partiald_conf = builds(f2, zen_partial=True)
 
     if not partial:
         with pytest.raises(TypeError):
             builds(
                 f2,
                 populate_full_signature=full_sig,
-                hydra_partial=partial,
+                zen_partial=partial,
                 builds_bases=(partiald_conf,),
             )
     else:
         builds(
             f2,
             populate_full_signature=full_sig,
-            hydra_partial=partial,
+            zen_partial=partial,
             builds_bases=(partiald_conf,),
         )
 
@@ -272,7 +339,7 @@ class Class:
 @given(partial=st.booleans(), full_sig=st.booleans())
 def test_builds_raises_on_non_callable_target(not_callable, partial, full_sig):
     with pytest.raises(TypeError):
-        builds(not_callable, populate_full_signature=full_sig, hydra_partial=partial)
+        builds(not_callable, populate_full_signature=full_sig, zen_partial=partial)
 
 
 @pytest.mark.parametrize(
@@ -280,7 +347,7 @@ def test_builds_raises_on_non_callable_target(not_callable, partial, full_sig):
     [
         ("populate_full_signature", None),
         ("hydra_recursive", 1),
-        ("hydra_partial", 1),
+        ("zen_partial", 1),
         ("hydra_convert", 1),
         ("hydra_convert", "wrong value"),
         ("dataclass_name", 1),
@@ -318,7 +385,7 @@ def test_builds_raises_for_unimportable_target(partial, full_sig):
         pass
 
     with pytest.raises(ModuleNotFoundError):
-        builds(unreachable, hydra_partial=partial, populate_full_signature=full_sig)
+        builds(unreachable, zen_partial=partial, populate_full_signature=full_sig)
 
 
 def test_just_raises_for_unimportable_target():
@@ -334,26 +401,26 @@ def test_get_target_on_non_builds():
         get_target(1)
 
 
-@pytest.mark.parametrize(
-    "field",
-    list(_HYDRA_FIELD_NAMES)
-    + [_ZEN_TARGET_FIELD_NAME, "_zen_some_new_feature", "hydra_some_new_feature"],
-)
+RESERVED_FIELD_NAMES = sorted(_HYDRA_FIELD_NAMES) + [
+    _ZEN_TARGET_FIELD_NAME,
+    "_zen_some_new_feature",
+    "hydra_some_new_feature",
+    "zen_some_new_feature",
+]
+
+
+@pytest.mark.parametrize("field", RESERVED_FIELD_NAMES)
 def test_reserved_names_are_reserved(field: str):
     kwargs = {field: True}
     with pytest.raises(ValueError):
         builds(dict, **kwargs)
 
 
-@pytest.mark.parametrize(
-    "field",
-    list(_HYDRA_FIELD_NAMES)
-    + [_ZEN_TARGET_FIELD_NAME, "_zen_some_new_feature", "hydra_some_new_feature"],
-)
-def test_reserved_names_are_reserved_by_hydra_meta(field: str):
+@pytest.mark.parametrize("field", RESERVED_FIELD_NAMES)
+def test_reserved_names_are_reserved_by_zen_meta(field: str):
     kwargs = {field: True}
     with pytest.raises(ValueError):
-        builds(dict, hydra_meta=kwargs)
+        builds(dict, zen_meta=kwargs)
 
 
 def f_meta_sig(x, *args, y, **kwargs):
@@ -374,16 +441,16 @@ def test_meta_fields_colliding_with_sig_raises(
         with pytest.raises(ValueError):
             builds(
                 f_meta_sig,
-                hydra_meta=meta_fields,
+                zen_meta=meta_fields,
                 populate_full_signature=pop_sig,
-                hydra_partial=partial,
+                zen_partial=partial,
             )
     else:
         builds(
             f_meta_sig,
-            hydra_meta=meta_fields,
+            zen_meta=meta_fields,
             populate_full_signature=pop_sig,
-            hydra_partial=partial,
+            zen_partial=partial,
         )
 
 
@@ -398,6 +465,6 @@ def test_meta_fields_colliding_with_user_provided_kwargs_raises(
 ):
     if {"x", "y"} & set(meta_fields):
         with pytest.raises(ValueError):
-            builds(dict, x=1, y=2, hydra_meta=meta_fields, hydra_partial=partial)
+            builds(dict, x=1, y=2, zen_meta=meta_fields, zen_partial=partial)
     else:
-        builds(dict, x=1, y=2, hydra_meta=meta_fields, hydra_partial=partial)
+        builds(dict, x=1, y=2, zen_meta=meta_fields, zen_partial=partial)

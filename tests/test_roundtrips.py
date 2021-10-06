@@ -54,7 +54,7 @@ def test_builds_kwargs_roundtrip_with_partial(
     partial_struct = instantiate(
         builds(
             pass_through_kwargs,
-            hydra_partial=True,
+            zen_partial=True,
             populate_full_signature=full_sig,
             **partial_kwargs,
         )
@@ -77,7 +77,7 @@ def test_builds_args_roundtrip_with_partial(
     partial_struct = instantiate(
         builds(
             pass_through_args,
-            hydra_partial=True,
+            zen_partial=True,
             populate_full_signature=full_sig,
             *partial_args,
         ),
@@ -101,11 +101,11 @@ def test_builds_roundtrips_with_mutable_values(
     # tests mutable user-specified value and default value
     if named_arg:
         result = instantiate(
-            builds(f, x=[1], populate_full_signature=full_sig, hydra_partial=partial)
+            builds(f, x=[1], populate_full_signature=full_sig, zen_partial=partial)
         )
     else:
         result = instantiate(
-            builds(f, [1], populate_full_signature=full_sig, hydra_partial=partial)
+            builds(f, [1], populate_full_signature=full_sig, zen_partial=partial)
         )
     if partial:
         result = result()
@@ -159,8 +159,8 @@ def test_just_roundtrip(obj):
     [
         builds,
         just,
-        lambda x: builds(x, hydra_partial=True),
-        lambda x: builds(x, hydra_meta=dict(_some_obscure_name=1)),
+        lambda x: builds(x, zen_partial=True),
+        lambda x: builds(x, zen_meta=dict(_some_obscure_name=1)),
     ],
 )
 def test_get_target_roundtrip(x, fn):

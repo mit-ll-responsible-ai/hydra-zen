@@ -21,38 +21,38 @@ def f(*args, **kwargs):
         st.text(string.ascii_letters, min_size=1, max_size=1),
         st.integers(),
     ),
-    hydra_meta=st.dictionaries(
+    zen_meta=st.dictionaries(
         st.text(string.ascii_letters, min_size=2, max_size=2).filter(
             lambda x: x not in {"is", "in", "as", "or", "if"}  # reserved fields
         ),
         st.integers(),
     ),
-    hydra_partial=st.booleans(),
+    zen_partial=st.booleans(),
     pop_sig=st.booleans(),
 )
-def test_basic_hydra_meta_behavior(
+def test_basic_zen_meta_behavior(
     args: tuple,
     kwargs: dict,
-    hydra_meta: dict,
-    hydra_partial: bool,
+    zen_meta: dict,
+    zen_partial: bool,
     pop_sig: bool,
 ):
     Conf = builds(
         f,
         *args,
         **kwargs,
-        hydra_meta=hydra_meta,
-        hydra_partial=hydra_partial,
+        zen_meta=zen_meta,
+        zen_partial=zen_partial,
         populate_full_signature=pop_sig
     )
 
     conf = Conf()
 
     # ensure all meta-fields are present
-    for meta_name, meta_val in hydra_meta.items():
+    for meta_name, meta_val in zen_meta.items():
         assert getattr(conf, meta_name) == meta_val
 
-    if not hydra_partial:
+    if not zen_partial:
         out_args, out_kwargs = instantiate(Conf)
     else:
         assert is_partial_builds(Conf)
@@ -60,11 +60,11 @@ def test_basic_hydra_meta_behavior(
 
     assert out_args == args
     assert out_kwargs == kwargs
-    assert set(out_kwargs).isdisjoint(hydra_meta)
+    assert set(out_kwargs).isdisjoint(zen_meta)
 
 
-def test_hydra_meta_via_hydrated_dataclass():
-    @hydrated_dataclass(dict, hydra_meta=dict(a=1))
+def test_zen_meta_via_hydrated_dataclass():
+    @hydrated_dataclass(dict, zen_meta=dict(a=1))
     class Conf:
         b: int = 2
 
@@ -75,7 +75,7 @@ def test_hydra_meta_via_hydrated_dataclass():
 
 
 def test_mutable_meta_value_gets_wrapped():
-    Conf = builds(int, hydra_meta=dict(a=[1, 2]))
+    Conf = builds(int, zen_meta=dict(a=[1, 2]))
     conf1 = Conf()
     assert conf1.a == [1, 2]
     conf1.a.append(3)
@@ -103,7 +103,7 @@ def test_deletion_by_inheritance():
             # a meta field.
             # We have effectively "deleted" `not_compat_with_f`
             # from this config.
-            hydra_meta=dict(not_compat_with_f=None),
+            zen_meta=dict(not_compat_with_f=None),
             builds_bases=(Conf,),
         )
     )

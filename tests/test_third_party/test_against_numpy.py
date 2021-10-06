@@ -16,7 +16,7 @@ from hydra_zen.structured_configs._utils import safe_name
 
 
 def test_builds_roundtrip_with_ufunc():
-    assert instantiate(builds(np.add, hydra_partial=True))(1.0, 2.0) == np.array(3.0)
+    assert instantiate(builds(np.add, zen_partial=True))(1.0, 2.0) == np.array(3.0)
 
 
 numpy_objects = [
@@ -37,7 +37,7 @@ numpy_objects = [
 
 @pytest.mark.parametrize("obj", numpy_objects)
 @pytest.mark.parametrize(
-    "hydra_zen_func", [builds, partial(builds, hydra_partial=True), just]
+    "hydra_zen_func", [builds, partial(builds, zen_partial=True), just]
 )
 def test_get_target_roundtrip(obj, hydra_zen_func):
     conf = hydra_zen_func(obj)
@@ -76,7 +76,7 @@ def test_fuzz_build_validation_against_a_bunch_of_common_objects(
 
     if doesnt_have_sig and full_sig:
         assume(False)
-    conf = builds(target, hydra_partial=partial, populate_full_signature=full_sig)
+    conf = builds(target, zen_partial=partial, populate_full_signature=full_sig)
 
     OmegaConf.create(to_yaml(conf))  # ensure serializable
 

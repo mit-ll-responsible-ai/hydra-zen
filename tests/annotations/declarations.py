@@ -24,12 +24,12 @@ def requires_A(x: int):
 
 # test type behaviors
 def f1():
-    # test builds(..., hydra_partial=True)
+    # test builds(..., zen_partial=True)
     # there is something really weird where annotating : PartialBuilds[Type[A]] breaks this..
     a: Literal["Type[PartialBuilds[Type[A]]]"] = reveal_type(
-        builds(A, hydra_partial=True)
+        builds(A, zen_partial=True)
     )
-    conf_a_partial = builds(A, hydra_partial=True)
+    conf_a_partial = builds(A, zen_partial=True)
     b: Literal["Partial[A]"] = reveal_type(instantiate(conf_a_partial))
     c: Literal["A"] = reveal_type(instantiate(conf_a_partial)())
 
@@ -39,10 +39,10 @@ f_sig = Callable[[int], int]
 
 def f2():
     a: Literal["Type[PartialBuilds[(x: int) -> int]]"] = reveal_type(
-        builds(f, hydra_partial=True)
+        builds(f, zen_partial=True)
     )
 
-    conf_f_partial = builds(f, hydra_partial=True)
+    conf_f_partial = builds(f, zen_partial=True)
 
     b: Literal["PartialBuilds[(x: int) -> int]"] = reveal_type(conf_f_partial())
 
@@ -53,15 +53,15 @@ def f2():
 
 
 def f3():
-    # test builds(..., hydra_partial=False)
-    a: Literal["Type[Builds[Type[A]]]"] = reveal_type(builds(A, hydra_partial=False))
-    conf_A_1 = builds(A, hydra_partial=False)
+    # test builds(..., zen_partial=False)
+    a: Literal["Type[Builds[Type[A]]]"] = reveal_type(builds(A, zen_partial=False))
+    conf_A_1 = builds(A, zen_partial=False)
     b: Literal["A"] = reveal_type(instantiate(conf_A_1))
 
     c: Literal["Type[Builds[(x: int) -> int]]"] = reveal_type(
-        builds(f, hydra_partial=False)
+        builds(f, zen_partial=False)
     )
-    conf_f_1: Type[Builds[f_sig]] = builds(f, hydra_partial=False)
+    conf_f_1: Type[Builds[f_sig]] = builds(f, zen_partial=False)
     d: Literal["int"] = reveal_type(instantiate(conf_f_1))
 
 
@@ -103,15 +103,15 @@ def f6():
 
 def f7():
     a1: Literal["Type[str]"] = reveal_type(get_target(builds(str)))
-    a2: Literal["Type[str]"] = reveal_type(get_target(builds(str, hydra_partial=False)))
-    a3: Literal["Type[str]"] = reveal_type(get_target(builds(str, hydra_partial=True)))
+    a2: Literal["Type[str]"] = reveal_type(get_target(builds(str, zen_partial=False)))
+    a3: Literal["Type[str]"] = reveal_type(get_target(builds(str, zen_partial=True)))
     a4: Literal["Type[str]"] = reveal_type(get_target(just(str)))
     b1: Literal["(x: int) -> int"] = reveal_type(get_target(builds(f)))
     b2: Literal["(x: int) -> int"] = reveal_type(
-        get_target(builds(f, hydra_partial=False))
+        get_target(builds(f, zen_partial=False))
     )
     b3: Literal["(x: int) -> int"] = reveal_type(
-        get_target(builds(f, hydra_partial=True))
+        get_target(builds(f, zen_partial=True))
     )
     b4: Literal["(x: int) -> int"] = reveal_type(get_target(just(f)))
 
