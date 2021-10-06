@@ -36,68 +36,43 @@ T = TypeVar("T")
 
 @overload
 def instantiate(
-    config: Type[Just[T]], *args: Any, **kwargs: Any
-) -> T:  # pragma: no cover
-    ...
-
-
-@overload
-def instantiate(config: Just[T], *args: Any, **kwargs: Any) -> T:  # pragma: no cover
-    ...
-
-
-@overload
-def instantiate(
-    config: PartialBuilds[Callable[..., T]], *args: Any, **kwargs: Any
-) -> Partial[T]:  # pragma: no cover
-    ...
-
-
-@overload
-def instantiate(
-    config: Type[PartialBuilds[Callable[..., T]]], *args: Any, **kwargs: Any
-) -> Partial[T]:  # pragma: no cover
-    ...
-
-
-@overload
-def instantiate(
-    config: Type[PartialBuilds[Type[T]]], *args: Any, **kwargs: Any
-) -> Partial[T]:  # pragma: no cover
-    ...
-
-
-@overload
-def instantiate(
-    config: PartialBuilds[Type[T]], *args: Any, **kwargs: Any
-) -> Partial[T]:  # pragma: no cover
-    ...
-
-
-@overload
-def instantiate(
-    config: Type[Builds[Type[T]]], *args: Any, **kwargs: Any
+    config: Union[Just[T], Type[Just[T]]], *args: Any, **kwargs: Any
 ) -> T:  # pragma: no cover
     ...
 
 
 @overload
 def instantiate(
-    config: Builds[Type[T]], *args: Any, **kwargs: Any
+    config: Union[
+        PartialBuilds[Callable[..., T]], Type[PartialBuilds[Callable[..., T]]]
+    ],
+    *args: Any,
+    **kwargs: Any
+) -> Partial[T]:  # pragma: no cover
+    ...
+
+
+@overload
+def instantiate(
+    config: Union[PartialBuilds[Type[T]], Type[PartialBuilds[Type[T]]]],
+    *args: Any,
+    **kwargs: Any
+) -> Partial[T]:  # pragma: no cover
+    ...
+
+
+@overload
+def instantiate(
+    config: Union[Builds[Type[T]], Type[Builds[Type[T]]]], *args: Any, **kwargs: Any
 ) -> T:  # pragma: no cover
     ...
 
 
 @overload
 def instantiate(
-    config: Type[Builds[Callable[..., T]]], *args: Any, **kwargs: Any
-) -> T:  # pragma: no cover
-    ...
-
-
-@overload
-def instantiate(
-    config: Builds[Callable[..., T]], *args: Any, **kwargs: Any
+    config: Union[Builds[Callable[..., T]], Type[Builds[Callable[..., T]]]],
+    *args: Any,
+    **kwargs: Any
 ) -> T:  # pragma: no cover
     ...
 
