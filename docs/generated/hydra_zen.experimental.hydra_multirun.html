@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>hydra_multirun &mdash; hydra-zen 0.3.0rc3+6.gdeffde3 documentation</title>
+  <title>hydra_multirun &mdash; hydra-zen 0.3.0rc3+13.g50abc07 documentation</title>
   
 
   
@@ -251,7 +251,7 @@ details on customizing Hydra.</p>
 </div>
 <p>Using a more complex <code class="xref py py-obj docutils literal notranslate"><span class="pre">task_function</span></code></p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">builds</span><span class="p">,</span> <span class="n">instantiate</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">builds</span><span class="p">(</span><span class="nb">pow</span><span class="p">,</span> <span class="n">exp</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">hydra_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">builds</span><span class="p">(</span><span class="nb">pow</span><span class="p">,</span> <span class="n">exp</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
 <span class="gp">... </span>   <span class="k">return</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">f</span><span class="p">)(</span><span class="n">cfg</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
 </pre></div>
@@ -265,7 +265,7 @@ details on customizing Hydra.</p>
 <p>An example using PyTorch</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">Adam</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Linear</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">AdamConfig</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">Adam</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">hydra_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">AdamConfig</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">Adam</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ModelConfig</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">Linear</span><span class="p">,</span> <span class="n">in_features</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">out_features</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">optim</span><span class="o">=</span><span class="n">AdamConfig</span><span class="p">(),</span> <span class="n">model</span><span class="o">=</span><span class="n">ModelConfig</span><span class="p">())</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>

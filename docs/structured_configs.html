@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Dynamically Generating Structured Configs &mdash; hydra-zen 0.3.0rc3+6.gdeffde3 documentation</title>
+  <title>Dynamically Generating Structured Configs &mdash; hydra-zen 0.3.0rc3+13.g50abc07 documentation</title>
   
 
   
@@ -499,11 +499,11 @@ This is very useful, as it is often the case that our configuration of a target 
 <p>For example, <code class="docutils literal notranslate"><span class="pre">Adam</span></code> is an gradient-based optimizer that is popular in the PyTorch library and that will frequently appear as a configurable component to a deep learning experiment.
 This optimizer has configurable parameters, such as a “learning rate” (<code class="docutils literal notranslate"><span class="pre">lr</span></code>), which must be provided by the user in order to instantiate <code class="docutils literal notranslate"><span class="pre">Adam</span></code>.
 The optimizer must <em>also</em> be initialized with the parameters that it will optimizing, however these parameters are typically created after we have started running our program and thus <em>they are not available to / cannot be part of our configuration</em>.
-Fortunately, we can use <code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">hydra_partial=True)</span></code> to configure <code class="docutils literal notranslate"><span class="pre">Adam</span></code> to be only partially-built using those values that we have access to at configuration time.</p>
+Fortunately, we can use <code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">zen_partial=True)</span></code> to configure <code class="docutils literal notranslate"><span class="pre">Adam</span></code> to be only partially-built using those values that we have access to at configuration time.</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">Adam</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">tensor</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">PartialBuilds_Adam</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">Adam</span><span class="p">,</span> <span class="n">hydra_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">PartialBuilds_Adam</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">Adam</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">partial_optim</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">PartialBuilds_Adam</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">partial_optim</span>  <span class="c1"># a partially-instantiated Adam</span>
 <span class="go">functools.partial(&lt;class &#39;torch.optim.adam.Adam&#39;&gt;, lr=10.0)</span>
@@ -524,7 +524,7 @@ Fortunately, we can use <code class="docutils literal notranslate"><span class="
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Leveraging <code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">hydra_partial=True)</span></code> will produce a config that depends explicitly
+<p>Leveraging <code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">zen_partial=True)</span></code> will produce a config that depends explicitly
 on hydra-zen. I.e. hydra-zen must be installed in order to instantiate the resulting config.</p>
 </div>
 </div>
@@ -743,7 +743,7 @@ it also exposes other features that are available in <a class="reference interna
 
 <span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">Adam</span>
 
-<span class="nd">@hydrated_dataclass</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">Adam</span><span class="p">,</span> <span class="n">hydra_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nd">@hydrated_dataclass</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">Adam</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">BuildsAdam</span><span class="p">:</span>
     <span class="n">lr</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span>
     <span class="n">momentum</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.9</span>
@@ -773,7 +773,7 @@ The following code block uses comments to indicate the types that will be inferr
 <span class="n">my_class1</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">Conf</span><span class="p">)</span>  <span class="c1"># type: MyClass</span>
 <span class="n">my_class2</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>  <span class="c1"># type: MyClass</span>
 
-<span class="n">PartialConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">MyClass</span><span class="p">,</span> <span class="n">hydra_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># type: Type[PartialBuilds[Type[MyClass]]]</span>
+<span class="n">PartialConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">MyClass</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># type: Type[PartialBuilds[Type[MyClass]]]</span>
 <span class="n">partial_conf</span> <span class="o">=</span> <span class="n">PartialConf</span><span class="p">()</span>                       <span class="c1"># type: PartialBuilds[Type[MyClass]]</span>
 
 <span class="n">partiald_class</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">PartialConf</span><span class="p">)</span>   <span class="c1"># type: Partial[MyClass]</span>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>hydrated_dataclass &mdash; hydra-zen 0.3.0rc3+6.gdeffde3 documentation</title>
+  <title>hydrated_dataclass &mdash; hydra-zen 0.3.0rc3+13.g50abc07 documentation</title>
   
 
   
@@ -183,7 +183,7 @@
 <h1>hydrated_dataclass<a class="headerlink" href="#hydrated-dataclass" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="hydra_zen.hydrated_dataclass">
-<code class="sig-prename descclassname"><span class="pre">hydra_zen.</span></code><code class="sig-name descname"><span class="pre">hydrated_dataclass</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">pos_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">populate_full_signature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_partial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_recursive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frozen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/structured_configs/_implementations.html#hydrated_dataclass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.hydrated_dataclass" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">hydra_zen.</span></code><code class="sig-name descname"><span class="pre">hydrated_dataclass</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">pos_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">populate_full_signature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_partial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_recursive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frozen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">_kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/structured_configs/_implementations.html#hydrated_dataclass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.hydrated_dataclass" title="Permalink to this definition">¶</a></dt>
 <dd><p>A decorator that uses <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.builds</span></code></a> to create a dataclass with the appropriate
 hydra-specific fields for specifying a structured config <a class="reference internal" href="#r8dd265aa7612-1" id="id1">[1]</a>.</p>
 <dl class="field-list">
@@ -200,7 +200,7 @@ will be populated according to the signature of <code class="xref py py-obj docu
 <p>Values specified in <code class="docutils literal notranslate"><span class="pre">**kwargs_for_target</span></code> take precedent over the corresponding
 default values from the signature.</p>
 </dd>
-<dt><strong>hydra_partial</strong><span class="classifier">Optional[bool] (default=False)</span></dt><dd><p>If True, then hydra-instantiation produces <code class="docutils literal notranslate"><span class="pre">functools.partial(target,</span> <span class="pre">**kwargs)</span></code></p>
+<dt><strong>zen_partial</strong><span class="classifier">Optional[bool] (default=False)</span></dt><dd><p>If True, then hydra-instantiation produces <code class="docutils literal notranslate"><span class="pre">functools.partial(target,</span> <span class="pre">**kwargs)</span></code></p>
 </dd>
 <dt><strong>hydra_recursive</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>If True, then upon hydra will recursively instantiate all other
 hydra-config objects nested within this dataclass <a class="reference internal" href="#r8dd265aa7612-2" id="id2">[2]</a>.</p>
@@ -216,7 +216,7 @@ a trace of OmegaConf containers</p></li>
 </ul>
 <p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_convert_</span></code> attribute is not set on the resulting dataclass.</p>
 </dd>
-<dt><strong>hydra_meta: Optional[Mapping[str, Any]]</strong></dt><dd><p>Specifies field-names and corresponding values that will be included in the
+<dt><strong>zen_meta: Optional[Mapping[str, Any]]</strong></dt><dd><p>Specifies field-names and corresponding values that will be included in the
 resulting dataclass, but that will <em>not</em> be used to build <code class="docutils literal notranslate"><span class="pre">hydra_target</span></code>
 via instantiation. These are called “meta” fields.</p>
 </dd>
@@ -260,7 +260,7 @@ at runtime.</p>
 </div>
 <p>We can also design a configuration that only partially instantiates our target.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">power</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">exponent</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="k">return</span> <span class="n">x</span> <span class="o">**</span> <span class="n">exponent</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nd">@hydrated_dataclass</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">power</span><span class="p">,</span> <span class="n">hydra_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nd">@hydrated_dataclass</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">power</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">... </span><span class="k">class</span> <span class="nc">PowerConf</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">exponent</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span>
 </pre></div>
@@ -279,7 +279,7 @@ at runtime.</p>
 <span class="gp">... </span>    <span class="n">eps</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-8</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@hydrated_dataclass</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">AdamW</span><span class="p">,</span> <span class="n">hydra_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@hydrated_dataclass</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">AdamW</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">... </span><span class="k">class</span> <span class="nc">AdamWConfig</span><span class="p">(</span><span class="n">AdamBaseConfig</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">weight_decay</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">AdamWConfig</span><span class="p">)</span>
@@ -288,7 +288,7 @@ at runtime.</p>
 </div>
 <p>Because this decorator uses <code class="xref py py-obj docutils literal notranslate"><span class="pre">hyda_utils.builds</span></code> under the hood, common mistakes like misspelled
 parameters will be caught upon constructing the structured config.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@hydrated_dataclass</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">AdamW</span><span class="p">,</span> <span class="n">hydra_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@hydrated_dataclass</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">AdamW</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">... </span><span class="k">class</span> <span class="nc">AdamWConfig</span><span class="p">(</span><span class="n">AdamBaseConfig</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">wieght_decay</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span>  <span class="c1"># i before e, right!?</span>
 <span class="go">TypeError: Building: AdamW ..</span>

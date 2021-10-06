@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>hydra_zen.experimental._implementations &mdash; hydra-zen 0.3.0rc3+6.gdeffde3 documentation</title>
+  <title>hydra_zen.experimental._implementations &mdash; hydra-zen 0.3.0rc3+13.g50abc07 documentation</title>
   
 
   
@@ -289,7 +289,7 @@
 
 <span class="sd">    &gt;&gt;&gt; from hydra_zen.experimental import hydra_run</span>
 <span class="sd">    &gt;&gt;&gt; from hydra_zen import builds, instantiate</span>
-<span class="sd">    &gt;&gt;&gt; cfg = dict(f=builds(pow, exp=2, hydra_partial=True), x=10)</span>
+<span class="sd">    &gt;&gt;&gt; cfg = dict(f=builds(pow, exp=2, zen_partial=True), x=10)</span>
 <span class="sd">    &gt;&gt;&gt; def task_function(cfg):</span>
 <span class="sd">    ...    return instantiate(cfg.f)(cfg.x)</span>
 
@@ -303,7 +303,7 @@
 
 <span class="sd">    &gt;&gt;&gt; from torch.optim import Adam</span>
 <span class="sd">    &gt;&gt;&gt; from torch.nn import Linear</span>
-<span class="sd">    &gt;&gt;&gt; AdamConfig = builds(Adam, lr=0.001, hydra_partial=True)</span>
+<span class="sd">    &gt;&gt;&gt; AdamConfig = builds(Adam, lr=0.001, zen_partial=True)</span>
 <span class="sd">    &gt;&gt;&gt; ModelConfig = builds(Linear, in_features=1, out_features=1)</span>
 <span class="sd">    &gt;&gt;&gt; cfg = dict(optim=AdamConfig(), model=ModelConfig())</span>
 <span class="sd">    &gt;&gt;&gt; def task_function(cfg):</span>
@@ -418,7 +418,7 @@
 <span class="sd">    Using a more complex `task_function`</span>
 
 <span class="sd">    &gt;&gt;&gt; from hydra_zen import builds, instantiate</span>
-<span class="sd">    &gt;&gt;&gt; cfg = dict(f=builds(pow, exp=2, hydra_partial=True), x=1)</span>
+<span class="sd">    &gt;&gt;&gt; cfg = dict(f=builds(pow, exp=2, zen_partial=True), x=1)</span>
 <span class="sd">    &gt;&gt;&gt; def task_function(cfg):</span>
 <span class="sd">    ...    return instantiate(cfg.f)(cfg.x)</span>
 
@@ -432,7 +432,7 @@
 
 <span class="sd">    &gt;&gt;&gt; from torch.optim import Adam</span>
 <span class="sd">    &gt;&gt;&gt; from torch.nn import Linear</span>
-<span class="sd">    &gt;&gt;&gt; AdamConfig = builds(Adam, lr=0.001, hydra_partial=True)</span>
+<span class="sd">    &gt;&gt;&gt; AdamConfig = builds(Adam, lr=0.001, zen_partial=True)</span>
 <span class="sd">    &gt;&gt;&gt; ModelConfig = builds(Linear, in_features=1, out_features=1)</span>
 <span class="sd">    &gt;&gt;&gt; cfg = dict(optim=AdamConfig(), model=ModelConfig())</span>
 <span class="sd">    &gt;&gt;&gt; def task_function(cfg):</span>
