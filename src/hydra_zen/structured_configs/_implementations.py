@@ -14,6 +14,7 @@ from typing import (
     List,
     Mapping,
     Optional,
+    Sequence,
     Set,
     Tuple,
     Type,
@@ -38,8 +39,11 @@ try:
 except ImportError:  # pragma: no cover
     ufunc = None
 
-
 _T = TypeVar("_T")
+_T2 = TypeVar("_T2", bound=Callable)
+_Wrapper = Callable[[_T2], Callable[..., _T2]]
+ZenWrapper = Union[Builds[_Wrapper], _Wrapper, str]
+
 
 _ZEN_PROCESSING_LOCATION: Final[str] = _utils.get_obj_path(zen_processing)
 _TARGET_FIELD_NAME: Final[str] = "_target_"
@@ -70,10 +74,6 @@ _builtin_function_or_method_type = type(len)
 
 def _get_target(x):
     return getattr(x, _TARGET_FIELD_NAME)
-
-
-_T = TypeVar("_T")
-_T2 = TypeVar("_T2", bound=Callable)
 
 
 def _target_as_kwarg_deprecation(func: _T2) -> Callable[..., _T2]:
@@ -457,6 +457,7 @@ def builds(
     hydra_target: Importable,
     *pos_args: Any,
     zen_partial: Literal[False] = False,
+    zen_wrappers: Optional[Union[ZenWrapper, Sequence[ZenWrapper]]] = None,
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -475,6 +476,7 @@ def builds(
     hydra_target: Importable,
     *pos_args: Any,
     zen_partial: Literal[True],
+    zen_wrappers: Optional[Union[ZenWrapper, Sequence[ZenWrapper]]] = None,
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -493,6 +495,7 @@ def builds(
     hydra_target: Importable,
     *pos_args: Any,
     zen_partial: bool,
+    zen_wrappers: Optional[Union[ZenWrapper, Sequence[ZenWrapper]]] = None,
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -512,6 +515,7 @@ def builds(
 def builds(
     *pos_args: Any,
     zen_partial: bool = False,
+    zen_wrappers: Optional[Union[ZenWrapper, Sequence[ZenWrapper]]] = None,
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -554,6 +558,8 @@ def builds(
         populate the dataclass' signature only with parameters that are specified by the
         user or that have default values specified in the target's signature. I.e. it is
         presumed that un-specified parameters are to be excluded from the partial configuration.
+
+    zen_wrappers : Optional[Union[ZenWrapper, Sequence[ZenWrapper]]]
 
     zen_meta: Optional[Mapping[str, Any]]
         Specifies field-names and corresponding values that will be included in the
@@ -742,11 +748,21 @@ def builds(
             f"`zen_meta` must be a mapping (e.g. a dictionary), got: {zen_meta}"
         )
 
-    for _key in zen_meta:
-        if not isinstance(_key, str):
-            raise TypeError(
-                f"`zen_meta` must be a mapping whose keys are strings, got key: {_key}"
-            )
+    if any(not isinstance(_key, str) for _key in zen_meta):
+        raise TypeError(
+            f"`zen_meta` must be a mapping whose keys are strings, got key(s):"
+            f" {','.join(str(_key) for _key in zen_meta if not isinstance(_key, str))}"
+        )
+
+    if zen_wrappers is not None:
+        if not isinstance(zen_wrappers, Sequence):
+            zen_wrappers = (zen_wrappers,)
+        else:
+            zen_wrappers = tuple(zen_wrappers)
+
+        # TODO: do proper error handling
+        # TODO: Builds[Callable] should be permitted too
+        assert all(callable(x) for x in zen_wrappers)
 
     # Check for reserved names
     for _name in chain(kwargs_for_target, zen_meta):
@@ -1020,7 +1036,6 @@ def builds(
         # We don't check for collisions between `zen_meta` names and the
         # names of inherited fields. Thus `zen_meta` can effectively be used
         # to "delete" names from a config, via inheritance.
-
         user_specified_named_params.update(
             {
                 name: (name, Any, sanitized_default_value(value))
@@ -1174,7 +1189,7 @@ def _is_old_partial_builds(x: Any) -> bool:  # pragma: no cover
     return False
 
 
-def uses_zen_processing(x: Any) -> bool:
+def uses_zen_processing(x: Any) -> TypeGuard[Builds]:
     if not is_builds(x) or not hasattr(x, _ZEN_TARGET_FIELD_NAME):
         return False
     attr = _get_target(x)

@@ -118,7 +118,6 @@ def f7():
     )
     b4: Literal["(x: int) -> int"] = reveal_type(get_target(just(f)))
 
-    # get_target(Builds[T]) -> T
     c1: Literal["Type[str]"] = reveal_type(get_target(builds(str)()))
     c2: Literal["Type[str]"] = reveal_type(get_target(builds(str, zen_partial=False)()))
     c3: Literal["Type[str]"] = reveal_type(get_target(builds(str, zen_partial=True)()))
