@@ -23,10 +23,10 @@ def f(x, y, z: int = 3):
 def test_builds_produces_dataclass(full_sig: bool, partial: bool):
 
     if full_sig and not partial:
-        Builds_f = builds(f, populate_full_signature=full_sig, hydra_partial=partial)
+        Builds_f = builds(f, populate_full_signature=full_sig, zen_partial=partial)
     else:
         Builds_f = builds(
-            f, x=None, y=None, hydra_partial=partial, populate_full_signature=full_sig
+            f, x=None, y=None, zen_partial=partial, populate_full_signature=full_sig
         )
     assert is_dataclass(Builds_f)
     out = Builds_f(x=1.0, y=-1.0)
@@ -52,7 +52,7 @@ def test_chain_builds_of_targets_with_common_interfaces(full_sig, partial):
     conf_3 = builds(
         f_three_vars,
         z=3,
-        hydra_partial=partial,
+        zen_partial=partial,
         populate_full_signature=full_sig,
         builds_bases=(conf_2,),
     )
@@ -75,7 +75,7 @@ def test_pos_args_with_inheritance(full_sig, partial):
     conf_2 = builds(
         f_three_vars,
         z=3,
-        hydra_partial=partial,
+        zen_partial=partial,
         populate_full_signature=full_sig,
         builds_bases=(conf_1,),
     )

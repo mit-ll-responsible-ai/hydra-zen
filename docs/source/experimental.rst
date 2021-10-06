@@ -130,7 +130,7 @@ Here we build a configuration to square an input using the ``pow`` function:
 .. code:: pycon
 
    >>> from omegaconf import DictConfig
-   >>> cfg = dict(f=builds(pow, exp=2, hydra_partial=True), x=10)
+   >>> cfg = dict(f=builds(pow, exp=2, zen_partial=True), x=10)
    >>> def task_function(cfg: DictConfig):
    ...     return instantiate(cfg.f)(cfg.x) # computes x ** 2
    >>> job = hydra_run(cfg, task_function)
@@ -144,7 +144,7 @@ Here we perform a multi-run for a range of values of ``x``:
 
 .. code:: pycon
 
-   >>> cfg = dict(f=builds(pow, exp=2, hydra_partial=True), x=1)
+   >>> cfg = dict(f=builds(pow, exp=2, zen_partial=True), x=1)
    >>> def task_function(cfg: DictConfig):
    ...    return instantiate(cfg.f)(cfg.x)
    >>> jobs = hydra_multirun(cfg, task_function, overrides=["x=range(-2,3)"])
@@ -217,8 +217,8 @@ To do this without ever leaving Python we must take advantage of Hydra's Config 
     from torch.optim import Optimizer, SGD, Adam
     from hydra_zen import builds
 
-    SGDConf = builds(SGD, lr=0.3, momentum=0.0, hydra_partial=True)
-    AdamConf = builds(Adam, lr=0.3, hydra_partial=True)
+    SGDConf = builds(SGD, lr=0.3, momentum=0.0, zen_partial=True)
+    AdamConf = builds(Adam, lr=0.3, zen_partial=True)
 
     cs = ConfigStore.instance()
     cs.store(group="optim", name="sgd", node=SGDConf)

@@ -9,7 +9,6 @@ from hypothesis import given
 from omegaconf import OmegaConf
 
 from hydra_zen import builds, instantiate, to_yaml
-
 from tests import valid_hydra_literals
 
 
@@ -25,7 +24,7 @@ def xy_are_pos_only(x, y, /):
 @given(partial=st.booleans(), full_sig=st.booleans())
 def test_builds_runtime_validation_pos_only_not_nameable(func, full_sig, partial):
     with pytest.raises(TypeError):
-        builds(func, x=10, hydra_partial=partial, populate_full_signature=full_sig)
+        builds(func, x=10, zen_partial=partial, populate_full_signature=full_sig)
 
 
 @given(
@@ -35,7 +34,7 @@ def test_builds_runtime_validation_pos_only_not_nameable(func, full_sig, partial
 )
 def test_roundtrip_pos_only(x, full_sig: bool, partial: bool):
     cfg = builds(
-        x_is_pos_only, x, populate_full_signature=full_sig, hydra_partial=partial
+        x_is_pos_only, x, populate_full_signature=full_sig, zen_partial=partial
     )
 
     out = instantiate(cfg)
@@ -54,12 +53,10 @@ def test_roundtrip_pos_only(x, full_sig: bool, partial: bool):
 
 @given(full_sig=st.booleans())
 def test_pos_only_with_partial_is_not_required(full_sig):
-    cfg = builds(x_is_pos_only, populate_full_signature=full_sig, hydra_partial=True)
+    cfg = builds(x_is_pos_only, populate_full_signature=full_sig, zen_partial=True)
     assert instantiate(cfg)(1) == 1
     assert len(inspect.signature(cfg).parameters) == 0
 
-    cfg = builds(
-        xy_are_pos_only, 1, populate_full_signature=full_sig, hydra_partial=True
-    )
+    cfg = builds(xy_are_pos_only, 1, populate_full_signature=full_sig, zen_partial=True)
     assert instantiate(cfg)(2) == (1, 2)
     assert len(inspect.signature(cfg).parameters) == 0

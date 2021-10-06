@@ -22,7 +22,7 @@ from hydra_zen.typing import Builds, Just, PartialBuilds
     [
         (just, Just),
         (builds, Builds),
-        (partial(builds, hydra_partial=True), PartialBuilds),
+        (partial(builds, zen_partial=True), PartialBuilds),
     ],
 )
 def test_runtime_checkability_of_protocols(fn, protocol):
@@ -37,7 +37,7 @@ def test_Builds_is_not_PartialBuilds():
     Conf = builds(dict)
     assert not isinstance(Conf, PartialBuilds)
 
-    PConf = builds(dict, hydra_partial=True)
+    PConf = builds(dict, zen_partial=True)
     assert isinstance(PConf, Builds)
 
 
@@ -60,7 +60,7 @@ def test_targeted_dataclass_is_Builds():
     "fn,protocol",
     [
         (just, Just),
-        (partial(builds, hydra_partial=True), PartialBuilds),
+        (partial(builds, zen_partial=True), PartialBuilds),
     ],
 )
 def test_protocol_target_is_correct(fn, protocol):
@@ -120,7 +120,7 @@ class NotPartial3:
         (builds(int), True, False, False),
         (just(int), True, True, False),
         (AJust, True, True, False),
-        (builds(int, hydra_partial=True), True, False, True),
+        (builds(int, zen_partial=True), True, False, True),
         (APartial, True, False, True),
         (NotJust, True, False, False),
         (NotPartial, True, False, False),

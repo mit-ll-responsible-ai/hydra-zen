@@ -291,14 +291,14 @@ This is very useful, as it is often the case that our configuration of a target 
 For example, ``Adam`` is an gradient-based optimizer that is popular in the PyTorch library and that will frequently appear as a configurable component to a deep learning experiment.
 This optimizer has configurable parameters, such as a "learning rate" (``lr``), which must be provided by the user in order to instantiate ``Adam``.
 The optimizer must *also* be initialized with the parameters that it will optimizing, however these parameters are typically created after we have started running our program and thus *they are not available to / cannot be part of our configuration*.
-Fortunately, we can use ``builds(..., hydra_partial=True)`` to configure ``Adam`` to be only partially-built using those values that we have access to at configuration time.
+Fortunately, we can use ``builds(..., zen_partial=True)`` to configure ``Adam`` to be only partially-built using those values that we have access to at configuration time.
 
 .. code:: pycon
 
    >>> from torch.optim import Adam
    >>> from torch import tensor
 
-   >>> PartialBuilds_Adam = builds(Adam, hydra_partial=True, lr=10.0)
+   >>> PartialBuilds_Adam = builds(Adam, zen_partial=True, lr=10.0)
    >>> partial_optim = instantiate(PartialBuilds_Adam)
    >>> partial_optim  # a partially-instantiated Adam
    functools.partial(<class 'torch.optim.adam.Adam'>, lr=10.0)
@@ -320,7 +320,7 @@ As promised, instantiating this config only partially-builds the ``Adam`` optimi
    )
 
 .. note::
-   Leveraging ``builds(..., hydra_partial=True)`` will produce a config that depends explicitly
+   Leveraging ``builds(..., zen_partial=True)`` will produce a config that depends explicitly
    on hydra-zen. I.e. hydra-zen must be installed in order to instantiate the resulting config.
 
 .. _Auto:
@@ -590,7 +590,7 @@ it also exposes other features that are available in `builds`.
 
    from torch.optim import Adam
 
-   @hydrated_dataclass(target=Adam, hydra_partial=True, frozen=True)
+   @hydrated_dataclass(target=Adam, zen_partial=True, frozen=True)
    class BuildsAdam:
        lr: float = 0.01
        momentum: float = 0.9
@@ -626,7 +626,7 @@ The following code block uses comments to indicate the types that will be inferr
    my_class1 = instantiate(Conf)  # type: MyClass
    my_class2 = instantiate(conf)  # type: MyClass
 
-   PartialConf = builds(MyClass, hydra_partial=True)  # type: Type[PartialBuilds[Type[MyClass]]]
+   PartialConf = builds(MyClass, zen_partial=True)  # type: Type[PartialBuilds[Type[MyClass]]]
    partial_conf = PartialConf()                       # type: PartialBuilds[Type[MyClass]]
 
    partiald_class = instantiate(PartialConf)   # type: Partial[MyClass]
