@@ -185,11 +185,11 @@ def __dataclass_transform__(
 def hydrated_dataclass(
     target: Callable,
     *pos_args: Any,
-    populate_full_signature: bool = False,
     zen_partial: bool = False,
+    zen_meta: Optional[Mapping[str, Any]] = None,
+    populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
-    zen_meta: Optional[Mapping[str, Any]] = None,
     frozen: bool = False,
     **_kw,  # reserved to deprecate hydra_partial
 ) -> Callable[[Type[_T]], Type[_T]]:
@@ -207,6 +207,9 @@ def hydrated_dataclass(
         Arguments specified positionally are not included in the dataclass' signature and
         are stored as a tuple bound to in the ``_args_`` field.
 
+    zen_partial : Optional[bool] (default=False)
+        If True, then hydra-instantiation produces ``functools.partial(target, **kwargs)``
+
     populate_full_signature : bool, optional (default=False)
         If True, then the resulting dataclass's ``__init__`` signature and fields
         will be populated according to the signature of `target`.
@@ -214,8 +217,10 @@ def hydrated_dataclass(
         Values specified in ``**kwargs_for_target`` take precedent over the corresponding
         default values from the signature.
 
-    zen_partial : Optional[bool] (default=False)
-        If True, then hydra-instantiation produces ``functools.partial(target, **kwargs)``
+    zen_meta: Optional[Mapping[str, Any]]
+        Specifies field-names and corresponding values that will be included in the
+        resulting dataclass, but that will *not* be used to build ``hydra_target``
+        via instantiation. These are called "meta" fields.
 
     hydra_recursive : bool, optional (default=True)
         If True, then upon hydra will recursively instantiate all other
@@ -233,11 +238,6 @@ def hydrated_dataclass(
           a trace of OmegaConf containers
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.
-
-    zen_meta: Optional[Mapping[str, Any]]
-        Specifies field-names and corresponding values that will be included in the
-        resulting dataclass, but that will *not* be used to build ``hydra_target``
-        via instantiation. These are called "meta" fields.
 
     frozen : bool, optional (default=False)
         If `True`, the resulting dataclass will create frozen (i.e. immutable) instances.
@@ -456,11 +456,11 @@ def sanitized_default_value(value: Any) -> Field:
 def builds(
     hydra_target: Importable,
     *pos_args: Any,
+    zen_partial: Literal[False] = False,
+    zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
-    zen_partial: Literal[False] = False,
-    zen_meta: Optional[Mapping[str, Any]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
@@ -474,11 +474,11 @@ def builds(
 def builds(
     hydra_target: Importable,
     *pos_args: Any,
+    zen_partial: Literal[True],
+    zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
-    zen_partial: Literal[True],
-    zen_meta: Optional[Mapping[str, Any]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
@@ -492,11 +492,11 @@ def builds(
 def builds(
     hydra_target: Importable,
     *pos_args: Any,
+    zen_partial: bool,
+    zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
-    zen_partial: bool,
-    zen_meta: Optional[Mapping[str, Any]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
@@ -511,17 +511,17 @@ def builds(
 @_target_as_kwarg_deprecation
 def builds(
     *pos_args: Any,
+    zen_partial: bool = False,
+    zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
-    zen_partial: bool = False,
-    zen_meta: Optional[Mapping[str, Any]] = None,
     frozen: bool = False,
-    dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
+    dataclass_name: Optional[str] = None,
     **kwargs_for_target,
 ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]:
-    """builds(hydra_target, /, *pos_args, populate_full_signature=False, zen_partial=False, hydra_recursive=None, zen_meta=None, hydra_convert=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
+    """builds(hydra_target, /, *pos_args, zen_partial=False, zen_meta=None, hydra_recursive=None, populate_full_signature=False, hydra_convert=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
 
     Returns a dataclass object that configures ``<hydra_target>`` with user-specified and auto-populated parameter
     values.
@@ -546,6 +546,20 @@ def builds(
         The arguments specified here solely determine the fields and init-parameters of the
         resulting dataclass, unless ``populate_full_signature=True`` is specified (see below).
 
+    zen_partial : bool, optional (default=False)
+        If True, then Hydra-instantiation produces ``functools.partial(target, *pos_args, **kwargs_for_target)``,
+        this enables the partial-configuration of objects.
+
+        Specifying ``zen_partial=True`` and ``populate_full_signature=True`` together will
+        populate the dataclass' signature only with parameters that are specified by the
+        user or that have default values specified in the target's signature. I.e. it is
+        presumed that un-specified parameters are to be excluded from the partial configuration.
+
+    zen_meta: Optional[Mapping[str, Any]]
+        Specifies field-names and corresponding values that will be included in the
+        resulting dataclass, but that will *not* be used to build ``hydra_target``
+        via instantiation. These are called "meta" fields.
+
     populate_full_signature : bool, optional (default=False)
         If ``True``, then the resulting dataclass's signature and fields will be populated
         according to the signature of ``target``.
@@ -555,15 +569,6 @@ def builds(
 
         This option is not available for objects with inaccessible signatures, such as
         NumPy's various ufuncs.
-
-    zen_partial : bool, optional (default=False)
-        If True, then Hydra-instantiation produces ``functools.partial(target, *pos_args, **kwargs_for_target)``,
-        this enables the partial-configuration of objects.
-
-        Specifying ``zen_partial=True`` and ``populate_full_signature=True`` together will
-        populate the dataclass' signature only with parameters that are specified by the
-        user or that have default values specified in the target's signature. I.e. it is
-        presumed that un-specified parameters are to be excluded from the partial configuration.
 
     hydra_recursive : Optional[bool], optional (default=True)
         If ``True``, then Hydra will recursively instantiate all other
@@ -581,11 +586,6 @@ def builds(
           a trace of OmegaConf containers
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.
-
-    zen_meta: Optional[Mapping[str, Any]]
-        Specifies field-names and corresponding values that will be included in the
-        resulting dataclass, but that will *not* be used to build ``hydra_target``
-        via instantiation. These are called "meta" fields.
 
     frozen : bool, optional (default=False)
         If ``True``, the resulting dataclass will create frozen (i.e. immutable) instances.
