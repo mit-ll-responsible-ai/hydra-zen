@@ -1190,32 +1190,19 @@ def is_partial_builds(x: Any) -> TypeGuard[PartialBuilds]:
 
 
 @overload
-def get_target(obj: Type[PartialBuilds[_T]]) -> _T:  # pragma: no cover
+def get_target(
+    obj: Union[PartialBuilds[_T], Type[PartialBuilds[_T]]]
+) -> _T:  # pragma: no cover
     ...
 
 
 @overload
-def get_target(obj: Type[Just[_T]]) -> _T:  # pragma: no cover
+def get_target(obj: Union[Just[_T], Type[Just[_T]]]) -> _T:  # pragma: no cover
     ...
 
 
 @overload
-def get_target(obj: Type[Builds[_T]]) -> _T:  # pragma: no cover
-    ...
-
-
-@overload
-def get_target(obj: PartialBuilds[_T]) -> _T:  # pragma: no cover
-    ...
-
-
-@overload
-def get_target(obj: Just[_T]) -> _T:  # pragma: no cover
-    ...
-
-
-@overload
-def get_target(obj: Builds[_T]) -> _T:  # pragma: no cover
+def get_target(obj: Union[Builds[_T], Type[Builds[_T]]]) -> _T:  # pragma: no cover
     ...
 
 
