@@ -774,7 +774,6 @@ def builds(
             # so that test-coverage will be checked for each one
 
             if is_builds(wrapper):
-                print(1)
                 # If Hydra's locate function starts supporting importing literals
                 # – or if we decide to ship our own locate function –
                 # then we should get the target of `wrapper` and make sure it is callable
@@ -785,7 +784,6 @@ def builds(
                     # config
                     validated_wrappers.append(getattr(wrapper, _JUST_FIELD_NAME))
                 else:
-                    print(hydra_recursive)
                     if hydra_recursive is False:
                         warnings.warn(
                             "A structured config was supplied for `zen_wrappers`. Its parent config has "
