@@ -44,16 +44,12 @@ _T2 = TypeVar("_T2", bound=Callable)
 _Wrapper = Callable[[_T2], Callable[..., _T2]]
 ZenWrapper = Union[Builds[_Wrapper], _Wrapper, str]
 
-
-_ZEN_PROCESSING_LOCATION: Final[str] = _utils.get_obj_path(zen_processing)
+# Hydra-specific fields
 _TARGET_FIELD_NAME: Final[str] = "_target_"
 _RECURSIVE_FIELD_NAME: Final[str] = "_recursive_"
 _CONVERT_FIELD_NAME: Final[str] = "_convert_"
-_PARTIAL_TARGET_FIELD_NAME: Final[str] = "_zen_partial"
-_META_FIELD_NAME: Final[str] = "_zen_exclude"
-_ZEN_TARGET_FIELD_NAME: Final[str] = "_zen_target"
 _POS_ARG_FIELD_NAME: Final[str] = "_args_"
-_JUST_FIELD_NAME: Final[str] = "path"
+
 _HYDRA_FIELD_NAMES: FrozenSet[str] = frozenset(
     (
         _TARGET_FIELD_NAME,
@@ -63,6 +59,15 @@ _HYDRA_FIELD_NAMES: FrozenSet[str] = frozenset(
     )
 )
 
+# hydra-zen-specific fields
+_ZEN_PROCESSING_LOCATION: Final[str] = _utils.get_obj_path(zen_processing)
+_ZEN_TARGET_FIELD_NAME: Final[str] = "_zen_target"
+_PARTIAL_TARGET_FIELD_NAME: Final[str] = "_zen_partial"
+_META_FIELD_NAME: Final[str] = "_zen_exclude"
+_ZEN_WRAPPERS_FIELD_NAME: Final[str] = "_zen_wrappers"
+_JUST_FIELD_NAME: Final[str] = "path"
+
+# signature param-types
 _POSITIONAL_ONLY: Final = inspect.Parameter.POSITIONAL_ONLY
 _POSITIONAL_OR_KEYWORD: Final = inspect.Parameter.POSITIONAL_OR_KEYWORD
 _VAR_POSITIONAL: Final = inspect.Parameter.VAR_POSITIONAL
@@ -762,6 +767,7 @@ def builds(
 
         # TODO: do proper error handling
         # TODO: Builds[Callable] should be permitted too
+
         assert all(callable(x) for x in zen_wrappers)
 
     # Check for reserved names
@@ -783,7 +789,7 @@ def builds(
 
     target_field: List[Union[Tuple[str, Type[Any]], Tuple[str, Type[Any], Field[Any]]]]
 
-    if zen_partial or zen_meta:
+    if zen_partial or zen_meta or zen_wrappers:
         target_field = [
             (
                 _TARGET_FIELD_NAME,
@@ -796,6 +802,7 @@ def builds(
                 _utils.field(default=_utils.get_obj_path(target), init=False),
             ),
         ]
+
         if zen_partial:
             target_field.append(
                 (
@@ -804,6 +811,7 @@ def builds(
                     _utils.field(default=True, init=False),
                 ),
             )
+
         if zen_meta:
             target_field.append(
                 (
@@ -812,6 +820,28 @@ def builds(
                     _utils.field(default=tuple(zen_meta), init=False),
                 ),
             )
+
+        if zen_wrappers:
+            # TODO: handle config'd - callables
+            _callable_paths = tuple(
+                z if is_builds(z) else _utils.get_obj_path(z) for z in zen_wrappers
+            )
+            if len(zen_wrappers) == 1:
+                target_field.append(
+                    (
+                        _ZEN_WRAPPERS_FIELD_NAME,
+                        _utils.sanitized_type(ZenWrapper),
+                        _utils.field(default=_callable_paths[0], init=False),
+                    ),
+                )
+            else:
+                target_field.append(
+                    (
+                        _ZEN_WRAPPERS_FIELD_NAME,
+                        _utils.sanitized_type(Tuple[ZenWrapper, ...]),
+                        _utils.field(default=_callable_paths, init=False),
+                    ),
+                )
     else:
         target_field = [
             (

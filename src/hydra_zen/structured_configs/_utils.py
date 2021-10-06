@@ -340,4 +340,7 @@ def sanitized_type(
 
 
 def is_interpolated_string(x: Any) -> TypeGuard[InterpStr]:
+    # This is only a necessary check – not a sufficient one – that `x`
+    # is a valid interpolated string. We do not verify that it rigorously
+    # satisfies omegaconf's grammar
     return isinstance(x, str) and len(x) > 3 and x.startswith("${") and x.endswith("}")
