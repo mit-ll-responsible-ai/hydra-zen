@@ -102,10 +102,13 @@ def f6():
 
 
 def f7():
+    # get_target(Type[Builds[T]]) -> T
     a1: Literal["Type[str]"] = reveal_type(get_target(builds(str)))
     a2: Literal["Type[str]"] = reveal_type(get_target(builds(str, zen_partial=False)))
     a3: Literal["Type[str]"] = reveal_type(get_target(builds(str, zen_partial=True)))
     a4: Literal["Type[str]"] = reveal_type(get_target(just(str)))
+
+    # get_target(Builds[Callable[...]]) -> Callable[...]
     b1: Literal["(x: int) -> int"] = reveal_type(get_target(builds(f)))
     b2: Literal["(x: int) -> int"] = reveal_type(
         get_target(builds(f, zen_partial=False))
@@ -114,6 +117,12 @@ def f7():
         get_target(builds(f, zen_partial=True))
     )
     b4: Literal["(x: int) -> int"] = reveal_type(get_target(just(f)))
+
+    # get_target(Builds[T]) -> T
+    c1: Literal["Type[str]"] = reveal_type(get_target(builds(str)()))
+    c2: Literal["Type[str]"] = reveal_type(get_target(builds(str, zen_partial=False)()))
+    c3: Literal["Type[str]"] = reveal_type(get_target(builds(str, zen_partial=True)()))
+    c4: Literal["Type[str]"] = reveal_type(get_target(just(str)()))
 
 
 def f8():
