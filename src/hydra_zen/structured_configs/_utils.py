@@ -18,7 +18,9 @@ from typing import (
     overload,
 )
 
-from typing_extensions import Final
+from typing_extensions import Final, TypeGuard
+
+from hydra_zen.typing._implementations import InterpStr
 
 try:
     from typing import get_args, get_origin
@@ -335,3 +337,7 @@ def sanitized_type(
         return type_
 
     return Any
+
+
+def is_interpolated_string(x: Any) -> TypeGuard[InterpStr]:
+    return isinstance(x, str) and len(x) > 3 and x.startswith("${") and x.endswith("}")
