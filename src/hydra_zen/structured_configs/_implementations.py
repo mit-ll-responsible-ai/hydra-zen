@@ -202,7 +202,7 @@ def hydrated_dataclass(
     frozen: bool = False,
     **_kw,  # reserved to deprecate hydra_partial
 ) -> Callable[[Type[_T]], Type[_T]]:
-    """A decorator that uses `hydra_zen.builds` to create a dataclass with the appropriate
+    """A decorator that uses `builds` to create a dataclass with the appropriate
     hydra-specific fields for specifying a structured config [1]_.
 
     Parameters
@@ -219,6 +219,21 @@ def hydrated_dataclass(
     zen_partial : Optional[bool] (default=False)
         If True, then hydra-instantiation produces ``functools.partial(target, **kwargs)``
 
+    zen_wrappers : Optional[Union[ZenWrapper, Sequence[ZenWrapper]]]
+        One or more wrappers, which will wrap `hydra_target` prior to instantiation.
+        E.g. specifying ``[f1, f2, f3]`` will instantiate as::
+
+            ``f3(f2(f1(hydra_target)))(*args, **kwargs)``
+
+        Wrappers can also be specified as interpolated strings [2]_ or targeted structured
+        configs.
+
+    zen_meta: Optional[Mapping[str, Any]]
+        Specifies field-names and corresponding values that will be included in the
+        resulting dataclass, but that will *not* be used to build ``hydra_target``
+        via instantiation. These are called "meta" fields.
+
+
     populate_full_signature : bool, optional (default=False)
         If True, then the resulting dataclass's ``__init__`` signature and fields
         will be populated according to the signature of `target`.
@@ -226,19 +241,15 @@ def hydrated_dataclass(
         Values specified in ``**kwargs_for_target`` take precedent over the corresponding
         default values from the signature.
 
-    zen_meta: Optional[Mapping[str, Any]]
-        Specifies field-names and corresponding values that will be included in the
-        resulting dataclass, but that will *not* be used to build ``hydra_target``
-        via instantiation. These are called "meta" fields.
 
     hydra_recursive : bool, optional (default=True)
         If True, then upon hydra will recursively instantiate all other
-        hydra-config objects nested within this dataclass [2]_.
+        hydra-config objects nested within this dataclass [3]_.
 
         If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.
 
     hydra_convert: Optional[Literal["none", "partial", "all"]] (default="none")
-        Determines how hydra handles the non-primitive objects passed to `target` [3]_.
+        Determines how hydra handles the non-primitive objects passed to `target` [4]_.
 
         - ``"none"``: Passed objects are DictConfig and ListConfig, default
         - ``"partial"``: Passed objects are converted to dict and list, with
@@ -260,8 +271,9 @@ def hydrated_dataclass(
     References
     ----------
     .. [1] https://hydra.cc/docs/next/tutorials/structured_config/intro/
-    .. [2] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
-    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
+    .. [2] https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation
+    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
+    .. [4] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
 
     Examples
     --------
@@ -311,6 +323,8 @@ def hydrated_dataclass(
     TypeError: Building: AdamW ..
     The following unexpected keyword argument(s) for torch.optim.adamw.AdamW was specified via inheritance
     from a base class: wieght_decay
+
+    For more detailed examples, refer to `builds`.
     """
 
     if "hydra_partial" in _kw:
@@ -545,7 +559,7 @@ def builds(
 
     Parameters
     ----------
-    hydra_target : Union[Instantiable, Callable]
+    hydra_target : Instantiable | Callable
         The object to be instantiated/called. This is a required, positional-only argument.
 
     *pos_args: Any
@@ -569,7 +583,14 @@ def builds(
         user or that have default values specified in the target's signature. I.e. it is
         presumed that un-specified parameters are to be excluded from the partial configuration.
 
-    zen_wrappers : Optional[Union[ZenWrapper, Sequence[ZenWrapper]]]
+    zen_wrappers : Optional[Callable | Builds | InterpStr | Sequence[Callable | Builds | InterpStr]
+        One or more wrappers, which will wrap `hydra_target` prior to instantiation.
+        E.g. specifying the wrappers ``[f1, f2, f3]`` will instantiate as::
+
+            f3(f2(f1(hydra_target)))(*args, **kwargs)
+
+        Wrappers can also be specified as interpolated strings [2]_ or targeted structured
+        configs.
 
     zen_meta: Optional[Mapping[str, Any]]
         Specifies field-names and corresponding values that will be included in the
@@ -588,12 +609,12 @@ def builds(
 
     hydra_recursive : Optional[bool], optional (default=True)
         If ``True``, then Hydra will recursively instantiate all other
-        hydra-config objects nested within this dataclass [2]_.
+        hydra-config objects nested within this dataclass [3]_.
 
         If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.
 
     hydra_convert: Optional[Literal["none", "partial", "all"]], optional (default="none")
-        Determines how hydra handles the non-primitive objects passed to `target` [3]_.
+        Determines how hydra handles the non-primitive objects passed to `target` [4]_.
 
         - ``"none"``: Passed objects are DictConfig and ListConfig, default
         - ``"partial"``: Passed objects are converted to dict and list, with
@@ -641,14 +662,15 @@ def builds(
     the target's signature. This helps to ensure that typos in field names
     fail early and explicitly.
 
-    Mutable values are automatically transformed to use a default factory [4]_.
+    Mutable values are automatically transformed to use a default factory [5]_.
 
     References
     ----------
     .. [1] https://hydra.cc/docs/next/tutorials/structured_config/intro/
-    .. [2] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
-    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
-    .. [4] https://docs.python.org/3/library/dataclasses.html#mutable-default-values
+    .. [2] https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation
+    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
+    .. [4] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
+    .. [5] https://docs.python.org/3/library/dataclasses.html#mutable-default-values
 
     Examples
     --------
@@ -700,6 +722,25 @@ def builds(
     {'a': -10, 'b': -10}
     >>> instantiate(Conf, s=2)
     {'a': 2, 'b': 2}
+
+    Leveraging zen-wrappers to inject unit-conversion capabilities. Let's take
+    a function that converts Farenheit to Celcius, and wrap it so that it converts
+    to Kelvin instead.
+
+    >>> def faren_to_celsius(temp_f):
+    ...     return ((temp_f - 32) * 5) / 9
+
+    >>> def change_celcius_to_kelvin(celc_func):
+    ...     def wraps(*args, **kwargs):
+    ...         return 273.15 + celc_func(*args, **kwargs)
+    ...     return wraps
+
+    >>> AsCelcius = builds(faren_to_celsius)
+    >>> AsKelvin = builds(faren_to_celsius, zen_wrappers=change_celcius_to_kelvin)
+    >>> instantiate(AsCelcius, temp_f=32)
+    0.0
+    >>> instantiate(AsKelvin, temp_f=32)
+    273.15
     """
 
     if not pos_args and not kwargs_for_target:
@@ -772,12 +813,10 @@ def builds(
         for wrapper in zen_wrappers:
             # We are intentionally keeping each condition branched
             # so that test-coverage will be checked for each one
-
             if is_builds(wrapper):
                 # If Hydra's locate function starts supporting importing literals
                 # – or if we decide to ship our own locate function –
                 # then we should get the target of `wrapper` and make sure it is callable
-
                 if is_just(wrapper):
                     # `zen_wrappers` handles importing string; we can
                     # elimintate the indirection of Just and "flatten" this
