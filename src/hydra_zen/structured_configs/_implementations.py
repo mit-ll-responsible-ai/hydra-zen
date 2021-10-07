@@ -7,6 +7,7 @@ from dataclasses import Field, dataclass, field, fields, is_dataclass, make_data
 from functools import wraps
 from itertools import chain
 from typing import (
+    TYPE_CHECKING,
     Any,
     Callable,
     Dict,
@@ -42,9 +43,13 @@ except ImportError:  # pragma: no cover
 _T = TypeVar("_T")
 _T2 = TypeVar("_T2", bound=Callable)
 _Wrapper = Callable[[_T2], _T2]
-ZenWrapper = Union[
-    Builds[_Wrapper], PartialBuilds[_Wrapper], Just[_Wrapper], _Wrapper, str
-]
+
+if TYPE_CHECKING:  # pragma: no cover
+    ZenWrapper = Union[
+        None, Builds[_Wrapper], PartialBuilds[_Wrapper], Just[_Wrapper], _Wrapper, str
+    ]
+else:
+    ZenWrapper = TypeVar("ZenWrapper")
 
 # Hydra-specific fields
 _TARGET_FIELD_NAME: Final[str] = "_target_"
@@ -194,7 +199,7 @@ def hydrated_dataclass(
     target: Callable,
     *pos_args: Any,
     zen_partial: bool = False,
-    zen_wrappers: Union[Optional[ZenWrapper], Sequence[Optional[ZenWrapper]]] = None,
+    zen_wrappers: Union[ZenWrapper, Sequence[ZenWrapper]] = None,
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -482,7 +487,7 @@ def builds(
     hydra_target: Importable,
     *pos_args: Any,
     zen_partial: Literal[False] = False,
-    zen_wrappers: Union[Optional[ZenWrapper], Sequence[Optional[ZenWrapper]]] = None,
+    zen_wrappers: Union[ZenWrapper, Sequence[ZenWrapper]] = None,
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -501,7 +506,7 @@ def builds(
     hydra_target: Importable,
     *pos_args: Any,
     zen_partial: Literal[True],
-    zen_wrappers: Union[Optional[ZenWrapper], Sequence[Optional[ZenWrapper]]] = None,
+    zen_wrappers: Union[ZenWrapper, Sequence[ZenWrapper]] = None,
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -520,7 +525,7 @@ def builds(
     hydra_target: Importable,
     *pos_args: Any,
     zen_partial: bool,
-    zen_wrappers: Union[Optional[ZenWrapper], Sequence[Optional[ZenWrapper]]] = None,
+    zen_wrappers: Union[ZenWrapper, Sequence[ZenWrapper]] = None,
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -540,7 +545,7 @@ def builds(
 def builds(
     *pos_args: Any,
     zen_partial: bool = False,
-    zen_wrappers: Union[Optional[ZenWrapper], Sequence[Optional[ZenWrapper]]] = None,
+    zen_wrappers: Union[ZenWrapper, Sequence[ZenWrapper]] = None,
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
