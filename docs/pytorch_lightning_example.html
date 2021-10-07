@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning &mdash; hydra-zen 0.3.0rc3+15.g91fdf87 documentation</title>
+  <title>Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning &mdash; hydra-zen 0.3.0rc3+16.g18c507c documentation</title>
   
 
   
@@ -199,6 +199,100 @@ of the optimizer) and to incorporate <a class="reference internal" href="structu
 <span class="kn">from</span> <span class="nn">hydra_zen.experimental</span> <span class="kn">import</span> <span class="n">hydra_multirun</span>
 </pre></div>
 </div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 58%" />
+<col style="width: 42%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>PyTorch Lightning Module</p></th>
+<th class="head"><p>hydra-zen Configuration</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">UniversalFuncModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; y = sum(V sigmoid(X W + b))&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">num_neurons</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">optim</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">],</span>
+        <span class="n">dataloader</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataLoader</span><span class="p">],</span>
+        <span class="n">target_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">tr</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">tr</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+        <span class="n">training_domain</span><span class="p">:</span> <span class="n">tr</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optim</span> <span class="o">=</span> <span class="n">optim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataloader</span> <span class="o">=</span> <span class="n">dataloader</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">training_domain</span> <span class="o">=</span> <span class="n">training_domain</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_fn</span> <span class="o">=</span> <span class="n">target_fn</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_neurons</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Sigmoid</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">num_neurons</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">batch</span>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">training_domain</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_fn</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataloader</span><span class="p">(</span><span class="n">TensorDataset</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+</pre></div>
+</div>
+</td>
+<td><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">ExperimentConfig</span><span class="p">:</span>
+    <span class="n">optim</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span>
+        <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">,</span>
+        <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">dataloader</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span>
+        <span class="n">DataLoader</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+        <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">drop_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">lightning_module</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span>
+        <span class="n">UniversalFuncModule</span><span class="p">,</span>
+        <span class="n">num_neurons</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">optim</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{optim}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">dataloader</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{dataloader}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">target_fn</span><span class="o">=</span><span class="n">just</span><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">cos</span><span class="p">),</span>
+        <span class="n">training_domain</span><span class="o">=</span><span class="n">builds</span><span class="p">(</span>
+            <span class="n">tr</span><span class="o">.</span><span class="n">linspace</span><span class="p">,</span>
+            <span class="n">start</span><span class="o">=-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span>
+            <span class="n">end</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span>
+            <span class="n">steps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">trainer</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">Trainer</span><span class="p">,</span>
+        <span class="n">max_epochs</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">gpus</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">progress_bar_refresh_rate</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">ExperimentConfig</span><span class="p">):</span>
     <span class="c1"># Hydra recursively instantiates the lightning module, trainer,</span>
     <span class="c1"># and all other instantiable attributes of `cfg`.</span>

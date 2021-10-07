@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>builds &mdash; hydra-zen 0.3.0rc3+15.g91fdf87 documentation</title>
+  <title>builds &mdash; hydra-zen 0.3.0rc3+16.g18c507c documentation</title>
   
 
   
@@ -191,7 +191,7 @@ values.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>hydra_target</strong><span class="classifier">Union[Instantiable, Callable]</span></dt><dd><p>The object to be instantiated/called. This is a required, positional-only argument.</p>
+<dt><strong>hydra_target</strong><span class="classifier">Instantiable | Callable</span></dt><dd><p>The object to be instantiated/called. This is a required, positional-only argument.</p>
 </dd>
 <dt><strong>*pos_args: Any</strong></dt><dd><p>Positional arguments passed to <code class="docutils literal notranslate"><span class="pre">target</span></code>.</p>
 <p>Arguments specified positionally are not included in the dataclass’ signature and
@@ -208,22 +208,30 @@ populate the dataclass’ signature only with parameters that are specified by t
 user or that have default values specified in the target’s signature. I.e. it is
 presumed that un-specified parameters are to be excluded from the partial configuration.</p>
 </dd>
+<dt><strong>zen_wrappers</strong><span class="classifier">Optional[Callable | Builds | InterpStr | Sequence[Callable | Builds | InterpStr]</span></dt><dd><p>One or more wrappers, which will wrap <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_target</span></code> prior to instantiation.
+E.g. specifying the wrappers <code class="docutils literal notranslate"><span class="pre">[f1,</span> <span class="pre">f2,</span> <span class="pre">f3]</span></code> will instantiate as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f3</span><span class="p">(</span><span class="n">f2</span><span class="p">(</span><span class="n">f1</span><span class="p">(</span><span class="n">hydra_target</span><span class="p">)))(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Wrappers can also be specified as interpolated strings <a class="reference internal" href="#rbd228efbc5f2-2" id="id2">[2]</a> or targeted structured
+configs.</p>
+</dd>
 <dt><strong>zen_meta: Optional[Mapping[str, Any]]</strong></dt><dd><p>Specifies field-names and corresponding values that will be included in the
 resulting dataclass, but that will <em>not</em> be used to build <code class="docutils literal notranslate"><span class="pre">hydra_target</span></code>
 via instantiation. These are called “meta” fields.</p>
 </dd>
 <dt><strong>populate_full_signature</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then the resulting dataclass’s signature and fields will be populated
 according to the signature of <code class="docutils literal notranslate"><span class="pre">target</span></code>.</p>
-<p>Values specified in <a href="#id2"><span class="problematic" id="id3">**</span></a>kwargs_for_target take precedent over the corresponding
+<p>Values specified in <a href="#id3"><span class="problematic" id="id4">**</span></a>kwargs_for_target take precedent over the corresponding
 default values from the signature.</p>
 <p>This option is not available for objects with inaccessible signatures, such as
 NumPy’s various ufuncs.</p>
 </dd>
 <dt><strong>hydra_recursive</strong><span class="classifier">Optional[bool], optional (default=True)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then Hydra will recursively instantiate all other
-hydra-config objects nested within this dataclass <a class="reference internal" href="#rbd228efbc5f2-2" id="id4">[2]</a>.</p>
+hydra-config objects nested within this dataclass <a class="reference internal" href="#rbd228efbc5f2-3" id="id5">[3]</a>.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_recursive_</span></code> attribute is not set on the resulting dataclass.</p>
 </dd>
-<dt><strong>hydra_convert: Optional[Literal[“none”, “partial”, “all”]], optional (default=”none”)</strong></dt><dd><p>Determines how hydra handles the non-primitive objects passed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code> <a class="reference internal" href="#rbd228efbc5f2-3" id="id5">[3]</a>.</p>
+<dt><strong>hydra_convert: Optional[Literal[“none”, “partial”, “all”]], optional (default=”none”)</strong></dt><dd><p>Determines how hydra handles the non-primitive objects passed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code> <a class="reference internal" href="#rbd228efbc5f2-4" id="id6">[4]</a>.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code>: Passed objects are DictConfig and ListConfig, default</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">&quot;partial&quot;</span></code>: Passed objects are converted to dict and list, with
@@ -253,7 +261,7 @@ of a <code class="docutils literal notranslate"><span class="pre">Builds</span><
 </dd>
 <dt class="field-odd">Raises</dt>
 <dd class="field-odd"><dl class="simple">
-<dt>TypeError</dt><dd><p>One or more unexpected arguments were specified via <a href="#id6"><span class="problematic" id="id7">**</span></a>kwargs_for_target, which
+<dt>TypeError</dt><dd><p>One or more unexpected arguments were specified via <a href="#id7"><span class="problematic" id="id8">**</span></a>kwargs_for_target, which
 are not compatible with the signature of <code class="docutils literal notranslate"><span class="pre">target</span></code>.</p>
 </dd>
 </dl>
@@ -269,19 +277,22 @@ annotations; otherwise <code class="xref py py-obj docutils literal notranslate"
 <p><a class="reference internal" href="#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> provides runtime validation of user-specified named arguments against
 the target’s signature. This helps to ensure that typos in field names
 fail early and explicitly.</p>
-<p>Mutable values are automatically transformed to use a default factory <a class="reference internal" href="#rbd228efbc5f2-4" id="id8">[4]</a>.</p>
+<p>Mutable values are automatically transformed to use a default factory <a class="reference internal" href="#rbd228efbc5f2-5" id="id9">[5]</a>.</p>
 <p class="rubric">References</p>
 <dl class="citation">
 <dt class="label" id="rbd228efbc5f2-1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
 <dd><p><a class="reference external" href="https://hydra.cc/docs/next/tutorials/structured_config/intro/">https://hydra.cc/docs/next/tutorials/structured_config/intro/</a></p>
 </dd>
-<dt class="label" id="rbd228efbc5f2-2"><span class="brackets"><a class="fn-backref" href="#id4">2</a></span></dt>
-<dd><p><a class="reference external" href="https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation">https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation</a></p>
+<dt class="label" id="rbd228efbc5f2-2"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p><a class="reference external" href="https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation">https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation</a></p>
 </dd>
 <dt class="label" id="rbd228efbc5f2-3"><span class="brackets"><a class="fn-backref" href="#id5">3</a></span></dt>
+<dd><p><a class="reference external" href="https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation">https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation</a></p>
+</dd>
+<dt class="label" id="rbd228efbc5f2-4"><span class="brackets"><a class="fn-backref" href="#id6">4</a></span></dt>
 <dd><p><a class="reference external" href="https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies">https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies</a></p>
 </dd>
-<dt class="label" id="rbd228efbc5f2-4"><span class="brackets"><a class="fn-backref" href="#id8">4</a></span></dt>
+<dt class="label" id="rbd228efbc5f2-5"><span class="brackets"><a class="fn-backref" href="#id9">5</a></span></dt>
 <dd><p><a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#mutable-default-values">https://docs.python.org/3/library/dataclasses.html#mutable-default-values</a></p>
 </dd>
 </dl>
@@ -334,6 +345,27 @@ fail early and explicitly.</p>
 <span class="go">{&#39;a&#39;: -10, &#39;b&#39;: -10}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="go">{&#39;a&#39;: 2, &#39;b&#39;: 2}</span>
+</pre></div>
+</div>
+<p>Leveraging zen-wrappers to inject unit-conversion capabilities. Let’s take
+a function that converts Farenheit to Celcius, and wrap it so that it converts
+to Kelvin instead.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">faren_to_celsius</span><span class="p">(</span><span class="n">temp_f</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="p">((</span><span class="n">temp_f</span> <span class="o">-</span> <span class="mi">32</span><span class="p">)</span> <span class="o">*</span> <span class="mi">5</span><span class="p">)</span> <span class="o">/</span> <span class="mi">9</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">change_celcius_to_kelvin</span><span class="p">(</span><span class="n">celc_func</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">wraps</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="mf">273.15</span> <span class="o">+</span> <span class="n">celc_func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">wraps</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">AsCelcius</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">faren_to_celsius</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">AsKelvin</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">faren_to_celsius</span><span class="p">,</span> <span class="n">zen_wrappers</span><span class="o">=</span><span class="n">change_celcius_to_kelvin</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">AsCelcius</span><span class="p">,</span> <span class="n">temp_f</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+<span class="go">0.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">AsKelvin</span><span class="p">,</span> <span class="n">temp_f</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+<span class="go">273.15</span>
 </pre></div>
 </div>
 </dd></dl>
