@@ -25,6 +25,7 @@ from typing import (
     overload,
 )
 
+from omegaconf import II
 from typing_extensions import Final, Literal, TypeGuard
 
 from hydra_zen.errors import HydraZenDeprecationWarning
@@ -904,6 +905,13 @@ def builds(
             )
 
         if validated_wrappers:
+            if zen_meta:
+                # Check to see
+                tuple(
+                    _utils.check_suspicious_interpolations(
+                        validated_wrappers, zen_meta=zen_meta, target=target
+                    )
+                )
             if len(validated_wrappers) == 1:
                 # we flatten the config to avoid unnecessary list
                 target_field.append(

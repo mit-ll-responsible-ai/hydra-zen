@@ -7,7 +7,7 @@ import hypothesis.strategies as st
 import pytest
 from hypothesis import given, settings
 from omegaconf import OmegaConf
-from omegaconf.errors import InterpolationKeyError
+from omegaconf.errors import InterpolationKeyError, InterpolationResolutionError
 from typing_extensions import Protocol
 
 from hydra_zen import builds, get_target, hydrated_dataclass, instantiate, just, to_yaml
@@ -266,3 +266,35 @@ def test_unresolved_interpolated_value_gets_caught(bad_wrapper):
 def test_wrapper_via_builds_with_recusive_False():
     with pytest.warns(Warning):
         builds(int, zen_wrappers=builds(f1, zen_partial=True), hydra_recursive=False)
+
+
+@pytest.mark.filterwarnings(
+    "ignore:A zen-wrapper is specified via the interpolated field"
+)
+@pytest.mark.parametrize(
+    "wrappers, expected_match",
+    [
+        ("${..s}", r"to \$\{.s\}"),
+        ("${...s}", r"to \$\{.s\}"),
+        (["${..s}"], r"to \$\{.s\}"),
+        (["${..s}", "${...s}"], r"to \$\{..s\}"),
+        (["${.s}", "${..s}", "${...s}"], r"to \$\{..s\}"),
+    ],
+)
+def test_bad_relative_interp_warns(wrappers, expected_match):
+    with pytest.warns(UserWarning, match=expected_match):
+        conf = builds(dict, zen_wrappers=wrappers, zen_meta=dict(s=1))
+
+    with pytest.raises(InterpolationResolutionError):
+        # make sure interpolation is actually bad
+        instantiate(conf)
+
+
+@pytest.mark.parametrize(
+    "wrappers",
+    ["${s}", "${.s}", ["${.s}"], ["${..s}", "${..s}"], ["${..s}", "${..s}", "${..s}"]],
+)
+def test_interp_doesnt_warn(wrappers):
+    with pytest.warns(None) as record:
+        builds(dict, zen_wrappers=wrappers, zen_meta=dict(s=1))
+    assert not record

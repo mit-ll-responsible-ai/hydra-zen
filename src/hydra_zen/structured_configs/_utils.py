@@ -1,7 +1,7 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-
 import sys
+import warnings
 from dataclasses import MISSING, Field, field as _field, is_dataclass
 from enum import Enum
 from typing import (
@@ -11,6 +11,7 @@ from typing import (
     List,
     Mapping,
     Optional,
+    Sequence,
     Tuple,
     TypeVar,
     Union,
@@ -18,6 +19,7 @@ from typing import (
     overload,
 )
 
+from omegaconf import II
 from typing_extensions import Final, TypeGuard
 
 from hydra_zen.typing._implementations import InterpStr
@@ -344,3 +346,30 @@ def is_interpolated_string(x: Any) -> TypeGuard[InterpStr]:
     # is a valid interpolated string. We do not verify that it rigorously
     # satisfies omegaconf's grammar
     return isinstance(x, str) and len(x) > 3 and x.startswith("${") and x.endswith("}")
+
+
+def check_suspicious_interpolations(
+    validated_wrappers: Sequence[Any], zen_meta: Mapping[str, Any], target: Any
+):
+    """Looks for patterns among zen_meta fields and interpolated fields in
+    wrappers. Relative interpolations pointing to the wrong level will produce
+    a warning"""
+    for _w in validated_wrappers:
+        if is_interpolated_string(_w):
+            _lvl = _w.count(".")  # level of relative-interp
+            _field_name = _w.replace(".", "")[2:-1]
+            if (
+                _lvl
+                and _field_name in zen_meta
+                and _lvl != (1 if len(validated_wrappers) == 1 else 2)
+            ):
+                _expected = II(
+                    "." * (1 if len(validated_wrappers) == 1 else 2) + _field_name
+                )
+
+                warnings.warn(
+                    building_error_prefix(target)
+                    + f"A zen-wrapper is specified via the interpolated field, {_w}, along with the meta-field name {_field_name}, however it appears to point to the wrong level. "
+                    f"It is likely you should change {_w} to {_expected}"
+                )
+                yield _expected
