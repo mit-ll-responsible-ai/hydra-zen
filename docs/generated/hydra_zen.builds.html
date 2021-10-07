@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>builds &mdash; hydra-zen 0.3.0rc3+16.g18c507c documentation</title>
+  <title>builds &mdash; hydra-zen 0.3.0rc3+17.g90ddb01 documentation</title>
   
 
   
@@ -191,15 +191,17 @@ values.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>hydra_target</strong><span class="classifier">Instantiable | Callable</span></dt><dd><p>The object to be instantiated/called. This is a required, positional-only argument.</p>
+<dt><strong>hydra_target</strong><span class="classifier">Instantiable | Callable</span></dt><dd><p>The object to be configured. This is a required, positional-only argument.</p>
 </dd>
-<dt><strong>*pos_args: Any</strong></dt><dd><p>Positional arguments passed to <code class="docutils literal notranslate"><span class="pre">target</span></code>.</p>
+<dt><strong>*pos_args: Any</strong></dt><dd><p>Positional arguments passed to <code class="docutils literal notranslate"><span class="pre">hydra_target</span></code>.</p>
 <p>Arguments specified positionally are not included in the dataclass’ signature and
 are stored as a tuple bound to in the <code class="docutils literal notranslate"><span class="pre">_args_</span></code> field.</p>
 </dd>
-<dt><strong>**kwargs_for_target</strong><span class="classifier">Any</span></dt><dd><p>The keyword arguments passed to <code class="docutils literal notranslate"><span class="pre">target(...)</span></code>.</p>
+<dt><strong>**kwargs_for_target</strong><span class="classifier">Any</span></dt><dd><p>The keyword arguments passed to <code class="docutils literal notranslate"><span class="pre">hydra_target(...)</span></code>.</p>
 <p>The arguments specified here solely determine the fields and init-parameters of the
 resulting dataclass, unless <code class="docutils literal notranslate"><span class="pre">populate_full_signature=True</span></code> is specified (see below).</p>
+<p>Named parameters of the forms <code class="docutils literal notranslate"><span class="pre">hydra_xx</span></code>, <code class="docutils literal notranslate"><span class="pre">zen_xx</span></code>, and <code class="docutils literal notranslate"><span class="pre">_zen_xx</span></code> are reserved
+to ensure future-compatibility, and cannot be specified by the user.</p>
 </dd>
 <dt><strong>zen_partial</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If True, then Hydra-instantiation produces <code class="docutils literal notranslate"><span class="pre">functools.partial(target,</span> <span class="pre">*pos_args,</span> <span class="pre">**kwargs_for_target)</span></code>,
 this enables the partial-configuration of objects.</p>
@@ -208,7 +210,7 @@ populate the dataclass’ signature only with parameters that are specified by t
 user or that have default values specified in the target’s signature. I.e. it is
 presumed that un-specified parameters are to be excluded from the partial configuration.</p>
 </dd>
-<dt><strong>zen_wrappers</strong><span class="classifier">Optional[Callable | Builds | InterpStr | Sequence[Callable | Builds | InterpStr]</span></dt><dd><p>One or more wrappers, which will wrap <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_target</span></code> prior to instantiation.
+<dt><strong>zen_wrappers</strong><span class="classifier">None | Callable | Builds | InterpStr | Sequence[None | Callable | Builds | InterpStr]</span></dt><dd><p>One or more wrappers, which will wrap <code class="docutils literal notranslate"><span class="pre">hydra_target</span></code> prior to instantiation.
 E.g. specifying the wrappers <code class="docutils literal notranslate"><span class="pre">[f1,</span> <span class="pre">f2,</span> <span class="pre">f3]</span></code> will instantiate as:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f3</span><span class="p">(</span><span class="n">f2</span><span class="p">(</span><span class="n">f1</span><span class="p">(</span><span class="n">hydra_target</span><span class="p">)))(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
@@ -221,7 +223,7 @@ resulting dataclass, but that will <em>not</em> be used to build <code class="do
 via instantiation. These are called “meta” fields.</p>
 </dd>
 <dt><strong>populate_full_signature</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then the resulting dataclass’s signature and fields will be populated
-according to the signature of <code class="docutils literal notranslate"><span class="pre">target</span></code>.</p>
+according to the signature of <code class="docutils literal notranslate"><span class="pre">hydra_target</span></code>.</p>
 <p>Values specified in <a href="#id3"><span class="problematic" id="id4">**</span></a>kwargs_for_target take precedent over the corresponding
 default values from the signature.</p>
 <p>This option is not available for objects with inaccessible signatures, such as
@@ -277,7 +279,8 @@ annotations; otherwise <code class="xref py py-obj docutils literal notranslate"
 <p><a class="reference internal" href="#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> provides runtime validation of user-specified named arguments against
 the target’s signature. This helps to ensure that typos in field names
 fail early and explicitly.</p>
-<p>Mutable values are automatically transformed to use a default factory <a class="reference internal" href="#rbd228efbc5f2-5" id="id9">[5]</a>.</p>
+<p>Mutable values are automatically transformed to use a default factory <a class="reference internal" href="#rbd228efbc5f2-5" id="id9">[5]</a>
+prior to setting them on the dataclass.</p>
 <p class="rubric">References</p>
 <dl class="citation">
 <dt class="label" id="rbd228efbc5f2-1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
@@ -324,8 +327,8 @@ fail early and explicitly.</p>
 </pre></div>
 </div>
 <p>Auto-populating parameters:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># signature: `Builds_a_two_tuple(x: int, y: float)`</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">a_two_tuple</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">a_two_tuple</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># signature: `Builds_a_two_tuple(x: int, y: float)`</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">10.0</span><span class="p">))</span>
 <span class="go">(1, 10.0)</span>
 </pre></div>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.3.0rc3+16.g18c507c documentation</title>
+  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.3.0rc3+17.g90ddb01 documentation</title>
   
 
   
@@ -188,7 +188,6 @@
     <span class="n">overload</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">II</span>
 <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Final</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">TypeGuard</span>
 
 <span class="kn">from</span> <span class="nn">hydra_zen.errors</span> <span class="kn">import</span> <span class="n">HydraZenDeprecationWarning</span>
@@ -383,11 +382,11 @@
 <span class="sd">    zen_partial : Optional[bool] (default=False)</span>
 <span class="sd">        If True, then hydra-instantiation produces ``functools.partial(target, **kwargs)``</span>
 
-<span class="sd">    zen_wrappers : Optional[Union[ZenWrapper, Sequence[ZenWrapper]]]</span>
-<span class="sd">        One or more wrappers, which will wrap `hydra_target` prior to instantiation.</span>
-<span class="sd">        E.g. specifying ``[f1, f2, f3]`` will instantiate as::</span>
+<span class="sd">    zen_wrappers : None | Callable | Builds | InterpStr | Sequence[None | Callable | Builds | InterpStr]</span>
+<span class="sd">        One or more wrappers, which will wrap ``hydra_target`` prior to instantiation.</span>
+<span class="sd">        E.g. specifying the wrappers ``[f1, f2, f3]`` will instantiate as::</span>
 
-<span class="sd">            ``f3(f2(f1(hydra_target)))(*args, **kwargs)``</span>
+<span class="sd">            f3(f2(f1(hydra_target)))(*args, **kwargs)</span>
 
 <span class="sd">        Wrappers can also be specified as interpolated strings [2]_ or targeted structured</span>
 <span class="sd">        configs.</span>
@@ -397,14 +396,15 @@
 <span class="sd">        resulting dataclass, but that will *not* be used to build ``hydra_target``</span>
 <span class="sd">        via instantiation. These are called &quot;meta&quot; fields.</span>
 
-
 <span class="sd">    populate_full_signature : bool, optional (default=False)</span>
-<span class="sd">        If True, then the resulting dataclass&#39;s ``__init__`` signature and fields</span>
-<span class="sd">        will be populated according to the signature of `target`.</span>
+<span class="sd">        If ``True``, then the resulting dataclass&#39;s signature and fields will be populated</span>
+<span class="sd">        according to the signature of ``hydra_target``.</span>
 
-<span class="sd">        Values specified in ``**kwargs_for_target`` take precedent over the corresponding</span>
+<span class="sd">        Values specified in **kwargs_for_target take precedent over the corresponding</span>
 <span class="sd">        default values from the signature.</span>
 
+<span class="sd">        This option is not available for objects with inaccessible signatures, such as</span>
+<span class="sd">        NumPy&#39;s various ufuncs.</span>
 
 <span class="sd">    hydra_recursive : bool, optional (default=True)</span>
 <span class="sd">        If True, then upon hydra will recursively instantiate all other</span>
@@ -724,19 +724,22 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    hydra_target : Instantiable | Callable</span>
-<span class="sd">        The object to be instantiated/called. This is a required, positional-only argument.</span>
+<span class="sd">        The object to be configured. This is a required, positional-only argument.</span>
 
 <span class="sd">    *pos_args: Any</span>
-<span class="sd">        Positional arguments passed to ``target``.</span>
+<span class="sd">        Positional arguments passed to ``hydra_target``.</span>
 
 <span class="sd">        Arguments specified positionally are not included in the dataclass&#39; signature and</span>
 <span class="sd">        are stored as a tuple bound to in the ``_args_`` field.</span>
 
 <span class="sd">    **kwargs_for_target : Any</span>
-<span class="sd">        The keyword arguments passed to ``target(...)``.</span>
+<span class="sd">        The keyword arguments passed to ``hydra_target(...)``.</span>
 
 <span class="sd">        The arguments specified here solely determine the fields and init-parameters of the</span>
 <span class="sd">        resulting dataclass, unless ``populate_full_signature=True`` is specified (see below).</span>
+
+<span class="sd">        Named parameters of the forms ``hydra_xx``, ``zen_xx``, and ``_zen_xx`` are reserved</span>
+<span class="sd">        to ensure future-compatibility, and cannot be specified by the user.</span>
 
 <span class="sd">    zen_partial : bool, optional (default=False)</span>
 <span class="sd">        If True, then Hydra-instantiation produces ``functools.partial(target, *pos_args, **kwargs_for_target)``,</span>
@@ -747,8 +750,8 @@
 <span class="sd">        user or that have default values specified in the target&#39;s signature. I.e. it is</span>
 <span class="sd">        presumed that un-specified parameters are to be excluded from the partial configuration.</span>
 
-<span class="sd">    zen_wrappers : Optional[Callable | Builds | InterpStr | Sequence[Callable | Builds | InterpStr]</span>
-<span class="sd">        One or more wrappers, which will wrap `hydra_target` prior to instantiation.</span>
+<span class="sd">    zen_wrappers : None | Callable | Builds | InterpStr | Sequence[None | Callable | Builds | InterpStr]</span>
+<span class="sd">        One or more wrappers, which will wrap ``hydra_target`` prior to instantiation.</span>
 <span class="sd">        E.g. specifying the wrappers ``[f1, f2, f3]`` will instantiate as::</span>
 
 <span class="sd">            f3(f2(f1(hydra_target)))(*args, **kwargs)</span>
@@ -763,7 +766,7 @@
 
 <span class="sd">    populate_full_signature : bool, optional (default=False)</span>
 <span class="sd">        If ``True``, then the resulting dataclass&#39;s signature and fields will be populated</span>
-<span class="sd">        according to the signature of ``target``.</span>
+<span class="sd">        according to the signature of ``hydra_target``.</span>
 
 <span class="sd">        Values specified in **kwargs_for_target take precedent over the corresponding</span>
 <span class="sd">        default values from the signature.</span>
@@ -826,7 +829,8 @@
 <span class="sd">    the target&#39;s signature. This helps to ensure that typos in field names</span>
 <span class="sd">    fail early and explicitly.</span>
 
-<span class="sd">    Mutable values are automatically transformed to use a default factory [5]_.</span>
+<span class="sd">    Mutable values are automatically transformed to use a default factory [5]_</span>
+<span class="sd">    prior to setting them on the dataclass.</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -865,8 +869,8 @@
 
 <span class="sd">    Auto-populating parameters:</span>
 
-<span class="sd">    &gt;&gt;&gt; # signature: `Builds_a_two_tuple(x: int, y: float)`</span>
 <span class="sd">    &gt;&gt;&gt; Conf = builds(a_two_tuple, populate_full_signature=True)</span>
+<span class="sd">    &gt;&gt;&gt; # signature: `Builds_a_two_tuple(x: int, y: float)`</span>
 <span class="sd">    &gt;&gt;&gt; instantiate(Conf(x=1, y=10.0))</span>
 <span class="sd">    (1, 10.0)</span>
 
