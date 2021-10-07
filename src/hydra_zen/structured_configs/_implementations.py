@@ -896,7 +896,7 @@ def builds(
             target_field.append(
                 (
                     _META_FIELD_NAME,
-                    bool,
+                    _utils.sanitized_type(Tuple[str, ...]),
                     _utils.field(default=tuple(zen_meta), init=False),
                 ),
             )
@@ -907,7 +907,9 @@ def builds(
                 target_field.append(
                     (
                         _ZEN_WRAPPERS_FIELD_NAME,
-                        _utils.sanitized_type(Union[str, Builds]),
+                        _utils.sanitized_type(
+                            Union[Union[str, Builds], Tuple[Union[str, Builds], ...]]
+                        ),
                         _utils.field(default=validated_wrappers[0], init=False),
                     ),
                 )
@@ -915,7 +917,9 @@ def builds(
                 target_field.append(
                     (
                         _ZEN_WRAPPERS_FIELD_NAME,
-                        _utils.sanitized_type(Tuple[Union[str, Builds], ...]),
+                        _utils.sanitized_type(
+                            Union[Union[str, Builds], Tuple[Union[str, Builds], ...]]
+                        ),
                         _utils.field(default=validated_wrappers, init=False),
                     ),
                 )
