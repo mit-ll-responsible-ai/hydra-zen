@@ -118,7 +118,6 @@ def f7():
     )
     b4: Literal["(x: int) -> int"] = reveal_type(get_target(just(f)))
 
-    # get_target(Builds[T]) -> T
     c1: Literal["Type[str]"] = reveal_type(get_target(builds(str)()))
     c2: Literal["Type[str]"] = reveal_type(get_target(builds(str, zen_partial=False)()))
     c3: Literal["Type[str]"] = reveal_type(get_target(builds(str, zen_partial=True)()))
@@ -129,3 +128,42 @@ def f8():
     @dataclass
     class A:
         x: List[int] = mutable_value([1, 2])
+
+
+def zen_wrappers():
+    def f(obj):
+        return obj
+
+    J = just(f)
+    B = builds(f, zen_partial=True)
+    PB = builds(f, zen_partial=True)
+    a1: Literal["Type[Builds[Type[str]]]"] = reveal_type(builds(str, zen_wrappers=f))
+    a2: Literal["Type[Builds[Type[str]]]"] = reveal_type(builds(str, zen_wrappers=J))
+    a3: Literal["Type[Builds[Type[str]]]"] = reveal_type(builds(str, zen_wrappers=B))
+    a4: Literal["Type[Builds[Type[str]]]"] = reveal_type(builds(str, zen_wrappers=PB))
+    a5: Literal["Type[Builds[Type[str]]]"] = reveal_type(
+        builds(str, zen_wrappers=(None,))
+    )
+
+    a6: Literal["Type[Builds[Type[str]]]"] = reveal_type(
+        builds(str, zen_wrappers=(f, J, B, PB, None))
+    )
+
+    b1: Literal["Type[PartialBuilds[Type[str]]]"] = reveal_type(
+        builds(str, zen_partial=True, zen_wrappers=f)
+    )
+    b2: Literal["Type[PartialBuilds[Type[str]]]"] = reveal_type(
+        builds(str, zen_partial=True, zen_wrappers=J)
+    )
+    b3: Literal["Type[PartialBuilds[Type[str]]]"] = reveal_type(
+        builds(str, zen_partial=True, zen_wrappers=B)
+    )
+    b4: Literal["Type[PartialBuilds[Type[str]]]"] = reveal_type(
+        builds(str, zen_partial=True, zen_wrappers=PB)
+    )
+    b5: Literal["Type[PartialBuilds[Type[str]]]"] = reveal_type(
+        builds(str, zen_partial=True, zen_wrappers=(None,))
+    )
+    b6: Literal["Type[PartialBuilds[Type[str]]]"] = reveal_type(
+        builds(str, zen_partial=True, zen_wrappers=(f, J, B, PB, None))
+    )

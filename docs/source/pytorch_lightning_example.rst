@@ -52,7 +52,7 @@ The following is the boilerplate-free code.
 |        """ y = sum(V sigmoid(X W + b))"""                 |    class ExperimentConfig:               |
 |                                                           |        optim: Any = builds(              |
 |        def __init__(                                      |            optim.Adam,                   |
-|            self,                                          |            zen_partial=True,           |
+|            self,                                          |            zen_partial=True,             |
 |            num_neurons: int,                              |            populate_full_signature=True, |
 |            optim: Type[optim.Optimizer],                  |        )                                 |
 |            dataloader: Type[DataLoader],                  |                                          |
@@ -61,7 +61,7 @@ The following is the boilerplate-free code.
 |        ):                                                 |            batch_size=25,                |
 |            super().__init__()                             |            shuffle=True,                 |
 |            self.optim = optim                             |            drop_last=True,               |
-|            self.dataloader = dataloader                   |            zen_partial=True,           |
+|            self.dataloader = dataloader                   |            zen_partial=True,             |
 |            self.training_domain = training_domain         |        )                                 |
 |            self.target_fn = target_fn                     |                                          |
 |                                                           |        lightning_module: Any = builds(   |

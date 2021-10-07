@@ -3,6 +3,7 @@
 import collections.abc as abc
 import enum
 import random
+import string
 import sys
 from dataclasses import dataclass, field as dataclass_field
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Type, TypeVar, Union
@@ -10,7 +11,7 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Type, TypeVa
 import hypothesis.strategies as st
 import pytest
 from hypothesis import given
-from omegaconf import OmegaConf, ValidationError
+from omegaconf import II, OmegaConf, ValidationError
 from omegaconf.errors import (
     ConfigIndexError,
     ConfigTypeError,
@@ -20,8 +21,14 @@ from omegaconf.errors import (
 from typing_extensions import Final, Literal
 
 from hydra_zen import builds, instantiate, mutable_value
-from hydra_zen.structured_configs._utils import field, safe_name, sanitized_type
+from hydra_zen.structured_configs._utils import (
+    field,
+    is_interpolated_string,
+    safe_name,
+    sanitized_type,
+)
 from hydra_zen.typing import Builds
+from tests import everything_except
 
 T = TypeVar("T")
 
@@ -207,6 +214,8 @@ def test_bare_generics(func, value):
 
 
 def test_vendored_field():
+    # Test that our implementation of `field` matches that of `dataclasses.field
+
     # The case where `default` is specified instead of `default_factory`
     # is already covered via our other tests
 
@@ -229,3 +238,40 @@ def test_vendored_field():
 def test_builds_random_regression():
     # was broken in `0.3.0rc3`
     assert 1 <= instantiate(builds(random.uniform, 1, 2)) <= 2
+
+
+def f_for_interp(*args, **kwargs):
+    return args[0]
+
+
+# II renders a string in omegaconf's interpolated-field format
+@given(st.text(alphabet=string.ascii_lowercase, min_size=1).map(II))
+def test_is_interpolated_against_omegaconf_generated_interpolated_strs(text):
+    assert is_interpolated_string(text)
+
+    # ensure interpolation actually works
+    assert instantiate(builds(f_for_interp, text), **{text[2:-1]: 1}) == 1
+
+
+@given(everything_except(str))
+def test_non_strings_are_not_interpolated_strings(not_a_str):
+    assert not is_interpolated_string(not_a_str)
+
+
+@given(st.text(alphabet=string.printable))
+def test_strings_that_fail_to_interpolate_are_not_interpolated_strings(any_text):
+    c = builds(
+        f_for_interp, any_text
+    )  # any_text is an attempt at an interpolated field
+    kwargs = {any_text[2:-1]: 1}
+    try:
+        # Interpreter raises if `any_text` is not a valid field name
+        # omegaconf raises if `any_text` causes a grammar error
+        out = instantiate(c, **kwargs)
+    except Exception:
+        # either fail case means `any_text` is not a valid interpolated string
+        assert not is_interpolated_string(any_text)
+        return
+
+    # If `any_text` is a valid interpolated string, then `out == 1`
+    assert out == 1 or not is_interpolated_string(any_text)

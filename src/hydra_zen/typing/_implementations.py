@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import Field
-from typing import Any, Callable, Dict, Generic, Tuple, TypeVar
+from typing import Any, Callable, Dict, Generic, NewType, Tuple, TypeVar
 
 from typing_extensions import Protocol, runtime_checkable
 
@@ -16,7 +16,6 @@ __all__ = [
 
 
 _T = TypeVar("_T", covariant=True)
-_T2 = TypeVar("_T2")
 
 
 class Partial(Generic[_T]):
@@ -33,10 +32,7 @@ class Partial(Generic[_T]):
         ...
 
 
-class _Importable(Protocol):
-    __module__: str
-    __name__: str
-
+InterpStr = NewType("InterpStr", str)
 
 Importable = TypeVar("Importable")
 

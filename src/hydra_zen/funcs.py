@@ -5,18 +5,23 @@
 Simple helper functions used to implement `just` and `builds`. This module is designed specifically so
 that these functions have a legible module-path when they appear in configuration files.
 """
-
 import functools as _functools
 import typing as _typing
 
 from hydra._internal import utils as _hydra_internal_utils
 from hydra.utils import log as _log
 
+from hydra_zen.structured_configs._utils import (
+    is_interpolated_string as _is_interpolated_string,
+)
 from hydra_zen.typing import Partial as _Partial
 
-_T = _typing.TypeVar("_T")
+__all__ = ["partial", "get_obj", "zen_processing"]
 
-__all__ = ["partial", "get_obj"]
+_T = _typing.TypeVar("_T")
+_WrapperConf = _typing.Union[
+    str, _typing.Callable[[_typing.Callable], _typing.Callable]
+]
 
 
 def partial(
@@ -45,9 +50,52 @@ def zen_processing(
     _zen_target: str,
     _zen_partial: bool = False,
     _zen_exclude: _typing.Sequence[str] = tuple(),
+    _zen_wrappers: _typing.Union[
+        _WrapperConf, _typing.Sequence[_WrapperConf]
+    ] = tuple(),
     **kwargs,
 ):
+    if isinstance(_zen_wrappers, str) or not isinstance(
+        _zen_wrappers, _typing.Sequence
+    ):
+        unresolved_wrappers: _typing.Sequence[_WrapperConf] = (_zen_wrappers,)  # type: ignore
+    else:
+        unresolved_wrappers: _typing.Sequence[_WrapperConf] = _zen_wrappers
+    del _zen_wrappers
+
+    resolved_wrappers = []
+
+    for _unresolved in unresolved_wrappers:
+        if _unresolved is None:
+            # We permit interpolated fields to resolve to `None`; this is
+            # a nice pattern for enabling people to ergonomically toggle
+            # wrappers off.
+            continue
+        if isinstance(_unresolved, str):
+            # Hydra will have already raised on missing interpolation
+            # keys by here
+            assert not _is_interpolated_string(_unresolved)
+            _unresolved = get_obj(path=_unresolved)
+
+        if not callable(_unresolved):
+            raise TypeError(
+                f"Instantiating {_zen_target}: `zen_wrappers` was passed a non-callable object: {_unresolved}"
+            )
+        else:
+            resolved = _unresolved
+        del _unresolved
+        resolved_wrappers.append(resolved)
+
     obj = get_obj(path=_zen_target)
+
+    # first wrapper listed should be called first
+    # [f1, f2, f3, ...] ->
+    #    target = f1(target)
+    #    target = f2(target)
+    #    target = f3(target)
+    #    ...
+    for wrapper in resolved_wrappers:
+        obj = wrapper(obj)
 
     if _zen_exclude:
         excluded_set = set(_zen_exclude)

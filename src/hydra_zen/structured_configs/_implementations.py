@@ -14,6 +14,7 @@ from typing import (
     List,
     Mapping,
     Optional,
+    Sequence,
     Set,
     Tuple,
     Type,
@@ -24,6 +25,7 @@ from typing import (
     overload,
 )
 
+from omegaconf import II
 from typing_extensions import Final, Literal, TypeGuard
 
 from hydra_zen.errors import HydraZenDeprecationWarning
@@ -38,18 +40,19 @@ try:
 except ImportError:  # pragma: no cover
     ufunc = None
 
-
 _T = TypeVar("_T")
+_T2 = TypeVar("_T2", bound=Callable)
+_Wrapper = Callable[[_T2], _T2]
+ZenWrapper = Union[
+    Builds[_Wrapper], PartialBuilds[_Wrapper], Just[_Wrapper], _Wrapper, str
+]
 
-_ZEN_PROCESSING_LOCATION: Final[str] = _utils.get_obj_path(zen_processing)
+# Hydra-specific fields
 _TARGET_FIELD_NAME: Final[str] = "_target_"
 _RECURSIVE_FIELD_NAME: Final[str] = "_recursive_"
 _CONVERT_FIELD_NAME: Final[str] = "_convert_"
-_PARTIAL_TARGET_FIELD_NAME: Final[str] = "_zen_partial"
-_META_FIELD_NAME: Final[str] = "_zen_exclude"
-_ZEN_TARGET_FIELD_NAME: Final[str] = "_zen_target"
 _POS_ARG_FIELD_NAME: Final[str] = "_args_"
-_JUST_FIELD_NAME: Final[str] = "path"
+
 _HYDRA_FIELD_NAMES: FrozenSet[str] = frozenset(
     (
         _TARGET_FIELD_NAME,
@@ -59,6 +62,16 @@ _HYDRA_FIELD_NAMES: FrozenSet[str] = frozenset(
     )
 )
 
+# hydra-zen-specific fields
+_ZEN_PROCESSING_LOCATION: Final[str] = _utils.get_obj_path(zen_processing)
+_ZEN_TARGET_FIELD_NAME: Final[str] = "_zen_target"
+_PARTIAL_TARGET_FIELD_NAME: Final[str] = "_zen_partial"
+_META_FIELD_NAME: Final[str] = "_zen_exclude"
+_ZEN_WRAPPERS_FIELD_NAME: Final[str] = "_zen_wrappers"
+_JUST_FIELD_NAME: Final[str] = "path"
+# TODO: add _JUST_Target
+
+# signature param-types
 _POSITIONAL_ONLY: Final = inspect.Parameter.POSITIONAL_ONLY
 _POSITIONAL_OR_KEYWORD: Final = inspect.Parameter.POSITIONAL_OR_KEYWORD
 _VAR_POSITIONAL: Final = inspect.Parameter.VAR_POSITIONAL
@@ -70,10 +83,6 @@ _builtin_function_or_method_type = type(len)
 
 def _get_target(x):
     return getattr(x, _TARGET_FIELD_NAME)
-
-
-_T = TypeVar("_T")
-_T2 = TypeVar("_T2", bound=Callable)
 
 
 def _target_as_kwarg_deprecation(func: _T2) -> Callable[..., _T2]:
@@ -186,6 +195,7 @@ def hydrated_dataclass(
     target: Callable,
     *pos_args: Any,
     zen_partial: bool = False,
+    zen_wrappers: Union[Optional[ZenWrapper], Sequence[Optional[ZenWrapper]]] = None,
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -193,7 +203,7 @@ def hydrated_dataclass(
     frozen: bool = False,
     **_kw,  # reserved to deprecate hydra_partial
 ) -> Callable[[Type[_T]], Type[_T]]:
-    """A decorator that uses `hydra_zen.builds` to create a dataclass with the appropriate
+    """A decorator that uses `builds` to create a dataclass with the appropriate
     hydra-specific fields for specifying a structured config [1]_.
 
     Parameters
@@ -210,6 +220,21 @@ def hydrated_dataclass(
     zen_partial : Optional[bool] (default=False)
         If True, then hydra-instantiation produces ``functools.partial(target, **kwargs)``
 
+    zen_wrappers : Optional[Union[ZenWrapper, Sequence[ZenWrapper]]]
+        One or more wrappers, which will wrap `hydra_target` prior to instantiation.
+        E.g. specifying ``[f1, f2, f3]`` will instantiate as::
+
+            ``f3(f2(f1(hydra_target)))(*args, **kwargs)``
+
+        Wrappers can also be specified as interpolated strings [2]_ or targeted structured
+        configs.
+
+    zen_meta: Optional[Mapping[str, Any]]
+        Specifies field-names and corresponding values that will be included in the
+        resulting dataclass, but that will *not* be used to build ``hydra_target``
+        via instantiation. These are called "meta" fields.
+
+
     populate_full_signature : bool, optional (default=False)
         If True, then the resulting dataclass's ``__init__`` signature and fields
         will be populated according to the signature of `target`.
@@ -217,19 +242,15 @@ def hydrated_dataclass(
         Values specified in ``**kwargs_for_target`` take precedent over the corresponding
         default values from the signature.
 
-    zen_meta: Optional[Mapping[str, Any]]
-        Specifies field-names and corresponding values that will be included in the
-        resulting dataclass, but that will *not* be used to build ``hydra_target``
-        via instantiation. These are called "meta" fields.
 
     hydra_recursive : bool, optional (default=True)
         If True, then upon hydra will recursively instantiate all other
-        hydra-config objects nested within this dataclass [2]_.
+        hydra-config objects nested within this dataclass [3]_.
 
         If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.
 
     hydra_convert: Optional[Literal["none", "partial", "all"]] (default="none")
-        Determines how hydra handles the non-primitive objects passed to `target` [3]_.
+        Determines how hydra handles the non-primitive objects passed to `target` [4]_.
 
         - ``"none"``: Passed objects are DictConfig and ListConfig, default
         - ``"partial"``: Passed objects are converted to dict and list, with
@@ -251,8 +272,9 @@ def hydrated_dataclass(
     References
     ----------
     .. [1] https://hydra.cc/docs/next/tutorials/structured_config/intro/
-    .. [2] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
-    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
+    .. [2] https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation
+    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
+    .. [4] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
 
     Examples
     --------
@@ -302,6 +324,8 @@ def hydrated_dataclass(
     TypeError: Building: AdamW ..
     The following unexpected keyword argument(s) for torch.optim.adamw.AdamW was specified via inheritance
     from a base class: wieght_decay
+
+    For more detailed examples, refer to `builds`.
     """
 
     if "hydra_partial" in _kw:
@@ -350,6 +374,7 @@ def hydrated_dataclass(
             populate_full_signature=populate_full_signature,
             hydra_recursive=hydra_recursive,
             hydra_convert=hydra_convert,
+            zen_wrappers=zen_wrappers,
             zen_partial=zen_partial,
             zen_meta=zen_meta,
             builds_bases=(decorated_obj,),
@@ -457,6 +482,7 @@ def builds(
     hydra_target: Importable,
     *pos_args: Any,
     zen_partial: Literal[False] = False,
+    zen_wrappers: Union[Optional[ZenWrapper], Sequence[Optional[ZenWrapper]]] = None,
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -475,6 +501,7 @@ def builds(
     hydra_target: Importable,
     *pos_args: Any,
     zen_partial: Literal[True],
+    zen_wrappers: Union[Optional[ZenWrapper], Sequence[Optional[ZenWrapper]]] = None,
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -493,6 +520,7 @@ def builds(
     hydra_target: Importable,
     *pos_args: Any,
     zen_partial: bool,
+    zen_wrappers: Union[Optional[ZenWrapper], Sequence[Optional[ZenWrapper]]] = None,
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -512,6 +540,7 @@ def builds(
 def builds(
     *pos_args: Any,
     zen_partial: bool = False,
+    zen_wrappers: Union[Optional[ZenWrapper], Sequence[Optional[ZenWrapper]]] = None,
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -531,7 +560,7 @@ def builds(
 
     Parameters
     ----------
-    hydra_target : Union[Instantiable, Callable]
+    hydra_target : Instantiable | Callable
         The object to be instantiated/called. This is a required, positional-only argument.
 
     *pos_args: Any
@@ -555,6 +584,15 @@ def builds(
         user or that have default values specified in the target's signature. I.e. it is
         presumed that un-specified parameters are to be excluded from the partial configuration.
 
+    zen_wrappers : Optional[Callable | Builds | InterpStr | Sequence[Callable | Builds | InterpStr]
+        One or more wrappers, which will wrap `hydra_target` prior to instantiation.
+        E.g. specifying the wrappers ``[f1, f2, f3]`` will instantiate as::
+
+            f3(f2(f1(hydra_target)))(*args, **kwargs)
+
+        Wrappers can also be specified as interpolated strings [2]_ or targeted structured
+        configs.
+
     zen_meta: Optional[Mapping[str, Any]]
         Specifies field-names and corresponding values that will be included in the
         resulting dataclass, but that will *not* be used to build ``hydra_target``
@@ -572,12 +610,12 @@ def builds(
 
     hydra_recursive : Optional[bool], optional (default=True)
         If ``True``, then Hydra will recursively instantiate all other
-        hydra-config objects nested within this dataclass [2]_.
+        hydra-config objects nested within this dataclass [3]_.
 
         If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.
 
     hydra_convert: Optional[Literal["none", "partial", "all"]], optional (default="none")
-        Determines how hydra handles the non-primitive objects passed to `target` [3]_.
+        Determines how hydra handles the non-primitive objects passed to `target` [4]_.
 
         - ``"none"``: Passed objects are DictConfig and ListConfig, default
         - ``"partial"``: Passed objects are converted to dict and list, with
@@ -625,14 +663,15 @@ def builds(
     the target's signature. This helps to ensure that typos in field names
     fail early and explicitly.
 
-    Mutable values are automatically transformed to use a default factory [4]_.
+    Mutable values are automatically transformed to use a default factory [5]_.
 
     References
     ----------
     .. [1] https://hydra.cc/docs/next/tutorials/structured_config/intro/
-    .. [2] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
-    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
-    .. [4] https://docs.python.org/3/library/dataclasses.html#mutable-default-values
+    .. [2] https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation
+    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
+    .. [4] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
+    .. [5] https://docs.python.org/3/library/dataclasses.html#mutable-default-values
 
     Examples
     --------
@@ -684,6 +723,25 @@ def builds(
     {'a': -10, 'b': -10}
     >>> instantiate(Conf, s=2)
     {'a': 2, 'b': 2}
+
+    Leveraging zen-wrappers to inject unit-conversion capabilities. Let's take
+    a function that converts Farenheit to Celcius, and wrap it so that it converts
+    to Kelvin instead.
+
+    >>> def faren_to_celsius(temp_f):
+    ...     return ((temp_f - 32) * 5) / 9
+
+    >>> def change_celcius_to_kelvin(celc_func):
+    ...     def wraps(*args, **kwargs):
+    ...         return 273.15 + celc_func(*args, **kwargs)
+    ...     return wraps
+
+    >>> AsCelcius = builds(faren_to_celsius)
+    >>> AsKelvin = builds(faren_to_celsius, zen_wrappers=change_celcius_to_kelvin)
+    >>> instantiate(AsCelcius, temp_f=32)
+    0.0
+    >>> instantiate(AsKelvin, temp_f=32)
+    273.15
     """
 
     if not pos_args and not kwargs_for_target:
@@ -742,11 +800,58 @@ def builds(
             f"`zen_meta` must be a mapping (e.g. a dictionary), got: {zen_meta}"
         )
 
-    for _key in zen_meta:
-        if not isinstance(_key, str):
-            raise TypeError(
-                f"`zen_meta` must be a mapping whose keys are strings, got key: {_key}"
-            )
+    if any(not isinstance(_key, str) for _key in zen_meta):
+        raise TypeError(
+            f"`zen_meta` must be a mapping whose keys are strings, got key(s):"
+            f" {','.join(str(_key) for _key in zen_meta if not isinstance(_key, str))}"
+        )
+
+    if zen_wrappers is not None:
+        if not isinstance(zen_wrappers, Sequence) or isinstance(zen_wrappers, str):
+            zen_wrappers = (zen_wrappers,)
+
+        validated_wrappers: Sequence[Union[str, Builds]] = []
+        for wrapper in zen_wrappers:
+            if wrapper is None:
+                continue
+            # We are intentionally keeping each condition branched
+            # so that test-coverage will be checked for each one
+            if is_builds(wrapper):
+                # If Hydra's locate function starts supporting importing literals
+                # – or if we decide to ship our own locate function –
+                # then we should get the target of `wrapper` and make sure it is callable
+                if is_just(wrapper):
+                    # `zen_wrappers` handles importing string; we can
+                    # elimintate the indirection of Just and "flatten" this
+                    # config
+                    validated_wrappers.append(getattr(wrapper, _JUST_FIELD_NAME))
+                else:
+                    if hydra_recursive is False:
+                        warnings.warn(
+                            "A structured config was supplied for `zen_wrappers`. Its parent config has "
+                            "`hydra_recursive=False`.\n If this value is not toggled to `True`, the config's "
+                            "instantiation will result in an error"
+                        )
+                    validated_wrappers.append(wrapper)
+
+            elif callable(wrapper):
+                validated_wrappers.append(_utils.get_obj_path(wrapper))
+
+            elif isinstance(wrapper, str):
+                # Assumed that wrapper is either a valid omegaconf-style interpolation string
+                # or a "valid" path for importing an object. The latter seems hopeless for validating:
+                # https://stackoverflow.com/a/47538106/6592114
+                # so we can't make any assurances here.
+                validated_wrappers.append(wrapper)
+            else:
+                raise TypeError(
+                    f"`zen_wrappers` requires a callable, targeted config, or a string, got: {wrapper}"
+                )
+
+        del zen_wrappers
+        validated_wrappers = tuple(validated_wrappers)
+    else:
+        validated_wrappers = ()
 
     # Check for reserved names
     for _name in chain(kwargs_for_target, zen_meta):
@@ -767,7 +872,7 @@ def builds(
 
     target_field: List[Union[Tuple[str, Type[Any]], Tuple[str, Type[Any], Field[Any]]]]
 
-    if zen_partial or zen_meta:
+    if zen_partial or zen_meta or validated_wrappers:
         target_field = [
             (
                 _TARGET_FIELD_NAME,
@@ -780,6 +885,7 @@ def builds(
                 _utils.field(default=_utils.get_obj_path(target), init=False),
             ),
         ]
+
         if zen_partial:
             target_field.append(
                 (
@@ -788,14 +894,45 @@ def builds(
                     _utils.field(default=True, init=False),
                 ),
             )
+
         if zen_meta:
             target_field.append(
                 (
                     _META_FIELD_NAME,
-                    bool,
+                    _utils.sanitized_type(Tuple[str, ...]),
                     _utils.field(default=tuple(zen_meta), init=False),
                 ),
             )
+
+        if validated_wrappers:
+            if zen_meta:
+                # Check to see
+                tuple(
+                    _utils.check_suspicious_interpolations(
+                        validated_wrappers, zen_meta=zen_meta, target=target
+                    )
+                )
+            if len(validated_wrappers) == 1:
+                # we flatten the config to avoid unnecessary list
+                target_field.append(
+                    (
+                        _ZEN_WRAPPERS_FIELD_NAME,
+                        _utils.sanitized_type(
+                            Union[Union[str, Builds], Tuple[Union[str, Builds], ...]]
+                        ),
+                        _utils.field(default=validated_wrappers[0], init=False),
+                    ),
+                )
+            else:
+                target_field.append(
+                    (
+                        _ZEN_WRAPPERS_FIELD_NAME,
+                        _utils.sanitized_type(
+                            Union[Union[str, Builds], Tuple[Union[str, Builds], ...]]
+                        ),
+                        _utils.field(default=validated_wrappers, init=False),
+                    ),
+                )
     else:
         target_field = [
             (
@@ -1020,7 +1157,6 @@ def builds(
         # We don't check for collisions between `zen_meta` names and the
         # names of inherited fields. Thus `zen_meta` can effectively be used
         # to "delete" names from a config, via inheritance.
-
         user_specified_named_params.update(
             {
                 name: (name, Any, sanitized_default_value(value))
@@ -1174,7 +1310,7 @@ def _is_old_partial_builds(x: Any) -> bool:  # pragma: no cover
     return False
 
 
-def uses_zen_processing(x: Any) -> bool:
+def uses_zen_processing(x: Any) -> TypeGuard[Builds]:
     if not is_builds(x) or not hasattr(x, _ZEN_TARGET_FIELD_NAME):
         return False
     attr = _get_target(x)
