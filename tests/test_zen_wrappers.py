@@ -55,9 +55,14 @@ def _resolve_wrappers(wrappers) -> List[TrackedFunc]:
     if not isinstance(wrappers, list):
         wrappers = [wrappers]
 
+    # None and interp-none can be skipped - no wrapping happened
     wrappers = [w for w in wrappers if w is not None]
     wrappers = [w for w in wrappers if not (isinstance(w, str) and w.endswith("none}"))]
+
+    # get wrappers from builds
     wrappers = [get_target(w) if is_builds(w) else w for w in wrappers]
+
+    # get wrappers from interpolated strings
     wrappers = [
         decorators_by_name[w[2:-1].replace(".", "")] if isinstance(w, str) else w
         for w in wrappers
@@ -153,6 +158,7 @@ def test_zen_wrappers_expected_behavior(
     - that the args and kwargs passed to the target are passed as-expected
     - that things interact as-expected with `zen_partial=True`
     - that things interact as-expected with `zen_meta`
+    - that confs are serializable and produce the correct behavior
     """
     TRACKED.clear()
     if hasattr(target, "num_decorated"):
