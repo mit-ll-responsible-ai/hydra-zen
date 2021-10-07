@@ -6,10 +6,11 @@ from typing import Any, Callable, Dict, List, TypeVar, Union
 import hypothesis.strategies as st
 import pytest
 from hypothesis import given, settings
+from omegaconf import OmegaConf
 from omegaconf.errors import InterpolationKeyError
 from typing_extensions import Protocol
 
-from hydra_zen import builds, get_target, hydrated_dataclass, instantiate, just
+from hydra_zen import builds, get_target, hydrated_dataclass, instantiate, just, to_yaml
 from hydra_zen.structured_configs._implementations import is_builds
 from hydra_zen.structured_configs._utils import is_interpolated_string
 from hydra_zen.typing import Just, PartialBuilds
@@ -35,28 +36,33 @@ def _coordinate_meta_fields_for_interpolation(wrappers, zen_meta):
         # change level of interpolation
         wrappers = wrappers.replace("..", ".")  # type: ignore
         dec_name: str = wrappers[3:-1]
-        zen_meta[dec_name] = just(decorators_by_name[dec_name])
+        item = decorators_by_name[dec_name]
+        zen_meta[dec_name] = item if item is None else just(item)
     elif isinstance(wrappers, list):
-        for wrapper in wrappers:
+        num_none = wrappers.count(None)
+        for n, wrapper in enumerate(wrappers):
             if is_interpolated_string(wrapper):
-                if len(wrappers) == 1:
-                    wrappers[0] = wrapper.replace("..", ".")
+                if len(wrappers) - num_none == 1:
+                    wrappers[n] = wrapper.replace("..", ".")
                 dec_name = wrapper[4:-1]
-                zen_meta[dec_name] = just(decorators_by_name[dec_name])
+                item = decorators_by_name[dec_name]
+                zen_meta[dec_name] = item if item is None else just(item)
     return wrappers, zen_meta
 
 
 def _resolve_wrappers(wrappers) -> List[TrackedFunc]:
     # Utility for testing
-    if callable(wrappers) or isinstance(wrappers, str):
+    if not isinstance(wrappers, list):
         wrappers = [wrappers]
 
-    wrappers = [get_target(w) if is_builds(w) else w for w in wrappers]  # type: ignore
+    wrappers = [w for w in wrappers if w is not None]
+    wrappers = [w for w in wrappers if not (isinstance(w, str) and w.endswith("none}"))]
+    wrappers = [get_target(w) if is_builds(w) else w for w in wrappers]
     wrappers = [
         decorators_by_name[w[2:-1].replace(".", "")] if isinstance(w, str) else w
         for w in wrappers
     ]
-    return wrappers
+    return wrappers  # type: ignore
 
 
 def tracked_decorator(obj):
@@ -91,7 +97,7 @@ f1.tracked_id = 1
 f2.tracked_id = 2
 f3.tracked_id = 3
 
-decorators_by_name = dict(f1=f1, f2=f2, f3=f3)
+decorators_by_name = dict(f1=f1, f2=f2, f3=f3, none=None)
 
 
 def target(*args, **kwargs):
@@ -99,10 +105,10 @@ def target(*args, **kwargs):
 
 
 # prepare all variety of valid decorators to be tested
-tracked_funcs = [f1, f2, f3]  # adds TrackedFunc
+tracked_funcs = [f1, f2, f3, None]  # adds TrackedFunc
 tracked_funcs.extend(just(f) for f in [f1, f2, f3])  # adds Just[TrackedFunc]
 tracked_funcs.extend(builds(f, zen_partial=True) for f in [f1, f2, f3])
-tracked_funcs.extend(["${..f1}", "${..f2}", "${..f3}"])
+tracked_funcs.extend(["${..f1}", "${..f2}", "${..f3}", "${..none}"])
 
 a_tracked_wrapper = st.sampled_from(tracked_funcs)
 
@@ -120,6 +126,7 @@ a_tracked_wrapper = st.sampled_from(tracked_funcs)
         st.integers(),
         max_size=2,
     ),
+    as_yaml=st.booleans(),
 )
 def test_zen_wrappers_expected_behavior(
     wrappers: Union[  # type: ignore
@@ -132,6 +139,7 @@ def test_zen_wrappers_expected_behavior(
     kwargs: Dict[str, int],
     zen_partial: bool,
     zen_meta: Dict[str, Any],
+    as_yaml: bool,
 ):
     """
     Tests:
@@ -161,7 +169,12 @@ def test_zen_wrappers_expected_behavior(
         zen_partial=zen_partial,
         zen_meta=zen_meta
     )
-    instantiated = instantiate(conf)
+    if not as_yaml:
+        instantiated = instantiate(conf)
+    else:
+        # ensure serializable
+        conf = OmegaConf.create(to_yaml(conf))
+        instantiated = instantiate(conf)
 
     out_args, out_kwargs = instantiated() if zen_partial else instantiated  # type: ignore
 
@@ -177,7 +190,7 @@ def test_zen_wrappers_expected_behavior(
 
     # ensure wrappers called in expected order and that
     # each one wrapped the expected target
-    if wrappers:
+    if resolved_wrappers:
         assert len(resolved_wrappers) == target.num_decorated
         assert TRACKED == [w.tracked_id for w in resolved_wrappers]
     else:
@@ -207,8 +220,8 @@ class NotAWrapper:
     "bad_wrapper",
     [
         1,  # not callable,
-        (None,),  # not callable in sequence
-        (tracked_decorator, None),  # 1st ok, 2nd bad
+        (1,),  # not callable in sequence
+        (tracked_decorator, 1),  # 1st ok, 2nd bad
     ],
 )
 def test_zen_wrappers_validation_during_builds(bad_wrapper):

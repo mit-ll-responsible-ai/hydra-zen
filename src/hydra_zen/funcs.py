@@ -66,6 +66,11 @@ def zen_processing(
     resolved_wrappers = []
 
     for _unresolved in unresolved_wrappers:
+        if _unresolved is None:
+            # We permit interpolated fields to resolve to `None`; this is
+            # a nice pattern for enabling people to ergonomically toggle
+            # wrappers off.
+            continue
         if isinstance(_unresolved, str):
             # Hydra will have already raised on missing interpolation
             # keys by here

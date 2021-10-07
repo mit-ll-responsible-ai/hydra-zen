@@ -194,7 +194,7 @@ def hydrated_dataclass(
     target: Callable,
     *pos_args: Any,
     zen_partial: bool = False,
-    zen_wrappers: Optional[Union[ZenWrapper, Sequence[ZenWrapper]]] = None,
+    zen_wrappers: Union[Optional[ZenWrapper], Sequence[Optional[ZenWrapper]]] = None,
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -481,7 +481,7 @@ def builds(
     hydra_target: Importable,
     *pos_args: Any,
     zen_partial: Literal[False] = False,
-    zen_wrappers: Optional[Union[ZenWrapper, Sequence[ZenWrapper]]] = None,
+    zen_wrappers: Union[Optional[ZenWrapper], Sequence[Optional[ZenWrapper]]] = None,
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -500,7 +500,7 @@ def builds(
     hydra_target: Importable,
     *pos_args: Any,
     zen_partial: Literal[True],
-    zen_wrappers: Optional[Union[ZenWrapper, Sequence[ZenWrapper]]] = None,
+    zen_wrappers: Union[Optional[ZenWrapper], Sequence[Optional[ZenWrapper]]] = None,
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -519,7 +519,7 @@ def builds(
     hydra_target: Importable,
     *pos_args: Any,
     zen_partial: bool,
-    zen_wrappers: Optional[Union[ZenWrapper, Sequence[ZenWrapper]]] = None,
+    zen_wrappers: Union[Optional[ZenWrapper], Sequence[Optional[ZenWrapper]]] = None,
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -539,7 +539,7 @@ def builds(
 def builds(
     *pos_args: Any,
     zen_partial: bool = False,
-    zen_wrappers: Optional[Union[ZenWrapper, Sequence[ZenWrapper]]] = None,
+    zen_wrappers: Union[Optional[ZenWrapper], Sequence[Optional[ZenWrapper]]] = None,
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -811,6 +811,8 @@ def builds(
 
         validated_wrappers: Sequence[Union[str, Builds]] = []
         for wrapper in zen_wrappers:
+            if wrapper is None:
+                continue
             # We are intentionally keeping each condition branched
             # so that test-coverage will be checked for each one
             if is_builds(wrapper):
