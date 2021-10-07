@@ -370,8 +370,8 @@ def check_suspicious_interpolations(
                 warnings.warn(
                     building_error_prefix(target)
                     + f"A zen-wrapper is specified via the interpolated field, {_w},"
-                    " along with the meta-field name {_field_name}, however it "
-                    "appears to point to the wrong level. It is likely you should "
-                    "change {_w} to {_expected}"
+                    f" along with the meta-field name {_field_name}, however it "
+                    f"appears to point to the wrong level. It is likely you should "
+                    f"change {_w} to {_expected}"
                 )
                 yield _expected
