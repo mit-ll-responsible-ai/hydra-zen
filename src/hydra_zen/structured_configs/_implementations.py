@@ -676,7 +676,6 @@ def builds(
     .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
     .. [4] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
     .. [5] https://docs.python.org/3/library/dataclasses.html#mutable-default-values
-    .. [6] https://hydra.cc/docs/next/tutorials/structured_config/intro#structured-configs-supports
 
     Examples
     --------
