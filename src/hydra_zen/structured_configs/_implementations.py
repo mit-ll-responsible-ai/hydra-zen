@@ -49,7 +49,15 @@ if TYPE_CHECKING:  # pragma: no cover
         None, Builds[_Wrapper], PartialBuilds[_Wrapper], Just[_Wrapper], _Wrapper, str
     ]
 else:
-    ZenWrapper = TypeVar("ZenWrapper")
+    ZenWrapper = TypeVar(
+        "ZenWrapper",
+        type(None),
+        Builds[_Wrapper],
+        PartialBuilds[_Wrapper],
+        Just[_Wrapper],
+        _Wrapper,
+        str,
+    )
 
 # Hydra-specific fields
 _TARGET_FIELD_NAME: Final[str] = "_target_"
