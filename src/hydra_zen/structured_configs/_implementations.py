@@ -25,7 +25,6 @@ from typing import (
     overload,
 )
 
-from omegaconf import II
 from typing_extensions import Final, Literal, TypeGuard
 
 from hydra_zen.errors import HydraZenDeprecationWarning
@@ -220,11 +219,11 @@ def hydrated_dataclass(
     zen_partial : Optional[bool] (default=False)
         If True, then hydra-instantiation produces ``functools.partial(target, **kwargs)``
 
-    zen_wrappers : Optional[Union[ZenWrapper, Sequence[ZenWrapper]]]
-        One or more wrappers, which will wrap `hydra_target` prior to instantiation.
-        E.g. specifying ``[f1, f2, f3]`` will instantiate as::
+    zen_wrappers : None | Callable | Builds | InterpStr | Sequence[None | Callable | Builds | InterpStr]
+        One or more wrappers, which will wrap ``hydra_target`` prior to instantiation.
+        E.g. specifying the wrappers ``[f1, f2, f3]`` will instantiate as::
 
-            ``f3(f2(f1(hydra_target)))(*args, **kwargs)``
+            f3(f2(f1(hydra_target)))(*args, **kwargs)
 
         Wrappers can also be specified as interpolated strings [2]_ or targeted structured
         configs.
@@ -234,14 +233,15 @@ def hydrated_dataclass(
         resulting dataclass, but that will *not* be used to build ``hydra_target``
         via instantiation. These are called "meta" fields.
 
-
     populate_full_signature : bool, optional (default=False)
-        If True, then the resulting dataclass's ``__init__`` signature and fields
-        will be populated according to the signature of `target`.
+        If ``True``, then the resulting dataclass's signature and fields will be populated
+        according to the signature of ``hydra_target``.
 
-        Values specified in ``**kwargs_for_target`` take precedent over the corresponding
+        Values specified in **kwargs_for_target take precedent over the corresponding
         default values from the signature.
 
+        This option is not available for objects with inaccessible signatures, such as
+        NumPy's various ufuncs.
 
     hydra_recursive : bool, optional (default=True)
         If True, then upon hydra will recursively instantiate all other
@@ -561,19 +561,22 @@ def builds(
     Parameters
     ----------
     hydra_target : Instantiable | Callable
-        The object to be instantiated/called. This is a required, positional-only argument.
+        The object to be configured. This is a required, positional-only argument.
 
     *pos_args: Any
-        Positional arguments passed to ``target``.
+        Positional arguments passed to ``hydra_target``.
 
         Arguments specified positionally are not included in the dataclass' signature and
         are stored as a tuple bound to in the ``_args_`` field.
 
     **kwargs_for_target : Any
-        The keyword arguments passed to ``target(...)``.
+        The keyword arguments passed to ``hydra_target(...)``.
 
         The arguments specified here solely determine the fields and init-parameters of the
         resulting dataclass, unless ``populate_full_signature=True`` is specified (see below).
+
+        Named parameters of the forms ``hydra_xx``, ``zen_xx``, and ``_zen_xx`` are reserved
+        to ensure future-compatibility, and cannot be specified by the user.
 
     zen_partial : bool, optional (default=False)
         If True, then Hydra-instantiation produces ``functools.partial(target, *pos_args, **kwargs_for_target)``,
@@ -584,8 +587,8 @@ def builds(
         user or that have default values specified in the target's signature. I.e. it is
         presumed that un-specified parameters are to be excluded from the partial configuration.
 
-    zen_wrappers : Optional[Callable | Builds | InterpStr | Sequence[Callable | Builds | InterpStr]
-        One or more wrappers, which will wrap `hydra_target` prior to instantiation.
+    zen_wrappers : None | Callable | Builds | InterpStr | Sequence[None | Callable | Builds | InterpStr]
+        One or more wrappers, which will wrap ``hydra_target`` prior to instantiation.
         E.g. specifying the wrappers ``[f1, f2, f3]`` will instantiate as::
 
             f3(f2(f1(hydra_target)))(*args, **kwargs)
@@ -600,7 +603,7 @@ def builds(
 
     populate_full_signature : bool, optional (default=False)
         If ``True``, then the resulting dataclass's signature and fields will be populated
-        according to the signature of ``target``.
+        according to the signature of ``hydra_target``.
 
         Values specified in **kwargs_for_target take precedent over the corresponding
         default values from the signature.
@@ -663,7 +666,8 @@ def builds(
     the target's signature. This helps to ensure that typos in field names
     fail early and explicitly.
 
-    Mutable values are automatically transformed to use a default factory [5]_.
+    Mutable values are automatically transformed to use a default factory [5]_
+    prior to setting them on the dataclass.
 
     References
     ----------
@@ -672,6 +676,7 @@ def builds(
     .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
     .. [4] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
     .. [5] https://docs.python.org/3/library/dataclasses.html#mutable-default-values
+    .. [6] https://hydra.cc/docs/next/tutorials/structured_config/intro#structured-configs-supports
 
     Examples
     --------
@@ -702,8 +707,8 @@ def builds(
 
     Auto-populating parameters:
 
-    >>> # signature: `Builds_a_two_tuple(x: int, y: float)`
     >>> Conf = builds(a_two_tuple, populate_full_signature=True)
+    >>> # signature: `Builds_a_two_tuple(x: int, y: float)`
     >>> instantiate(Conf(x=1, y=10.0))
     (1, 10.0)
 
