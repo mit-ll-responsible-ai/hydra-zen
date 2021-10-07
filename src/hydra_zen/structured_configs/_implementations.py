@@ -42,22 +42,18 @@ except ImportError:  # pragma: no cover
 
 _T = TypeVar("_T")
 _T2 = TypeVar("_T2", bound=Callable)
-_Wrapper = Callable[[_T2], _T2]
-
+ZenWrapper = Union[
+    None,
+    Builds[Callable[[_T2], _T2]],
+    PartialBuilds[Callable[[_T2], _T2]],
+    Just[Callable[[_T2], _T2]],
+    Callable[[_T2], _T2],
+    str,
+]
 if TYPE_CHECKING:  # pragma: no cover
-    ZenWrapper = Union[
-        None, Builds[_Wrapper], PartialBuilds[_Wrapper], Just[_Wrapper], _Wrapper, str
-    ]
+    ZenWrappers = Union[ZenWrapper, Sequence[ZenWrapper]]
 else:
-    ZenWrapper = TypeVar(
-        "ZenWrapper",
-        type(None),
-        Builds[_Wrapper],
-        PartialBuilds[_Wrapper],
-        Just[_Wrapper],
-        _Wrapper,
-        str,
-    )
+    ZenWrappers = TypeVar("ZenWrappers")
 
 # Hydra-specific fields
 _TARGET_FIELD_NAME: Final[str] = "_target_"
@@ -207,7 +203,7 @@ def hydrated_dataclass(
     target: Callable,
     *pos_args: Any,
     zen_partial: bool = False,
-    zen_wrappers: Union[ZenWrapper, Sequence[ZenWrapper]] = None,
+    zen_wrappers: ZenWrappers = tuple(),
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -495,7 +491,7 @@ def builds(
     hydra_target: Importable,
     *pos_args: Any,
     zen_partial: Literal[False] = False,
-    zen_wrappers: Union[ZenWrapper, Sequence[ZenWrapper]] = None,
+    zen_wrappers: ZenWrappers = tuple(),
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -514,7 +510,7 @@ def builds(
     hydra_target: Importable,
     *pos_args: Any,
     zen_partial: Literal[True],
-    zen_wrappers: Union[ZenWrapper, Sequence[ZenWrapper]] = None,
+    zen_wrappers: ZenWrappers = tuple(),
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -533,7 +529,7 @@ def builds(
     hydra_target: Importable,
     *pos_args: Any,
     zen_partial: bool,
-    zen_wrappers: Union[ZenWrapper, Sequence[ZenWrapper]] = None,
+    zen_wrappers: ZenWrappers = tuple(),
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -553,7 +549,7 @@ def builds(
 def builds(
     *pos_args: Any,
     zen_partial: bool = False,
-    zen_wrappers: Union[ZenWrapper, Sequence[ZenWrapper]] = None,
+    zen_wrappers: ZenWrappers = tuple(),
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
