@@ -60,8 +60,10 @@ class _XFail:
     def __init__(self):
         self.documented_fail_cases: Dict[type, Set[Callable]] = defaultdict(set)
 
-    def add(self, annotation, *validators: Callable):
-        self.documented_fail_cases[annotation].update(validators)
+    def add(self, annotation, *validators: Optional[Callable]):
+        self.documented_fail_cases[annotation].update(
+            (v for v in validators if v is not None)
+        )
         return annotation
 
     def __getitem__(self, key):
@@ -275,7 +277,7 @@ class ClassWithSig:
     pass
 
 
-ClassWithSig.__init__ = _detached_init_
+ClassWithSig.__init__ = _detached_init_  # type: ignore
 
 
 @skip_if_no_validators
@@ -329,4 +331,4 @@ def test_signature_parsing(args, kwargs, should_pass, validator, target, as_yaml
         if target is ClassWithSig:
             # this is a bit hacky, but we have to reassign the class's
             # init, since it is mutated in-place by validators
-            ClassWithSig.__init__ = _detached_init_
+            ClassWithSig.__init__ = _detached_init_  # type: ignore
