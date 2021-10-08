@@ -18,6 +18,7 @@ OPTIONAL_TEST_DEPENDENCIES = (
     "jax",
     "pytorch_lightning",
     "pydantic",
+    "beartype",
 )
 
 for _module_name in OPTIONAL_TEST_DEPENDENCIES:
