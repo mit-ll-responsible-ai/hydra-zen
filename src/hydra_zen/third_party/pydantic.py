@@ -45,13 +45,13 @@ def validates_with_pydantic(
     pydantic among resulting yamls as well, these yamls will also be validated by pydantic
     upon instantiation.
 
-    Users should be aware of pydantic's data conversion strategy [2]_; pydantic
-    may cast data so that it will conform to its annotated type.
-
     It is recommended that `validates_with_pydantic` be used in conjunction with
     the following `builds` settings:
 
       - ``hydra_convert="all"``: to ensure omegaconf containers are converted to std-lib types
+
+    Users should be aware of pydantic's data conversion strategy [2]_; pydantic
+    may cast data so that it will conform to its annotated type.
 
     References
     ----------

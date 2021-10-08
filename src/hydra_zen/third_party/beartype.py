@@ -34,25 +34,29 @@ def validates_with_beartype(obj: _T) -> _T:
     beartype among resulting yamls as well, these yamls will also be validated by beartype
     upon instantiation.
 
-    hydra-zen adds a data-coercion step that is not performed by ``beartype``.
-    This only impacts fields in `obj` annotated with a (non-string) sequence-type
-    annotation, which are passed list-type data. All other fields rely solely on beartype's
-    native behavior.
-
-    E.g. a field with a `Tuple`-annotation, if passed a list, will see that list be cast
-    to a tuple. See the Examples section for more details.
-
-    This coercion is necessary as Hydra can only read (non-string) sequential
-    data from a config as a list. I.e. without this coercion step, all non-list/string
-    annotated  sequence fields populated by Hydra would get rasied (roared at) by beartype.
+    Please refer to beartype's documentation [3]_ to see what varieties of types it does and
+    does not support.
 
     It is recommended that `validates_with_beartype` be used in conjunction with
     the following `builds` settings:
 
       - ``hydra_convert="all"``: to ensure omegaconf containers are converted to std-lib types
 
-    Please refer to beartype's documentation [3]_ to see what varieties of types it does and
-    does not support.
+    **Data Coercion Behavior**
+
+    hydra-zen adds a data-coercion step that is not performed by ``beartype``.
+    This only impacts fields in ``obj`` annotated with a (non-string) sequence-type
+    annotation, which are passed list-type data. All other fields rely solely on beartype's
+    native behavior.
+
+    E.g. a field with a ``Tuple``-annotation, if passed a list, will see that list be cast
+    to a tuple. See the Examples section for more details.
+
+    This coercion is necessary as Hydra can only read (non-string) sequential data
+    from a config as a list. I.e. without this coercion step, all non-list/string annotated
+    sequence fields populated by Hydra would get rasied (roared at) by beartype. Ultimately,
+    this data-coercion strategy is designed to be as minimalistic as possible while ensuring
+    that type-checked interfaces will be compatible with Hydra.
 
     References
     ----------
