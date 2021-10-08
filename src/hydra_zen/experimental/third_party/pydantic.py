@@ -48,6 +48,11 @@ def validates_with_pydantic(
     Users should be aware of pydantic's data conversion strategy [2]_; pydantic
     may cast data so that it will conform to its annotated type.
 
+    It is recommended that `validates_with_pydantic` be used in conjunction with
+    the following `builds` settings:
+
+      - ``hydra_convert="all"``: to ensure omegaconf containers are converted to std-lib types
+
     References
     ----------
     .. [1] https://pydantic-docs.helpmanual.io/usage/validation_decorator/
@@ -78,7 +83,13 @@ def validates_with_pydantic(
 
     >>> from hydra_zen import builds, instantiate
     >>> # instantiations of `conf` will be validated by pydantic
-    >>> conf = builds(f, populate_full_signature=True, zen_wrappers=validates_with_pydantic)
+    >>> conf = builds(
+    ...     f,
+    ...     zen_wrappers=validates_with_pydantic,
+    ...     # recommended builds-settings for pydantic-validation
+    ...     populate_full_signature=True,
+    ...     hydra_convert="all",
+    ... )
     >>> instantiate(conf, x=10)
     10
     >>> instantiate(conf, x=-2)
