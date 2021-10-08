@@ -150,15 +150,6 @@ def a_func(x):
     return x
 
 
-class AClass:
-    def __init__(self, x):
-        self.x = x
-
-
-def hydra_target(x):
-    return
-
-
 class UserIdentity(TypedDict):
     name: str
     surname: str
