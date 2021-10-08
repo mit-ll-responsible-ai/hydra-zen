@@ -54,7 +54,7 @@ skip_if_no_validators: Final = pytest.mark.skipif(
 
 
 class _XFail:
-    """Used to track known unsupported cases for certain validation-annotation
+    """Used to track known unsupported cases for certain validator-annotation
     combos"""
 
     def __init__(self):
