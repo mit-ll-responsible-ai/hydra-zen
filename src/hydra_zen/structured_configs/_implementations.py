@@ -1522,6 +1522,11 @@ def make_custom_builds_fn(
         A ``PartialBuilds`` class (resulting from ``zen_partial=True``) cannot be a parent
         of a ``Builds`` class (i.e. where `zen_partial=False` was specified).
 
+    returns
+    -------
+    builds
+        The function `builds`, but with customized default-values.
+
     See Also
     --------
     builds
