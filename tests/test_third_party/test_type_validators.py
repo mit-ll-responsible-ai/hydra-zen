@@ -1,13 +1,13 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 from collections import deque
-from typing import Deque, List, NamedTuple, Sequence, Tuple
+from typing import Deque, Dict, List, NamedTuple, Sequence, Tuple, Union
 
 import hypothesis.strategies as st
 import pytest
-from hypothesis import given
+from hypothesis import given, settings
 from omegaconf import OmegaConf
-from typing_extensions import Final
+from typing_extensions import Annotated, Final, Literal, TypedDict
 
 from hydra_zen import builds, instantiate, to_yaml
 
@@ -144,49 +144,90 @@ def test_on_custom_types(validator):
     assert f((a, b)) == (a, b)
 
 
-def run_with_hydra(x: float):
+def a_func(x):
     return x
 
 
-@skip_if_no_validators
-@pytest.mark.parametrize("validator", all_validators)
-@pytest.mark.parametrize("as_yaml", [True, False])
-def test_hydra_compatible_func_target(validator, as_yaml: bool):
-
-    conf_with_val = builds(
-        run_with_hydra, populate_full_signature=True, zen_wrappers=validator
-    )
-    if as_yaml:
-        conf_with_val = OmegaConf.create(to_yaml(conf_with_val))
-
-    with pytest.raises(Exception):
-        instantiate(conf_with_val, x="not a float")
-
-    out = instantiate(conf_with_val, x=1)
-    assert isinstance(out, float)
-    assert out == 1.0
-
-
-class RunWithHydra:
-    def __init__(self, x: float):
+class AClass:
+    def __init__(self, x):
         self.x = x
 
 
+def hydra_target(x):
+    return
+
+
+class UserIdentity(TypedDict):
+    name: str
+    surname: str
+
+
 @skip_if_no_validators
+@pytest.mark.parametrize(
+    "annotation, fools_hydra",
+    [
+        (Tuple[str, int, bool], (True, "hi", 2)),
+        (Dict[str, int], dict(a="hi")),
+        (Literal["a", "b"], "c"),
+        (Union[List[str], str], dict(a=1)),
+        (MyNamedTuple, (1.0, 2.0)),
+        (UserIdentity, dict(first="bruce", last="lee")),
+        (Annotated[int, "special"], "hello"),
+    ],
+)
 @pytest.mark.parametrize("validator", all_validators)
-@pytest.mark.parametrize("as_yaml", [True, False])
-def test_hydra_compatible_class_target(validator, as_yaml: bool):
+@settings(max_examples=20)
+@given(data=st.data(), as_yaml=st.booleans(), target=st.sampled_from([a_func, AClass]))
+def test_validations_missed_by_hydra(
+    annotation, fools_hydra, target, validator, as_yaml: bool, data: st.DataObject
+):
+    """Tests variety of annotations not supported by Hydra.
+
+    Ensures:
+    - inputs that would be missed by Hydra get validated by provided validator
+    - validation works post yaml-roundtrip
+    - validated targets produce expected outputs
+    - validation works in end-to-end instantiation workflows
+    """
+
+    # draw valid input
+    valid_input = data.draw(st.from_type(annotation), label="valid_input")
+
+    # boilerplate: set annotation of target to-be-built
+    _ann = (target.__init__ if target is AClass else target).__annotations__
+    _ann.clear()
+    _ann["x"] = annotation
+    hydra_target.__annotations__.clear()
+    hydra_target.__annotations__["x"] = annotation
+    assert _ann == hydra_target.__annotations__
+
+    conf_no_val = builds(
+        hydra_target, populate_full_signature=True, hydra_convert="all"
+    )
+
     conf_with_val = builds(
-        RunWithHydra, populate_full_signature=True, zen_wrappers=validator
+        target,
+        populate_full_signature=True,
+        zen_wrappers=validator,
+        hydra_convert="all",
     )
 
     if as_yaml:
         conf_with_val = OmegaConf.create(to_yaml(conf_with_val))
 
-    with pytest.raises(Exception):
-        instantiate(conf_with_val, x="not a float")
+    # Hydra misses bad input
+    instantiate(conf_no_val, x=fools_hydra)
 
-    out = instantiate(conf_with_val, x=1)
-    assert isinstance(out, RunWithHydra)
-    assert isinstance(out.x, float)
-    assert out.x == 1.0
+    with pytest.raises(Exception):
+        # validation catches bad input
+        instantiate(conf_with_val, x=fools_hydra)
+
+    # passes validation
+    out = target(x=valid_input)
+
+    if target is AClass:
+        assert isinstance(out, AClass)
+        out = out.x
+
+    assert isinstance(out, type(valid_input))
+    assert out == valid_input
