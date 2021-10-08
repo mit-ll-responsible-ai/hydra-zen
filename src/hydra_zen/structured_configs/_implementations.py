@@ -3,6 +3,7 @@
 import inspect
 import warnings
 from collections import defaultdict
+from copy import deepcopy
 from dataclasses import Field, dataclass, field, fields, is_dataclass, make_dataclass
 from functools import wraps
 from itertools import chain
@@ -588,8 +589,11 @@ def builds(
         to ensure future-compatibility, and cannot be specified by the user.
 
     zen_partial : bool, optional (default=False)
-        If True, then Hydra-instantiation produces ``functools.partial(target, *pos_args, **kwargs_for_target)``,
-        this enables the partial-configuration of objects.
+        If True, then the resulting config will instantiate as
+        ``functools.partial(hydra_target, *pos_args, **kwargs_for_target)`` rather than
+        ``hydra_target(*pos_args, **kwargs_for_target)``.
+
+        Thus this enables the partial-configuration of objects.
 
         Specifying ``zen_partial=True`` and ``populate_full_signature=True`` together will
         populate the dataclass' signature only with parameters that are specified by the
@@ -796,6 +800,9 @@ def builds(
         raise ValueError(
             f"`hydra_convert` must be 'none', 'partial', or 'all', got: {hydra_convert}"
         )
+
+    if not isinstance(frozen, bool):
+        raise TypeError(f"frozen must be a bool, got: {frozen}")
 
     if dataclass_name is not None and not isinstance(dataclass_name, str):
         raise TypeError(
@@ -1425,3 +1432,159 @@ def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:
         pass  # makes sure we cover this branch in tests
 
     return target
+
+
+_builds_sig = inspect.signature(builds)
+__BUILDS_DEFAULTS: Final[Dict[str, Any]] = {
+    name: p.default
+    for name, p in _builds_sig.parameters.items()
+    if p.kind is p.KEYWORD_ONLY
+}
+del _builds_sig
+
+
+def make_custom_builds_fn(
+    *,
+    zen_partial: bool = False,
+    zen_wrappers: ZenWrappers = tuple(),
+    zen_meta: Optional[Mapping[str, Any]] = None,
+    populate_full_signature: bool = False,
+    hydra_recursive: Optional[bool] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    frozen: bool = False,
+    builds_bases: Tuple[Any, ...] = (),
+    __x: _T2 = builds,  # this is the easiest way to get static tooling to see the output as `builds`
+) -> _T2:
+    """Returns the `builds` function, but with customized default values.
+
+    Parameters
+    ----------
+    zen_partial : bool, optional (default=False)
+        If True, then the resulting config will instantiate as
+        ``functools.partial(hydra_target, *pos_args, **kwargs_for_target)`` rather than
+        ``hydra_target(*pos_args, **kwargs_for_target)``.
+
+        Thus this enables the partial-configuration of objects.
+
+        Specifying ``zen_partial=True`` and ``populate_full_signature=True`` together will
+        populate the dataclass' signature only with parameters that are specified by the
+        user or that have default values specified in the target's signature. I.e. it is
+        presumed that un-specified parameters are to be excluded from the partial configuration.
+
+    zen_wrappers : None | Callable | Builds | InterpStr | Sequence[None | Callable | Builds | InterpStr]
+        One or more wrappers, which will wrap ``hydra_target`` prior to instantiation.
+        E.g. specifying the wrappers ``[f1, f2, f3]`` will instantiate as::
+
+            f3(f2(f1(hydra_target)))(*args, **kwargs)
+
+        Wrappers can also be specified as interpolated strings [2]_ or targeted structured
+        configs.
+
+    zen_meta: Optional[Mapping[str, Any]]
+        Specifies field-names and corresponding values that will be included in the
+        resulting dataclass, but that will *not* be used to build ``hydra_target``
+        via instantiation. These are called "meta" fields.
+
+    populate_full_signature : bool, optional (default=False)
+        If ``True``, then the resulting dataclass's signature and fields will be populated
+        according to the signature of ``hydra_target``.
+
+        Values specified in **kwargs_for_target take precedent over the corresponding
+        default values from the signature.
+
+        This option is not available for objects with inaccessible signatures, such as
+        NumPy's various ufuncs.
+
+    hydra_recursive : Optional[bool], optional (default=True)
+        If ``True``, then Hydra will recursively instantiate all other
+        hydra-config objects nested within this dataclass [3]_.
+
+        If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.
+
+    hydra_convert: Optional[Literal["none", "partial", "all"]], optional (default="none")
+        Determines how hydra handles the non-primitive objects passed to `target` [4]_.
+
+        - ``"none"``: Passed objects are DictConfig and ListConfig, default
+        - ``"partial"``: Passed objects are converted to dict and list, with
+          the exception of Structured Configs (and their fields).
+        - ``"all"``: Passed objects are dicts, lists and primitives without
+          a trace of OmegaConf containers
+
+        If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.
+
+    frozen : bool, optional (default=False)
+        If ``True``, the resulting dataclass will create frozen (i.e. immutable) instances.
+        I.e. setting/deleting an attribute of an instance will raise ``FrozenInstanceError``
+        at runtime.
+
+    builds_bases : Tuple[DataClass, ...]
+        Specifies a tuple of parent classes that the resulting dataclass inherits from.
+        A ``PartialBuilds`` class (resulting from ``zen_partial=True``) cannot be a parent
+        of a ``Builds`` class (i.e. where `zen_partial=False` was specified).
+
+    See Also
+    --------
+    builds
+
+    Examples
+    --------
+    >>> from hydra_zen import make_custom_builds_fn, instantiate
+
+    The following will produce a `builds` function whose default-value
+    for ``zen_partial`` has been set to ``True``.
+
+    >>> pbuilds = make_custom_builds_fn(zen_partial=True)
+
+    I.e. using ``pbuilds(...)`` is equivalent to using `builds(..., zen_partial=True)
+
+    >>> instantiate(pbuilds(int))
+    functools.partial(<class 'int'>)
+    >>> instantiate(pbuilds(len))
+    functools.partial(<built-in function len>)
+
+    Suppose that we want to enable runtime type-checking with beartype on all of
+    our configured targets; the following settings for `builds` would be handy
+
+    >>> from hydra_zen.third_party.beartype import validates_with_beartype
+    >>> build_a_bear = make_custom_builds_fn(
+    ...     populate_full_signature=True,
+    ...     hydra_convert="all",
+    ...     zen_wrappers=validates_with_beartype,
+    ... )
+
+    Now all configs produced via ``build_a_bear` will include type-checking
+    during instantiation.
+
+    >>> from typing_extensions import Literal
+    >>> def f(x: Literal["a", "b"]): return x
+    >>> conf = build_a_bear(f)
+    >>> instantiate(conf, x="a")
+    "a"
+    >>> instantiate(conf, x="c")
+    <Validation error: "c" is not "a" or "b">
+    """
+    assert __x is builds
+    del __x
+
+    excluded_fields = {"dataclass_name"}
+    LOCALS = locals()
+    assert (set(__BUILDS_DEFAULTS) - excluded_fields) <= set(LOCALS), (
+        tuple(__BUILDS_DEFAULTS),
+        tuple(LOCALS),
+    )
+
+    _new_defaults = {
+        name: LOCALS[name] for name in __BUILDS_DEFAULTS if name not in excluded_fields
+    }
+
+    # let builds validate the new defaults!
+    builds(builds, **_new_defaults)
+
+    @wraps(builds)
+    def wrapped(*args, **kwargs):
+        merged_kwargs = {}
+        merged_kwargs.update(_new_defaults)
+        merged_kwargs.update(kwargs)
+        return builds(*args, **merged_kwargs)
+
+    return cast(_T2, wrapped)

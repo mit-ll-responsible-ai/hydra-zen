@@ -9,7 +9,13 @@ from ._hydra_overloads import (
     to_yaml,
 )
 from ._version import get_versions
-from .structured_configs import builds, hydrated_dataclass, just, mutable_value
+from .structured_configs import (
+    builds,
+    hydrated_dataclass,
+    just,
+    make_custom_builds_fn,
+    mutable_value,
+)
 from .structured_configs._implementations import get_target
 
 __all__ = [
@@ -23,6 +29,7 @@ __all__ = [
     "load_from_yaml",
     "save_as_yaml",
     "to_yaml",
+    "make_custom_builds_fn",
 ]
 
 __version__ = get_versions()["version"]
