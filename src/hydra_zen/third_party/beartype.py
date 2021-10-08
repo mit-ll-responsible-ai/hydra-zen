@@ -42,10 +42,14 @@ def validates_with_beartype(obj: _T) -> _T:
 
       - ``hydra_convert="all"``: to ensure omegaconf containers are converted to std-lib types
 
+      Please refer to beartype's documented list of compliances [3]_ to see what varieties of
+      types it does and does not support.
+
     References
     ----------
     .. [1] https://github.com/beartype/beartype
     .. [2] https://github.com/beartype/beartype#install
+    .. [3] https://github.com/beartype/beartype#compliance
 
     Examples
     --------
