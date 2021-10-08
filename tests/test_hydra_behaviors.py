@@ -18,16 +18,23 @@ def f_three_vars(x, y, z):
     return x, y, z
 
 
+def wrapper(obj):
+    return obj
+
+
 @given(
     convert=st.sampled_from(["none", "all", "partial"]),
     recursive=st.booleans(),
     sig=st.booleans(),
     partial=st.booleans(),
     meta=st.none() | st.just(dict(meta=1)),
+    wrappers=st.none() | st.just(wrapper) | st.lists(st.just(wrapper)),
     kwargs=st.dictionaries(keys=st.sampled_from(["x", "y", "z"]), values=st.floats()),
     name=st.none() | st.sampled_from(["NameA", "NameB"]),
 )
-def test_builds_sets_hydra_params(convert, recursive, sig, partial, name, meta, kwargs):
+def test_builds_sets_hydra_params(
+    convert, recursive, sig, partial, name, meta, wrappers, kwargs
+):
     out = builds(
         f_three_vars,
         hydra_convert=convert,
@@ -35,6 +42,7 @@ def test_builds_sets_hydra_params(convert, recursive, sig, partial, name, meta, 
         populate_full_signature=sig,
         zen_partial=partial,
         zen_meta=meta,
+        zen_wrappers=wrappers,
         dataclass_name=name,
         **kwargs,
     )
