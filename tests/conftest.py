@@ -32,6 +32,12 @@ if sys.version_info < (3, 8):
 if sys.version_info < (3, 9):
     collect_ignore_glob.append("*py39*")
 
+if sys.version_info > (3, 6):
+    collect_ignore_glob.append("*py36*")
+
+if sys.version_info < (3, 7):
+    collect_ignore_glob.append("**/*test_sequence_coercion.py")
+
 
 @pytest.fixture()
 def cleandir():
