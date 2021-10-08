@@ -1,7 +1,9 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+# flake8: noqa
+
 from collections import deque
-from typing import Deque, Dict, List, NamedTuple, Sequence, Tuple, Union
+from typing import Deque, Dict, List, NamedTuple, Optional, Sequence, Tuple, Union
 
 import hypothesis.strategies as st
 import pytest
@@ -218,7 +220,7 @@ def test_validations_missed_by_hydra(
     # Hydra misses bad input
     instantiate(conf_no_val, x=fools_hydra)
 
-    with pytest.raises(Exception):
+    with pytest.raises(TypeError):
         # validation catches bad input
         instantiate(conf_with_val, x=fools_hydra)
 
@@ -231,3 +233,61 @@ def test_validations_missed_by_hydra(
 
     assert isinstance(out, type(valid_input))
     assert out == valid_input
+
+
+def func_with_sig(x: str, *args: int, y: Optional[Tuple[int, str]] = None, **kwargs):
+    return (x, *args), {"y": y, **kwargs}
+
+
+class ClassWithSig:
+    def __init__(
+        self, x: str, *args: int, y: Optional[Tuple[int, str]] = None, **kwargs
+    ):
+        self.out = (x, *args), {"y": y, **kwargs}
+
+
+@skip_if_no_validators
+@pytest.mark.parametrize("validator", all_validators)
+@pytest.mark.parametrize(
+    "args, kwargs, should_pass",
+    # fmt: off
+    [
+        (("a",), {}, True),                      #                       f("a") ✓
+        ((), dict(x="a"), True),                 #                     f(x="a") ✓
+        (("a", 1, 2), {}, True),                 #                 f("a", 1, 2) ✓
+        (("a",), dict(y=(1, "a")), True),        #          f("hi", y=(1, "a")) ✓
+        (("a",), dict(y=[1, "a"]), True),        #          f("hi", y=[1, "a"]) ✓
+        (("a",), dict(y=(1, "a"), z=1), True),   #      f("a", y=(1, "a"), z=1) ✓
+        (("a",), dict(y=(1, "a"), z="a"), True), #    f("a", y=(1, "a"), z="a") ✓
+        (([1],), {}, False),                     #                       f([1]) ✗
+        ((), dict(x=[1]), False),                #                     f(x=[1]) ✗
+        (("a", 2, "b"), {}, False),              #               f("a", 1, "b") ✗
+        (("a",), dict(y=(1, None)), False),      #     f("a", y=(1, None), z=1) ✗
+        (([1],), dict(y=(1, "a")), False),       #      f([1], y=(1, "a"), z=1) ✗
+        (([1],), dict(y=(1, None)), False),      #     f([1], y=(1, None), z=1) ✗
+    ],
+    # fmt: on
+)
+@given(target=st.sampled_from([func_with_sig, ClassWithSig]), as_yaml=st.booleans())
+def test_signature_parsing(args, kwargs, should_pass, validator, target, as_yaml):
+    """Ensures validators handle various *args and **kwargs arrangements properly.
+    Includes:
+    - positional args
+    - named args
+    - annotated *args
+    - kwd-only args"""
+    conf_with_val = builds(
+        target,
+        *args,
+        **kwargs,
+        populate_full_signature=True,
+        zen_wrappers=validator,
+        hydra_convert="all",
+    )
+    if as_yaml:
+        conf_with_val = OmegaConf.create(to_yaml(conf_with_val))
+    if not should_pass:
+        with pytest.raises(TypeError):
+            instantiate(conf_with_val)
+        return
+    instantiate(conf_with_val)
