@@ -20,6 +20,7 @@ from typing import (
 import hypothesis.strategies as st
 import pytest
 from hypothesis import assume, example, given, settings
+from omegaconf import ListConfig
 from omegaconf.errors import GrammarParseError
 from typing_extensions import Annotated, Final, Literal
 
@@ -104,6 +105,85 @@ def test_fuzz_sequence_coercion(annotation):
     coerce_sequences(f_for_fuzz)
 
 
+@example((1, 2))
+@example([1, 2])
+@example(1)
+@example("hi")
+@example(None)
+@example(ListConfig([1, 2]))
+# generate anything that hypothesis can generate!
+@given(st.from_type(type).flatmap(st.from_type))  # type: ignore
+def test_only_list_values_get_cast(input_val):
+    try:
+        assume(input_val == input_val)  # reject inputs who don't satisfy identity
+        assume(input_val is input_val)  # reject inputs who don't satisfy identity
+    except Exception:
+        assume(False)  # hypothesis generated something *super* scary
+
+    @coerce_sequences
+    def f(x: Tuple[int, int]):
+        return x
+
+    if isinstance(input_val, (list, ListConfig)):
+        assert f(input_val) == tuple(input_val)  # type: ignore
+        assert f(x=input_val) == tuple(input_val)  # type: ignore
+    else:
+        assert f(input_val) is input_val
+        assert f(x=input_val) is input_val
+
+
+def test_convert_sequence_on_various_inputs():
+    @coerce_sequences
+    def f(x: MyNamedTuple, y: tuple, *args: tuple, z: Deque, **kwargs: tuple):
+        return (x, y, *args, z) + tuple(kwargs.values())
+
+    assert f(0, [1, 2], z=[3, 4]) == (0, (1, 2), deque([3, 4]))  # type: ignore
+    assert f(0, y=[1, 2], z=[3, 4]) == (0, (1, 2), deque([3, 4]))  # type: ignore
+    assert f(0, [1, 2], [-1], z=[3, 4]) == (0, (1, 2), [-1], deque([3, 4]))  # type: ignore
+    assert f(0, [1, 2], [-1], z=[3, 4], extra=[5, 6]) == (  # type: ignore
+        0,
+        (1, 2),
+        [-1],
+        deque([3, 4]),
+        [5, 6],
+    )
+
+
+def test_convert_sequences_on_class():
+    @coerce_sequences
+    class AClass:
+        def __init__(self, x: tuple, y) -> None:
+            self.x = x
+            self.y = y
+
+    out = AClass([1, 2], [3])  # type: ignore
+    assert out.x == (1, 2)
+    assert out.y == [3]
+
+
+def no_annotation(x, y=2, *args, z, **kwargs):
+    ...
+
+
+def no_sequences(x: int, y: bool, z: str):
+    ...
+
+
+def args_only(x, *args: tuple):
+    ...
+
+
+def kwargs_only(x, **kwargs: tuple):
+    ...
+
+
+@pytest.mark.parametrize(
+    "target_fn", [no_annotation, no_sequences, args_only, kwargs_only]
+)
+def test_convert_sequences_no_annotations_is_noop(target_fn):
+    assert target_fn is coerce_sequences(target_fn)
+
+
 @pytest.mark.parametrize(
     "in_type, expected_type",
     [
@@ -176,63 +256,3 @@ def test_convert_sequences_against_many_types(in_type, expected_type):
             assert out == caster(*x)
 
     run()
-
-
-def no_annotation(x, y=2, *args, z, **kwargs):
-    ...
-
-
-def no_sequences(x: int, y: bool, z: str):
-    ...
-
-
-def args_only(x, *args: tuple):
-    ...
-
-
-def kwargs_only(x, **kwargs: tuple):
-    ...
-
-
-@pytest.mark.parametrize(
-    "target_fn", [no_annotation, no_sequences, args_only, kwargs_only]
-)
-def test_convert_sequences_no_annotations_is_noop(target_fn):
-    assert target_fn is coerce_sequences(target_fn)
-
-
-def test_convert_sequence_on_various_inputs():
-    @coerce_sequences
-    def f(x: MyNamedTuple, y: tuple, *args: tuple, z: Deque, **kwargs: tuple):
-        return (x, y, *args, z) + tuple(kwargs.values())
-
-    assert f(0, [1, 2], z=[3, 4]) == (0, (1, 2), deque([3, 4]))  # type: ignore
-    assert f(0, y=[1, 2], z=[3, 4]) == (0, (1, 2), deque([3, 4]))  # type: ignore
-    assert f(0, [1, 2], [-1], z=[3, 4]) == (0, (1, 2), [-1], deque([3, 4]))  # type: ignore
-    assert f(0, [1, 2], [-1], z=[3, 4], extra=[5, 6]) == (  # type: ignore
-        0,
-        (1, 2),
-        [-1],
-        deque([3, 4]),
-        [5, 6],
-    )
-
-
-def test_convert_sequences_on_class():
-    @coerce_sequences
-    class AClass:
-        def __init__(self, x: tuple, y) -> None:
-            self.x = x
-            self.y = y
-
-    out = AClass([1, 2], [3])  # type: ignore
-    assert out.x == (1, 2)
-    assert out.y == [3]
-
-
-def test_invalid_type_annotation_doesnt_cause_internal_error():
-    def f(x):
-        return x
-
-    f.__annotations__["x"] = 1  # an unexpected type hint
-    assert coerce_sequences(f)(x=10) == 10
