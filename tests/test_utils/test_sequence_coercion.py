@@ -1,13 +1,27 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+from abc import ABC
 from collections import UserList, deque, namedtuple
-from typing import Deque, List, NamedTuple, Optional, Sequence, Tuple, Union
+from typing import (
+    Callable,
+    Deque,
+    List,
+    NamedTuple,
+    NewType,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
 
 import hypothesis.strategies as st
 import pytest
-from hypothesis import assume, given, settings
+from hypothesis import assume, example, given, settings
 from omegaconf.errors import GrammarParseError
-from typing_extensions import Annotated, Literal
+from typing_extensions import Annotated, Final, Literal
 
 from hydra_zen import builds, instantiate, to_yaml
 from hydra_zen._utils.coerce import coerce_sequences
@@ -30,6 +44,59 @@ def f(x):
 
 
 NoneType = type(None)
+
+
+def f_for_fuzz(x):
+    return
+
+
+class MyMetaClass(ABC):
+    pass
+
+
+class MyClass:
+    pass
+
+
+@example(int)
+@example(str)
+@example(bool)
+@example(tuple)
+@example(list)
+@example(dict)
+@example(set)
+@example(deque)
+@example(MyList)
+@example(MyClass)
+@example(MyMetaClass)
+@example(Sequence[int])
+@example(Tuple)
+@example(Tuple[int, int])
+@example(MyNamedTuple)
+@example(Deque[str])
+@example(List[int])
+@example(Set[int])
+@example(Callable[[int], int])
+@example(Annotated[int, "meta"])
+@example(Literal[1, 2])
+@example(TypeVar("T"))
+@example(NewType("NewInt", int))
+@example(Final[str])
+@example(Type[list])
+@example(Optional[MyNamedTuple])
+@example(Optional[int])
+@example(Optional[Tuple[int, int]])
+@example(Optional[Sequence[int]])
+@example(Union[NoneType, Literal[1]])
+@example(Union[Literal[1], NoneType])
+@example(Union[Tuple[int, int], Tuple[int, int, int]])
+@example(Union[Tuple[int, int], NoneType, Tuple[int, int, int]])
+@given(st.from_type(type))
+def test_fuzz_sequence_coercion(annotation):
+    # test that `coerce_sequences` never raises
+    f_for_fuzz.__annotations__.clear()
+    f_for_fuzz.__annotations__["x"] = annotation
+    coerce_sequences(f_for_fuzz)
 
 
 @pytest.mark.parametrize(
