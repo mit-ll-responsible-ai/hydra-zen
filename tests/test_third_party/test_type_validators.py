@@ -1,9 +1,19 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 # flake8: noqa
-
-from collections import deque
-from typing import Deque, Dict, List, NamedTuple, Optional, Sequence, Tuple, Union
+from collections import defaultdict, deque
+from typing import (
+    Callable,
+    Deque,
+    Dict,
+    List,
+    NamedTuple,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Union,
+)
 
 import hypothesis.strategies as st
 import pytest
@@ -15,12 +25,25 @@ from hydra_zen import builds, instantiate, to_yaml
 
 all_validators = []
 
+PYDANT = None
+BEAR = None
 
 try:
     from hydra_zen.third_party.pydantic import validates_with_pydantic
 
     all_validators.append(validates_with_pydantic)
+    PYDANT = validates_with_pydantic
     del validates_with_pydantic
+except ImportError:
+    pass
+
+
+try:
+    from hydra_zen.third_party.beartype import validates_with_beartype
+
+    all_validators.append(validates_with_beartype)
+    BEAR = validates_with_beartype
+    del validates_with_beartype
 except ImportError:
     pass
 
@@ -28,6 +51,28 @@ except ImportError:
 skip_if_no_validators: Final = pytest.mark.skipif(
     not all_validators, reason="no thirdparty validators available"
 )
+
+
+class _XFail:
+    """Used to track known unsupported cases for certain validation-annotation
+    combos"""
+
+    def __init__(self):
+        self.documented_fail_cases: Dict[type, Set[Callable]] = defaultdict(set)
+
+    def add(self, annotation, *validators: Callable):
+        self.documented_fail_cases[annotation].update(validators)
+        return annotation
+
+    def __getitem__(self, key):
+        return self.documented_fail_cases[key]
+
+    def check_xfail(self, annotation, validator):
+        if validator in self[annotation]:
+            pytest.xfail(f"{validator} is known to not support {annotation}")
+
+
+xf = _XFail()
 
 
 @skip_if_no_validators
@@ -160,11 +205,11 @@ class UserIdentity(TypedDict):
     "annotation, fools_hydra",
     [
         (Tuple[str, int, bool], (True, "hi", 2)),
-        (Dict[str, int], dict(a="hi")),
+        (xf.add(Dict[str, int], BEAR), dict(a="hi")),
         (Literal["a", "b"], "c"),
         (Union[List[str], str], dict(a=1)),
         (MyNamedTuple, (1.0, 2.0)),
-        (UserIdentity, dict(first="bruce", last="lee")),
+        (xf.add(UserIdentity, BEAR), dict(first="bruce", last="lee")),
         (Annotated[int, "special"], "hello"),
     ],
 )
@@ -182,7 +227,7 @@ def test_validations_missed_by_hydra(
     - validated targets produce expected outputs
     - validation works in end-to-end instantiation workflows
     """
-
+    xf.check_xfail(annotation, validator)
     # draw valid input
     valid_input = data.draw(st.from_type(annotation), label="valid_input")
 
@@ -205,7 +250,7 @@ def test_validations_missed_by_hydra(
     # Hydra misses bad input
     instantiate(conf_no_val, x=fools_hydra)
 
-    with pytest.raises(TypeError):
+    with pytest.raises(Exception):
         # validation catches bad input
         instantiate(conf_with_val, x=fools_hydra)
 
@@ -217,14 +262,20 @@ def test_validations_missed_by_hydra(
 
 
 def func_with_sig(x: str, *args: int, y: Optional[Tuple[int, str]] = None, **kwargs):
-    return (x, *args), {"y": y, **kwargs}
+    return
+
+
+def _detached_init_(
+    self, x: str, *args: int, y: Optional[Tuple[int, str]] = None, **kwargs
+):
+    return
 
 
 class ClassWithSig:
-    def __init__(
-        self, x: str, *args: int, y: Optional[Tuple[int, str]] = None, **kwargs
-    ):
-        self.out = (x, *args), {"y": y, **kwargs}
+    pass
+
+
+ClassWithSig.__init__ = _detached_init_
 
 
 @skip_if_no_validators
@@ -258,18 +309,24 @@ def test_signature_parsing(args, kwargs, should_pass, validator, target, as_yaml
     - named args
     - annotated *args
     - kwd-only args"""
-    conf_with_val = builds(
-        target,
-        *args,
-        **kwargs,
-        populate_full_signature=True,
-        zen_wrappers=validator,
-        hydra_convert="all",
-    )
-    if as_yaml:
-        conf_with_val = OmegaConf.create(to_yaml(conf_with_val))
-    if not should_pass:
-        with pytest.raises(TypeError):
-            instantiate(conf_with_val)
-        return
-    instantiate(conf_with_val)
+    try:
+        conf_with_val = builds(
+            target,
+            *args,
+            **kwargs,
+            populate_full_signature=True,
+            zen_wrappers=validator,
+            hydra_convert="all",
+        )
+        if as_yaml:
+            conf_with_val = OmegaConf.create(to_yaml(conf_with_val))
+        if not should_pass:
+            with pytest.raises(Exception):
+                instantiate(conf_with_val)
+            return
+        instantiate(conf_with_val)
+    finally:
+        if target is ClassWithSig:
+            # this is a bit hacky, but we have to reassign the class's
+            # init, since it is mutated in-place by validators
+            ClassWithSig.__init__ = _detached_init_
