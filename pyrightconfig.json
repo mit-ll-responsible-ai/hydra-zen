@@ -6,5 +6,6 @@
         "**/node_modules",
         "**/__pycache__",
         "src/hydra_zen/_version.py",
+        "**/third_party",
     ],
 }
