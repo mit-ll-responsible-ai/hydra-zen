@@ -61,7 +61,7 @@ def validates_with_pydantic(
 
     Examples
     --------
-    >>> from hydra_zen.experimental.third_party.pydantic import validates_with_pydantic
+    >>> from hydra_zen.third_party.pydantic import validates_with_pydantic
     >>> from pydantic import PositiveInt
     >>> def f(x: PositiveInt): return x
     >>> val_f = validates_with_pydantic(f)

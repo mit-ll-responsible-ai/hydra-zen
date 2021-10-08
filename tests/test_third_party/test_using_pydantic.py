@@ -3,7 +3,7 @@
 import pytest
 from pydantic import AnyUrl, PositiveFloat
 
-from hydra_zen.experimental.third_party.pydantic import validates_with_pydantic
+from hydra_zen.third_party.pydantic import validates_with_pydantic
 
 parametrize_pydantic_fields = pytest.mark.parametrize(
     "custom_type, good_val, bad_val",
