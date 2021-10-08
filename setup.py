@@ -68,5 +68,10 @@ setup(
     python_requires=">=3.6",
     packages=find_packages(where="src", exclude=["tests", "tests.*"]),
     package_dir={"": "src"},
-    package_data={"hydra_zen": ["py.typed"]}
+    package_data={"hydra_zen": ["py.typed"]},
+    extras_require={
+        "pydantic": [
+            "pydantic>=1.8.2"
+        ],  # don't reduce below 1.8.2 -- security vulnerability
+    },
 )
