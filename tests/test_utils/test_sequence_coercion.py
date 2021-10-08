@@ -25,6 +25,7 @@ from typing_extensions import Annotated, Final, Literal
 
 from hydra_zen import builds, instantiate, to_yaml
 from hydra_zen._utils.coerce import coerce_sequences
+from hydra_zen.typing import Builds
 
 
 class MyNamedTuple(NamedTuple):
@@ -58,6 +59,8 @@ class MyClass:
     pass
 
 
+@example(1)  # not even a valid type!
+@example(None)  # not even a valid type!
 @example(int)
 @example(str)
 @example(bool)
@@ -91,6 +94,8 @@ class MyClass:
 @example(Union[Literal[1], NoneType])
 @example(Union[Tuple[int, int], Tuple[int, int, int]])
 @example(Union[Tuple[int, int], NoneType, Tuple[int, int, int]])
+@example(Builds)
+@example(Builds[Type[list]])
 @given(st.from_type(type))
 def test_fuzz_sequence_coercion(annotation):
     # test that `coerce_sequences` never raises
