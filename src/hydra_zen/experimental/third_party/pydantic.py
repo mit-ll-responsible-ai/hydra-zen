@@ -14,7 +14,7 @@ _default_validator = _pyd.validate_arguments(config={"arbitrary_types_allowed": 
 
 
 def validates_with_pydantic(
-    obj: _T, validator: Callable[[_T], _T] = _default_validator
+    obj: _T, *, validator: Callable[[_T], _T] = _default_validator
 ) -> _T:
     """Decorates a function, or the init-method of an object, with a pydantic
     validation decorator.
