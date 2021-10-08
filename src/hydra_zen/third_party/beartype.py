@@ -49,7 +49,7 @@ def validates_with_beartype(obj: _T) -> _T:
 
     Examples
     --------
-    >>> from hydra_zen.experimental.third_party.beartype import validates_with_beartype
+    >>> from hydra_zen.third_party.beartype import validates_with_beartype
     >>> from beartype.cave import ScalarTypes
     >>> def f(x: ScalarTypes): return x  # a scalar is any real-valued number
     >>> val_f = validates_with_beartype(f)
@@ -72,7 +72,7 @@ def validates_with_beartype(obj: _T) -> _T:
     >>> conf = builds(f, populate_full_signature=True, zen_wrappers=validates_with_beartype)
     >>> instantiate(conf, x=10)  # 10 is a scalar: ok!
     10
-    >>> instantiate(conf, x=[1, 2])
+    >>> instantiate(conf, x=[1, 2])  # [1, 2] is not a scalar: roar!
     BeartypeCallHintPepParamException: @beartyped f() parameter x=[1, 2] violates type hint [...]
 
     Note that sequence-coercion is enabled to ensure smooth compatibility with Hydra.
