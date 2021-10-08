@@ -42,6 +42,8 @@ def test_pydantic_specific_fields_class(custom_type, good_val, bad_val):
 
 
 def test_custom_validation_config():
+    # test that users can pass a custom-configured instance of
+    # `pydantic.validate_arguments`
     from functools import partial
 
     from pydantic import validate_arguments
