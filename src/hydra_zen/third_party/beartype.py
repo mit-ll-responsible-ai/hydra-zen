@@ -15,7 +15,7 @@ __all__ = ["validates_with_beartype"]
 def validates_with_beartype(obj: _T) -> _T:
     """Decorates a function or the init-method of an object with beartype [1]_.
 
-    This can be used with
+    This is designed to be used as a "zen-wrapper"; see Examples for details.
 
     Parameters
     ----------
@@ -25,25 +25,34 @@ def validates_with_beartype(obj: _T) -> _T:
     -------
     obj_w_validation : Callable
         A wrapped function, or a class whose init-method has been
-        wrapped in-place
+        wrapped in-place.
 
     Notes
     -----
     ``beartype`` must be installed [2]_ as a separate dependency to leverage this validator.
+    Using ``validates_with_beartype`` as a ``zen_wrapper`` will create a dependency on
+    beartype among resulting yamls as well, these yamls will also be validated by beartype
+    upon instantiation.
 
-    hydra-zen adds a sequence-coercion step that is not performed by beartype.
-    This is implemented by `hydra_zen.experimental.coerce.coerce_sequences`. This
-    coercion is necessary as Hydra can only read sequence data in as a list. I.e.
-    without this coercion step, all non-list annotated sequence fields populated by
-    Hydra would get roared at (raised) by beartype.
+    hydra-zen adds a data-coercion step that is not performed by ``beartype``.
+    This only impacts fields in `obj` annotated with a (non-string) sequence-type
+    annotation, which are passed list-type data. All other fields rely solely on beartype's
+    native behavior.
+
+    E.g. a field with a `Tuple`-annotation, if passed a list, will see that list be cast
+    to a tuple. See the Examples section for more details.
+
+    This coercion is necessary as Hydra can only read (non-string) sequential
+    data from a config as a list. I.e. without this coercion step, all non-list/string
+    annotated  sequence fields populated by Hydra would get rasied (roared at) by beartype.
 
     It is recommended that `validates_with_beartype` be used in conjunction with
     the following `builds` settings:
 
       - ``hydra_convert="all"``: to ensure omegaconf containers are converted to std-lib types
 
-      Please refer to beartype's documented list of compliances [3]_ to see what varieties of
-      types it does and does not support.
+    Please refer to beartype's documentation [3]_ to see what varieties of types it does and
+    does not support.
 
     References
     ----------
@@ -82,8 +91,16 @@ def validates_with_beartype(obj: _T) -> _T:
     Note that sequence-coercion is enabled to ensure smooth compatibility with Hydra.
 
     >>> def g(x: tuple): return x  # note the annotation
+    >>> g([1, 2, 3])
+    [1, 2, 3]
     >>> validates_with_beartype(g)([1, 2, 3])  # input: list, output: tuple
     (1, 2, 3)
+
+    Only inputs of type list and ``ListConfig`` get cast in this way, since Hydra will
+    read non-string sequential data from configs as either of these two types
+
+    >>> validates_with_beartype(g)({1, 2, 3})  # input: a set
+    BeartypeCallHintPepParamException: @beartyped g() parameter x={1, 2, 3} violates type hint [...]
     """
     if inspect.isclass(obj) and hasattr(type, "__init__"):
         obj.__init__ = bt.beartype(obj.__init__)
