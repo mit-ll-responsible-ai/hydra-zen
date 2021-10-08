@@ -179,9 +179,9 @@ class UserIdentity(TypedDict):
 )
 @pytest.mark.parametrize("validator", all_validators)
 @settings(max_examples=20)
-@given(data=st.data(), as_yaml=st.booleans(), target=st.sampled_from([a_func, AClass]))
+@given(data=st.data(), as_yaml=st.booleans())
 def test_validations_missed_by_hydra(
-    annotation, fools_hydra, target, validator, as_yaml: bool, data: st.DataObject
+    annotation, fools_hydra, validator, as_yaml: bool, data: st.DataObject
 ):
     """Tests variety of annotations not supported by Hydra.
 
@@ -196,19 +196,13 @@ def test_validations_missed_by_hydra(
     valid_input = data.draw(st.from_type(annotation), label="valid_input")
 
     # boilerplate: set annotation of target to-be-built
-    _ann = (target.__init__ if target is AClass else target).__annotations__
-    _ann.clear()
-    _ann["x"] = annotation
-    hydra_target.__annotations__.clear()
-    hydra_target.__annotations__["x"] = annotation
-    assert _ann == hydra_target.__annotations__
+    a_func.__annotations__.clear()
+    a_func.__annotations__["x"] = annotation
 
-    conf_no_val = builds(
-        hydra_target, populate_full_signature=True, hydra_convert="all"
-    )
+    conf_no_val = builds(a_func, populate_full_signature=True, hydra_convert="all")
 
     conf_with_val = builds(
-        target,
+        a_func,
         populate_full_signature=True,
         zen_wrappers=validator,
         hydra_convert="all",
@@ -225,11 +219,7 @@ def test_validations_missed_by_hydra(
         instantiate(conf_with_val, x=fools_hydra)
 
     # passes validation
-    out = target(x=valid_input)
-
-    if target is AClass:
-        assert isinstance(out, AClass)
-        out = out.x
+    out = instantiate(conf_with_val, x=valid_input)
 
     assert isinstance(out, type(valid_input))
     assert out == valid_input
