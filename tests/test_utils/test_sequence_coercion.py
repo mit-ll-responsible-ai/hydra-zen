@@ -7,7 +7,7 @@ import hypothesis.strategies as st
 import pytest
 from hypothesis import assume, given, settings
 from omegaconf.errors import GrammarParseError
-from typing_extensions import Annotated
+from typing_extensions import Annotated, Literal
 
 from hydra_zen import builds, instantiate, to_yaml
 from hydra_zen._utils.coerce import coerce_sequences
@@ -37,6 +37,7 @@ NoneType = type(None)
     [
         (int, int),
         (Annotated[int, "meta"], int),
+        (Literal[1, 2], int),
         (str, str),
         (bool, bool),
         (Tuple, tuple),
