@@ -28,7 +28,7 @@ INSTALL_REQUIRES = [
 ]
 TESTS_REQUIRE = [
     "pytest >= 3.8",
-    "hypothesis >= 5.32.0",
+    "hypothesis >= 6.16.0",
 ]
 
 DESCRIPTION = "Utilities for making hydra scale to ML workflows"
