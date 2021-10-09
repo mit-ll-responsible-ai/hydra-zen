@@ -1453,7 +1453,9 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     frozen: bool = False,
     builds_bases: Tuple[Any, ...] = (),
-    __x: _T2 = builds,  # this is the easiest way to get static tooling to see the output as `builds`
+    # This is the easiest way to get static tooling to see the output
+    # as `builds`.
+    __b: _T2 = builds,
 ) -> _T2:
     """Returns the `builds` function, but with customized default values.
 
@@ -1535,20 +1537,27 @@ def make_custom_builds_fn(
     --------
     >>> from hydra_zen import make_custom_builds_fn, instantiate
 
-    The following will produce a `builds` function whose default-value
+    The following will create a `builds` function whose default-value
     for ``zen_partial`` has been set to ``True``.
 
     >>> pbuilds = make_custom_builds_fn(zen_partial=True)
 
-    I.e. using ``pbuilds(...)`` is equivalent to using `builds(..., zen_partial=True)
+    I.e. using ``pbuilds(...)`` is equivalent to using
+    ``builds(..., zen_partial=True)``.
 
-    >>> instantiate(pbuilds(int))
+    >>> instantiate(pbuilds(int))  # calls `funtools.partial(int)`
     functools.partial(<class 'int'>)
-    >>> instantiate(pbuilds(len))
+    >>> instantiate(pbuilds(len))  # calls `funtools.partial(len)`
     functools.partial(<built-in function len>)
 
-    Suppose that we want to enable runtime type-checking with beartype on all of
-    our configured targets; the following settings for `builds` would be handy
+    You can still specify ``zen_partial`` on a per-case basis with ``pbuilds``
+
+    >>> instantiate(pbuilds(int, zen_partial=False))  # calls `int()`
+    0
+
+    Suppose that we want to enable runtime type-checking - using beartype -
+    whenever our configs are being instnatiated; then the following settings
+    for `builds` would be handy
 
     >>> from hydra_zen.third_party.beartype import validates_with_beartype
     >>> build_a_bear = make_custom_builds_fn(
@@ -1568,21 +1577,22 @@ def make_custom_builds_fn(
     >>> instantiate(conf, x="c")
     <Validation error: "c" is not "a" or "b">
     """
-    assert __x is builds
-    del __x
+    if __b is not builds:
+        raise TypeError("make_custom_builds_fn() got an unexpected argument: '__b'")
+    del __b
 
     excluded_fields = {"dataclass_name"}
     LOCALS = locals()
-    assert (set(__BUILDS_DEFAULTS) - excluded_fields) <= set(LOCALS), (
-        tuple(__BUILDS_DEFAULTS),
-        tuple(LOCALS),
-    )
+
+    # Ensures that new defaults added to `builds` must be reflected
+    # in the signature of `make_custom_builds_fn`.
+    assert (set(__BUILDS_DEFAULTS) - excluded_fields) <= set(LOCALS)
 
     _new_defaults = {
         name: LOCALS[name] for name in __BUILDS_DEFAULTS if name not in excluded_fields
     }
 
-    # let builds validate the new defaults!
+    # let `builds` validate the new defaults!
     builds(builds, **_new_defaults)
 
     @wraps(builds)
