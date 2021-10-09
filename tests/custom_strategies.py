@@ -9,7 +9,7 @@ from hydra_zen.structured_configs._utils import get_obj_path
 __all__ = ["valid_builds_args", "partition"]
 
 _Sequence = Union[List, Tuple, Deque]
-T = TypeVar("T", bound=_Sequence)
+T = TypeVar("T", bound=Union[_Sequence, Dict[str, Any]])
 
 
 def _wrapper(obj):
@@ -81,11 +81,9 @@ def _partition(draw: st.DrawFn, collection: T, ordered: bool) -> Tuple[T, T]:
     keys_a, keys_b = keys[divider:], keys[:divider]
     if not isinstance(collection, dict):
         caster = type(collection)
-        return caster(collection[k] for k in keys_a), caster(
-            collection[k] for k in keys_b
-        )
+        return tuple((caster(collection[k] for k in keys)) for keys in [keys_a, keys_b])  # type: ignore
     else:
-        return {k: collection[k] for k in keys_a}, {k: collection[k] for k in keys_b}  # type: ignore
+        return tuple(({k: collection[k] for k in keys}) for keys in [keys_a, keys_b])  # type: ignore
 
 
 def partition(
