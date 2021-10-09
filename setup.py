@@ -73,5 +73,6 @@ setup(
         "pydantic": [
             "pydantic>=1.8.2"
         ],  # don't reduce below 1.8.2 -- security vulnerability
+        "beartype": ["beartype>=0.8.0"],
     },
 )

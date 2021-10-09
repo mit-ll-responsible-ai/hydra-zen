@@ -42,16 +42,16 @@ def validates_with_pydantic(
     -----
     pydantic must be installed [2]_ as a separate dependency to leverage this validator.
     Using ``validates_with_pydantic`` as a ``zen_wrapper`` will create a dependency on
-    pydantic among resulting yamls as well - instantiated yamls will be validated by
-    pydantic.
-
-    Users should be aware of pydantic's data conversion strategy [2]_; pydantic
-    may cast data so that it will conform to its annotated type.
+    pydantic among resulting yamls as well, these yamls will also be validated by pydantic
+    upon instantiation.
 
     It is recommended that `validates_with_pydantic` be used in conjunction with
     the following `builds` settings:
 
       - ``hydra_convert="all"``: to ensure omegaconf containers are converted to std-lib types
+
+    Users should be aware of pydantic's data conversion strategy [2]_; pydantic
+    may cast data so that it will conform to its annotated type.
 
     References
     ----------
@@ -95,7 +95,7 @@ def validates_with_pydantic(
     >>> instantiate(conf, x=-2)
     ValidationError: 1 validation error for F (...)
 
-    Note that pydantic's data-coercion is ensures smooth compatibility with Hydra.
+    Note that pydantic's data-coercion ensures smooth compatibility with Hydra.
     I.e. lists will be coerced to the appropriate annotated sequence type.
 
     >>> def g(x: tuple): return x  # note the annotation
