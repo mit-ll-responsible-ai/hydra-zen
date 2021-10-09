@@ -1459,6 +1459,10 @@ def make_custom_builds_fn(
 ) -> _T2:
     """Returns the `builds` function, but with customized default values.
 
+    E.g. ``make_custom_builds_fn(hydra_convert='all')`` will return a version
+    of the `builds` function where the default value for ``hydra_convert``
+    is ``'all'`` instead of ``None``.
+
     Parameters
     ----------
     zen_partial : bool, optional (default=False)
@@ -1535,7 +1539,7 @@ def make_custom_builds_fn(
 
     Examples
     --------
-    >>> from hydra_zen import make_custom_builds_fn, instantiate
+    >>> from hydra_zen import builds, make_custom_builds_fn, instantiate
 
     The following will create a `builds` function whose default-value
     for ``zen_partial`` has been set to ``True``.
@@ -1545,9 +1549,9 @@ def make_custom_builds_fn(
     I.e. using ``pbuilds(...)`` is equivalent to using
     ``builds(..., zen_partial=True)``.
 
-    >>> instantiate(pbuilds(int))  # calls `funtools.partial(int)`
+    >>> instantiate(pbuilds(int))  # calls `functools.partial(int)`
     functools.partial(<class 'int'>)
-    >>> instantiate(pbuilds(len))  # calls `funtools.partial(len)`
+    >>> instantiate(builds(int, zen_partial=True))  # manually-overriding default
     functools.partial(<built-in function len>)
 
     You can still specify ``zen_partial`` on a per-case basis with ``pbuilds``
@@ -1556,7 +1560,7 @@ def make_custom_builds_fn(
     0
 
     Suppose that we want to enable runtime type-checking - using beartype -
-    whenever our configs are being instnatiated; then the following settings
+    whenever our configs are being instantiated; then the following settings
     for `builds` would be handy
 
     >>> from hydra_zen.third_party.beartype import validates_with_beartype
@@ -1566,7 +1570,7 @@ def make_custom_builds_fn(
     ...     zen_wrappers=validates_with_beartype,
     ... )
 
-    Now all configs produced via ``build_a_bear` will include type-checking
+    Now all configs produced via ``build_a_bear`` will include type-checking
     during instantiation.
 
     >>> from typing_extensions import Literal
