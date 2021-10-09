@@ -4,7 +4,14 @@
 from dataclasses import dataclass
 from typing import Any, Callable, List, Literal, Tuple, Type
 
-from hydra_zen import builds, get_target, instantiate, just, mutable_value
+from hydra_zen import (
+    builds,
+    get_target,
+    instantiate,
+    just,
+    make_custom_builds_fn,
+    mutable_value,
+)
 from hydra_zen.typing import Builds
 from hydra_zen.typing._implementations import DataClass
 
@@ -166,4 +173,13 @@ def zen_wrappers():
     )
     b6: Literal["Type[PartialBuilds[Type[str]]]"] = reveal_type(
         builds(str, zen_partial=True, zen_wrappers=(f, J, B, PB, None))
+    )
+
+
+def custom_builds_fn():
+    _builds = make_custom_builds_fn()
+
+    a1: Literal["Type[Builds[Type[int]]]"] = reveal_type(_builds(int))
+    a2: Literal["Type[PartialBuilds[Type[int]]]"] = reveal_type(
+        _builds(int, zen_partial=True)
     )
