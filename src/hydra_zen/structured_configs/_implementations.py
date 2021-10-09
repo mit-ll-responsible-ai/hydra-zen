@@ -3,7 +3,6 @@
 import inspect
 import warnings
 from collections import defaultdict
-from copy import deepcopy
 from dataclasses import Field, dataclass, field, fields, is_dataclass, make_dataclass
 from functools import wraps
 from itertools import chain
