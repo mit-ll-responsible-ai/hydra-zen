@@ -1551,7 +1551,7 @@ def make_custom_builds_fn(
     >>> instantiate(pbuilds(int))  # calls `functools.partial(int)`
     functools.partial(<class 'int'>)
     >>> instantiate(builds(int, zen_partial=True))  # manually-overriding default
-    functools.partial(<built-in function len>)
+    functools.partial(<class 'int'>)
 
     You can still specify ``zen_partial`` on a per-case basis with ``pbuilds``
 
