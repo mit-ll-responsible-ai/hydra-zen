@@ -36,34 +36,6 @@ def test_make_custom_builds_doesnt_accept_args_not_named_by_builds(args, kwargs)
         make_custom_builds_fn(*args, **kwargs)
 
 
-def f1(x: int):
-    return
-
-
-def f2(x, y: str):
-    return
-
-
-@pytest.mark.filterwarnings(
-    "ignore:A structured config was supplied for `zen_wrappers`"
-)
-@given(
-    kwargs=partition(valid_builds_args(), ordered=False),
-    target=st.sampled_from([f1, f2]),
-)
-def test_make_builds_produces_builds_with_expected_config(kwargs, target):
-    kwargs_as_defaults, kwargs_passed_through = kwargs
-
-    # set a random partition of args as defaults to a custom builds
-    custom_builds = make_custom_builds_fn(**kwargs_as_defaults)
-    # pass the remainder of args directly to the customized builds
-    via_custom = custom_builds(target, **kwargs_passed_through)
-
-    # this should be the same as passing all of these args directly to vanilla builds
-    via_builds = builds(target, **kwargs_passed_through, **kwargs_as_defaults)
-    assert to_yaml(via_custom) == to_yaml(via_builds)
-
-
 class BadGuy:
     pass
 
@@ -81,3 +53,33 @@ def test_raises_on_bad_defaults(bad_kwargs):
     except Exception as e:
         with pytest.raises(type(e)):
             make_custom_builds_fn(**bad_kwargs)
+
+
+def f1(x: int):
+    return
+
+
+def f2(x, y: str):
+    return
+
+
+@pytest.mark.filterwarnings(
+    "ignore:A structured config was supplied for `zen_wrappers`"
+)
+@given(
+    kwargs=partition(valid_builds_args(), ordered=False),
+    target=st.sampled_from([f1, f2]),
+)
+def test_make_builds_fn_produces_builds_with_expected_defaults_and_behaviors(
+    kwargs, target
+):
+    kwargs_as_defaults, kwargs_passed_through = kwargs
+
+    # set a random partition of args as defaults to a custom builds
+    custom_builds = make_custom_builds_fn(**kwargs_as_defaults)
+    # pass the remainder of args directly to the customized builds
+    via_custom = custom_builds(target, **kwargs_passed_through)
+
+    # this should be the same as passing all of these args directly to vanilla builds
+    via_builds = builds(target, **kwargs_passed_through, **kwargs_as_defaults)
+    assert to_yaml(via_custom) == to_yaml(via_builds)
