@@ -29,6 +29,16 @@ def test_valid_build_strats_are_exhaustive():
     assert nameable_builds_args - {"dataclass_name"} == set(_valid_builds_strats)
 
 
+@given(req_excl=partitions(tuple(_valid_builds_strats), ordered=False), data=st.data())
+def test_valid_builds_excluded_and_required(req_excl, data: st.DataObject):
+    required, excluded = req_excl
+    drawn_args = data.draw(
+        valid_builds_args(*required, excluded=excluded).map(set), label="draw_args"
+    )
+    assert set(required) <= drawn_args
+    assert drawn_args.isdisjoint(set(excluded))
+
+
 a_list = [1, 2, 3]
 a_dict = dict(a=-1, b=-2, c=-3)
 

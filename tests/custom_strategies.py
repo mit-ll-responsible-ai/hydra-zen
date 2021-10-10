@@ -16,6 +16,7 @@ def _wrapper(obj):
     return obj
 
 
+# strategies for drawing valid inputs to `zen_wrappers`
 single_wrapper_strat = (
     st.just(_wrapper)
     | st.just(get_obj_path(_wrapper))
@@ -42,6 +43,8 @@ _valid_builds_strats = dict(
 
 
 def _compat_frozen(conf: Dict[str, Any]):
+    # dataclass has some hard rules about a frozen dataclass inheriting
+    # from a non-frozen one anf vice versa. Let's avoid this
     if conf.get("frozen", None) is True and conf.get("builds_bases", ()):
         conf["frozen"] = False
     return conf
