@@ -5,7 +5,7 @@ import pytest
 from hypothesis import given
 
 from hydra_zen import builds
-from tests.custom_strategies import _valid_builds_strats, partition, valid_builds_args
+from tests.custom_strategies import _valid_builds_strats, partitions, valid_builds_args
 
 
 def f():
@@ -40,7 +40,7 @@ a_dict = dict(a=-1, b=-2, c=-3)
     data=st.data(),
 )
 def test_partition(collection_or_strat, ordered: bool, data: st.DataObject):
-    a, b = data.draw(partition(collection_or_strat, ordered=ordered))
+    a, b = data.draw(partitions(collection_or_strat, ordered=ordered))
     assert len(set(a)) == len(a)
     assert len(set(b)) == len(b)
     assert len(a) + len(b) == 3

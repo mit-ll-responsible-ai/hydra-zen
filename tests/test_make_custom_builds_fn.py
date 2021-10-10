@@ -6,7 +6,7 @@ import pytest
 from hypothesis import assume, example, given
 
 from hydra_zen import builds, make_custom_builds_fn, to_yaml
-from tests.custom_strategies import partition, valid_builds_args
+from tests.custom_strategies import partitions, valid_builds_args
 
 _builds_sig = inspect.signature(builds)
 BUILDS_DEFAULTS = {
@@ -67,7 +67,7 @@ def f2(x, y: str):
     "ignore:A structured config was supplied for `zen_wrappers`"
 )
 @given(
-    kwargs=partition(valid_builds_args(), ordered=False),
+    kwargs=partitions(valid_builds_args(), ordered=False),
     target=st.sampled_from([f1, f2]),
 )
 def test_make_builds_fn_produces_builds_with_expected_defaults_and_behaviors(

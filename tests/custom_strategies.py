@@ -6,7 +6,7 @@ import hypothesis.strategies as st
 from hydra_zen import builds
 from hydra_zen.structured_configs._utils import get_obj_path
 
-__all__ = ["valid_builds_args", "partition"]
+__all__ = ["valid_builds_args", "partitions"]
 
 _Sequence = Union[List, Tuple, Deque]
 T = TypeVar("T", bound=Union[_Sequence, Dict[str, Any]])
@@ -60,7 +60,9 @@ def valid_builds_args(*required: str, excluded: Sequence[str] = ()):
     return st.fixed_dictionaries(
         {k: _valid_builds_strats[k] for k in sorted(_required)},
         optional={
-            k: v for k, v in _valid_builds_strats.items() if k not in sorted(_excluded)
+            k: v
+            for k, v in _valid_builds_strats.items()
+            if k not in _excluded and k not in _required
         },
     ).map(_compat_frozen)
 
@@ -86,10 +88,10 @@ def _partition(draw: st.DrawFn, collection: T, ordered: bool) -> Tuple[T, T]:
         return tuple(({k: collection[k] for k in keys}) for keys in [keys_a, keys_b])  # type: ignore
 
 
-def partition(
+def partitions(
     collection: Union[T, st.SearchStrategy[T]], ordered: bool = True
 ) -> st.SearchStrategy[Tuple[T, T]]:
-    """Randomly partitions a collection or dictionary into to partitions."""
+    """Randomly partitions a collection or dictionary into two partitions."""
     if isinstance(collection, st.SearchStrategy):
         return collection.flatmap(lambda x: _partition(x, ordered=ordered))  # type: ignore
     return cast(st.SearchStrategy[Tuple[T, T]], _partition(collection, ordered))
