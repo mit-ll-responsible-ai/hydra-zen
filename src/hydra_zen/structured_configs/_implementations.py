@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 import inspect
 import warnings
-from collections import defaultdict
+from collections import Counter, defaultdict
 from dataclasses import Field, dataclass, field, fields, is_dataclass, make_dataclass
 from functools import wraps
 from itertools import chain
@@ -1144,7 +1144,7 @@ def builds(
             #    https://github.com/facebookresearch/hydra/issues/1759
             # Thus we will auto-broaden the annotation when we see that the user
             # has specified a `Builds` as a default value.
-            if not isinstance(value, Builds) or hydra_recursive is False else Any,
+            if not is_dataclass(value) or hydra_recursive is False else Any,
             sanitized_default_value(value),
         )
         for name, value in kwargs_for_target.items()
@@ -1425,3 +1425,129 @@ def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:
         pass  # makes sure we cover this branch in tests
 
     return target
+
+
+class NOTHING:
+    pass
+
+
+@dataclass
+class ZenField:
+    hint: type = Any
+    default: Any = NOTHING
+    name: Union[str, Type[NOTHING]] = NOTHING
+
+    def __post_init__(self):
+        if not isinstance(self.name, str):
+            if self.name is not NOTHING:
+                raise TypeError(f"`ZenField.name` expects a string, got: {self.name}")
+
+        self.hint = _utils.sanitized_type(self.hint)
+
+        if self.default is not NOTHING:
+            self.default = sanitized_default_value(self.default)
+
+
+def make_config(
+    *fields_as_args: Union[str, ZenField],
+    hydra_recursive: Optional[bool] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = "all",
+    config_name: str = "Config",
+    frozen: bool = False,
+    bases=(),
+    **fields_as_kwargs,
+):
+    for _field in fields_as_args:
+        if not isinstance(_field, (str, ZenField)):
+            raise TypeError(
+                f"`fields_as_args` can only consist of field-names (i.e. strings) or "
+                f"`ZenField` instances. Got: "
+                f"{', '.join(str(x) for x in fields_as_args if not isinstance(x, (str, ZenField)))}"
+            )
+        if isinstance(_field, ZenField) and _field.name is NOTHING:
+            raise ValueError(
+                f"All `ZenField` instances specified in `fields_as_args` must have a name associated with it. Got: {_field}"
+            )
+    for name, _field in fields_as_kwargs.items():
+        if isinstance(_field, ZenField):
+            if _field.name is not NOTHING and _field.name != name:
+                raise ValueError(
+                    f"`fields_as_kwargs` specifies conflicting names: the kwarg {name} is associated with a `ZenField` with name {_field.name}"
+                )
+            else:
+                _field.name = name
+
+    if fields_as_args:
+        all_names = [f.name if isinstance(f, ZenField) else f for f in fields_as_args]
+        all_names.extend(fields_as_kwargs)
+
+        if len(all_names) != len(set(all_names)):
+            raise ValueError(
+                f"`fields_as_args` cannot specify the same field-name multiple times. Got"
+                f" multiple entries for"
+                f" {', '.join(str(n) for n, count in Counter(all_names).items() if count > 1)}"
+            )
+
+        del all_names
+
+    # validate hydra-args via `builds`
+    builds(dict, hydra_convert=hydra_convert, hydra_recursive=hydra_recursive)
+
+    normalized_fields: Dict[str, ZenField] = {}
+
+    for _field in fields_as_args:
+        if isinstance(_field, str):
+            normalized_fields[_field] = ZenField(name=_field, hint=Any)
+        else:
+            assert isinstance(_field.name, str)
+            normalized_fields[_field.name] = _field
+
+    for name, value in fields_as_kwargs.items():
+        if not isinstance(value, ZenField):
+            normalized_fields[name] = ZenField(name=name, default=value)
+
+        else:
+            normalized_fields[name] = value
+
+    # fields without defaults must come first
+    config_fields: List[Union[Tuple[str, type], Tuple[str, type, Any]]] = [
+        (str(f.name), f.hint)
+        for f in normalized_fields.values()
+        if f.default is NOTHING
+    ]
+
+    config_fields.extend(
+        [
+            (
+                str(f.name),
+                (
+                    f.hint
+                    # f.default: Field
+                    # f.default.default: Any
+                    if not is_dataclass(f.default.default) or hydra_recursive is False
+                    else Any
+                ),
+                f.default,
+            )
+            for f in normalized_fields.values()
+            if f.default is not NOTHING
+        ]
+    )
+
+    if hydra_recursive is not None:
+        config_fields.append(
+            (
+                _RECURSIVE_FIELD_NAME,
+                bool,
+                _utils.field(default=hydra_recursive, init=False),
+            )
+        )
+
+    if hydra_convert is not None:
+        config_fields.append(
+            (_CONVERT_FIELD_NAME, str, _utils.field(default=hydra_convert, init=False))
+        )
+
+    return make_dataclass(
+        cls_name=config_name, fields=config_fields, frozen=frozen, bases=bases
+    )
