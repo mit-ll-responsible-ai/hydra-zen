@@ -46,6 +46,9 @@ class DataClass(Protocol):
     def __getattribute__(self, name: str) -> Any:
         ...
 
+    def __setattr__(self, name: str, value: Any) -> None:
+        return super().__setattr__(name, value)
+
 
 @runtime_checkable
 class Builds(DataClass, Protocol[_T]):  # pragma: no cover
