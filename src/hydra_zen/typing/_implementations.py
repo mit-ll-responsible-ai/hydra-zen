@@ -43,6 +43,9 @@ class DataClass(Protocol):
     def __init__(self, *args, **kwargs) -> None:
         ...
 
+    def __getattribute__(self, name: str) -> Any:
+        ...
+
 
 @runtime_checkable
 class Builds(DataClass, Protocol[_T]):  # pragma: no cover
