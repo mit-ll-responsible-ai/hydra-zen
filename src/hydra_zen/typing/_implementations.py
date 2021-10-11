@@ -37,7 +37,7 @@ InterpStr = NewType("InterpStr", str)
 Importable = TypeVar("Importable")
 
 
-class DataClass(Protocol):
+class DataClass(Protocol):  # pragma: no cover
     __dataclass_fields__: Dict[str, Field]
 
     def __init__(self, *args, **kwargs) -> None:
@@ -47,7 +47,7 @@ class DataClass(Protocol):
         ...
 
     def __setattr__(self, name: str, value: Any) -> None:
-        return super().__setattr__(name, value)
+        ...
 
 
 @runtime_checkable
