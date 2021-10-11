@@ -54,6 +54,13 @@ def partitions(
 not_a_string = everything_except(str)
 
 
+@settings(max_examples=10)
+@given(not_a_string)
+def test_validate_ZenField_name(not_str):
+    with pytest.raises(TypeError):
+        ZenField(name=not_str)
+
+
 @settings(max_examples=20)
 @given(
     args=st.lists(not_a_string | st.just(ZenField()), min_size=1),
