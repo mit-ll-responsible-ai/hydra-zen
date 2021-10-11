@@ -1551,7 +1551,7 @@ def make_config(
         )
 
     return cast(
-        DataClass,
+        Type[DataClass],
         make_dataclass(
             cls_name=config_name, fields=config_fields, frozen=frozen, bases=bases
         ),
