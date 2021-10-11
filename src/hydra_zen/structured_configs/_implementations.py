@@ -1466,13 +1466,15 @@ def make_config(
             )
         if isinstance(_field, ZenField) and _field.name is NOTHING:
             raise ValueError(
-                f"All `ZenField` instances specified in `fields_as_args` must have a name associated with it. Got: {_field}"
+                f"All `ZenField` instances specified in `fields_as_args` must have a "
+                f"name associated with it. Got: {_field}"
             )
     for name, _field in fields_as_kwargs.items():
         if isinstance(_field, ZenField):
             if _field.name is not NOTHING and _field.name != name:
                 raise ValueError(
-                    f"`fields_as_kwargs` specifies conflicting names: the kwarg {name} is associated with a `ZenField` with name {_field.name}"
+                    f"`fields_as_kwargs` specifies conflicting names: the kwarg {name} "
+                    f"is associated with a `ZenField` with name {_field.name}"
                 )
             else:
                 _field.name = name
@@ -1483,8 +1485,8 @@ def make_config(
 
         if len(all_names) != len(set(all_names)):
             raise ValueError(
-                f"`fields_as_args` cannot specify the same field-name multiple times. Got"
-                f" multiple entries for"
+                f"`fields_as_args` cannot specify the same field-name multiple times."
+                f" Got multiple entries for:"
                 f" {', '.join(str(n) for n, count in Counter(all_names).items() if count > 1)}"
             )
 
