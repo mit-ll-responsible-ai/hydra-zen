@@ -32,7 +32,7 @@ from hydra_zen.errors import HydraZenDeprecationWarning
 from hydra_zen.funcs import get_obj, partial, zen_processing
 from hydra_zen.structured_configs import _utils
 from hydra_zen.typing import Builds, Importable, Just, PartialBuilds
-from hydra_zen.typing._implementations import HasPartialTarget, HasTarget
+from hydra_zen.typing._implementations import DataClass, HasPartialTarget, HasTarget
 
 try:
     # used to check if default values are ufuncs
@@ -627,7 +627,7 @@ def builds(
         If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.
 
     hydra_convert: Optional[Literal["none", "partial", "all"]], optional (default="none")
-        Determines how hydra handles the non-primitive objects passed to `target` [4]_.
+        Determines how Hydra handles the non-primitive objects passed to `target` [4]_.
 
         - ``"none"``: Passed objects are DictConfig and ListConfig, default
         - ``"partial"``: Passed objects are converted to dict and list, with
@@ -1144,7 +1144,7 @@ def builds(
             #    https://github.com/facebookresearch/hydra/issues/1759
             # Thus we will auto-broaden the annotation when we see that the user
             # has specified a `Builds` as a default value.
-            if not is_dataclass(value) or hydra_recursive is False else Any,
+            if not is_builds(value) or hydra_recursive is False else Any,
             sanitized_default_value(value),
         )
         for name, value in kwargs_for_target.items()
@@ -1451,12 +1451,12 @@ class ZenField:
 def make_config(
     *fields_as_args: Union[str, ZenField],
     hydra_recursive: Optional[bool] = None,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = "all",
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     config_name: str = "Config",
     frozen: bool = False,
     bases=(),
     **fields_as_kwargs,
-):
+) -> Type[DataClass]:
     for _field in fields_as_args:
         if not isinstance(_field, (str, ZenField)):
             raise TypeError(
@@ -1526,7 +1526,7 @@ def make_config(
                     f.hint
                     # f.default: Field
                     # f.default.default: Any
-                    if not is_dataclass(f.default.default) or hydra_recursive is False
+                    if not is_builds(f.default.default) or hydra_recursive is False
                     else Any
                 ),
                 f.default,
@@ -1550,6 +1550,9 @@ def make_config(
             (_CONVERT_FIELD_NAME, str, _utils.field(default=hydra_convert, init=False))
         )
 
-    return make_dataclass(
-        cls_name=config_name, fields=config_fields, frozen=frozen, bases=bases
+    return cast(
+        DataClass,
+        make_dataclass(
+            cls_name=config_name, fields=config_fields, frozen=frozen, bases=bases
+        ),
     )

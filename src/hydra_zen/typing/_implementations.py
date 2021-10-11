@@ -40,11 +40,12 @@ Importable = TypeVar("Importable")
 class DataClass(Protocol):
     __dataclass_fields__: Dict[str, Field]
 
+    def __init__(self, *args, **kwargs) -> None:
+        ...
+
 
 @runtime_checkable
 class Builds(DataClass, Protocol[_T]):  # pragma: no cover
-    def __init__(self, *args, **kwargs) -> None:
-        ...
 
     _target_: str
 
