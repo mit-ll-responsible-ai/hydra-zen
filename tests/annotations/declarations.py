@@ -95,10 +95,10 @@ class SomeDataClass:
 
 
 def f6():
-    some_dataclass: DataClass = SomeDataClass()
+    some_dataclass = SomeDataClass()
 
-    out1: Any = instantiate(SomeDataClass)
-    out2: Any = instantiate(some_dataclass)
+    out1 = instantiate(SomeDataClass)
+    out2 = instantiate(some_dataclass)
 
 
 def f7():
