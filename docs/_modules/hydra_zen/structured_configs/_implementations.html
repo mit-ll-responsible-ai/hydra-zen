@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.3.0rc3+20.ge7838e3 documentation</title>
+  <title>hydra_zen.structured_configs._implementations &mdash; hydra-zen 0.3.0rc3+21.g4831914 documentation</title>
   
 
   
@@ -751,8 +751,11 @@
 <span class="sd">        to ensure future-compatibility, and cannot be specified by the user.</span>
 
 <span class="sd">    zen_partial : bool, optional (default=False)</span>
-<span class="sd">        If True, then Hydra-instantiation produces ``functools.partial(target, *pos_args, **kwargs_for_target)``,</span>
-<span class="sd">        this enables the partial-configuration of objects.</span>
+<span class="sd">        If True, then the resulting config will instantiate as</span>
+<span class="sd">        ``functools.partial(hydra_target, *pos_args, **kwargs_for_target)`` rather than</span>
+<span class="sd">        ``hydra_target(*pos_args, **kwargs_for_target)``.</span>
+
+<span class="sd">        Thus this enables the partial-configuration of objects.</span>
 
 <span class="sd">        Specifying ``zen_partial=True`` and ``populate_full_signature=True`` together will</span>
 <span class="sd">        populate the dataclass&#39; signature only with parameters that are specified by the</span>
@@ -959,6 +962,9 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;`hydra_convert` must be &#39;none&#39;, &#39;partial&#39;, or &#39;all&#39;, got: </span><span class="si">{</span><span class="n">hydra_convert</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">frozen</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;frozen must be a bool, got: </span><span class="si">{</span><span class="n">frozen</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">dataclass_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataclass_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
@@ -1588,6 +1594,181 @@
         <span class="k">pass</span>  <span class="c1"># makes sure we cover this branch in tests</span>
 
     <span class="k">return</span> <span class="n">target</span></div>
+
+
+<span class="n">_builds_sig</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">builds</span><span class="p">)</span>
+<span class="n">__BUILDS_DEFAULTS</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">default</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">_builds_sig</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">kind</span> <span class="ow">is</span> <span class="n">p</span><span class="o">.</span><span class="n">KEYWORD_ONLY</span>
+<span class="p">}</span>
+<span class="k">del</span> <span class="n">_builds_sig</span>
+
+
+<span class="k">def</span> <span class="nf">make_custom_builds_fn</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">zen_partial</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(),</span>
+    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
+    <span class="c1"># This is the easiest way to get static tooling to see the output</span>
+    <span class="c1"># as `builds`.</span>
+    <span class="n">__b</span><span class="p">:</span> <span class="n">_T2</span> <span class="o">=</span> <span class="n">builds</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T2</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns the `builds` function, but with customized default values.</span>
+
+<span class="sd">    E.g. ``make_custom_builds_fn(hydra_convert=&#39;all&#39;)`` will return a version</span>
+<span class="sd">    of the `builds` function where the default value for ``hydra_convert``</span>
+<span class="sd">    is ``&#39;all&#39;`` instead of ``None``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    zen_partial : bool, optional (default=False)</span>
+<span class="sd">        If True, then the resulting config will instantiate as</span>
+<span class="sd">        ``functools.partial(hydra_target, *pos_args, **kwargs_for_target)`` rather than</span>
+<span class="sd">        ``hydra_target(*pos_args, **kwargs_for_target)``.</span>
+
+<span class="sd">        Thus this enables the partial-configuration of objects.</span>
+
+<span class="sd">        Specifying ``zen_partial=True`` and ``populate_full_signature=True`` together will</span>
+<span class="sd">        populate the dataclass&#39; signature only with parameters that are specified by the</span>
+<span class="sd">        user or that have default values specified in the target&#39;s signature. I.e. it is</span>
+<span class="sd">        presumed that un-specified parameters are to be excluded from the partial configuration.</span>
+
+<span class="sd">    zen_wrappers : None | Callable | Builds | InterpStr | Sequence[None | Callable | Builds | InterpStr]</span>
+<span class="sd">        One or more wrappers, which will wrap ``hydra_target`` prior to instantiation.</span>
+<span class="sd">        E.g. specifying the wrappers ``[f1, f2, f3]`` will instantiate as::</span>
+
+<span class="sd">            f3(f2(f1(hydra_target)))(*args, **kwargs)</span>
+
+<span class="sd">        Wrappers can also be specified as interpolated strings [2]_ or targeted structured</span>
+<span class="sd">        configs.</span>
+
+<span class="sd">    zen_meta: Optional[Mapping[str, Any]]</span>
+<span class="sd">        Specifies field-names and corresponding values that will be included in the</span>
+<span class="sd">        resulting dataclass, but that will *not* be used to build ``hydra_target``</span>
+<span class="sd">        via instantiation. These are called &quot;meta&quot; fields.</span>
+
+<span class="sd">    populate_full_signature : bool, optional (default=False)</span>
+<span class="sd">        If ``True``, then the resulting dataclass&#39;s signature and fields will be populated</span>
+<span class="sd">        according to the signature of ``hydra_target``.</span>
+
+<span class="sd">        Values specified in **kwargs_for_target take precedent over the corresponding</span>
+<span class="sd">        default values from the signature.</span>
+
+<span class="sd">        This option is not available for objects with inaccessible signatures, such as</span>
+<span class="sd">        NumPy&#39;s various ufuncs.</span>
+
+<span class="sd">    hydra_recursive : Optional[bool], optional (default=True)</span>
+<span class="sd">        If ``True``, then Hydra will recursively instantiate all other</span>
+<span class="sd">        hydra-config objects nested within this dataclass [3]_.</span>
+
+<span class="sd">        If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.</span>
+
+<span class="sd">    hydra_convert: Optional[Literal[&quot;none&quot;, &quot;partial&quot;, &quot;all&quot;]], optional (default=&quot;none&quot;)</span>
+<span class="sd">        Determines how hydra handles the non-primitive objects passed to `target` [4]_.</span>
+
+<span class="sd">        - ``&quot;none&quot;``: Passed objects are DictConfig and ListConfig, default</span>
+<span class="sd">        - ``&quot;partial&quot;``: Passed objects are converted to dict and list, with</span>
+<span class="sd">          the exception of Structured Configs (and their fields).</span>
+<span class="sd">        - ``&quot;all&quot;``: Passed objects are dicts, lists and primitives without</span>
+<span class="sd">          a trace of OmegaConf containers</span>
+
+<span class="sd">        If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.</span>
+
+<span class="sd">    frozen : bool, optional (default=False)</span>
+<span class="sd">        If ``True``, the resulting dataclass will create frozen (i.e. immutable) instances.</span>
+<span class="sd">        I.e. setting/deleting an attribute of an instance will raise ``FrozenInstanceError``</span>
+<span class="sd">        at runtime.</span>
+
+<span class="sd">    builds_bases : Tuple[DataClass, ...]</span>
+<span class="sd">        Specifies a tuple of parent classes that the resulting dataclass inherits from.</span>
+<span class="sd">        A ``PartialBuilds`` class (resulting from ``zen_partial=True``) cannot be a parent</span>
+<span class="sd">        of a ``Builds`` class (i.e. where `zen_partial=False` was specified).</span>
+
+<span class="sd">    returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    builds</span>
+<span class="sd">        The function `builds`, but with customized default-values.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    builds</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from hydra_zen import builds, make_custom_builds_fn, instantiate</span>
+
+<span class="sd">    The following will create a `builds` function whose default-value</span>
+<span class="sd">    for ``zen_partial`` has been set to ``True``.</span>
+
+<span class="sd">    &gt;&gt;&gt; pbuilds = make_custom_builds_fn(zen_partial=True)</span>
+
+<span class="sd">    I.e. using ``pbuilds(...)`` is equivalent to using</span>
+<span class="sd">    ``builds(..., zen_partial=True)``.</span>
+
+<span class="sd">    &gt;&gt;&gt; instantiate(pbuilds(int))  # calls `functools.partial(int)`</span>
+<span class="sd">    functools.partial(&lt;class &#39;int&#39;&gt;)</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(builds(int, zen_partial=True))  # manually-overriding default</span>
+<span class="sd">    functools.partial(&lt;class &#39;int&#39;&gt;)</span>
+
+<span class="sd">    You can still specify ``zen_partial`` on a per-case basis with ``pbuilds``</span>
+
+<span class="sd">    &gt;&gt;&gt; instantiate(pbuilds(int, zen_partial=False))  # calls `int()`</span>
+<span class="sd">    0</span>
+
+<span class="sd">    Suppose that we want to enable runtime type-checking - using beartype -</span>
+<span class="sd">    whenever our configs are being instantiated; then the following settings</span>
+<span class="sd">    for `builds` would be handy</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydra_zen.third_party.beartype import validates_with_beartype</span>
+<span class="sd">    &gt;&gt;&gt; build_a_bear = make_custom_builds_fn(</span>
+<span class="sd">    ...     populate_full_signature=True,</span>
+<span class="sd">    ...     hydra_convert=&quot;all&quot;,</span>
+<span class="sd">    ...     zen_wrappers=validates_with_beartype,</span>
+<span class="sd">    ... )</span>
+
+<span class="sd">    Now all configs produced via ``build_a_bear`` will include type-checking</span>
+<span class="sd">    during instantiation.</span>
+
+<span class="sd">    &gt;&gt;&gt; from typing_extensions import Literal</span>
+<span class="sd">    &gt;&gt;&gt; def f(x: Literal[&quot;a&quot;, &quot;b&quot;]): return x</span>
+<span class="sd">    &gt;&gt;&gt; conf = build_a_bear(f)</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(conf, x=&quot;a&quot;)</span>
+<span class="sd">    &quot;a&quot;</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(conf, x=&quot;c&quot;)</span>
+<span class="sd">    &lt;Validation error: &quot;c&quot; is not &quot;a&quot; or &quot;b&quot;&gt;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">__b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">builds</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;make_custom_builds_fn() got an unexpected argument: &#39;__b&#39;&quot;</span><span class="p">)</span>
+    <span class="k">del</span> <span class="n">__b</span>
+
+    <span class="n">excluded_fields</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;dataclass_name&quot;</span><span class="p">}</span>
+    <span class="n">LOCALS</span> <span class="o">=</span> <span class="nb">locals</span><span class="p">()</span>
+
+    <span class="c1"># Ensures that new defaults added to `builds` must be reflected</span>
+    <span class="c1"># in the signature of `make_custom_builds_fn`.</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">__BUILDS_DEFAULTS</span><span class="p">)</span> <span class="o">-</span> <span class="n">excluded_fields</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">LOCALS</span><span class="p">)</span>
+
+    <span class="n">_new_defaults</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">name</span><span class="p">:</span> <span class="n">LOCALS</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">__BUILDS_DEFAULTS</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">excluded_fields</span>
+    <span class="p">}</span>
+
+    <span class="c1"># let `builds` validate the new defaults!</span>
+    <span class="n">builds</span><span class="p">(</span><span class="n">builds</span><span class="p">,</span> <span class="o">**</span><span class="n">_new_defaults</span><span class="p">)</span>
+
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">builds</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">merged_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">merged_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_new_defaults</span><span class="p">)</span>
+        <span class="n">merged_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">builds</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">merged_kwargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">_T2</span><span class="p">,</span> <span class="n">wrapped</span><span class="p">)</span>
 </pre></div>
 
            </div>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>builds &mdash; hydra-zen 0.3.0rc3+20.ge7838e3 documentation</title>
+  <title>builds &mdash; hydra-zen 0.3.0rc3+21.g4831914 documentation</title>
   
 
   
@@ -203,8 +203,10 @@ resulting dataclass, unless <code class="docutils literal notranslate"><span cla
 <p>Named parameters of the forms <code class="docutils literal notranslate"><span class="pre">hydra_xx</span></code>, <code class="docutils literal notranslate"><span class="pre">zen_xx</span></code>, and <code class="docutils literal notranslate"><span class="pre">_zen_xx</span></code> are reserved
 to ensure future-compatibility, and cannot be specified by the user.</p>
 </dd>
-<dt><strong>zen_partial</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If True, then Hydra-instantiation produces <code class="docutils literal notranslate"><span class="pre">functools.partial(target,</span> <span class="pre">*pos_args,</span> <span class="pre">**kwargs_for_target)</span></code>,
-this enables the partial-configuration of objects.</p>
+<dt><strong>zen_partial</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If True, then the resulting config will instantiate as
+<code class="docutils literal notranslate"><span class="pre">functools.partial(hydra_target,</span> <span class="pre">*pos_args,</span> <span class="pre">**kwargs_for_target)</span></code> rather than
+<code class="docutils literal notranslate"><span class="pre">hydra_target(*pos_args,</span> <span class="pre">**kwargs_for_target)</span></code>.</p>
+<p>Thus this enables the partial-configuration of objects.</p>
 <p>Specifying <code class="docutils literal notranslate"><span class="pre">zen_partial=True</span></code> and <code class="docutils literal notranslate"><span class="pre">populate_full_signature=True</span></code> together will
 populate the dataclass’ signature only with parameters that are specified by the
 user or that have default values specified in the target’s signature. I.e. it is
