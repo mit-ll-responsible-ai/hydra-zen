@@ -12,10 +12,16 @@ from omegaconf import OmegaConf
 from omegaconf.errors import OmegaConfBaseException, ValidationError
 
 from hydra_zen import ZenField, builds, instantiate, make_config, to_yaml
+from hydra_zen.structured_configs._implementations import NOTHING
 from tests import everything_except
 from tests.custom_strategies import partitions
 
 not_a_string = everything_except(str)
+
+
+def test_NOTHING_cannot_be_instantiated():
+    with pytest.raises(TypeError):
+        NOTHING()
 
 
 @settings(max_examples=10)

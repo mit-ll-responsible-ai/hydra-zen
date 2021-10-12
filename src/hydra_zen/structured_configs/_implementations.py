@@ -1614,7 +1614,8 @@ def make_custom_builds_fn(
 
 
 class NOTHING:
-    pass
+    def __init__(self) -> None:
+        raise TypeError("`NOTHING` cannot be instantiated")
 
 
 @dataclass
