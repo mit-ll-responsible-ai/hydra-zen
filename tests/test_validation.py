@@ -23,7 +23,7 @@ from tests import everything_except
 
 def test_builds_no_args_raises():
     with pytest.raises(TypeError):
-        builds()
+        builds()  # type: ignore
 
 
 def test_builds_no_positional_target_raises():
@@ -34,12 +34,12 @@ def test_builds_no_positional_target_raises():
 @pytest.mark.filterwarnings("ignore:Specifying the target of")
 def test_target_as_kwarg_is_deprecated():
     with pytest.warns(HydraZenDeprecationWarning):
-        builds(target=int)
+        builds(target=int)  # type: ignore
 
 
 @pytest.mark.filterwarnings("ignore:Specifying the target of")
 def test_builds_target_as_kwarg_is_still_correct():
-    out = instantiate(builds(target=dict, a=2, b=3, zen_partial=True))()
+    out = instantiate(builds(target=dict, a=2, b=3, zen_partial=True))()  # type: ignore
     assert out == {"a": 2, "b": 3}
 
 
@@ -55,7 +55,7 @@ def test_hydra_partial_is_still_works(as_partial):
     out = instantiate(builds(int, hydra_partial=as_partial))
 
     if as_partial:
-        assert out() == 0
+        assert out() == 0  # type: ignore
     else:
         assert out == 0
 
@@ -136,7 +136,7 @@ def test_builds_zen_meta_not_mapping_raises(not_a_mapping):
 
 def test_builds_zen_meta_with_non_string_keys_raises():
     with pytest.raises(TypeError):
-        builds(int, zen_meta={1: None})
+        builds(int, zen_meta={1: None})  # type: ignore
 
 
 def f_starx(*x):
@@ -376,7 +376,7 @@ def test_hydrated_dataclass_from_instance_raise():
 
     instance_of_a = A()
     with pytest.raises(NotImplementedError):
-        hydrated_dataclass(dict)(instance_of_a)
+        hydrated_dataclass(dict)(instance_of_a)  # type: ignore
 
 
 @given(partial=st.booleans(), full_sig=st.booleans())
@@ -398,7 +398,7 @@ def test_just_raises_for_unimportable_target():
 
 def test_get_target_on_non_builds():
     with pytest.raises(TypeError):
-        get_target(1)
+        get_target(1)  # type: ignore
 
 
 RESERVED_FIELD_NAMES = sorted(_HYDRA_FIELD_NAMES) + [
