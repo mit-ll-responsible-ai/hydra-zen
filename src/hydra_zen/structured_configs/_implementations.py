@@ -32,7 +32,12 @@ from hydra_zen.errors import HydraZenDeprecationWarning
 from hydra_zen.funcs import get_obj, partial, zen_processing
 from hydra_zen.structured_configs import _utils
 from hydra_zen.typing import Builds, Importable, Just, PartialBuilds
-from hydra_zen.typing._implementations import DataClass, HasPartialTarget, HasTarget
+from hydra_zen.typing._implementations import (
+    DataClass,
+    HasPartialTarget,
+    HasTarget,
+    _DataClass,
+)
 
 try:
     # used to check if default values are ufuncs
@@ -1454,9 +1459,106 @@ def make_config(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     config_name: str = "Config",
     frozen: bool = False,
-    bases=(),
+    bases: Tuple[Type[DataClass], ...] = (),
     **fields_as_kwargs,
-) -> Type[DataClass]:
+) -> Type[_DataClass]:
+    """
+    Creates a structured config with user-defined fieldnames and, optionally,
+    associated default values and/or type-annotations.
+
+    Unlike `builds`, `make_config` is not used to configure a particular target
+    object, rather, it can be used to create more general structured configs [1]_.
+
+    Parameters
+    ----------
+    *fields_as_args : str | ZenField
+        The names of the fields to be be included in the config. Or,
+        the fields' names and their default values and/or their type
+        annotations, expressed via `ZenField` instances.
+
+    **fields_as_kwargs : Any | ZenField
+        Like ``fields_as_args``, but fieldname/default-value pairs are
+        specified as keyword arguments. `ZenField` can also be used here
+        to express a fields type-annotation and/or its default value.
+
+    hydra_recursive : Optional[bool], optional (default=True)
+        If ``True``, then Hydra will recursively instantiate all other
+        hydra-config objects nested within this dataclass [2]_.
+
+        If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.
+
+    hydra_convert: Optional[Literal["none", "partial", "all"]], optional (default="none")
+        Determines how Hydra handles the non-primitive objects passed to `target` [3]_.
+
+        - ``"none"``: Passed objects are DictConfig and ListConfig, default
+        - ``"partial"``: Passed objects are converted to dict and list, with
+            the exception of Structured Configs (and their fields).
+        - ``"all"``: Passed objects are dicts, lists and primitives without
+            a trace of OmegaConf containers
+
+        If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.
+
+    frozen : bool, optional (default=False)
+        If ``True``, the resulting config class will produce 'frozen' (i.e. immutable) instances.
+        I.e. setting/deleting an attribute of an instance of the config will raise
+        ``dataclasses.FrozenInstanceError`` at runtime.
+
+    config_name : str, optional (default="Config")
+        The class name of the resulting config class.
+
+    Returns
+    -------
+    Config : Type[DataClass]
+        The resulting config class; a dataclass with the specified fields and values attached
+        to it.
+
+    Notes
+    -----
+    Any field specified without a type-annotation is automatically annotated with ``typing.Any``.
+    Hydra only supports a narrow subset of types [4]_; `make_config` will automatically 'broaden'
+    any user-specified annotations so that they are compatible with Hydra.
+
+    `make_config` will automatically manipulate certain types of default values to ensure that
+    they can be utilized in the resulting dataclass and by Hydra:
+       - Mutable default values will automatically be packaged in a default factory function [5]_
+       - A default value that is a class-object or function-object will automatically be wrapped by
+       `just`, to ensure that the resulting config is serializable by Hydra.
+
+    For finer-grain control over how type-annotations and default values are managed, consider using
+    ``dataclasses.make_dataclass`` [6]_.
+
+    See Also
+    --------
+    builds : Create a targeted structured figure – designed to "build" a particular object.
+    just : Create a config that 'just' returns a class-object or function, without instantiating/calling it.
+
+    References
+    ----------
+    .. [1] https://hydra.cc/docs/next/tutorials/structured_config/intro/
+    .. [2] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
+    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
+    .. [4] https://hydra.cc/docs/next/tutorials/structured_config/intro/#structured-configs-supports
+    .. [5] https://docs.python.org/3/library/dataclasses.html#default-factory-functions
+    .. [6] https://docs.python.org/3/library/dataclasses.html#dataclasses.make_dataclass
+
+    Examples
+    --------
+    >>> from hydra_zen import make_config, to_yaml
+    >>> def pp(x): return print(to_yaml(x))  # pretty-print config as yaml
+
+    Let's create a bare-bones config with two fields, named 'a' and 'b'.
+
+    >>> Conf = make_config("a", "b")  # sig: `Conf(a: Any, b: Any)`
+    >>> pp(Conf)
+    a: ???
+    b: ???
+
+    Configuring these fields with particular values:
+
+    >>> pp(Conf(1, "hi"))
+    a: 1
+    b: hi
+    """
     for _field in fields_as_args:
         if not isinstance(_field, (str, ZenField)):
             raise TypeError(
