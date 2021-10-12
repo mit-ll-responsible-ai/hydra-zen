@@ -13,43 +13,7 @@ from omegaconf.errors import OmegaConfBaseException, ValidationError
 
 from hydra_zen import ZenField, builds, instantiate, make_config, to_yaml
 from tests import everything_except
-
-# CODE BLOCK REDUNDANT WITH PR #129: WILL BE DELETED ONCE 129 MERGED
-_Sequence = Union[List, Tuple, Deque]
-T = TypeVar("T", bound=Union[_Sequence, Dict[str, Any]])
-
-
-@st.composite
-def _partition(draw: st.DrawFn, collection: T, ordered: bool) -> Tuple[T, T]:
-
-    if isinstance(collection, dict):
-        keys = list(collection)
-    else:
-        keys = list(range(len(collection)))
-
-    divider = draw(st.integers(0, len(keys)))
-
-    if not ordered:
-        keys = draw(st.permutations(keys))
-
-    keys_a, keys_b = keys[divider:], keys[:divider]
-    if not isinstance(collection, dict):
-        caster = type(collection)
-        return tuple((caster(collection[k] for k in keys)) for keys in [keys_a, keys_b])  # type: ignore
-    else:
-        return tuple(({k: collection[k] for k in keys}) for keys in [keys_a, keys_b])  # type: ignore
-
-
-def partitions(
-    collection: Union[T, st.SearchStrategy[T]], ordered: bool = True
-) -> st.SearchStrategy[Tuple[T, T]]:
-    """Randomly partitions a collection or dictionary into two partitions."""
-    if isinstance(collection, st.SearchStrategy):
-        return collection.flatmap(lambda x: _partition(x, ordered=ordered))  # type: ignore
-    return cast(st.SearchStrategy[Tuple[T, T]], _partition(collection, ordered))
-
-
-# END REDUNDANT
+from tests.custom_strategies import partitions
 
 not_a_string = everything_except(str)
 

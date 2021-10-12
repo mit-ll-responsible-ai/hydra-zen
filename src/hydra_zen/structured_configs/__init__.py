@@ -7,6 +7,7 @@ from ._implementations import (
     hydrated_dataclass,
     just,
     make_config,
+    make_custom_builds_fn,
     mutable_value,
 )
 
@@ -17,4 +18,5 @@ __all__ = [
     "mutable_value",
     "make_config",
     "ZenField",
+    "make_custom_builds_fn",
 ]
