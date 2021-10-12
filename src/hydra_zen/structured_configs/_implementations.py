@@ -1729,16 +1729,31 @@ def make_config(
 
     Let's create a bare-bones config with two fields, named 'a' and 'b'.
 
-    >>> Conf = make_config("a", "b")  # sig: `Conf(a: Any, b: Any)`
-    >>> pp(Conf)
+    >>> Conf1 = make_config("a", "b")  # sig: `Conf(a: Any, b: Any)`
+    >>> pp(Conf1)
     a: ???
     b: ???
 
     Configuring these fields with particular values:
 
-    >>> pp(Conf(1, "hi"))
+    >>> pp(Conf1(1, "hi"))
     a: 1
     b: hi
+
+    We can also specify fields via keyword args; this is especially convenient
+    for providing associated default values.
+
+    >>> Conf2 = make_config("unit", data=[-10, -20], reduction=sum)
+    >>> pp(Conf2)
+    unit: ???
+    data:
+    - -10
+    - -20
+    reduction:
+    _target_: hydra_zen.funcs.get_obj
+    path: builtins.sum
+
+    Configurations can be nested
     """
     for _field in fields_as_args:
         if not isinstance(_field, (str, ZenField)):
