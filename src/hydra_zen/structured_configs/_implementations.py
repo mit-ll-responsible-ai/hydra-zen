@@ -1754,6 +1754,22 @@ def make_config(
     path: builtins.sum
 
     Configurations can be nested
+
+    >>> Conf3 = make_config(c1=Conf1(a=1, b=2), c2=Conf2)
+    >>> pp(Conf3)
+    c1:
+      a: 1
+      b: 2
+    c2:
+      unit: ???
+      data:
+      - -10
+      - -20
+      reduction:
+        _target_: hydra_zen.funcs.get_obj
+        path: builtins.sum
+    >>> Conf3.c1.a
+    1
     """
     for _field in fields_as_args:
         if not isinstance(_field, (str, ZenField)):
