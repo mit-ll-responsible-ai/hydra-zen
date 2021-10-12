@@ -1680,6 +1680,9 @@ def make_config(
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.
 
+    bases : Tuple[Type[DataClass], ...], optional (default=())
+        Base classes that the resulting config class will inherit from.
+
     frozen : bool, optional (default=False)
         If ``True``, the resulting config class will produce 'frozen' (i.e. immutable) instances.
         I.e. setting/deleting an attribute of an instance of the config will raise
@@ -1691,8 +1694,7 @@ def make_config(
     Returns
     -------
     Config : Type[DataClass]
-        The resulting config class; a dataclass with the specified fields and values attached
-        to it.
+        The resulting config class; a dataclass that possess the user-specified fields.
 
     Notes
     -----
@@ -1765,6 +1767,17 @@ def make_config(
       - -20
     >>> Conf3.c1.a
     1
+
+    Configurations can be composed via inheritance
+
+    >>> pp(make_config(c=2, bases=(Conf2, Conf1)))
+    a: ???
+    b: ???
+    unit: ???
+    data:
+    - -10
+    - -20
+    c: 2
 
     **Using ZenField to Provide Type Information**
 
