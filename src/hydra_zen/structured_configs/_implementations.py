@@ -1734,7 +1734,7 @@ def make_config(
     a: ???
     b: ???
 
-    Configuring these fields with particular values:
+    Now we'll configure these fields with particular values:
 
     >>> pp(Conf1(1, "hi"))
     a: 1
@@ -1743,15 +1743,12 @@ def make_config(
     We can also specify fields via keyword args; this is especially convenient
     for providing associated default values.
 
-    >>> Conf2 = make_config("unit", data=[-10, -20], reduction=sum)
+    >>> Conf2 = make_config("unit", data=[-10, -20])
     >>> pp(Conf2)
     unit: ???
     data:
     - -10
     - -20
-    reduction:
-    _target_: hydra_zen.funcs.get_obj
-    path: builtins.sum
 
     Configurations can be nested
 
@@ -1765,11 +1762,33 @@ def make_config(
       data:
       - -10
       - -20
-      reduction:
-        _target_: hydra_zen.funcs.get_obj
-        path: builtins.sum
     >>> Conf3.c1.a
     1
+
+    **Using ZenField to Provide Type Information**
+
+    The `ZenField` class can be used to include a type-annotation in association
+    with a field.
+
+    >>> from hydra_zen import ZenField as zf
+    >>> ProfileConf = make_config(username=zf(str), age=zf(int))
+    >>> # signature: ProfileConf(username: str, age: int)
+
+    Providing type annotations is optional, but doing so enables Hydra to perform
+    checks at runtime to ensure that a configured value matches its associated type [4]_.
+
+    >>> pp(ProfileConf(username="piro", age=False))  # age should be an integer
+    <ValidationError: Value 'False' could not be converted to Integer>
+
+    These default values can be provides alongside type-annotations
+
+    >>> C = make_config(age=zf(int, 0))  # signature: C(age: int = 0)
+
+    `ZenField` can also be used to specify ``fields_as_args``; here, field names
+    must be specified as well.
+
+    >>> C2 = make_config(zf(name="username", hint=str), age=zf(int, 0))
+    >>> # signature: C2(username: str, age: int = 0)
     """
     for _field in fields_as_args:
         if not isinstance(_field, (str, ZenField)):
