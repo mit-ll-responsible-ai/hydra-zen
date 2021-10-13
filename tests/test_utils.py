@@ -10,7 +10,7 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Type, TypeVa
 
 import hypothesis.strategies as st
 import pytest
-from hypothesis import given
+from hypothesis import given, settings
 from omegaconf import II, OmegaConf, ValidationError
 from omegaconf.errors import (
     ConfigIndexError,
@@ -253,6 +253,7 @@ def test_is_interpolated_against_omegaconf_generated_interpolated_strs(text):
     assert instantiate(builds(f_for_interp, text), **{text[2:-1]: 1}) == 1
 
 
+@settings(deadline=None)
 @given(everything_except(str))
 def test_non_strings_are_not_interpolated_strings(not_a_str):
     assert not is_interpolated_string(not_a_str)

@@ -118,7 +118,7 @@ tracked_funcs.extend(["${..f1}", "${..f2}", "${..f3}", "${..none}"])
 a_tracked_wrapper = st.sampled_from(tracked_funcs)
 
 
-@settings(max_examples=500)  # ensures coverage of various branches
+@settings(max_examples=500, deadline=None)  # ensures coverage of various branches
 @given(
     wrappers=a_tracked_wrapper | st.lists(a_tracked_wrapper),
     args=st.lists(st.integers()),
