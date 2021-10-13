@@ -14,12 +14,3 @@ def everything_except(*excluded_types: type):
         .flatmap(st.from_type)
         .filter(lambda x: not isinstance(x, excluded_types))
     )
-
-
-from hydra._internal.core_plugins.basic_sweeper import BasicSweeper
-
-# Forces the plugin to be local and not installed in the 
-# Hydra Path
-class MyBasicSweeper(BasicSweeper):
-    def __init__(self, max_batch_size) -> None:
-        super().__init__(max_batch_size=max_batch_size)

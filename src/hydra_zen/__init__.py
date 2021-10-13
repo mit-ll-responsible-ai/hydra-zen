@@ -8,6 +8,7 @@ from ._hydra_overloads import (
     save_as_yaml,
     to_yaml,
 )
+from ._launch import launch
 from ._version import get_versions
 from .structured_configs import (
     builds,
@@ -17,8 +18,6 @@ from .structured_configs import (
     mutable_value,
 )
 from .structured_configs._implementations import get_target
-
-from ._launch import launch
 
 __all__ = [
     "builds",

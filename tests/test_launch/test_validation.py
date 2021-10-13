@@ -61,7 +61,9 @@ def test_launch_with_hydra_in_config(overrides, hydra_overrides, expected):
     ],
 )
 @pytest.mark.parametrize("hydra_overrides", [[], ["hydra.sweep.dir=test"]])
-def test_launch_with_multirun_with_hydra_in_config(overrides, hydra_overrides, expected):
+def test_launch_with_multirun_with_hydra_in_config(
+    overrides, hydra_overrides, expected
+):
     # validate hydra_launch executes properly if config contains
     # hydra configuration object
     cn = _store_config(builds(dict, a=1, b=1))
@@ -78,7 +80,9 @@ def test_launch_with_multirun_with_hydra_in_config(overrides, hydra_overrides, e
     task_cfg.b = 10
 
     # override works and user value is set
-    job = launch(task_cfg, task_function=instantiate, overrides=overrides, multirun=True)
+    job = launch(
+        task_cfg, task_function=instantiate, overrides=overrides, multirun=True
+    )
     for e, j, k in zip(expected, job[0], range(len(expected))):
         assert j.return_value == e
         assert j.working_dir == f"tested{os.path.sep}{k}"
@@ -109,7 +113,7 @@ def test_launch_with_multirun_with_default_values():
         task_cfg,
         task_function=lambda _: print("hello"),
         overrides=["+a=b2,b4"],
-        multirun=True
+        multirun=True,
     )
 
     # need the + sign
@@ -118,7 +122,7 @@ def test_launch_with_multirun_with_default_values():
             task_cfg,
             task_function=lambda _: print("hello"),
             overrides=["a=b2,b4"],
-            multirun=True
+            multirun=True,
         )
 
     # a default is set for "a"
@@ -128,5 +132,5 @@ def test_launch_with_multirun_with_default_values():
             task_cfg,
             task_function=lambda _: print("hello"),
             overrides=["a=b2,b4"],
-            multirun=True
+            multirun=True,
         )

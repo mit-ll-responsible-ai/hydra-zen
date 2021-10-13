@@ -82,7 +82,10 @@ def test_hydra_run_with_callback(multirun):
         assert not any(tracker())  # ensures all flags are false
 
         job = launch(
-            cfg, task_function=instantiate, overrides=["hydra/callbacks=test_callback"], multirun=multirun
+            cfg,
+            task_function=instantiate,
+            overrides=["hydra/callbacks=test_callback"],
+            multirun=multirun,
         )
 
         if multirun:

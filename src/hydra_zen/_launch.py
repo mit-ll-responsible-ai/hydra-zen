@@ -57,7 +57,7 @@ def launch(
     config_name: str = "hydra_run",
     job_name: str = "hydra_run",
     with_log_configuration: bool = True,
-    multirun: bool = False
+    multirun: bool = False,
 ) -> Union[JobReturn, Any]:
     """Launch a Hydra job defined by `task_function` using the configuration
     provided in `config`.
@@ -106,7 +106,7 @@ def launch(
         Flag to configure logging subsystem from the loaded config
 
     multirun: bool (default: False)
-        Launch a Hydra multi-run ([3]_) 
+        Launch a Hydra multi-run ([3]_)
 
     Returns
     -------
@@ -256,7 +256,9 @@ def launch(
                 task_function=task_function,
             )
 
-            task_overrides = OmegaConf.to_container(cfg.hydra.overrides.task, resolve=False)
+            task_overrides = OmegaConf.to_container(
+                cfg.hydra.overrides.task, resolve=False
+            )
             assert isinstance(task_overrides, list)
 
             job = sweeper.sweep(arguments=task_overrides)
