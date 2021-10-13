@@ -1512,7 +1512,7 @@ def make_custom_builds_fn(
         If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.
 
     hydra_convert: Optional[Literal["none", "partial", "all"]], optional (default="none")
-        Determines how hydra handles the non-primitive objects passed to `target` [4]_.
+        Determines how hydra handles the non-primitive objects passed to ``hydra_target`` [4]_.
 
         - ``"none"``: Passed objects are DictConfig and ListConfig, default
         - ``"partial"``: Passed objects are converted to dict and list, with
@@ -1670,7 +1670,7 @@ def make_config(
         If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.
 
     hydra_convert: Optional[Literal["none", "partial", "all"]], optional (default="none")
-        Determines how Hydra handles the non-primitive objects passed to `target` [3]_.
+        Determines how Hydra handles the non-primitive objects passed to configuations [3]_.
 
         - ``"none"``: Passed objects are DictConfig and ListConfig, default
         - ``"partial"``: Passed objects are converted to dict and list, with
