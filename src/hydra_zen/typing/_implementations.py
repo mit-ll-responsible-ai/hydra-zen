@@ -37,14 +37,24 @@ InterpStr = NewType("InterpStr", str)
 Importable = TypeVar("Importable")
 
 
-class DataClass(Protocol):
+class _DataClass(Protocol):  # pragma: no cover
+    # doesn't provide __init__, __getattribute__, etc.
     __dataclass_fields__: Dict[str, Field]
+
+
+class DataClass(_DataClass, Protocol):  # pragma: no cover
+    def __init__(self, *args, **kwargs) -> None:
+        ...
+
+    def __getattribute__(self, name: str) -> Any:
+        ...
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        ...
 
 
 @runtime_checkable
 class Builds(DataClass, Protocol[_T]):  # pragma: no cover
-    def __init__(self, *args, **kwargs) -> None:
-        ...
 
     _target_: str
 

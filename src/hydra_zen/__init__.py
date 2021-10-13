@@ -10,9 +10,11 @@ from ._hydra_overloads import (
 )
 from ._version import get_versions
 from .structured_configs import (
+    ZenField,
     builds,
     hydrated_dataclass,
     just,
+    make_config,
     make_custom_builds_fn,
     mutable_value,
 )
@@ -29,6 +31,8 @@ __all__ = [
     "load_from_yaml",
     "save_as_yaml",
     "to_yaml",
+    "make_config",
+    "ZenField",
     "make_custom_builds_fn",
 ]
 
