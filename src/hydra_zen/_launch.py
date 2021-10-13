@@ -49,7 +49,7 @@ def _store_config(
     return config_name
 
 
-def hydra_run(
+def launch(
     config: Union[DataClass, DictConfig, Mapping],
     task_function: Callable[[DictConfig], Any],
     overrides: Optional[List[str]] = None,
@@ -57,7 +57,8 @@ def hydra_run(
     config_name: str = "hydra_run",
     job_name: str = "hydra_run",
     with_log_configuration: bool = True,
-) -> JobReturn:
+    multirun: bool = False
+) -> Union[JobReturn, Any]:
     """Launch a Hydra job defined by `task_function` using the configuration
     provided in `config`.
 
@@ -68,10 +69,19 @@ def hydra_run(
 
     would be::
 
-       >>> job = hydra_run(config, task_function, overrides=["job/group=group_name", "job.group.param=1"])
+       >>> job = launch(config, task_function, overrides=["job/group=group_name", "job.group.param=1"])
 
     This functions executes Hydra and therefore creates its own working directory.  See Configuring Hydra [2]_ for more
     details on customizing Hydra.
+
+    Similarily, to launch a `multirun` job and sweep over parameters the Hydra CLI provided by::
+
+       $ python -m job.task_function job/group=group_name job.group.param=1,2,3 --multirun
+
+    would become::
+
+       >>> job = launch(config, task_function, overrides=["job/group=group_name", "job.group.param=1,2,3"], multirun=True)
+
 
     Parameters
     ----------
@@ -95,21 +105,29 @@ def hydra_run(
     with_log_configuration: bool (default: True)
         Flag to configure logging subsystem from the loaded config
 
+    multirun: bool (default: False)
+        Launch a Hydra multi-run ([3]_) 
+
     Returns
     -------
-    result: JobReturn
-        The object storing the results of the Hydra experiment.
-            - overrides: From `overrides` and `multirun_overrides`
-            - return_value: The return value of the task function
-            - cfg: The configuration object sent to the task function
-            - hydra_cfg: The hydra configuration object
-            - working_dir: The experiment working directory
-            - task_name: The task name of the Hydra job
+
+    result: JobReturn | Any
+        If `multirun = False`:
+            A `JobReturn` object storing the results of the Hydra experiment.
+                - overrides: From `overrides` and `multirun_overrides`
+                - return_value: The return value of the task function
+                - cfg: The configuration object sent to the task function
+                - hydra_cfg: The hydra configuration object
+                - working_dir: The experiment working directory
+                - task_name: The task name of the Hydra job
+        Else:
+            Return values of all launched jobs (depends on the Sweeper implementation).
 
     References
     ----------
     .. [1] https://hydra.cc/docs/next/advanced/override_grammar/basic
     .. [2] https://hydra.cc/docs/next/configure_hydra/intro
+    .. [3] https://hydra.cc/docs/tutorials/basic/running_your_app/multi-run
 
     Examples
     --------
@@ -154,93 +172,6 @@ def hydra_run(
     >>> jobs = hydra_run(cfg, task_function, overrides=["optim.lr=0.1"])
     >>> j.return_value
     0.3054758310317993
-    """
-    config_name = _store_config(config, config_name)
-
-    if config_dir is not None:
-        config_dir = str(Path(config_dir).absolute())
-    search_path = create_config_search_path(config_dir)
-
-    hydra = Hydra.create_main_hydra2(task_name=job_name, config_search_path=search_path)
-    try:
-        job = hydra.run(
-            config_name=config_name,
-            task_function=task_function,
-            overrides=overrides if overrides is not None else [],
-            with_log_configuration=with_log_configuration,
-        )
-    finally:
-        GlobalHydra.instance().clear()
-    return job
-
-
-def hydra_multirun(
-    config: Union[DataClass, DictConfig, Mapping],
-    task_function: Callable[[DictConfig], Any],
-    overrides: Optional[List[str]] = None,
-    config_dir: Optional[Union[str, Path]] = None,
-    config_name: str = "hydra_multirun",
-    job_name: str = "hydra_multirun",
-    with_log_configuration: bool = True,
-) -> Any:
-    """Launch a Hydra multi-run ([1]_) job defined by `task_function` using the configuration
-    provided in `config`.
-
-    Similar to how Hydra CLI works, `overrides` are a string list of configuration
-    values to use for a given experiment run.  For example, the Hydra CLI provided by::
-
-       $ python -m job.task_function job/group=group_name job.group.param=1 --multirun
-
-    would be::
-
-       >>> job = hydra_multirun(config, task_function, overrides=["job/group=group_name", "job.group.param=1"])
-
-    To sweep over parameters the Hydra CLI provided by::
-
-       $ python -m job.task_function job/group=group_name job.group.param=1,2,3 --multirun
-
-    would be::
-
-       >>> job = hydra_multirun(config, task_function, overrides=["job/group=group_name", "job.group.param=1,2,3"])
-
-    This functions executes Hydra and therefore creates its own working directory.  See Configuring Hydra [3]_ for more
-    details on customizing Hydra.
-
-    Parameters
-    ----------
-    config: Union[DataClass, DictConfig]
-        A configuration as a dataclass, configuration object, or a dictionary.
-
-    task_function: Callable[[DictConfig], Any]
-        The function Hydra will execute with the given configuration.
-
-    overrides: Optional[List[str]] (default: None)
-        If provided, overrides default configurations, see [2]_ and [3]_.
-
-    config_dir: Optional[Union[str, Path]] (default: None)
-        Add configuration directories if needed.
-
-    config_name: str (default: "hydra_run")
-        Name of the stored configuration in Hydra's ConfigStore API.
-
-    job_name: str (default: "hydra_multirun")
-
-    with_log_configuration: bool (default: True)
-        Flag to configure logging subsystem from the loaded config
-
-    Returns
-    -------
-    result: Any
-        The return values of all launched jobs (depends on the Sweeper implementation).
-
-    References
-    ----------
-    .. [1] https://hydra.cc/docs/tutorials/basic/running_your_app/multi-run
-    .. [2] https://hydra.cc/docs/next/advanced/override_grammar/basic
-    .. [3] https://hydra.cc/docs/next/configure_hydra/intro
-
-    Examples
-    --------
 
     Simple Hydra multirun:
 
@@ -295,32 +226,41 @@ def hydra_multirun(
 
     hydra = Hydra.create_main_hydra2(task_name=job_name, config_search_path=search_path)
     try:
-        cfg = hydra.compose_config(
-            config_name=config_name,
-            overrides=overrides if overrides is not None else [],
-            with_log_configuration=with_log_configuration,
-            run_mode=RunMode.MULTIRUN,
-        )
+        if not multirun:
+            job = hydra.run(
+                config_name=config_name,
+                task_function=task_function,
+                overrides=overrides if overrides is not None else [],
+                with_log_configuration=with_log_configuration,
+            )
 
-        callbacks = Callbacks(cfg)
-        callbacks.on_multirun_start(config=cfg, config_name=config_name)
+        else:
+            cfg = hydra.compose_config(
+                config_name=config_name,
+                overrides=overrides if overrides is not None else [],
+                with_log_configuration=with_log_configuration,
+                run_mode=RunMode.MULTIRUN,
+            )
 
-        # Instantiate sweeper without using Hydra's Plugin discovery (Zen!)
-        sweeper = instantiate(cfg.hydra.sweeper)
-        assert isinstance(sweeper, Sweeper)
-        sweeper.setup(
-            config=cfg,
-            hydra_context=HydraContext(
-                config_loader=hydra.config_loader, callbacks=callbacks
-            ),
-            task_function=task_function,
-        )
+            callbacks = Callbacks(cfg)
+            callbacks.on_multirun_start(config=cfg, config_name=config_name)
 
-        task_overrides = OmegaConf.to_container(cfg.hydra.overrides.task, resolve=False)
-        assert isinstance(task_overrides, list)
+            # Instantiate sweeper without using Hydra's Plugin discovery (Zen!)
+            sweeper = instantiate(cfg.hydra.sweeper)
+            assert isinstance(sweeper, Sweeper)
+            sweeper.setup(
+                config=cfg,
+                hydra_context=HydraContext(
+                    config_loader=hydra.config_loader, callbacks=callbacks
+                ),
+                task_function=task_function,
+            )
 
-        job = sweeper.sweep(arguments=task_overrides)
-        callbacks.on_multirun_end(config=cfg, config_name=config_name)
+            task_overrides = OmegaConf.to_container(cfg.hydra.overrides.task, resolve=False)
+            assert isinstance(task_overrides, list)
+
+            job = sweeper.sweep(arguments=task_overrides)
+            callbacks.on_multirun_end(config=cfg, config_name=config_name)
 
     finally:
         GlobalHydra.instance().clear()

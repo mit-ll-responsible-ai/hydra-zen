@@ -18,6 +18,8 @@ from .structured_configs import (
 )
 from .structured_configs._implementations import get_target
 
+from ._launch import launch
+
 __all__ = [
     "builds",
     "hydrated_dataclass",
@@ -30,6 +32,7 @@ __all__ = [
     "save_as_yaml",
     "to_yaml",
     "make_custom_builds_fn",
+    "launch",
 ]
 
 __version__ = get_versions()["version"]

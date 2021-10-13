@@ -6,8 +6,7 @@ from hydra.core.utils import JobReturn
 from hydra.experimental.callback import Callback
 from omegaconf import DictConfig
 
-from hydra_zen import builds, instantiate
-from hydra_zen.experimental import hydra_multirun, hydra_run
+from hydra_zen import builds, instantiate, launch
 
 
 class Tracker(NamedTuple):
@@ -73,36 +72,34 @@ def tracker(x=CustomCallback):
 
 
 @pytest.mark.usefixtures("cleandir")
-@pytest.mark.parametrize("fn", [hydra_run, hydra_multirun])
-def test_hydra_run_with_callback(fn):
+@pytest.mark.parametrize("multirun", [False, True])
+def test_hydra_run_with_callback(multirun):
     # Tests that callback methods are called during appropriate
     # stages
     try:
-        is_multirun = fn is hydra_multirun
-
         cfg = builds(tracker)
 
         assert not any(tracker())  # ensures all flags are false
 
-        job = fn(
-            cfg, task_function=instantiate, overrides=["hydra/callbacks=test_callback"]
+        job = launch(
+            cfg, task_function=instantiate, overrides=["hydra/callbacks=test_callback"], multirun=multirun
         )
 
-        if is_multirun:
+        if multirun:
             job = job[0][0]
 
         tracked_mid_run: Tracker = job.return_value
         assert tracked_mid_run.job_start is True
-        assert tracked_mid_run.run_start is not is_multirun
-        assert tracked_mid_run.multirun_start is is_multirun
+        assert tracked_mid_run.run_start is not multirun
+        assert tracked_mid_run.multirun_start is multirun
 
         assert tracked_mid_run.job_end is False
         assert tracked_mid_run.run_end is False
         assert tracked_mid_run.multirun_end is False
 
         assert CustomCallback.JOB_END_CALLED is True
-        assert CustomCallback.RUN_END_CALLED is not is_multirun
-        assert CustomCallback.MULTIRUN_END_CALLED is is_multirun
+        assert CustomCallback.RUN_END_CALLED is not multirun
+        assert CustomCallback.MULTIRUN_END_CALLED is multirun
 
     finally:
         CustomCallback.JOB_START_CALLED = False

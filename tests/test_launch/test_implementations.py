@@ -8,9 +8,8 @@ from hydra import compose, initialize
 from hydra.core.config_store import ConfigStore
 from omegaconf.omegaconf import OmegaConf
 
-from hydra_zen import builds, instantiate
-from hydra_zen.experimental import hydra_multirun, hydra_run
-from hydra_zen.experimental._implementations import _store_config
+from hydra_zen import builds, instantiate, launch
+from hydra_zen._launch import _store_config
 
 
 @pytest.mark.parametrize("as_dataclass", [True, False])
@@ -32,13 +31,13 @@ def test_store_config(as_dataclass, as_dictconfig):
 
 
 @pytest.mark.usefixtures("cleandir")
-@pytest.mark.parametrize("runmode", [hydra_run, hydra_multirun])
+@pytest.mark.parametrize("multirun", [False, True])
 @pytest.mark.parametrize("as_dataclass", [True, False])
 @pytest.mark.parametrize(
     "as_dictconfig, with_hydra", [(True, True), (True, False), (False, False)]
 )
-def test_hydra_run_config_type(
-    runmode,
+def test_launch_config_type(
+    multirun,
     as_dataclass,
     as_dictconfig,
     with_hydra,
@@ -56,7 +55,7 @@ def test_hydra_run_config_type(
             with initialize(config_path=None):
                 cfg = compose(config_name=cn)
 
-    job = runmode(cfg, task_function=instantiate)
+    job = launch(cfg, task_function=instantiate, multirun=multirun)
     if isinstance(job, list):
         job = job[0][0]
 
@@ -69,7 +68,7 @@ def test_hydra_run_config_type(
 )
 @pytest.mark.parametrize("config_dir", [Path.cwd(), None])
 @pytest.mark.parametrize("with_log_configuration", [False, True])
-def test_hydra_run_job(
+def test_launch_job(
     overrides,
     config_dir,
     with_log_configuration,
@@ -77,7 +76,7 @@ def test_hydra_run_job(
     cfg = dict(a=1, b=1)
     override_exists = overrides and len(overrides) > 1
 
-    job = hydra_run(
+    job = launch(
         cfg,
         task_function=instantiate,
         overrides=overrides,
@@ -114,12 +113,13 @@ def test_hydra_multirun(
             else (overrides + multirun_overrides)
         )
 
-    job = hydra_multirun(
+    job = launch(
         cfg,
         task_function=instantiate,
         overrides=_overrides,
         config_dir=config_dir,
         with_log_configuration=with_log_configuration,
+        multirun=True
     )
     for i, j in enumerate(job[0]):
         assert j.return_value == {"a": i + 1, "b": 1}
@@ -128,28 +128,29 @@ def test_hydra_multirun(
         assert Path("test_hydra_overrided").exists()
 
 
+
+from tests import MyBasicSweeper
+from hydra.errors import ConfigCompositionException
+cs = ConfigStore.instance()
+cs.store(group="hydra/sweeper", name="local_test", node=builds(MyBasicSweeper, max_batch_size=None))
+
+@pytest.mark.usefixtures("cleandir")
+def test_launch_with_multirun_overrides():
+    cfg = builds(dict, a=1, b=1)
+    multirun_overrides = ["hydra/sweeper=basic", "a=1,2"]
+    with pytest.raises(ConfigCompositionException):
+        launch(cfg, instantiate, overrides=multirun_overrides)
+
+
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize(
-    "overrides",
-    [["hydra/launcher=submitit_local"]],
+    "plugin",
+    [["hydra/sweeper=basic", "hydra/sweeper=local_test"]],
 )
-def test_hydra_multirun_plugin(overrides):
-    try:
-        from hydra_plugins.hydra_submitit_launcher.submitit_launcher import (
-            BaseSubmititLauncher,
-        )
-    except ImportError:
-        pytest.skip("Submitit plugin not available")
-        return
-
+def test_launch_with_multirun_plugin(plugin):
     cfg = builds(dict, a=1, b=1)
-    multirun_overrides = ["a=1,2"]
-
-    _overrides = (
-        multirun_overrides if overrides is None else overrides + multirun_overrides
-    )
-    job = hydra_multirun(cfg, task_function=instantiate, overrides=_overrides)
+    multirun_overrides = plugin + ["a=1,2"]
+    job = launch(cfg, instantiate, overrides=multirun_overrides, multirun=True)
+    assert isinstance(job, list) and len(job) == 1 and len(job[0]) == 2
     for i, j in enumerate(job[0]):
-        submitit_folder = Path(j.working_dir).parent / ".submitit"
-        assert submitit_folder.exists()
         assert j.return_value == {"a": i + 1, "b": 1}
