@@ -9,7 +9,7 @@ from itertools import zip_longest
 import hypothesis.strategies as st
 import pytest
 from hydra import __version__ as HYDRA_VERSION
-from hypothesis import assume, given
+from hypothesis import assume, given, settings
 from omegaconf import OmegaConf
 
 from hydra_zen import builds, get_target, hydrated_dataclass, instantiate, just, to_yaml
@@ -128,6 +128,7 @@ def test_builds_returns_a_dataclass_type():
     assert is_dataclass(conf) and isinstance(conf, type)
 
 
+@settings(deadline=None)
 @given(everything_except(Mapping, type(None)))
 def test_builds_zen_meta_not_mapping_raises(not_a_mapping):
     with pytest.raises(TypeError):
