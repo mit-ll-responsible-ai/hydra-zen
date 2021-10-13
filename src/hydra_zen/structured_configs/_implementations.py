@@ -1899,7 +1899,6 @@ def make_config(
     for name, value in fields_as_kwargs.items():
         if not isinstance(value, ZenField):
             normalized_fields[name] = ZenField(name=name, default=value)
-
         else:
             normalized_fields[name] = value
 

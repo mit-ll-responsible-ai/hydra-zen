@@ -3,7 +3,7 @@ import string
 from dataclasses import FrozenInstanceError
 from enum import Enum
 from itertools import chain
-from typing import Any, Callable, Deque, Dict, List, Tuple, TypeVar, Union, cast
+from typing import Callable, Tuple, Union
 
 import hypothesis.strategies as st
 import pytest
@@ -37,6 +37,13 @@ def test_future_compatibility_name_squatting():
 
     with pytest.raises(ValueError):
         make_config("_zen_field")
+
+
+def test_zen_field_args_positional_ordering():
+    field = ZenField(int, 1, "name")
+    assert field.name == "name"
+    assert field.hint is int
+    assert field.default.default == 1
 
 
 @settings(max_examples=20)
