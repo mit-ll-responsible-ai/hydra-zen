@@ -890,7 +890,7 @@ def builds(
                 raise ValueError(err_msg)
         if _name.startswith(("hydra_", "_zen_", "zen_")):
             raise ValueError(
-                f"The field-name specified via `builds(..., {_name}=<...>)` is reserved by hydra-zen."
+                f"The field-name specified via `{_name}=<...>` is reserved by hydra-zen."
                 " You can manually create a dataclass to utilize this name in a structured config."
             )
 
@@ -1620,6 +1620,37 @@ class NOTHING:
 
 @dataclass
 class ZenField:
+    """Specifies a field's name and/or type-annotation and/or default-value.
+    Designed to specify fields in `make_config`.
+
+    See the Examples section of the docstring for `make_config` for examples of using
+    `ZenField`.
+
+    Parameters
+    ----------
+    hint : type, optional (default=Any)
+    default : Any, optional
+    name : str, optional
+
+    Notes
+    -----
+    ``default`` will be returned as an instance of ``dataclasses.Field``.
+    Mutable values (e.g. lists or dictionaries) passed to ``default`` will automatically
+    be "packaged" in a default-factory function [1]_.
+
+    A type passed to ``hint`` will automatically be "broadened" such that the resulting
+    type is compatible with Hydra's set of supported type annotations [2]_.
+
+    References
+    ----------
+    .. [1] https://docs.python.org/3/library/dataclasses.html#default-factory-functions
+    .. [2] https://hydra.cc/docs/next/tutorials/structured_config/intro/#structured-configs-supports
+
+    See Also
+    --------
+    make_config: create a config with customized field names, default values, and annotations.
+    """
+
     hint: type = Any
     default: Any = NOTHING
     name: Union[str, Type[NOTHING]] = NOTHING
@@ -1662,6 +1693,9 @@ def make_config(
         Like ``fields_as_args``, but fieldname/default-value pairs are
         specified as keyword arguments. `ZenField` can also be used here
         to express a fields type-annotation and/or its default value.
+
+        Named parameters of the forms ``hydra_xx``, ``zen_xx``, and ``_zen_xx`` are reserved
+        to ensure future-compatibility, and cannot be specified by the user.
 
     hydra_recursive : Optional[bool], optional (default=True)
         If ``True``, then Hydra will recursively instantiate all other
@@ -1836,11 +1870,22 @@ def make_config(
                 f" Got multiple entries for:"
                 f" {', '.join(str(n) for n, count in Counter(all_names).items() if count > 1)}"
             )
-
+        for _name in all_names:
+            if isinstance(_name, str) and _name.startswith("_zen_"):
+                raise ValueError(
+                    f"The field-name specified via `{_name}=<...>` is reserved by hydra-zen."
+                    " You can manually create a dataclass to utilize this name in a structured config."
+                )
         del all_names
 
     # validate hydra-args via `builds`
-    builds(dict, hydra_convert=hydra_convert, hydra_recursive=hydra_recursive)
+    # also check for use of reserved names
+    builds(
+        dict,
+        hydra_convert=hydra_convert,
+        hydra_recursive=hydra_recursive,
+        **fields_as_kwargs,
+    )
 
     normalized_fields: Dict[str, ZenField] = {}
 
