@@ -17,6 +17,7 @@ hydra-zen provides us with some simple but powerful tools for creating and worki
 
    make_config
    builds
+   instantiate
    make_custom_builds_fn
    get_target
    just

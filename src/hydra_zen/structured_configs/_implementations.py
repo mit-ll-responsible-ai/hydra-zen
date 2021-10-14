@@ -690,6 +690,7 @@ def builds(
 
     See Also
     --------
+    instantiate: Instantiates a configuration created by `builds`.
     make_custom_builds_fn: Returns the `builds` function, but with customized default values.
     make_config: Creates a config with customized field names, default values, and annotations.
     get_target: Returns the target-object from a targeted structured config.
