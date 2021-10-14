@@ -249,13 +249,14 @@ To demonstrate this, we'll use hydra-zen to launch multiple jobs from a Python c
 
 ```python
 # Running `gradient_descent` using multiple SGD-momentum values
->>> from hydra_zen.experimental import hydra_multirun
+>>> from hydra_zen import launch
 
 # Returns a List of Hydra's JobReturn objects for each experiment
->>> jobs = hydra_multirun(
+>>> jobs = launch(
 ...     ConfigGradDesc,
 ...     task_function=instantiate,
 ...     overrides=["hydra/sweeper=basic", "optim.momentum=range(0.0,1.2,0.2)"],
+...     multirun=True
 ... )
 [2021-04-15 21:49:40,635][HYDRA] Launching 6 jobs locally
 [2021-04-15 21:49:40,635][HYDRA] 	#0 : optim.momentum=0.0
