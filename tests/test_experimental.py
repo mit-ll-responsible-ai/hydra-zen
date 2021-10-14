@@ -2,7 +2,7 @@ import pytest
 
 from hydra_zen import builds, instantiate
 from hydra_zen.errors import HydraZenDeprecationWarning
-from hydra_zen.experimentatal import hydra_multirun, hydra_run
+from hydra_zen.experimental import hydra_multirun, hydra_run
 
 
 @pytest.mark.usefixtures("cleandir")
