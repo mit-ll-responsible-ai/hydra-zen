@@ -40,7 +40,6 @@ extensions = [
     "sphinx.ext.githubpages",
     "sphinx.ext.autosummary",
     "numpydoc",
-    "sphinx_rtd_theme",
 ]
 
 default_role = "py:obj"
