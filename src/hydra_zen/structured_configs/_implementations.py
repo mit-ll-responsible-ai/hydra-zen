@@ -1674,7 +1674,7 @@ def make_config(
     frozen: bool = False,
     bases: Tuple[Type[DataClass], ...] = (),
     **fields_as_kwargs,
-) -> Type[_DataClass]:
+) -> Type[DataClass]:
     """
     Creates a structured config with user-defined fieldnames and, optionally,
     associated default values and/or type-annotations.
