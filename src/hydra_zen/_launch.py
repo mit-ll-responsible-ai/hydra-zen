@@ -134,16 +134,13 @@ def launch(
 
     Simple Hydra run:
 
-    >>> from hydra_zen import instantiate, builds
-    >>> from hydra_zen import launch
+    >>> from hydra_zen import instantiate, builds, launch
     >>> job = launch(builds(dict, a=1, b=1), task_function=instantiate)
     >>> job.return_value
     {'a': 1, 'b': 1}
 
     Using a more complex task function:
 
-    >>> from hydra_zen.experimental import launch
-    >>> from hydra_zen import builds, instantiate
     >>> cfg = dict(f=builds(pow, exp=2, zen_partial=True), x=10)
     >>> def task_function(cfg):
     ...    return instantiate(cfg.f)(cfg.x)
