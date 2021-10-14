@@ -1,0 +1,283 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>hydra_zen.experimental &mdash; hydra-zen 0.3.0rc3+25.gc1e2e7d documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/my_theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> hydra-zen
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation and Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview of hydra-zen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pytorch_lightning_example.html">Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../structured_configs.html">Dynamically Generating Structured Configs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../experimental.html">Running Experiments with Hydra</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changes.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">hydra-zen</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>hydra_zen.experimental</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for hydra_zen.experimental</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2021 Massachusetts Institute of Technology</span>
+<span class="c1"># SPDX-License-Identifier: MIT</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">omegaconf.dictconfig</span> <span class="kn">import</span> <span class="n">DictConfig</span>
+
+<span class="kn">from</span> <span class="nn">hydra_zen.errors</span> <span class="kn">import</span> <span class="n">HydraZenDeprecationWarning</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass</span>
+
+<span class="kn">from</span> <span class="nn">._launch</span> <span class="kn">import</span> <span class="n">launch</span>
+
+
+<div class="viewcode-block" id="hydra_run"><a class="viewcode-back" href="../../generated/hydra_zen.experimental.hydra_run.html#hydra_zen.experimental.hydra_run">[docs]</a><span class="k">def</span> <span class="nf">hydra_run</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataClass</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">],</span>
+    <span class="n">task_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">DictConfig</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">config_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;hydra_run&quot;</span><span class="p">,</span>
+    <span class="n">job_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;hydra_run&quot;</span><span class="p">,</span>
+    <span class="n">with_log_configuration</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+        <span class="n">HydraZenDeprecationWarning</span><span class="p">(</span>
+            <span class="s2">&quot;hydra_zen.experimental.hydra_run is deprecated &quot;</span>
+            <span class="s2">&quot;as of 2021-10-13. Change `hydra_run(cfg, task_fn, overrides, ...)` to `launch(cfg, task_fn, overrides, ...)`.&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">This will be an error in hydra-zen 1.0.0, or by 2022-01-13 — whichever &quot;</span>
+            <span class="s2">&quot;comes first.</span><span class="se">\n\n</span><span class="s2">Note: This deprecation does not impact yaml configs &quot;</span>
+            <span class="s2">&quot;produced by `builds`.&quot;</span>
+        <span class="p">),</span>
+        <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">launch</span><span class="p">(</span>
+        <span class="n">config</span><span class="p">,</span>
+        <span class="n">task_function</span><span class="p">,</span>
+        <span class="n">overrides</span><span class="p">,</span>
+        <span class="n">config_dir</span><span class="p">,</span>
+        <span class="n">config_name</span><span class="p">,</span>
+        <span class="n">job_name</span><span class="p">,</span>
+        <span class="n">with_log_configuration</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="hydra_multirun"><a class="viewcode-back" href="../../generated/hydra_zen.experimental.hydra_multirun.html#hydra_zen.experimental.hydra_multirun">[docs]</a><span class="k">def</span> <span class="nf">hydra_multirun</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataClass</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">],</span>
+    <span class="n">task_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">DictConfig</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">config_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;hydra_run&quot;</span><span class="p">,</span>
+    <span class="n">job_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;hydra_run&quot;</span><span class="p">,</span>
+    <span class="n">with_log_configuration</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+        <span class="n">HydraZenDeprecationWarning</span><span class="p">(</span>
+            <span class="s2">&quot;hydra_zen.experimental.hydra_multirun is deprecated &quot;</span>
+            <span class="s2">&quot;as of 2021-10-13. Change `hydra_multirun(cfg, task_fn, overrides, ...)` to `launch(cfg, task_fn, overrides, multirun=True, ...)`.&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">This will be an error in hydra-zen 1.0.0, or by 2022-01-13 — whichever &quot;</span>
+            <span class="s2">&quot;comes first.</span><span class="se">\n\n</span><span class="s2">Note: This deprecation does not impact yaml configs &quot;</span>
+            <span class="s2">&quot;produced by `builds`.&quot;</span>
+        <span class="p">),</span>
+        <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">launch</span><span class="p">(</span>
+        <span class="n">config</span><span class="p">,</span>
+        <span class="n">task_function</span><span class="p">,</span>
+        <span class="n">overrides</span><span class="p">,</span>
+        <span class="n">config_dir</span><span class="p">,</span>
+        <span class="n">config_name</span><span class="p">,</span>
+        <span class="n">job_name</span><span class="p">,</span>
+        <span class="n">with_log_configuration</span><span class="p">,</span>
+        <span class="n">multirun</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021 Massachusetts Institute of Technology.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

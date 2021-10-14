@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>hydra_multirun &mdash; hydra-zen 0.3.0rc3+24.g5c605d6 documentation</title>
+  <title>hydra_multirun &mdash; hydra-zen 0.3.0rc3+25.gc1e2e7d documentation</title>
   
 
   
@@ -179,112 +179,8 @@
 <h1>hydra_multirun<a class="headerlink" href="#hydra-multirun" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="hydra_zen.experimental.hydra_multirun">
-<code class="sig-prename descclassname"><span class="pre">hydra_zen.experimental.</span></code><code class="sig-name descname"><span class="pre">hydra_multirun</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overrides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hydra_multirun'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">job_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hydra_multirun'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_log_configuration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/experimental/_implementations.html#hydra_multirun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.experimental.hydra_multirun" title="Permalink to this definition">¶</a></dt>
-<dd><p>Launch a Hydra multi-run (<a class="reference internal" href="#rd47319f3cb5c-1" id="id1">[1]</a>) job defined by <code class="xref py py-obj docutils literal notranslate"><span class="pre">task_function</span></code> using the configuration
-provided in <code class="xref py py-obj docutils literal notranslate"><span class="pre">config</span></code>.</p>
-<p>Similar to how Hydra CLI works, <code class="xref py py-obj docutils literal notranslate"><span class="pre">overrides</span></code> are a string list of configuration
-values to use for a given experiment run.  For example, the Hydra CLI provided by:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m job.task_function job/group=group_name job.group.param=1 --multirun
-</pre></div>
-</div>
-<p>would be:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">job</span> <span class="o">=</span> <span class="n">hydra_multirun</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">task_function</span><span class="p">,</span> <span class="n">overrides</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;job/group=group_name&quot;</span><span class="p">,</span> <span class="s2">&quot;job.group.param=1&quot;</span><span class="p">])</span>
-</pre></div>
-</div>
-<p>To sweep over parameters the Hydra CLI provided by:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m job.task_function job/group=group_name job.group.param=1,2,3 --multirun
-</pre></div>
-</div>
-<p>would be:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">job</span> <span class="o">=</span> <span class="n">hydra_multirun</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">task_function</span><span class="p">,</span> <span class="n">overrides</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;job/group=group_name&quot;</span><span class="p">,</span> <span class="s2">&quot;job.group.param=1,2,3&quot;</span><span class="p">])</span>
-</pre></div>
-</div>
-<p>This functions executes Hydra and therefore creates its own working directory.  See Configuring Hydra <a class="reference internal" href="#rd47319f3cb5c-3" id="id2">[3]</a> for more
-details on customizing Hydra.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>config: Union[DataClass, DictConfig]</strong></dt><dd><p>A configuration as a dataclass, configuration object, or a dictionary.</p>
-</dd>
-<dt><strong>task_function: Callable[[DictConfig], Any]</strong></dt><dd><p>The function Hydra will execute with the given configuration.</p>
-</dd>
-<dt><strong>overrides: Optional[List[str]] (default: None)</strong></dt><dd><p>If provided, overrides default configurations, see <a class="reference internal" href="#rd47319f3cb5c-2" id="id3">[2]</a> and <a class="reference internal" href="#rd47319f3cb5c-3" id="id4">[3]</a>.</p>
-</dd>
-<dt><strong>config_dir: Optional[Union[str, Path]] (default: None)</strong></dt><dd><p>Add configuration directories if needed.</p>
-</dd>
-<dt><strong>config_name: str (default: “hydra_run”)</strong></dt><dd><p>Name of the stored configuration in Hydra’s ConfigStore API.</p>
-</dd>
-<dt><strong>job_name: str (default: “hydra_multirun”)</strong></dt><dd></dd>
-<dt><strong>with_log_configuration: bool (default: True)</strong></dt><dd><p>Flag to configure logging subsystem from the loaded config</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt>result: Any</dt><dd><p>The return values of all launched jobs (depends on the Sweeper implementation).</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<p class="rubric">References</p>
-<dl class="citation">
-<dt class="label" id="rd47319f3cb5c-1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p><a class="reference external" href="https://hydra.cc/docs/tutorials/basic/running_your_app/multi-run">https://hydra.cc/docs/tutorials/basic/running_your_app/multi-run</a></p>
-</dd>
-<dt class="label" id="rd47319f3cb5c-2"><span class="brackets"><a class="fn-backref" href="#id3">2</a></span></dt>
-<dd><p><a class="reference external" href="https://hydra.cc/docs/next/advanced/override_grammar/basic">https://hydra.cc/docs/next/advanced/override_grammar/basic</a></p>
-</dd>
-<dt class="label" id="rd47319f3cb5c-3"><span class="brackets">3</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id4">2</a>)</span></dt>
-<dd><p><a class="reference external" href="https://hydra.cc/docs/next/configure_hydra/intro">https://hydra.cc/docs/next/configure_hydra/intro</a></p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<p>Simple Hydra multirun:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">job</span> <span class="o">=</span> <span class="n">hydra_multirun</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
-<span class="gp">... </span>    <span class="n">task_function</span><span class="o">=</span><span class="n">instantiate</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">overrides</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a=1,2&quot;</span><span class="p">],</span>
-<span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">j</span><span class="o">.</span><span class="n">return_value</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">job</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-<span class="go">[{&#39;a&#39;: 1, &#39;b&#39;: 1}, {&#39;a&#39;: 2, &#39;b&#39;: 1}]</span>
-</pre></div>
-</div>
-<p>Using a more complex <code class="xref py py-obj docutils literal notranslate"><span class="pre">task_function</span></code></p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">builds</span><span class="p">,</span> <span class="n">instantiate</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">builds</span><span class="p">(</span><span class="nb">pow</span><span class="p">,</span> <span class="n">exp</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
-<span class="gp">... </span>   <span class="k">return</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">f</span><span class="p">)(</span><span class="n">cfg</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Launch a multi-run over a list of different <code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code> values using Hydra’s override syntax <code class="xref py py-obj docutils literal notranslate"><span class="pre">range</span></code>:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">jobs</span> <span class="o">=</span> <span class="n">hydra_multirun</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">task_function</span><span class="p">,</span> <span class="n">overrides</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x=range(-2,3)&quot;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">j</span><span class="o">.</span><span class="n">return_value</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">jobs</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-<span class="go">[4, 1, 0, 1, 4]</span>
-</pre></div>
-</div>
-<p>An example using PyTorch</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">Adam</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Linear</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">AdamConfig</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">Adam</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ModelConfig</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">Linear</span><span class="p">,</span> <span class="n">in_features</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">out_features</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">optim</span><span class="o">=</span><span class="n">AdamConfig</span><span class="p">(),</span> <span class="n">model</span><span class="o">=</span><span class="n">ModelConfig</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="n">cfg</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
-<span class="gp">... </span>    <span class="n">optim</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">optim</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
-<span class="gp">... </span>    <span class="n">loss</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-<span class="gp">... </span>    <span class="n">optim</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-<span class="gp">... </span>    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-<span class="gp">... </span>    <span class="n">optim</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-<span class="gp">... </span>    <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>Evaluate the function for different learning rates</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">jobs</span> <span class="o">=</span> <span class="n">hydra_multirun</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">task_function</span><span class="p">,</span> <span class="n">overrides</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;optim.lr=0.1,1.0&quot;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">j</span><span class="o">.</span><span class="n">return_value</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">jobs</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-<span class="go">[0.3054758310317993, 0.28910207748413086]</span>
-</pre></div>
-</div>
-</dd></dl>
+<code class="sig-prename descclassname"><span class="pre">hydra_zen.experimental.</span></code><code class="sig-name descname"><span class="pre">hydra_multirun</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overrides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hydra_run'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">job_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hydra_run'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_log_configuration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/experimental.html#hydra_multirun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.experimental.hydra_multirun" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </div>
 
