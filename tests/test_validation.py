@@ -353,6 +353,7 @@ def test_builds_raises_on_non_callable_target(not_callable, partial, full_sig):
         ("hydra_convert", "wrong value"),
         ("dataclass_name", 1),
         ("builds_bases", (Class,)),
+        ("frozen", 1),
     ],
 )
 def test_builds_input_validation(param_name: str, value):
