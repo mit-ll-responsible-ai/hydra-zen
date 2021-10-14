@@ -1,11 +1,32 @@
 # hydra-zen
+![image](brand/Hydra-Zen_logo_full_filled_bkgrnd_small.png)
 
-[![PyPi version](https://img.shields.io/pypi/v/hydra-zen.svg)](https://pypi.python.org/pypi/hydra-zen)
-[![Automated tests status](https://github.com/mit-ll-responsible-ai/hydra-zen/workflows/Tests/badge.svg)](https://github.com/mit-ll-responsible-ai/hydra-zen/actions?query=workflow%3ATests+branch%3Amain)
-[![Test coverage](https://img.shields.io/badge/coverage-100%25-green.svg)](https://github.com/mit-ll-responsible-ai/hydra-zen/actions?query=workflow%3ATests+branch%3Amain)
-[![Docs status](https://github.com/mit-ll-responsible-ai/hydra-zen/actions/workflows/publish_docs.yml/badge.svg)](https://mit-ll-responsible-ai.github.io/hydra-zen/)
-![Python version support](https://img.shields.io/badge/python-3.6%20&#8208;%203.9-blue.svg)
-[![DOI](https://zenodo.org/badge/354130346.svg)](https://zenodo.org/badge/latestdoi/354130346)
+
+<p align="center">
+  <a href="https://pypi.python.org/pypi/hydra-zen">
+    <img src="https://img.shields.io/pypi/v/hydra-zen.svg" alt="PyPI" />
+  </a>
+  <a>
+    <img src="https://img.shields.io/badge/python-3.6%20&#8208;%203.9-blue.svg" alt="Python version support" />
+  </a>
+  <a href="https://github.com/mit-ll-responsible-ai/hydra-zen/actions?query=workflow%3ATests+branch%3Amain">
+    <img src="https://github.com/mit-ll-responsible-ai/hydra-zen/workflows/Tests/badge.svg" alt="GitHub Actions" />
+  <a href="https://github.com/mit-ll-responsible-ai/hydra-zen/actions?query=workflow%3ATests+branch%3Amain">
+    <img src="https://img.shields.io/badge/coverage-100%25-green.svg" alt="Code Coverage" />
+  <a href="https://hypothesis.readthedocs.io/">
+    <img src="https://img.shields.io/badge/hypothesis-tested-brightgreen.svg" alt="Tested with Hypothesis" />
+  </a>
+  <a href="https://zenodo.org/badge/latestdoi/354130346">
+    <img src="https://zenodo.org/badge/354130346.svg" alt="Cite Us" />
+  </a>
+  <p align="center">
+    A library for facilitating configurable, scalable, and reproducible workflows, using Hydra.
+  </p>
+  <p align="center">
+    Check out our <a href="https://mit-ll-responsible-ai.github.io/hydra-zen/">documentation</a> for more information.
+  </p>
+</p>
+
 
 hydra-zen helps you configure your project using the power of [Hydra](https://github.com/facebookresearch/hydra), while enjoying the [Zen of Python](https://www.python.org/dev/peps/pep-0020/)!
 

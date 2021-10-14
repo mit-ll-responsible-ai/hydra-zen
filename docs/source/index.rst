@@ -27,6 +27,7 @@ hydra-zen offers:
    pytorch_lightning_example
    structured_configs
    experimental
+   api_reference
    changes
 
 Indices and tables

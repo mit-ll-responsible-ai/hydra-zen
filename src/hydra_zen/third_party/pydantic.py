@@ -16,8 +16,11 @@ _default_validator = _pyd.validate_arguments(config={"arbitrary_types_allowed": 
 def validates_with_pydantic(
     obj: _T, *, validator: Callable[[_T], _T] = _default_validator
 ) -> _T:
-    """Decorates a function, or the init-method of an object, with a pydantic
-    validation decorator.
+    """Enables runtime type-checking of values, via the library ``pydantic``.
+
+    I.e. ``obj = validates_with_beartype(obj)`` adds runtime type-checking
+    to all calls of ``obj(*args, **kwargs)``, based on the type-annotations specified
+    in the signature of ``obj``.
 
     This leverages ``pydantic.validate_arguments``, which is currently a
     beta [1]_ feature in pydantic.
@@ -26,7 +29,7 @@ def validates_with_pydantic(
     ----------
     obj : Callable
 
-    validator : pydantic.validate_arguments, optional
+    validator : Type[pydantic.validate_arguments], optional
         A configured instance of pydantic's validation decorator.
 
         The default validator that we provide specifies:

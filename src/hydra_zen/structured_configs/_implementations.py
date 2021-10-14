@@ -224,7 +224,7 @@ def hydrated_dataclass(
     target : Union[Instantiable, Callable]
         The object to be instantiated/called.
 
-    *pos_args: Any
+    *pos_args : Any
         Positional arguments passed to ``target``.
 
         Arguments specified positionally are not included in the dataclass' signature and
@@ -242,7 +242,7 @@ def hydrated_dataclass(
         Wrappers can also be specified as interpolated strings [2]_ or targeted structured
         configs.
 
-    zen_meta: Optional[Mapping[str, Any]]
+    zen_meta : Optional[Mapping[str, Any]]
         Specifies field-names and corresponding values that will be included in the
         resulting dataclass, but that will *not* be used to build ``hydra_target``
         via instantiation. These are called "meta" fields.
@@ -263,7 +263,7 @@ def hydrated_dataclass(
 
         If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.
 
-    hydra_convert: Optional[Literal["none", "partial", "all"]] (default="none")
+    hydra_convert : Optional[Literal["none", "partial", "all"]] (default="none")
         Determines how hydra handles the non-primitive objects passed to `target` [4]_.
 
         - ``"none"``: Passed objects are DictConfig and ListConfig, default
@@ -281,7 +281,7 @@ def hydrated_dataclass(
 
     See Also
     --------
-    builds
+    builds : Create a targeted structured config designed to "build" a particular object.
 
     References
     ----------
@@ -297,8 +297,8 @@ def hydrated_dataclass(
     >>> from hydra_zen import hydrated_dataclass, instantiate
     >>> @hydrated_dataclass(target=dict)
     ... class DictConf:
-    ...     x : int = 2
-    ...     y : str = 'hello'
+    ...     x: int = 2
+    ...     y: str = 'hello'
 
     >>> instantiate(DictConf(x=10))  # override default `x`
     {'x': 10, 'y': 'hello'}
@@ -320,8 +320,8 @@ def hydrated_dataclass(
     >>> from torch.optim import AdamW
     >>> @dataclass
     ... class AdamBaseConfig:
-    ...     lr : float = 0.001
-    ...     eps : float = 1e-8
+    ...     lr: float = 0.001
+    ...     eps: float = 1e-8
 
     >>> @hydrated_dataclass(target=AdamW, zen_partial=True)
     ... class AdamWConfig(AdamBaseConfig):
@@ -400,8 +400,8 @@ def hydrated_dataclass(
 
 
 def just(obj: Importable) -> Type[Just[Importable]]:
-    """Produces a structured config that, when instantiated by hydra, 'just'
-    returns `obj`.
+    """Produces a structured config that, when instantiated by Hydra, 'just'
+    returns the target (uninstantiated).
 
     This is convenient for specifying a particular, un-instantiated object as part of your
     configuration.
@@ -574,10 +574,10 @@ def builds(
 
     Parameters
     ----------
-    hydra_target : Instantiable | Callable
+    hydra_target : T (Callable)
         The object to be configured. This is a required, positional-only argument.
 
-    *pos_args: Any
+    *pos_args : Any
         Positional arguments passed to ``hydra_target``.
 
         Arguments specified positionally are not included in the dataclass' signature and
@@ -613,7 +613,7 @@ def builds(
         Wrappers can also be specified as interpolated strings [2]_ or targeted structured
         configs.
 
-    zen_meta: Optional[Mapping[str, Any]]
+    zen_meta : Optional[Mapping[str, Any]]
         Specifies field-names and corresponding values that will be included in the
         resulting dataclass, but that will *not* be used to build ``hydra_target``
         via instantiation. These are called "meta" fields.
@@ -634,7 +634,7 @@ def builds(
 
         If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.
 
-    hydra_convert: Optional[Literal["none", "partial", "all"]], optional (default="none")
+    hydra_convert : Optional[Literal["none", "partial", "all"]], optional (default="none")
         Determines how Hydra handles the non-primitive objects passed to `target` [4]_.
 
         - ``"none"``: Passed objects are DictConfig and ListConfig, default
@@ -660,14 +660,8 @@ def builds(
 
     Returns
     -------
-    builder : Union[Type[Builds[Importable]], Union[Type[Builds[Importable]]
-        A structured config that builds ``target``
-
-    Raises
-    ------
-    TypeError
-        One or more unexpected arguments were specified via **kwargs_for_target, which
-        are not compatible with the signature of ``target``.
+    Config : Type[Builds[Type[T]]] |  Type[PartialBuilds[Type[T]]]
+        A structured config that builds ``hydra_target``
 
     Notes
     -----
@@ -693,6 +687,14 @@ def builds(
     .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
     .. [4] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
     .. [5] https://docs.python.org/3/library/dataclasses.html#mutable-default-values
+
+    See Also
+    --------
+    instantiate: Instantiates a configuration created by `builds`.
+    make_custom_builds_fn: Returns the `builds` function, but with customized default values.
+    make_config: Creates a config with customized field names, default values, and annotations.
+    get_target: Returns the target-object from a targeted structured config.
+    just: Produces a config that, when instantiated by Hydra, "just" returns the uninstantiated target.
 
     Examples
     --------
@@ -1487,10 +1489,10 @@ def make_custom_builds_fn(
 
             f3(f2(f1(hydra_target)))(*args, **kwargs)
 
-        Wrappers can also be specified as interpolated strings [2]_ or targeted structured
+        Wrappers can also be specified as interpolated strings [1]_ or targeted structured
         configs.
 
-    zen_meta: Optional[Mapping[str, Any]]
+    zen_meta : Optional[Mapping[str, Any]]
         Specifies field-names and corresponding values that will be included in the
         resulting dataclass, but that will *not* be used to build ``hydra_target``
         via instantiation. These are called "meta" fields.
@@ -1507,12 +1509,12 @@ def make_custom_builds_fn(
 
     hydra_recursive : Optional[bool], optional (default=True)
         If ``True``, then Hydra will recursively instantiate all other
-        hydra-config objects nested within this dataclass [3]_.
+        hydra-config objects nested within this dataclass [2]_.
 
         If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.
 
-    hydra_convert: Optional[Literal["none", "partial", "all"]], optional (default="none")
-        Determines how hydra handles the non-primitive objects passed to ``hydra_target`` [4]_.
+    hydra_convert : Optional[Literal["none", "partial", "all"]], optional (default="none")
+        Determines how hydra handles the non-primitive objects passed to ``hydra_target`` [3]_.
 
         - ``"none"``: Passed objects are DictConfig and ListConfig, default
         - ``"partial"``: Passed objects are converted to dict and list, with
@@ -1537,9 +1539,15 @@ def make_custom_builds_fn(
     builds
         The function `builds`, but with customized default-values.
 
+    References
+    ----------
+    .. [1] https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation
+    .. [2] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
+    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
+
     See Also
     --------
-    builds
+    builds : Create a targeted structured config designed to "build" a particular object.
 
     Examples
     --------
@@ -1620,7 +1628,10 @@ class NOTHING:
 
 @dataclass
 class ZenField:
-    """Specifies a field's name and/or type-annotation and/or default-value.
+    """
+    ZenField(hint=Any, default=<class 'NOTHING'>, name=<class 'NOTHING'>)
+
+    Specifies a field's name and/or type-annotation and/or default-value.
     Designed to specify fields in `make_config`.
 
     See the Examples section of the docstring for `make_config` for examples of using
@@ -1674,7 +1685,7 @@ def make_config(
     frozen: bool = False,
     bases: Tuple[Type[DataClass], ...] = (),
     **fields_as_kwargs,
-) -> Type[_DataClass]:
+) -> Type[DataClass]:
     """
     Creates a structured config with user-defined fieldnames and, optionally,
     associated default values and/or type-annotations.
@@ -1703,7 +1714,7 @@ def make_config(
 
         If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.
 
-    hydra_convert: Optional[Literal["none", "partial", "all"]], optional (default="none")
+    hydra_convert : Optional[Literal["none", "partial", "all"]], optional (default="none")
         Determines how Hydra handles the non-primitive objects passed to configuations [3]_.
 
         - ``"none"``: Passed objects are DictConfig and ListConfig, default
@@ -1738,16 +1749,17 @@ def make_config(
 
     `make_config` will automatically manipulate certain types of default values to ensure that
     they can be utilized in the resulting dataclass and by Hydra:
-       - Mutable default values will automatically be packaged in a default factory function [5]_
-       - A default value that is a class-object or function-object will automatically be wrapped by
-       `just`, to ensure that the resulting config is serializable by Hydra.
+
+    - Mutable default values will automatically be packaged in a default factory function [5]_
+    - A default value that is a class-object or function-object will automatically be wrapped by
+    `just`, to ensure that the resulting config is serializable by Hydra.
 
     For finer-grain control over how type-annotations and default values are managed, consider using
     ``dataclasses.make_dataclass`` [6]_.
 
     See Also
     --------
-    builds : Create a targeted structured figure – designed to "build" a particular object.
+    builds : Create a targeted structured config designed to "build" a particular object.
     just : Create a config that 'just' returns a class-object or function, without instantiating/calling it.
 
     References

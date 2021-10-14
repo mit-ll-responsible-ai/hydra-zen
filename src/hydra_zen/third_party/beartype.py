@@ -13,7 +13,11 @@ __all__ = ["validates_with_beartype"]
 
 
 def validates_with_beartype(obj: _T) -> _T:
-    """Decorates a function or the init-method of an object with beartype [1]_.
+    """Enables runtime type-checking of values, via the library ``beartype``.
+
+    I.e. ``obj = validates_with_beartype(obj)`` adds runtime type-checking
+    to all calls of ``obj(*args, **kwargs)``, based on the type-annotations
+    specified in the signature of ``obj``.
 
     This is designed to be used as a "zen-wrapper"; see Examples for details.
 
@@ -29,18 +33,18 @@ def validates_with_beartype(obj: _T) -> _T:
 
     Notes
     -----
-    ``beartype`` must be installed [2]_ as a separate dependency to leverage this validator.
+    ``beartype`` [1]_ must be installed as a separate dependency to leverage this validator.
     Using ``validates_with_beartype`` as a ``zen_wrapper`` will create a dependency on
     beartype among resulting yamls as well, these yamls will also be validated by beartype
     upon instantiation.
 
-    Please refer to beartype's documentation [3]_ to see what varieties of types it does and
+    Please refer to beartype's documentation [2]_ to see what varieties of types it does and
     does not support.
 
     It is recommended that `validates_with_beartype` be used in conjunction with
     the following `builds` settings:
 
-      - ``hydra_convert="all"``: to ensure omegaconf containers are converted to std-lib types
+    - ``hydra_convert="all"``: to ensure omegaconf containers are converted to std-lib types
 
     **Data Coercion Behavior**
 
@@ -61,8 +65,7 @@ def validates_with_beartype(obj: _T) -> _T:
     References
     ----------
     .. [1] https://github.com/beartype/beartype
-    .. [2] https://github.com/beartype/beartype#install
-    .. [3] https://github.com/beartype/beartype#compliance
+    .. [2] https://github.com/beartype/beartype#compliance
 
     Examples
     --------
