@@ -62,6 +62,8 @@ exclude_patterns = []
 # a list of builtin themes.
 #
 html_theme = "sphinx_rtd_theme"
+html_favicon = "../../brand/hydra_zen_favicon_32x32.ico"
+html_logo = "../../brand/HydraZen_logo_border.png"
 
 
 def setup(app):

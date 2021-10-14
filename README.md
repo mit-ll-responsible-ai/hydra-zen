@@ -1,4 +1,5 @@
 # hydra-zen
+![image](brand/Hydra-Zen_logo_full.png)
 
 [![PyPi version](https://img.shields.io/pypi/v/hydra-zen.svg)](https://pypi.python.org/pypi/hydra-zen)
 [![Automated tests status](https://github.com/mit-ll-responsible-ai/hydra-zen/workflows/Tests/badge.svg)](https://github.com/mit-ll-responsible-ai/hydra-zen/actions?query=workflow%3ATests+branch%3Amain)
