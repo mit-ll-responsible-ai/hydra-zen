@@ -65,7 +65,7 @@ def launch(
     Similar to how Hydra CLI works, `overrides` are a string list of configuration
     values to use for a given experiment run.  For example, the Hydra CLI provided by::
 
-       $ python -m job.task_function job/group=group_name job.group.param=1
+       $ python my_task.py job/group=group_name job.group.param=1
 
     would be::
 
