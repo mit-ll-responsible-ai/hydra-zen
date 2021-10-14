@@ -131,7 +131,6 @@ def launch(
 
     Examples
     --------
-
     Simple Hydra run:
 
     >>> from hydra_zen import instantiate, builds, launch
