@@ -66,6 +66,8 @@ html_favicon = "../../brand/hydra_zen_favicon_32x32.ico"
 html_logo = "../../brand/Hydra-Zen_logo_full_filled_bkgrnd_small.png"
 
 html_theme_options = {
+    "collapse_navigation": True,
+    "navigation_depth": 4,
     "favicons": [
         {
             "rel": "icon",

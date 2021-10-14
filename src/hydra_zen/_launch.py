@@ -24,15 +24,15 @@ def _store_config(
 
     Parameters
     ----------
-    cfg: Union[DataClass, DictConfig, Mapping]
+    cfg : Union[DataClass, DictConfig, Mapping]
         A configuration as a dataclass, configuration object, or a dictionary.
 
-    config_name: str (default: hydra_launch)
+    config_name : str (default: hydra_launch)
         The configuration name used to store the configuration.
 
     Returns
     -------
-    config_name: str
+    config_name : str
         The configuration name used to store the default configuration.
 
     Notes
@@ -85,35 +85,34 @@ def launch(
 
     Parameters
     ----------
-    config: Union[DataClass, DictConfig, Mapping]
+    config : Union[DataClass, DictConfig, Mapping]
         A configuration as a dataclass, configuration object, or a dictionary.
 
-    task_function: Callable[[DictConfig], Any]
+    task_function : Callable[[DictConfig], Any]
         The function Hydra will execute with the given configuration.
 
-    overrides: Optional[List[str]] (default: None)
+    overrides : Optional[List[str]] (default: None)
         If provided, overrides default configurations, see [1]_ and [2]_.
 
-    config_dir: Optional[Union[str, Path]] (default: None)
+    config_dir : Optional[Union[str, Path]] (default: None)
         Add configuration directories if needed.
 
-    config_name: str (default: "hydra_run")
+    config_name : str (default: "hydra_run")
         Name of the stored configuration in Hydra's ConfigStore API.
 
-    job_name: str (default: "hydra_run")
+    job_name : str (default: "hydra_run")
 
-    with_log_configuration: bool (default: True)
+    with_log_configuration : bool (default: True)
         Flag to configure logging subsystem from the loaded config
 
-    multirun: bool (default: False)
+    multirun : bool (default: False)
         Launch a Hydra multi-run ([3]_)
 
     Returns
     -------
-
-    result: JobReturn | Any
-        If `multirun = False`:
-            A `JobReturn` object storing the results of the Hydra experiment.
+    result : JobReturn | Any
+        If ``multirun = False``:
+            A ``JobReturn`` object storing the results of the Hydra experiment.
                 - overrides: From `overrides` and `multirun_overrides`
                 - return_value: The return value of the task function
                 - cfg: The configuration object sent to the task function

@@ -22,3 +22,31 @@ hydra-zen provides us with some simple but powerful tools for creating and worki
    just
    hydrated_dataclass
    ZenField
+
+
+*************************
+Launching Jobs with Hydra
+*************************
+
+.. currentmodule:: hydra_zen
+
+.. autosummary::
+   :toctree: generated/
+
+   launch
+
+*********************
+Third-Party Utilities
+*********************
+
+
+Runtime Type-Validation
+***********************
+
+.. currentmodule:: hydra_zen.third_party
+
+.. autosummary::
+   :toctree: generated/
+
+   beartype.validates_with_beartype
+   pydantic.validates_with_pydantic

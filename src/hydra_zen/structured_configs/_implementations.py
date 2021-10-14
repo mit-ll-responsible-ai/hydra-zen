@@ -663,12 +663,6 @@ def builds(
     Config : Type[Builds[Type[T]]] |  Type[PartialBuilds[Type[T]]]
         A structured config that builds ``hydra_target``
 
-    Raises
-    ------
-    TypeError
-        One or more unexpected arguments were specified via **kwargs_for_target, which
-        are not compatible with the signature of ``target``.
-
     Notes
     -----
     Using any of the `zen_xx` features will result in a config that depends
