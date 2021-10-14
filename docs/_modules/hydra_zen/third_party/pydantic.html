@@ -1,0 +1,338 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hydra_zen.third_party.pydantic &#8212; hydra-zen 0.3.0rc3+27.g62b36c7 documentation</title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/blank.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/my_theme.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/hydra_zen_favicon_32x32.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+      
+      <link rel="icon" sizes="32x32" href="../../../_static/../../brand/hydra_zen_favicon_32x32.ico">
+      
+    
+      
+      <link rel="icon" sizes="64x64" href="../../../_static/../../brand/hydra_zen_favicon_64x64.ico">
+      
+    
+      
+      <link rel="icon" sizes="134x134" href="../../../_static/../../brand/hydra_zen_favicon.ico">
+      
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="../../../index.html">
+  <img src="../../../_static/Hydra-Zen_logo_full_filled_bkgrnd_small.png" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../installation.html">
+  Installation and Basic Usage
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../overview.html">
+  Overview of hydra-zen
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../pytorch_lightning_example.html">
+  Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../structured_configs.html">
+  Dynamically Generating Structured Configs
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../experimental.html">
+  Running Experiments with Hydra
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../api_reference.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../changes.html">
+  Changelog
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/mit-ll-responsible-ai/hydra-zen" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for hydra_zen.third_party.pydantic</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2021 Massachusetts Institute of Technology</span>
+<span class="c1"># SPDX-License-Identifier: MIT</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">cast</span>
+
+<span class="kn">import</span> <span class="nn">pydantic</span> <span class="k">as</span> <span class="nn">_pyd</span>
+
+<span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">)</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;validates_with_pydantic&quot;</span><span class="p">]</span>
+
+
+<span class="n">_default_validator</span> <span class="o">=</span> <span class="n">_pyd</span><span class="o">.</span><span class="n">validate_arguments</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+
+
+<div class="viewcode-block" id="validates_with_pydantic"><a class="viewcode-back" href="../../../generated/hydra_zen.third_party.pydantic.validates_with_pydantic.html#hydra_zen.third_party.pydantic.validates_with_pydantic">[docs]</a><span class="k">def</span> <span class="nf">validates_with_pydantic</span><span class="p">(</span>
+    <span class="n">obj</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">validator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_T</span><span class="p">],</span> <span class="n">_T</span><span class="p">]</span> <span class="o">=</span> <span class="n">_default_validator</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Enables runtime type-checking of values, via the library ``pydantic``.</span>
+
+<span class="sd">    I.e. ``obj = validates_with_beartype(obj)`` adds runtime type-checking</span>
+<span class="sd">    to all calls of ``obj(*args, **kwargs)``, based on the type-annotations specified</span>
+<span class="sd">    in the signature of ``obj``.</span>
+
+<span class="sd">    This leverages ``pydantic.validate_arguments``, which is currently a</span>
+<span class="sd">    beta [1]_ feature in pydantic.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    obj : Callable</span>
+
+<span class="sd">    validator : Type[pydantic.validate_arguments], optional</span>
+<span class="sd">        A configured instance of pydantic&#39;s validation decorator.</span>
+
+<span class="sd">        The default validator that we provide specifies:</span>
+<span class="sd">           - arbitrary_types_allowed: True</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    obj_w_validation : Callable</span>
+<span class="sd">        A wrapped function or a class whose init-method has been</span>
+<span class="sd">        wrapped in-place</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    pydantic must be installed [2]_ as a separate dependency to leverage this validator.</span>
+<span class="sd">    Using ``validates_with_pydantic`` as a ``zen_wrapper`` will create a dependency on</span>
+<span class="sd">    pydantic among resulting yamls as well, these yamls will also be validated by pydantic</span>
+<span class="sd">    upon instantiation.</span>
+
+<span class="sd">    It is recommended that `validates_with_pydantic` be used in conjunction with</span>
+<span class="sd">    the following `builds` settings:</span>
+
+<span class="sd">      - ``hydra_convert=&quot;all&quot;``: to ensure omegaconf containers are converted to std-lib types</span>
+
+<span class="sd">    Users should be aware of pydantic&#39;s data conversion strategy [2]_; pydantic</span>
+<span class="sd">    may cast data so that it will conform to its annotated type.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] https://pydantic-docs.helpmanual.io/usage/validation_decorator/</span>
+<span class="sd">    .. [2] https://pydantic-docs.helpmanual.io/install/</span>
+<span class="sd">    .. [3] https://pydantic-docs.helpmanual.io/usage/models/#data-conversion</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from hydra_zen.third_party.pydantic import validates_with_pydantic</span>
+<span class="sd">    &gt;&gt;&gt; from pydantic import PositiveInt</span>
+<span class="sd">    &gt;&gt;&gt; def f(x: PositiveInt): return x</span>
+<span class="sd">    &gt;&gt;&gt; val_f = validates_with_pydantic(f)</span>
+<span class="sd">    &gt;&gt;&gt; f(-100)</span>
+<span class="sd">    -100</span>
+<span class="sd">    &gt;&gt;&gt; val_f(-100)</span>
+<span class="sd">    ValidationError: 1 validation error for F (...)</span>
+
+<span class="sd">    Using `validates_with_pydantic` with a class.</span>
+
+<span class="sd">    &gt;&gt;&gt; class A:</span>
+<span class="sd">    ...     def __init__(self, x: PositiveInt): ...</span>
+<span class="sd">    &gt;&gt;&gt; validates_with_pydantic(A)  # wrapping occurs in-place</span>
+<span class="sd">    __main__.A</span>
+<span class="sd">    &gt;&gt;&gt; A(-10)</span>
+<span class="sd">    ValidationError: 1 validation error for Init</span>
+
+<span class="sd">    This is designed to be used with the ``zen_wrappers`` feature of `builds`.</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydra_zen import builds, instantiate</span>
+<span class="sd">    &gt;&gt;&gt; # instantiations of `conf` will be validated by pydantic</span>
+<span class="sd">    &gt;&gt;&gt; conf = builds(</span>
+<span class="sd">    ...     f,</span>
+<span class="sd">    ...     zen_wrappers=validates_with_pydantic,</span>
+<span class="sd">    ...     # recommended builds-settings for pydantic-validation</span>
+<span class="sd">    ...     populate_full_signature=True,</span>
+<span class="sd">    ...     hydra_convert=&quot;all&quot;,</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(conf, x=10)</span>
+<span class="sd">    10</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(conf, x=-2)</span>
+<span class="sd">    ValidationError: 1 validation error for F (...)</span>
+
+<span class="sd">    Note that pydantic&#39;s data-coercion ensures smooth compatibility with Hydra.</span>
+<span class="sd">    I.e. lists will be coerced to the appropriate annotated sequence type.</span>
+
+<span class="sd">    &gt;&gt;&gt; def g(x: tuple): return x  # note the annotation</span>
+<span class="sd">    &gt;&gt;&gt; validates_with_pydantic(g)([1, 2, 3])  # input: list, output: tuple</span>
+<span class="sd">    (1, 2, 3)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="s2">&quot;__init__&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="fm">__init__</span><span class="p">,</span> <span class="s2">&quot;validate&quot;</span><span class="p">):</span>
+            <span class="c1"># already decorated by pydantic</span>
+            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">_T</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="fm">__init__</span> <span class="o">=</span> <span class="n">validator</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;validate&quot;</span><span class="p">):</span>
+            <span class="c1"># already decorated by pydantic</span>
+            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">_T</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">_T</span><span class="p">,</span> <span class="n">validator</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">_T</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span></div>
+</pre></div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2021 Massachusetts Institute of Technology.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>
