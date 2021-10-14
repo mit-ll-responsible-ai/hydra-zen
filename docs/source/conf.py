@@ -61,9 +61,36 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_rtd_theme"
+html_theme = "pydata_sphinx_theme"
 html_favicon = "../../brand/hydra_zen_favicon_32x32.ico"
-html_logo = "../../brand/HydraZen_logo_border.png"
+html_logo = "../../brand/Hydra-Zen_logo_full_filled_bkgrnd_small.png"
+
+html_theme_options = {
+    "favicons": [
+        {
+            "rel": "icon",
+            "sizes": "32x32",
+            "href": "../../brand/hydra_zen_favicon_32x32.ico",
+        },
+        {
+            "rel": "icon",
+            "sizes": "64x64",
+            "href": "../../brand/hydra_zen_favicon_64x64.ico",
+        },
+        {
+            "rel": "icon",
+            "sizes": "134x134",
+            "href": "../../brand/hydra_zen_favicon.ico",
+        },
+    ],
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/mit-ll-responsible-ai/hydra-zen",
+            "icon": "fab fa-github-square",
+        },
+    ],
+}
 
 
 def setup(app):
