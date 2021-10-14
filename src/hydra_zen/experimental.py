@@ -1,3 +1,6 @@
+# Copyright (c) 2021 Massachusetts Institute of Technology
+# SPDX-License-Identifier: MIT
+
 import warnings
 from pathlib import Path
 from typing import Any, Callable, List, Mapping, Optional, Union
