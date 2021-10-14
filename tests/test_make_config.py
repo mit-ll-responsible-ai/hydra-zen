@@ -157,9 +157,9 @@ def test_hydra_type_validation_works(input_type):
 
 @settings(max_examples=500)
 @given(
-    default=st.none()
-    | st.booleans()
-    | st.text()
+    default=st.none() | st.booleans()
+    # avoid issues with interpolated fields
+    | st.text().filter(lambda x: not x.startswith("$"))
     | st.lists(st.booleans())
     | st.dictionaries(st.booleans(), st.booleans())
     | st.just(print)
