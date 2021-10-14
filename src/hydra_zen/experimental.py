@@ -29,7 +29,7 @@ def hydra_run(
         ),
         stacklevel=2,
     )
-    launch(
+    return launch(
         config,
         task_function,
         overrides,
@@ -59,7 +59,7 @@ def hydra_multirun(
         ),
         stacklevel=2,
     )
-    launch(
+    return launch(
         config,
         task_function,
         overrides,

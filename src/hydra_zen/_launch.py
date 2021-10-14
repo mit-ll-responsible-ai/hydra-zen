@@ -54,8 +54,8 @@ def launch(
     task_function: Callable[[DictConfig], Any],
     overrides: Optional[List[str]] = None,
     config_dir: Optional[Union[str, Path]] = None,
-    config_name: str = "hydra_run",
-    job_name: str = "hydra_run",
+    config_name: str = "_zen_launch",
+    job_name: str = "_zen_launch",
     with_log_configuration: bool = True,
     multirun: bool = False,
 ) -> Union[JobReturn, Any]:
@@ -135,14 +135,14 @@ def launch(
     Simple Hydra run:
 
     >>> from hydra_zen import instantiate, builds
-    >>> from hydra_zen.experimental import hydra_run
-    >>> job = hydra_run(builds(dict, a=1, b=1), task_function=instantiate)
+    >>> from hydra_zen import launch
+    >>> job = launch(builds(dict, a=1, b=1), task_function=instantiate)
     >>> job.return_value
     {'a': 1, 'b': 1}
 
     Using a more complex task function:
 
-    >>> from hydra_zen.experimental import hydra_run
+    >>> from hydra_zen.experimental import launch
     >>> from hydra_zen import builds, instantiate
     >>> cfg = dict(f=builds(pow, exp=2, zen_partial=True), x=10)
     >>> def task_function(cfg):
@@ -150,49 +150,24 @@ def launch(
 
     Launch a job to evaluate the function using the given configuration:
 
-    >>> job = hydra_run(cfg, task_function)
+    >>> job = launch(cfg, task_function)
     >>> job.return_value
     100
 
-    An example using PyTorch:
+    Next, a Hydra multi-run can be launched by setting `multirun=True`:
 
-    >>> from torch.optim import Adam
-    >>> from torch.nn import Linear
-    >>> AdamConfig = builds(Adam, lr=0.001, zen_partial=True)
-    >>> ModelConfig = builds(Linear, in_features=1, out_features=1)
-    >>> cfg = dict(optim=AdamConfig(), model=ModelConfig())
-    >>> def task_function(cfg):
-    ...     cfg = instantiate(cfg)
-    ...     optim = cfg.optim(model.parameters())
-    ...     loss = cfg.model(torch.ones(1)).mean()
-    ...     optim.zero_grad()
-    ...     loss.backward()
-    ...     optim.step()
-    ...     return loss.item()
-    >>> jobs = hydra_run(cfg, task_function, overrides=["optim.lr=0.1"])
-    >>> j.return_value
-    0.3054758310317993
-
-    Simple Hydra multirun:
-
-    >>> job = hydra_multirun(
+    >>> job = launch(
     ...     builds(dict, a=1, b=1),
     ...     task_function=instantiate,
     ...     overrides=["a=1,2"],
+    ...     multirun=True
     ... )
     >>> [j.return_value for j in job[0]]
     [{'a': 1, 'b': 1}, {'a': 2, 'b': 1}]
 
-    Using a more complex `task_function`
-
-    >>> from hydra_zen import builds, instantiate
-    >>> cfg = dict(f=builds(pow, exp=2, zen_partial=True), x=1)
-    >>> def task_function(cfg):
-    ...    return instantiate(cfg.f)(cfg.x)
-
     Launch a multi-run over a list of different `x` values using Hydra's override syntax `range`:
 
-    >>> jobs = hydra_multirun(cfg, task_function, overrides=["x=range(-2,3)"])
+    >>> jobs = launch(cfg, task_function, overrides=["x=range(-2,3)"], multirun=True)
     >>> [j.return_value for j in jobs[0]]
     [4, 1, 0, 1, 4]
 
@@ -214,7 +189,7 @@ def launch(
 
     Evaluate the function for different learning rates
 
-    >>> jobs = hydra_multirun(cfg, task_function, overrides=["optim.lr=0.1,1.0"])
+    >>> jobs = launch(cfg, task_function, overrides=["optim.lr=0.1,1.0"], multirun=True)
     >>> [j.return_value for j in jobs[0]]
     [0.3054758310317993, 0.28910207748413086]
     """
@@ -227,6 +202,7 @@ def launch(
     hydra = Hydra.create_main_hydra2(task_name=job_name, config_search_path=search_path)
     try:
         if not multirun:
+            # Here we can use Hydra's `run` method
             job = hydra.run(
                 config_name=config_name,
                 task_function=task_function,
@@ -235,6 +211,10 @@ def launch(
             )
 
         else:
+            # Instead of running Hydra's `multirun` method we instantiate
+            # and run the sweeper method.  This allows us to run local
+            # sweepers and launchers without installing them in `hydra_plugins`
+            # package directory.
             cfg = hydra.compose_config(
                 config_name=config_name,
                 overrides=overrides if overrides is not None else [],

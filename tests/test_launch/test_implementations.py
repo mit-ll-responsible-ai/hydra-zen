@@ -96,7 +96,7 @@ def test_launch_job(
 @pytest.mark.parametrize("multirun_overrides", [None, ["a=1,2"]])
 @pytest.mark.parametrize("config_dir", [Path.cwd(), None])
 @pytest.mark.parametrize("with_log_configuration", [False, True])
-def test_hydra_multirun(
+def test_launch_multirun(
     overrides,
     multirun_overrides,
     config_dir,
@@ -121,6 +121,7 @@ def test_hydra_multirun(
         with_log_configuration=with_log_configuration,
         multirun=True,
     )
+    assert isinstance(job, list) and len(job) == 1
     for i, j in enumerate(job[0]):
         assert j.return_value == {"a": i + 1, "b": 1}
 
@@ -171,14 +172,6 @@ class LocalBasicSweeper(Sweeper):
             task_function=task_function,
             config=config,
         )
-
-    @staticmethod
-    def split_overrides_to_chunks(lst, n):
-        if n is None or n == -1:
-            n = len(lst)
-        assert n > 0
-        for i in range(0, len(lst), n):
-            yield lst[i : i + n]
 
     @staticmethod
     def split_arguments(overrides):

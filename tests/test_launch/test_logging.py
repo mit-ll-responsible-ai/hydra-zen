@@ -5,6 +5,7 @@ import logging
 from pathlib import Path
 
 import pytest
+from hydra.core.utils import JobReturn
 
 from hydra_zen import builds, instantiate, launch
 
@@ -20,6 +21,9 @@ def task(cfg):
 def test_consecutive_logs():
     job1 = launch(builds(dict, message="1"), task_function=task)
     job2 = launch(builds(dict, message="2"), task_function=task)
+
+    assert isinstance(job1, JobReturn) and job1.working_dir is not None
+    assert isinstance(job2, JobReturn) and job2.working_dir is not None
 
     if job1.working_dir == job2.working_dir:
         with open(Path(job1.working_dir) / "hydra_run.log") as f:
