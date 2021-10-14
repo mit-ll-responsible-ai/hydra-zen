@@ -62,7 +62,7 @@ exclude_patterns = []
 #
 html_theme = "pydata_sphinx_theme"
 html_favicon = "../../brand/hydra_zen_favicon_32x32.ico"
-html_logo = "../../brand/Hydra-Zen_logo_full_filled_bkgrnd_small.png"
+html_logo = "../../brand/Hydra-Zen_logo_full_filled_bkgrnd_smaller.png"
 
 html_theme_options = {
     "collapse_navigation": True,
