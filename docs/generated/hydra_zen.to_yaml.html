@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>to_yaml &#8212; hydra-zen 0.3.0rc4+1.gb2d64d7 documentation</title>
+    <title>to_yaml &#8212; hydra-zen 0.3.0rc4+2.ga6f7079 documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -305,16 +305,13 @@
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">builds</span><span class="p">,</span> <span class="n">to_yaml</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{a}</span><span class="s2">&quot;</span><span class="p">))</span>  <span class="c1"># structured config of nested dictionaries</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{c}</span><span class="s2">&quot;</span><span class="p">),</span> <span class="n">c</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">resolve</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 <span class="go">_target_: builtins.dict</span>
-<span class="go">_recursive_: true</span>
-<span class="go">_convert_: none</span>
 <span class="go">a:</span>
 <span class="go">  _target_: builtins.dict</span>
-<span class="go">  _recursive_: true</span>
-<span class="go">  _convert_: none</span>
 <span class="go">  b: 1</span>
+<span class="go">c: 1</span>
 </pre></div>
 </div>
 </dd></dl>

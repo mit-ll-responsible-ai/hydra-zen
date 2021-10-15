@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hydra_zen._hydra_overloads &#8212; hydra-zen 0.3.0rc4+1.gb2d64d7 documentation</title>
+    <title>hydra_zen._hydra_overloads &#8212; hydra-zen 0.3.0rc4+2.ga6f7079 documentation</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -334,16 +334,13 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; from hydra_zen import builds, to_yaml</span>
-<span class="sd">    &gt;&gt;&gt; cfg = builds(dict, a=builds(dict, b=&quot;${a}&quot;))  # structured config of nested dictionaries</span>
+<span class="sd">    &gt;&gt;&gt; cfg = builds(dict, a=builds(dict, b=&quot;${c}&quot;), c=1)</span>
 <span class="sd">    &gt;&gt;&gt; print(to_yaml(cfg, resolve=True))</span>
 <span class="sd">    _target_: builtins.dict</span>
-<span class="sd">    _recursive_: true</span>
-<span class="sd">    _convert_: none</span>
 <span class="sd">    a:</span>
 <span class="sd">      _target_: builtins.dict</span>
-<span class="sd">      _recursive_: true</span>
-<span class="sd">      _convert_: none</span>
 <span class="sd">      b: 1</span>
+<span class="sd">    c: 1</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">OmegaConf</span><span class="o">.</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">cfg</span><span class="o">=</span><span class="n">cfg</span><span class="p">,</span> <span class="n">resolve</span><span class="o">=</span><span class="n">resolve</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="n">sort_keys</span><span class="p">)</span></div>
 
