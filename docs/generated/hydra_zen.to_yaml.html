@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ZenField &#8212; hydra-zen 0.3.0rc4+1.gb2d64d7 documentation</title>
+    <title>to_yaml &#8212; hydra-zen 0.3.0rc4+1.gb2d64d7 documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -35,8 +35,8 @@
     <link rel="shortcut icon" href="../_static/hydra_zen_favicon_32x32.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="to_yaml" href="hydra_zen.to_yaml.html" />
-    <link rel="prev" title="make_custom_builds_fn" href="hydra_zen.make_custom_builds_fn.html" />
+    <link rel="next" title="save_as_yaml" href="hydra_zen.save_as_yaml.html" />
+    <link rel="prev" title="ZenField" href="hydra_zen.ZenField.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -196,21 +196,21 @@
   </a>
  </li>
 </ul>
-<ul class="current nav bd-sidenav">
+<ul class="nav bd-sidenav">
  <li class="toctree-l1">
   <a class="reference internal" href="hydra_zen.make_custom_builds_fn.html">
    make_custom_builds_fn
   </a>
  </li>
- <li class="toctree-l1 current active">
-  <a class="current reference internal" href="#">
+ <li class="toctree-l1">
+  <a class="reference internal" href="hydra_zen.ZenField.html">
    ZenField
   </a>
  </li>
 </ul>
-<ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="hydra_zen.to_yaml.html">
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
    to_yaml
   </a>
  </li>
@@ -279,46 +279,44 @@
               
               <div>
                 
-  <div class="section" id="zenfield">
-<h1>ZenField<a class="headerlink" href="#zenfield" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="to-yaml">
+<h1>to_yaml<a class="headerlink" href="#to-yaml" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="hydra_zen.ZenField">
-<code class="sig-prename descclassname"><span class="pre">hydra_zen.</span></code><code class="sig-name descname"><span class="pre">ZenField</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">hint=Any</span></em>, <em class="sig-param"><span class="pre">default=&lt;class</span> <span class="pre">'NOTHING'&gt;</span></em>, <em class="sig-param"><span class="pre">name=&lt;class</span> <span class="pre">'NOTHING'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/structured_configs/_implementations.html#ZenField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.ZenField" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specifies a field’s name and/or type-annotation and/or default-value.
-Designed to specify fields in <a class="reference internal" href="hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_config</span></code></a>.</p>
-<p>See the Examples section of the docstring for <a class="reference internal" href="hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_config</span></code></a> for examples of using
-<a class="reference internal" href="#hydra_zen.ZenField" title="hydra_zen.ZenField"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenField</span></code></a>.</p>
+<dt id="hydra_zen.to_yaml">
+<code class="sig-prename descclassname"><span class="pre">hydra_zen.</span></code><code class="sig-name descname"><span class="pre">to_yaml</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/_hydra_overloads.html#to_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.to_yaml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a yaml-formatted string representation of <code class="docutils literal notranslate"><span class="pre">cfg</span></code>.</p>
+<p>This is an alias of <code class="docutils literal notranslate"><span class="pre">omegaconf.Omegaconf.to_yaml</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>hint</strong><span class="classifier">type, optional (default=Any)</span></dt><dd></dd>
-<dt><strong>default</strong><span class="classifier">Any, optional</span></dt><dd></dd>
-<dt><strong>name</strong><span class="classifier">str, optional</span></dt><dd></dd>
+<dt><strong>cfg</strong><span class="classifier">Any</span></dt><dd><p>A valid configuration object (e.g. DictConfig, ListConfig, dataclass).</p>
+</dd>
+<dt><strong>resolve</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>, interpolated fields in <code class="xref py py-obj docutils literal notranslate"><span class="pre">cfg</span></code> will be resolved in the yaml.</p>
+</dd>
+<dt><strong>sort_keys</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>, the yaml’s entries will alphabetically ordered.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>yaml</strong><span class="classifier">str</span></dt><dd></dd>
 </dl>
 </dd>
 </dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<dl class="simple">
-<dt><a class="reference internal" href="hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_config</span></code></a></dt><dd><p>create a config with customized field names, default values, and annotations.</p>
-</dd>
-</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">builds</span><span class="p">,</span> <span class="n">to_yaml</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{a}</span><span class="s2">&quot;</span><span class="p">))</span>  <span class="c1"># structured config of nested dictionaries</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">resolve</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">_target_: builtins.dict</span>
+<span class="go">_recursive_: true</span>
+<span class="go">_convert_: none</span>
+<span class="go">a:</span>
+<span class="go">  _target_: builtins.dict</span>
+<span class="go">  _recursive_: true</span>
+<span class="go">  _convert_: none</span>
+<span class="go">  b: 1</span>
+</pre></div>
 </div>
-<p class="rubric">Notes</p>
-<p><code class="docutils literal notranslate"><span class="pre">default</span></code> will be returned as an instance of <code class="docutils literal notranslate"><span class="pre">dataclasses.Field</span></code>.
-Mutable values (e.g. lists or dictionaries) passed to <code class="docutils literal notranslate"><span class="pre">default</span></code> will automatically
-be “packaged” in a default-factory function <a class="reference internal" href="#r52d5414ac616-1" id="id1">[1]</a>.</p>
-<p>A type passed to <code class="docutils literal notranslate"><span class="pre">hint</span></code> will automatically be “broadened” such that the resulting
-type is compatible with Hydra’s set of supported type annotations <a class="reference internal" href="#r52d5414ac616-2" id="id2">[2]</a>.</p>
-<p class="rubric">References</p>
-<dl class="citation">
-<dt class="label" id="r52d5414ac616-1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p><a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#default-factory-functions">https://docs.python.org/3/library/dataclasses.html#default-factory-functions</a></p>
-</dd>
-<dt class="label" id="r52d5414ac616-2"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
-<dd><p><a class="reference external" href="https://hydra.cc/docs/next/tutorials/structured_config/intro/#structured-configs-supports">https://hydra.cc/docs/next/tutorials/structured_config/intro/#structured-configs-supports</a></p>
-</dd>
-</dl>
 </dd></dl>
 
 </div>
@@ -329,17 +327,17 @@ type is compatible with Hydra’s set of supported type annotations <a class="re
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
-    <a class='left-prev' id="prev-link" href="hydra_zen.make_custom_builds_fn.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="hydra_zen.ZenField.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">make_custom_builds_fn</p>
+            <p class="prev-next-title">ZenField</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="hydra_zen.to_yaml.html" title="next page">
+    <a class='right-next' id="next-link" href="hydra_zen.save_as_yaml.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">to_yaml</p>
+        <p class="prev-next-title">save_as_yaml</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

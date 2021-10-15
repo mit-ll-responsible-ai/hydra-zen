@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>API Reference &#8212; hydra-zen 0.3.0rc4 documentation</title>
+    <title>API Reference &#8212; hydra-zen 0.3.0rc4+1.gb2d64d7 documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -174,21 +174,6 @@
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="generated/hydra_zen.instantiate.html">
-   instantiate
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/hydra_zen.make_custom_builds_fn.html">
-   make_custom_builds_fn
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/hydra_zen.get_target.html">
-   get_target
-  </a>
- </li>
- <li class="toctree-l1">
   <a class="reference internal" href="generated/hydra_zen.just.html">
    just
   </a>
@@ -198,9 +183,45 @@
    hydrated_dataclass
   </a>
  </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="generated/hydra_zen.instantiate.html">
+   instantiate
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="generated/hydra_zen.get_target.html">
+   get_target
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="generated/hydra_zen.make_custom_builds_fn.html">
+   make_custom_builds_fn
+  </a>
+ </li>
  <li class="toctree-l1">
   <a class="reference internal" href="generated/hydra_zen.ZenField.html">
    ZenField
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="generated/hydra_zen.to_yaml.html">
+   to_yaml
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="generated/hydra_zen.save_as_yaml.html">
+   save_as_yaml
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="generated/hydra_zen.load_from_yaml.html">
+   load_from_yaml
   </a>
  </li>
 </ul>
@@ -243,9 +264,31 @@
 <nav id="bd-toc-nav">
     <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#creating-and-working-with-configs">
-   Creating and Working with Configs
+  <a class="reference internal nav-link" href="#creating-and-working-with-structured-configs">
+   Creating and Working with Structured Configs
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#creating-structured-configs">
+     Creating Structured Configs
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#instantiating-and-resolving-configs">
+     Instantiating and Resolving Configs
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#utilities">
+     Utilities
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#working-with-yamls">
+     Working with YAMLs
+    </a>
+   </li>
+  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#launching-jobs-with-hydra">
@@ -258,8 +301,8 @@
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#runtime-type-validation">
-     Runtime Type-Validation
+    <a class="reference internal nav-link" href="#runtime-data-validation">
+     Runtime Data Validation
     </a>
    </li>
   </ul>
@@ -287,9 +330,11 @@
                 
   <div class="section" id="api-reference">
 <h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="creating-and-working-with-configs">
-<h2>Creating and Working with Configs<a class="headerlink" href="#creating-and-working-with-configs" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="creating-and-working-with-structured-configs">
+<h2>Creating and Working with Structured Configs<a class="headerlink" href="#creating-and-working-with-structured-configs" title="Permalink to this headline">¶</a></h2>
 <p>hydra-zen provides us with some simple but powerful tools for creating and working with structured configs.</p>
+<div class="section" id="creating-structured-configs">
+<h3>Creating Structured Configs<a class="headerlink" href="#creating-structured-configs" title="Permalink to this headline">¶</a></h3>
 <table class="longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
@@ -302,26 +347,69 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>(hydra_target, /, *pos_args[, …])</p></td>
 <td><p>Returns a dataclass object that configures <code class="docutils literal notranslate"><span class="pre">&lt;hydra_target&gt;</span></code> with user-specified and auto-populated parameter values.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a>(obj)</p></td>
+<td><p>Produces a structured config that, when instantiated by Hydra, ‘just’ returns the target (uninstantiated).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.hydrated_dataclass.html#hydra_zen.hydrated_dataclass" title="hydra_zen.hydrated_dataclass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydrated_dataclass</span></code></a>(target, *pos_args[, …])</p></td>
+<td><p>A decorator that uses <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> to create a dataclass with the appropriate hydra-specific fields for specifying a structured config <a class="reference internal" href="generated/hydra_zen.hydrated_dataclass.html#r8dd265aa7612-1" id="id1"><span>[R8dd265aa7612-1]</span></a>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="instantiating-and-resolving-configs">
+<h3>Instantiating and Resolving Configs<a class="headerlink" href="#instantiating-and-resolving-configs" title="Permalink to this headline">¶</a></h3>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">instantiate</span></code></a>(config, *args, **kwargs)</p></td>
 <td><p>Instantiates the object specified in the <code class="docutils literal notranslate"><span class="pre">_target_</span></code> field of <code class="docutils literal notranslate"><span class="pre">config</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_custom_builds_fn</span></code></a>(*[, zen_partial, …])</p></td>
-<td><p>Returns the <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> function, but with customized default values.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.get_target.html#hydra_zen.get_target" title="hydra_zen.get_target"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_target</span></code></a>(obj)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.get_target.html#hydra_zen.get_target" title="hydra_zen.get_target"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_target</span></code></a>(obj)</p></td>
 <td><p>Returns the target-object from a targeted structured config.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a>(obj)</p></td>
-<td><p>Produces a structured config that, when instantiated by Hydra, ‘just’ returns the target (uninstantiated).</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.hydrated_dataclass.html#hydra_zen.hydrated_dataclass" title="hydra_zen.hydrated_dataclass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydrated_dataclass</span></code></a>(target, *pos_args[, …])</p></td>
-<td><p>A decorator that uses <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> to create a dataclass with the appropriate hydra-specific fields for specifying a structured config <a class="reference internal" href="generated/hydra_zen.hydrated_dataclass.html#r8dd265aa7612-1" id="id1"><span>[R8dd265aa7612-1]</span></a>.</p></td>
+</tbody>
+</table>
+</div>
+<div class="section" id="utilities">
+<h3>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h3>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_custom_builds_fn</span></code></a>(*[, zen_partial, …])</p></td>
+<td><p>Returns the <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> function, but with customized default values.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.ZenField.html#hydra_zen.ZenField" title="hydra_zen.ZenField"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenField</span></code></a>([hint, default, name])</p></td>
 <td><p>Specifies a field’s name and/or type-annotation and/or default-value.</p></td>
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section" id="working-with-yamls">
+<h3>Working with YAMLs<a class="headerlink" href="#working-with-yamls" title="Permalink to this headline">¶</a></h3>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_yaml</span></code></a>(cfg, *[, resolve, sort_keys])</p></td>
+<td><p>Returns a yaml-formatted string representation of <code class="docutils literal notranslate"><span class="pre">cfg</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.save_as_yaml.html#hydra_zen.save_as_yaml" title="hydra_zen.save_as_yaml"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_as_yaml</span></code></a>(config, f[, resolve])</p></td>
+<td><p>Save as configuration object to a yaml-format file</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.load_from_yaml.html#hydra_zen.load_from_yaml" title="hydra_zen.load_from_yaml"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_from_yaml</span></code></a>(file_)</p></td>
+<td><p>Load as configuration object from a yaml-format file</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div class="section" id="launching-jobs-with-hydra">
 <h2>Launching Jobs with Hydra<a class="headerlink" href="#launching-jobs-with-hydra" title="Permalink to this headline">¶</a></h2>
@@ -339,8 +427,8 @@
 </div>
 <div class="section" id="third-party-utilities">
 <h2>Third-Party Utilities<a class="headerlink" href="#third-party-utilities" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="runtime-type-validation">
-<h3>Runtime Type-Validation<a class="headerlink" href="#runtime-type-validation" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="runtime-data-validation">
+<h3>Runtime Data Validation<a class="headerlink" href="#runtime-data-validation" title="Permalink to this headline">¶</a></h3>
 <table class="longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
