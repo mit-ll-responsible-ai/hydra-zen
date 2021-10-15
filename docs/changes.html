@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Changelog &#8212; hydra-zen 0.3.0rc3+29.g2ac1201 documentation</title>
+    <title>Changelog &#8212; hydra-zen 0.3.0rc4 documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -181,9 +181,26 @@
 <nav id="bd-toc-nav">
     <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#rc3-2021-09-20">
-   0.3.0rc3 - 2021-09-20
+  <a class="reference internal nav-link" href="#rc4-2021-10-14">
+   0.3.0rc4 - 2021-10-14
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#new-features">
+     New Features
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#deprecations">
+     Deprecations
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#additional-items">
+     Additional Items
+    </a>
+   </li>
+  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#v0-2-0">
@@ -220,14 +237,56 @@
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
 <p>This is a record of all past hydra-zen releases and what went into them, in reverse chronological order.
 All previous releases should still be available on pip.</p>
-<div class="section" id="rc3-2021-09-20">
-<span id="v0-3-0"></span><h2>0.3.0rc3 - 2021-09-20<a class="headerlink" href="#rc3-2021-09-20" title="Permalink to this headline">¶</a></h2>
-<p>This release:</p>
+<div class="section" id="rc4-2021-10-14">
+<span id="v0-3-0"></span><h2>0.3.0rc4 - 2021-10-14<a class="headerlink" href="#rc4-2021-10-14" title="Permalink to this headline">¶</a></h2>
+<p>This release adds many new features to hydra-zen, and is a big step towards <code class="docutils literal notranslate"><span class="pre">v1.0.0</span></code>. It also introduces some significant API changes, meaning that there are notable deprecations of expressions that were valid in <code class="docutils literal notranslate"><span class="pre">v0.2.0</span></code>.</p>
+<div class="section" id="new-features">
+<h3>New Features<a class="headerlink" href="#new-features" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>The introduction of <code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">zen_wrappers=&lt;&gt;)</span></code>.</p>
+<blockquote>
+<div><p>This is an extremely powerful feature that enables one to modify the instantiation of a builds-config, by including wrappers in a target’s configuration. <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/122">Read more about it here</a>.</p>
+</div></blockquote>
+</li>
+<li><p>Rich support for runtime type-checking of configurations.</p>
+<blockquote>
+<div><p>Piggybacking off of the introduction of the <code class="docutils literal notranslate"><span class="pre">zen_wrappers</span></code> feature, <strong>hydra-zen now offers support for customized runtime type-checking</strong>. Presently, either of two type-checking libraries can be used: pydantic and beartype.</p>
 <ul class="simple">
-<li><p>Makes the “target” of <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code> a positional-only argument. Code that specifies <code class="docutils literal notranslate"><span class="pre">builds(target=&lt;target&gt;,</span> <span class="pre">...)</span></code> will now raise a deprecation warning. Now, e.g., <code class="docutils literal notranslate"><span class="pre">builds(dict,</span> <span class="pre">target=1)</span></code> will work. <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/104">#104</a></p></li>
-<li><p>Adds the ability to set “meta” fields via <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code>. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/112">#112</a></p></li>
-<li><p>Adds the <a class="reference internal" href="generated/hydra_zen.get_target.html#hydra_zen.get_target" title="hydra_zen.get_target"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_target()</span></code></a> function for retrieving target-objects from structured configs. <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/94">#94</a></p></li>
-<li><p>Improves type-annotations on <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code>. Now, e.g., <code class="docutils literal notranslate"><span class="pre">builds(&quot;hi&quot;)</span></code> will be marked as invalid by static checkers (the target of <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code> must be callable). <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/104">#104</a>.</p></li>
+<li><p><a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/126">Read about hydra-zen compatibility with pydantic</a></p></li>
+<li><p><a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/128">Read about hydra-zen compatibility with beartype</a></p></li>
+</ul>
+</div></blockquote>
+<p>The type-checking capabilities offered by <a class="reference internal" href="generated/hydra_zen.third_party.pydantic.validates_with_pydantic.html#hydra_zen.third_party.pydantic.validates_with_pydantic" title="hydra_zen.third_party.pydantic.validates_with_pydantic"><code class="xref py py-func docutils literal notranslate"><span class="pre">validates_with_pydantic()</span></code></a> and <a class="reference internal" href="generated/hydra_zen.third_party.beartype.validates_with_beartype.html#hydra_zen.third_party.beartype.validates_with_beartype" title="hydra_zen.third_party.beartype.validates_with_beartype"><code class="xref py py-func docutils literal notranslate"><span class="pre">validates_with_beartype()</span></code></a>, respectively, are both far more robust than those <a class="reference external" href="https://hydra.cc/docs/next/tutorials/structured_config/intro/#structured-configs-supports">offered by Hydra</a>.</p>
+</li>
+<li><p>A new, simplified method for creating a structured config, via <a class="reference internal" href="generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_config()</span></code></a>.</p>
+<blockquote>
+<div><p>This serves as a much more succinct way to create a dataclass, where specifying type-annotations is optional. Additionally, provided type-annotations and default values are automatically adapted to be made compatible with Hydra. <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/130">Read more about it here</a>.</p>
+</div></blockquote>
+</li>
+<li><p><a class="reference internal" href="generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_custom_builds_fn()</span></code></a>, which enables us to produce new “copies” of the <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> function, but with customized default-values.</p></li>
+<li><p><a class="reference internal" href="generated/hydra_zen.get_target.html#hydra_zen.get_target" title="hydra_zen.get_target"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_target()</span></code></a>, which is used to retrieve target-objects from structured configs. <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/94">See #94</a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">zen_meta=&lt;dict&gt;)</span></code> users to attach “meta” fields to a targeted config, which will <em>not</em> be used by instantiate when building the target.</p>
+<blockquote>
+<div><p>A meta-field can be referenced via relative interpolation; this
+interpolation will be valid no matter where the configuration is
+utilized. <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/112">See #112</a> for more details.</p>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="deprecations">
+<h3>Deprecations<a class="headerlink" href="#deprecations" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>The use of both <code class="docutils literal notranslate"><span class="pre">hydra_zen.experimental.hydra_run</span></code> and <code class="docutils literal notranslate"><span class="pre">hydra_zen.experimental.hydra_multirun</span></code> are deprecated in favor of the the function <a class="reference internal" href="generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><code class="xref py py-func docutils literal notranslate"><span class="pre">launch()</span></code></a>.</p></li>
+<li><p>Creating partial configurations with <code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">hydra_partial=True)</span></code> is now deprecated in favor of <code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">zen_partial=True)</span></code>.</p></li>
+<li><p>The first argument of <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> is now a positional-only argument. Code that specifies <code class="docutils literal notranslate"><span class="pre">builds(target=&lt;target&gt;,</span> <span class="pre">...)</span></code> will now raise a deprecation warning; use <code class="docutils literal notranslate"><span class="pre">builds(&lt;target&gt;,</span> <span class="pre">...)</span></code> instead. Previously, it was impossible to specify <code class="docutils literal notranslate"><span class="pre">target</span></code> as a keyword argument for the object being configured; now, e.g., <code class="docutils literal notranslate"><span class="pre">builds(dict,</span> <span class="pre">target=1)</span></code> will work. (See: <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/104">#104</a>).</p></li>
+<li><p>All keyword arguments of the form <code class="docutils literal notranslate"><span class="pre">zen_xx</span></code>, <code class="docutils literal notranslate"><span class="pre">hydra_xx</span></code>, and <code class="docutils literal notranslate"><span class="pre">_zen_xx</span></code> are reserved by both <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> and <a class="reference internal" href="generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_config()</span></code></a>, to ensure that future features introduced by Hydra and hydra-zen will not cause compatibility conflicts for users.</p></li>
+</ul>
+</div>
+<div class="section" id="additional-items">
+<h3>Additional Items<a class="headerlink" href="#additional-items" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Improves type-annotations on <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a>. Now, e.g., <code class="docutils literal notranslate"><span class="pre">builds(&quot;hi&quot;)</span></code> will be marked as invalid by static checkers (the target of <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> must be callable). <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/104">#104</a>.</p></li>
 <li><p>Migrates zen-specific fields to a new naming-scheme, and zen-specific processing to a universal mechanism. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/110">#110</a> for more details.</p></li>
 <li><p>Ensures that hydra-zen’s source code is “pyright-clean”, under <a class="reference external" href="https://github.com/microsoft/pyright/blob/main/docs/configuration.md#diagnostic-rule-defaults">pyright’s basic type-checking mode</a>. <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/101">#101</a></p></li>
 <li><p>Adds to all public modules/packages an <code class="docutils literal notranslate"><span class="pre">__all__</span></code> field. <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/99">#99</a></p></li>
@@ -236,8 +295,9 @@ All previous releases should still be available on pip.</p>
 <li><p>Makes improvements to hydra-zen’s test suite. <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/90">#90</a> and <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/91">#91</a>.</p></li>
 </ul>
 </div>
+</div>
 <div class="section" id="v0-2-0">
-<span id="id12"></span><h2>0.2.0 - 2021-08-12<a class="headerlink" href="#v0-2-0" title="Permalink to this headline">¶</a></h2>
+<span id="id11"></span><h2>0.2.0 - 2021-08-12<a class="headerlink" href="#v0-2-0" title="Permalink to this headline">¶</a></h2>
 <p>This release:</p>
 <ul class="simple">
 <li><p>Improves hydra-zen’s <a class="reference external" href="https://mit-ll-responsible-ai.github.io/hydra-zen/structured_configs.html#automatic-type-refinement">automatic type refinement</a>. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/84">#84</a> for details</p></li>
@@ -249,7 +309,7 @@ All previous releases should still be available on pip.</p>
 </ul>
 </div>
 <div class="section" id="v0-1-0">
-<span id="id15"></span><h2>0.1.0 - 2021-08-04<a class="headerlink" href="#v0-1-0" title="Permalink to this headline">¶</a></h2>
+<span id="id14"></span><h2>0.1.0 - 2021-08-04<a class="headerlink" href="#v0-1-0" title="Permalink to this headline">¶</a></h2>
 <p>This is hydra-zen’s first stable release on PyPI!
 Although we have not yet released version <code class="xref py py-obj docutils literal notranslate"><span class="pre">v1.0.0</span></code>, it should be noted that hydra-zen’s codebase is thoroughly tested.
 Its test suite makes keen use of the property-based testing library <a class="reference external" href="https://hypothesis.readthedocs.io/en/latest/">Hypothesis</a>.
