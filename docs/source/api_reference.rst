@@ -2,14 +2,15 @@
 API Reference
 #############
 
-*********************************
-Creating and Working with Configs
-*********************************
+********************************************
+Creating and Working with Structured Configs
+********************************************
 
 hydra-zen provides us with some simple but powerful tools for creating and working with structured configs.
 
 
-
+Creating Structured Configs
+***************************
 .. currentmodule:: hydra_zen
 
 .. autosummary::
@@ -17,12 +18,47 @@ hydra-zen provides us with some simple but powerful tools for creating and worki
 
    make_config
    builds
-   instantiate
-   make_custom_builds_fn
-   get_target
    just
    hydrated_dataclass
+
+
+Instantiating and Resolving Configs
+***********************************
+
+.. currentmodule:: hydra_zen
+
+.. autosummary::
+   :toctree: generated/
+
+   instantiate
+   get_target
+
+
+Utilities
+*********
+
+.. currentmodule:: hydra_zen
+
+.. autosummary::
+   :toctree: generated/
+
+
+   make_custom_builds_fn
    ZenField
+
+
+Working with YAMLs
+******************
+
+.. currentmodule:: hydra_zen
+
+.. autosummary::
+   :toctree: generated/
+
+
+   to_yaml
+   save_as_yaml
+   load_from_yaml
 
 
 *************************
@@ -41,7 +77,7 @@ Third-Party Utilities
 *********************
 
 
-Runtime Type-Validation
+Runtime Data Validation
 ***********************
 
 .. currentmodule:: hydra_zen.third_party

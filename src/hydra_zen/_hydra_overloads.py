@@ -130,7 +130,7 @@ def to_yaml(cfg: Any, *, resolve: bool = False, sort_keys: bool = False) -> str:
     """
     Returns a yaml-formatted string representation of ``cfg``.
 
-    This is an alias of ``omegaconf.Omegaconf.to_yaml`` [1]_
+    This is an alias of ``omegaconf.Omegaconf.to_yaml``.
 
     Parameters
     ----------
@@ -185,8 +185,8 @@ def save_as_yaml(
 
     References
     ----------
-    [1].. https://omegaconf.readthedocs.io/en/2.0_branch/usage.html#save-load-yaml-file
-    [2].. https://omegaconf.readthedocs.io/en/2.0_branch/usage.html#variable-interpolation
+    .. [1] https://omegaconf.readthedocs.io/en/2.0_branch/usage.html#save-load-yaml-file
+    .. [2] https://omegaconf.readthedocs.io/en/2.0_branch/usage.html#variable-interpolation
 
     Examples
     --------
@@ -205,7 +205,7 @@ def load_from_yaml(
     """
     Load as configuration object from a yaml-format file
 
-    This is an alias of ``omegaconf.OmegaConf.load`` [1]_.
+    This is an alias of ``omegaconf.OmegaConf.load``.
 
     Parameters
     ----------
