@@ -219,16 +219,62 @@ def to_yaml(cfg: Any, *, resolve: bool = False, sort_keys: bool = False) -> str:
     -------
     yaml : str
 
+    See Also
+    --------
+    save_as_yaml: Save a config to a yaml-format file.
+    load_from_yaml: Load as configuration object from a yaml-format file.
+
     Examples
     --------
-    >>> from hydra_zen import builds, to_yaml
-    >>> cfg = builds(dict, a=builds(dict, b="${c}"), c=1)
-    >>> print(to_yaml(cfg, resolve=True))
+    >>> from hydra_zen import builds, make_config, to_yaml
+
+    **Basic usage**
+
+    The yaml of a config with both an un-configured field
+    and a configured field:
+
+    >>> c1 = make_config("a", b=1)
+    >>> print(to_yaml(c1))
+    a: ???
+    b: 1
+
+    The yaml of a targeted config:
+
+    >>> c2 = builds(dict, y=10)
+    >>> print(to_yaml(c2))
     _target_: builtins.dict
+    'y': 10
+
+    **Specifying resolve**
+
+    The following is a config with interpolated fields.
+
+    >>> c3 = make_config(a=builds(dict, b="${c}"), c=1)
+
+
+    >>> print(to_yaml(c3, resolve=False))
+    a:
+      _target_: builtins.dict
+      b: ${c}
+    c: 1
+
+    >>> print(to_yaml(c3, resolve=True))
     a:
       _target_: builtins.dict
       b: 1
     c: 1
+
+    **Specifying sort_keys**
+
+    >>> c4 = make_config("b", "a")  # field order: b then a
+
+    >>> print(to_yaml(c4, sort_keys=False))
+    b: ???
+    a: ???
+
+    >>> print(to_yaml(c4, sort_keys=True))
+    a: ???
+    b: ???
     """
     return OmegaConf.to_yaml(cfg=cfg, resolve=resolve, sort_keys=sort_keys)
 
@@ -237,20 +283,26 @@ def save_as_yaml(
     config: Any, f: Union[str, pathlib.Path, IO[Any]], resolve: bool = False
 ) -> None:
     """
-    Save as configuration object to a yaml-format file
+    Save a config to a yaml-format file
 
     This is an alias of ``omegaconf.Omegaconf.save`` [1]_.
 
     Parameters
     ----------
     config : Any
-        A valid config object (e.g. a structured config produced by `builds`)
+        A config object.
 
-    f : str | pathlib.Path | IO[Any]]
-        The target filename or file object
+    f : str | pathlib.Path | IO[Any]
+        The path of the file file, or a file object, to be written to.
 
     resolve : bool, optional (default=None)
         If ``True`` interpolations will be resolved in the config prior to serialization [2]_.
+        See Examples section of `to_yaml` for details.
+
+    See Also
+    --------
+    to_yaml: Serialize a config as a yaml-formatted string.
+    load_from_yaml: Load as configuration object from a yaml-format file.
 
     References
     ----------
@@ -259,11 +311,14 @@ def save_as_yaml(
 
     Examples
     --------
-    >>> from hydra_zen import builds, save_as_yaml, load_from_yaml
-    >>> conf = builds(dict, hello=10, goodbye=2)
+    >>> from hydra_zen import make_config, save_as_yaml, load_from_yaml
+
+    **Basic usage**
+
+    >>> Conf = make_config(a=1, b="foo")
     >>> save_as_yaml(conf, "test.yaml")  # file written to: test.yaml
     >>> load_from_yaml("test.yaml")
-    {'_target_': 'builtins.dict', 'hello': 10, 'goodbye': 2}
+    {'a': 1, 'b': 'foo'}
     """
     return OmegaConf.save(config=config, f=f, resolve=resolve)
 
@@ -279,22 +334,31 @@ def load_from_yaml(
     Parameters
     ----------
     file_ : str | pathlib.Path | IO[Any]
-        A valid config object (e.g. a structured config produced by `builds`)
+        The path to the yaml-formatted file, or the file object, that the config
+        will be loaded from.
 
     Returns
     -------
     loaded_conf : DictConfig | ListConfig
 
+    See Also
+    --------
+    save_as_yaml: Save a config to a yaml-format file.
+    to_yaml: Serialize a config as a yaml-formatted string.
+
     References
     ----------
-    [1].. https://omegaconf.readthedocs.io/en/2.0_branch/usage.html#save-load-yaml-file
+    .. [1] https://omegaconf.readthedocs.io/en/2.0_branch/usage.html#save-load-yaml-file
 
     Examples
     --------
-    >>> from hydra_zen import builds, save_as_yaml, load_from_yaml
-    >>> conf = builds(dict, hello=10, goodbye=2)
+    >>> from hydra_zen import make_config, save_as_yaml, load_from_yaml
+
+    **Basic usage**
+
+    >>> Conf = make_config(a=1, b="foo")
     >>> save_as_yaml(conf, "test.yaml")  # file written to: test.yaml
     >>> load_from_yaml("test.yaml")
-    {'_target_': 'builtins.dict', 'hello': 10, 'goodbye': 2}
+    {'a': 1, 'b': 'foo'}
     """
     return OmegaConf.load(file_)
