@@ -812,7 +812,7 @@ def builds(
     Zen-wrappers enables us to make arbitrary changes to ``<hydra_target>``, its inputs,
     and/or its outputs during the instantiation process.
 
-    Let's use a wrapper to inject add a unit-conversion step to a config. We'll modify a
+    Let's use a wrapper to add a unit-conversion step to a config. We'll modify a
     config for a function that converts Farenheit to Celcius, and add a wrapper it so that
     it will convert to Kelvin instead.
 

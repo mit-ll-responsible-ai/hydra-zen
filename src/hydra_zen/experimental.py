@@ -22,6 +22,45 @@ def hydra_run(
     job_name: str = "hydra_run",
     with_log_configuration: bool = True,
 ):
+    """(Deprecated) Launch a Hydra job defined by `task_function` using the configuration
+    provided in `config`.
+
+    .. deprecated:: 0.3.0
+          `hydra_run` will be removed in hydra-zen 1.0.0; it is replaced by
+          :func:`hydra_zen.launch`.
+
+    Parameters
+    ----------
+    config : Union[DataClass, DictConfig, Mapping]
+        A configuration as a dataclass, configuration object, or a dictionary.
+
+    task_function : Callable[[DictConfig], Any]
+        The function Hydra will execute with the given configuration.
+
+    overrides : Optional[List[str]] (default: None)
+        If provided, overrides default configurations, see [1]_ and [2]_.
+
+    config_dir : Optional[Union[str, Path]] (default: None)
+        Add configuration directories if needed.
+
+    config_name : str (default: "hydra_run")
+        Name of the stored configuration in Hydra's ConfigStore API.
+
+    job_name : str (default: "hydra_run")
+
+    with_log_configuration : bool (default: True)
+        Flag to configure logging subsystem from the loaded config
+
+    Returns
+    -------
+    result : JobReturn
+
+    References
+    ----------
+    .. [1] https://hydra.cc/docs/next/advanced/override_grammar/basic
+    .. [2] https://hydra.cc/docs/next/configure_hydra/intro
+    .. [3] https://hydra.cc/docs/tutorials/basic/running_your_app/multi-run
+    """
     warnings.warn(
         HydraZenDeprecationWarning(
             "hydra_zen.experimental.hydra_run is deprecated "
@@ -34,12 +73,12 @@ def hydra_run(
     )
     return launch(
         config,
-        task_function,
-        overrides,
-        config_dir,
-        config_name,
-        job_name,
-        with_log_configuration,
+        task_function=task_function,
+        overrides=overrides,
+        config_dir=config_dir,
+        config_name=config_name,
+        job_name=job_name,
+        with_log_configuration=with_log_configuration,
     )
 
 
@@ -52,6 +91,45 @@ def hydra_multirun(
     job_name: str = "hydra_run",
     with_log_configuration: bool = True,
 ):
+    """(Deprecated) Launch multiple Hydra jobs defined by `task_function` using the configuration
+    provided in `config`.
+
+    .. deprecated:: 0.3.0
+          `hydra_multirun` will be removed in hydra-zen 1.0.0; it is replaced by
+          :func:`hydra_zen.launch`.
+
+    Parameters
+    ----------
+    config : Union[DataClass, DictConfig, Mapping]
+        A configuration as a dataclass, configuration object, or a dictionary.
+
+    task_function : Callable[[DictConfig], Any]
+        The function Hydra will execute with the given configuration.
+
+    overrides : Optional[List[str]] (default: None)
+        If provided, overrides default configurations, see [1]_ and [2]_.
+
+    config_dir : Optional[Union[str, Path]] (default: None)
+        Add configuration directories if needed.
+
+    config_name : str (default: "hydra_run")
+        Name of the stored configuration in Hydra's ConfigStore API.
+
+    job_name : str (default: "hydra_run")
+
+    with_log_configuration : bool (default: True)
+        Flag to configure logging subsystem from the loaded config
+
+    Returns
+    -------
+    result : Any
+
+    References
+    ----------
+    .. [1] https://hydra.cc/docs/next/advanced/override_grammar/basic
+    .. [2] https://hydra.cc/docs/next/configure_hydra/intro
+    .. [3] https://hydra.cc/docs/tutorials/basic/running_your_app/multi-run
+    """
     warnings.warn(
         HydraZenDeprecationWarning(
             "hydra_zen.experimental.hydra_multirun is deprecated "
@@ -64,11 +142,11 @@ def hydra_multirun(
     )
     return launch(
         config,
-        task_function,
-        overrides,
-        config_dir,
-        config_name,
-        job_name,
-        with_log_configuration,
+        task_function=task_function,
+        overrides=overrides,
+        config_dir=config_dir,
+        config_name=config_name,
+        job_name=job_name,
+        with_log_configuration=with_log_configuration,
         multirun=True,
     )

@@ -2,6 +2,26 @@
 API Reference
 #############
 
+*************************
+Launching Jobs with Hydra
+*************************
+
+.. currentmodule:: hydra_zen
+
+.. autosummary::
+   :toctree: generated/
+
+   launch
+
+.. currentmodule:: hydra_zen.experimental
+
+.. autosummary::
+   :toctree: generated/
+   
+   hydra_run
+   hydra_multirun
+
+
 ********************************************
 Creating and Working with Structured Configs
 ********************************************
@@ -60,17 +80,6 @@ Working with YAMLs
    save_as_yaml
    load_from_yaml
 
-
-*************************
-Launching Jobs with Hydra
-*************************
-
-.. currentmodule:: hydra_zen
-
-.. autosummary::
-   :toctree: generated/
-
-   launch
 
 *********************
 Third-Party Utilities
