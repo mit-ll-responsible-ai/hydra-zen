@@ -222,7 +222,7 @@ def to_yaml(cfg: Any, *, resolve: bool = False, sort_keys: bool = False) -> str:
     See Also
     --------
     save_as_yaml: Save a config to a yaml-format file.
-    load_from_yaml: Load as configuration object from a yaml-format file.
+    load_from_yaml: Load a config from a yaml-format file.
 
     Examples
     --------
@@ -302,7 +302,7 @@ def save_as_yaml(
     See Also
     --------
     to_yaml: Serialize a config as a yaml-formatted string.
-    load_from_yaml: Load as configuration object from a yaml-format file.
+    load_from_yaml: Load a config from a yaml-format file.
 
     References
     ----------
@@ -327,7 +327,7 @@ def load_from_yaml(
     file_: Union[str, pathlib.Path, IO[Any]]
 ) -> Union[DictConfig, ListConfig]:
     """
-    Load as configuration object from a yaml-format file
+    Load a config from a yaml-format file
 
     This is an alias of ``omegaconf.OmegaConf.load``.
 
