@@ -201,6 +201,23 @@ class AClass:
     ):
         pass
 
+    @classmethod
+    def a_class_method(
+        cls,
+        x: int,
+        y: str,
+        z: bool,
+        a_tuple: Tuple[str] = ("hi",),
+        optional: Optional[int] = None,
+        inferred_optional_str: str = None,
+        inferred_optional_any: Mapping = None,
+        default: float = 100.0,
+        a_function: Callable = func,
+        a_class: Type[Dict] = dict,
+        a_dataclass: Type[ADataClass] = ADataClass,
+    ):
+        pass
+
 
 class AMetaClass(ABC):
     def __init__(
@@ -220,7 +237,7 @@ class AMetaClass(ABC):
         pass
 
 
-@pytest.mark.parametrize("target", [a_func, AClass, AMetaClass])
+@pytest.mark.parametrize("target", [a_func, AClass, AClass.a_class_method, AMetaClass])
 @given(
     user_specified_values=st.dictionaries(
         keys=st.sampled_from(["x", "y", "z"]), values=st.integers(0, 3), max_size=3
@@ -237,7 +254,7 @@ def test_builds_partial_with_full_sig_excludes_non_specified_params(
         zen_partial=True,
     )
 
-    expected_sig = [
+    expected_sig = [  # type: ignore
         (var_name, name_to_type[var_name], user_specified_values[var_name])
         for var_name in sorted(user_specified_values)
     ] + [

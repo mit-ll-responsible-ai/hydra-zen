@@ -73,3 +73,13 @@ def test_nested_configs_pos_args():
     assert x == dict(w=1)
     assert y is f
     assert z is f
+
+
+class C:
+    @classmethod
+    def f(cls, x):
+        return x
+
+
+def test_builds_classmethod():
+    assert instantiate(builds(C.f, x=10)) == 10
