@@ -665,9 +665,10 @@ def builds(
     Notes
     -----
     The resulting "config" is a dataclass-object [5]_ with Hydra-specific attributes
-    attached to it; e.g. ``_target_`` indicates
+    attached to it; e.g. ``_target_`` indicates the location where ``<hydra_target>``
+    will be imported from.
 
-    Using any of the `zen_xx` features will result in a config that depends
+    Using any of the ``zen_xx`` features will result in a config that depends
     explicitly on hydra-zen. I.e. hydra-zen must be installed in order to
     instantiate the resulting config, including its yaml version.
 
@@ -699,7 +700,8 @@ def builds(
     make_custom_builds_fn: Returns the `builds` function, but one with customized default values.
     make_config: Creates a general config with customized field names, default values, and annotations.
     get_target: Returns the target-object from a targeted structured config.
-    just: Produces a config that, when instantiated by Hydra, "just" returns the uninstantiated target-object.
+    just: Produces a config that, when instantiated by Hydra, "just" returns the un-instantiated target-object.
+    to_yaml: Serialize a config as a yaml-formatted string.
 
     Examples
     --------
@@ -712,12 +714,12 @@ def builds(
 
     The resulting config is a dataclass with the following signature and attributes:
 
-    >>> Conf  # signature: c(a: Any = 1, b: Any = 'x')
+    >>> Conf  # signature: Conf(a: Any = 1, b: Any = 'x')
     types.Builds_dict
     >>> Conf.a
     1
     >>> Conf.b
-    x
+    'x'
 
     The `instantiate` function is used to enact this build – to create the dictionary.
 

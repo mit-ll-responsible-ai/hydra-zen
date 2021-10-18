@@ -76,9 +76,12 @@ Launching Jobs with Hydra
 Third-Party Utilities
 *********************
 
+.. _data-val:
 
 Runtime Data Validation
 ***********************
+
+hydra-zen offers support for customized runtime type-checking via various third-party libraries.
 
 .. currentmodule:: hydra_zen.third_party
 
