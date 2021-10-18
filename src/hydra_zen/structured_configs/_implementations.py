@@ -401,7 +401,7 @@ def hydrated_dataclass(
 
 def just(obj: Importable) -> Type[Just[Importable]]:
     """Produces a structured config that, when instantiated by Hydra, 'just'
-    returns the target (uninstantiated).
+    returns the target (un-instantiated).
 
     This is convenient for specifying a particular, un-instantiated object as part of your
     configuration.
@@ -566,43 +566,43 @@ def builds(
 ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]:
     """builds(hydra_target, /, *pos_args, zen_partial=False, zen_meta=None, hydra_recursive=None, populate_full_signature=False, hydra_convert=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
 
-    Returns a dataclass object that configures ``<hydra_target>`` with user-specified and auto-populated parameter
-    values.
+    Returns a config, which describes how to instantiate/call ``<hydra_target>`` with user-specified and
+    auto-populated parameter values.
 
-    The resulting dataclass is specifically a structured config [1]_ that enables Hydra to initialize/call
-    `target` either fully or partially. See Notes for additional features and explanation of implementation details.
+    The resulting object is a dataclass; specifically it is a targeted structured config [1]_.
 
     Parameters
     ----------
     hydra_target : T (Callable)
-        The object to be configured. This is a required, positional-only argument.
+        The target-object to be configured. This is a required, positional-only argument.
 
     *pos_args : Any
-        Positional arguments passed to ``hydra_target``.
+        Positional arguments passed as ``hydra_target(*pos_args, ...)`` upon instantiation.
 
         Arguments specified positionally are not included in the dataclass' signature and
         are stored as a tuple bound to in the ``_args_`` field.
 
     **kwargs_for_target : Any
-        The keyword arguments passed to ``hydra_target(...)``.
+        The keyword arguments passed as ``hydra_target(..., **kwargs_for_target)`` upon instantiation.
 
-        The arguments specified here solely determine the fields and init-parameters of the
-        resulting dataclass, unless ``populate_full_signature=True`` is specified (see below).
+        The arguments specified here solely determine the signature of the resulting config,
+        unless ``populate_full_signature=True`` is specified (see below).
 
-        Named parameters of the forms ``hydra_xx``, ``zen_xx``, and ``_zen_xx`` are reserved
-        to ensure future-compatibility, and cannot be specified by the user.
+        Named parameters of the forms that have the prefixes ``hydra_``, ``zen_`` or ``_zen_``
+        are reserved to ensure future-compatibility, and thus cannot be specified by the user.
 
     zen_partial : bool, optional (default=False)
-        If True, then the resulting config will instantiate as
+        If ``True``, then the resulting config will instantiate as
         ``functools.partial(hydra_target, *pos_args, **kwargs_for_target)`` rather than
         ``hydra_target(*pos_args, **kwargs_for_target)``.
 
         Thus this enables the partial-configuration of objects.
 
         Specifying ``zen_partial=True`` and ``populate_full_signature=True`` together will
-        populate the dataclass' signature only with parameters that are specified by the
-        user or that have default values specified in the target's signature. I.e. it is
-        presumed that un-specified parameters are to be excluded from the partial configuration.
+        populate the config's signature only with parameters that: are explicitly specified by the
+        user, or that have default values specified in the target's signature. I.e. it is
+        presumed that un-specified parameters that have no default values are to be excluded from
+        the config.
 
     zen_wrappers : None | Callable | Builds | InterpStr | Sequence[None | Callable | Builds | InterpStr]
         One or more wrappers, which will wrap ``hydra_target`` prior to instantiation.
@@ -620,30 +620,29 @@ def builds(
 
     populate_full_signature : bool, optional (default=False)
         If ``True``, then the resulting dataclass's signature and fields will be populated
-        according to the signature of ``hydra_target``.
-
-        Values specified in **kwargs_for_target take precedent over the corresponding
-        default values from the signature.
+        according to the signature of ``hydra_target``; values also specified in
+        ``**kwargs_for_target`` take precedent.
 
         This option is not available for objects with inaccessible signatures, such as
         NumPy's various ufuncs.
 
     hydra_recursive : Optional[bool], optional (default=True)
         If ``True``, then Hydra will recursively instantiate all other
-        hydra-config objects nested within this dataclass [3]_.
+        hydra-config objects nested within this config [3]_.
 
-        If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.
+        If ``None``, the ``_recursive_`` attribute is not set on the resulting config.
 
     hydra_convert : Optional[Literal["none", "partial", "all"]], optional (default="none")
-        Determines how Hydra handles the non-primitive objects passed to `target` [4]_.
+        Determines how Hydra handles the non-primitive, omegaconf-specific objects passed to
+        ``<hydra_target>`` [4]_.
 
-        - ``"none"``: Passed objects are DictConfig and ListConfig, default
-        - ``"partial"``: Passed objects are converted to dict and list, with
-          the exception of Structured Configs (and their fields).
-        - ``"all"``: Passed objects are dicts, lists and primitives without
-          a trace of OmegaConf containers
+        - ``"none"``: No conversion occurs; omegaconf containers are passed through (Default)
+        - ``"partial"``: ``DictConfig`` and ``ListConfig`` objects converted to ``dict`` and
+          ``list``, respectively. Structured configs and their fields are passed without conversion.
+        - ``"all"``: All passed objects are converted to dicts, lists, and primitives, without
+          a trace of OmegaConf containers.
 
-        If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.
+        If ``None``, the ``_convert_`` attribute is not set on the resulting config.
 
     frozen : bool, optional (default=False)
         If ``True``, the resulting dataclass will create frozen (i.e. immutable) instances.
@@ -660,24 +659,28 @@ def builds(
 
     Returns
     -------
-    Config : Type[Builds[Type[T]]] |  Type[PartialBuilds[Type[T]]]
-        A structured config that builds ``hydra_target``
+    Config : Type[Builds[Type[T]]]
+        A structured config that describes how to build ``hydra_target``
 
     Notes
     -----
+    The resulting "config" is a dataclass-object [5]_ with Hydra-specific attributes
+    attached to it; e.g. ``_target_`` indicates
+
     Using any of the `zen_xx` features will result in a config that depends
-    explicitly on hydra-zen. (i.e. hydra-zen must be installed in order to
-    instantiate the resulting config, including its yaml version).
+    explicitly on hydra-zen. I.e. hydra-zen must be installed in order to
+    instantiate the resulting config, including its yaml version.
 
     Type annotations are inferred from the target's signature and are only
-    retained if they are compatible with hydra's limited set of supported
-    annotations; otherwise `Any` is specified.
+    retained if they are compatible with Hydra's limited set of supported
+    annotations; otherwise an annotation is automatically 'broadened' until
+    it is made compatible with Hydra.
 
     `builds` provides runtime validation of user-specified named arguments against
     the target's signature. This helps to ensure that typos in field names
     fail early and explicitly.
 
-    Mutable values are automatically transformed to use a default factory [5]_
+    Mutable values are automatically transformed to use a default factory [6]_
     prior to setting them on the dataclass.
 
     References
@@ -686,51 +689,102 @@ def builds(
     .. [2] https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation
     .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
     .. [4] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
-    .. [5] https://docs.python.org/3/library/dataclasses.html#mutable-default-values
+    .. [5] https://docs.python.org/3/library/dataclasses.html
+    .. [6] https://docs.python.org/3/library/dataclasses.html#mutable-default-values
+    .. [7] https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation
 
     See Also
     --------
-    instantiate: Instantiates a configuration created by `builds`.
-    make_custom_builds_fn: Returns the `builds` function, but with customized default values.
-    make_config: Creates a config with customized field names, default values, and annotations.
+    instantiate: Instantiates a configuration created by `builds`, returning the instantiated target.
+    make_custom_builds_fn: Returns the `builds` function, but one with customized default values.
+    make_config: Creates a general config with customized field names, default values, and annotations.
     get_target: Returns the target-object from a targeted structured config.
-    just: Produces a config that, when instantiated by Hydra, "just" returns the uninstantiated target.
+    just: Produces a config that, when instantiated by Hydra, "just" returns the uninstantiated target-object.
 
     Examples
     --------
-    Basic Usage:
+    **Basic Usage**
+
+    Lets create a basic config that describes how to 'build' a particular dictionary.
 
     >>> from hydra_zen import builds, instantiate
-    >>> Conf = builds(dict, a=1, b='x')  # makes a dataclass that will "build" a dictionary with the specified fields
+    >>> Conf = builds(dict, a=1, b='x')
+
+    The resulting config is a dataclass with the following signature and attributes:
+
     >>> Conf  # signature: c(a: Any = 1, b: Any = 'x')
     types.Builds_dict
-    >>> instantiate(Conf)  # using Hydra to "instantiate" this build
+    >>> Conf.a
+    1
+    >>> Conf.b
+    x
+
+    The `instantiate` function is used to enact this build – to create the dictionary.
+
+    >>> instantiate(Conf)  # calls: `dict(a=1, b='x')`
     {'a': 1, 'b': 'x'}
-    >>> instantiate(Conf(a=10, b="hi"))  # overriding configuration values
+
+    The default parameters that we provided can be overridden.
+
+    >>> new_conf = Conf(a=10, b="hi")  # an instance of our dataclass
+    >>> instantiate(new_conf)  # calls: `dict(a=10, b='hi')`
     {'a': 10, 'b': 'hi'}
+
+    Positional arguments can be provided too.
 
     >>> Conf = builds(len, [1, 2, 3])  # specifying positional arguments
     >>> instantiate(Conf)
     3
 
-    Using `builds` to partially-configure a target
+    **Creating a Partial Config**
+
+    `builds` can be used to only partially-configure a target. Let's
+    create a config for the following function
 
     >>> def a_two_tuple(x: int, y: float): return x, y
+
+    such that we only configure the parameter ``x``.
+
     >>> PartialConf = builds(a_two_tuple, x=1, zen_partial=True)  # configures only `x`
+
+    Instantiating this conf will return ``functools.partial(a_two_tuple, x=1)``.
+
     >>> partial_func = instantiate(PartialConf)
     >>> partial_func
     functools.partial(<function a_two_tuple at 0x00000220A7820EE0>, x=1)
-    >>> partial_func(y=22.0)  # y can be provided after configuration & instantiation
+
+    And thus the remaining parameter can be provided after configuration and instantiation
+
+    >>> partial_func(y=22.0)  # providing the remaining parameter
     (1, 22.0)
 
-    Auto-populating parameters:
+    **Auto-populating parameters**
 
-    >>> Conf = builds(a_two_tuple, populate_full_signature=True)
-    >>> # signature: `Builds_a_two_tuple(x: int, y: float)`
-    >>> instantiate(Conf(x=1, y=10.0))
-    (1, 10.0)
+    The configurable parameters of a target can be auto-populated in our config.
+    Suppose we want to configure the following function.
 
-    Inheritance:
+    >>> def f(x: bool, y: str = 'foo'): return x, y
+
+    The following config will have a signature that matches ``f``; the
+    annotations and default values of the parameters of ``f`` are explicitly
+    incorporated into the config.
+
+    >>> Conf = builds(f, populate_full_signature=True)  # signature: `Builds_f(x: bool, y: str = 'foo')`
+    >>> Conf.y
+    'foo'
+
+    Annotations will be used to provided limited runtime type-checking during instantiation. Here, we'll pass
+    a float for ``x``, which expects a boolean value.
+
+    >>> instantiate(Conf(x=10.0))
+    ValidationError: Value '10.0' is not a valid bool (type float)
+        full_key: x
+        object_type=Builds_f
+
+    **Composing configs via inheritance**
+
+    Because a config produced via `builds` is simply a class-object, we can
+    compose configs via class inheritance.
 
     >>> ParentConf = builds(dict, a=1, b=2)
     >>> ChildConf = builds(dict, b=-2, c=-3, builds_bases=(ParentConf,))
@@ -739,7 +793,11 @@ def builds(
     >>> issubclass(ChildConf, ParentConf)
     True
 
-    Leveraging meta-fields for portable, relative interpolation:
+    **Using meta-fields**
+
+    Meta-fields are fields that are included in a config, but not used by the
+    instantiation process. In addition to attaching arbitrary metadata to a config,
+    these can be used to enable portable, relative interpolation [7]_:
 
     >>> Conf = builds(dict, a="${.s}", b="${.s}", zen_meta=dict(s=-10))
     >>> instantiate(Conf)
@@ -747,14 +805,19 @@ def builds(
     >>> instantiate(Conf, s=2)
     {'a': 2, 'b': 2}
 
-    Leveraging zen-wrappers to inject unit-conversion capabilities. Let's take
-    a function that converts Farenheit to Celcius, and wrap it so that it converts
-    to Kelvin instead.
+    **Using zen-wrappers**
 
-    >>> def faren_to_celsius(temp_f):
+    Zen-wrappers enables us to make arbitrary changes to ``<hydra_target>``, its inputs,
+    and/or its outputs during the instantiation process.
+
+    Let's use a wrapper to inject add a unit-conversion step to a config. We'll modify a
+    config for a function that converts Farenheit to Celcius, and add a wrapper it so that
+    it will convert to Kelvin instead.
+
+    >>> def faren_to_celsius(temp_f):  # our target
     ...     return ((temp_f - 32) * 5) / 9
 
-    >>> def change_celcius_to_kelvin(celc_func):
+    >>> def change_celcius_to_kelvin(celc_func):  # our wrapper
     ...     def wraps(*args, **kwargs):
     ...         return 273.15 + celc_func(*args, **kwargs)
     ...     return wraps
