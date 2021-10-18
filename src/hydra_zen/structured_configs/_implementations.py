@@ -276,7 +276,7 @@ def hydrated_dataclass(
 
     frozen : bool, optional (default=False)
         If `True`, the resulting dataclass will create frozen (i.e. immutable) instances.
-        I.e. setting/deleting an attribute of an instance will raise `FrozenInstanceError`
+        I.e. setting/deleting an attribute of an instance will raise :py:class:`dataclasses.FrozenInstanceError`
         at runtime.
 
     See Also
@@ -646,7 +646,7 @@ def builds(
 
     frozen : bool, optional (default=False)
         If ``True``, the resulting dataclass will create frozen (i.e. immutable) instances.
-        I.e. setting/deleting an attribute of an instance will raise ``FrozenInstanceError``
+        I.e. setting/deleting an attribute of an instance will raise :py:class:`dataclasses.FrozenInstanceError`
         at runtime.
 
     builds_bases : Tuple[DataClass, ...]
@@ -1394,7 +1394,7 @@ def _is_old_partial_builds(x: Any) -> bool:  # pragma: no cover
         ):
             return True
         else:
-            # ensures we conver this branch in tests
+            # ensures we cover this branch in tests
             return False
     return False
 
@@ -1589,8 +1589,8 @@ def make_custom_builds_fn(
 
     frozen : bool, optional (default=False)
         If ``True``, the resulting dataclass will create frozen (i.e. immutable) instances.
-        I.e. setting/deleting an attribute of an instance will raise ``FrozenInstanceError``
-        at runtime.
+        I.e. setting/deleting an attribute of an instance will raise
+        :py:class:`dataclasses.FrozenInstanceError` at runtime.
 
     builds_bases : Tuple[DataClass, ...]
         Specifies a tuple of parent classes that the resulting dataclass inherits from.
@@ -1708,7 +1708,7 @@ class ZenField:
 
     Notes
     -----
-    ``default`` will be returned as an instance of ``dataclasses.Field``.
+    ``default`` will be returned as an instance of :class:`dataclasses.Field`.
     Mutable values (e.g. lists or dictionaries) passed to ``default`` will automatically
     be "packaged" in a default-factory function [1]_.
 
@@ -1778,7 +1778,7 @@ def make_config(
         If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.
 
     hydra_convert : Optional[Literal["none", "partial", "all"]], optional (default="none")
-        Determines how Hydra handles the non-primitive objects passed to configuations [3]_.
+        Determines how Hydra handles the non-primitive objects passed to configuration [3]_.
 
         - ``"none"``: Passed objects are DictConfig and ListConfig, default
         - ``"partial"``: Passed objects are converted to dict and list, with
@@ -1794,7 +1794,7 @@ def make_config(
     frozen : bool, optional (default=False)
         If ``True``, the resulting config class will produce 'frozen' (i.e. immutable) instances.
         I.e. setting/deleting an attribute of an instance of the config will raise
-        ``dataclasses.FrozenInstanceError`` at runtime.
+        :py:class:`dataclasses.FrozenInstanceError` at runtime.
 
     config_name : str, optional (default="Config")
         The class name of the resulting config class.
@@ -1806,7 +1806,7 @@ def make_config(
 
     Notes
     -----
-    Any field specified without a type-annotation is automatically annotated with ``typing.Any``.
+    Any field specified without a type-annotation is automatically annotated with :py:class:`typing.Any`.
     Hydra only supports a narrow subset of types [4]_; `make_config` will automatically 'broaden'
     any user-specified annotations so that they are compatible with Hydra.
 
@@ -1818,7 +1818,7 @@ def make_config(
     `just`, to ensure that the resulting config is serializable by Hydra.
 
     For finer-grain control over how type-annotations and default values are managed, consider using
-    ``dataclasses.make_dataclass`` [6]_.
+    :func:`dataclasses.make_dataclass` [6]_.
 
     See Also
     --------

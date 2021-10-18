@@ -29,12 +29,13 @@ New Features
   
    This serves as a much more succinct way to create a dataclass, where specifying type-annotations is optional. Additionally, provided type-annotations and default values are automatically adapted to be made compatible with Hydra. `Read more about it here <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/130>`_.
 - :func:`~hydra_zen.make_custom_builds_fn`, which enables us to produce new "copies" of the :func:`~hydra_zen.builds` function, but with customized default-values.
-- :func:`~hydra_zen.get_target`, which is used to retrieve target-objects from structured configs. `See #94 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/94>`_.
+- :func:`~hydra_zen.get_target`, which is used to retrieve target-objects from structured configs. See :pull:`94`
 - ``builds(..., zen_meta=<dict>)`` users to attach "meta" fields to a targeted config, which will *not* be used by instantiate when building the target. 
 
    A meta-field can be referenced via relative interpolation; this
    interpolation will be valid no matter where the configuration is
-   utilized. `See #112 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/112>`_ for more details.
+   utilized. See :pull:`112`.
+
 
 Deprecations
 ------------
@@ -47,13 +48,13 @@ Deprecations
 Additional Items
 ----------------
 
-- Improves type-annotations on :func:`~hydra_zen.builds`. Now, e.g., ``builds("hi")`` will be marked as invalid by static checkers (the target of :func:`~hydra_zen.builds` must be callable). `#104 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/104>`_.
-- Migrates zen-specific fields to a new naming-scheme, and zen-specific processing to a universal mechanism. See `#110 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/110>`_ for more details.
+- Improves type-annotations on :func:`~hydra_zen.builds`. Now, e.g., ``builds("hi")`` will be marked as invalid by static checkers (the target of :func:`~hydra_zen.builds` must be callable). See :pull:`104`.
+- Migrates zen-specific fields to a new naming-scheme, and zen-specific processing to a universal mechanism. See :pull:`110` for more details.
 - Ensures that hydra-zen's source code is "pyright-clean", under `pyright's basic type-checking mode <https://github.com/microsoft/pyright/blob/main/docs/configuration.md#diagnostic-rule-defaults>`_. `#101 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/101>`_
-- Adds to all public modules/packages an ``__all__`` field. `#99 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/99>`_
-- Adds PEP 561 compliance (e.g. hydra-zen is now compatible with mypy). `#97 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/97>`_
-- Refactors hydra-zen's internals using `shed <https://pypi.org/project/shed/>`_. `#95 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/95>`_
-- Makes improvements to hydra-zen's test suite. `#90 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/90>`_ and `#91 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/91>`_.
+- Adds to all public modules/packages an ``__all__`` field. See :pull:`99`.
+- Adds PEP 561 compliance (e.g. hydra-zen is now compatible with mypy). See :pull:`97`.
+- Refactors hydra-zen's internals using `shed <https://pypi.org/project/shed/>`_. See :pull:`95`.
+- Makes improvements to hydra-zen's test suite. See :pull:`90` and :pull:`91`.
 
 .. _v0.2.0:
 
@@ -63,8 +64,8 @@ Additional Items
 
 This release:
 
-- Improves hydra-zen's `automatic type refinement <https://mit-ll-responsible-ai.github.io/hydra-zen/structured_configs.html#automatic-type-refinement>`_. See `#84 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/84>`_ for details
-- Cleans up the namespace of ```hydra_zen.typing``. See `#85 <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/85>`_ for details
+- Improves hydra-zen's `automatic type refinement <https://mit-ll-responsible-ai.github.io/hydra-zen/structured_configs.html#automatic-type-refinement>`_. See :pull:`84` for details
+- Cleans up the namespace of ```hydra_zen.typing``. See :pull:`85` for details.
 
 **Compatibility-Breaking Changes**
 
