@@ -1,5 +1,6 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+import inspect
 import sys
 import warnings
 from dataclasses import MISSING, Field, field as _field, is_dataclass
@@ -182,6 +183,32 @@ def safe_name(obj: Any, repr_allowed=True) -> str:
     return UNKNOWN_NAME
 
 
+def is_classmethod(obj) -> bool:
+    """
+    https://stackoverflow.com/a/19228282/6592114
+
+    Credit to: Martijn Pieters
+    License: CC BY-SA 4.0 (free to copy/redistribute/remix/transform)"""
+
+    if not inspect.ismethod(obj):
+        return False
+
+    bound_to = getattr(obj, "__self__", None)
+    if not isinstance(bound_to, type):
+        # must be bound to a class
+        return False
+    name = safe_name(obj)
+
+    if name == UNKNOWN_NAME:  # pragma: no cover
+        return False
+
+    for cls in bound_to.__mro__:
+        descriptor = vars(cls).get(name)
+        if descriptor is not None:
+            return isinstance(descriptor, classmethod)
+    return False  # pragma: no cover
+
+
 def building_error_prefix(target) -> str:
     return f"Building: {safe_name(target)} ..\n"
 
@@ -220,7 +247,10 @@ def get_obj_path(obj: Any) -> str:
         else:
             raise ModuleNotFoundError(f"{name} is not importable")
 
-    return f"{module}.{name}"
+    if not is_classmethod(obj):
+        return f"{module}.{name}"
+    else:
+        return f"{module}.{qualname}"
 
 
 NoneType = type(None)

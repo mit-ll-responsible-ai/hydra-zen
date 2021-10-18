@@ -10,10 +10,12 @@ from hypothesis import assume, given
 from omegaconf import OmegaConf
 
 from hydra_zen import builds, instantiate, just, to_yaml
+from tests import check_identity
 
 pl_objects = [
     pl.Trainer,
     pl.LightningDataModule,
+    pl.LightningDataModule.from_datasets,
     pl.LightningModule,
     pl.accelerators.Accelerator,
     pl.callbacks.Callback,
@@ -34,7 +36,7 @@ pl_objects = [
 
 @pytest.mark.parametrize("obj", pl_objects)
 def test_just_roundtrip(obj):
-    assert instantiate(just(obj)) is obj
+    assert check_identity(instantiate(just(obj)), obj)
 
 
 @pytest.mark.parametrize("target", pl_objects)

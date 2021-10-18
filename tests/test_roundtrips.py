@@ -18,7 +18,8 @@ from hypothesis import given
 from omegaconf import OmegaConf
 
 from hydra_zen import builds, get_target, instantiate, just, to_yaml
-from tests import valid_hydra_literals
+from hydra_zen.structured_configs._utils import is_classmethod
+from tests import check_identity, valid_hydra_literals
 
 arbitrary_kwargs = st.dictionaries(
     keys=st.text(alphabet=string.ascii_letters, min_size=1, max_size=1),
@@ -113,7 +114,9 @@ def test_builds_roundtrips_with_mutable_values(
 
 
 class LocalClass:
-    pass
+    @classmethod
+    def a_class_method(cls):
+        return
 
 
 def local_function():
@@ -123,6 +126,7 @@ def local_function():
 a_bunch_of_objects = [
     local_function,
     LocalClass,
+    LocalClass.a_class_method,
     int,
     str,
     list,
@@ -146,11 +150,20 @@ a_bunch_of_objects = [
 ]
 
 
+def with_is(x, y):
+    return x is y
+
+
+def with_eq(x, y):
+    return x == y
+
+
 @pytest.mark.parametrize("obj", a_bunch_of_objects)
 def test_just_roundtrip(obj):
+    # local classmethods have weird identity behaviors
     cfg = just(obj)
-    assert instantiate(cfg) is obj
-    assert instantiate(OmegaConf.create(to_yaml(cfg))) is obj
+    assert check_identity(instantiate(cfg), obj)
+    assert check_identity(instantiate(OmegaConf.create(to_yaml(cfg))), obj)
 
 
 @pytest.mark.parametrize("x", a_bunch_of_objects)
@@ -165,10 +178,10 @@ def test_just_roundtrip(obj):
 )
 def test_get_target_roundtrip(x, fn):
     conf = fn(x)
-    assert x is get_target(conf)
+    assert check_identity(x, get_target(conf))
 
     loaded = OmegaConf.create(to_yaml(conf))
-    assert x is get_target(loaded)
+    assert check_identity(x, get_target(loaded))
 
 
 @dataclass
