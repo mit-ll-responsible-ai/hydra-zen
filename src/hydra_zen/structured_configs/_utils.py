@@ -199,14 +199,14 @@ def is_classmethod(obj) -> bool:
         return False
     name = safe_name(obj)
 
-    if name == UNKNOWN_NAME:
+    if name == UNKNOWN_NAME:  # pragma: no cover
         return False
 
     for cls in bound_to.__mro__:
         descriptor = vars(cls).get(name)
         if descriptor is not None:
             return isinstance(descriptor, classmethod)
-    return False
+    return False  # pragma: no cover
 
 
 def building_error_prefix(target) -> str:
