@@ -1,8 +1,9 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 from pathlib import Path
-from typing import Any, Callable, List, Mapping, Optional, Union
+from typing import Any, Callable, List, Mapping, Optional, Type, Union
 
+from hydra import main
 from hydra._internal.callbacks import Callbacks
 from hydra._internal.hydra import Hydra
 from hydra._internal.utils import create_config_search_path
@@ -50,7 +51,7 @@ def _store_config(
 
 
 def launch(
-    config: Union[DataClass, DictConfig, Mapping],
+    config: Union[DataClass, Type[DataClass], DictConfig, Mapping[str, Any]],
     task_function: Callable[[DictConfig], Any],
     overrides: Optional[List[str]] = None,
     config_dir: Optional[Union[str, Path]] = None,
@@ -59,43 +60,40 @@ def launch(
     with_log_configuration: bool = True,
     multirun: bool = False,
 ) -> Union[JobReturn, Any]:
-    """Launch a Hydra job defined by `task_function` using the configuration
-    provided in `config`.
+    """Launch a Hydra job using a Python-based interface.
 
-    Similar to how Hydra CLI works, `overrides` are a string list of configuration
-    values to use for a given experiment run.  For example, the Hydra CLI provided by::
+    `launch` is designed to closely match the interface of the standard Hydra CLI.
+    For example, launching a Hydra job from the CLI via::
 
        $ python my_task.py job/group=group_name job.group.param=1
 
-    would be::
+    corresponds to the following usage of `launch`:
 
        >>> job = launch(config, task_function, overrides=["job/group=group_name", "job.group.param=1"])
 
-    This functions executes Hydra and therefore creates its own working directory.  See Configuring Hydra [2]_ for more
-    details on customizing Hydra.
-
-    Similarily, to launch a `multirun` job and sweep over parameters the Hydra CLI provided by::
+    Similarly, where the following CLI input launches a `multirun` job with a parameter sweep::
 
        $ python -m job.task_function job/group=group_name job.group.param=1,2,3 --multirun
 
-    would become::
+    the corresponding `launch` usage would be::
 
        >>> job = launch(config, task_function, overrides=["job/group=group_name", "job.group.param=1,2,3"], multirun=True)
 
 
     Parameters
     ----------
-    config : Union[DataClass, DictConfig, Mapping]
-        A configuration as a dataclass, configuration object, or a dictionary.
+    config : DataClass | Type[DataClass] | DictConfig | Mapping[str, Any]
+        A config that will be passed to ``task_function``.
 
     task_function : Callable[[DictConfig], Any]
-        The function Hydra will execute with the given configuration.
+        The function Hydra will execute.
 
-    overrides : Optional[List[str]] (default: None)
+    overrides : Optional[List[str]]
         If provided, overrides default configurations, see [1]_ and [2]_.
 
     config_dir : Optional[Union[str, Path]] (default: None)
-        Add configuration directories if needed.
+        The config path, a directory relative to the declaring python file.
+        If ``None``, no directory is added to the config search path.
 
     config_name : str (default: "hydra_run")
         Name of the stored configuration in Hydra's ConfigStore API.
