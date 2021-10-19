@@ -3,7 +3,6 @@
 from pathlib import Path
 from typing import Any, Callable, List, Mapping, Optional, Type, Union
 
-from hydra import main
 from hydra._internal.callbacks import Callbacks
 from hydra._internal.hydra import Hydra
 from hydra._internal.utils import create_config_search_path
