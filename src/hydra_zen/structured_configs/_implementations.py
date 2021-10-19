@@ -813,8 +813,8 @@ def builds(
     and/or its outputs during the instantiation process.
 
     Let's use a wrapper to add a unit-conversion step to a config. We'll modify a
-    config for a function that converts Farenheit to Celcius, and add a wrapper it so that
-    it will convert to Kelvin instead.
+    config for a function that converts a temperature in Farenheit to Celcius, and add a
+    wrapper it so that it will convert from Farenheit to Kelvin instead.
 
     >>> def faren_to_celsius(temp_f):  # our target
     ...     return ((temp_f - 32) * 5) / 9
@@ -1713,11 +1713,11 @@ def make_config(
     **fields_as_kwargs,
 ) -> Type[DataClass]:
     """
-    Creates a structured config with user-defined fieldnames and, optionally,
+    Creates a config with user-defined fieldnames and, optionally,
     associated default values and/or type-annotations.
 
     Unlike `builds`, `make_config` is not used to configure a particular target
-    object, rather, it can be used to create more general structured configs [1]_.
+    object, rather, it can be used to create more general configs [1]_.
 
     Parameters
     ----------
@@ -1769,19 +1769,23 @@ def make_config(
 
     Notes
     -----
+    The resulting "config" is a dataclass-object [4]_ with Hydra-specific attributes
+    attached to it, along with the attributes specified via ``fields_as_args`` and
+    ``fields_as_kwargs``.
+
     Any field specified without a type-annotation is automatically annotated with :py:class:`typing.Any`.
-    Hydra only supports a narrow subset of types [4]_; `make_config` will automatically 'broaden'
+    Hydra only supports a narrow subset of types [5]_; `make_config` will automatically 'broaden'
     any user-specified annotations so that they are compatible with Hydra.
 
     `make_config` will automatically manipulate certain types of default values to ensure that
     they can be utilized in the resulting dataclass and by Hydra:
 
-    - Mutable default values will automatically be packaged in a default factory function [5]_
+    - Mutable default values will automatically be packaged in a default factory function [6]_
     - A default value that is a class-object or function-object will automatically be wrapped by
     `just`, to ensure that the resulting config is serializable by Hydra.
 
     For finer-grain control over how type-annotations and default values are managed, consider using
-    :func:`dataclasses.make_dataclass` [6]_.
+    :func:`dataclasses.make_dataclass`.
 
     See Also
     --------
@@ -1793,9 +1797,9 @@ def make_config(
     .. [1] https://hydra.cc/docs/next/tutorials/structured_config/intro/
     .. [2] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
     .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
-    .. [4] https://hydra.cc/docs/next/tutorials/structured_config/intro/#structured-configs-supports
-    .. [5] https://docs.python.org/3/library/dataclasses.html#default-factory-functions
-    .. [6] https://docs.python.org/3/library/dataclasses.html#dataclasses.make_dataclass
+    .. [4] https://docs.python.org/3/library/dataclasses.html
+    .. [5] https://hydra.cc/docs/next/tutorials/structured_config/intro/#structured-configs-supports
+    .. [6] https://docs.python.org/3/library/dataclasses.html#default-factory-functions
 
     Examples
     --------
@@ -1811,9 +1815,14 @@ def make_config(
 
     Now we'll configure these fields with particular values:
 
-    >>> pp(Conf1(1, "hi"))
+    >>> conf1 = Conf1(1, "hi")
+    >>> pp(conf1)
     a: 1
     b: hi
+    >>> conf1.a
+    1
+    >>> conf1.b
+    'hi'
 
     We can also specify fields via keyword args; this is especially convenient
     for providing associated default values.
@@ -1842,7 +1851,8 @@ def make_config(
 
     Configurations can be composed via inheritance
 
-    >>> pp(make_config(c=2, bases=(Conf2, Conf1)))
+    >>> ConfInherit = make_config(c=2, bases=(Conf2, Conf1))
+    >>> pp(ConfInherit)
     a: ???
     b: ???
     unit: ???
@@ -1850,6 +1860,9 @@ def make_config(
     - -10
     - -20
     c: 2
+
+    >>> issubclass(ConfInherit, Conf1) and issubclass(ConfInherit, Conf2)
+    True
 
     **Using ZenField to Provide Type Information**
 
@@ -1875,6 +1888,8 @@ def make_config(
 
     >>> C2 = make_config(zf(name="username", hint=str), age=zf(int, 0))
     >>> # signature: C2(username: str, age: int = 0)
+
+    See :ref:`data-val` for more general data validation capabilities via hydra-zen.
     """
     for _field in fields_as_args:
         if not isinstance(_field, (str, ZenField)):

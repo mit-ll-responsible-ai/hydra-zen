@@ -90,7 +90,7 @@ Third-Party Utilities
 Runtime Data Validation
 ***********************
 
-hydra-zen offers support for customized runtime type-checking via various third-party libraries.
+Although Hydra provides some runtime type-checking functionality, it only supports `a limited set of types and annotations <https://omegaconf.readthedocs.io/en/latest/structured_config.html#simple-types>`_. hydra-zen offers support for more robust runtime type-checking capabilities via various third-party libraries.
 
 .. currentmodule:: hydra_zen.third_party
 
