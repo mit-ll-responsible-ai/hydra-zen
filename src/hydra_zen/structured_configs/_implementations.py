@@ -1537,78 +1537,33 @@ def make_custom_builds_fn(
     Parameters
     ----------
     zen_partial : bool, optional (default=False)
-        If True, then the resulting config will instantiate as
-        ``functools.partial(hydra_target, *pos_args, **kwargs_for_target)`` rather than
-        ``hydra_target(*pos_args, **kwargs_for_target)``.
-
-        Thus this enables the partial-configuration of objects.
-
-        Specifying ``zen_partial=True`` and ``populate_full_signature=True`` together will
-        populate the dataclass' signature only with parameters that are specified by the
-        user or that have default values specified in the target's signature. I.e. it is
-        presumed that un-specified parameters are to be excluded from the partial configuration.
+        Specifies a new the default value for ``builds(..., zen_partial=<..>)``
 
     zen_wrappers : None | Callable | Builds | InterpStr | Sequence[None | Callable | Builds | InterpStr]
-        One or more wrappers, which will wrap ``hydra_target`` prior to instantiation.
-        E.g. specifying the wrappers ``[f1, f2, f3]`` will instantiate as::
-
-            f3(f2(f1(hydra_target)))(*args, **kwargs)
-
-        Wrappers can also be specified as interpolated strings [1]_ or targeted structured
-        configs.
+        Specifies a new the default value for ``builds(..., zen_wrappers=<..>)``
 
     zen_meta : Optional[Mapping[str, Any]]
-        Specifies field-names and corresponding values that will be included in the
-        resulting dataclass, but that will *not* be used to build ``hydra_target``
-        via instantiation. These are called "meta" fields.
+        Specifies a new the default value for ``builds(..., zen_meta=<..>)``
 
     populate_full_signature : bool, optional (default=False)
-        If ``True``, then the resulting dataclass's signature and fields will be populated
-        according to the signature of ``hydra_target``.
-
-        Values specified in **kwargs_for_target take precedent over the corresponding
-        default values from the signature.
-
-        This option is not available for objects with inaccessible signatures, such as
-        NumPy's various ufuncs.
+        Specifies a new the default value for ``builds(..., populate_full_signature=<..>)``
 
     hydra_recursive : Optional[bool], optional (default=True)
-        If ``True``, then Hydra will recursively instantiate all other
-        hydra-config objects nested within this dataclass [2]_.
-
-        If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.
+        Specifies a new the default value for ``builds(..., hydra_recursive=<..>)``
 
     hydra_convert : Optional[Literal["none", "partial", "all"]], optional (default="none")
-        Determines how hydra handles the non-primitive objects passed to ``hydra_target`` [3]_.
-
-        - ``"none"``: Passed objects are DictConfig and ListConfig, default
-        - ``"partial"``: Passed objects are converted to dict and list, with
-          the exception of Structured Configs (and their fields).
-        - ``"all"``: Passed objects are dicts, lists and primitives without
-          a trace of OmegaConf containers
-
-        If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.
+        Specifies a new the default value for ``builds(..., hydra_convert=<..>)``
 
     frozen : bool, optional (default=False)
-        If ``True``, the resulting dataclass will create frozen (i.e. immutable) instances.
-        I.e. setting/deleting an attribute of an instance will raise
-        :py:class:`dataclasses.FrozenInstanceError` at runtime.
+        Specifies a new the default value for ``builds(..., frozen=<..>)``
 
     builds_bases : Tuple[DataClass, ...]
-        Specifies a tuple of parent classes that the resulting dataclass inherits from.
-        A ``PartialBuilds`` class (resulting from ``zen_partial=True``) cannot be a parent
-        of a ``Builds`` class (i.e. where `zen_partial=False` was specified).
+        Specifies a new the default value for ``builds(..., builds_bases=<..>)``
 
     returns
     -------
-    builds
+    custom_builds
         The function `builds`, but with customized default-values.
-
-    References
-    ----------
-    .. [1] https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation
-    .. [2] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
-    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
 
     See Also
     --------
@@ -1617,6 +1572,8 @@ def make_custom_builds_fn(
     Examples
     --------
     >>> from hydra_zen import builds, make_custom_builds_fn, instantiate
+
+    **Basic usage**
 
     The following will create a `builds` function whose default-value
     for ``zen_partial`` has been set to ``True``.
@@ -1628,18 +1585,19 @@ def make_custom_builds_fn(
 
     >>> instantiate(pbuilds(int))  # calls `functools.partial(int)`
     functools.partial(<class 'int'>)
-    >>> instantiate(builds(int, zen_partial=True))  # manually-overriding default
-    functools.partial(<class 'int'>)
 
-    You can still specify ``zen_partial`` on a per-case basis with ``pbuilds``
+    You can still specify ``zen_partial`` on a per-case basis with ``pbuilds``.
 
     >>> instantiate(pbuilds(int, zen_partial=False))  # calls `int()`
     0
 
+    **Adding data validation to configs**
+
     Suppose that we want to enable runtime type-checking - using beartype -
     whenever our configs are being instantiated; then the following settings
-    for `builds` would be handy
+    for `builds` would be handy.
 
+    >>> # Note: beartype must be installed to use this feature
     >>> from hydra_zen.third_party.beartype import validates_with_beartype
     >>> build_a_bear = make_custom_builds_fn(
     ...     populate_full_signature=True,
@@ -1652,10 +1610,13 @@ def make_custom_builds_fn(
 
     >>> from typing_extensions import Literal
     >>> def f(x: Literal["a", "b"]): return x
-    >>> conf = build_a_bear(f)
-    >>> instantiate(conf, x="a")
+
+    >>> Conf = build_a_bear(f)  # a conf that includes `validates_with_beartype`
+
+    >>> instantiate(conf, x="a")  # satisfies annotation: Literal["a", "b"]
     "a"
-    >>> instantiate(conf, x="c")
+
+    >>> instantiate(conf, x="c")  # violates annotation: Literal["a", "b"]
     <Validation error: "c" is not "a" or "b">
     """
     if __b is not builds:
