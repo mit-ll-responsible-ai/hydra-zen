@@ -407,11 +407,8 @@ def hydrated_dataclass(
 
 
 def just(obj: Importable) -> Type[Just[Importable]]:
-    """Produces a structured config that, when instantiated by Hydra, 'just'
+    """Produces a targeted config that, when instantiated by Hydra, 'just'
     returns the target (un-instantiated).
-
-    This is convenient for specifying a particular, un-instantiated object as part of your
-    configuration.
 
     Parameters
     ----------
@@ -420,8 +417,11 @@ def just(obj: Importable) -> Type[Just[Importable]]:
 
     Returns
     -------
-    Type[Just[Importable]]
-        The dataclass object that is designed as a structured config.
+    config : Type[Just[Importable]]
+
+    See Also
+    --------
+    builds : Create a targeted structured config designed to "build" a particular object.
 
     Notes
     -----
@@ -430,14 +430,18 @@ def just(obj: Importable) -> Type[Just[Importable]]:
 
     Examples
     --------
+    **Basic usage**
+
     >>> from hydra_zen import just, instantiate, to_yaml
-    >>> just_range = just(range)
-    >>> range is instantiate(just_range)
+    >>> Conf = just(range)  # when instantiated, "just" returns `range`
+    >>> instantiate(Conf) is range
     True
-    >>> just_range._target_
-    'hydra_zen.funcs.get_obj'
-    >>> just_range.path
-    'builtins.range'
+
+    The config produces by `just` describes how to import the target
+
+    >>> print(to_yaml(Conf))
+    _target_: hydra_zen.funcs.get_obj
+    path: builtins.range
     """
     try:
         obj_path = _utils.get_obj_path(obj)
