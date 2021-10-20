@@ -1510,10 +1510,7 @@ def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:  # pragma: no co
 
 def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:
     """
-    Returns the target-object from a targeted structured config.
-
-    The target is imported and returned if the config's ``_target_``
-    field is a string that indicates its location.
+    Returns the target-object from a targeted config.
 
     Parameters
     ----------
@@ -1523,30 +1520,50 @@ def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:
     -------
     target : Any
 
+    Raises
+    ------
+    TypeError: ``obj`` does not have a ``_target_`` attribute.
+
     Examples
     --------
-    >>> from hydra_zen import builds, just, get_target, load_from_yaml
+    **Basic usage**
+
+    `get_target` works on all variety of configs produced by `builds` and
+    `just`.
+
+    >>> from hydra_zen import builds, just, get_target
     >>> get_target(builds(int))
+    int
+    >>> get_target(builds(int, zen_partial=True))
     int
     >>> get_target(just(str))
     str
 
-    This works even if the ``_target_`` field specifies a string.
+    It works for manually-defined configs:
 
     >>> from dataclasses import dataclass
     >>> @dataclass
     ... class A:
     ...     _target_: str = "builtins.dict"
+
     >>> get_target(A)
     dict
 
-    This function is useful for accessing a target's type from a config
-    without having to instantiate the target. For example, suppose we want
-    to access a type from a yaml-serialized config.
+    and for configs loaded from yamls.
 
-    >>> ModelConfig = load_from_yaml("model.yaml")
-    >>> get_target(ModelConfig)
-    CustomClassifier
+    >>> from hydra_zen import load_from_yaml, save_as_yaml
+
+    >>> class B: pass
+    >>> Conf = builds(B)
+
+    >>> save_as_yaml(Conf, "config.yaml")
+    >>> loaded_conf = load_from_yaml("config.yaml")
+
+    Note that the target of ``loaded_conf`` can be accessed without
+    instantiating the config.
+
+    >>> get_target(loaded_conf)
+    __main__.B
     """
     if _is_old_partial_builds(obj):
         # obj._partial_target_ is `Just[obj]`
