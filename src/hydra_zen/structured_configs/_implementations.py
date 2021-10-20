@@ -422,26 +422,51 @@ def just(obj: Importable) -> Type[Just[Importable]]:
     See Also
     --------
     builds : Create a targeted structured config designed to "build" a particular object.
+    make_config: Creates a general config with customized field names, default values, and annotations.
 
     Notes
     -----
     The configs produced by `just` introduce an explicit dependency on hydra-zen. I.e.
-    hydra-zen must be installed in order to instantiate the config.
+    hydra-zen must be installed in order to instantiate any config that used `just`.
 
     Examples
     --------
     **Basic usage**
 
     >>> from hydra_zen import just, instantiate, to_yaml
-    >>> Conf = just(range)  # when instantiated, "just" returns `range`
+
+    >>> Conf = just(range)
     >>> instantiate(Conf) is range
     True
 
-    The config produces by `just` describes how to import the target
+    The config produced by `just` describes how to import the target,
+    not how to instantiate/call the object.
 
     >>> print(to_yaml(Conf))
     _target_: hydra_zen.funcs.get_obj
     path: builtins.range
+
+    **Auto-Application of just**
+
+    Both `builds` and `make_config` will automatically apply `just` to default values
+    that are function-objects or class objects. E.g. in the following example `just`
+    will be applied to ``sum``.
+
+    >>> from hydra_zen import make_config
+    >>> Conf2 = make_config(data=[1, 2, 3], reduction_fn=sum)
+
+    >>> print(to_yaml(Conf2))
+    data:
+    - 1
+    - 2
+    - 3
+    reduction_fn:
+      _target_: hydra_zen.funcs.get_obj
+      path: builtins.sum
+
+    >>> conf = instantiate(Conf2)
+    >>> conf.reduction_fn(conf.data)
+    6
     """
     try:
         obj_path = _utils.get_obj_path(obj)
