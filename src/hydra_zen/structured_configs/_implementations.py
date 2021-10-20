@@ -861,7 +861,6 @@ def builds(
 
     >>> builds(func, a_nmbr=2)  # misspelled parameter name
     TypeError: Building: func ..
-    The following unexpected keyword argument(s) was specified for __main__.func via     `builds`: a_nmbr
 
     >>> builds(func, 1, 2)  # too many arguments
     TypeError: Building: func ..
