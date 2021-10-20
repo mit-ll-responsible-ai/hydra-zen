@@ -231,9 +231,8 @@ def hydrated_dataclass(
     zen_partial : bool, optional (default=False)
         If ``True``, then the resulting config will instantiate as
         ``functools.partial(hydra_target, *pos_args, **kwargs_for_target)`` rather than
-        ``hydra_target(*pos_args, **kwargs_for_target)``.
-
-        Thus this enables the partial-configuration of objects.
+        ``hydra_target(*pos_args, **kwargs_for_target)``. Thus this enables the
+        partial-configuration of objects.
 
         Specifying ``zen_partial=True`` and ``populate_full_signature=True`` together will
         populate the config's signature only with parameters that: are explicitly specified by the
@@ -247,16 +246,16 @@ def hydrated_dataclass(
 
             f3(f2(f1(hydra_target)))(*args, **kwargs)
 
-        Wrappers can also be specified as interpolated strings [2]_ or targeted structured
+        Wrappers can also be specified as interpolated strings [2]_ or targeted
         configs.
 
     zen_meta : Optional[Mapping[str, Any]]
         Specifies field-names and corresponding values that will be included in the
-        resulting dataclass, but that will *not* be used to build ``hydra_target``
+        resulting config, but that will *not* be used to builds ``<hydra_target>``
         via instantiation. These are called "meta" fields.
 
     populate_full_signature : bool, optional (default=False)
-        If ``True``, then the resulting dataclass's signature and fields will be populated
+        If ``True``, then the resulting config's signature and fields will be populated
         according to the signature of ``hydra_target``; values also specified in
         ``**kwargs_for_target`` take precedent.
 
@@ -282,7 +281,7 @@ def hydrated_dataclass(
         If ``None``, the ``_convert_`` attribute is not set on the resulting config.
 
     frozen : bool, optional (default=False)
-        If ``True``, the resulting dataclass will create frozen (i.e. immutable) instances.
+        If ``True``, the resulting config will create frozen (i.e. immutable) instances.
         I.e. setting/deleting an attribute of an instance will raise :py:class:`dataclasses.FrozenInstanceError`
         at runtime.
 
@@ -293,7 +292,7 @@ def hydrated_dataclass(
     Notes
     -----
     Unlike `builds`, `hydrated_dataclass` enables config fields to be set explicitly
-    with custom type annotations. Additionally, the resulting dataclass' attributes
+    with custom type annotations. Additionally, the resulting config' attributes
     can be analyzed by static tooling, which can help to warn about errors prior
     to running one's code.
 
@@ -572,45 +571,49 @@ def builds(
     dataclass_name: Optional[str] = None,
     **kwargs_for_target,
 ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]:
-    """builds(hydra_target, /, *pos_args, zen_partial=False, zen_meta=None, hydra_recursive=None, populate_full_signature=False, hydra_convert=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
+    """builds(hydra_target, /, *pos_args, zen_partial=False, zen_meta=None,
+    hydra_recursive=None, populate_full_signature=False, hydra_convert=None,
+    frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
 
-    Returns a config, which describes how to instantiate/call ``<hydra_target>`` with user-specified and
-    auto-populated parameter values.
+    Returns a config, which describes how to instantiate/call ``<hydra_target>`` with
+    user-specified and auto-populated parameter values.
 
     The resulting object is a dataclass; specifically it is a targeted structured config [1]_.
+
+    See the Examples section of the docstring to see
 
     Parameters
     ----------
     hydra_target : T (Callable)
-        The target-object to be configured. This is a required, positional-only argument.
+        The target-object to be configured. This is a required, positional-only
+        argument.
 
     *pos_args : Any
-        Positional arguments passed as ``hydra_target(*pos_args, ...)`` upon instantiation.
+        Positional arguments passed as ``hydra_target(*pos_args, ...)`` upon
+        instantiation.
 
-        Arguments specified positionally are not included in the dataclass' signature and
-        are stored as a tuple bound to in the ``_args_`` field.
+        Arguments specified positionally are not included in the dataclass' signature
+        and are stored as a tuple bound to in the ``_args_`` field.
 
     **kwargs_for_target : Any
         The keyword arguments passed as ``hydra_target(..., **kwargs_for_target)`` upon instantiation.
 
-        The arguments specified here solely determine the signature of the resulting config,
-        unless ``populate_full_signature=True`` is specified (see below).
+        The arguments specified here solely determine the signature of the resulting
+        config, unless ``populate_full_signature=True`` is specified (see below).
 
-        Named parameters of the forms that have the prefixes ``hydra_``, ``zen_`` or ``_zen_``
-        are reserved to ensure future-compatibility, and thus cannot be specified by the user.
+        Named parameters of the forms that have the prefixes ``hydra_``, ``zen_`` or ``_zen_`` are reserved to ensure future-compatibility, and thus cannot be
+        specified by the user.
 
     zen_partial : bool, optional (default=False)
         If ``True``, then the resulting config will instantiate as
         ``functools.partial(hydra_target, *pos_args, **kwargs_for_target)`` rather than
-        ``hydra_target(*pos_args, **kwargs_for_target)``.
+        ``hydra_target(*pos_args, **kwargs_for_target)``. Thus this enables the
+        partial-configuration of objects.
 
-        Thus this enables the partial-configuration of objects.
-
-        Specifying ``zen_partial=True`` and ``populate_full_signature=True`` together will
-        populate the config's signature only with parameters that: are explicitly specified by the
-        user, or that have default values specified in the target's signature. I.e. it is
-        presumed that un-specified parameters that have no default values are to be excluded from
-        the config.
+        Specifying ``zen_partial=True`` and ``populate_full_signature=True`` together
+        will populate the config's signature only with parameters that: are explicitly specified by the user, or that have default values specified in the target's
+        signature. I.e. it is presumed that un-specified parameters that have no
+        default values are to be excluded from the config.
 
     zen_wrappers : None | Callable | Builds | InterpStr | Sequence[None | Callable | Builds | InterpStr]
         One or more wrappers, which will wrap ``hydra_target`` prior to instantiation.
@@ -618,16 +621,16 @@ def builds(
 
             f3(f2(f1(hydra_target)))(*args, **kwargs)
 
-        Wrappers can also be specified as interpolated strings [2]_ or targeted structured
+        Wrappers can also be specified as interpolated strings [2]_ or targeted
         configs.
 
     zen_meta : Optional[Mapping[str, Any]]
         Specifies field-names and corresponding values that will be included in the
-        resulting dataclass, but that will *not* be used to build ``hydra_target``
+        resulting config, but that will *not* be used to builds ``<hydra_target>``
         via instantiation. These are called "meta" fields.
 
     populate_full_signature : bool, optional (default=False)
-        If ``True``, then the resulting dataclass's signature and fields will be populated
+        If ``True``, then the resulting config's signature and fields will be populated
         according to the signature of ``hydra_target``; values also specified in
         ``**kwargs_for_target`` take precedent.
 
@@ -653,14 +656,14 @@ def builds(
         If ``None``, the ``_convert_`` attribute is not set on the resulting config.
 
     frozen : bool, optional (default=False)
-        If ``True``, the resulting dataclass will create frozen (i.e. immutable) instances.
-        I.e. setting/deleting an attribute of an instance will raise :py:class:`dataclasses.FrozenInstanceError`
-        at runtime.
+        If ``True``, the resulting config will create frozen (i.e. immutable) instances.
+        I.e. setting/deleting an attribute of an instance will raise
+        :py:class:`dataclasses.FrozenInstanceError` at runtime.
 
     builds_bases : Tuple[DataClass, ...]
-        Specifies a tuple of parent classes that the resulting dataclass inherits from.
-        A ``PartialBuilds`` class (resulting from ``zen_partial=True``) cannot be a parent
-        of a ``Builds`` class (i.e. where `zen_partial=False` was specified).
+        Specifies a tuple of parent classes that the resulting config inherits from.
+        A ``PartialBuilds`` class (resulting from ``zen_partial=True``) cannot be a
+        parent of a ``Builds`` class (i.e. where `zen_partial=False` was specified).
 
     dataclass_name : Optional[str]
         If specified, determines the name of the returned class object.
@@ -1721,11 +1724,11 @@ def make_config(
     **fields_as_kwargs,
 ) -> Type[DataClass]:
     """
-    Creates a config with user-defined fieldnames and, optionally,
+    Creates a config with user-defined field names and, optionally,
     associated default values and/or type-annotations.
 
     Unlike `builds`, `make_config` is not used to configure a particular target
-    object, rather, it can be used to create more general configs [1]_.
+    object; rather, it can be used to create more general configs [1]_.
 
     Parameters
     ----------
@@ -1746,7 +1749,7 @@ def make_config(
         If ``True``, then Hydra will recursively instantiate all other
         hydra-config objects nested within this dataclass [2]_.
 
-        If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.
+        If ``None``, the ``_recursive_`` attribute is not set on the resulting config.
 
     hydra_convert : Optional[Literal["none", "partial", "all"]], optional (default="none")
         Determines how Hydra handles the non-primitive objects passed to configuration [3]_.
@@ -1757,7 +1760,7 @@ def make_config(
         - ``"all"``: Passed objects are dicts, lists and primitives without
             a trace of OmegaConf containers
 
-        If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.
+        If ``None``, the ``_convert_`` attribute is not set on the resulting config.
 
     bases : Tuple[Type[DataClass], ...], optional (default=())
         Base classes that the resulting config class will inherit from.
@@ -1786,7 +1789,7 @@ def make_config(
     any user-specified annotations so that they are compatible with Hydra.
 
     `make_config` will automatically manipulate certain types of default values to ensure that
-    they can be utilized in the resulting dataclass and by Hydra:
+    they can be utilized in the resulting config and by Hydra:
 
     - Mutable default values will automatically be packaged in a default factory function [6]_
     - A default value that is a class-object or function-object will automatically be wrapped by `just`, to ensure that the resulting config is serializable by Hydra.
