@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hydra_zen.third_party.beartype &#8212; hydra-zen 0.3.0rc4+3.g81e1a7d documentation</title>
+    <title>hydra_zen.third_party.beartype &#8212; hydra-zen 0.3.0rc5+1.g19538fd documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -215,36 +215,29 @@
 <span class="sd">        A wrapped function, or a class whose init-method has been</span>
 <span class="sd">        wrapped in-place.</span>
 
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    hydra_zen.third_party.pydantic.validates_with_pydantic</span>
+
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    ``beartype`` [1]_ must be installed as a separate dependency to leverage this validator.</span>
+<span class="sd">    ``beartype`` [1]_ must be installed as a separate dependency to leverage this</span>
+<span class="sd">    validator. Refer to beartype&#39;s documentation [2]_ to see what varieties of types it</span>
+<span class="sd">    does and does not support.</span>
+
 <span class="sd">    Using ``validates_with_beartype`` as a ``zen_wrapper`` will create a dependency on</span>
-<span class="sd">    beartype among resulting yamls as well, these yamls will also be validated by beartype</span>
-<span class="sd">    upon instantiation.</span>
+<span class="sd">    beartype among resulting yamls: these yamls will also be validated by</span>
+<span class="sd">    beartype upon instantiation.</span>
 
-<span class="sd">    Please refer to beartype&#39;s documentation [2]_ to see what varieties of types it does and</span>
-<span class="sd">    does not support.</span>
-
-<span class="sd">    It is recommended that `validates_with_beartype` be used in conjunction with</span>
-<span class="sd">    the following `builds` settings:</span>
-
-<span class="sd">    - ``hydra_convert=&quot;all&quot;``: to ensure omegaconf containers are converted to std-lib types</span>
-
-<span class="sd">    **Data Coercion Behavior**</span>
+<span class="sd">    **Data-Coercion Behavior**</span>
 
 <span class="sd">    hydra-zen adds a data-coercion step that is not performed by ``beartype``.</span>
 <span class="sd">    This only impacts fields in ``obj`` annotated with a (non-string) sequence-type</span>
-<span class="sd">    annotation, which are passed list-type data. All other fields rely solely on beartype&#39;s</span>
-<span class="sd">    native behavior.</span>
+<span class="sd">    annotation, which are passed list-type data. All other fields rely solely on</span>
+<span class="sd">    beartype&#39;s native behavior.</span>
 
-<span class="sd">    E.g. a field with a ``Tuple``-annotation, if passed a list, will see that list be cast</span>
-<span class="sd">    to a tuple. See the Examples section for more details.</span>
-
-<span class="sd">    This coercion is necessary as Hydra can only read (non-string) sequential data</span>
-<span class="sd">    from a config as a list. I.e. without this coercion step, all non-list/string annotated</span>
-<span class="sd">    sequence fields populated by Hydra would get rasied (roared at) by beartype. Ultimately,</span>
-<span class="sd">    this data-coercion strategy is designed to be as minimalistic as possible while ensuring</span>
-<span class="sd">    that type-checked interfaces will be compatible with Hydra.</span>
+<span class="sd">    E.g. a field with a ``Tuple``-annotation, if passed a list, will see that list be</span>
+<span class="sd">    cast to a tuple. See the Examples section for more details.</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -253,14 +246,21 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
+<span class="sd">    **Basic usage**</span>
+
 <span class="sd">    &gt;&gt;&gt; from hydra_zen.third_party.beartype import validates_with_beartype</span>
+
 <span class="sd">    &gt;&gt;&gt; from beartype.cave import ScalarTypes</span>
 <span class="sd">    &gt;&gt;&gt; def f(x: ScalarTypes): return x  # a scalar is any real-valued number</span>
-<span class="sd">    &gt;&gt;&gt; val_f = validates_with_beartype(f)</span>
 <span class="sd">    &gt;&gt;&gt; f([1, 2])  # doesn&#39;t catch bad input</span>
 <span class="sd">    [1, 2]</span>
+
+<span class="sd">    &gt;&gt;&gt; val_f = validates_with_beartype(f)  # f + validation</span>
 <span class="sd">    &gt;&gt;&gt; val_f([1, 2])</span>
 <span class="sd">    BeartypeCallHintPepParamException: @beartyped f() parameter x=[1, 2] violates type hint [...]</span>
+
+<span class="sd">    Applying `validates_with_beartype` to a class-object will wrap its ``__init__``</span>
+<span class="sd">    method in-place.</span>
 
 <span class="sd">    &gt;&gt;&gt; class A:</span>
 <span class="sd">    ...     def __init__(self, x: ScalarTypes): ...</span>
@@ -269,17 +269,29 @@
 <span class="sd">    &gt;&gt;&gt; A([1, 2])</span>
 <span class="sd">    BeartypeCallHintPepParamException: @beartyped A.__init__() parameter x=[1, 2] violates type hint [...]</span>
 
+<span class="sd">    **Adding beartype validation to configs**</span>
+
 <span class="sd">    This is designed to be used with the ``zen_wrappers`` feature of `builds`.</span>
 
 <span class="sd">    &gt;&gt;&gt; from hydra_zen import builds, instantiate</span>
-<span class="sd">    &gt;&gt;&gt; # instantiations of `conf` will be validated by beartype</span>
-<span class="sd">    &gt;&gt;&gt; conf = builds(f, populate_full_signature=True, zen_wrappers=validates_with_beartype)</span>
-<span class="sd">    &gt;&gt;&gt; instantiate(conf, x=10)  # 10 is a scalar: ok!</span>
+
+<span class="sd">    &gt;&gt;&gt; Conf = builds(f, populate_full_signature=True, zen_wrappers=validates_with_beartype)</span>
+
+<span class="sd">    Instantiating ``Conf`` will prompt ``beartype`` to check the types of configured</span>
+<span class="sd">    parameters against the corresponding annotations on ``f``.</span>
+
+<span class="sd">    &gt;&gt;&gt; instantiate(Conf, x=10)  # 10 is a scalar: ok!</span>
 <span class="sd">    10</span>
-<span class="sd">    &gt;&gt;&gt; instantiate(conf, x=[1, 2])  # [1, 2] is not a scalar: roar!</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(Conf, x=[1, 2])  # [1, 2] is not a scalar: roar!</span>
 <span class="sd">    BeartypeCallHintPepParamException: @beartyped f() parameter x=[1, 2] violates type hint [...]</span>
 
-<span class="sd">    Note that sequence-coercion is enabled to ensure smooth compatibility with Hydra.</span>
+<span class="sd">    Consider using :func:`~hydra_zen.make_custom_builds_fn` to add validation to</span>
+<span class="sd">    all configs.</span>
+
+<span class="sd">    **Sequence-coercion behavior for compatibility with Hydra**</span>
+
+<span class="sd">    Note that sequence-coercion is enabled to ensure smooth compatibility with Hydra,</span>
+<span class="sd">    as Hydra will interpret all (non-string) sequential data structures as lists.</span>
 
 <span class="sd">    &gt;&gt;&gt; def g(x: tuple): return x  # note the annotation</span>
 <span class="sd">    &gt;&gt;&gt; g([1, 2, 3])</span>

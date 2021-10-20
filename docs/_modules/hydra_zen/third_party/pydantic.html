@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hydra_zen.third_party.pydantic &#8212; hydra-zen 0.3.0rc4+3.g81e1a7d documentation</title>
+    <title>hydra_zen.third_party.pydantic &#8212; hydra-zen 0.3.0rc5+1.g19538fd documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -225,11 +225,15 @@
 <span class="sd">        A wrapped function or a class whose init-method has been</span>
 <span class="sd">        wrapped in-place</span>
 
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    hydra_zen.third_party.beartype.validates_with_beartype</span>
+
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    pydantic must be installed [2]_ as a separate dependency to leverage this validator.</span>
 <span class="sd">    Using ``validates_with_pydantic`` as a ``zen_wrapper`` will create a dependency on</span>
-<span class="sd">    pydantic among resulting yamls as well, these yamls will also be validated by pydantic</span>
+<span class="sd">    pydantic among resulting yamls: these yamls will also be validated by pydantic</span>
 <span class="sd">    upon instantiation.</span>
 
 <span class="sd">    It is recommended that `validates_with_pydantic` be used in conjunction with</span>
@@ -248,16 +252,22 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
+<span class="sd">    **Basic usage**</span>
+
 <span class="sd">    &gt;&gt;&gt; from hydra_zen.third_party.pydantic import validates_with_pydantic</span>
 <span class="sd">    &gt;&gt;&gt; from pydantic import PositiveInt</span>
+
 <span class="sd">    &gt;&gt;&gt; def f(x: PositiveInt): return x</span>
-<span class="sd">    &gt;&gt;&gt; val_f = validates_with_pydantic(f)</span>
-<span class="sd">    &gt;&gt;&gt; f(-100)</span>
+
+<span class="sd">    &gt;&gt;&gt; f(-100)  # bad value passes</span>
 <span class="sd">    -100</span>
-<span class="sd">    &gt;&gt;&gt; val_f(-100)</span>
+
+<span class="sd">    &gt;&gt;&gt; val_f = validates_with_pydantic(f)  # f + validation</span>
+<span class="sd">    &gt;&gt;&gt; val_f(-100)  # bad value gets caught</span>
 <span class="sd">    ValidationError: 1 validation error for F (...)</span>
 
-<span class="sd">    Using `validates_with_pydantic` with a class.</span>
+<span class="sd">    Applying `validates_with_pydantic` to a class-object will wrap its ``__init__``</span>
+<span class="sd">    method in-place.</span>
 
 <span class="sd">    &gt;&gt;&gt; class A:</span>
 <span class="sd">    ...     def __init__(self, x: PositiveInt): ...</span>
@@ -265,6 +275,8 @@
 <span class="sd">    __main__.A</span>
 <span class="sd">    &gt;&gt;&gt; A(-10)</span>
 <span class="sd">    ValidationError: 1 validation error for Init</span>
+
+<span class="sd">    **Adding pydantic validation to configs**</span>
 
 <span class="sd">    This is designed to be used with the ``zen_wrappers`` feature of `builds`.</span>
 
@@ -288,6 +300,9 @@
 <span class="sd">    &gt;&gt;&gt; def g(x: tuple): return x  # note the annotation</span>
 <span class="sd">    &gt;&gt;&gt; validates_with_pydantic(g)([1, 2, 3])  # input: list, output: tuple</span>
 <span class="sd">    (1, 2, 3)</span>
+
+<span class="sd">    Consider using :func:`~hydra_zen.make_custom_builds_fn` to add validation to</span>
+<span class="sd">    all configs.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="s2">&quot;__init__&quot;</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="fm">__init__</span><span class="p">,</span> <span class="s2">&quot;validate&quot;</span><span class="p">):</span>

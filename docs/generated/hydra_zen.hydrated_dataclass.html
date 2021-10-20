@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hydrated_dataclass &#8212; hydra-zen 0.3.0rc4+3.g81e1a7d documentation</title>
+    <title>hydrated_dataclass &#8212; hydra-zen 0.3.0rc5+1.g19538fd documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -225,54 +225,61 @@
 <dt id="hydra_zen.hydrated_dataclass">
 <code class="sig-prename descclassname"><span class="pre">hydra_zen.</span></code><code class="sig-name descname"><span class="pre">hydrated_dataclass</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">pos_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_partial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_wrappers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">populate_full_signature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_recursive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frozen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">_kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/structured_configs/_implementations.html#hydrated_dataclass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.hydrated_dataclass" title="Permalink to this definition">¶</a></dt>
 <dd><p>A decorator that uses <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> to create a dataclass with the appropriate
-hydra-specific fields for specifying a structured config <a class="reference internal" href="#r8dd265aa7612-1" id="id1">[1]</a>.</p>
+Hydra-specific fields for specifying a targeted config <a class="reference internal" href="#r8dd265aa7612-1" id="id1">[1]</a>.</p>
+<p>This provides similar functionality to <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>, but enables a user to define
+a config explicitly using the <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="(in Python v3.10)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataclasses.dataclass()</span></code></a> syntax.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>target</strong><span class="classifier">Union[Instantiable, Callable]</span></dt><dd><p>The object to be instantiated/called.</p>
+<dt><strong>hydra_target</strong><span class="classifier">T (Callable)</span></dt><dd><p>The target-object to be configured. This is a required, positional-only argument.</p>
 </dd>
-<dt><strong>*pos_args</strong><span class="classifier">Any</span></dt><dd><p>Positional arguments passed to <code class="docutils literal notranslate"><span class="pre">target</span></code>.</p>
+<dt><strong>*pos_args</strong><span class="classifier">Any</span></dt><dd><p>Positional arguments passed as <code class="docutils literal notranslate"><span class="pre">hydra_target(*pos_args,</span> <span class="pre">...)</span></code> upon instantiation.</p>
 <p>Arguments specified positionally are not included in the dataclass’ signature and
 are stored as a tuple bound to in the <code class="docutils literal notranslate"><span class="pre">_args_</span></code> field.</p>
 </dd>
-<dt><strong>zen_partial</strong><span class="classifier">Optional[bool] (default=False)</span></dt><dd><p>If True, then hydra-instantiation produces <code class="docutils literal notranslate"><span class="pre">functools.partial(target,</span> <span class="pre">**kwargs)</span></code></p>
+<dt><strong>zen_partial</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then the resulting config will instantiate as
+<code class="docutils literal notranslate"><span class="pre">functools.partial(hydra_target,</span> <span class="pre">*pos_args,</span> <span class="pre">**kwargs_for_target)</span></code> rather than
+<code class="docutils literal notranslate"><span class="pre">hydra_target(*pos_args,</span> <span class="pre">**kwargs_for_target)</span></code>. Thus this enables the
+partial-configuration of objects.</p>
+<p>Specifying <code class="docutils literal notranslate"><span class="pre">zen_partial=True</span></code> and <code class="docutils literal notranslate"><span class="pre">populate_full_signature=True</span></code> together
+will populate the config’s signature only with parameters that: are explicitly
+specified by the user, or that have default values specified in the target’s
+signature. I.e. it is presumed that un-specified parameters that have no
+default values are to be excluded from the config.</p>
 </dd>
 <dt><strong>zen_wrappers</strong><span class="classifier">None | Callable | Builds | InterpStr | Sequence[None | Callable | Builds | InterpStr]</span></dt><dd><p>One or more wrappers, which will wrap <code class="docutils literal notranslate"><span class="pre">hydra_target</span></code> prior to instantiation.
 E.g. specifying the wrappers <code class="docutils literal notranslate"><span class="pre">[f1,</span> <span class="pre">f2,</span> <span class="pre">f3]</span></code> will instantiate as:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f3</span><span class="p">(</span><span class="n">f2</span><span class="p">(</span><span class="n">f1</span><span class="p">(</span><span class="n">hydra_target</span><span class="p">)))(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Wrappers can also be specified as interpolated strings <a class="reference internal" href="#r8dd265aa7612-2" id="id2">[2]</a> or targeted structured
+<p>Wrappers can also be specified as interpolated strings <a class="reference internal" href="#r8dd265aa7612-2" id="id2">[2]</a> or targeted
 configs.</p>
 </dd>
 <dt><strong>zen_meta</strong><span class="classifier">Optional[Mapping[str, Any]]</span></dt><dd><p>Specifies field-names and corresponding values that will be included in the
-resulting dataclass, but that will <em>not</em> be used to build <code class="docutils literal notranslate"><span class="pre">hydra_target</span></code>
+resulting config, but that will <em>not</em> be used to builds <code class="docutils literal notranslate"><span class="pre">&lt;hydra_target&gt;</span></code>
 via instantiation. These are called “meta” fields.</p>
 </dd>
-<dt><strong>populate_full_signature</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then the resulting dataclass’s signature and fields will be populated
-according to the signature of <code class="docutils literal notranslate"><span class="pre">hydra_target</span></code>.</p>
-<p>Values specified in <a href="#id3"><span class="problematic" id="id4">**</span></a>kwargs_for_target take precedent over the corresponding
-default values from the signature.</p>
+<dt><strong>populate_full_signature</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then the resulting config’s signature and fields will be populated
+according to the signature of <code class="docutils literal notranslate"><span class="pre">hydra_target</span></code>; values also specified in
+<code class="docutils literal notranslate"><span class="pre">**kwargs_for_target</span></code> take precedent.</p>
 <p>This option is not available for objects with inaccessible signatures, such as
 NumPy’s various ufuncs.</p>
 </dd>
-<dt><strong>hydra_recursive</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>If True, then upon hydra will recursively instantiate all other
-hydra-config objects nested within this dataclass <a class="reference internal" href="#r8dd265aa7612-3" id="id5">[3]</a>.</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_recursive_</span></code> attribute is not set on the resulting dataclass.</p>
-</dd>
-<dt><strong>hydra_convert</strong><span class="classifier">Optional[Literal[“none”, “partial”, “all”]] (default=”none”)</span></dt><dd><p>Determines how hydra handles the non-primitive objects passed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code> <a class="reference internal" href="#r8dd265aa7612-4" id="id6">[4]</a>.</p>
+<dt><strong>hydra_recursive</strong><span class="classifier">Optional[bool], optional (default=True)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then Hydra will recursively instantiate all other
+hydra-config objects nested within this config <a class="reference internal" href="#r8dd265aa7612-3" id="id3">[3]</a>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_recursive_</span></code> attribute is not set on the resulting config.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code>: Passed objects are DictConfig and ListConfig, default</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;partial&quot;</span></code>: Passed objects are converted to dict and list, with
-the exception of Structured Configs (and their fields).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>: Passed objects are dicts, lists and primitives without
-a trace of OmegaConf containers</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code>: No conversion occurs; omegaconf containers are passed through (Default)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;partial&quot;</span></code>: <code class="docutils literal notranslate"><span class="pre">DictConfig</span></code> and <code class="docutils literal notranslate"><span class="pre">ListConfig</span></code> objects converted to <code class="docutils literal notranslate"><span class="pre">dict</span></code> and
+<code class="docutils literal notranslate"><span class="pre">list</span></code>, respectively. Structured configs and their fields are passed without conversion.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>: All passed objects are converted to dicts, lists, and primitives, without
+a trace of OmegaConf containers.</p></li>
 </ul>
-<p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_convert_</span></code> attribute is not set on the resulting dataclass.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_convert_</span></code> attribute is not set on the resulting config.</p>
 </dd>
-<dt><strong>frozen</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code>, the resulting dataclass will create frozen (i.e. immutable) instances.
-I.e. setting/deleting an attribute of an instance will raise <code class="xref py py-obj docutils literal notranslate"><span class="pre">FrozenInstanceError</span></code>
-at runtime.</p>
+<dt><strong>frozen</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the resulting config will create frozen (i.e. immutable) instances.
+I.e. setting/deleting an attribute of an instance will raise
+<a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.FrozenInstanceError" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataclasses.FrozenInstanceError</span></code></a> at runtime.</p>
 </dd>
 </dl>
 </dd>
@@ -284,6 +291,11 @@ at runtime.</p>
 </dd>
 </dl>
 </div>
+<p class="rubric">Notes</p>
+<p>Unlike <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>, <a class="reference internal" href="#hydra_zen.hydrated_dataclass" title="hydra_zen.hydrated_dataclass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydrated_dataclass</span></code></a> enables config fields to be set explicitly
+with custom type annotations. Additionally, the resulting config’ attributes
+can be analyzed by static tooling, which can help to warn about errors prior
+to running one’s code.</p>
 <p class="rubric">References</p>
 <dl class="citation">
 <dt class="label" id="r8dd265aa7612-1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
@@ -292,17 +304,21 @@ at runtime.</p>
 <dt class="label" id="r8dd265aa7612-2"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
 <dd><p><a class="reference external" href="https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation">https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation</a></p>
 </dd>
-<dt class="label" id="r8dd265aa7612-3"><span class="brackets"><a class="fn-backref" href="#id5">3</a></span></dt>
+<dt class="label" id="r8dd265aa7612-3"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
 <dd><p><a class="reference external" href="https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation">https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation</a></p>
 </dd>
-<dt class="label" id="r8dd265aa7612-4"><span class="brackets"><a class="fn-backref" href="#id6">4</a></span></dt>
+<dt class="label" id="r8dd265aa7612-4"><span class="brackets">4</span></dt>
 <dd><p><a class="reference external" href="https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies">https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<p>A simple usage of <a class="reference internal" href="#hydra_zen.hydrated_dataclass" title="hydra_zen.hydrated_dataclass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydrated_dataclass</span></code></a>. Here, we specify a structured config</p>
+<p><strong>Basic usage</strong></p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">hydrated_dataclass</span><span class="p">,</span> <span class="n">instantiate</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nd">@hydrated_dataclass</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here, we specify a config that is designed to “build” a dictionary
+upon instantiation</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@hydrated_dataclass</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <span class="gp">... </span><span class="k">class</span> <span class="nc">DictConf</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">x</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="gp">... </span>    <span class="n">y</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;hello&#39;</span>
@@ -310,44 +326,6 @@ at runtime.</p>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">DictConf</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>  <span class="c1"># override default `x`</span>
 <span class="go">{&#39;x&#39;: 10, &#39;y&#39;: &#39;hello&#39;}</span>
-</pre></div>
-</div>
-<p>We can also design a configuration that only partially instantiates our target.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">power</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">exponent</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="k">return</span> <span class="n">x</span> <span class="o">**</span> <span class="n">exponent</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nd">@hydrated_dataclass</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">power</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">... </span><span class="k">class</span> <span class="nc">PowerConf</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="n">exponent</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">partiald_power</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">PowerConf</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">partiald_power</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span>
-<span class="go">100.0</span>
-</pre></div>
-</div>
-<p>Inheritance can be used to compose configurations</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">AdamW</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nd">@dataclass</span>
-<span class="gp">... </span><span class="k">class</span> <span class="nc">AdamBaseConfig</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="n">lr</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.001</span>
-<span class="gp">... </span>    <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-8</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@hydrated_dataclass</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">AdamW</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">... </span><span class="k">class</span> <span class="nc">AdamWConfig</span><span class="p">(</span><span class="n">AdamBaseConfig</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="n">weight_decay</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">AdamWConfig</span><span class="p">)</span>
-<span class="go">functools.partial(&lt;class &#39;torch.optim.adamw.AdamW&#39;&gt;, lr=0.001, eps=1e-08, weight_decay=0.01)</span>
-</pre></div>
-</div>
-<p>Because this decorator uses <code class="xref py py-obj docutils literal notranslate"><span class="pre">hyda_utils.builds</span></code> under the hood, common mistakes like misspelled
-parameters will be caught upon constructing the structured config.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@hydrated_dataclass</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">AdamW</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">... </span><span class="k">class</span> <span class="nc">AdamWConfig</span><span class="p">(</span><span class="n">AdamBaseConfig</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="n">wieght_decay</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span>  <span class="c1"># i before e, right!?</span>
-<span class="go">TypeError: Building: AdamW ..</span>
-<span class="go">The following unexpected keyword argument(s) for torch.optim.adamw.AdamW was specified via inheritance</span>
-<span class="go">from a base class: wieght_decay</span>
 </pre></div>
 </div>
 <p>For more detailed examples, refer to <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>.</p>

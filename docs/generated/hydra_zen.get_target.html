@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>get_target &#8212; hydra-zen 0.3.0rc4+3.g81e1a7d documentation</title>
+    <title>get_target &#8212; hydra-zen 0.3.0rc5+1.g19538fd documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -224,13 +224,12 @@
 <dl class="py function">
 <dt id="hydra_zen.get_target">
 <code class="sig-prename descclassname"><span class="pre">hydra_zen.</span></code><code class="sig-name descname"><span class="pre">get_target</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/structured_configs/_implementations.html#get_target"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.get_target" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the target-object from a targeted structured config.</p>
-<p>The target is imported and returned if the config’s <code class="docutils literal notranslate"><span class="pre">_target_</span></code>
-field is a string that indicates its location.</p>
+<dd><p>Returns the target-object from a targeted config.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>obj</strong><span class="classifier">HasTarget | HasPartialTarget</span></dt><dd></dd>
+<dt><strong>obj</strong><span class="classifier">HasTarget</span></dt><dd><p>An object with a <code class="docutils literal notranslate"><span class="pre">_target_</span></code> attribute.</p>
+</dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -238,30 +237,52 @@ field is a string that indicates its location.</p>
 <dt><strong>target</strong><span class="classifier">Any</span></dt><dd></dd>
 </dl>
 </dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>TypeError: <code class="docutils literal notranslate"><span class="pre">obj</span></code> does not have a <code class="docutils literal notranslate"><span class="pre">_target_</span></code> attribute.</dt><dd></dd>
+</dl>
+</dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">builds</span><span class="p">,</span> <span class="n">just</span><span class="p">,</span> <span class="n">get_target</span><span class="p">,</span> <span class="n">load_from_yaml</span>
+<p><strong>Basic usage</strong></p>
+<p><a class="reference internal" href="#hydra_zen.get_target" title="hydra_zen.get_target"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_target</span></code></a> works on all variety of configs produced by <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> and
+<a class="reference internal" href="hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">builds</span><span class="p">,</span> <span class="n">just</span><span class="p">,</span> <span class="n">get_target</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">get_target</span><span class="p">(</span><span class="n">builds</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span>
-<span class="go">int</span>
+<span class="go">&lt;class &#39;int&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_target</span><span class="p">(</span><span class="n">builds</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">&lt;class &#39;int&#39;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">get_target</span><span class="p">(</span><span class="n">just</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
-<span class="go">str</span>
+<span class="go">&lt;class &#39;str&#39;&gt;</span>
 </pre></div>
 </div>
-<p>This works even if the <code class="docutils literal notranslate"><span class="pre">_target_</span></code> field specifies a string.</p>
+<p>It works for manually-defined configs:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nd">@dataclass</span>
 <span class="gp">... </span><span class="k">class</span> <span class="nc">A</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;builtins.dict&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">get_target</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="go">dict</span>
 </pre></div>
 </div>
-<p>This function is useful for accessing a target’s type from a config
-without having to instantiate the target. For example, suppose we want
-to access a type from a yaml-serialized config.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ModelConfig</span> <span class="o">=</span> <span class="n">load_from_yaml</span><span class="p">(</span><span class="s2">&quot;model.yaml&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">get_target</span><span class="p">(</span><span class="n">ModelConfig</span><span class="p">)</span>
-<span class="go">CustomClassifier</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_target</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="go">&lt;class &#39;dict&#39;&gt;</span>
+</pre></div>
+</div>
+<p>and for configs loaded from yamls.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">load_from_yaml</span><span class="p">,</span> <span class="n">save_as_yaml</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">B</span><span class="p">:</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">save_as_yaml</span><span class="p">(</span><span class="n">Conf</span><span class="p">,</span> <span class="s2">&quot;config.yaml&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">loaded_conf</span> <span class="o">=</span> <span class="n">load_from_yaml</span><span class="p">(</span><span class="s2">&quot;config.yaml&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that the target of <code class="docutils literal notranslate"><span class="pre">loaded_conf</span></code> can be accessed without
+instantiating the config.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_target</span><span class="p">(</span><span class="n">loaded_conf</span><span class="p">)</span>
+<span class="go">__main__.B</span>
 </pre></div>
 </div>
 </dd></dl>

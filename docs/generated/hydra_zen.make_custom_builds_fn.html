@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>make_custom_builds_fn &#8212; hydra-zen 0.3.0rc4+3.g81e1a7d documentation</title>
+    <title>make_custom_builds_fn &#8212; hydra-zen 0.3.0rc5+1.g19538fd documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -164,6 +164,25 @@
   <div class="bd-toc-item active">
     <ul class="nav bd-sidenav">
  <li class="toctree-l1">
+  <a class="reference internal" href="hydra_zen.launch.html">
+   launch
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="hydra_zen.experimental.hydra_run.html">
+   hydra_run
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="hydra_zen.experimental.hydra_multirun.html">
+   hydra_multirun
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
   <a class="reference internal" href="hydra_zen.make_config.html">
    make_config
   </a>
@@ -227,13 +246,6 @@
 </ul>
 <ul class="nav bd-sidenav">
  <li class="toctree-l1">
-  <a class="reference internal" href="hydra_zen.launch.html">
-   launch
-  </a>
- </li>
-</ul>
-<ul class="nav bd-sidenav">
- <li class="toctree-l1">
   <a class="reference internal" href="hydra_zen.third_party.beartype.validates_with_beartype.html">
    validates_with_beartype
   </a>
@@ -288,64 +300,30 @@
 <p>E.g. <code class="docutils literal notranslate"><span class="pre">make_custom_builds_fn(hydra_convert='all')</span></code> will return a version
 of the <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> function where the default value for <code class="docutils literal notranslate"><span class="pre">hydra_convert</span></code>
 is <code class="docutils literal notranslate"><span class="pre">'all'</span></code> instead of <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
-<dl class="field-list">
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl>
-<dt><strong>zen_partial</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If True, then the resulting config will instantiate as
-<code class="docutils literal notranslate"><span class="pre">functools.partial(hydra_target,</span> <span class="pre">*pos_args,</span> <span class="pre">**kwargs_for_target)</span></code> rather than
-<code class="docutils literal notranslate"><span class="pre">hydra_target(*pos_args,</span> <span class="pre">**kwargs_for_target)</span></code>.</p>
-<p>Thus this enables the partial-configuration of objects.</p>
-<p>Specifying <code class="docutils literal notranslate"><span class="pre">zen_partial=True</span></code> and <code class="docutils literal notranslate"><span class="pre">populate_full_signature=True</span></code> together will
-populate the dataclass’ signature only with parameters that are specified by the
-user or that have default values specified in the target’s signature. I.e. it is
-presumed that un-specified parameters are to be excluded from the partial configuration.</p>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>zen_partial</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>Specifies a new the default value for <code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">zen_partial=&lt;..&gt;)</span></code></p>
 </dd>
-<dt><strong>zen_wrappers</strong><span class="classifier">None | Callable | Builds | InterpStr | Sequence[None | Callable | Builds | InterpStr]</span></dt><dd><p>One or more wrappers, which will wrap <code class="docutils literal notranslate"><span class="pre">hydra_target</span></code> prior to instantiation.
-E.g. specifying the wrappers <code class="docutils literal notranslate"><span class="pre">[f1,</span> <span class="pre">f2,</span> <span class="pre">f3]</span></code> will instantiate as:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f3</span><span class="p">(</span><span class="n">f2</span><span class="p">(</span><span class="n">f1</span><span class="p">(</span><span class="n">hydra_target</span><span class="p">)))(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Wrappers can also be specified as interpolated strings <a class="reference internal" href="#r044a267a3bc3-1" id="id1">[1]</a> or targeted structured
-configs.</p>
+<dt><strong>zen_wrappers</strong><span class="classifier">None | Callable | Builds | InterpStr | Sequence[None | Callable | Builds | InterpStr]</span></dt><dd><p>Specifies a new the default value for <code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">zen_wrappers=&lt;..&gt;)</span></code></p>
 </dd>
-<dt><strong>zen_meta</strong><span class="classifier">Optional[Mapping[str, Any]]</span></dt><dd><p>Specifies field-names and corresponding values that will be included in the
-resulting dataclass, but that will <em>not</em> be used to build <code class="docutils literal notranslate"><span class="pre">hydra_target</span></code>
-via instantiation. These are called “meta” fields.</p>
+<dt><strong>zen_meta</strong><span class="classifier">Optional[Mapping[str, Any]]</span></dt><dd><p>Specifies a new the default value for <code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">zen_meta=&lt;..&gt;)</span></code></p>
 </dd>
-<dt><strong>populate_full_signature</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then the resulting dataclass’s signature and fields will be populated
-according to the signature of <code class="docutils literal notranslate"><span class="pre">hydra_target</span></code>.</p>
-<p>Values specified in <a href="#id2"><span class="problematic" id="id3">**</span></a>kwargs_for_target take precedent over the corresponding
-default values from the signature.</p>
-<p>This option is not available for objects with inaccessible signatures, such as
-NumPy’s various ufuncs.</p>
+<dt><strong>populate_full_signature</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>Specifies a new the default value for <code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">populate_full_signature=&lt;..&gt;)</span></code></p>
 </dd>
-<dt><strong>hydra_recursive</strong><span class="classifier">Optional[bool], optional (default=True)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then Hydra will recursively instantiate all other
-hydra-config objects nested within this dataclass <a class="reference internal" href="#r044a267a3bc3-2" id="id4">[2]</a>.</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_recursive_</span></code> attribute is not set on the resulting dataclass.</p>
+<dt><strong>hydra_recursive</strong><span class="classifier">Optional[bool], optional (default=True)</span></dt><dd><p>Specifies a new the default value for <code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">hydra_recursive=&lt;..&gt;)</span></code></p>
 </dd>
-<dt><strong>hydra_convert</strong><span class="classifier">Optional[Literal[“none”, “partial”, “all”]], optional (default=”none”)</span></dt><dd><p>Determines how hydra handles the non-primitive objects passed to <code class="docutils literal notranslate"><span class="pre">hydra_target</span></code> <a class="reference internal" href="#r044a267a3bc3-3" id="id5">[3]</a>.</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code>: Passed objects are DictConfig and ListConfig, default</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;partial&quot;</span></code>: Passed objects are converted to dict and list, with
-the exception of Structured Configs (and their fields).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>: Passed objects are dicts, lists and primitives without
-a trace of OmegaConf containers</p></li>
-</ul>
-<p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_convert_</span></code> attribute is not set on the resulting dataclass.</p>
+<dt><strong>hydra_convert</strong><span class="classifier">Optional[Literal[“none”, “partial”, “all”]], optional (default=”none”)</span></dt><dd><p>Specifies a new the default value for <code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">hydra_convert=&lt;..&gt;)</span></code></p>
 </dd>
-<dt><strong>frozen</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the resulting dataclass will create frozen (i.e. immutable) instances.
-I.e. setting/deleting an attribute of an instance will raise <code class="docutils literal notranslate"><span class="pre">FrozenInstanceError</span></code>
-at runtime.</p>
+<dt><strong>frozen</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>Specifies a new the default value for <code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">frozen=&lt;..&gt;)</span></code></p>
 </dd>
-<dt><strong>builds_bases</strong><span class="classifier">Tuple[DataClass, …]</span></dt><dd><p>Specifies a tuple of parent classes that the resulting dataclass inherits from.
-A <code class="docutils literal notranslate"><span class="pre">PartialBuilds</span></code> class (resulting from <code class="docutils literal notranslate"><span class="pre">zen_partial=True</span></code>) cannot be a parent
-of a <code class="docutils literal notranslate"><span class="pre">Builds</span></code> class (i.e. where <code class="xref py py-obj docutils literal notranslate"><span class="pre">zen_partial=False</span></code> was specified).</p>
+<dt><strong>builds_bases</strong><span class="classifier">Tuple[DataClass, …]</span></dt><dd><p>Specifies a new the default value for <code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">builds_bases=&lt;..&gt;)</span></code></p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>builds</dt><dd><p>The function <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>, but with customized default-values.</p>
+<dt>custom_builds</dt><dd><p>The function <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>, but with customized default-values.</p>
 </dd>
 </dl>
 </dd>
@@ -357,22 +335,11 @@ of a <code class="docutils literal notranslate"><span class="pre">Builds</span><
 </dd>
 </dl>
 </div>
-<p class="rubric">References</p>
-<dl class="citation">
-<dt class="label" id="r044a267a3bc3-1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p><a class="reference external" href="https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation">https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation</a></p>
-</dd>
-<dt class="label" id="r044a267a3bc3-2"><span class="brackets"><a class="fn-backref" href="#id4">2</a></span></dt>
-<dd><p><a class="reference external" href="https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation">https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation</a></p>
-</dd>
-<dt class="label" id="r044a267a3bc3-3"><span class="brackets"><a class="fn-backref" href="#id5">3</a></span></dt>
-<dd><p><a class="reference external" href="https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies">https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies</a></p>
-</dd>
-</dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">builds</span><span class="p">,</span> <span class="n">make_custom_builds_fn</span><span class="p">,</span> <span class="n">instantiate</span>
 </pre></div>
 </div>
+<p><strong>Basic usage</strong></p>
 <p>The following will create a <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> function whose default-value
 for <code class="docutils literal notranslate"><span class="pre">zen_partial</span></code> has been set to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pbuilds</span> <span class="o">=</span> <span class="n">make_custom_builds_fn</span><span class="p">(</span><span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -382,19 +349,19 @@ for <code class="docutils literal notranslate"><span class="pre">zen_partial</sp
 <code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">zen_partial=True)</span></code>.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">pbuilds</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span>  <span class="c1"># calls `functools.partial(int)`</span>
 <span class="go">functools.partial(&lt;class &#39;int&#39;&gt;)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">builds</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>  <span class="c1"># manually-overriding default</span>
-<span class="go">functools.partial(&lt;class &#39;int&#39;&gt;)</span>
 </pre></div>
 </div>
-<p>You can still specify <code class="docutils literal notranslate"><span class="pre">zen_partial</span></code> on a per-case basis with <code class="docutils literal notranslate"><span class="pre">pbuilds</span></code></p>
+<p>You can still specify <code class="docutils literal notranslate"><span class="pre">zen_partial</span></code> on a per-case basis with <code class="docutils literal notranslate"><span class="pre">pbuilds</span></code>.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">pbuilds</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>  <span class="c1"># calls `int()`</span>
 <span class="go">0</span>
 </pre></div>
 </div>
+<p><strong>Adding data validation to configs</strong></p>
 <p>Suppose that we want to enable runtime type-checking - using beartype -
 whenever our configs are being instantiated; then the following settings
-for <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> would be handy</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen.third_party.beartype</span> <span class="kn">import</span> <span class="n">validates_with_beartype</span>
+for <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> would be handy.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Note: beartype must be installed to use this feature</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen.third_party.beartype</span> <span class="kn">import</span> <span class="n">validates_with_beartype</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">build_a_bear</span> <span class="o">=</span> <span class="n">make_custom_builds_fn</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">hydra_convert</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
@@ -406,10 +373,16 @@ for <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" 
 during instantiation.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Literal</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">]):</span> <span class="k">return</span> <span class="n">x</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span> <span class="o">=</span> <span class="n">build_a_bear</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">build_a_bear</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>  <span class="c1"># a conf that includes `validates_with_beartype`</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">)</span>  <span class="c1"># satisfies annotation: Literal[&quot;a&quot;, &quot;b&quot;]</span>
 <span class="go">&quot;a&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;c&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;c&quot;</span><span class="p">)</span>  <span class="c1"># violates annotation: Literal[&quot;a&quot;, &quot;b&quot;]</span>
 <span class="go">&lt;Validation error: &quot;c&quot; is not &quot;a&quot; or &quot;b&quot;&gt;</span>
 </pre></div>
 </div>

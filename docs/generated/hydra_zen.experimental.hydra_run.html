@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hydra_run &#8212; hydra-zen 0.3.0rc4+3.g81e1a7d documentation</title>
+    <title>hydra_run &#8212; hydra-zen 0.3.0rc5+1.g19538fd documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -214,7 +214,49 @@
 <dl class="py function">
 <dt id="hydra_zen.experimental.hydra_run">
 <code class="sig-prename descclassname"><span class="pre">hydra_zen.experimental.</span></code><code class="sig-name descname"><span class="pre">hydra_run</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overrides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hydra_run'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">job_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hydra_run'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_log_configuration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/experimental.html#hydra_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.experimental.hydra_run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>(Deprecated) Launch a Hydra job defined by <code class="xref py py-obj docutils literal notranslate"><span class="pre">task_function</span></code> using the configuration
+provided in <code class="xref py py-obj docutils literal notranslate"><span class="pre">config</span></code>.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.3.0: </span><a class="reference internal" href="#hydra_zen.experimental.hydra_run" title="hydra_zen.experimental.hydra_run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_run</span></code></a> will be removed in hydra-zen 1.0.0; it is replaced by
+<a class="reference internal" href="hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.launch()</span></code></a>.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>config</strong><span class="classifier">Union[DataClass, DictConfig, Mapping]</span></dt><dd><p>A configuration as a dataclass, configuration object, or a dictionary.</p>
+</dd>
+<dt><strong>task_function</strong><span class="classifier">Callable[[DictConfig], Any]</span></dt><dd><p>The function Hydra will execute with the given configuration.</p>
+</dd>
+<dt><strong>overrides</strong><span class="classifier">Optional[List[str]] (default: None)</span></dt><dd><p>If provided, overrides default configurations, see <a class="reference internal" href="#r8726529c3915-1" id="id1">[1]</a> and <a class="reference internal" href="#r8726529c3915-2" id="id2">[2]</a>.</p>
+</dd>
+<dt><strong>config_dir</strong><span class="classifier">Optional[Union[str, Path]] (default: None)</span></dt><dd><p>Add configuration directories if needed.</p>
+</dd>
+<dt><strong>config_name</strong><span class="classifier">str (default: “hydra_run”)</span></dt><dd><p>Name of the stored configuration in Hydra’s ConfigStore API.</p>
+</dd>
+<dt><strong>job_name</strong><span class="classifier">str (default: “hydra_run”)</span></dt><dd></dd>
+<dt><strong>with_log_configuration</strong><span class="classifier">bool (default: True)</span></dt><dd><p>Flag to configure logging subsystem from the loaded config</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>result</strong><span class="classifier">JobReturn</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="citation">
+<dt class="label" id="r8726529c3915-1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p><a class="reference external" href="https://hydra.cc/docs/next/advanced/override_grammar/basic">https://hydra.cc/docs/next/advanced/override_grammar/basic</a></p>
+</dd>
+<dt class="label" id="r8726529c3915-2"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p><a class="reference external" href="https://hydra.cc/docs/next/configure_hydra/intro">https://hydra.cc/docs/next/configure_hydra/intro</a></p>
+</dd>
+<dt class="label" id="r8726529c3915-3"><span class="brackets">3</span></dt>
+<dd><p><a class="reference external" href="https://hydra.cc/docs/tutorials/basic/running_your_app/multi-run">https://hydra.cc/docs/tutorials/basic/running_your_app/multi-run</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 </div>
 

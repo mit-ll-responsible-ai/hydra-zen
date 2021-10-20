@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>load_from_yaml &#8212; hydra-zen 0.3.0rc4+3.g81e1a7d documentation</title>
+    <title>load_from_yaml &#8212; hydra-zen 0.3.0rc5+1.g19538fd documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -35,7 +35,7 @@
     <link rel="shortcut icon" href="../_static/hydra_zen_favicon_32x32.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="launch" href="hydra_zen.launch.html" />
+    <link rel="next" title="validates_with_beartype" href="hydra_zen.third_party.beartype.validates_with_beartype.html" />
     <link rel="prev" title="save_as_yaml" href="hydra_zen.save_as_yaml.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -164,6 +164,25 @@
   <div class="bd-toc-item active">
     <ul class="nav bd-sidenav">
  <li class="toctree-l1">
+  <a class="reference internal" href="hydra_zen.launch.html">
+   launch
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="hydra_zen.experimental.hydra_run.html">
+   hydra_run
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="hydra_zen.experimental.hydra_multirun.html">
+   hydra_multirun
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
   <a class="reference internal" href="hydra_zen.make_config.html">
    make_config
   </a>
@@ -227,13 +246,6 @@
 </ul>
 <ul class="nav bd-sidenav">
  <li class="toctree-l1">
-  <a class="reference internal" href="hydra_zen.launch.html">
-   launch
-  </a>
- </li>
-</ul>
-<ul class="nav bd-sidenav">
- <li class="toctree-l1">
   <a class="reference internal" href="hydra_zen.third_party.beartype.validates_with_beartype.html">
    validates_with_beartype
   </a>
@@ -284,12 +296,13 @@
 <dl class="py function">
 <dt id="hydra_zen.load_from_yaml">
 <code class="sig-prename descclassname"><span class="pre">hydra_zen.</span></code><code class="sig-name descname"><span class="pre">load_from_yaml</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/_hydra_overloads.html#load_from_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.load_from_yaml" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load as configuration object from a yaml-format file</p>
+<dd><p>Load a config from a yaml-format file</p>
 <p>This is an alias of <code class="docutils literal notranslate"><span class="pre">omegaconf.OmegaConf.load</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>file_</strong><span class="classifier">str | pathlib.Path | IO[Any]</span></dt><dd><p>A valid config object (e.g. a structured config produced by <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>)</p>
+<dt><strong>file_</strong><span class="classifier">str | pathlib.Path | IO[Any]</span></dt><dd><p>The path to the yaml-formatted file, or the file object, that the config
+will be loaded from.</p>
 </dd>
 </dl>
 </dd>
@@ -299,14 +312,30 @@
 </dl>
 </dd>
 </dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="hydra_zen.save_as_yaml.html#hydra_zen.save_as_yaml" title="hydra_zen.save_as_yaml"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_as_yaml</span></code></a></dt><dd><p>Save a config to a yaml-format file.</p>
+</dd>
+<dt><a class="reference internal" href="hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_yaml</span></code></a></dt><dd><p>Serialize a config as a yaml-formatted string.</p>
+</dd>
+</dl>
+</div>
 <p class="rubric">References</p>
-<p>[1].. <a class="reference external" href="https://omegaconf.readthedocs.io/en/2.0_branch/usage.html#save-load-yaml-file">https://omegaconf.readthedocs.io/en/2.0_branch/usage.html#save-load-yaml-file</a></p>
+<dl class="citation">
+<dt class="label" id="rd4537f94edc0-1"><span class="brackets">1</span></dt>
+<dd><p><a class="reference external" href="https://omegaconf.readthedocs.io/en/2.0_branch/usage.html#save-load-yaml-file">https://omegaconf.readthedocs.io/en/2.0_branch/usage.html#save-load-yaml-file</a></p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">builds</span><span class="p">,</span> <span class="n">save_as_yaml</span><span class="p">,</span> <span class="n">load_from_yaml</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">hello</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">goodbye</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">save_as_yaml</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="s2">&quot;test.yaml&quot;</span><span class="p">)</span>  <span class="c1"># file written to: test.yaml</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">make_config</span><span class="p">,</span> <span class="n">save_as_yaml</span><span class="p">,</span> <span class="n">load_from_yaml</span>
+</pre></div>
+</div>
+<p><strong>Basic usage</strong></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="s2">&quot;foo&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">save_as_yaml</span><span class="p">(</span><span class="n">Conf</span><span class="p">,</span> <span class="s2">&quot;test.yaml&quot;</span><span class="p">)</span>  <span class="c1"># file written to: test.yaml</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">load_from_yaml</span><span class="p">(</span><span class="s2">&quot;test.yaml&quot;</span><span class="p">)</span>
-<span class="go">{&#39;_target_&#39;: &#39;builtins.dict&#39;, &#39;hello&#39;: 10, &#39;goodbye&#39;: 2}</span>
+<span class="go">{&#39;a&#39;: 1, &#39;b&#39;: &#39;foo&#39;}</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -326,10 +355,10 @@
             <p class="prev-next-title">save_as_yaml</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="hydra_zen.launch.html" title="next page">
+    <a class='right-next' id="next-link" href="hydra_zen.third_party.beartype.validates_with_beartype.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">launch</p>
+        <p class="prev-next-title">validates_with_beartype</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

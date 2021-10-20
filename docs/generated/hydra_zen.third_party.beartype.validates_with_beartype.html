@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>validates_with_beartype &#8212; hydra-zen 0.3.0rc4+3.g81e1a7d documentation</title>
+    <title>validates_with_beartype &#8212; hydra-zen 0.3.0rc5+1.g19538fd documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -36,7 +36,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="validates_with_pydantic" href="hydra_zen.third_party.pydantic.validates_with_pydantic.html" />
-    <link rel="prev" title="launch" href="hydra_zen.launch.html" />
+    <link rel="prev" title="load_from_yaml" href="hydra_zen.load_from_yaml.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -164,6 +164,25 @@
   <div class="bd-toc-item active">
     <ul class="nav bd-sidenav">
  <li class="toctree-l1">
+  <a class="reference internal" href="hydra_zen.launch.html">
+   launch
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="hydra_zen.experimental.hydra_run.html">
+   hydra_run
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="hydra_zen.experimental.hydra_multirun.html">
+   hydra_multirun
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
   <a class="reference internal" href="hydra_zen.make_config.html">
    make_config
   </a>
@@ -222,13 +241,6 @@
  <li class="toctree-l1">
   <a class="reference internal" href="hydra_zen.load_from_yaml.html">
    load_from_yaml
-  </a>
- </li>
-</ul>
-<ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="hydra_zen.launch.html">
-   launch
   </a>
  </li>
 </ul>
@@ -303,30 +315,26 @@ wrapped in-place.</p>
 </dl>
 </dd>
 </dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="hydra_zen.third_party.pydantic.validates_with_pydantic.html#hydra_zen.third_party.pydantic.validates_with_pydantic" title="hydra_zen.third_party.pydantic.validates_with_pydantic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.third_party.pydantic.validates_with_pydantic</span></code></a></dt><dd></dd>
+</dl>
+</div>
 <p class="rubric">Notes</p>
-<p><code class="docutils literal notranslate"><span class="pre">beartype</span></code> <a class="reference internal" href="#rd5bfba2143d0-1" id="id1">[1]</a> must be installed as a separate dependency to leverage this validator.
-Using <code class="docutils literal notranslate"><span class="pre">validates_with_beartype</span></code> as a <code class="docutils literal notranslate"><span class="pre">zen_wrapper</span></code> will create a dependency on
-beartype among resulting yamls as well, these yamls will also be validated by beartype
-upon instantiation.</p>
-<p>Please refer to beartype’s documentation <a class="reference internal" href="#rd5bfba2143d0-2" id="id2">[2]</a> to see what varieties of types it does and
-does not support.</p>
-<p>It is recommended that <a class="reference internal" href="#hydra_zen.third_party.beartype.validates_with_beartype" title="hydra_zen.third_party.beartype.validates_with_beartype"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validates_with_beartype</span></code></a> be used in conjunction with
-the following <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code> settings:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">hydra_convert=&quot;all&quot;</span></code>: to ensure omegaconf containers are converted to std-lib types</p></li>
-</ul>
-<p><strong>Data Coercion Behavior</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">beartype</span></code> <a class="reference internal" href="#rd5bfba2143d0-1" id="id1">[1]</a> must be installed as a separate dependency to leverage this
+validator. Refer to beartype’s documentation <a class="reference internal" href="#rd5bfba2143d0-2" id="id2">[2]</a> to see what varieties of types it
+does and does not support.</p>
+<p>Using <code class="docutils literal notranslate"><span class="pre">validates_with_beartype</span></code> as a <code class="docutils literal notranslate"><span class="pre">zen_wrapper</span></code> will create a dependency on
+beartype among resulting yamls: these yamls will also be validated by
+beartype upon instantiation.</p>
+<p><strong>Data-Coercion Behavior</strong></p>
 <p>hydra-zen adds a data-coercion step that is not performed by <code class="docutils literal notranslate"><span class="pre">beartype</span></code>.
 This only impacts fields in <code class="docutils literal notranslate"><span class="pre">obj</span></code> annotated with a (non-string) sequence-type
-annotation, which are passed list-type data. All other fields rely solely on beartype’s
-native behavior.</p>
-<p>E.g. a field with a <code class="docutils literal notranslate"><span class="pre">Tuple</span></code>-annotation, if passed a list, will see that list be cast
-to a tuple. See the Examples section for more details.</p>
-<p>This coercion is necessary as Hydra can only read (non-string) sequential data
-from a config as a list. I.e. without this coercion step, all non-list/string annotated
-sequence fields populated by Hydra would get rasied (roared at) by beartype. Ultimately,
-this data-coercion strategy is designed to be as minimalistic as possible while ensuring
-that type-checked interfaces will be compatible with Hydra.</p>
+annotation, which are passed list-type data. All other fields rely solely on
+beartype’s native behavior.</p>
+<p>E.g. a field with a <code class="docutils literal notranslate"><span class="pre">Tuple</span></code>-annotation, if passed a list, will see that list be
+cast to a tuple. See the Examples section for more details.</p>
 <p class="rubric">References</p>
 <dl class="citation">
 <dt class="label" id="rd5bfba2143d0-1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
@@ -337,16 +345,23 @@ that type-checked interfaces will be compatible with Hydra.</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
+<p><strong>Basic usage</strong></p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen.third_party.beartype</span> <span class="kn">import</span> <span class="n">validates_with_beartype</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">beartype.cave</span> <span class="kn">import</span> <span class="n">ScalarTypes</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">beartype.cave</span> <span class="kn">import</span> <span class="n">ScalarTypes</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">ScalarTypes</span><span class="p">):</span> <span class="k">return</span> <span class="n">x</span>  <span class="c1"># a scalar is any real-valued number</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">val_f</span> <span class="o">=</span> <span class="n">validates_with_beartype</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>  <span class="c1"># doesn&#39;t catch bad input</span>
 <span class="go">[1, 2]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">val_f</span> <span class="o">=</span> <span class="n">validates_with_beartype</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>  <span class="c1"># f + validation</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">val_f</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
 <span class="go">BeartypeCallHintPepParamException: @beartyped f() parameter x=[1, 2] violates type hint [...]</span>
 </pre></div>
 </div>
+<p>Applying <a class="reference internal" href="#hydra_zen.third_party.beartype.validates_with_beartype" title="hydra_zen.third_party.beartype.validates_with_beartype"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validates_with_beartype</span></code></a> to a class-object will wrap its <code class="docutils literal notranslate"><span class="pre">__init__</span></code>
+method in-place.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">A</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">ScalarTypes</span><span class="p">):</span> <span class="o">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">validates_with_beartype</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>  <span class="c1"># wrapping occurs in-place</span>
@@ -355,17 +370,27 @@ that type-checked interfaces will be compatible with Hydra.</p>
 <span class="go">BeartypeCallHintPepParamException: @beartyped A.__init__() parameter x=[1, 2] violates type hint [...]</span>
 </pre></div>
 </div>
+<p><strong>Adding beartype validation to configs</strong></p>
 <p>This is designed to be used with the <code class="docutils literal notranslate"><span class="pre">zen_wrappers</span></code> feature of <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code>.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">builds</span><span class="p">,</span> <span class="n">instantiate</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># instantiations of `conf` will be validated by beartype</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">zen_wrappers</span><span class="o">=</span><span class="n">validates_with_beartype</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>  <span class="c1"># 10 is a scalar: ok!</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">zen_wrappers</span><span class="o">=</span><span class="n">validates_with_beartype</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Instantiating <code class="docutils literal notranslate"><span class="pre">Conf</span></code> will prompt <code class="docutils literal notranslate"><span class="pre">beartype</span></code> to check the types of configured
+parameters against the corresponding annotations on <code class="docutils literal notranslate"><span class="pre">f</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>  <span class="c1"># 10 is a scalar: ok!</span>
 <span class="go">10</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>  <span class="c1"># [1, 2] is not a scalar: roar!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>  <span class="c1"># [1, 2] is not a scalar: roar!</span>
 <span class="go">BeartypeCallHintPepParamException: @beartyped f() parameter x=[1, 2] violates type hint [...]</span>
 </pre></div>
 </div>
-<p>Note that sequence-coercion is enabled to ensure smooth compatibility with Hydra.</p>
+<p>Consider using <a class="reference internal" href="hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_custom_builds_fn()</span></code></a> to add validation to
+all configs.</p>
+<p><strong>Sequence-coercion behavior for compatibility with Hydra</strong></p>
+<p>Note that sequence-coercion is enabled to ensure smooth compatibility with Hydra,
+as Hydra will interpret all (non-string) sequential data structures as lists.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">):</span> <span class="k">return</span> <span class="n">x</span>  <span class="c1"># note the annotation</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
 <span class="go">[1, 2, 3]</span>
@@ -389,11 +414,11 @@ read non-string sequential data from configs as either of these two types</p>
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
-    <a class='left-prev' id="prev-link" href="hydra_zen.launch.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="hydra_zen.load_from_yaml.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">launch</p>
+            <p class="prev-next-title">load_from_yaml</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="hydra_zen.third_party.pydantic.validates_with_pydantic.html" title="next page">

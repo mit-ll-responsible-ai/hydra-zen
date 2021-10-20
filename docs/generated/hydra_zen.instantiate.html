@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>instantiate &#8212; hydra-zen 0.3.0rc4+3.g81e1a7d documentation</title>
+    <title>instantiate &#8212; hydra-zen 0.3.0rc5+1.g19538fd documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -164,6 +164,25 @@
   <div class="bd-toc-item active">
     <ul class="nav bd-sidenav">
  <li class="toctree-l1">
+  <a class="reference internal" href="hydra_zen.launch.html">
+   launch
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="hydra_zen.experimental.hydra_run.html">
+   hydra_run
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="hydra_zen.experimental.hydra_multirun.html">
+   hydra_multirun
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
   <a class="reference internal" href="hydra_zen.make_config.html">
    make_config
   </a>
@@ -227,13 +246,6 @@
 </ul>
 <ul class="nav bd-sidenav">
  <li class="toctree-l1">
-  <a class="reference internal" href="hydra_zen.launch.html">
-   launch
-  </a>
- </li>
-</ul>
-<ul class="nav bd-sidenav">
- <li class="toctree-l1">
   <a class="reference internal" href="hydra_zen.third_party.beartype.validates_with_beartype.html">
    validates_with_beartype
   </a>
@@ -284,48 +296,120 @@
 <dl class="py function">
 <dt id="hydra_zen.instantiate">
 <code class="sig-prename descclassname"><span class="pre">hydra_zen.</span></code><code class="sig-name descname"><span class="pre">instantiate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/_hydra_overloads.html#instantiate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.instantiate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Instantiates the object specified in the <code class="docutils literal notranslate"><span class="pre">_target_</span></code> field of <code class="docutils literal notranslate"><span class="pre">config</span></code>.</p>
-<p>Calls <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra.utils.instantiate(config,</span> <span class="pre">*args,</span> <span class="pre">**kwargs)</span></code></p>
-<p>This functions is identical to <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra.utils.instantiate</span></code>, but it provides
-useful static type information by leveraging the types defined in <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.typing</span></code>.</p>
-<dl class="field-list">
+<dd><p>Instantiates the target of a targeted config.</p>
+<p>By default, <a class="reference internal" href="#hydra_zen.instantiate" title="hydra_zen.instantiate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">instantiate</span></code></a> will recursively instantiate nested configurations <a class="reference internal" href="#rfffea48737d8-1" id="id1">[1]</a>.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl>
-<dt><strong>config</strong><span class="classifier">Instantiable[Type[T]]</span></dt><dd><p>The config object (dict or structured config) to be instantiated.</p>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>config</strong><span class="classifier">Builds[Type[T] | Callable[…, T]]</span></dt><dd><p>The targeted config whose target will be instantiated/called.</p>
 </dd>
-<dt><strong>*args: Any</strong></dt><dd><p>Positional parameters pass-through.</p>
+<dt><strong>*args: Any</strong></dt><dd><p>Override values, specified by-position. Take priority over
+the positional values provided by <code class="docutils literal notranslate"><span class="pre">config</span></code>.</p>
 </dd>
-<dt><strong>**kwargs</strong><span class="classifier">Any</span></dt><dd><p>Named parameters to override parameters in the config object.
-Parameters not present in the config objects are being passed as is to the target.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>IMPORTANT: dataclasses instances in kwargs are interpreted as config</dt><dd><p>and cannot be used as passthrough</p>
-</dd>
-</dl>
-</div></blockquote>
+<dt><strong>**kwargs</strong><span class="classifier">Any</span></dt><dd><p>Override values, specified by-name. Take priority over
+the named values provided by <code class="docutils literal notranslate"><span class="pre">config</span></code>.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt><strong>instantiated</strong><span class="classifier">T</span></dt><dd><p>The config, instantiated with the arguments specified in the config, and by
-<a href="#id1"><span class="problematic" id="id2">*</span></a>args and <a href="#id3"><span class="problematic" id="id4">**</span></a>kwargs.</p>
+<dt><strong>instantiated</strong><span class="classifier">T</span></dt><dd><p>The instantiated target. Instantiated using the values provided
+by <code class="docutils literal notranslate"><span class="pre">config</span></code> and/or overridden via <code class="docutils literal notranslate"><span class="pre">*args</span></code> and <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code>.</p>
 </dd>
 </dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a></dt><dd><p>Returns a config, which describes how to instantiate/call <code class="docutils literal notranslate"><span class="pre">&lt;hydra_target&gt;</span></code>.</p>
+</dd>
+<dt><a class="reference internal" href="hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a></dt><dd><p>Produces a config that, when instantiated by Hydra, “just” returns the un-instantiated target-object</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">Notes</p>
+<p>This is an alias for <code class="docutils literal notranslate"><span class="pre">hydra.utils.instantiate</span></code>, but adds additional static type
+information.</p>
+<p>During instantiation, Hydra performs runtime validation of data based on a limited set of
+type-annotations that can be associated with the fields of the provided config <a class="reference internal" href="#rfffea48737d8-2" id="id2">[2]</a> <a class="reference internal" href="#rfffea48737d8-3" id="id3">[3]</a>.</p>
+<p>Hydra supports a string-based syntax for variable interpolation, which enables configured
+values to be set in a self-referential and dynamic manner <a class="reference internal" href="#rfffea48737d8-4" id="id4">[4]</a>.</p>
+<p class="rubric">References</p>
+<dl class="citation">
+<dt class="label" id="rfffea48737d8-1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p><a class="reference external" href="https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation">https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation</a></p>
+</dd>
+<dt class="label" id="rfffea48737d8-2"><span class="brackets">2</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id10">2</a>)</span></dt>
+<dd><p><a class="reference external" href="https://omegaconf.readthedocs.io/en/latest/structured_config.html#simple-types">https://omegaconf.readthedocs.io/en/latest/structured_config.html#simple-types</a></p>
+</dd>
+<dt class="label" id="rfffea48737d8-3"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
+<dd><p><a class="reference external" href="https://omegaconf.readthedocs.io/en/latest/structured_config.html#runtime-type-validation-and-conversion">https://omegaconf.readthedocs.io/en/latest/structured_config.html#runtime-type-validation-and-conversion</a></p>
+</dd>
+<dt class="label" id="rfffea48737d8-4"><span class="brackets">4</span><span class="fn-backref">(<a href="#id4">1</a>,<a href="#id9">2</a>)</span></dt>
+<dd><p><a class="reference external" href="https://omegaconf.readthedocs.io/en/latest/usage.html#variable-interpolation">https://omegaconf.readthedocs.io/en/latest/usage.html#variable-interpolation</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">instantiate</span><span class="p">,</span> <span class="n">builds</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># type: Type[Builds[Type[dict]]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># static analysis can deduce that the result type is `dict`</span>
-<span class="go">{&#39;a&#39;: 1, &#39;b&#39;: 2, &#39;c&#39;: 3}</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">builds</span><span class="p">,</span> <span class="n">instantiate</span><span class="p">,</span> <span class="n">just</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>  <span class="c1"># type: Type[Builds[Type[list]]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>  <span class="c1"># static analysis can deduce that the result type is `list`</span>
-<span class="go">[1, 2, 3]</span>
+<p><strong>Basic Usage</strong></p>
+<p>Instantiating a config that targets a class/type.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ConfDict</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># a targeted config</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">ConfDict</span><span class="p">)</span>  <span class="c1"># calls `dict(x=1)`</span>
+<span class="go">{&#39;x&#39;: 1}</span>
 </pre></div>
 </div>
+<p>Instantiating a config that targets a function.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">z</span><span class="p">):</span> <span class="k">return</span> <span class="n">z</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ConfF</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">22</span><span class="p">)</span>  <span class="c1"># a targeted config</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">ConfF</span><span class="p">)</span>  <span class="c1"># calls `f(z=22)`</span>
+<span class="go">22</span>
+</pre></div>
+</div>
+<p>Providing a manual override, via <code class="docutils literal notranslate"><span class="pre">instantiate(...,</span> <span class="pre">**kwargs)</span></code></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">ConfF</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span>  <span class="c1"># calls `f(z=&#39;foo&#39;)`</span>
+<span class="go">&#39;foo&#39;</span>
+</pre></div>
+</div>
+<p>Recursive instantiation through nested configs.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">inner</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">outer</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">inner</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">outer</span><span class="p">)</span> <span class="c1"># calls `dict(a=dict(b=&#39;hi))`</span>
+<span class="go">{&#39;a&#39;: {&#39;b&#39;: &#39;hi&#39;}}</span>
+</pre></div>
+</div>
+<p><strong>Leveraging Variable Interpolation</strong></p>
+<p>Hydra provides a powerful language for absolute and relative
+interpolated variables among configs <a class="reference internal" href="#rfffea48737d8-4" id="id9">[4]</a>. Let’s make a config
+where multiple fields reference the field <code class="docutils literal notranslate"><span class="pre">name</span></code> via absolute
+interpolation.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">make_config</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{name}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{name}</span><span class="s2">&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Resolving the interpolation key: <code class="docutils literal notranslate"><span class="pre">name</span></code></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Jeff&quot;</span><span class="p">)</span>
+<span class="go">{&#39;a&#39;: &#39;Jeff&#39;, &#39;b&#39;: {&#39;x&#39;: &#39;Jeff&#39;}, &#39;name&#39;: &#39;Jeff&#39;}</span>
+</pre></div>
+</div>
+<p><strong>Runtime Data Validation via Hydra</strong></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span> <span class="k">return</span> <span class="n">x</span>  <span class="c1"># note the annotation: float</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Conf_g</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf_g</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="go">1.0</span>
+</pre></div>
+</div>
+<p>Passing a non-float to <code class="docutils literal notranslate"><span class="pre">x</span></code> will produce a validation error upon instantiation</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf_g</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;hi&#39;</span><span class="p">)</span>
+<span class="go">ValidationError: Value &#39;hi&#39; could not be converted to Float</span>
+<span class="go">    full_key: x</span>
+<span class="go">    object_type=Builds_g</span>
+</pre></div>
+</div>
+<p>Only a subset of primitive types are supported by Hydra’s validation system <a class="reference internal" href="#rfffea48737d8-2" id="id10">[2]</a>.
+See <a class="reference internal" href="../api_reference.html#data-val"><span class="std std-ref">Runtime Data Validation</span></a> for more general data validation capabilities via hydra-zen.</p>
 </dd></dl>
 
 </div>

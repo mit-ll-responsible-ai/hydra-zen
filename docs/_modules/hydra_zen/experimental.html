@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hydra_zen.experimental &#8212; hydra-zen 0.3.0rc4+3.g81e1a7d documentation</title>
+    <title>hydra_zen.experimental &#8212; hydra-zen 0.3.0rc5+1.g19538fd documentation</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -206,6 +206,45 @@
     <span class="n">job_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;hydra_run&quot;</span><span class="p">,</span>
     <span class="n">with_log_configuration</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;(Deprecated) Launch a Hydra job defined by `task_function` using the configuration</span>
+<span class="sd">    provided in `config`.</span>
+
+<span class="sd">    .. deprecated:: 0.3.0</span>
+<span class="sd">          `hydra_run` will be removed in hydra-zen 1.0.0; it is replaced by</span>
+<span class="sd">          :func:`hydra_zen.launch`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config : Union[DataClass, DictConfig, Mapping]</span>
+<span class="sd">        A configuration as a dataclass, configuration object, or a dictionary.</span>
+
+<span class="sd">    task_function : Callable[[DictConfig], Any]</span>
+<span class="sd">        The function Hydra will execute with the given configuration.</span>
+
+<span class="sd">    overrides : Optional[List[str]] (default: None)</span>
+<span class="sd">        If provided, overrides default configurations, see [1]_ and [2]_.</span>
+
+<span class="sd">    config_dir : Optional[Union[str, Path]] (default: None)</span>
+<span class="sd">        Add configuration directories if needed.</span>
+
+<span class="sd">    config_name : str (default: &quot;hydra_run&quot;)</span>
+<span class="sd">        Name of the stored configuration in Hydra&#39;s ConfigStore API.</span>
+
+<span class="sd">    job_name : str (default: &quot;hydra_run&quot;)</span>
+
+<span class="sd">    with_log_configuration : bool (default: True)</span>
+<span class="sd">        Flag to configure logging subsystem from the loaded config</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    result : JobReturn</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] https://hydra.cc/docs/next/advanced/override_grammar/basic</span>
+<span class="sd">    .. [2] https://hydra.cc/docs/next/configure_hydra/intro</span>
+<span class="sd">    .. [3] https://hydra.cc/docs/tutorials/basic/running_your_app/multi-run</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
         <span class="n">HydraZenDeprecationWarning</span><span class="p">(</span>
             <span class="s2">&quot;hydra_zen.experimental.hydra_run is deprecated &quot;</span>
@@ -218,12 +257,12 @@
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">launch</span><span class="p">(</span>
         <span class="n">config</span><span class="p">,</span>
-        <span class="n">task_function</span><span class="p">,</span>
-        <span class="n">overrides</span><span class="p">,</span>
-        <span class="n">config_dir</span><span class="p">,</span>
-        <span class="n">config_name</span><span class="p">,</span>
-        <span class="n">job_name</span><span class="p">,</span>
-        <span class="n">with_log_configuration</span><span class="p">,</span>
+        <span class="n">task_function</span><span class="o">=</span><span class="n">task_function</span><span class="p">,</span>
+        <span class="n">overrides</span><span class="o">=</span><span class="n">overrides</span><span class="p">,</span>
+        <span class="n">config_dir</span><span class="o">=</span><span class="n">config_dir</span><span class="p">,</span>
+        <span class="n">config_name</span><span class="o">=</span><span class="n">config_name</span><span class="p">,</span>
+        <span class="n">job_name</span><span class="o">=</span><span class="n">job_name</span><span class="p">,</span>
+        <span class="n">with_log_configuration</span><span class="o">=</span><span class="n">with_log_configuration</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
@@ -236,6 +275,45 @@
     <span class="n">job_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;hydra_run&quot;</span><span class="p">,</span>
     <span class="n">with_log_configuration</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;(Deprecated) Launch multiple Hydra jobs defined by `task_function` using the configuration</span>
+<span class="sd">    provided in `config`.</span>
+
+<span class="sd">    .. deprecated:: 0.3.0</span>
+<span class="sd">          `hydra_multirun` will be removed in hydra-zen 1.0.0; it is replaced by</span>
+<span class="sd">          :func:`hydra_zen.launch`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config : Union[DataClass, DictConfig, Mapping]</span>
+<span class="sd">        A configuration as a dataclass, configuration object, or a dictionary.</span>
+
+<span class="sd">    task_function : Callable[[DictConfig], Any]</span>
+<span class="sd">        The function Hydra will execute with the given configuration.</span>
+
+<span class="sd">    overrides : Optional[List[str]] (default: None)</span>
+<span class="sd">        If provided, overrides default configurations, see [1]_ and [2]_.</span>
+
+<span class="sd">    config_dir : Optional[Union[str, Path]] (default: None)</span>
+<span class="sd">        Add configuration directories if needed.</span>
+
+<span class="sd">    config_name : str (default: &quot;hydra_run&quot;)</span>
+<span class="sd">        Name of the stored configuration in Hydra&#39;s ConfigStore API.</span>
+
+<span class="sd">    job_name : str (default: &quot;hydra_run&quot;)</span>
+
+<span class="sd">    with_log_configuration : bool (default: True)</span>
+<span class="sd">        Flag to configure logging subsystem from the loaded config</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    result : Any</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] https://hydra.cc/docs/next/advanced/override_grammar/basic</span>
+<span class="sd">    .. [2] https://hydra.cc/docs/next/configure_hydra/intro</span>
+<span class="sd">    .. [3] https://hydra.cc/docs/tutorials/basic/running_your_app/multi-run</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
         <span class="n">HydraZenDeprecationWarning</span><span class="p">(</span>
             <span class="s2">&quot;hydra_zen.experimental.hydra_multirun is deprecated &quot;</span>
@@ -248,12 +326,12 @@
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">launch</span><span class="p">(</span>
         <span class="n">config</span><span class="p">,</span>
-        <span class="n">task_function</span><span class="p">,</span>
-        <span class="n">overrides</span><span class="p">,</span>
-        <span class="n">config_dir</span><span class="p">,</span>
-        <span class="n">config_name</span><span class="p">,</span>
-        <span class="n">job_name</span><span class="p">,</span>
-        <span class="n">with_log_configuration</span><span class="p">,</span>
+        <span class="n">task_function</span><span class="o">=</span><span class="n">task_function</span><span class="p">,</span>
+        <span class="n">overrides</span><span class="o">=</span><span class="n">overrides</span><span class="p">,</span>
+        <span class="n">config_dir</span><span class="o">=</span><span class="n">config_dir</span><span class="p">,</span>
+        <span class="n">config_name</span><span class="o">=</span><span class="n">config_name</span><span class="p">,</span>
+        <span class="n">job_name</span><span class="o">=</span><span class="n">job_name</span><span class="p">,</span>
+        <span class="n">with_log_configuration</span><span class="o">=</span><span class="n">with_log_configuration</span><span class="p">,</span>
         <span class="n">multirun</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span></div>
 </pre></div>

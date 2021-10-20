@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hydra_zen.structured_configs._implementations &#8212; hydra-zen 0.3.0rc4+3.g81e1a7d documentation</title>
+    <title>hydra_zen.structured_configs._implementations &#8212; hydra-zen 0.3.0rc5+1.g19538fd documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -216,12 +216,7 @@
 <span class="kn">from</span> <span class="nn">hydra_zen.funcs</span> <span class="kn">import</span> <span class="n">get_obj</span><span class="p">,</span> <span class="n">partial</span><span class="p">,</span> <span class="n">zen_processing</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.structured_configs</span> <span class="kn">import</span> <span class="n">_utils</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">Builds</span><span class="p">,</span> <span class="n">Importable</span><span class="p">,</span> <span class="n">Just</span><span class="p">,</span> <span class="n">PartialBuilds</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">DataClass</span><span class="p">,</span>
-    <span class="n">HasPartialTarget</span><span class="p">,</span>
-    <span class="n">HasTarget</span><span class="p">,</span>
-    <span class="n">_DataClass</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass</span><span class="p">,</span> <span class="n">HasPartialTarget</span><span class="p">,</span> <span class="n">HasTarget</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="c1"># used to check if default values are ufuncs</span>
@@ -347,7 +342,7 @@
 
 <span class="sd">    See https://docs.python.org/3/library/dataclasses.html#mutable-default-values</span>
 
-<span class="sd">    &gt;&gt;&gt; @dataclass</span>
+<span class="sd">    &gt;&gt;&gt; @dataclass  # doctest: +SKIP</span>
 <span class="sd">    ... class HasMutableDefault:</span>
 <span class="sd">    ...     a_list: list  = [1, 2, 3]  # error: mutable default</span>
 
@@ -401,21 +396,33 @@
     <span class="o">**</span><span class="n">_kw</span><span class="p">,</span>  <span class="c1"># reserved to deprecate hydra_partial</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">]],</span> <span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">]]:</span>
     <span class="sd">&quot;&quot;&quot;A decorator that uses `builds` to create a dataclass with the appropriate</span>
-<span class="sd">    hydra-specific fields for specifying a structured config [1]_.</span>
+<span class="sd">    Hydra-specific fields for specifying a targeted config [1]_.</span>
+
+<span class="sd">    This provides similar functionality to `builds`, but enables a user to define</span>
+<span class="sd">    a config explicitly using the :func:`dataclasses.dataclass` syntax.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    target : Union[Instantiable, Callable]</span>
-<span class="sd">        The object to be instantiated/called.</span>
+<span class="sd">    hydra_target : T (Callable)</span>
+<span class="sd">        The target-object to be configured. This is a required, positional-only argument.</span>
 
 <span class="sd">    *pos_args : Any</span>
-<span class="sd">        Positional arguments passed to ``target``.</span>
+<span class="sd">        Positional arguments passed as ``hydra_target(*pos_args, ...)`` upon instantiation.</span>
 
 <span class="sd">        Arguments specified positionally are not included in the dataclass&#39; signature and</span>
 <span class="sd">        are stored as a tuple bound to in the ``_args_`` field.</span>
 
-<span class="sd">    zen_partial : Optional[bool] (default=False)</span>
-<span class="sd">        If True, then hydra-instantiation produces ``functools.partial(target, **kwargs)``</span>
+<span class="sd">    zen_partial : bool, optional (default=False)</span>
+<span class="sd">        If ``True``, then the resulting config will instantiate as</span>
+<span class="sd">        ``functools.partial(hydra_target, *pos_args, **kwargs_for_target)`` rather than</span>
+<span class="sd">        ``hydra_target(*pos_args, **kwargs_for_target)``. Thus this enables the</span>
+<span class="sd">        partial-configuration of objects.</span>
+
+<span class="sd">        Specifying ``zen_partial=True`` and ``populate_full_signature=True`` together</span>
+<span class="sd">        will populate the config&#39;s signature only with parameters that: are explicitly</span>
+<span class="sd">        specified by the user, or that have default values specified in the target&#39;s</span>
+<span class="sd">        signature. I.e. it is presumed that un-specified parameters that have no</span>
+<span class="sd">        default values are to be excluded from the config.</span>
 
 <span class="sd">    zen_wrappers : None | Callable | Builds | InterpStr | Sequence[None | Callable | Builds | InterpStr]</span>
 <span class="sd">        One or more wrappers, which will wrap ``hydra_target`` prior to instantiation.</span>
@@ -423,49 +430,51 @@
 
 <span class="sd">            f3(f2(f1(hydra_target)))(*args, **kwargs)</span>
 
-<span class="sd">        Wrappers can also be specified as interpolated strings [2]_ or targeted structured</span>
+<span class="sd">        Wrappers can also be specified as interpolated strings [2]_ or targeted</span>
 <span class="sd">        configs.</span>
 
 <span class="sd">    zen_meta : Optional[Mapping[str, Any]]</span>
 <span class="sd">        Specifies field-names and corresponding values that will be included in the</span>
-<span class="sd">        resulting dataclass, but that will *not* be used to build ``hydra_target``</span>
+<span class="sd">        resulting config, but that will *not* be used to builds ``&lt;hydra_target&gt;``</span>
 <span class="sd">        via instantiation. These are called &quot;meta&quot; fields.</span>
 
 <span class="sd">    populate_full_signature : bool, optional (default=False)</span>
-<span class="sd">        If ``True``, then the resulting dataclass&#39;s signature and fields will be populated</span>
-<span class="sd">        according to the signature of ``hydra_target``.</span>
-
-<span class="sd">        Values specified in **kwargs_for_target take precedent over the corresponding</span>
-<span class="sd">        default values from the signature.</span>
+<span class="sd">        If ``True``, then the resulting config&#39;s signature and fields will be populated</span>
+<span class="sd">        according to the signature of ``hydra_target``; values also specified in</span>
+<span class="sd">        ``**kwargs_for_target`` take precedent.</span>
 
 <span class="sd">        This option is not available for objects with inaccessible signatures, such as</span>
 <span class="sd">        NumPy&#39;s various ufuncs.</span>
 
-<span class="sd">    hydra_recursive : bool, optional (default=True)</span>
-<span class="sd">        If True, then upon hydra will recursively instantiate all other</span>
-<span class="sd">        hydra-config objects nested within this dataclass [3]_.</span>
+<span class="sd">    hydra_recursive : Optional[bool], optional (default=True)</span>
+<span class="sd">        If ``True``, then Hydra will recursively instantiate all other</span>
+<span class="sd">        hydra-config objects nested within this config [3]_.</span>
 
-<span class="sd">        If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.</span>
+<span class="sd">        If ``None``, the ``_recursive_`` attribute is not set on the resulting config.</span>
 
-<span class="sd">    hydra_convert : Optional[Literal[&quot;none&quot;, &quot;partial&quot;, &quot;all&quot;]] (default=&quot;none&quot;)</span>
-<span class="sd">        Determines how hydra handles the non-primitive objects passed to `target` [4]_.</span>
+<span class="sd">        - ``&quot;none&quot;``: No conversion occurs; omegaconf containers are passed through (Default)</span>
+<span class="sd">        - ``&quot;partial&quot;``: ``DictConfig`` and ``ListConfig`` objects converted to ``dict`` and</span>
+<span class="sd">          ``list``, respectively. Structured configs and their fields are passed without conversion.</span>
+<span class="sd">        - ``&quot;all&quot;``: All passed objects are converted to dicts, lists, and primitives, without</span>
+<span class="sd">          a trace of OmegaConf containers.</span>
 
-<span class="sd">        - ``&quot;none&quot;``: Passed objects are DictConfig and ListConfig, default</span>
-<span class="sd">        - ``&quot;partial&quot;``: Passed objects are converted to dict and list, with</span>
-<span class="sd">          the exception of Structured Configs (and their fields).</span>
-<span class="sd">        - ``&quot;all&quot;``: Passed objects are dicts, lists and primitives without</span>
-<span class="sd">          a trace of OmegaConf containers</span>
-
-<span class="sd">        If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.</span>
+<span class="sd">        If ``None``, the ``_convert_`` attribute is not set on the resulting config.</span>
 
 <span class="sd">    frozen : bool, optional (default=False)</span>
-<span class="sd">        If `True`, the resulting dataclass will create frozen (i.e. immutable) instances.</span>
-<span class="sd">        I.e. setting/deleting an attribute of an instance will raise `FrozenInstanceError`</span>
-<span class="sd">        at runtime.</span>
+<span class="sd">        If ``True``, the resulting config will create frozen (i.e. immutable) instances.</span>
+<span class="sd">        I.e. setting/deleting an attribute of an instance will raise</span>
+<span class="sd">        :py:class:`dataclasses.FrozenInstanceError` at runtime.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 <span class="sd">    builds : Create a targeted structured config designed to &quot;build&quot; a particular object.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Unlike `builds`, `hydrated_dataclass` enables config fields to be set explicitly</span>
+<span class="sd">    with custom type annotations. Additionally, the resulting config&#39; attributes</span>
+<span class="sd">    can be analyzed by static tooling, which can help to warn about errors prior</span>
+<span class="sd">    to running one&#39;s code.</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -476,9 +485,13 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    A simple usage of `hydrated_dataclass`. Here, we specify a structured config</span>
+<span class="sd">    **Basic usage**</span>
 
 <span class="sd">    &gt;&gt;&gt; from hydra_zen import hydrated_dataclass, instantiate</span>
+
+<span class="sd">    Here, we specify a config that is designed to &quot;build&quot; a dictionary</span>
+<span class="sd">    upon instantiation</span>
+
 <span class="sd">    &gt;&gt;&gt; @hydrated_dataclass(target=dict)</span>
 <span class="sd">    ... class DictConf:</span>
 <span class="sd">    ...     x: int = 2</span>
@@ -486,42 +499,6 @@
 
 <span class="sd">    &gt;&gt;&gt; instantiate(DictConf(x=10))  # override default `x`</span>
 <span class="sd">    {&#39;x&#39;: 10, &#39;y&#39;: &#39;hello&#39;}</span>
-
-<span class="sd">    We can also design a configuration that only partially instantiates our target.</span>
-
-<span class="sd">    &gt;&gt;&gt; def power(x: float, exponent: float) -&gt; float: return x ** exponent</span>
-<span class="sd">    &gt;&gt;&gt; @hydrated_dataclass(target=power, zen_partial=True)</span>
-<span class="sd">    ... class PowerConf:</span>
-<span class="sd">    ...     exponent : float = 2.0</span>
-
-<span class="sd">    &gt;&gt;&gt; partiald_power = instantiate(PowerConf)</span>
-<span class="sd">    &gt;&gt;&gt; partiald_power(10.0)</span>
-<span class="sd">    100.0</span>
-
-<span class="sd">    Inheritance can be used to compose configurations</span>
-
-<span class="sd">    &gt;&gt;&gt; from dataclasses import dataclass</span>
-<span class="sd">    &gt;&gt;&gt; from torch.optim import AdamW</span>
-<span class="sd">    &gt;&gt;&gt; @dataclass</span>
-<span class="sd">    ... class AdamBaseConfig:</span>
-<span class="sd">    ...     lr: float = 0.001</span>
-<span class="sd">    ...     eps: float = 1e-8</span>
-
-<span class="sd">    &gt;&gt;&gt; @hydrated_dataclass(target=AdamW, zen_partial=True)</span>
-<span class="sd">    ... class AdamWConfig(AdamBaseConfig):</span>
-<span class="sd">    ...     weight_decay : float = 0.01</span>
-<span class="sd">    &gt;&gt;&gt; instantiate(AdamWConfig)</span>
-<span class="sd">    functools.partial(&lt;class &#39;torch.optim.adamw.AdamW&#39;&gt;, lr=0.001, eps=1e-08, weight_decay=0.01)</span>
-
-<span class="sd">    Because this decorator uses `hyda_utils.builds` under the hood, common mistakes like misspelled</span>
-<span class="sd">    parameters will be caught upon constructing the structured config.</span>
-
-<span class="sd">    &gt;&gt;&gt; @hydrated_dataclass(target=AdamW, zen_partial=True)</span>
-<span class="sd">    ... class AdamWConfig(AdamBaseConfig):</span>
-<span class="sd">    ...     wieght_decay : float = 0.01  # i before e, right!?</span>
-<span class="sd">    TypeError: Building: AdamW ..</span>
-<span class="sd">    The following unexpected keyword argument(s) for torch.optim.adamw.AdamW was specified via inheritance</span>
-<span class="sd">    from a base class: wieght_decay</span>
 
 <span class="sd">    For more detailed examples, refer to `builds`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -584,11 +561,8 @@
 
 
 <div class="viewcode-block" id="just"><a class="viewcode-back" href="../../../generated/hydra_zen.just.html#hydra_zen.just">[docs]</a><span class="k">def</span> <span class="nf">just</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Importable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span>
-    <span class="sd">&quot;&quot;&quot;Produces a structured config that, when instantiated by Hydra, &#39;just&#39;</span>
-<span class="sd">    returns the target (uninstantiated).</span>
-
-<span class="sd">    This is convenient for specifying a particular, un-instantiated object as part of your</span>
-<span class="sd">    configuration.</span>
+    <span class="sd">&quot;&quot;&quot;Produces a targeted config that, when instantiated by Hydra, &#39;just&#39;</span>
+<span class="sd">    returns the target (un-instantiated).</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -597,24 +571,56 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    Type[Just[Importable]]</span>
-<span class="sd">        The dataclass object that is designed as a structured config.</span>
+<span class="sd">    config : Type[Just[Importable]]</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    builds : Create a targeted structured config designed to &quot;build&quot; a particular object.</span>
+<span class="sd">    make_config: Creates a general config with customized field names, default values, and annotations.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    The configs produced by `just` introduce an explicit dependency on hydra-zen. I.e.</span>
-<span class="sd">    hydra-zen must be installed in order to instantiate the config.</span>
+<span class="sd">    hydra-zen must be installed in order to instantiate any config that used `just`.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
+<span class="sd">    **Basic usage**</span>
+
 <span class="sd">    &gt;&gt;&gt; from hydra_zen import just, instantiate, to_yaml</span>
-<span class="sd">    &gt;&gt;&gt; just_range = just(range)</span>
-<span class="sd">    &gt;&gt;&gt; range is instantiate(just_range)</span>
+
+<span class="sd">    &gt;&gt;&gt; Conf = just(range)</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(Conf) is range</span>
 <span class="sd">    True</span>
-<span class="sd">    &gt;&gt;&gt; just_range._target_</span>
-<span class="sd">    &#39;hydra_zen.funcs.get_obj&#39;</span>
-<span class="sd">    &gt;&gt;&gt; just_range.path</span>
-<span class="sd">    &#39;builtins.range&#39;</span>
+
+<span class="sd">    The config produced by `just` describes how to import the target,</span>
+<span class="sd">    not how to instantiate/call the object.</span>
+
+<span class="sd">    &gt;&gt;&gt; print(to_yaml(Conf))</span>
+<span class="sd">    _target_: hydra_zen.funcs.get_obj</span>
+<span class="sd">    path: builtins.range</span>
+
+<span class="sd">    **Auto-Application of just**</span>
+
+<span class="sd">    Both `builds` and `make_config` will automatically apply `just` to default values</span>
+<span class="sd">    that are function-objects or class objects. E.g. in the following example `just`</span>
+<span class="sd">    will be applied to ``sum``.</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydra_zen import make_config</span>
+<span class="sd">    &gt;&gt;&gt; Conf2 = make_config(data=[1, 2, 3], reduction_fn=sum)</span>
+
+<span class="sd">    &gt;&gt;&gt; print(to_yaml(Conf2))</span>
+<span class="sd">    data:</span>
+<span class="sd">    - 1</span>
+<span class="sd">    - 2</span>
+<span class="sd">    - 3</span>
+<span class="sd">    reduction_fn:</span>
+<span class="sd">      _target_: hydra_zen.funcs.get_obj</span>
+<span class="sd">      path: builtins.sum</span>
+
+<span class="sd">    &gt;&gt;&gt; conf = instantiate(Conf2)</span>
+<span class="sd">    &gt;&gt;&gt; conf.reduction_fn(conf.data)</span>
+<span class="sd">    6</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">obj_path</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
@@ -748,121 +754,125 @@
     <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]]:</span>
-    <span class="sd">&quot;&quot;&quot;builds(hydra_target, /, *pos_args, zen_partial=False, zen_meta=None, hydra_recursive=None, populate_full_signature=False, hydra_convert=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)</span>
+    <span class="sd">&quot;&quot;&quot;builds(hydra_target, /, *pos_args, zen_partial=False, zen_meta=None,</span>
+<span class="sd">    hydra_recursive=None, populate_full_signature=False, hydra_convert=None,</span>
+<span class="sd">    frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)</span>
 
-<span class="sd">    Returns a dataclass object that configures ``&lt;hydra_target&gt;`` with user-specified and auto-populated parameter</span>
-<span class="sd">    values.</span>
+<span class="sd">    Returns a config, which describes how to instantiate/call ``&lt;hydra_target&gt;`` with</span>
+<span class="sd">    user-specified and auto-populated parameter values.</span>
 
-<span class="sd">    The resulting dataclass is specifically a structured config [1]_ that enables Hydra to initialize/call</span>
-<span class="sd">    `target` either fully or partially. See Notes for additional features and explanation of implementation details.</span>
+<span class="sd">    Consult the Examples section of the docstring to see the various features of</span>
+<span class="sd">    `builds` in action.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    hydra_target : T (Callable)</span>
-<span class="sd">        The object to be configured. This is a required, positional-only argument.</span>
+<span class="sd">        The target-object to be configured. This is a required, **positional-only**</span>
+<span class="sd">        argument.</span>
 
 <span class="sd">    *pos_args : Any</span>
-<span class="sd">        Positional arguments passed to ``hydra_target``.</span>
+<span class="sd">        Positional arguments passed as ``&lt;hydra_target&gt;(*pos_args, ...)`` upon</span>
+<span class="sd">        instantiation.</span>
 
-<span class="sd">        Arguments specified positionally are not included in the dataclass&#39; signature and</span>
-<span class="sd">        are stored as a tuple bound to in the ``_args_`` field.</span>
+<span class="sd">        Arguments specified positionally are not included in the dataclass&#39; signature</span>
+<span class="sd">        and are stored as a tuple bound to in the ``_args_`` field.</span>
 
 <span class="sd">    **kwargs_for_target : Any</span>
-<span class="sd">        The keyword arguments passed to ``hydra_target(...)``.</span>
+<span class="sd">        The keyword arguments passed as ``&lt;hydra_target&gt;(..., **kwargs_for_target)``</span>
+<span class="sd">        upon instantiation.</span>
 
-<span class="sd">        The arguments specified here solely determine the fields and init-parameters of the</span>
-<span class="sd">        resulting dataclass, unless ``populate_full_signature=True`` is specified (see below).</span>
+<span class="sd">        The arguments specified here solely determine the signature of the resulting</span>
+<span class="sd">        config, unless ``populate_full_signature=True`` is specified (see below).</span>
 
-<span class="sd">        Named parameters of the forms ``hydra_xx``, ``zen_xx``, and ``_zen_xx`` are reserved</span>
-<span class="sd">        to ensure future-compatibility, and cannot be specified by the user.</span>
+<span class="sd">        Named parameters of the forms that have the prefixes ``hydra_``, ``zen_`` or ``_zen_`` are reserved to ensure future-compatibility, and thus cannot be</span>
+<span class="sd">        specified by the user.</span>
 
 <span class="sd">    zen_partial : bool, optional (default=False)</span>
-<span class="sd">        If True, then the resulting config will instantiate as</span>
-<span class="sd">        ``functools.partial(hydra_target, *pos_args, **kwargs_for_target)`` rather than</span>
-<span class="sd">        ``hydra_target(*pos_args, **kwargs_for_target)``.</span>
+<span class="sd">        If ``True``, then the resulting config will instantiate as</span>
+<span class="sd">        ``functools.partial(&lt;hydra_target&gt;, *pos_args, **kwargs_for_target)``. Thus</span>
+<span class="sd">        this enables the partial-configuration of objects.</span>
 
-<span class="sd">        Thus this enables the partial-configuration of objects.</span>
-
-<span class="sd">        Specifying ``zen_partial=True`` and ``populate_full_signature=True`` together will</span>
-<span class="sd">        populate the dataclass&#39; signature only with parameters that are specified by the</span>
-<span class="sd">        user or that have default values specified in the target&#39;s signature. I.e. it is</span>
-<span class="sd">        presumed that un-specified parameters are to be excluded from the partial configuration.</span>
+<span class="sd">        Specifying ``zen_partial=True`` and ``populate_full_signature=True`` together</span>
+<span class="sd">        will populate the config&#39;s signature only with parameters that: are explicitly</span>
+<span class="sd">        specified by the user, or that have default values specified in the target&#39;s</span>
+<span class="sd">        signature. I.e. it is presumed that un-specified parameters that have no</span>
+<span class="sd">        default values are to be excluded from the config.</span>
 
 <span class="sd">    zen_wrappers : None | Callable | Builds | InterpStr | Sequence[None | Callable | Builds | InterpStr]</span>
 <span class="sd">        One or more wrappers, which will wrap ``hydra_target`` prior to instantiation.</span>
 <span class="sd">        E.g. specifying the wrappers ``[f1, f2, f3]`` will instantiate as::</span>
 
-<span class="sd">            f3(f2(f1(hydra_target)))(*args, **kwargs)</span>
+<span class="sd">            f3(f2(f1(&lt;hydra_target&gt;)))(*args, **kwargs)</span>
 
-<span class="sd">        Wrappers can also be specified as interpolated strings [2]_ or targeted structured</span>
+<span class="sd">        Wrappers can also be specified as interpolated strings [2]_ or targeted</span>
 <span class="sd">        configs.</span>
 
 <span class="sd">    zen_meta : Optional[Mapping[str, Any]]</span>
 <span class="sd">        Specifies field-names and corresponding values that will be included in the</span>
-<span class="sd">        resulting dataclass, but that will *not* be used to build ``hydra_target``</span>
+<span class="sd">        resulting config, but that will *not* be used to builds ``&lt;hydra_target&gt;``</span>
 <span class="sd">        via instantiation. These are called &quot;meta&quot; fields.</span>
 
 <span class="sd">    populate_full_signature : bool, optional (default=False)</span>
-<span class="sd">        If ``True``, then the resulting dataclass&#39;s signature and fields will be populated</span>
-<span class="sd">        according to the signature of ``hydra_target``.</span>
-
-<span class="sd">        Values specified in **kwargs_for_target take precedent over the corresponding</span>
-<span class="sd">        default values from the signature.</span>
+<span class="sd">        If ``True``, then the resulting config&#39;s signature and fields will be populated</span>
+<span class="sd">        according to the signature of ``&lt;hydra_target&gt;``; values also specified in</span>
+<span class="sd">        ``**kwargs_for_target`` take precedent.</span>
 
 <span class="sd">        This option is not available for objects with inaccessible signatures, such as</span>
 <span class="sd">        NumPy&#39;s various ufuncs.</span>
 
 <span class="sd">    hydra_recursive : Optional[bool], optional (default=True)</span>
 <span class="sd">        If ``True``, then Hydra will recursively instantiate all other</span>
-<span class="sd">        hydra-config objects nested within this dataclass [3]_.</span>
+<span class="sd">        hydra-config objects nested within this config [3]_.</span>
 
-<span class="sd">        If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.</span>
+<span class="sd">        If ``None``, the ``_recursive_`` attribute is not set on the resulting config.</span>
 
 <span class="sd">    hydra_convert : Optional[Literal[&quot;none&quot;, &quot;partial&quot;, &quot;all&quot;]], optional (default=&quot;none&quot;)</span>
-<span class="sd">        Determines how Hydra handles the non-primitive objects passed to `target` [4]_.</span>
+<span class="sd">        Determines how Hydra handles the non-primitive, omegaconf-specific objects passed to</span>
+<span class="sd">        ``&lt;hydra_target&gt;`` [4]_.</span>
 
-<span class="sd">        - ``&quot;none&quot;``: Passed objects are DictConfig and ListConfig, default</span>
-<span class="sd">        - ``&quot;partial&quot;``: Passed objects are converted to dict and list, with</span>
-<span class="sd">          the exception of Structured Configs (and their fields).</span>
-<span class="sd">        - ``&quot;all&quot;``: Passed objects are dicts, lists and primitives without</span>
-<span class="sd">          a trace of OmegaConf containers</span>
+<span class="sd">        - ``&quot;none&quot;``: No conversion occurs; omegaconf containers are passed through (Default)</span>
+<span class="sd">        - ``&quot;partial&quot;``: ``DictConfig`` and ``ListConfig`` objects converted to ``dict`` and</span>
+<span class="sd">          ``list``, respectively. Structured configs and their fields are passed without conversion.</span>
+<span class="sd">        - ``&quot;all&quot;``: All passed objects are converted to dicts, lists, and primitives, without</span>
+<span class="sd">          a trace of OmegaConf containers.</span>
 
-<span class="sd">        If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.</span>
+<span class="sd">        If ``None``, the ``_convert_`` attribute is not set on the resulting config.</span>
 
 <span class="sd">    frozen : bool, optional (default=False)</span>
-<span class="sd">        If ``True``, the resulting dataclass will create frozen (i.e. immutable) instances.</span>
-<span class="sd">        I.e. setting/deleting an attribute of an instance will raise ``FrozenInstanceError``</span>
-<span class="sd">        at runtime.</span>
+<span class="sd">        If ``True``, the resulting config will create frozen (i.e. immutable) instances.</span>
+<span class="sd">        I.e. setting/deleting an attribute of an instance will raise</span>
+<span class="sd">        :py:class:`dataclasses.FrozenInstanceError` at runtime.</span>
 
 <span class="sd">    builds_bases : Tuple[DataClass, ...]</span>
-<span class="sd">        Specifies a tuple of parent classes that the resulting dataclass inherits from.</span>
-<span class="sd">        A ``PartialBuilds`` class (resulting from ``zen_partial=True``) cannot be a parent</span>
-<span class="sd">        of a ``Builds`` class (i.e. where `zen_partial=False` was specified).</span>
+<span class="sd">        Specifies a tuple of parent classes that the resulting config inherits from.</span>
+<span class="sd">        A ``PartialBuilds`` class (resulting from ``zen_partial=True``) cannot be a</span>
+<span class="sd">        parent of a ``Builds`` class (i.e. where `zen_partial=False` was specified).</span>
 
 <span class="sd">    dataclass_name : Optional[str]</span>
 <span class="sd">        If specified, determines the name of the returned class object.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    Config : Type[Builds[Type[T]]] |  Type[PartialBuilds[Type[T]]]</span>
-<span class="sd">        A structured config that builds ``hydra_target``</span>
+<span class="sd">    Config : Type[Builds[Type[T]]]</span>
+<span class="sd">        A structured config that describes how to build ``hydra_target``</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    Using any of the `zen_xx` features will result in a config that depends</span>
-<span class="sd">    explicitly on hydra-zen. (i.e. hydra-zen must be installed in order to</span>
-<span class="sd">    instantiate the resulting config, including its yaml version).</span>
+<span class="sd">    The resulting &quot;config&quot; is a dataclass-object [5]_ with Hydra-specific attributes</span>
+<span class="sd">    attached to it [1]_.</span>
+
+<span class="sd">    Using any of the ``zen_xx`` features will result in a config that depends</span>
+<span class="sd">    explicitly on hydra-zen. I.e. hydra-zen must be installed in order to</span>
+<span class="sd">    instantiate the resulting config, including its yaml version.</span>
 
 <span class="sd">    Type annotations are inferred from the target&#39;s signature and are only</span>
-<span class="sd">    retained if they are compatible with hydra&#39;s limited set of supported</span>
-<span class="sd">    annotations; otherwise `Any` is specified.</span>
+<span class="sd">    retained if they are compatible with Hydra&#39;s limited set of supported</span>
+<span class="sd">    annotations; otherwise an annotation is automatically &#39;broadened&#39; until</span>
+<span class="sd">    it is made compatible with Hydra.</span>
 
-<span class="sd">    `builds` provides runtime validation of user-specified named arguments against</span>
-<span class="sd">    the target&#39;s signature. This helps to ensure that typos in field names</span>
-<span class="sd">    fail early and explicitly.</span>
-
-<span class="sd">    Mutable values are automatically transformed to use a default factory [5]_</span>
-<span class="sd">    prior to setting them on the dataclass.</span>
+<span class="sd">    `builds` provides runtime validation of user-specified arguments against</span>
+<span class="sd">    the target&#39;s signature. E.g. specifying mis-named arguments or too many</span>
+<span class="sd">    arguments will cause `builds` to raise.</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -870,51 +880,102 @@
 <span class="sd">    .. [2] https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation</span>
 <span class="sd">    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation</span>
 <span class="sd">    .. [4] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies</span>
-<span class="sd">    .. [5] https://docs.python.org/3/library/dataclasses.html#mutable-default-values</span>
+<span class="sd">    .. [5] https://docs.python.org/3/library/dataclasses.html</span>
+<span class="sd">    .. [6] https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
-<span class="sd">    instantiate: Instantiates a configuration created by `builds`.</span>
-<span class="sd">    make_custom_builds_fn: Returns the `builds` function, but with customized default values.</span>
-<span class="sd">    make_config: Creates a config with customized field names, default values, and annotations.</span>
+<span class="sd">    instantiate: Instantiates a configuration created by `builds`, returning the instantiated target.</span>
+<span class="sd">    make_custom_builds_fn: Returns the `builds` function, but one with customized default values.</span>
+<span class="sd">    make_config: Creates a general config with customized field names, default values, and annotations.</span>
 <span class="sd">    get_target: Returns the target-object from a targeted structured config.</span>
-<span class="sd">    just: Produces a config that, when instantiated by Hydra, &quot;just&quot; returns the uninstantiated target.</span>
+<span class="sd">    just: Produces a config that, when instantiated by Hydra, &quot;just&quot; returns the un-instantiated target-object.</span>
+<span class="sd">    to_yaml: Serialize a config as a yaml-formatted string.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    Basic Usage:</span>
+<span class="sd">    **Basic Usage**</span>
+
+<span class="sd">    Lets create a basic config that describes how to &#39;build&#39; a particular dictionary.</span>
 
 <span class="sd">    &gt;&gt;&gt; from hydra_zen import builds, instantiate</span>
-<span class="sd">    &gt;&gt;&gt; Conf = builds(dict, a=1, b=&#39;x&#39;)  # makes a dataclass that will &quot;build&quot; a dictionary with the specified fields</span>
-<span class="sd">    &gt;&gt;&gt; Conf  # signature: c(a: Any = 1, b: Any = &#39;x&#39;)</span>
-<span class="sd">    types.Builds_dict</span>
-<span class="sd">    &gt;&gt;&gt; instantiate(Conf)  # using Hydra to &quot;instantiate&quot; this build</span>
+<span class="sd">    &gt;&gt;&gt; Conf = builds(dict, a=1, b=&#39;x&#39;)</span>
+
+<span class="sd">    The resulting config is a dataclass with the following signature and attributes:</span>
+
+<span class="sd">    &gt;&gt;&gt; Conf  # signature: Conf(a: Any = 1, b: Any = &#39;x&#39;)</span>
+<span class="sd">    &lt;class &#39;types.Builds_dict&#39;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; Conf.a</span>
+<span class="sd">    1</span>
+<span class="sd">    &gt;&gt;&gt; Conf.b</span>
+<span class="sd">    &#39;x&#39;</span>
+
+<span class="sd">    The `instantiate` function is used to enact this build – to create the dictionary.</span>
+
+<span class="sd">    &gt;&gt;&gt; instantiate(Conf)  # calls: `dict(a=1, b=&#39;x&#39;)`</span>
 <span class="sd">    {&#39;a&#39;: 1, &#39;b&#39;: &#39;x&#39;}</span>
-<span class="sd">    &gt;&gt;&gt; instantiate(Conf(a=10, b=&quot;hi&quot;))  # overriding configuration values</span>
+
+<span class="sd">    The default parameters that we provided can be overridden.</span>
+
+<span class="sd">    &gt;&gt;&gt; new_conf = Conf(a=10, b=&quot;hi&quot;)  # an instance of our dataclass</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(new_conf)  # calls: `dict(a=10, b=&#39;hi&#39;)`</span>
 <span class="sd">    {&#39;a&#39;: 10, &#39;b&#39;: &#39;hi&#39;}</span>
+
+<span class="sd">    Positional arguments can be provided too.</span>
 
 <span class="sd">    &gt;&gt;&gt; Conf = builds(len, [1, 2, 3])  # specifying positional arguments</span>
 <span class="sd">    &gt;&gt;&gt; instantiate(Conf)</span>
 <span class="sd">    3</span>
 
-<span class="sd">    Using `builds` to partially-configure a target</span>
+<span class="sd">    **Creating a Partial Config**</span>
+
+<span class="sd">    `builds` can be used to partially-configure a target. Let&#39;s</span>
+<span class="sd">    create a config for the following function</span>
 
 <span class="sd">    &gt;&gt;&gt; def a_two_tuple(x: int, y: float): return x, y</span>
+
+<span class="sd">    such that we only configure the parameter ``x``.</span>
+
 <span class="sd">    &gt;&gt;&gt; PartialConf = builds(a_two_tuple, x=1, zen_partial=True)  # configures only `x`</span>
+
+<span class="sd">    Instantiating this conf will return ``functools.partial(a_two_tuple, x=1)``.</span>
+
 <span class="sd">    &gt;&gt;&gt; partial_func = instantiate(PartialConf)</span>
 <span class="sd">    &gt;&gt;&gt; partial_func</span>
 <span class="sd">    functools.partial(&lt;function a_two_tuple at 0x00000220A7820EE0&gt;, x=1)</span>
-<span class="sd">    &gt;&gt;&gt; partial_func(y=22.0)  # y can be provided after configuration &amp; instantiation</span>
+
+<span class="sd">    And thus the remaining parameter can be provided post-instantiation.</span>
+
+<span class="sd">    &gt;&gt;&gt; partial_func(y=22.0)  # providing the remaining parameter</span>
 <span class="sd">    (1, 22.0)</span>
 
-<span class="sd">    Auto-populating parameters:</span>
+<span class="sd">    **Auto-populating parameters**</span>
 
-<span class="sd">    &gt;&gt;&gt; Conf = builds(a_two_tuple, populate_full_signature=True)</span>
-<span class="sd">    &gt;&gt;&gt; # signature: `Builds_a_two_tuple(x: int, y: float)`</span>
-<span class="sd">    &gt;&gt;&gt; instantiate(Conf(x=1, y=10.0))</span>
-<span class="sd">    (1, 10.0)</span>
+<span class="sd">    The configurable parameters of a target can be auto-populated in our config.</span>
+<span class="sd">    Suppose we want to configure the following function.</span>
 
-<span class="sd">    Inheritance:</span>
+<span class="sd">    &gt;&gt;&gt; def f(x: bool, y: str = &#39;foo&#39;): return x, y</span>
+
+<span class="sd">    The following config will have a signature that matches ``f``; the</span>
+<span class="sd">    annotations and default values of the parameters of ``f`` are explicitly</span>
+<span class="sd">    incorporated into the config.</span>
+
+<span class="sd">    &gt;&gt;&gt; Conf = builds(f, populate_full_signature=True)  # signature: `Builds_f(x: bool, y: str = &#39;foo&#39;)`</span>
+<span class="sd">    &gt;&gt;&gt; Conf.y</span>
+<span class="sd">    &#39;foo&#39;</span>
+
+<span class="sd">    Annotations will be used by Hydra to provide limited runtime type-checking during</span>
+<span class="sd">    instantiation. Here, we&#39;ll pass a float for ``x``, which expects a boolean value.</span>
+
+<span class="sd">    &gt;&gt;&gt; instantiate(Conf(x=10.0))</span>
+<span class="sd">    ValidationError: Value &#39;10.0&#39; is not a valid bool (type float)</span>
+<span class="sd">        full_key: x</span>
+<span class="sd">        object_type=Builds_f</span>
+
+<span class="sd">    **Composing configs via inheritance**</span>
+
+<span class="sd">    Because a config produced via `builds` is simply a class-object, we can</span>
+<span class="sd">    compose configs via class inheritance.</span>
 
 <span class="sd">    &gt;&gt;&gt; ParentConf = builds(dict, a=1, b=2)</span>
 <span class="sd">    &gt;&gt;&gt; ChildConf = builds(dict, b=-2, c=-3, builds_bases=(ParentConf,))</span>
@@ -923,7 +984,13 @@
 <span class="sd">    &gt;&gt;&gt; issubclass(ChildConf, ParentConf)</span>
 <span class="sd">    True</span>
 
-<span class="sd">    Leveraging meta-fields for portable, relative interpolation:</span>
+<span class="sd">    **Using meta-fields**</span>
+
+<span class="sd">    Meta-fields are fields that are included in a config but are excluded by the</span>
+<span class="sd">    instantiation process. Thus arbitrary metadata can be attached to a config.</span>
+
+<span class="sd">    Let&#39;s create a config whose fields reference a meta-field via</span>
+<span class="sd">    relative-interpolation [6]_.</span>
 
 <span class="sd">    &gt;&gt;&gt; Conf = builds(dict, a=&quot;${.s}&quot;, b=&quot;${.s}&quot;, zen_meta=dict(s=-10))</span>
 <span class="sd">    &gt;&gt;&gt; instantiate(Conf)</span>
@@ -931,14 +998,20 @@
 <span class="sd">    &gt;&gt;&gt; instantiate(Conf, s=2)</span>
 <span class="sd">    {&#39;a&#39;: 2, &#39;b&#39;: 2}</span>
 
-<span class="sd">    Leveraging zen-wrappers to inject unit-conversion capabilities. Let&#39;s take</span>
-<span class="sd">    a function that converts Farenheit to Celcius, and wrap it so that it converts</span>
-<span class="sd">    to Kelvin instead.</span>
+<span class="sd">    **Using zen-wrappers**</span>
 
-<span class="sd">    &gt;&gt;&gt; def faren_to_celsius(temp_f):</span>
+<span class="sd">    Zen-wrappers enables us to make arbitrary changes to ``&lt;hydra_target&gt;``, its inputs,</span>
+<span class="sd">    and/or its outputs during the instantiation process.</span>
+
+<span class="sd">    Let&#39;s use a wrapper to add a unit-conversion step to a config. We&#39;ll modify a</span>
+<span class="sd">    config that builds a function, which converts a temperature in Farenheit to</span>
+<span class="sd">    Celcius, and add a wrapper it so that it will convert from Farenheit to Kelvin</span>
+<span class="sd">    instead.</span>
+
+<span class="sd">    &gt;&gt;&gt; def faren_to_celsius(temp_f):  # our target</span>
 <span class="sd">    ...     return ((temp_f - 32) * 5) / 9</span>
 
-<span class="sd">    &gt;&gt;&gt; def change_celcius_to_kelvin(celc_func):</span>
+<span class="sd">    &gt;&gt;&gt; def change_celcius_to_kelvin(celc_func):  # our wrapper</span>
 <span class="sd">    ...     def wraps(*args, **kwargs):</span>
 <span class="sd">    ...         return 273.15 + celc_func(*args, **kwargs)</span>
 <span class="sd">    ...     return wraps</span>
@@ -949,6 +1022,37 @@
 <span class="sd">    0.0</span>
 <span class="sd">    &gt;&gt;&gt; instantiate(AsKelvin, temp_f=32)</span>
 <span class="sd">    273.15</span>
+
+<span class="sd">    **Creating a frozen config**</span>
+
+<span class="sd">    Let&#39;s create a config object whose instances will by &quot;frozen&quot; (i.e., immutable).</span>
+
+<span class="sd">    &gt;&gt;&gt; RouterConfig = builds(dict, ip_address=None, frozen=True)</span>
+<span class="sd">    &gt;&gt;&gt; my_router = RouterConfig(ip_address=&quot;192.168.56.1&quot;)  # an immutable instance</span>
+
+<span class="sd">    Attempting to overwrite the attributes of ``my_router`` will raise.</span>
+
+<span class="sd">    &gt;&gt;&gt; my_router.ip_address = &quot;148.109.37.2&quot;</span>
+<span class="sd">    FrozenInstanceError: cannot assign to field &#39;ip_address&#39;</span>
+
+<span class="sd">    **Runtime validation perfomed by builds**</span>
+
+<span class="sd">    Misspelled parameter names and other invalid configurations for the target’s</span>
+<span class="sd">    signature will be caught by `builds`, so that the error surfaces immediately while</span>
+<span class="sd">    creating the configuration.</span>
+
+<span class="sd">    &gt;&gt;&gt; def func(a_number: int): pass</span>
+
+<span class="sd">    &gt;&gt;&gt; builds(func, a_nmbr=2)  # misspelled parameter name</span>
+<span class="sd">    TypeError: Building: func ..</span>
+<span class="sd">    The following unexpected keyword argument(s) was specified for __main__.func via     `builds`: a_nmbr</span>
+
+<span class="sd">    &gt;&gt;&gt; builds(func, 1, 2)  # too many arguments</span>
+<span class="sd">    TypeError: Building: func ..</span>
+
+<span class="sd">    &gt;&gt;&gt; BaseConf = builds(func, a_number=2)</span>
+<span class="sd">    &gt;&gt;&gt; builds(func, 1, builds_bases=(BaseConf,))  # too many args (via inheritance)</span>
+<span class="sd">    TypeError: Building: func ..</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">pos_args</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">kwargs_for_target</span><span class="p">:</span>
@@ -1515,7 +1619,7 @@
         <span class="p">):</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># ensures we conver this branch in tests</span>
+            <span class="c1"># ensures we cover this branch in tests</span>
             <span class="k">return</span> <span class="kc">False</span>
     <span class="k">return</span> <span class="kc">False</span>
 
@@ -1559,43 +1663,61 @@
 
 <div class="viewcode-block" id="get_target"><a class="viewcode-back" href="../../../generated/hydra_zen.get_target.html#hydra_zen.get_target">[docs]</a><span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">HasTarget</span><span class="p">,</span> <span class="n">HasPartialTarget</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Returns the target-object from a targeted structured config.</span>
-
-<span class="sd">    The target is imported and returned if the config&#39;s ``_target_``</span>
-<span class="sd">    field is a string that indicates its location.</span>
+<span class="sd">    Returns the target-object from a targeted config.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    obj : HasTarget | HasPartialTarget</span>
+<span class="sd">    obj : HasTarget</span>
+<span class="sd">        An object with a ``_target_`` attribute.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    target : Any</span>
 
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    TypeError: ``obj`` does not have a ``_target_`` attribute.</span>
+
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; from hydra_zen import builds, just, get_target, load_from_yaml</span>
-<span class="sd">    &gt;&gt;&gt; get_target(builds(int))</span>
-<span class="sd">    int</span>
-<span class="sd">    &gt;&gt;&gt; get_target(just(str))</span>
-<span class="sd">    str</span>
+<span class="sd">    **Basic usage**</span>
 
-<span class="sd">    This works even if the ``_target_`` field specifies a string.</span>
+<span class="sd">    `get_target` works on all variety of configs produced by `builds` and</span>
+<span class="sd">    `just`.</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydra_zen import builds, just, get_target</span>
+<span class="sd">    &gt;&gt;&gt; get_target(builds(int))</span>
+<span class="sd">    &lt;class &#39;int&#39;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; get_target(builds(int, zen_partial=True))</span>
+<span class="sd">    &lt;class &#39;int&#39;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; get_target(just(str))</span>
+<span class="sd">    &lt;class &#39;str&#39;&gt;</span>
+
+<span class="sd">    It works for manually-defined configs:</span>
 
 <span class="sd">    &gt;&gt;&gt; from dataclasses import dataclass</span>
 <span class="sd">    &gt;&gt;&gt; @dataclass</span>
 <span class="sd">    ... class A:</span>
 <span class="sd">    ...     _target_: str = &quot;builtins.dict&quot;</span>
+
 <span class="sd">    &gt;&gt;&gt; get_target(A)</span>
-<span class="sd">    dict</span>
+<span class="sd">    &lt;class &#39;dict&#39;&gt;</span>
 
-<span class="sd">    This function is useful for accessing a target&#39;s type from a config</span>
-<span class="sd">    without having to instantiate the target. For example, suppose we want</span>
-<span class="sd">    to access a type from a yaml-serialized config.</span>
+<span class="sd">    and for configs loaded from yamls.</span>
 
-<span class="sd">    &gt;&gt;&gt; ModelConfig = load_from_yaml(&quot;model.yaml&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; get_target(ModelConfig)</span>
-<span class="sd">    CustomClassifier</span>
+<span class="sd">    &gt;&gt;&gt; from hydra_zen import load_from_yaml, save_as_yaml</span>
+
+<span class="sd">    &gt;&gt;&gt; class B: pass</span>
+<span class="sd">    &gt;&gt;&gt; Conf = builds(B)</span>
+
+<span class="sd">    &gt;&gt;&gt; save_as_yaml(Conf, &quot;config.yaml&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; loaded_conf = load_from_yaml(&quot;config.yaml&quot;)</span>
+
+<span class="sd">    Note that the target of ``loaded_conf`` can be accessed without</span>
+<span class="sd">    instantiating the config.</span>
+
+<span class="sd">    &gt;&gt;&gt; get_target(loaded_conf)</span>
+<span class="sd">    __main__.B</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">_is_old_partial_builds</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
         <span class="c1"># obj._partial_target_ is `Just[obj]`</span>
@@ -1656,78 +1778,33 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    zen_partial : bool, optional (default=False)</span>
-<span class="sd">        If True, then the resulting config will instantiate as</span>
-<span class="sd">        ``functools.partial(hydra_target, *pos_args, **kwargs_for_target)`` rather than</span>
-<span class="sd">        ``hydra_target(*pos_args, **kwargs_for_target)``.</span>
-
-<span class="sd">        Thus this enables the partial-configuration of objects.</span>
-
-<span class="sd">        Specifying ``zen_partial=True`` and ``populate_full_signature=True`` together will</span>
-<span class="sd">        populate the dataclass&#39; signature only with parameters that are specified by the</span>
-<span class="sd">        user or that have default values specified in the target&#39;s signature. I.e. it is</span>
-<span class="sd">        presumed that un-specified parameters are to be excluded from the partial configuration.</span>
+<span class="sd">        Specifies a new the default value for ``builds(..., zen_partial=&lt;..&gt;)``</span>
 
 <span class="sd">    zen_wrappers : None | Callable | Builds | InterpStr | Sequence[None | Callable | Builds | InterpStr]</span>
-<span class="sd">        One or more wrappers, which will wrap ``hydra_target`` prior to instantiation.</span>
-<span class="sd">        E.g. specifying the wrappers ``[f1, f2, f3]`` will instantiate as::</span>
-
-<span class="sd">            f3(f2(f1(hydra_target)))(*args, **kwargs)</span>
-
-<span class="sd">        Wrappers can also be specified as interpolated strings [1]_ or targeted structured</span>
-<span class="sd">        configs.</span>
+<span class="sd">        Specifies a new the default value for ``builds(..., zen_wrappers=&lt;..&gt;)``</span>
 
 <span class="sd">    zen_meta : Optional[Mapping[str, Any]]</span>
-<span class="sd">        Specifies field-names and corresponding values that will be included in the</span>
-<span class="sd">        resulting dataclass, but that will *not* be used to build ``hydra_target``</span>
-<span class="sd">        via instantiation. These are called &quot;meta&quot; fields.</span>
+<span class="sd">        Specifies a new the default value for ``builds(..., zen_meta=&lt;..&gt;)``</span>
 
 <span class="sd">    populate_full_signature : bool, optional (default=False)</span>
-<span class="sd">        If ``True``, then the resulting dataclass&#39;s signature and fields will be populated</span>
-<span class="sd">        according to the signature of ``hydra_target``.</span>
-
-<span class="sd">        Values specified in **kwargs_for_target take precedent over the corresponding</span>
-<span class="sd">        default values from the signature.</span>
-
-<span class="sd">        This option is not available for objects with inaccessible signatures, such as</span>
-<span class="sd">        NumPy&#39;s various ufuncs.</span>
+<span class="sd">        Specifies a new the default value for ``builds(..., populate_full_signature=&lt;..&gt;)``</span>
 
 <span class="sd">    hydra_recursive : Optional[bool], optional (default=True)</span>
-<span class="sd">        If ``True``, then Hydra will recursively instantiate all other</span>
-<span class="sd">        hydra-config objects nested within this dataclass [2]_.</span>
-
-<span class="sd">        If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.</span>
+<span class="sd">        Specifies a new the default value for ``builds(..., hydra_recursive=&lt;..&gt;)``</span>
 
 <span class="sd">    hydra_convert : Optional[Literal[&quot;none&quot;, &quot;partial&quot;, &quot;all&quot;]], optional (default=&quot;none&quot;)</span>
-<span class="sd">        Determines how hydra handles the non-primitive objects passed to ``hydra_target`` [3]_.</span>
-
-<span class="sd">        - ``&quot;none&quot;``: Passed objects are DictConfig and ListConfig, default</span>
-<span class="sd">        - ``&quot;partial&quot;``: Passed objects are converted to dict and list, with</span>
-<span class="sd">          the exception of Structured Configs (and their fields).</span>
-<span class="sd">        - ``&quot;all&quot;``: Passed objects are dicts, lists and primitives without</span>
-<span class="sd">          a trace of OmegaConf containers</span>
-
-<span class="sd">        If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.</span>
+<span class="sd">        Specifies a new the default value for ``builds(..., hydra_convert=&lt;..&gt;)``</span>
 
 <span class="sd">    frozen : bool, optional (default=False)</span>
-<span class="sd">        If ``True``, the resulting dataclass will create frozen (i.e. immutable) instances.</span>
-<span class="sd">        I.e. setting/deleting an attribute of an instance will raise ``FrozenInstanceError``</span>
-<span class="sd">        at runtime.</span>
+<span class="sd">        Specifies a new the default value for ``builds(..., frozen=&lt;..&gt;)``</span>
 
 <span class="sd">    builds_bases : Tuple[DataClass, ...]</span>
-<span class="sd">        Specifies a tuple of parent classes that the resulting dataclass inherits from.</span>
-<span class="sd">        A ``PartialBuilds`` class (resulting from ``zen_partial=True``) cannot be a parent</span>
-<span class="sd">        of a ``Builds`` class (i.e. where `zen_partial=False` was specified).</span>
+<span class="sd">        Specifies a new the default value for ``builds(..., builds_bases=&lt;..&gt;)``</span>
 
 <span class="sd">    returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    builds</span>
+<span class="sd">    custom_builds</span>
 <span class="sd">        The function `builds`, but with customized default-values.</span>
-
-<span class="sd">    References</span>
-<span class="sd">    ----------</span>
-<span class="sd">    .. [1] https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation</span>
-<span class="sd">    .. [2] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation</span>
-<span class="sd">    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -1736,6 +1813,8 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; from hydra_zen import builds, make_custom_builds_fn, instantiate</span>
+
+<span class="sd">    **Basic usage**</span>
 
 <span class="sd">    The following will create a `builds` function whose default-value</span>
 <span class="sd">    for ``zen_partial`` has been set to ``True``.</span>
@@ -1747,18 +1826,19 @@
 
 <span class="sd">    &gt;&gt;&gt; instantiate(pbuilds(int))  # calls `functools.partial(int)`</span>
 <span class="sd">    functools.partial(&lt;class &#39;int&#39;&gt;)</span>
-<span class="sd">    &gt;&gt;&gt; instantiate(builds(int, zen_partial=True))  # manually-overriding default</span>
-<span class="sd">    functools.partial(&lt;class &#39;int&#39;&gt;)</span>
 
-<span class="sd">    You can still specify ``zen_partial`` on a per-case basis with ``pbuilds``</span>
+<span class="sd">    You can still specify ``zen_partial`` on a per-case basis with ``pbuilds``.</span>
 
 <span class="sd">    &gt;&gt;&gt; instantiate(pbuilds(int, zen_partial=False))  # calls `int()`</span>
 <span class="sd">    0</span>
 
+<span class="sd">    **Adding data validation to configs**</span>
+
 <span class="sd">    Suppose that we want to enable runtime type-checking - using beartype -</span>
 <span class="sd">    whenever our configs are being instantiated; then the following settings</span>
-<span class="sd">    for `builds` would be handy</span>
+<span class="sd">    for `builds` would be handy.</span>
 
+<span class="sd">    &gt;&gt;&gt; # Note: beartype must be installed to use this feature</span>
 <span class="sd">    &gt;&gt;&gt; from hydra_zen.third_party.beartype import validates_with_beartype</span>
 <span class="sd">    &gt;&gt;&gt; build_a_bear = make_custom_builds_fn(</span>
 <span class="sd">    ...     populate_full_signature=True,</span>
@@ -1771,10 +1851,13 @@
 
 <span class="sd">    &gt;&gt;&gt; from typing_extensions import Literal</span>
 <span class="sd">    &gt;&gt;&gt; def f(x: Literal[&quot;a&quot;, &quot;b&quot;]): return x</span>
-<span class="sd">    &gt;&gt;&gt; conf = build_a_bear(f)</span>
-<span class="sd">    &gt;&gt;&gt; instantiate(conf, x=&quot;a&quot;)</span>
+
+<span class="sd">    &gt;&gt;&gt; Conf = build_a_bear(f)  # a conf that includes `validates_with_beartype`</span>
+
+<span class="sd">    &gt;&gt;&gt; instantiate(Conf, x=&quot;a&quot;)  # satisfies annotation: Literal[&quot;a&quot;, &quot;b&quot;]</span>
 <span class="sd">    &quot;a&quot;</span>
-<span class="sd">    &gt;&gt;&gt; instantiate(conf, x=&quot;c&quot;)</span>
+
+<span class="sd">    &gt;&gt;&gt; instantiate(conf, x=&quot;c&quot;)  # violates annotation: Literal[&quot;a&quot;, &quot;b&quot;]</span>
 <span class="sd">    &lt;Validation error: &quot;c&quot; is not &quot;a&quot; or &quot;b&quot;&gt;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">__b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">builds</span><span class="p">:</span>
@@ -1829,7 +1912,7 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    ``default`` will be returned as an instance of ``dataclasses.Field``.</span>
+<span class="sd">    ``default`` will be returned as an instance of :class:`dataclasses.Field`.</span>
 <span class="sd">    Mutable values (e.g. lists or dictionaries) passed to ``default`` will automatically</span>
 <span class="sd">    be &quot;packaged&quot; in a default-factory function [1]_.</span>
 
@@ -1871,11 +1954,11 @@
     <span class="o">**</span><span class="n">fields_as_kwargs</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataClass</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Creates a structured config with user-defined fieldnames and, optionally,</span>
+<span class="sd">    Creates a config with user-defined field names and, optionally,</span>
 <span class="sd">    associated default values and/or type-annotations.</span>
 
 <span class="sd">    Unlike `builds`, `make_config` is not used to configure a particular target</span>
-<span class="sd">    object, rather, it can be used to create more general structured configs [1]_.</span>
+<span class="sd">    object; rather, it can be used to create more general configs [1]_.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1896,10 +1979,10 @@
 <span class="sd">        If ``True``, then Hydra will recursively instantiate all other</span>
 <span class="sd">        hydra-config objects nested within this dataclass [2]_.</span>
 
-<span class="sd">        If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.</span>
+<span class="sd">        If ``None``, the ``_recursive_`` attribute is not set on the resulting config.</span>
 
 <span class="sd">    hydra_convert : Optional[Literal[&quot;none&quot;, &quot;partial&quot;, &quot;all&quot;]], optional (default=&quot;none&quot;)</span>
-<span class="sd">        Determines how Hydra handles the non-primitive objects passed to configuations [3]_.</span>
+<span class="sd">        Determines how Hydra handles the non-primitive objects passed to configuration [3]_.</span>
 
 <span class="sd">        - ``&quot;none&quot;``: Passed objects are DictConfig and ListConfig, default</span>
 <span class="sd">        - ``&quot;partial&quot;``: Passed objects are converted to dict and list, with</span>
@@ -1907,7 +1990,7 @@
 <span class="sd">        - ``&quot;all&quot;``: Passed objects are dicts, lists and primitives without</span>
 <span class="sd">            a trace of OmegaConf containers</span>
 
-<span class="sd">        If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.</span>
+<span class="sd">        If ``None``, the ``_convert_`` attribute is not set on the resulting config.</span>
 
 <span class="sd">    bases : Tuple[Type[DataClass], ...], optional (default=())</span>
 <span class="sd">        Base classes that the resulting config class will inherit from.</span>
@@ -1915,7 +1998,7 @@
 <span class="sd">    frozen : bool, optional (default=False)</span>
 <span class="sd">        If ``True``, the resulting config class will produce &#39;frozen&#39; (i.e. immutable) instances.</span>
 <span class="sd">        I.e. setting/deleting an attribute of an instance of the config will raise</span>
-<span class="sd">        ``dataclasses.FrozenInstanceError`` at runtime.</span>
+<span class="sd">        :py:class:`dataclasses.FrozenInstanceError` at runtime.</span>
 
 <span class="sd">    config_name : str, optional (default=&quot;Config&quot;)</span>
 <span class="sd">        The class name of the resulting config class.</span>
@@ -1927,19 +2010,22 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    Any field specified without a type-annotation is automatically annotated with ``typing.Any``.</span>
-<span class="sd">    Hydra only supports a narrow subset of types [4]_; `make_config` will automatically &#39;broaden&#39;</span>
+<span class="sd">    The resulting &quot;config&quot; is a dataclass-object [4]_ with Hydra-specific attributes</span>
+<span class="sd">    attached to it, along with the attributes specified via ``fields_as_args`` and</span>
+<span class="sd">    ``fields_as_kwargs``.</span>
+
+<span class="sd">    Any field specified without a type-annotation is automatically annotated with :py:class:`typing.Any`.</span>
+<span class="sd">    Hydra only supports a narrow subset of types [5]_; `make_config` will automatically &#39;broaden&#39;</span>
 <span class="sd">    any user-specified annotations so that they are compatible with Hydra.</span>
 
 <span class="sd">    `make_config` will automatically manipulate certain types of default values to ensure that</span>
-<span class="sd">    they can be utilized in the resulting dataclass and by Hydra:</span>
+<span class="sd">    they can be utilized in the resulting config and by Hydra:</span>
 
-<span class="sd">    - Mutable default values will automatically be packaged in a default factory function [5]_</span>
-<span class="sd">    - A default value that is a class-object or function-object will automatically be wrapped by</span>
-<span class="sd">    `just`, to ensure that the resulting config is serializable by Hydra.</span>
+<span class="sd">    - Mutable default values will automatically be packaged in a default factory function [6]_</span>
+<span class="sd">    - A default value that is a class-object or function-object will automatically be wrapped by `just`, to ensure that the resulting config is serializable by Hydra.</span>
 
 <span class="sd">    For finer-grain control over how type-annotations and default values are managed, consider using</span>
-<span class="sd">    ``dataclasses.make_dataclass`` [6]_.</span>
+<span class="sd">    :func:`dataclasses.make_dataclass`.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -1951,9 +2037,9 @@
 <span class="sd">    .. [1] https://hydra.cc/docs/next/tutorials/structured_config/intro/</span>
 <span class="sd">    .. [2] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation</span>
 <span class="sd">    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies</span>
-<span class="sd">    .. [4] https://hydra.cc/docs/next/tutorials/structured_config/intro/#structured-configs-supports</span>
-<span class="sd">    .. [5] https://docs.python.org/3/library/dataclasses.html#default-factory-functions</span>
-<span class="sd">    .. [6] https://docs.python.org/3/library/dataclasses.html#dataclasses.make_dataclass</span>
+<span class="sd">    .. [4] https://docs.python.org/3/library/dataclasses.html</span>
+<span class="sd">    .. [5] https://hydra.cc/docs/next/tutorials/structured_config/intro/#structured-configs-supports</span>
+<span class="sd">    .. [6] https://docs.python.org/3/library/dataclasses.html#default-factory-functions</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -1969,9 +2055,14 @@
 
 <span class="sd">    Now we&#39;ll configure these fields with particular values:</span>
 
-<span class="sd">    &gt;&gt;&gt; pp(Conf1(1, &quot;hi&quot;))</span>
+<span class="sd">    &gt;&gt;&gt; conf1 = Conf1(1, &quot;hi&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; pp(conf1)</span>
 <span class="sd">    a: 1</span>
 <span class="sd">    b: hi</span>
+<span class="sd">    &gt;&gt;&gt; conf1.a</span>
+<span class="sd">    1</span>
+<span class="sd">    &gt;&gt;&gt; conf1.b</span>
+<span class="sd">    &#39;hi&#39;</span>
 
 <span class="sd">    We can also specify fields via keyword args; this is especially convenient</span>
 <span class="sd">    for providing associated default values.</span>
@@ -2000,7 +2091,8 @@
 
 <span class="sd">    Configurations can be composed via inheritance</span>
 
-<span class="sd">    &gt;&gt;&gt; pp(make_config(c=2, bases=(Conf2, Conf1)))</span>
+<span class="sd">    &gt;&gt;&gt; ConfInherit = make_config(c=2, bases=(Conf2, Conf1))</span>
+<span class="sd">    &gt;&gt;&gt; pp(ConfInherit)</span>
 <span class="sd">    a: ???</span>
 <span class="sd">    b: ???</span>
 <span class="sd">    unit: ???</span>
@@ -2008,6 +2100,9 @@
 <span class="sd">    - -10</span>
 <span class="sd">    - -20</span>
 <span class="sd">    c: 2</span>
+
+<span class="sd">    &gt;&gt;&gt; issubclass(ConfInherit, Conf1) and issubclass(ConfInherit, Conf2)</span>
+<span class="sd">    True</span>
 
 <span class="sd">    **Using ZenField to Provide Type Information**</span>
 
@@ -2033,6 +2128,8 @@
 
 <span class="sd">    &gt;&gt;&gt; C2 = make_config(zf(name=&quot;username&quot;, hint=str), age=zf(int, 0))</span>
 <span class="sd">    &gt;&gt;&gt; # signature: C2(username: str, age: int = 0)</span>
+
+<span class="sd">    See :ref:`data-val` for more general data validation capabilities via hydra-zen.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">_field</span> <span class="ow">in</span> <span class="n">fields_as_args</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_field</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">)):</span>

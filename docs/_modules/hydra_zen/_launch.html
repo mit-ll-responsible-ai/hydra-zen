@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hydra_zen._launch &#8212; hydra-zen 0.3.0rc4+3.g81e1a7d documentation</title>
+    <title>hydra_zen._launch &#8212; hydra-zen 0.3.0rc5+1.g19538fd documentation</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -185,7 +185,7 @@
 <span></span><span class="c1"># Copyright (c) 2021 Massachusetts Institute of Technology</span>
 <span class="c1"># SPDX-License-Identifier: MIT</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">hydra._internal.callbacks</span> <span class="kn">import</span> <span class="n">Callbacks</span>
 <span class="kn">from</span> <span class="nn">hydra._internal.hydra</span> <span class="kn">import</span> <span class="n">Hydra</span>
@@ -234,75 +234,65 @@
 
 
 <div class="viewcode-block" id="launch"><a class="viewcode-back" href="../../generated/hydra_zen.launch.html#hydra_zen.launch">[docs]</a><span class="k">def</span> <span class="nf">launch</span><span class="p">(</span>
-    <span class="n">config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataClass</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">],</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataClass</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataClass</span><span class="p">],</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
     <span class="n">task_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">DictConfig</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
     <span class="n">overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">config_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;_zen_launch&quot;</span><span class="p">,</span>
-    <span class="n">job_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;_zen_launch&quot;</span><span class="p">,</span>
+    <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;zen_launch&quot;</span><span class="p">,</span>
+    <span class="n">job_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;zen_launch&quot;</span><span class="p">,</span>
     <span class="n">with_log_configuration</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">multirun</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">JobReturn</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Launch a Hydra job defined by `task_function` using the configuration</span>
-<span class="sd">    provided in `config`.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Launch a Hydra job using a Python-based interface.</span>
 
-<span class="sd">    Similar to how Hydra CLI works, `overrides` are a string list of configuration</span>
-<span class="sd">    values to use for a given experiment run.  For example, the Hydra CLI provided by::</span>
+<span class="sd">    `launch` is designed to closely match the interface of the standard Hydra CLI.</span>
+<span class="sd">    For example, launching a Hydra job from the CLI via::</span>
 
 <span class="sd">       $ python my_task.py job/group=group_name job.group.param=1</span>
 
-<span class="sd">    would be::</span>
+<span class="sd">    corresponds to the following usage of `launch`:</span>
 
 <span class="sd">       &gt;&gt;&gt; job = launch(config, task_function, overrides=[&quot;job/group=group_name&quot;, &quot;job.group.param=1&quot;])</span>
 
-<span class="sd">    This functions executes Hydra and therefore creates its own working directory.  See Configuring Hydra [2]_ for more</span>
-<span class="sd">    details on customizing Hydra.</span>
-
-<span class="sd">    Similarily, to launch a `multirun` job and sweep over parameters the Hydra CLI provided by::</span>
-
-<span class="sd">       $ python -m job.task_function job/group=group_name job.group.param=1,2,3 --multirun</span>
-
-<span class="sd">    would become::</span>
-
-<span class="sd">       &gt;&gt;&gt; job = launch(config, task_function, overrides=[&quot;job/group=group_name&quot;, &quot;job.group.param=1,2,3&quot;], multirun=True)</span>
-
-
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    config : Union[DataClass, DictConfig, Mapping]</span>
-<span class="sd">        A configuration as a dataclass, configuration object, or a dictionary.</span>
+<span class="sd">    config : DataClass | Type[DataClass] | Mapping[str, Any]</span>
+<span class="sd">        A config that will be passed to ``task_function``.</span>
 
 <span class="sd">    task_function : Callable[[DictConfig], Any]</span>
-<span class="sd">        The function Hydra will execute with the given configuration.</span>
+<span class="sd">        The function that Hydra will execute. Its input will be ``config``, which</span>
+<span class="sd">        has been modified via the specified ``overrides``</span>
 
-<span class="sd">    overrides : Optional[List[str]] (default: None)</span>
-<span class="sd">        If provided, overrides default configurations, see [1]_ and [2]_.</span>
+<span class="sd">    overrides : Optional[List[str]]</span>
+<span class="sd">        If provided, sets/overrides values in ``config``. See [1]_ and [2]_</span>
+<span class="sd">        for a detailed discussion of the &quot;grammar&quot; supported by ``overrides``.</span>
 
-<span class="sd">    config_dir : Optional[Union[str, Path]] (default: None)</span>
-<span class="sd">        Add configuration directories if needed.</span>
+<span class="sd">    config_dir : Optional[Union[str, Path]]</span>
+<span class="sd">        The config path: a directory where Hydra will search for configs.</span>
 
-<span class="sd">    config_name : str (default: &quot;hydra_run&quot;)</span>
+<span class="sd">    config_name : str (default: &quot;zen_launch&quot;)</span>
 <span class="sd">        Name of the stored configuration in Hydra&#39;s ConfigStore API.</span>
 
-<span class="sd">    job_name : str (default: &quot;hydra_run&quot;)</span>
+<span class="sd">    job_name : str (default: &quot;zen_launch&quot;)</span>
 
 <span class="sd">    with_log_configuration : bool (default: True)</span>
-<span class="sd">        Flag to configure logging subsystem from the loaded config</span>
+<span class="sd">        If ``True``, enables the configuration of the logging subsystem from the loaded config.</span>
 
 <span class="sd">    multirun : bool (default: False)</span>
-<span class="sd">        Launch a Hydra multi-run ([3]_)</span>
+<span class="sd">        Launch a Hydra multi-run ([3]_).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    result : JobReturn | Any</span>
-<span class="sd">        If ``multirun = False``:</span>
-<span class="sd">            A ``JobReturn`` object storing the results of the Hydra experiment.</span>
-<span class="sd">                - overrides: From `overrides` and `multirun_overrides`</span>
-<span class="sd">                - return_value: The return value of the task function</span>
-<span class="sd">                - cfg: The configuration object sent to the task function</span>
-<span class="sd">                - hydra_cfg: The hydra configuration object</span>
-<span class="sd">                - working_dir: The experiment working directory</span>
-<span class="sd">                - task_name: The task name of the Hydra job</span>
+<span class="sd">        If ``multirun is False``:</span>
+<span class="sd">            A ``JobReturn`` object storing the results of the Hydra experiment via the following attributes</span>
+<span class="sd">                - ``cfg``: Reflects ``config``</span>
+<span class="sd">                - ``overrides``: Reflects ``overrides``</span>
+<span class="sd">                - ``return_value``: The return value of the task function</span>
+<span class="sd">                - ``hydra_cfg``: The Hydra configuration object</span>
+<span class="sd">                - ``working_dir``: The experiment working directory</span>
+<span class="sd">                - ``task_name``: The task name of the Hydra job</span>
+<span class="sd">                - ``status``: A ``JobStatus`` enum reporting whether or not the job completed successfully</span>
 <span class="sd">        Else:</span>
 <span class="sd">            Return values of all launched jobs (depends on the Sweeper implementation).</span>
 
@@ -314,63 +304,87 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    Simple Hydra run:</span>
 
-<span class="sd">    &gt;&gt;&gt; from hydra_zen import instantiate, builds, launch</span>
-<span class="sd">    &gt;&gt;&gt; job = launch(builds(dict, a=1, b=1), task_function=instantiate)</span>
-<span class="sd">    &gt;&gt;&gt; job.return_value</span>
-<span class="sd">    {&#39;a&#39;: 1, &#39;b&#39;: 1}</span>
+<span class="sd">    **Basic usage**</span>
 
-<span class="sd">    Using a more complex task function:</span>
+<span class="sd">    Let&#39;s define and launch a trivial Hydra app.</span>
 
-<span class="sd">    &gt;&gt;&gt; cfg = dict(f=builds(pow, exp=2, zen_partial=True), x=10)</span>
-<span class="sd">    &gt;&gt;&gt; def task_function(cfg):</span>
-<span class="sd">    ...    return instantiate(cfg.f)(cfg.x)</span>
+<span class="sd">    &gt;&gt;&gt; from hydra_zen import make_config, launch, to_yaml</span>
 
-<span class="sd">    Launch a job to evaluate the function using the given configuration:</span>
+<span class="sd">    First, we will define a config, which determines the configurable interface to our</span>
+<span class="sd">    &quot;app&quot;. For the purpose of example, we&#39;ll design the &quot;interface&quot; of this config to accept</span>
+<span class="sd">    two configurable parameters: ``a`` and ``b``.</span>
 
-<span class="sd">    &gt;&gt;&gt; job = launch(cfg, task_function)</span>
-<span class="sd">    &gt;&gt;&gt; job.return_value</span>
-<span class="sd">    100</span>
+<span class="sd">    &gt;&gt;&gt; Conf = make_config(&quot;a&quot;, &quot;b&quot;)</span>
 
-<span class="sd">    Next, a Hydra multi-run can be launched by setting `multirun=True`:</span>
+<span class="sd">    Our task function accepts the config as an input and uses it to run some generic functionality.</span>
+<span class="sd">    For simplicity&#39;s sake, let&#39;s design this task function to: convert the job&#39;s config to a</span>
+<span class="sd">    yaml-formatted string, print it, and then return the string.</span>
 
-<span class="sd">    &gt;&gt;&gt; job = launch(</span>
-<span class="sd">    ...     builds(dict, a=1, b=1),</span>
-<span class="sd">    ...     task_function=instantiate,</span>
-<span class="sd">    ...     overrides=[&quot;a=1,2&quot;],</span>
-<span class="sd">    ...     multirun=True</span>
+<span class="sd">    &gt;&gt;&gt; def task_fn(cfg):</span>
+<span class="sd">    ...     out = to_yaml(cfg)  # task&#39;s input config, converted to yaml-string</span>
+<span class="sd">    ...     print(out)</span>
+<span class="sd">    ...     return out</span>
+
+<span class="sd">    Now, let&#39;s use `launch` to run this task function via Hydra, using particular configured</span>
+<span class="sd">    values (or, &quot;overrides&quot;) for ``a`` and ``b``.</span>
+
+<span class="sd">    &gt;&gt;&gt; job_out = launch(Conf, task_fn, overrides=[&quot;a=1&quot;, &quot;b=&#39;foo&#39;&quot;])</span>
+<span class="sd">    a: 1</span>
+<span class="sd">    b: foo</span>
+
+<span class="sd">    Let&#39;s inspect ``job_out`` to see the ways that it summarizes the results of this job.</span>
+
+<span class="sd">    &gt;&gt;&gt; job_out.return_value  # the value returned by `task_fn`</span>
+<span class="sd">    &#39;a: 1\nb: foo\n&#39;</span>
+
+<span class="sd">    &gt;&gt;&gt; job_out.working_dir  # where the job&#39;s outputs, logs, and configs are saved</span>
+<span class="sd">    &#39;outputs/2021-10-19/15-27-11&#39;</span>
+
+<span class="sd">    &gt;&gt;&gt; job_out.cfg  # the particular config used to run our task-function</span>
+<span class="sd">    {&#39;a&#39;: 1, &#39;b&#39;: &#39;foo&#39;}</span>
+
+<span class="sd">    &gt;&gt;&gt; job_out.overrides  # the overrides that we provides</span>
+<span class="sd">    [&#39;a=1&#39;, &quot;b=&#39;foo&#39;&quot;]</span>
+
+<span class="sd">    &gt;&gt;&gt; job_out.status  # the job&#39;s completion status</span>
+<span class="sd">    &lt;JobStatus.COMPLETED: 1&gt;</span>
+
+<span class="sd">    **Launching a multirun job**</span>
+
+<span class="sd">    We can launch multiple runs of our task-function, using various configured values.</span>
+<span class="sd">    Let&#39;s launch a multirun that sweeps over three configurations</span>
+
+<span class="sd">    &gt;&gt;&gt; (outputs,) = launch(</span>
+<span class="sd">    ...     Conf,</span>
+<span class="sd">    ...     task_fn,</span>
+<span class="sd">    ...     overrides=[&quot;a=1,2,3&quot;, &quot;b=&#39;bar&#39;&quot;],</span>
+<span class="sd">    ...     multirun=True,</span>
 <span class="sd">    ... )</span>
-<span class="sd">    &gt;&gt;&gt; [j.return_value for j in job[0]]</span>
-<span class="sd">    [{&#39;a&#39;: 1, &#39;b&#39;: 1}, {&#39;a&#39;: 2, &#39;b&#39;: 1}]</span>
+<span class="sd">    [2021-10-19 17:50:07,334][HYDRA] Launching 3 jobs locally</span>
+<span class="sd">    [2021-10-19 17:50:07,334][HYDRA] 	#0 : a=1 b=&#39;bar&#39;</span>
+<span class="sd">    a: 1</span>
+<span class="sd">    b: bar</span>
+<span class="sd">    [2021-10-19 17:50:07,434][HYDRA] 	#1 : a=2 b=&#39;bar&#39;</span>
+<span class="sd">    a: 2</span>
+<span class="sd">    b: bar</span>
+<span class="sd">    [2021-10-19 17:50:07,535][HYDRA] 	#2 : a=3 b=&#39;bar&#39;</span>
+<span class="sd">    a: 3</span>
+<span class="sd">    b: bar</span>
 
-<span class="sd">    Launch a multi-run over a list of different `x` values using Hydra&#39;s override syntax `range`:</span>
+<span class="sd">    ``outputs`` contains three corresponding ``JobReturns`` instances.</span>
 
-<span class="sd">    &gt;&gt;&gt; jobs = launch(cfg, task_function, overrides=[&quot;x=range(-2,3)&quot;], multirun=True)</span>
-<span class="sd">    &gt;&gt;&gt; [j.return_value for j in jobs[0]]</span>
-<span class="sd">    [4, 1, 0, 1, 4]</span>
+<span class="sd">    &gt;&gt;&gt; len(outputs)</span>
+<span class="sd">    3</span>
+<span class="sd">    &gt;&gt;&gt; [j.cfg for j in outputs]</span>
+<span class="sd">    [{&#39;a&#39;: 1, &#39;b&#39;: &#39;bar&#39;}, {&#39;a&#39;: 2, &#39;b&#39;: &#39;bar&#39;}, {&#39;a&#39;: 3, &#39;b&#39;: &#39;bar&#39;}]</span>
 
-<span class="sd">    An example using PyTorch</span>
+<span class="sd">    Each run&#39;s outputs, logs, and configs are saved to separate working directories</span>
 
-<span class="sd">    &gt;&gt;&gt; from torch.optim import Adam</span>
-<span class="sd">    &gt;&gt;&gt; from torch.nn import Linear</span>
-<span class="sd">    &gt;&gt;&gt; AdamConfig = builds(Adam, lr=0.001, zen_partial=True)</span>
-<span class="sd">    &gt;&gt;&gt; ModelConfig = builds(Linear, in_features=1, out_features=1)</span>
-<span class="sd">    &gt;&gt;&gt; cfg = dict(optim=AdamConfig(), model=ModelConfig())</span>
-<span class="sd">    &gt;&gt;&gt; def task_function(cfg):</span>
-<span class="sd">    ...     cfg = instantiate(cfg)</span>
-<span class="sd">    ...     optim = cfg.optim(model.parameters())</span>
-<span class="sd">    ...     loss = cfg.model(torch.ones(1)).mean()</span>
-<span class="sd">    ...     optim.zero_grad()</span>
-<span class="sd">    ...     loss.backward()</span>
-<span class="sd">    ...     optim.step()</span>
-<span class="sd">    ...     return loss.item()</span>
-
-<span class="sd">    Evaluate the function for different learning rates</span>
-
-<span class="sd">    &gt;&gt;&gt; jobs = launch(cfg, task_function, overrides=[&quot;optim.lr=0.1,1.0&quot;], multirun=True)</span>
-<span class="sd">    &gt;&gt;&gt; [j.return_value for j in jobs[0]]</span>
-<span class="sd">    [0.3054758310317993, 0.28910207748413086]</span>
+<span class="sd">    &gt;&gt;&gt; [j.working_dir for j in outputs]</span>
+<span class="sd">    [&#39;multirun/2021-10-19/17-50-07\\0&#39;,</span>
+<span class="sd">    &#39;multirun/2021-10-19/17-50-07\\1&#39;,</span>
+<span class="sd">    &#39;multirun/2021-10-19/17-50-07\\2&#39;]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">config_name</span> <span class="o">=</span> <span class="n">_store_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">config_name</span><span class="p">)</span>
 
