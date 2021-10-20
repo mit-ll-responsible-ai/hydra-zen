@@ -580,7 +580,8 @@ def builds(
 
     The resulting object is a dataclass; specifically it is a targeted structured config [1]_.
 
-    See the Examples section of the docstring to see
+    Consult the Examples section of the docstring to see the various features of
+    `builds` in action.
 
     Parameters
     ----------
@@ -768,7 +769,7 @@ def builds(
     >>> partial_func
     functools.partial(<function a_two_tuple at 0x00000220A7820EE0>, x=1)
 
-    And thus the remaining parameter can be provided after configuration and instantiation
+    And thus the remaining parameter can be provided post-instantiation.
 
     >>> partial_func(y=22.0)  # providing the remaining parameter
     (1, 22.0)
@@ -788,8 +789,8 @@ def builds(
     >>> Conf.y
     'foo'
 
-    Annotations will be used to provided limited runtime type-checking during instantiation. Here, we'll pass
-    a float for ``x``, which expects a boolean value.
+    Annotations will be used by Hydra to provide limited runtime type-checking during
+    instantiation. Here, we'll pass a float for ``x``, which expects a boolean value.
 
     >>> instantiate(Conf(x=10.0))
     ValidationError: Value '10.0' is not a valid bool (type float)
