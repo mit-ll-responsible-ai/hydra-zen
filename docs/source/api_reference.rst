@@ -22,15 +22,19 @@ Launching Jobs with Hydra
    hydra_multirun
 
 
-********************************************
-Creating and Working with Structured Configs
-********************************************
+*********************************
+Creating and Working with Configs
+*********************************
 
-hydra-zen provides us with some simple but powerful tools for creating and working with structured configs.
+hydra-zen provides us with some simple but powerful tools for creating and working with 
+configs. Among these, the most essential functions for creating configs are 
+:func:`~hydra_zen.make_config` and :func:`~hydra_zen.builds`. Then, 
+:func:`~hydra_zen.instantiate` can be used to resolve these configs so that they return 
+the data and class-instances that we need for our application.
 
 
-Creating Structured Configs
-***************************
+Creating Configs
+****************
 .. currentmodule:: hydra_zen
 
 .. autosummary::
@@ -69,6 +73,8 @@ Utilities
 
 Working with YAMLs
 ******************
+Hydra serializes all configs to a YAML-format when launching a job.
+The following utilities can be used to work with YAML-serialized configs.
 
 .. currentmodule:: hydra_zen
 
