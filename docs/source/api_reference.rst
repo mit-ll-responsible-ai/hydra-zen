@@ -1,6 +1,6 @@
-#############
-API Reference
-#############
+#########
+Reference
+#########
 
 *************************
 Launching Jobs with Hydra
