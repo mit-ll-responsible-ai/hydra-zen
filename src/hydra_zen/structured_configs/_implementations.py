@@ -607,27 +607,25 @@ def builds(
     Returns a config, which describes how to instantiate/call ``<hydra_target>`` with
     user-specified and auto-populated parameter values.
 
-    The resulting object is a dataclass; specifically it is a targeted structured config [1]_.
-
     Consult the Examples section of the docstring to see the various features of
     `builds` in action.
 
     Parameters
     ----------
     hydra_target : T (Callable)
-        The target-object to be configured. This is a required, positional-only
+        The target-object to be configured. This is a required, **positional-only**
         argument.
 
     *pos_args : Any
-        Positional arguments passed as ``hydra_target(*pos_args, ...)`` upon
+        Positional arguments passed as ``<hydra_target>(*pos_args, ...)`` upon
         instantiation.
 
         Arguments specified positionally are not included in the dataclass' signature
         and are stored as a tuple bound to in the ``_args_`` field.
 
     **kwargs_for_target : Any
-        The keyword arguments passed as ``hydra_target(..., **kwargs_for_target)`` upon
-        instantiation.
+        The keyword arguments passed as ``<hydra_target>(..., **kwargs_for_target)``
+        upon instantiation.
 
         The arguments specified here solely determine the signature of the resulting
         config, unless ``populate_full_signature=True`` is specified (see below).
@@ -637,9 +635,8 @@ def builds(
 
     zen_partial : bool, optional (default=False)
         If ``True``, then the resulting config will instantiate as
-        ``functools.partial(hydra_target, *pos_args, **kwargs_for_target)`` rather than
-        ``hydra_target(*pos_args, **kwargs_for_target)``. Thus this enables the
-        partial-configuration of objects.
+        ``functools.partial(<hydra_target>, *pos_args, **kwargs_for_target)``. Thus
+        this enables the partial-configuration of objects.
 
         Specifying ``zen_partial=True`` and ``populate_full_signature=True`` together
         will populate the config's signature only with parameters that: are explicitly
@@ -651,7 +648,7 @@ def builds(
         One or more wrappers, which will wrap ``hydra_target`` prior to instantiation.
         E.g. specifying the wrappers ``[f1, f2, f3]`` will instantiate as::
 
-            f3(f2(f1(hydra_target)))(*args, **kwargs)
+            f3(f2(f1(<hydra_target>)))(*args, **kwargs)
 
         Wrappers can also be specified as interpolated strings [2]_ or targeted
         configs.
@@ -663,7 +660,7 @@ def builds(
 
     populate_full_signature : bool, optional (default=False)
         If ``True``, then the resulting config's signature and fields will be populated
-        according to the signature of ``hydra_target``; values also specified in
+        according to the signature of ``<hydra_target>``; values also specified in
         ``**kwargs_for_target`` take precedent.
 
         This option is not available for objects with inaccessible signatures, such as
@@ -708,8 +705,7 @@ def builds(
     Notes
     -----
     The resulting "config" is a dataclass-object [5]_ with Hydra-specific attributes
-    attached to it; e.g. ``_target_`` indicates the location where ``<hydra_target>``
-    will be imported from.
+    attached to it [1]_.
 
     Using any of the ``zen_xx`` features will result in a config that depends
     explicitly on hydra-zen. I.e. hydra-zen must be installed in order to
@@ -720,12 +716,9 @@ def builds(
     annotations; otherwise an annotation is automatically 'broadened' until
     it is made compatible with Hydra.
 
-    `builds` provides runtime validation of user-specified named arguments against
-    the target's signature. This helps to ensure that typos in field names
-    fail early and explicitly.
-
-    Mutable values are automatically transformed to use a default factory [6]_
-    prior to setting them on the dataclass.
+    `builds` provides runtime validation of user-specified arguments against
+    the target's signature. E.g. specifying mis-named arguments or too many
+    arguments will cause `builds` to raise.
 
     References
     ----------
@@ -734,8 +727,7 @@ def builds(
     .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
     .. [4] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
     .. [5] https://docs.python.org/3/library/dataclasses.html
-    .. [6] https://docs.python.org/3/library/dataclasses.html#mutable-default-values
-    .. [7] https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation
+    .. [6] https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation
 
     See Also
     --------
@@ -783,7 +775,7 @@ def builds(
 
     **Creating a Partial Config**
 
-    `builds` can be used to only partially-configure a target. Let's
+    `builds` can be used to partially-configure a target. Let's
     create a config for the following function
 
     >>> def a_two_tuple(x: int, y: float): return x, y
@@ -840,9 +832,11 @@ def builds(
 
     **Using meta-fields**
 
-    Meta-fields are fields that are included in a config, but not used by the
-    instantiation process. In addition to attaching arbitrary metadata to a config,
-    these can be used to enable portable, relative interpolation [7]_:
+    Meta-fields are fields that are included in a config but are excluded by the
+    instantiation process. Thus arbitrary metadata can be attached to a config.
+
+    Let's create a config whose fields reference a meta-field via
+    relative-interpolation [6]_.
 
     >>> Conf = builds(dict, a="${.s}", b="${.s}", zen_meta=dict(s=-10))
     >>> instantiate(Conf)
@@ -856,8 +850,9 @@ def builds(
     and/or its outputs during the instantiation process.
 
     Let's use a wrapper to add a unit-conversion step to a config. We'll modify a
-    config for a function that converts a temperature in Farenheit to Celcius, and add a
-    wrapper it so that it will convert from Farenheit to Kelvin instead.
+    config that builds a function, which converts a temperature in Farenheit to
+    Celcius, and add a wrapper it so that it will convert from Farenheit to Kelvin
+    instead.
 
     >>> def faren_to_celsius(temp_f):  # our target
     ...     return ((temp_f - 32) * 5) / 9
@@ -873,6 +868,38 @@ def builds(
     0.0
     >>> instantiate(AsKelvin, temp_f=32)
     273.15
+
+    **Creating a frozen config**
+
+    Let's create a config object whose instances will by "frozen" (i.e., immutable).
+
+    >>> RouterConfig = builds(dict, ip_address=None, frozen=True)
+    >>> my_router = RouterConfig(ip_address="192.168.56.1")  # an immutable instance
+
+    Attempting to overwrite the attributes of ``my_router`` will raise.
+
+    >>> my_router.ip_address = "148.109.37.2"
+    FrozenInstanceError: cannot assign to field 'ip_address'
+
+    **Runtime validation perfomed by builds**
+
+    Misspelled parameter names and other invalid configurations for the target’s
+    signature will be caught by `builds`, so that the error surfaces immediately while
+    creating the configuration.
+
+    >>> def func(a_number: int): pass
+
+    >>> builds(func, a_nmbr=2)  # misspelled parameter name
+    TypeError: Building: func ..
+    The following unexpected keyword argument(s) was specified for __main__.func via     `builds`: a_nmbr
+
+    >>> builds(func, 1, 2)  # too many arguments
+    TypeError: Building: func ..
+
+    >>> BaseConf = builds(func, a_number=2)
+    >>> builds(func, 1, builds_bases=(BaseConf,))  # too many args (via inheritance)
+    TypeError: Building: func ..
+
     """
 
     if not pos_args and not kwargs_for_target:
