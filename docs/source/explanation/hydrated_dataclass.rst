@@ -40,8 +40,9 @@ creation of ``BuildsAdam`` because the fieldname ``momentum`` was misspelled.
 
 .. code:: python
 
-   # This code will raise a TypeError
-    
+   # @hydrated_dataclass will catch the misspelled parameter name
+   # and will raise a TypeError
+
    @hydrated_dataclass(target=Adam)
    class BuildsAdam:
        momtum: float = 0.9  # typo in name momentum
