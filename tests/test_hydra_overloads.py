@@ -36,7 +36,7 @@ def test_MISSING_is_alias_from_omegaconf():
     assert omega_MISSING is zen_MISSING
 
 
-@settings(max_examples=10)
+@settings(max_examples=10, deadline=None)
 @given(fname=st.text(string.ascii_letters, min_size=1), value=st.integers(-2, 2))
 @pytest.mark.usefixtures("cleandir")
 def test_yaml_io_roundtrip(fname, value):
