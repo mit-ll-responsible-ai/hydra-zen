@@ -268,17 +268,11 @@ def hydrated_dataclass(
 
         If ``None``, the ``_recursive_`` attribute is not set on the resulting config.
 
-    hydra_convert : Optional[Literal["none", "partial", "all"]], optional (default="none")
-        Determines how Hydra handles the non-primitive, omegaconf-specific objects
-        passed to ``<hydra_target>`` [4]_.
-
-        - ``"none"``: No conversion occurs; omegaconf containers are passed through
-        (Default)
-        - ``"partial"``: ``DictConfig`` and ``ListConfig`` objects converted to
-        ``dict`` and ``list``, respectively. Structured configs and their fields are
-        passed without conversion.
-        - ``"all"``: All passed objects are converted to dicts, lists, and primitives,
-        without a trace of OmegaConf containers.
+        - ``"none"``: No conversion occurs; omegaconf containers are passed through (Default)
+        - ``"partial"``: ``DictConfig`` and ``ListConfig`` objects converted to ``dict`` and
+          ``list``, respectively. Structured configs and their fields are passed without conversion.
+        - ``"all"``: All passed objects are converted to dicts, lists, and primitives, without
+          a trace of OmegaConf containers.
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting config.
 
@@ -875,7 +869,6 @@ def builds(
     >>> BaseConf = builds(func, a_number=2)
     >>> builds(func, 1, builds_bases=(BaseConf,))  # too many args (via inheritance)
     TypeError: Building: func ..
-
     """
 
     if not pos_args and not kwargs_for_target:
