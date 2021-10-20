@@ -265,13 +265,14 @@ def sanitized_type(
     Examples
     --------
     >>> sanitized_type(int)
-    int
+    <class 'int'>
 
     >>> sanitized_type(frozenset)  # not supported by hydra
     typing.Any
 
     >>> sanitized_type(int, wrap_optional=True)
-    Union[
+    typing.Union[int, NoneType]
+
     >>> sanitized_type(List[int])
     List[int]
 

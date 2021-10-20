@@ -34,6 +34,7 @@ release = hydra_zen.__version__
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
@@ -54,6 +55,22 @@ templates_path = ["_templates"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
 
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3/", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+}
+
+# https://www.sphinx-doc.org/en/master/usage/extensions/extlinks.html
+# A dictionary of external sites
+#   alias ->  (base-URL, prefix)
+_repo = "https://github.com/mit-ll-responsible-ai/hydra-zen/"
+extlinks = {
+    "commit": (_repo + "commit/%s", "commit "),
+    "gh-file": (_repo + "blob/master/%s", ""),
+    "gh-link": (_repo + "%s", ""),
+    "issue": (_repo + "issues/%s", "issue #"),
+    "pull": (_repo + "pull/%s", "pull request #"),
+}
 
 # -- Options for HTML output -------------------------------------------------
 

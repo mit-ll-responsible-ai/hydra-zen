@@ -1,7 +1,7 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 from pathlib import Path
-from typing import Any, Callable, List, Mapping, Optional, Union
+from typing import Any, Callable, List, Mapping, Optional, Type, Union
 
 from hydra._internal.callbacks import Callbacks
 from hydra._internal.hydra import Hydra
@@ -50,75 +50,65 @@ def _store_config(
 
 
 def launch(
-    config: Union[DataClass, DictConfig, Mapping],
+    config: Union[DataClass, Type[DataClass], Mapping[str, Any]],
     task_function: Callable[[DictConfig], Any],
     overrides: Optional[List[str]] = None,
     config_dir: Optional[Union[str, Path]] = None,
-    config_name: str = "_zen_launch",
-    job_name: str = "_zen_launch",
+    config_name: str = "zen_launch",
+    job_name: str = "zen_launch",
     with_log_configuration: bool = True,
     multirun: bool = False,
 ) -> Union[JobReturn, Any]:
-    """Launch a Hydra job defined by `task_function` using the configuration
-    provided in `config`.
+    r"""Launch a Hydra job using a Python-based interface.
 
-    Similar to how Hydra CLI works, `overrides` are a string list of configuration
-    values to use for a given experiment run.  For example, the Hydra CLI provided by::
+    `launch` is designed to closely match the interface of the standard Hydra CLI.
+    For example, launching a Hydra job from the CLI via::
 
        $ python my_task.py job/group=group_name job.group.param=1
 
-    would be::
+    corresponds to the following usage of `launch`:
 
        >>> job = launch(config, task_function, overrides=["job/group=group_name", "job.group.param=1"])
 
-    This functions executes Hydra and therefore creates its own working directory.  See Configuring Hydra [2]_ for more
-    details on customizing Hydra.
-
-    Similarily, to launch a `multirun` job and sweep over parameters the Hydra CLI provided by::
-
-       $ python -m job.task_function job/group=group_name job.group.param=1,2,3 --multirun
-
-    would become::
-
-       >>> job = launch(config, task_function, overrides=["job/group=group_name", "job.group.param=1,2,3"], multirun=True)
-
-
     Parameters
     ----------
-    config : Union[DataClass, DictConfig, Mapping]
-        A configuration as a dataclass, configuration object, or a dictionary.
+    config : DataClass | Type[DataClass] | Mapping[str, Any]
+        A config that will be passed to ``task_function``.
 
     task_function : Callable[[DictConfig], Any]
-        The function Hydra will execute with the given configuration.
+        The function that Hydra will execute. Its input will be ``config``, which
+        has been modified via the specified ``overrides``
 
-    overrides : Optional[List[str]] (default: None)
-        If provided, overrides default configurations, see [1]_ and [2]_.
+    overrides : Optional[List[str]]
+        If provided, sets/overrides values in ``config``. See [1]_ and [2]_
+        for a detailed discussion of the "grammar" supported by ``overrides``.
 
-    config_dir : Optional[Union[str, Path]] (default: None)
-        Add configuration directories if needed.
+    config_dir : Optional[Union[str, Path]]
+        The config path: a directory where Hydra will search for configs.
 
-    config_name : str (default: "hydra_run")
+    config_name : str (default: "zen_launch")
         Name of the stored configuration in Hydra's ConfigStore API.
 
-    job_name : str (default: "hydra_run")
+    job_name : str (default: "zen_launch")
 
     with_log_configuration : bool (default: True)
-        Flag to configure logging subsystem from the loaded config
+        If ``True``, enables the configuration of the logging subsystem from the loaded config.
 
     multirun : bool (default: False)
-        Launch a Hydra multi-run ([3]_)
+        Launch a Hydra multi-run ([3]_).
 
     Returns
     -------
     result : JobReturn | Any
-        If ``multirun = False``:
-            A ``JobReturn`` object storing the results of the Hydra experiment.
-                - overrides: From `overrides` and `multirun_overrides`
-                - return_value: The return value of the task function
-                - cfg: The configuration object sent to the task function
-                - hydra_cfg: The hydra configuration object
-                - working_dir: The experiment working directory
-                - task_name: The task name of the Hydra job
+        If ``multirun is False``:
+            A ``JobReturn`` object storing the results of the Hydra experiment via the following attributes
+                - ``cfg``: Reflects ``config``
+                - ``overrides``: Reflects ``overrides``
+                - ``return_value``: The return value of the task function
+                - ``hydra_cfg``: The Hydra configuration object
+                - ``working_dir``: The experiment working directory
+                - ``task_name``: The task name of the Hydra job
+                - ``status``: A ``JobStatus`` enum reporting whether or not the job completed successfully
         Else:
             Return values of all launched jobs (depends on the Sweeper implementation).
 
@@ -130,63 +120,87 @@ def launch(
 
     Examples
     --------
-    Simple Hydra run:
 
-    >>> from hydra_zen import instantiate, builds, launch
-    >>> job = launch(builds(dict, a=1, b=1), task_function=instantiate)
-    >>> job.return_value
-    {'a': 1, 'b': 1}
+    **Basic usage**
 
-    Using a more complex task function:
+    Let's define and launch a trivial Hydra app.
 
-    >>> cfg = dict(f=builds(pow, exp=2, zen_partial=True), x=10)
-    >>> def task_function(cfg):
-    ...    return instantiate(cfg.f)(cfg.x)
+    >>> from hydra_zen import make_config, launch, to_yaml
 
-    Launch a job to evaluate the function using the given configuration:
+    First, we will define a config, which determines the configurable interface to our
+    "app". For the purpose of example, we'll design the "interface" of this config to accept
+    two configurable parameters: ``a`` and ``b``.
 
-    >>> job = launch(cfg, task_function)
-    >>> job.return_value
-    100
+    >>> Conf = make_config("a", "b")
 
-    Next, a Hydra multi-run can be launched by setting `multirun=True`:
+    Our task function accepts the config as an input and uses it to run some generic functionality.
+    For simplicity's sake, let's design this task function to: convert the job's config to a
+    yaml-formatted string, print it, and then return the string.
 
-    >>> job = launch(
-    ...     builds(dict, a=1, b=1),
-    ...     task_function=instantiate,
-    ...     overrides=["a=1,2"],
-    ...     multirun=True
+    >>> def task_fn(cfg):
+    ...     out = to_yaml(cfg)  # task's input config, converted to yaml-string
+    ...     print(out)
+    ...     return out
+
+    Now, let's use `launch` to run this task function via Hydra, using particular configured
+    values (or, "overrides") for ``a`` and ``b``.
+
+    >>> job_out = launch(Conf, task_fn, overrides=["a=1", "b='foo'"])
+    a: 1
+    b: foo
+
+    Let's inspect ``job_out`` to see the ways that it summarizes the results of this job.
+
+    >>> job_out.return_value  # the value returned by `task_fn`
+    'a: 1\nb: foo\n'
+
+    >>> job_out.working_dir  # where the job's outputs, logs, and configs are saved
+    'outputs/2021-10-19/15-27-11'
+
+    >>> job_out.cfg  # the particular config used to run our task-function
+    {'a': 1, 'b': 'foo'}
+
+    >>> job_out.overrides  # the overrides that we provides
+    ['a=1', "b='foo'"]
+
+    >>> job_out.status  # the job's completion status
+    <JobStatus.COMPLETED: 1>
+
+    **Launching a multirun job**
+
+    We can launch multiple runs of our task-function, using various configured values.
+    Let's launch a multirun that sweeps over three configurations
+
+    >>> (outputs,) = launch(
+    ...     Conf,
+    ...     task_fn,
+    ...     overrides=["a=1,2,3", "b='bar'"],
+    ...     multirun=True,
     ... )
-    >>> [j.return_value for j in job[0]]
-    [{'a': 1, 'b': 1}, {'a': 2, 'b': 1}]
+    [2021-10-19 17:50:07,334][HYDRA] Launching 3 jobs locally
+    [2021-10-19 17:50:07,334][HYDRA] 	#0 : a=1 b='bar'
+    a: 1
+    b: bar
+    [2021-10-19 17:50:07,434][HYDRA] 	#1 : a=2 b='bar'
+    a: 2
+    b: bar
+    [2021-10-19 17:50:07,535][HYDRA] 	#2 : a=3 b='bar'
+    a: 3
+    b: bar
 
-    Launch a multi-run over a list of different `x` values using Hydra's override syntax `range`:
+    ``outputs`` contains three corresponding ``JobReturns`` instances.
 
-    >>> jobs = launch(cfg, task_function, overrides=["x=range(-2,3)"], multirun=True)
-    >>> [j.return_value for j in jobs[0]]
-    [4, 1, 0, 1, 4]
+    >>> len(outputs)
+    3
+    >>> [j.cfg for j in outputs]
+    [{'a': 1, 'b': 'bar'}, {'a': 2, 'b': 'bar'}, {'a': 3, 'b': 'bar'}]
 
-    An example using PyTorch
+    Each run's outputs, logs, and configs are saved to separate working directories
 
-    >>> from torch.optim import Adam
-    >>> from torch.nn import Linear
-    >>> AdamConfig = builds(Adam, lr=0.001, zen_partial=True)
-    >>> ModelConfig = builds(Linear, in_features=1, out_features=1)
-    >>> cfg = dict(optim=AdamConfig(), model=ModelConfig())
-    >>> def task_function(cfg):
-    ...     cfg = instantiate(cfg)
-    ...     optim = cfg.optim(model.parameters())
-    ...     loss = cfg.model(torch.ones(1)).mean()
-    ...     optim.zero_grad()
-    ...     loss.backward()
-    ...     optim.step()
-    ...     return loss.item()
-
-    Evaluate the function for different learning rates
-
-    >>> jobs = launch(cfg, task_function, overrides=["optim.lr=0.1,1.0"], multirun=True)
-    >>> [j.return_value for j in jobs[0]]
-    [0.3054758310317993, 0.28910207748413086]
+    >>> [j.working_dir for j in outputs]
+    ['multirun/2021-10-19/17-50-07\\0',
+    'multirun/2021-10-19/17-50-07\\1',
+    'multirun/2021-10-19/17-50-07\\2']
     """
     config_name = _store_config(config, config_name)
 

@@ -41,11 +41,15 @@ def validates_with_pydantic(
         A wrapped function or a class whose init-method has been
         wrapped in-place
 
+    See Also
+    --------
+    hydra_zen.third_party.beartype.validates_with_beartype
+
     Notes
     -----
     pydantic must be installed [2]_ as a separate dependency to leverage this validator.
     Using ``validates_with_pydantic`` as a ``zen_wrapper`` will create a dependency on
-    pydantic among resulting yamls as well, these yamls will also be validated by pydantic
+    pydantic among resulting yamls: these yamls will also be validated by pydantic
     upon instantiation.
 
     It is recommended that `validates_with_pydantic` be used in conjunction with
@@ -64,16 +68,22 @@ def validates_with_pydantic(
 
     Examples
     --------
+    **Basic usage**
+
     >>> from hydra_zen.third_party.pydantic import validates_with_pydantic
     >>> from pydantic import PositiveInt
+
     >>> def f(x: PositiveInt): return x
-    >>> val_f = validates_with_pydantic(f)
-    >>> f(-100)
+
+    >>> f(-100)  # bad value passes
     -100
-    >>> val_f(-100)
+
+    >>> val_f = validates_with_pydantic(f)  # f + validation
+    >>> val_f(-100)  # bad value gets caught
     ValidationError: 1 validation error for F (...)
 
-    Using `validates_with_pydantic` with a class.
+    Applying `validates_with_pydantic` to a class-object will wrap its ``__init__``
+    method in-place.
 
     >>> class A:
     ...     def __init__(self, x: PositiveInt): ...
@@ -81,6 +91,8 @@ def validates_with_pydantic(
     __main__.A
     >>> A(-10)
     ValidationError: 1 validation error for Init
+
+    **Adding pydantic validation to configs**
 
     This is designed to be used with the ``zen_wrappers`` feature of `builds`.
 
@@ -104,6 +116,9 @@ def validates_with_pydantic(
     >>> def g(x: tuple): return x  # note the annotation
     >>> validates_with_pydantic(g)([1, 2, 3])  # input: list, output: tuple
     (1, 2, 3)
+
+    Consider using :func:`~hydra_zen.make_custom_builds_fn` to add validation to
+    all configs.
     """
     if inspect.isclass(obj) and hasattr(type, "__init__"):
         if hasattr(obj.__init__, "validate"):
