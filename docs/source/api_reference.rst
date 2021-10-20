@@ -6,6 +6,9 @@ API Reference
 Launching Jobs with Hydra
 *************************
 
+hydra-zen provides users the ability to launch a Hydra job via a 
+Python function instead of from a commandline interface.
+
 .. currentmodule:: hydra_zen
 
 .. autosummary::
@@ -73,7 +76,7 @@ Utilities
 
 Working with YAMLs
 ******************
-Hydra serializes all configs to a YAML-format when launching a job.
+Hydra serializes all configs to a YAML-format text when launching a job.
 The following utilities can be used to work with YAML-serialized configs.
 
 .. currentmodule:: hydra_zen
