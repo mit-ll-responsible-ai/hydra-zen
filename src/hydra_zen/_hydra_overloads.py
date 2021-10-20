@@ -316,7 +316,7 @@ def save_as_yaml(
     **Basic usage**
 
     >>> Conf = make_config(a=1, b="foo")
-    >>> save_as_yaml(conf, "test.yaml")  # file written to: test.yaml
+    >>> save_as_yaml(Conf, "test.yaml")  # file written to: test.yaml
     >>> load_from_yaml("test.yaml")
     {'a': 1, 'b': 'foo'}
     """
@@ -357,7 +357,7 @@ def load_from_yaml(
     **Basic usage**
 
     >>> Conf = make_config(a=1, b="foo")
-    >>> save_as_yaml(conf, "test.yaml")  # file written to: test.yaml
+    >>> save_as_yaml(Conf, "test.yaml")  # file written to: test.yaml
     >>> load_from_yaml("test.yaml")
     {'a': 1, 'b': 'foo'}
     """

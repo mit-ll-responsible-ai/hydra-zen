@@ -158,7 +158,7 @@ def mutable_value(x: _T) -> _T:
 
     See https://docs.python.org/3/library/dataclasses.html#mutable-default-values
 
-    >>> @dataclass
+    >>> @dataclass  # doctest: +SKIP
     ... class HasMutableDefault:
     ...     a_list: list  = [1, 2, 3]  # error: mutable default
 
@@ -726,7 +726,7 @@ def builds(
     The resulting config is a dataclass with the following signature and attributes:
 
     >>> Conf  # signature: Conf(a: Any = 1, b: Any = 'x')
-    types.Builds_dict
+    <class 'types.Builds_dict'>
     >>> Conf.a
     1
     >>> Conf.b
@@ -1490,7 +1490,8 @@ def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:
 
     Parameters
     ----------
-    obj : HasTarget | HasPartialTarget
+    obj : HasTarget
+        An object with a ``_target_`` attribute.
 
     Returns
     -------
@@ -1509,11 +1510,11 @@ def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:
 
     >>> from hydra_zen import builds, just, get_target
     >>> get_target(builds(int))
-    int
+    <class 'int'>
     >>> get_target(builds(int, zen_partial=True))
-    int
+    <class 'int'>
     >>> get_target(just(str))
-    str
+    <class 'str'>
 
     It works for manually-defined configs:
 
@@ -1523,7 +1524,7 @@ def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:
     ...     _target_: str = "builtins.dict"
 
     >>> get_target(A)
-    dict
+    <class 'dict'>
 
     and for configs loaded from yamls.
 
@@ -1676,7 +1677,7 @@ def make_custom_builds_fn(
 
     >>> Conf = build_a_bear(f)  # a conf that includes `validates_with_beartype`
 
-    >>> instantiate(conf, x="a")  # satisfies annotation: Literal["a", "b"]
+    >>> instantiate(Conf, x="a")  # satisfies annotation: Literal["a", "b"]
     "a"
 
     >>> instantiate(conf, x="c")  # violates annotation: Literal["a", "b"]
