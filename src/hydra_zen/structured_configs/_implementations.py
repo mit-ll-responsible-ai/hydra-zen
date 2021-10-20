@@ -234,11 +234,11 @@ def hydrated_dataclass(
         ``hydra_target(*pos_args, **kwargs_for_target)``. Thus this enables the
         partial-configuration of objects.
 
-        Specifying ``zen_partial=True`` and ``populate_full_signature=True`` together will
-        populate the config's signature only with parameters that: are explicitly specified by the
-        user, or that have default values specified in the target's signature. I.e. it is
-        presumed that un-specified parameters that have no default values are to be excluded from
-        the config.
+        Specifying ``zen_partial=True`` and ``populate_full_signature=True`` together
+        will populate the config's signature only with parameters that: are explicitly
+        specified by the user, or that have default values specified in the target's
+        signature. I.e. it is presumed that un-specified parameters that have no
+        default values are to be excluded from the config.
 
     zen_wrappers : None | Callable | Builds | InterpStr | Sequence[None | Callable | Builds | InterpStr]
         One or more wrappers, which will wrap ``hydra_target`` prior to instantiation.
@@ -269,21 +269,23 @@ def hydrated_dataclass(
         If ``None``, the ``_recursive_`` attribute is not set on the resulting config.
 
     hydra_convert : Optional[Literal["none", "partial", "all"]], optional (default="none")
-        Determines how Hydra handles the non-primitive, omegaconf-specific objects passed to
-        ``<hydra_target>`` [4]_.
+        Determines how Hydra handles the non-primitive, omegaconf-specific objects
+        passed to ``<hydra_target>`` [4]_.
 
-        - ``"none"``: No conversion occurs; omegaconf containers are passed through (Default)
-        - ``"partial"``: ``DictConfig`` and ``ListConfig`` objects converted to ``dict`` and
-          ``list``, respectively. Structured configs and their fields are passed without conversion.
-        - ``"all"``: All passed objects are converted to dicts, lists, and primitives, without
-          a trace of OmegaConf containers.
+        - ``"none"``: No conversion occurs; omegaconf containers are passed through
+        (Default)
+        - ``"partial"``: ``DictConfig`` and ``ListConfig`` objects converted to
+        ``dict`` and ``list``, respectively. Structured configs and their fields are
+        passed without conversion.
+        - ``"all"``: All passed objects are converted to dicts, lists, and primitives,
+        without a trace of OmegaConf containers.
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting config.
 
     frozen : bool, optional (default=False)
         If ``True``, the resulting config will create frozen (i.e. immutable) instances.
-        I.e. setting/deleting an attribute of an instance will raise :py:class:`dataclasses.FrozenInstanceError`
-        at runtime.
+        I.e. setting/deleting an attribute of an instance will raise
+        :py:class:`dataclasses.FrozenInstanceError` at runtime.
 
     See Also
     --------
@@ -319,32 +321,6 @@ def hydrated_dataclass(
 
     >>> instantiate(DictConf(x=10))  # override default `x`
     {'x': 10, 'y': 'hello'}
-
-    Inheritance can be used to compose configurations
-
-    >>> from dataclasses import dataclass
-    >>> from torch.optim import AdamW
-    >>> @dataclass
-    ... class AdamBaseConfig:
-    ...     lr: float = 0.001
-    ...     eps: float = 1e-8
-
-    >>> @hydrated_dataclass(target=AdamW, zen_partial=True)
-    ... class AdamWConfig(AdamBaseConfig):
-    ...     weight_decay : float = 0.01
-    >>> instantiate(AdamWConfig)
-    functools.partial(<class 'torch.optim.adamw.AdamW'>, lr=0.001, eps=1e-08, weight_decay=0.01)
-
-    Because this decorator uses `hyda_utils.builds` under the hood, common mistakes like misspelled
-    parameters will be caught upon constructing the structured config.
-    In the following, the parameter ``weight_decay`` is spelled incorrectly.
-
-    >>> @hydrated_dataclass(target=AdamW, zen_partial=True)
-    ... class AdamWConfig(AdamBaseConfig):
-    ...     wieght_decay : float = 0.01  # i before e, right!?
-    TypeError: Building: AdamW ..
-    The following unexpected keyword argument(s) for torch.optim.adamw.AdamW was specified via inheritance
-    from a base class: wieght_decay
 
     For more detailed examples, refer to `builds`.
     """
