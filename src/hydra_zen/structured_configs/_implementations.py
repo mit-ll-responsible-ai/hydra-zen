@@ -596,7 +596,8 @@ def builds(
         and are stored as a tuple bound to in the ``_args_`` field.
 
     **kwargs_for_target : Any
-        The keyword arguments passed as ``hydra_target(..., **kwargs_for_target)`` upon instantiation.
+        The keyword arguments passed as ``hydra_target(..., **kwargs_for_target)`` upon
+        instantiation.
 
         The arguments specified here solely determine the signature of the resulting
         config, unless ``populate_full_signature=True`` is specified (see below).
@@ -611,7 +612,8 @@ def builds(
         partial-configuration of objects.
 
         Specifying ``zen_partial=True`` and ``populate_full_signature=True`` together
-        will populate the config's signature only with parameters that: are explicitly specified by the user, or that have default values specified in the target's
+        will populate the config's signature only with parameters that: are explicitly
+        specified by the user, or that have default values specified in the target's
         signature. I.e. it is presumed that un-specified parameters that have no
         default values are to be excluded from the config.
 
