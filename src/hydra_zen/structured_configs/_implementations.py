@@ -32,12 +32,7 @@ from hydra_zen.errors import HydraZenDeprecationWarning
 from hydra_zen.funcs import get_obj, partial, zen_processing
 from hydra_zen.structured_configs import _utils
 from hydra_zen.typing import Builds, Importable, Just, PartialBuilds
-from hydra_zen.typing._implementations import (
-    DataClass,
-    HasPartialTarget,
-    HasTarget,
-    _DataClass,
-)
+from hydra_zen.typing._implementations import DataClass, HasPartialTarget, HasTarget
 
 try:
     # used to check if default values are ufuncs
@@ -217,21 +212,34 @@ def hydrated_dataclass(
     **_kw,  # reserved to deprecate hydra_partial
 ) -> Callable[[Type[_T]], Type[_T]]:
     """A decorator that uses `builds` to create a dataclass with the appropriate
-    hydra-specific fields for specifying a structured config [1]_.
+    Hydra-specific fields for specifying a targeted config [1]_.
+
+    This provides similar functionality to `builds`, but enables a user to define
+    a config explicitly using the :func:`dataclasses.dataclass` syntax.
 
     Parameters
     ----------
-    target : Union[Instantiable, Callable]
-        The object to be instantiated/called.
+    hydra_target : T (Callable)
+        The target-object to be configured. This is a required, positional-only argument.
 
     *pos_args : Any
-        Positional arguments passed to ``target``.
+        Positional arguments passed as ``hydra_target(*pos_args, ...)`` upon instantiation.
 
         Arguments specified positionally are not included in the dataclass' signature and
         are stored as a tuple bound to in the ``_args_`` field.
 
-    zen_partial : Optional[bool] (default=False)
-        If True, then hydra-instantiation produces ``functools.partial(target, **kwargs)``
+    zen_partial : bool, optional (default=False)
+        If ``True``, then the resulting config will instantiate as
+        ``functools.partial(hydra_target, *pos_args, **kwargs_for_target)`` rather than
+        ``hydra_target(*pos_args, **kwargs_for_target)``.
+
+        Thus this enables the partial-configuration of objects.
+
+        Specifying ``zen_partial=True`` and ``populate_full_signature=True`` together will
+        populate the config's signature only with parameters that: are explicitly specified by the
+        user, or that have default values specified in the target's signature. I.e. it is
+        presumed that un-specified parameters that have no default values are to be excluded from
+        the config.
 
     zen_wrappers : None | Callable | Builds | InterpStr | Sequence[None | Callable | Builds | InterpStr]
         One or more wrappers, which will wrap ``hydra_target`` prior to instantiation.
@@ -249,39 +257,45 @@ def hydrated_dataclass(
 
     populate_full_signature : bool, optional (default=False)
         If ``True``, then the resulting dataclass's signature and fields will be populated
-        according to the signature of ``hydra_target``.
-
-        Values specified in **kwargs_for_target take precedent over the corresponding
-        default values from the signature.
+        according to the signature of ``hydra_target``; values also specified in
+        ``**kwargs_for_target`` take precedent.
 
         This option is not available for objects with inaccessible signatures, such as
         NumPy's various ufuncs.
 
-    hydra_recursive : bool, optional (default=True)
-        If True, then upon hydra will recursively instantiate all other
-        hydra-config objects nested within this dataclass [3]_.
+    hydra_recursive : Optional[bool], optional (default=True)
+        If ``True``, then Hydra will recursively instantiate all other
+        hydra-config objects nested within this config [3]_.
 
-        If ``None``, the ``_recursive_`` attribute is not set on the resulting dataclass.
+        If ``None``, the ``_recursive_`` attribute is not set on the resulting config.
 
-    hydra_convert : Optional[Literal["none", "partial", "all"]] (default="none")
-        Determines how hydra handles the non-primitive objects passed to `target` [4]_.
+    hydra_convert : Optional[Literal["none", "partial", "all"]], optional (default="none")
+        Determines how Hydra handles the non-primitive, omegaconf-specific objects passed to
+        ``<hydra_target>`` [4]_.
 
-        - ``"none"``: Passed objects are DictConfig and ListConfig, default
-        - ``"partial"``: Passed objects are converted to dict and list, with
-          the exception of Structured Configs (and their fields).
-        - ``"all"``: Passed objects are dicts, lists and primitives without
-          a trace of OmegaConf containers
+        - ``"none"``: No conversion occurs; omegaconf containers are passed through (Default)
+        - ``"partial"``: ``DictConfig`` and ``ListConfig`` objects converted to ``dict`` and
+          ``list``, respectively. Structured configs and their fields are passed without conversion.
+        - ``"all"``: All passed objects are converted to dicts, lists, and primitives, without
+          a trace of OmegaConf containers.
 
-        If ``None``, the ``_convert_`` attribute is not set on the resulting dataclass.
+        If ``None``, the ``_convert_`` attribute is not set on the resulting config.
 
     frozen : bool, optional (default=False)
-        If `True`, the resulting dataclass will create frozen (i.e. immutable) instances.
+        If ``True``, the resulting dataclass will create frozen (i.e. immutable) instances.
         I.e. setting/deleting an attribute of an instance will raise :py:class:`dataclasses.FrozenInstanceError`
         at runtime.
 
     See Also
     --------
     builds : Create a targeted structured config designed to "build" a particular object.
+
+    Notes
+    -----
+    Unlike `builds`, `hydrated_dataclass` enables config fields to be set explicitly
+    with custom type annotations. Additionally, the resulting dataclass' attributes
+    can be analyzed by static tooling, which can help to warn about errors prior
+    to running one's code.
 
     References
     ----------
@@ -292,9 +306,13 @@ def hydrated_dataclass(
 
     Examples
     --------
-    A simple usage of `hydrated_dataclass`. Here, we specify a structured config
+    **Basic usage**
 
     >>> from hydra_zen import hydrated_dataclass, instantiate
+
+    Here, we specify a config that is designed to "build" a dictionary
+    upon instantiation
+
     >>> @hydrated_dataclass(target=dict)
     ... class DictConf:
     ...     x: int = 2
@@ -302,17 +320,6 @@ def hydrated_dataclass(
 
     >>> instantiate(DictConf(x=10))  # override default `x`
     {'x': 10, 'y': 'hello'}
-
-    We can also design a configuration that only partially instantiates our target.
-
-    >>> def power(x: float, exponent: float) -> float: return x ** exponent
-    >>> @hydrated_dataclass(target=power, zen_partial=True)
-    ... class PowerConf:
-    ...     exponent : float = 2.0
-
-    >>> partiald_power = instantiate(PowerConf)
-    >>> partiald_power(10.0)
-    100.0
 
     Inheritance can be used to compose configurations
 
@@ -331,6 +338,7 @@ def hydrated_dataclass(
 
     Because this decorator uses `hyda_utils.builds` under the hood, common mistakes like misspelled
     parameters will be caught upon constructing the structured config.
+    In the following, the parameter ``weight_decay`` is spelled incorrectly.
 
     >>> @hydrated_dataclass(target=AdamW, zen_partial=True)
     ... class AdamWConfig(AdamBaseConfig):
@@ -1781,8 +1789,7 @@ def make_config(
     they can be utilized in the resulting dataclass and by Hydra:
 
     - Mutable default values will automatically be packaged in a default factory function [6]_
-    - A default value that is a class-object or function-object will automatically be wrapped by
-    `just`, to ensure that the resulting config is serializable by Hydra.
+    - A default value that is a class-object or function-object will automatically be wrapped by `just`, to ensure that the resulting config is serializable by Hydra.
 
     For finer-grain control over how type-annotations and default values are managed, consider using
     :func:`dataclasses.make_dataclass`.
