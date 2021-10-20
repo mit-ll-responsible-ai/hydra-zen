@@ -31,36 +31,29 @@ def validates_with_beartype(obj: _T) -> _T:
         A wrapped function, or a class whose init-method has been
         wrapped in-place.
 
+    See Also
+    --------
+    hydra_zen.third_party.pydantic.validates_with_pydantic
+
     Notes
     -----
-    ``beartype`` [1]_ must be installed as a separate dependency to leverage this validator.
+    ``beartype`` [1]_ must be installed as a separate dependency to leverage this
+    validator. Refer to beartype's documentation [2]_ to see what varieties of types it
+    does and does not support.
+
     Using ``validates_with_beartype`` as a ``zen_wrapper`` will create a dependency on
-    beartype among resulting yamls as well, these yamls will also be validated by beartype
-    upon instantiation.
+    beartype among resulting yamls: these yamls will also be validated by
+    beartype upon instantiation.
 
-    Please refer to beartype's documentation [2]_ to see what varieties of types it does and
-    does not support.
-
-    It is recommended that `validates_with_beartype` be used in conjunction with
-    the following `builds` settings:
-
-    - ``hydra_convert="all"``: to ensure omegaconf containers are converted to std-lib types
-
-    **Data Coercion Behavior**
+    **Data-Coercion Behavior**
 
     hydra-zen adds a data-coercion step that is not performed by ``beartype``.
     This only impacts fields in ``obj`` annotated with a (non-string) sequence-type
-    annotation, which are passed list-type data. All other fields rely solely on beartype's
-    native behavior.
+    annotation, which are passed list-type data. All other fields rely solely on
+    beartype's native behavior.
 
-    E.g. a field with a ``Tuple``-annotation, if passed a list, will see that list be cast
-    to a tuple. See the Examples section for more details.
-
-    This coercion is necessary as Hydra can only read (non-string) sequential data
-    from a config as a list. I.e. without this coercion step, all non-list/string annotated
-    sequence fields populated by Hydra would get rasied (roared at) by beartype. Ultimately,
-    this data-coercion strategy is designed to be as minimalistic as possible while ensuring
-    that type-checked interfaces will be compatible with Hydra.
+    E.g. a field with a ``Tuple``-annotation, if passed a list, will see that list be
+    cast to a tuple. See the Examples section for more details.
 
     References
     ----------
@@ -69,14 +62,21 @@ def validates_with_beartype(obj: _T) -> _T:
 
     Examples
     --------
+    **Basic usage**
+
     >>> from hydra_zen.third_party.beartype import validates_with_beartype
+
     >>> from beartype.cave import ScalarTypes
     >>> def f(x: ScalarTypes): return x  # a scalar is any real-valued number
-    >>> val_f = validates_with_beartype(f)
     >>> f([1, 2])  # doesn't catch bad input
     [1, 2]
+
+    >>> val_f = validates_with_beartype(f)  # f + validation
     >>> val_f([1, 2])
     BeartypeCallHintPepParamException: @beartyped f() parameter x=[1, 2] violates type hint [...]
+
+    Applying `validates_with_beartype` to a class-object will wrap its ``__init__``
+    method in-place.
 
     >>> class A:
     ...     def __init__(self, x: ScalarTypes): ...
@@ -85,17 +85,29 @@ def validates_with_beartype(obj: _T) -> _T:
     >>> A([1, 2])
     BeartypeCallHintPepParamException: @beartyped A.__init__() parameter x=[1, 2] violates type hint [...]
 
+    **Adding beartype validation to configs**
+
     This is designed to be used with the ``zen_wrappers`` feature of `builds`.
 
     >>> from hydra_zen import builds, instantiate
-    >>> # instantiations of `conf` will be validated by beartype
-    >>> conf = builds(f, populate_full_signature=True, zen_wrappers=validates_with_beartype)
-    >>> instantiate(conf, x=10)  # 10 is a scalar: ok!
+
+    >>> Conf = builds(f, populate_full_signature=True, zen_wrappers=validates_with_beartype)
+
+    Instantiating ``Conf`` will prompt ``beartype`` to check the types of configured
+    parameters against the corresponding annotations on ``f``.
+
+    >>> instantiate(Conf, x=10)  # 10 is a scalar: ok!
     10
-    >>> instantiate(conf, x=[1, 2])  # [1, 2] is not a scalar: roar!
+    >>> instantiate(Conf, x=[1, 2])  # [1, 2] is not a scalar: roar!
     BeartypeCallHintPepParamException: @beartyped f() parameter x=[1, 2] violates type hint [...]
 
-    Note that sequence-coercion is enabled to ensure smooth compatibility with Hydra.
+    Consider using :func:`~hydra_zen.make_custom_builds_fn` to add validation to
+    all configs.
+
+    **Sequence-coercion behavior for compatibility with Hydra**
+
+    Note that sequence-coercion is enabled to ensure smooth compatibility with Hydra,
+    as Hydra will interpret all (non-string) sequential data structures as lists.
 
     >>> def g(x: tuple): return x  # note the annotation
     >>> g([1, 2, 3])
