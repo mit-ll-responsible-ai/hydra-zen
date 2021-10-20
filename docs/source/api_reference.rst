@@ -35,6 +35,7 @@ configs. Among these, the most essential functions for creating configs are
 :func:`~hydra_zen.instantiate` can be used to resolve these configs so that they return 
 the data and class-instances that we need for our application.
 
+.. _create-config:
 
 Creating Configs
 ****************

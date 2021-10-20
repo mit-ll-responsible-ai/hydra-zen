@@ -22,11 +22,9 @@ hydra-zen offers:
    :maxdepth: 2
    :caption: Contents:
 
-   installation
-   overview
-   pytorch_lightning_example
-   structured_configs
-   experimental
+   tutorials
+   how_tos
+   explanation
    api_reference
    changes
 
