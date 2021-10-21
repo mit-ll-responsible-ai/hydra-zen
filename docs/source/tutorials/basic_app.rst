@@ -4,6 +4,10 @@
 Create and Launch a Basic App with Hydra
 ========================================
 
+.. tip:: 
+   Hover your cursor over any code block in this tutorial, and a clipboard will appear.
+   Click it to copy the contents of the code block.
+
 In this tutorial we will create a basic app that we can launch using Hydra.
 While the app itself will be trivial, we will see that it is designed to 
 be configurable and that it can be run in a reproducible way.
