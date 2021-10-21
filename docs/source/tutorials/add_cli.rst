@@ -77,8 +77,8 @@ command.
    You can `add tab-completion <https://hydra.cc/docs/tutorials/basic/running_your_app/tab_completion/>`_ to your app's command line interface. This is helpful once you 
    start writing apps that have many configurable components.
 
-To inspect the log written by our app, let's open a Python terminal and define
-the following function for reading files
+To inspect the log written by our app, let's open a Python terminal in the same 
+directory as ``my_app.py`` and define the following function for reading files
 
 .. code-block:: pycon
 
