@@ -6,9 +6,13 @@ to :py:func:`dataclasses.dataclass`, but can be used to auto-populate Hydra-spec
 parameters; it also exposes other features that are available in 
 :func:`~hydra_zen.builds`.
 
+E.g. in the following codeblock, we will use ``@hydrated_dataclass`` to create a frozen
+(i.e. immutable) config, which is designed to partially configure the class 
+``torch.optim.Adam``.
+
 .. code:: python
 
-   from hydra_zen import hydrated_dataclass
+   from hydra_zen import hydrated_dataclass 
 
    from torch.optim import Adam
 
@@ -33,10 +37,8 @@ This has the benefit of making certain pertinent information (e.g. the dataclass
 fields and that it is frozen) available to static type checkers, while still 
 dynamically populating the resulting dataclass with Hydra-specific fields (e.g. 
 ``_target_``) and providing the same runtime validation capabilities as 
-:func:`~hydra_zen.builds`.
-
-E.g. the following code will raise an error during the
-creation of ``BuildsAdam`` because the fieldname ``momentum`` was misspelled.
+:func:`~hydra_zen.builds` – e.g. the following code will raise an error during the
+creation of ``BuildsAdam`` because the field name ``momentum`` was misspelled.
 
 .. code:: python
 
@@ -45,7 +47,7 @@ creation of ``BuildsAdam`` because the fieldname ``momentum`` was misspelled.
 
    @hydrated_dataclass(target=Adam)
    class BuildsAdam:
-       momtum: float = 0.9  # typo in name momentum
+       momtum: float = 0.9  # <- typo causes TypeError upon constructing config
 
 This means that our config is validated *upon construction*: we will identify this 
 error before we launch our Hydra job.

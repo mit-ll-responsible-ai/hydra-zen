@@ -22,7 +22,7 @@ config:
    - Optional fields
 
 Annotations that fall outside of this subset will cause Hydra's to raise an error. 
-This means that the following structured config:
+This means that the following config:
 
 .. code:: python
 
@@ -108,7 +108,7 @@ preserved. This means that third-party type checkers like
 type-checking functionality.
 
 E.g. let's return to the original example involving the dataclass ``A``. Assuming that
-we have installed ``pydantic``, we recreate this dataclass using ``pydantic``, which 
+we have installed ``pydantic``, we can use it to recreate this dataclass so that it 
 will perform general, runtime type-checking for us.
 
 .. code:: python
