@@ -158,8 +158,8 @@ def test_hydra_type_validation_works(input_type):
 @settings(max_examples=500)
 @given(
     default=st.none() | st.booleans()
-    # avoid issues with interpolated fields
-    | st.text().filter(lambda x: "${" not in x)
+    # avoid issues with interpolated fields and missing values
+    | st.text().filter(lambda x: "${" not in x and "?" not in x)
     | st.lists(st.booleans())
     | st.dictionaries(st.booleans(), st.booleans())
     | st.just(print)
