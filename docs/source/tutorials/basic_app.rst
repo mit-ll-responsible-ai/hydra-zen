@@ -75,7 +75,7 @@ code in this file.
 
 
 .. code-block:: python
-   :caption: Contents of my_app.py:
+    :caption: Contents of my_app.py:
     
     from hydra_zen import make_config, instantiate
     

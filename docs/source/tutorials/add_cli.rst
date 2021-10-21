@@ -117,4 +117,3 @@ line. It should be noted that we can still launch our app from a Python console,
 .. attention:: **Cleaning Up**:
    To clean up after this tutorial, delete the ``outputs`` directory that Hydra created 
    upon launching our app.
-
