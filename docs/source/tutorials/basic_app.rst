@@ -1,3 +1,5 @@
+.. _basic-app:
+
 ========================================
 Create and Launch a Basic App with Hydra
 ========================================
@@ -68,9 +70,8 @@ In ``my_app.py`` we'll define a config and task function for this app. We will u
 code in this file.
 
 
-.. code:: python
-    
-    # contents of my_app.py
+.. code-block:: python
+   :caption: Contents of my_app.py:
     
     from hydra_zen import make_config, instantiate
     
@@ -88,6 +89,7 @@ code in this file.
             f.write("Game session log:\n")
             f.write(f"Player 1: {p1}\n" f"Player 2: {p2}")
 
+.. _launch-basic-app:
 
 Launching the App
 -----------------
@@ -136,7 +138,7 @@ other files that Hydra writes when it launches an app.
 First, we'll create a simple Python function that will make it easy to print files 
 in our Python console
 
-.. code:: pycon
+.. code-block:: pycon
 
    >>> from pathlib import Path 
    >>> def print_file(x: Path):
@@ -148,7 +150,7 @@ outputs in a time-stamped subdirectory of the form
 ``outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}``. The particular subdirectory for our job is 
 provided by ``job.working_dir``.
 
-.. code:: pycon
+.. code-block:: pycon
    
    >>> job_dir = Path(job.working_dir)
    >>> job_dir  # output will vary based on reader's date/time/OS

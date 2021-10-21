@@ -6,3 +6,4 @@ Tutorials
    :caption: Contents:
 
    tutorials/basic_app
+   tutorials/add_cli
