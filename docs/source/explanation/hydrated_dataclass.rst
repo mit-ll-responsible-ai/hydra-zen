@@ -2,13 +2,14 @@ Combining Statically-Defined and Dynamically-Generated Configurations
 =====================================================================
 
 hydra-zen provides a decorator, :func:`~hydra_zen.hydrated_dataclass`, which is similar 
-to :py:func:`dataclasses.dataclass`, but can be used to auto-populate Hydra-specific 
-parameters; it also exposes other features that are available in 
-:func:`~hydra_zen.builds`.
+to :py:func:`dataclasses.dataclass`. It can be used to dynamically auto-populate configuration parameters, à la :func:`~hydra_zen.builds`, while enabling users to
+define the config such that its properties are also statically available to various
+tools, like type-checkers and IDEs.
 
 E.g. in the following codeblock, we will use ``@hydrated_dataclass`` to create a frozen
 (i.e. immutable) config, which is designed to partially configure the class 
-``torch.optim.Adam``.
+``torch.optim.Adam``. Here, static tooling can "see" the types associated with the
+configured fields, and flag bad inputs in our code. That this config is immutable is also salient to static analysis.
 
 .. code:: python
 
@@ -33,12 +34,10 @@ E.g. in the following codeblock, we will use ``@hydrated_dataclass`` to create a
    >>> instantiate(BuildsAdam)
    functools.partial(<class Adam>, lr=0.01, momentum=0.9)
 
-This has the benefit of making certain pertinent information (e.g. the dataclass' 
-fields and that it is frozen) available to static type checkers, while still 
-dynamically populating the resulting dataclass with Hydra-specific fields (e.g. 
-``_target_``) and providing the same runtime validation capabilities as 
-:func:`~hydra_zen.builds` – e.g. the following code will raise an error during the
-creation of ``BuildsAdam`` because the field name ``momentum`` was misspelled.
+Note that we did not need to specify Hydra-specific fields like ``_target_``: the 
+decorator handled this for us. Furthermore, we also benefit from the additional runtime validation capabilities that :func:`~hydra_zen.builds` provides; e.g. the following 
+code will raise an error during the creation of ``BuildsAdam`` because the field name 
+``momentum`` was misspelled.
 
 .. code:: python
 
