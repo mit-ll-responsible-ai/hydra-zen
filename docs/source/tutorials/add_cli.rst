@@ -65,8 +65,11 @@ With the above modifications to ``my_app.py`` complete, we can launch our app fr
 command line. The following will launch a job with ``mario`` and ``luigi`` as the names
 for player 1 and player 2, respectively.
 
+Open your terminal in the same directory as ``my_app.py`` and execute the following 
+command.
+
 .. code-block:: shell
-   :caption: Launching our app  from the command line
+   :caption: Launching our app from the command line
 
    python my_app.py player1=mario player2=luigi
 

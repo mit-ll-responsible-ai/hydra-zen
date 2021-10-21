@@ -114,8 +114,11 @@ We will also need to import hydra-zen's :func:`~hydra_zen.launch` function.
 
 Next, we will launch our app by providing the :func:`~hydra_zen.launch` function with: 
 our config, our task function, and specific configured values for the player's names.
+Here, we will use the names ``link`` and ``zelda`` for the names of player 1 and player 
+2, respectively.
 
-.. code:: pycon
+.. code-block:: pycon
+   :caption: Launching our app
 
    >>> job = launch(Config, task_function, overrides=["player1=link", "player2=zelda"])
 

@@ -1,5 +1,5 @@
-Combining Static and Dynamic Configurations with `@hydrated_dataclass`
-======================================================================
+Combining Statically-Defined and Dynamically-Generated Configurations
+=====================================================================
 
 hydra-zen provides a decorator, :func:`~hydra_zen.hydrated_dataclass`, which is similar 
 to :py:func:`dataclasses.dataclass`, but can be used to auto-populate Hydra-specific 
