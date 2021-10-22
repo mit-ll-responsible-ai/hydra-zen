@@ -231,6 +231,8 @@ behavior shown below.
 Wonderful! Using config groups in our app makes it trivial to swap-out entire "modules" 
 of our app's config. This is an elegant way to change, en-masse, pieces of functionality that are being used by our app.
 
+In the final section of this tutorial, we will use hydra-zen to "inject" novel 
+functionality into our code without having to modify our library's source code nor our task function.
 
 .. admonition:: References
    
