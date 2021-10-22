@@ -64,9 +64,9 @@ be stored with a distinct name, but under the same group: ``player/inventory``.
 Creating Player-Config Groups
 -----------------------------
 
-Now, let's imagine that we have a couple of players who have saved their player 
-profiles, so that they can resume progress when they play our game. Let's mock-up these 
-player configs and then add them to the config store.
+Suppose that we have a couple of players who have saved their player profiles, so that 
+they can resume progress when they play our game. Let's mock-up these player configs 
+and then add them to the config store.
 
 .. code-block:: python
    :caption: Creating player-profile configs
@@ -198,31 +198,48 @@ Open your terminal in the directory shared by both ``my_app.py`` and
 behavior shown below.
 
 .. code-block:: console
-   :caption: Configuring: name
+   :caption: Default inventory.
 
-   $ python my_app.py player.name=frodo
-   frodo, lvl: 1, has: {'gold': 10, 'weapon': 'stick', 'costume': 'tunic'}
-
-.. code-block:: console
-   :caption: Configuring: name and level
-
-   $ python my_app.py player.name=frodo player.level=5
-   frodo, lvl: 5, has: {'gold': 10, 'weapon': 'stick', 'costume': 'tunic'}
+   $ python my_app.py player.name=ivy
+   ivy, lvl: 1, has: {'gold': 10, 'weapon': 'stick', 'costume': 'tunic'}
 
 .. code-block:: console
-   :caption: Configuring: name, level, and costume
+   :caption: Give player 'hard-mode' load-out.
 
-   $ python my_app.py player.name=frodo player.level=2 player.inventory.costume=robe
-   frodo, lvl: 2, has: {'gold': 10, 'weapon': 'stick', 'costume': 'robe'}
+   $ python my_app.py player.name=ivy +player/inventory=hard_mode
+   ivy, lvl: 1, has: {'gold': 0, 'weapon': 'inner thoughts', 'costume': 'rags'}
 
+.. code-block:: console
+   :caption: Player-level 3. With 'hard-mode' load-out, but with 10 gold.
+
+   $ python my_app.py player.name=ivy player.level=3 +player/inventory=hard_mode player.inventory.gold=10
+   ivy, lvl: 3, has: {'gold': 10, 'weapon': 'inner thoughts', 'costume': 'rags'}
+
+.. code-block:: console
+   :caption: Load Rakesh's player-profile
+
+   $ python my_app.py player=rakesh
+   rakesh, lvl: 300, has: {'gold': 41, 'weapon': 'pillow', 'costume': 'PJs'}
+
+.. code-block:: console
+   :caption: Load Brinda's player-profile, and change their costume
+
+   $ python my_app.py player=brinda player.inventory.costume=armor
+   brinda, lvl: 47, has: {'gold': 52, 'weapon': 'flute', 'costume': 'armor'}
+
+
+Wonderful! Using config groups in our app makes it trivial to swap-out entire "modules" 
+of our app's config. This is an elegant way to change, en-masse, pieces of functionality that are being used by our app.
 
 
 .. admonition:: References
-
-   - `~hydra_zen.make_custom_builds_fn`
-   - `~hydra_zen.builds`
+   
+   - :hydra:`Hydra's default list <tutorials/structured_config/defaults>`
+   - :hydra:`Hydra's default list (technical reference) <advanced/defaults_list>`
    - :hydra:`Hydra's Config Store API <tutorials/structured_config/config_store>`
    - :hydra:`Hydra's command line override syntax <advanced/override_grammar/basic>`
+   - `~hydra_zen.make_custom_builds_fn`
+   - `~hydra_zen.builds`
 
 .. attention:: **Cleaning Up**:
    To clean up after this tutorial, delete the ``outputs`` directory that Hydra created 
