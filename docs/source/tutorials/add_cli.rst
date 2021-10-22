@@ -113,7 +113,9 @@ line. It should be noted that we can still launch our app from a Python console,
 
 .. admonition:: References
 
-   Refer to `this documentation <https://hydra.cc/docs/tutorials/structured_config/config_store>`_ for details about Hydra's config store API.
+   - `Hydra's Config Store API <https://hydra.cc/docs/next/tutorials/structured_config/config_store>`_
+   - `Hydra's command line override syntax <https://hydra.cc/docs/next/advanced/override_grammar/basic/>`_
+
 
 .. attention:: **Cleaning Up**:
    To clean up after this tutorial, delete the ``outputs`` directory that Hydra created 

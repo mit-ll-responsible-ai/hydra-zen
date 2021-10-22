@@ -210,10 +210,10 @@ that Hydra leaves for us.
 
 .. admonition:: References
 
-   Refer to :func:`~hydra_zen.make_config` for more details about designing configs, including creating configs with default  values, and with type-annotations for type-checking.
+   - :func:`~hydra_zen.make_config`
+   - :func:`~hydra_zen.instantiate`
+   - :func:`~hydra_zen.launch`
 
-   Refer to :func:`~hydra_zen.launch` to learn more about the ``JobReturn`` object that
-   is produced by our job, and to see an app run in a multirun fashion.
 
 .. attention:: **Cleaning Up**:
    To clean up after this tutorial, delete the ``outputs`` directory that Hydra created 
