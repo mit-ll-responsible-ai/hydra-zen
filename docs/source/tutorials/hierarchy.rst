@@ -23,7 +23,7 @@ In this script we'll define a :class:`Character` class and an :func:`inventory`
 function as follows. Populate ``game_library.py`` with the following code.
 
 .. code-block:: python
-   :caption: Contents of game_library.py
+   :caption: Contents of ``game_library.py``
    
    # Note: type annotations are *not* required by hydra-zen
 
@@ -53,6 +53,7 @@ To see this code in action, open a Python console (or Jupyter notebook) in the s
 directory as ``game_library.py`` and reproduce the following steps.
 
 .. code-block:: pycon
+   :caption: Getting a feel for the code in ``game_library.py``
 
    >>> from game_library import Character, inventory
    >>> stuff = inventory(gold=12, weapon="stick", costume="bball jersey")
@@ -87,6 +88,19 @@ Because configurable aspects of our app should directly reflect the interfaces o
 :class:`Character` class and :func:`inventory`, we can use
 :func:`~hydra_zen.builds` to generate configs that reflect these interfaces. 
 
+To see :func:`~hydra_zen.builds` in action, open a Python console (or Jupyter notebook) in the same directory as ``game_library.py``. Follow with these inputs.
+
+.. code-block:: pycon
+   :caption: Getting a feel for :func:`~hydra_zen.builds`
+
+   >>> from hydra_zen import builds, instantiate
+   >>> from game_library import Character
+
+   >>> CharConf = builds(Character, populate_full_signature=True)
+   
+   >>> instantiate(CharConf, name="celeste")
+   celeste, lvl: 1, has: None
+
 Let's create a configuration for a character with basic "starter gear" for their 
 inventory. We will use the following code in ``my_app.py``.
 
@@ -102,10 +116,12 @@ inventory. We will use the following code in ``my_app.py``.
    InventoryConf = builds(inventory)
    starter_gear = InventoryConf(gold=10, weapon="stick", costume="tunic")
    
+   # note: 
+   # We are nesting the config for `inventory` within the 
+   # config for `Character`.
    CharConf = builds(Character, inventory=starter_gear)
 
-Then the config for our app will simply specify that ``player`` is described by this 
-character config:
+Finally, the top-level config for our app will simply specify that ``player`` is described by this character config:
 
 .. code-block:: python
    :caption: The top-level config for our app
@@ -230,7 +246,7 @@ To inspect the most-recent log written by our app, let's open a Python terminal 
    ...         print(f.read())
 
 
-Getting the directory containing the output of the most most-recent job:
+Getting the directory containing the output of the most-recent job:
 
 .. code-block:: pycon
    
@@ -278,7 +294,7 @@ dynamically - the library code that we are ultimately instantiating. We also see
 power of Hydra's ability to configure nested fields within our config.
 
 In the next tutorial, we will define swappable config groups so that we can load 
-specific player profiles and inventory load-outs from our app's interface.
+specific player profiles and inventory load-outs, from our app's interface.
 
 .. admonition:: References
 
