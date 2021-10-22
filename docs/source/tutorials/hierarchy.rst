@@ -284,8 +284,8 @@ specific player profiles and inventory load-outs from our app's interface.
 
    - `~hydra_zen.make_custom_builds_fn`
    - `~hydra_zen.builds`
-   - `Hydra's Config Store API <https://hydra.cc/docs/next/tutorials/structured_config/config_store>`_
-   - `Hydra's command line override syntax <https://hydra.cc/docs/next/advanced/override_grammar/basic/>`_
+   - :hydra:`Hydra's Config Store API <tutorials/structured_config/config_store>`
+   - :hydra:`Hydra's command line override syntax <advanced/override_grammar/basic>`
 
 .. attention:: **Cleaning Up**:
    To clean up after this tutorial, delete the ``outputs`` directory that Hydra created 

@@ -78,6 +78,7 @@ extlinks = {
     "issue": (_repo + "issues/%s", "issue #"),
     "pull": (_repo + "pull/%s", "pull request #"),
     "plymi": ("https://www.pythonlikeyoumeanit.com/%s", ""),
+    "hydra": ("https://hydra.cc/docs/%s", ""),
 }
 
 # -- Options for HTML output -------------------------------------------------
