@@ -7,3 +7,4 @@ Tutorials
 
    tutorials/basic_app
    tutorials/add_cli
+   tutorials/hierarchy

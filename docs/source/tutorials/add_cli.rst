@@ -1,3 +1,4 @@
+.. _cli-app:
 
 =======================================
 Add a Command Line Interface to Our App
@@ -68,10 +69,10 @@ for player 1 and player 2, respectively.
 Open your terminal in the same directory as ``my_app.py`` and execute the following 
 command.
 
-.. code-block:: shell
+.. code-block:: console
    :caption: Launching our app from the command line
 
-   python my_app.py player1=mario player2=luigi
+   $ python my_app.py player1=mario player2=luigi
 
 .. tip::
    You can `add tab-completion <https://hydra.cc/docs/tutorials/basic/running_your_app/tab_completion/>`_ to your app's command line interface. This is helpful once you 
