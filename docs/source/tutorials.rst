@@ -8,3 +8,4 @@ Tutorials
    tutorials/basic_app
    tutorials/add_cli
    tutorials/hierarchy
+   tutorials/config_groups
