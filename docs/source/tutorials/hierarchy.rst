@@ -1,3 +1,5 @@
+.. _hierarchy-app:
+
 ===================================
 Design a Hierarchical App Interface
 ===================================
@@ -12,6 +14,8 @@ configurable components.
    This tutorial assumes that you have completed the earlier tutorials: :ref:`basic-app`
    and :ref:`cli-app`.
 
+.. _game-library:
+
 Creating (Fake) Library Code
 ============================
 
@@ -24,6 +28,8 @@ function as follows. Populate ``game_library.py`` with the following code.
 
 .. code-block:: python
    :caption: Contents of ``game_library.py``
+   
+   # Should be in same directory as `my_app.py`
    
    # Note: type annotations are *not* required by hydra-zen
 
@@ -231,6 +237,30 @@ behavior shown below.
 
    $ python my_app.py player.name=frodo player.level=2 player.inventory.costume=robe
    frodo, lvl: 2, has: {'gold': 10, 'weapon': 'stick', 'costume': 'robe'}
+
+.. note:: 
+    
+   We can use :func:`hydra_zen.launch` to launch our app, instead of using our app's 
+   CLI. The following command line expression
+
+   .. code-block:: console
+   
+      $ python my_app.py player.name=frodo player.level=2 player.inventory.costume=robe
+      frodo, lvl: 2, has: {'gold': 10, 'weapon': 'stick', 'costume': 'robe'}
+
+   can be replicated from a Python console via:
+
+   .. code-block:: pycon
+      :caption: In a Python console opened in the same directory as ``my_app.py``
+      
+      >>> from hydra_zen import launch
+      >>> from my_app import Config, task_function
+      >>> job = launch(
+      ...     Config,
+      ...     task_function,
+      ...     ["player.name=frodo", "player.level=2", "player.inventory.costume=robe"],
+      ... )
+      frodo, lvl: 2, has: {'gold': 10, 'weapon': 'stick', 'costume': 'robe'}
 
 
 Inspecting the Results
