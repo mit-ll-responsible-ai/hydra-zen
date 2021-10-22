@@ -115,7 +115,8 @@ Updating the Task Function
 
 We'll make some trivial modifications to our task function. We're only dealing with one 
 player now, not two, so we adjust accordingly. Let's also print the 
-``Character``-instance for ``player`` so that it is we get instant feedback when we run the app.
+``Character``-instance for ``player`` so that it is we get instant feedback as we 
+prototype our app.
 
 .. code-block:: python
    :caption: A revised task function (single-player only)
@@ -266,6 +267,13 @@ for this job in ``.hydra/overrides.yaml``.
    - player.name=frodo
    - player.level=2
    - player.inventory.costume=robe
+
+Great! Our app is now much more sophisticated: its configurable interface reflects - 
+dynamically - the library code that we are ultimately instantiating. We also see the 
+power of Hydra's ability to configure nested fields within our config.
+
+In the next tutorial, we will define swappable config groups so that we can load 
+specific player profiles and inventory load-outs from our app's interface.
 
 .. admonition:: References
 
