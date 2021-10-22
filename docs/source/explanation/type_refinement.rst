@@ -1,3 +1,5 @@
+.. _type-support:
+
 ##############################################
 hydra-zen's Automatic Type Refinement Behavior
 ##############################################

@@ -44,6 +44,11 @@ function as follows. Populate ``game_library.py`` with the following code.
    def inventory(gold: int, weapon: str, costume: str):
        return {"gold": gold, "weapon": weapon, "costume": costume}
 
+.. note::
+
+   :plymi:`Type-annotations <Module5_OddsAndEnds/Writing_Good_Code.html#Type-Hinting>` are **not** required by hydra-zen. However, they do enable :ref:`runtime type-checking of configured values <type-support>` for our app.
+
+
 To see this code in action, open a Python console (or Jupyter notebook) in the same 
 directory as ``game_library.py`` and reproduce the following steps.
 

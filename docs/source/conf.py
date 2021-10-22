@@ -77,6 +77,7 @@ extlinks = {
     "gh-link": (_repo + "%s", ""),
     "issue": (_repo + "issues/%s", "issue #"),
     "pull": (_repo + "pull/%s", "pull request #"),
+    "plymi": ("https://www.pythonlikeyoumeanit.com/%s", ""),
 }
 
 # -- Options for HTML output -------------------------------------------------
