@@ -20,10 +20,10 @@ our library's code. Let's create a new Python script, ``game_library.py``, in th
 directory as ``my_app.py``. This will serve as a mimic of a "real" Python library.
 
 In this script we'll define a :class:`Character` class and an :func:`inventory` 
-function as follows.
+function as follows. Populate ``game_library.py`` with the following code.
 
 .. code-block:: python
-   :caption: Contents of game_library.py:
+   :caption: Contents of game_library.py
    
    # Note: type annotations are *not* required by hydra-zen
 
@@ -60,24 +60,33 @@ Modifying Our App
 =================
 
 Let's change our app so that the interface describes only one player, instead of two.
-We want to be able to configure the player's
+We want to be able to configure the player based on the following hierarchy of fields:
+
+**Player**
 
 - name
 - level
-- gold in their inventory
-- weapon in their inventory
-- costume in their inventory
+- inventory
+   
+  * amount of gold
+  * weapon type
+  * costume
+
+These fields reflect the interfaces/structure of :class:`Character` and 
+:func:`inventory`.
 
 Dynamically Generating Configs
 ------------------------------
 
-The configurable aspects of our app is already reflected in the interfaces of 
-:class:`Character` class and :func:`inventory`. Thus we can use 
-:func:`~hydra_zen.builds` to generate configs based on these interfaces. We'll
-create a configuration for a character with basic "starter gear" for their 
-inventory.
+Because configurable aspects of our app should directly reflect the interfaces of 
+:class:`Character` class and :func:`inventory`, we can use
+:func:`~hydra_zen.builds` to generate configs that reflect these interfaces. 
+
+Let's create a configuration for a character with basic "starter gear" for their 
+inventory. We will use the following code in ``my_app.py``.
 
 .. code-block:: python
+   :caption: Dynamically generating configs based on ``game_library``
 
    from hydra_zen import make_custom_builds_fn 
    
@@ -94,6 +103,7 @@ Then the config for our app will simply specify that ``player`` is described by 
 character config:
 
 .. code-block:: python
+   :caption: The top-level config for our app
 
    from hydra_zen import make_config
 
@@ -105,10 +115,10 @@ Updating the Task Function
 
 We'll make some trivial modifications to our task function. We're only dealing with one 
 player now, not two, so we adjust accordingly. Let's also print the 
-``Character``-instance for ``player`` so that it is easy for us to get instant feedback 
-from the app.
+``Character``-instance for ``player`` so that it is we get instant feedback when we run the app.
 
 .. code-block:: python
+   :caption: A revised task function (single-player only)
 
    def task_function(cfg: Config):
        cfg = instantiate(cfg)
@@ -158,12 +168,15 @@ script is as follows.
     @hydra.main(config_path=None, config_name="config")
     def task_function(cfg: Config):
         cfg = instantiate(cfg)
+        
         player = cfg.player
         print(player)
+        
         with open("player_log.txt", "w") as f:
             f.write("Game session log:\n")
             f.write(f"Player: {player}\n")
-    
+
+        return player
     
     if __name__ == "__main__":
         task_function()
@@ -172,8 +185,12 @@ script is as follows.
 Running Our App
 ===============
 
-We can configure any aspect of the player when launching our app; let's try a few 
-examples in order to get a feel for the syntax
+We can now configure any aspect of the player when launching our app; let's try a few 
+examples in order to get a feel for the syntax. 
+
+Open your terminal in the directory shared by both ``my_app.py`` and 
+``game_library.py`` and run the following commands. Verify that you can reproduce the 
+behavior shown below.
 
 .. code-block:: console
    :caption: Configuring: name
@@ -194,12 +211,10 @@ examples in order to get a feel for the syntax
    frodo, lvl: 2, has: {'gold': 10, 'weapon': 'stick', 'costume': 'robe'}
 
 
-
 Inspecting the Results
 ----------------------
 
-To inspect the log written by our app, let's open a Python terminal in the same 
-directory as ``my_app.py`` and define the following function for reading files
+To inspect the most-recent log written by our app, let's open a Python terminal in the same directory as ``my_app.py`` and define the following function for reading files
 
 .. code-block:: pycon
 
@@ -209,7 +224,7 @@ directory as ``my_app.py`` and define the following function for reading files
    ...         print(f.read())
 
 
-Getting the directory containing the output of this job:
+Getting the directory containing the output of the most most-recent job:
 
 .. code-block:: pycon
    
@@ -254,10 +269,10 @@ for this job in ``.hydra/overrides.yaml``.
 
 .. admonition:: References
 
-   Refer to :func:`~hydra_zen.make_config` for more details about designing configs, including creating configs with default  values, and with type-annotations for type-checking.
-
-   Refer to :func:`~hydra_zen.launch` to learn more about the ``JobReturn`` object that
-   is produced by our job, and to see an app run in a multirun fashion.
+   - `~hydra_zen.make_custom_builds_fn`
+   - `~hydra_zen.builds`
+   - `Hydra's Config Store API <https://hydra.cc/docs/next/tutorials/structured_config/config_store>`_
+   - `Hydra's command line override syntax <https://hydra.cc/docs/next/advanced/override_grammar/basic/>`_
 
 .. attention:: **Cleaning Up**:
    To clean up after this tutorial, delete the ``outputs`` directory that Hydra created 
