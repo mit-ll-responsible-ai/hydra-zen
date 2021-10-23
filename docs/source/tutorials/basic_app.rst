@@ -16,10 +16,10 @@ be configurable and that it can be run in a reproducible way.
 
    This tutorial does not assume that you have any familiarity with
    hydra-zen or Hydra. It does, however, assume that you are comfortable
-   with using Python. 
-   
-   If you are not comfortable with using Python, consider consulting this
-   resource for `getting started with Python <https://www.pythonlikeyoumeanit.com/module_1.html>`_, and this `tutorial on the essentials of Python <https://www.pythonlikeyoumeanit.com/module_2.html>`_.
+   with using Python. If you are new to Python, consider consulting this resource for 
+   `getting started with Python <https://www.pythonlikeyoumeanit.com/module_1.html>`_, 
+   and this 
+   `tutorial on the essentials of Python <https://www.pythonlikeyoumeanit.com/module_2.html>`_.
 
 
 Getting Started
@@ -183,7 +183,7 @@ Let's verify that our app wrote the player-log as-expected.
    Player 1: link
    Player 2: zelda
 
-Great! The player's names were recorded correctly.
+Great! The players' names were recorded correctly.
 
 The contents of the ``.hydra`` subdirectory is a collection of YAML files:
 
@@ -204,9 +204,7 @@ we can inspect ``config.yaml``.
    player2: zelda
 
 We successfully designed, configured, and launched an app using hydra-zen and Hydra!
-In the next tutorial, we will add a command line interface to this app. We will also
-see how we can reproduce the results of a job by using the breadcrumb trail of configs
-that Hydra leaves for us.
+In the next tutorial, we will add a command line interface to this app.
 
 .. admonition:: References
 
@@ -217,5 +215,6 @@ that Hydra leaves for us.
 
 .. attention:: **Cleaning Up**:
    To clean up after this tutorial, delete the ``outputs`` directory that Hydra created 
-   upon launching our app.
+   upon launching our app. You can find this in the same directory as your 
+   ``my_app.py`` file.
 

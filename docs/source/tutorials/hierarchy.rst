@@ -94,15 +94,20 @@ Because configurable aspects of our app should directly reflect the interfaces o
 :class:`Character` class and :func:`inventory`, we can use
 :func:`~hydra_zen.builds` to generate configs that reflect these interfaces. 
 
-To see :func:`~hydra_zen.builds` in action, open a Python console (or Jupyter notebook) in the same directory as ``game_library.py``. Follow with these inputs.
+To see :func:`~hydra_zen.builds` in action, open a Python console (or Jupyter notebook) in the same directory as ``game_library.py``. Follow along with these inputs.
 
 .. code-block:: pycon
    :caption: Getting a feel for :func:`~hydra_zen.builds`
 
-   >>> from hydra_zen import builds, instantiate
+   >>> from hydra_zen import builds, instantiate, to_yaml
    >>> from game_library import Character
-
+   
    >>> CharConf = builds(Character, populate_full_signature=True)
+   >>> print(to_yaml(CharConf))
+   _target_: game_library.Character
+   name: ???
+   level: 1
+   inventory: null
    
    >>> instantiate(CharConf, name="celeste")
    celeste, lvl: 1, has: None
@@ -251,7 +256,7 @@ behavior shown below.
    can be replicated from a Python console via:
 
    .. code-block:: pycon
-      :caption: In a Python console opened in the same directory as ``my_app.py``
+      :caption: A Python console, opened in the same directory as ``my_app.py``
       
       >>> from hydra_zen import launch
       >>> from my_app import Config, task_function

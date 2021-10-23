@@ -107,7 +107,7 @@ default config for that group. Let's specify the ``CharConf`` config, which we n
 
 
 .. code-block:: python
-   :caption: Adding configs to the ``player`` group in Hydra's config store
+   :caption: Specifying the player-group item named ``base`` as the default player-profile
 
    Config = make_config("player", defaults=["_self_", {"player": "base"}])
    cs.store(name="config", node=Config)
@@ -186,6 +186,14 @@ over. Modify your ``my_app.py`` script to match the following code.
    
    if __name__ == "__main__":
        task_function()
+
+.. tip::
+
+   **A matter of housekeeping**: our configs need not be defined in the same file as
+   ``task_function``. They can be defined - and added to the config store - in a 
+   separate file in our library, e.g. ``configs.py``, or across multiple files. This is 
+   nice from an organizational perspective, plus it can enables to use these configs
+   across multiple apps.
 
 
 Running Our App

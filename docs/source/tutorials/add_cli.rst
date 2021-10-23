@@ -42,7 +42,9 @@ Modify your script to match this:
    cs.store(name="config", node=Config)
    
    
-   # 2) Tell Hydra what config to use for our task-function
+   # 2) Tell Hydra what config to use for our task-function.
+   #    The name specified here - 'config' - must match the
+   #    name that we provided to `cs.store(name=<...>, node=Config)`
    @hydra.main(config_path=None, config_name="config")
    def task_function(cfg: Config):
        cfg = instantiate(cfg)
