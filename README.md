@@ -20,7 +20,7 @@
     <img src="https://zenodo.org/badge/354130346.svg" alt="Cite Us" />
   </a>
   <p align="center">
-    A library for facilitating configurable, scalable, and reproducible workflows, using Hydra.
+    A library that facilitates configurable, scalable, and reproducible workflows, using Hydra.
   </p>
   <p align="center">
     Check out our <a href="https://mit-ll-responsible-ai.github.io/hydra-zen/">documentation</a> for more information.
