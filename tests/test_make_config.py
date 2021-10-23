@@ -159,7 +159,7 @@ def test_hydra_type_validation_works(input_type):
 @given(
     default=st.none() | st.booleans()
     # avoid issues with interpolated fields
-    | st.text().filter(lambda x: "${" not in x)
+    | st.text().filter(lambda x: "${" not in x and "?" not in x)
     | st.lists(st.booleans())
     | st.dictionaries(st.booleans(), st.booleans())
     | st.just(print)
