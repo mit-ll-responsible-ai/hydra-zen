@@ -7,3 +7,4 @@ Explanation
 
    explanation/type_refinement
    explanation/hydrated_dataclass
+   explanation/dont_repeat_yourself

@@ -851,6 +851,8 @@ def builds(
     >>> my_router.ip_address = "148.109.37.2"
     FrozenInstanceError: cannot assign to field 'ip_address'
 
+    .. _builds-validation:
+
     **Runtime validation perfomed by builds**
 
     Misspelled parameter names and other invalid configurations for the target’s
