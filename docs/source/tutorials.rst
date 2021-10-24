@@ -9,3 +9,4 @@ Tutorials
    tutorials/add_cli
    tutorials/hierarchy
    tutorials/config_groups
+   tutorials/inject_wrapper
