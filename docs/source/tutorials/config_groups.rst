@@ -194,7 +194,7 @@ over. Modify your ``my_app.py`` script to match the following code.
    **A matter of housekeeping**: our configs need not be defined in the same file as
    ``task_function``. They can be defined - and added to the config store - in a 
    separate file in our library, e.g. ``configs.py``, or across multiple files. This is 
-   nice from an organizational perspective, plus it can enables to use these configs
+   nice from an organizational perspective, plus it enables to use these configs
    across multiple apps.
 
 
