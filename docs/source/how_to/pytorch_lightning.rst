@@ -23,7 +23,7 @@ In this "How-To" we will do the following:
 1. Define a simple neural network and `lightning module <https://pytorch-lightning.readthedocs.io/en/latest/common/lightning_module.html>`_.
 2. Create configs for our lighting module, data loader, optimizer, and trainer.
 3. Define a task-function for training and testing a model.
-4. Train four different models using combinations of two batch-sizes and two model-sizes (i.e. the number of neurons), and compare their fits.
+4. Train four different models using combinations of two batch-sizes and two model-sizes (i.e. the number of neurons).
 5. Analyze our models' results.
 6. Load our best model using the checkpoints saved by PyTorch Lightning and the job-config saved by Hydra.
 
@@ -50,6 +50,7 @@ following code. Here, we define our single-layer neural network and the `lightni
    
    
    def single_layer_nn(num_neurons: int) -> nn.Module:
+       """y = sum(V sigmoid(X W + b))"""
        return nn.Sequential(
            nn.Linear(1, num_neurons),
            nn.Sigmoid(),
@@ -58,8 +59,6 @@ following code. Here, we define our single-layer neural network and the `lightni
    
    
    class UniversalFuncModule(pl.LightningModule):
-       """y = sum(V sigmoid(X W + b))"""
-   
        def __init__(
            self,
            model: nn.Module,
@@ -103,8 +102,7 @@ following code. Here, we define our single-layer neural network and the `lightni
 Creating Our Configs and Task Function
 ======================================
 
-Create another script, named ``experiment.py``, in the same directory as ``zen_model.
-py``. Here, we will create the configs for our experiments as well as the task function.
+Create another script - named ``experiment.py`` - in the same directory as ``zen_model.py``. Here, we will create the configs for our experiments as well as the task function.
 
 
 .. code-block:: python
@@ -191,7 +189,7 @@ py``. Here, we will create the configs for our experiments as well as the task f
 Running Our Experiments
 ========================
 
-and ``zen_model.py``. We will use :func:`hydra_zen.launch` to run four jobs: training our model with all four combinations of:
+We will use :func:`hydra_zen.launch` to run four jobs: training our model with all four combinations of:
 
 - a batch-size of 20 and 200
 - a model with 10 and 100 neurons
@@ -250,6 +248,7 @@ you see the plot shown below.
    ... 
    >>> ax.grid(True)
    >>> ax.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
+   >>> plt.show()
 
 .. image:: https://user-images.githubusercontent.com/29104956/138622935-3a3a960f-301f-477e-b5ab-7f4c741b1f9e.png
    :width: 800
@@ -364,14 +363,10 @@ at :math:`-\pi/2`, :math:`0`, and :math:`\pi/2` should return, approximately, :m
            [0.0364]], grad_fn=<MmBackward>)
 
 
-More Examples of hydra-zen in ML Projects
------------------------------------------
-You can check out `this repository <https://github.com/mit-ll-responsible-ai/hydra-zen-examples>`_ for examples of larger-scale ML projects using hydra-zen.
-
 
 .. admonition:: Nerdy Math Details
 
-   In this toy-problem are optimizing `arbitrary-width universal function approximators    <https://en.wikipedia.org/wiki/Universal_approximation_theorem#Arbitrary-width_case>`_ to fit :math:`\cos{x}`
+   For the interested reader... In this toy-problem we are optimizing `arbitrary-width universal function approximators    <https://en.wikipedia.org/wiki/Universal_approximation_theorem#Arbitrary-width_case>`_ to fit :math:`\cos{x}`
    on :math:`x \in [-2\pi, 2\pi]`.
    In mathematical notation, we want to solve the following optimization problem:
    
@@ -384,3 +379,8 @@ You can check out `this repository <https://github.com/mit-ll-responsible-ai/hyd
       x &\in [-2\pi, 2\pi]
    
    where :math:`N` – the number of "neurons" in our layer – is a hyperparameter.
+
+More Examples of Using hydra-zen in ML Projects
+===============================================
+
+You can check out `this repository <https://github.com/mit-ll-responsible-ai/hydra-zen-examples>`_ for examples of larger-scale ML projects using hydra-zen.
