@@ -4,12 +4,12 @@ Don't Repeat Yourself: Keeping DRY with Dynamically-Generated Configs 🌞
 
 **DRY – Don't Repeat Yourself** – is a `principle of software development <https://en.
 wikipedia.org/wiki/Don%27t_repeat_yourself>`_ that cautions against repetitive software 
-patterns and workflows. Manually writing configs for  your code will often leave you 
-soaking **WET (Writing Everything Twice)**. One of the major benefits of using 
-hydra-zen's :ref:`config-creation functions <create-config>` is that they help us abide 
-by the DRY principle.
+patterns and workflows. One of the major benefits of using hydra-zen's 
+:ref:`config-creation functions <create-config>` is that they help us abide by the DRY 
+principle. On the other hand, manually writing configs for  your code will often leave 
+you soaking **WET (Writing Everything Twice)**.
 
-To see this, let's suppose that we want to configure the following class.
+To develop an intuition for these claims, let's suppose that we want to configure the following class.
 
 .. code-block:: python
    :caption: Contents of ``vision/model.py``
@@ -32,7 +32,7 @@ We'll compare the processes of configuring :class:`DNN` using a YAML-file, using
 Statically-Defined Configs are WET
 ==================================
 
-Manually writing a structured config for ``DNN`` entails hard-coding its current import-path as a string along with explicitly mirroring its signature:
+Manually writing a structured config for ``DNN`` entails hard-coding its current import-path as a string as wll as explicitly mirroring its signature:
 
 .. tabs::
 
