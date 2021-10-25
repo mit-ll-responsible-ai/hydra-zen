@@ -1,16 +1,6 @@
-.. _basic-app:
-
-========================================
-Create and Launch a Basic App with Hydra
-========================================
-
 .. tip:: 
    Hover your cursor over any code block in this tutorial, and a clipboard will appear.
    Click it to copy the contents of the code block.
-
-In this tutorial we will create a basic app that we can launch using Hydra.
-While the app itself will be trivial, we will see that it is designed to 
-be configurable and that it can be run in a reproducible way.
 
 .. admonition:: Prerequisites
 
@@ -20,6 +10,16 @@ be configurable and that it can be run in a reproducible way.
    `getting started with Python <https://www.pythonlikeyoumeanit.com/module_1.html>`_, 
    and this 
    `tutorial on the essentials of Python <https://www.pythonlikeyoumeanit.com/module_2.html>`_.
+
+.. _basic-app:
+
+========================================
+Create and Launch a Basic App with Hydra
+========================================
+
+In this tutorial we will create a basic app that we can launch using Hydra.
+While the app itself will be trivial, we will see that it is designed to 
+be configurable and that it can be run in a reproducible way.
 
 
 Getting Started

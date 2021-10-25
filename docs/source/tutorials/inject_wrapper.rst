@@ -1,10 +1,10 @@
-===============================================
-Inject Novel Functionality via the App's Config
-===============================================
-
 .. admonition:: Prerequisites
 
    This tutorial is a direct follow-on to: :ref:`config-groups-tutorial`.
+
+===============================================
+Inject Novel Functionality via the App's Config
+===============================================
 
 In this tutorial we will add new functionality into our app without modifying either 
 our library's code or our task function. 

@@ -1,12 +1,12 @@
+.. admonition:: Prerequisites
+
+   This tutorial is a direct follow-on to: :ref:`hierarchy-app`.
+
 .. _config-groups-tutorial:
 
 ======================================
 Provide Swappable Configuration Groups
 ======================================
-
-.. admonition:: Prerequisites
-
-   This tutorial is a direct follow-on to: :ref:`hierarchy-app`.
 
 In this tutorial we will create swappable configuration groups for our app; this will 
 enable us to create specific player profiles and inventory load-outs. These config 

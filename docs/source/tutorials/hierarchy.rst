@@ -1,3 +1,8 @@
+.. admonition:: Prerequisites
+
+   This tutorial assumes that you have completed the earlier tutorials: :ref:`basic-app`
+   and :ref:`cli-app`.
+
 .. _hierarchy-app:
 
 ===================================
@@ -8,11 +13,6 @@ In this tutorial we will design an app that has an interface that is hierarchica
 nature. This particular app will describe a player in a video game; this player has a 
 configurable name and experience-level, as well as an inventory, which itself has 
 configurable components.
-
-.. admonition:: Prerequisites
-
-   This tutorial assumes that you have completed the earlier tutorials: :ref:`basic-app`
-   and :ref:`cli-app`.
 
 .. _game-library:
 

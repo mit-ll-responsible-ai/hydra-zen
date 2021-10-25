@@ -1,19 +1,19 @@
+.. tip:: 
+   Hover your cursor over any code block in this tutorial, and a clipboard will appear.
+   Click it to copy the contents of the code block.
+
+.. admonition:: Prerequisites
+
+   This tutorial assumes that you have completed the earlier tutorial: :ref:`basic-app`
+
 .. _cli-app:
 
 =======================================
 Add a Command Line Interface to Our App
 =======================================
 
-.. tip:: 
-   Hover your cursor over any code block in this tutorial, and a clipboard will appear.
-   Click it to copy the contents of the code block.
-
 In this tutorial we will update our app so that it can be configured an launched 
 from a command line interface.
-
-.. admonition:: Prerequisites
-
-   This tutorial assumes that you have completed the earlier tutorial: :ref:`basic-app`
 
 
 Modifying Our App
