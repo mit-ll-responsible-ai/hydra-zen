@@ -1,0 +1,652 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Run Boilerplate-Free ML Experiments with PyTorch Lightning &amp; hydra-zen &#8212; hydra-zen 0.3.0rc5+11.g748fba6 documentation</title>
+    
+  <link href="../_static/css/theme.css" rel="stylesheet">
+  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/blank.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/my_theme.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../_static/hydra_zen_favicon_32x32.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Explanation" href="../explanation.html" />
+    <link rel="prev" title="How-To Guides" href="../how_tos.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/../../brand/hydra_zen_favicon_32x32.ico">
+      
+    
+      
+      <link rel="icon" sizes="64x64" href="../_static/../../brand/hydra_zen_favicon_64x64.ico">
+      
+    
+      
+      <link rel="icon" sizes="134x134" href="../_static/../../brand/hydra_zen_favicon.ico">
+      
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="../index.html">
+  <img src="../_static/Hydra-Zen_logo_full_filled_bkgrnd_smaller.png" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../tutorials.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../how_tos.html">
+  How-To Guides
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../explanation.html">
+  Explanation
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../api_reference.html">
+  Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../changes.html">
+  Changelog
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/mit-ll-responsible-ai/hydra-zen" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <p class="caption">
+ <span class="caption-text">
+  Contents:
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Run Boilerplate-Free ML Experiments with PyTorch Lightning &amp; hydra-zen
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#defining-our-model">
+   Defining Our Model
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#creating-our-configs-and-task-function">
+   Creating Our Configs and Task Function
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#running-our-experiments">
+   Running Our Experiments
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#inspecting-our-results">
+   Inspecting Our Results
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#visualizing-our-results">
+     Visualizing Our Results
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#loading-the-model-of-best-fit">
+     Loading the Model of Best-Fit
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#more-examples-of-using-hydra-zen-in-ml-projects">
+   More Examples of Using hydra-zen in ML Projects
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="admonition-prerequisites admonition" id="lightning">
+<p class="admonition-title">Prerequisites</p>
+<p>Your must install <a class="reference external" href="https://pytorch.org/">PyTorch</a> and <a class="reference external" href="https://www.pytorchlightning.ai/">PyTorch Lightning</a> in order to complete this How-To lesson.</p>
+</div>
+<div class="section" id="run-boilerplate-free-ml-experiments-with-pytorch-lightning-hydra-zen">
+<h1>Run Boilerplate-Free ML Experiments with PyTorch Lightning &amp; hydra-zen<a class="headerlink" href="#run-boilerplate-free-ml-experiments-with-pytorch-lightning-hydra-zen" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://www.pytorchlightning.ai/">PyTorch Lightning</a> is a library designed to
+eliminate the boilerplate code that is associated with training and testing neural
+networks in PyTorch. This is a natural bedfellow of Hydra and hydra-zen, which eliminate the boilerplate associated with designing software that is configurable, repeatable, and scalable.</p>
+<p>Let’s use Hydra, hydra-zen, and PyTorch Lightning to <strong>configure and train multiple
+single-layer neural networks without any boilerplate code</strong>. For the sake of
+simplicity, we will train it to simply fit <span class="math notranslate nohighlight">\(\cos{x}\)</span> on
+<span class="math notranslate nohighlight">\(x \in [-2\pi, 2\pi]\)</span>.</p>
+<p>In this “How-To” we will do the following:</p>
+<ol class="arabic simple">
+<li><p>Define a simple neural network and <a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/latest/common/lightning_module.html">lightning module</a>.</p></li>
+<li><p>Create configs for our lighting module, data loader, optimizer, and trainer.</p></li>
+<li><p>Define a task-function for training and testing a model.</p></li>
+<li><p>Train four different models using combinations of two batch-sizes and two model-sizes (i.e. the number of neurons).</p></li>
+<li><p>Analyze our models’ results.</p></li>
+<li><p>Load our best model using the checkpoints saved by PyTorch Lightning and the job-config saved by Hydra.</p></li>
+</ol>
+<div class="section" id="defining-our-model">
+<h2>Defining Our Model<a class="headerlink" href="#defining-our-model" title="Permalink to this headline">¶</a></h2>
+<p>Create a script called <code class="docutils literal notranslate"><span class="pre">zen_model.py</span></code> (or, open a Jupyter notebook and include the
+following code. Here, we define our single-layer neural network and the <a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/latest/common/lightning_module.html">lightning module</a> that describes how to train and evaluate our model.</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Contents of <code class="docutils literal notranslate"><span class="pre">zen_model.py</span></code></span><a class="headerlink" href="#id3" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Type</span>
+
+<span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">TensorDataset</span>
+
+<span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">Partial</span>
+
+
+<span class="k">def</span> <span class="nf">single_layer_nn</span><span class="p">(</span><span class="n">num_neurons</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;y = sum(V sigmoid(X W + b))&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+        <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_neurons</span><span class="p">),</span>
+        <span class="n">nn</span><span class="o">.</span><span class="n">Sigmoid</span><span class="p">(),</span>
+        <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">num_neurons</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">UniversalFuncModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
+        <span class="n">optim</span><span class="p">:</span> <span class="n">Partial</span><span class="p">[</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">],</span>
+        <span class="n">dataloader</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataLoader</span><span class="p">],</span>
+        <span class="n">target_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">tr</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">tr</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+        <span class="n">training_domain</span><span class="p">:</span> <span class="n">tr</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optim</span> <span class="o">=</span> <span class="n">optim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataloader</span> <span class="o">=</span> <span class="n">dataloader</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">training_domain</span> <span class="o">=</span> <span class="n">training_domain</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_fn</span> <span class="o">=</span> <span class="n">target_fn</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># provide optimizer with model parameters</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">batch</span>
+        <span class="c1"># compute |cos(x) - model(x)|^2</span>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># generate dataset: x, cos(x)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">training_domain</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_fn</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataloader</span><span class="p">(</span><span class="n">TensorDataset</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p><a class="reference external" href="https://www.pythonlikeyoumeanit.com/Module5_OddsAndEnds/Writing_Good_Code.html#Type-Hinting">Type-annotations</a> are <strong>not</strong> required by hydra-zen. However, they do enable <a class="reference internal" href="../explanation/type_refinement.html#type-support"><span class="std std-ref">runtime type-checking of configured values</span></a> for our app.</p>
+</div>
+</div>
+<div class="section" id="creating-our-configs-and-task-function">
+<h2>Creating Our Configs and Task Function<a class="headerlink" href="#creating-our-configs-and-task-function" title="Permalink to this headline">¶</a></h2>
+<p>Create another script - named <code class="docutils literal notranslate"><span class="pre">experiment.py</span></code> - in the same directory as <code class="docutils literal notranslate"><span class="pre">zen_model.py</span></code>. Here, we will create the configs for our experiments as well as the task function.</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Contents of <code class="docutils literal notranslate"><span class="pre">experiment.py</span></code></span><a class="headerlink" href="#id4" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
+<span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">Adam</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span> <span class="nn">zen_model</span> <span class="kn">import</span> <span class="n">UniversalFuncModule</span><span class="p">,</span> <span class="n">single_layer_nn</span>
+
+<span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">builds</span><span class="p">,</span> <span class="n">just</span><span class="p">,</span> <span class="n">make_config</span><span class="p">,</span> <span class="n">make_custom_builds_fn</span><span class="p">,</span> <span class="n">instantiate</span>
+
+<span class="n">pbuilds</span> <span class="o">=</span> <span class="n">make_custom_builds_fn</span><span class="p">(</span><span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">OptimConf</span> <span class="o">=</span> <span class="n">pbuilds</span><span class="p">(</span><span class="n">Adam</span><span class="p">)</span>
+
+<span class="n">LoaderConf</span> <span class="o">=</span> <span class="n">pbuilds</span><span class="p">(</span>
+    <span class="n">DataLoader</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="n">ModelConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">single_layer_nn</span><span class="p">,</span> <span class="n">num_neurons</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="c1"># configure our lightning module</span>
+<span class="n">LitConf</span> <span class="o">=</span> <span class="n">pbuilds</span><span class="p">(</span>
+    <span class="n">UniversalFuncModule</span><span class="p">,</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">ModelConf</span><span class="p">,</span>
+    <span class="n">target_fn</span><span class="o">=</span><span class="n">just</span><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">cos</span><span class="p">),</span>
+    <span class="n">training_domain</span><span class="o">=</span><span class="n">builds</span><span class="p">(</span>
+        <span class="n">tr</span><span class="o">.</span><span class="n">linspace</span><span class="p">,</span> <span class="n">start</span><span class="o">=-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">1000</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">TrainerConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span>
+    <span class="n">pl</span><span class="o">.</span><span class="n">Trainer</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">gpus</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">progress_bar_refresh_rate</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+
+<span class="n">ExperimentConfig</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span>
+    <span class="n">optim</span><span class="o">=</span><span class="n">OptimConf</span><span class="p">,</span>
+    <span class="n">dataloader</span><span class="o">=</span><span class="n">LoaderConf</span><span class="p">,</span>
+    <span class="n">lit_module</span><span class="o">=</span><span class="n">LitConf</span><span class="p">,</span>
+    <span class="n">trainer</span><span class="o">=</span><span class="n">TrainerConf</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">ExperimentConfig</span><span class="p">):</span>
+    <span class="n">pl</span><span class="o">.</span><span class="n">seed_everything</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+
+    <span class="c1"># finish instantiating the lightning module, data-loader, and optimizer</span>
+    <span class="n">lit_module</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">lit_module</span><span class="p">(</span><span class="n">dataloader</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataloader</span><span class="p">,</span> <span class="n">optim</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">optim</span><span class="p">)</span>
+
+    <span class="c1"># train the model</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">lit_module</span><span class="p">)</span>
+
+    <span class="c1"># evaluate the model over the domain to assess the fit</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">lit_module</span><span class="o">.</span><span class="n">training_domain</span>
+    <span class="n">final_fit</span> <span class="o">=</span> <span class="n">lit_module</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># return the trained model instance and the final fit</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">lit_module</span><span class="p">,</span>
+        <span class="n">final_fit</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Note that the our: optimizer, data-loader, and
+lightning module are only <em>partially</em> configured here. I.e. we will leverage
+<code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">zen_partial=True)</span></code> to create their configs. This is due to the fact
+that we do not have access to all of their required inputs during configuration
+time. For instance, our optimizer requires access to our model’s parameters, which
+are not available until after the model has been instantiated.</p>
+<p>Thus we provide what information we can to these objects, via our experiment’s
+configurable interface, and the rest of the information is provided within our task
+function to fully-instantiate the objects.</p>
+</div>
+</div>
+<div class="section" id="running-our-experiments">
+<h2>Running Our Experiments<a class="headerlink" href="#running-our-experiments" title="Permalink to this headline">¶</a></h2>
+<p>We will use <a class="reference internal" href="../generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.launch()</span></code></a> to run four jobs: training our model with all four combinations of:</p>
+<ul class="simple">
+<li><p>a batch-size of 20 and 200</p></li>
+<li><p>a model with 10 and 100 neurons</p></li>
+</ul>
+<p>Open a Python console (or Jupyter notebook) in the same directory as <code class="docutils literal notranslate"><span class="pre">experiment.py</span></code>
+and run the following code.</p>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">Launching four jobs</span><a class="headerlink" href="#id5" title="Permalink to this code">¶</a></div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">launch</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">experiment</span> <span class="kn">import</span> <span class="n">ExperimentConfig</span><span class="p">,</span> <span class="n">task_function</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">jobs</span><span class="p">,)</span> <span class="o">=</span> <span class="n">launch</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">ExperimentConfig</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">task_function</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">overrides</span><span class="o">=</span><span class="p">[</span>
+<span class="gp">... </span>        <span class="s2">&quot;dataloader.batch_size=20,200&quot;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="s2">&quot;lit_module.model.num_neurons=10,100&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">],</span>
+<span class="gp">... </span>    <span class="n">multirun</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="go">[2021-10-24 21:23:32,556][HYDRA] Launching 4 jobs locally</span>
+<span class="go">[2021-10-24 21:23:32,558][HYDRA]     #0 : dataloader.batch_size=20 lit_module.model.num_neurons=10</span>
+<span class="go">[2021-10-24 21:23:45,809][HYDRA]     #1 : dataloader.batch_size=20 lit_module.model.num_neurons=100</span>
+<span class="go">[2021-10-24 21:23:58,656][HYDRA]     #2 : dataloader.batch_size=200 lit_module.model.num_neurons=10</span>
+<span class="go">[2021-10-24 21:24:01,796][HYDRA]     #3 : dataloader.batch_size=200 lit_module.model.num_neurons=100</span>
+</pre></div>
+</div>
+</div>
+<p>Keep this Python console open; we will be making use of <code class="docutils literal notranslate"><span class="pre">jobs</span></code> in order to inspect
+our results.</p>
+</div>
+<div class="section" id="inspecting-our-results">
+<h2>Inspecting Our Results<a class="headerlink" href="#inspecting-our-results" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="visualizing-our-results">
+<h3>Visualizing Our Results<a class="headerlink" href="#visualizing-our-results" title="Permalink to this headline">¶</a></h3>
+<p>Let’s begin inspecting our results by plotting our four models on <span class="math notranslate nohighlight">\(x \in [-2\pi, 2\pi]\)</span>, alongside the target function: <span class="math notranslate nohighlight">\(\cos{x}\)</span>. Continuing to work in our
+current Python console (or Jupyter notebook), run the following code and verify that
+you see the plot shown below.</p>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">Plotting our models</span><a class="headerlink" href="#id6" title="Permalink to this code">¶</a></div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">instantiate</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">ExperimentConfig</span><span class="o">.</span><span class="n">lit_module</span><span class="o">.</span><span class="n">training_domain</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">target_fn</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">ExperimentConfig</span><span class="o">.</span><span class="n">lit_module</span><span class="o">.</span><span class="n">target_fn</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">target_fn</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Target&quot;</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">jobs</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">out</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">return_value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">j</span><span class="o">.</span><span class="n">overrides</span><span class="p">))</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.04</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper left&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<a class="reference internal image-reference" href="https://user-images.githubusercontent.com/29104956/138622935-3a3a960f-301f-477e-b5ab-7f4c741b1f9e.png"><img alt="Plot of four trained models vs the target function" src="https://user-images.githubusercontent.com/29104956/138622935-3a3a960f-301f-477e-b5ab-7f4c741b1f9e.png" style="width: 800px;" /></a>
+</div>
+<div class="section" id="loading-the-model-of-best-fit">
+<h3>Loading the Model of Best-Fit<a class="headerlink" href="#loading-the-model-of-best-fit" title="Permalink to this headline">¶</a></h3>
+<p>The 100-neuron model trained with a batch-size of 20 best fits our target function.
+Let’s load the model weights that were saved by PyTorch Lightning during training.</p>
+<p>Continuing our work in the same Python console, let’s verify that job-1 corresponds to
+our desired model. Verify that you see the following outputs.</p>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">Job 1 corresponds to the 100-neuron model trained with batch-size 20.</span><a class="headerlink" href="#id7" title="Permalink to this code">¶</a></div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">best</span> <span class="o">=</span> <span class="n">jobs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">best</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">batch_size</span>
+<span class="go">20</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">best</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">lit_module</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">num_neurons</span>
+<span class="go">100</span>
+</pre></div>
+</div>
+</div>
+<p>Next, we’ll load the config for this job. Recall that Hydra saves a <code class="docutils literal notranslate"><span class="pre">.hydra/config.yaml</span></code> file, which contains the complete configuration of this job – we can reproduce
+all aspects of it from this YAML.</p>
+<div class="literal-block-wrapper docutils container" id="id8">
+<div class="code-block-caption"><span class="caption-text">Loading the complete config for this job</span><a class="headerlink" href="#id8" title="Permalink to this code">¶</a></div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">load_from_yaml</span><span class="p">,</span> <span class="n">get_target</span><span class="p">,</span> <span class="n">to_yaml</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">outdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">best</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <span class="n">load_from_yaml</span><span class="p">(</span><span class="n">outdir</span> <span class="o">/</span> <span class="s2">&quot;.hydra&quot;</span> <span class="o">/</span> <span class="s2">&quot;config.yaml&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>It is worth printing our this config to appreciate all of the exhaustive details that
+it captures about this job.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">cfg</span><span class="p">))</span>  <span class="c1"># fully details this job&#39;s config</span>
+<span class="go">optim:</span>
+<span class="go">  _target_: hydra_zen.funcs.zen_processing</span>
+<span class="go">  _zen_target: torch.optim.adam.Adam</span>
+<span class="go">  _zen_partial: true</span>
+<span class="go">  lr: 0.001</span>
+<span class="go">  betas:</span>
+<span class="go">  - 0.9</span>
+<span class="go">  - 0.999</span>
+<span class="go">  eps: 1.0e-08</span>
+<span class="go">  weight_decay: 0</span>
+<span class="go">  amsgrad: false</span>
+<span class="go">dataloader:</span>
+<span class="go">  _target_: hydra_zen.funcs.zen_processing</span>
+<span class="go">  _zen_target: torch.utils.data.dataloader.DataLoader</span>
+<span class="go">  _zen_partial: true</span>
+<span class="go">  batch_size: 20</span>
+<span class="go">  shuffle: true</span>
+<span class="go">  drop_last: true</span>
+<span class="go">lit_module:</span>
+<span class="go">  _target_: hydra_zen.funcs.zen_processing</span>
+<span class="go">  _zen_target: zen_model.UniversalFuncModule</span>
+<span class="go">  _zen_partial: true</span>
+<span class="go">  model:</span>
+<span class="go">    _target_: zen_model.single_layer_nn</span>
+<span class="go">    num_neurons: 100</span>
+<span class="go">  target_fn:</span>
+<span class="go">    _target_: hydra_zen.funcs.get_obj</span>
+<span class="go">    path: torch.cos</span>
+<span class="go">  training_domain:</span>
+<span class="go">    _target_: torch.linspace</span>
+<span class="go">    start: -6.283185307179586</span>
+<span class="go">    end: 6.283185307179586</span>
+<span class="go">    steps: 1000</span>
+<span class="go">trainer:</span>
+<span class="go">  _target_: pytorch_lightning.trainer.trainer.Trainer</span>
+<span class="go">  max_epochs: 100</span>
+<span class="go">  gpus: 0</span>
+<span class="go">  progress_bar_refresh_rate: 0</span>
+<span class="go">seed: 1</span>
+</pre></div>
+</div>
+<p>PyTorch Lightning saved the model’s trained weights as a <code class="docutils literal notranslate"><span class="pre">.ckpt</span></code> file in this job’s
+working directory. Let’s load these weights and use them to instantiate our lighting
+module.</p>
+<div class="literal-block-wrapper docutils container" id="id9">
+<div class="code-block-caption"><span class="caption-text">Loading our lighting module with trained weights</span><a class="headerlink" href="#id9" title="Permalink to this code">¶</a></div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="n">last_ckpt</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">outdir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;**/*.ckpt&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">LitModule</span> <span class="o">=</span> <span class="n">get_target</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">lit_module</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">loaded</span> <span class="o">=</span> <span class="n">LitModule</span><span class="o">.</span><span class="n">load_from_checkpoint</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">last_ckpt</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">model</span><span class="o">=</span><span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">lit_module</span><span class="o">.</span><span class="n">model</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">target_fn</span><span class="o">=</span><span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">lit_module</span><span class="o">.</span><span class="n">target_fn</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">training_domain</span><span class="o">=</span><span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">lit_module</span><span class="o">.</span><span class="n">training_domain</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">optim</span><span class="o">=</span><span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">optim</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">dataloader</span><span class="o">=</span><span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataloader</span><span class="p">),</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Finally, let’s double check that this loaded model behaves as-expected. Evaluating it
+at <span class="math notranslate nohighlight">\(-\pi/2\)</span>, <span class="math notranslate nohighlight">\(0\)</span>, and <span class="math notranslate nohighlight">\(\pi/2\)</span> should return, approximately, <span class="math notranslate nohighlight">\(0\)</span>, <span class="math notranslate nohighlight">\(1\)</span>, and <span class="math notranslate nohighlight">\(0\)</span>, respectively.</p>
+<div class="literal-block-wrapper docutils container" id="id10">
+<div class="code-block-caption"><span class="caption-text">Checkout our loaded model’s behavior</span><a class="headerlink" href="#id10" title="Permalink to this code">¶</a></div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">loaded</span><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="o">-</span><span class="mf">3.1415</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">3.1415</span> <span class="o">/</span> <span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="go">tensor([[0.0110],</span>
+<span class="go">        [0.9633],</span>
+<span class="go">        [0.0364]], grad_fn=&lt;MmBackward&gt;)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition-nerdy-math-details admonition">
+<p class="admonition-title">Nerdy Math Details</p>
+<p>For the interested reader… In this toy-problem we are optimizing <a class="reference external" href="https://en.wikipedia.org/wiki/Universal_approximation_theorem#Arbitrary-width_case">arbitrary-width universal function approximators</a> to fit <span class="math notranslate nohighlight">\(\cos{x}\)</span>
+on <span class="math notranslate nohighlight">\(x \in [-2\pi, 2\pi]\)</span>.
+In mathematical notation, we want to solve the following optimization problem:</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}F(\vec{v}, \vec{w}, \vec{b}; x) &amp;= \sum_{i=1}^{N}{v_{i}\sigma(x w_i + b_i)}\\\vec{v}^*, \vec{w}^*, \vec{b}^* &amp;= \operatorname*{arg\,min}_{\vec{v}, \vec{w}, \vec   {b}\in\mathbb{R}^{N}} \;  \|F(\vec{v}, \vec{w}, \vec{b}; x)\ - \cos{x}\|_{2}\\x &amp;\in [-2\pi, 2\pi]\end{aligned}\end{align} \]</div>
+<p>where <span class="math notranslate nohighlight">\(N\)</span> – the number of “neurons” in our layer – is a hyperparameter.</p>
+</div>
+</div>
+</div>
+<div class="section" id="more-examples-of-using-hydra-zen-in-ml-projects">
+<h2>More Examples of Using hydra-zen in ML Projects<a class="headerlink" href="#more-examples-of-using-hydra-zen-in-ml-projects" title="Permalink to this headline">¶</a></h2>
+<p>You can check out <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen-examples">this repository</a> for examples of larger-scale ML projects using hydra-zen.</p>
+</div>
+</div>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="../how_tos.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">How-To Guides</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="../explanation.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Explanation</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2021 Massachusetts Institute of Technology.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

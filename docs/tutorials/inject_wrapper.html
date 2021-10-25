@@ -1,0 +1,568 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inject Novel Functionality via the App’s Config &#8212; hydra-zen 0.3.0rc5+11.g748fba6 documentation</title>
+    
+  <link href="../_static/css/theme.css" rel="stylesheet">
+  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/blank.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/my_theme.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../_static/hydra_zen_favicon_32x32.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="How-To Guides" href="../how_tos.html" />
+    <link rel="prev" title="Provide Swappable Configuration Groups" href="config_groups.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+      
+      <link rel="icon" sizes="32x32" href="../_static/../../brand/hydra_zen_favicon_32x32.ico">
+      
+    
+      
+      <link rel="icon" sizes="64x64" href="../_static/../../brand/hydra_zen_favicon_64x64.ico">
+      
+    
+      
+      <link rel="icon" sizes="134x134" href="../_static/../../brand/hydra_zen_favicon.ico">
+      
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="../index.html">
+  <img src="../_static/Hydra-Zen_logo_full_filled_bkgrnd_smaller.png" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../tutorials.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../how_tos.html">
+  How-To Guides
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../explanation.html">
+  Explanation
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../api_reference.html">
+  Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../changes.html">
+  Changelog
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/mit-ll-responsible-ai/hydra-zen" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <p class="caption">
+ <span class="caption-text">
+  Contents:
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="basic_app.html">
+   Create and Launch a Basic App with Hydra
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="add_cli.html">
+   Add a Command Line Interface to Our App
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="hierarchy.html">
+   Design a Hierarchical App Interface
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="config_groups.html">
+   Provide Swappable Configuration Groups
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Inject Novel Functionality via the App’s Config
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#modifying-our-app">
+   Modifying Our App
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#creating-the-functionality-injecting-wrapper">
+     Creating the Functionality-Injecting Wrapper
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#including-the-wrapper-in-our-config">
+     Including the Wrapper in Our Config
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#putting-it-all-together">
+     Putting It All Together
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#running-our-app">
+   Running Our App
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#inspecting-the-results">
+     Inspecting the Results
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="admonition-prerequisites admonition">
+<p class="admonition-title">Prerequisites</p>
+<p>This tutorial is a direct follow-on to: <a class="reference internal" href="config_groups.html#config-groups-tutorial"><span class="std std-ref">Provide Swappable Configuration Groups</span></a>.</p>
+</div>
+<div class="section" id="inject-novel-functionality-via-the-app-s-config">
+<h1>Inject Novel Functionality via the App’s Config<a class="headerlink" href="#inject-novel-functionality-via-the-app-s-config" title="Permalink to this headline">¶</a></h1>
+<p>In this tutorial we will add new functionality into our app without modifying either
+our library’s code or our task function.</p>
+<p>Let’s suppose that the Halloween holiday is
+approaching, and we want to surprise our players with a treat: all of their costumes
+will display as “spooky” renditions during this season 🎃. We can use the
+“zen-wrappers” feature of <a class="reference internal" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> to “inject” these updated costumes into
+the game, simply by modifying our app’s config.</p>
+<div class="section" id="modifying-our-app">
+<h2>Modifying Our App<a class="headerlink" href="#modifying-our-app" title="Permalink to this headline">¶</a></h2>
+<p>We will need to make two modifications to our code in <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code>:</p>
+<ol class="arabic simple">
+<li><p>Define a wrapper that will modify the player’s costume so that it is a “spooky” version of itself.</p></li>
+<li><p>Include the wrapper in the player’s config.</p></li>
+</ol>
+<div class="section" id="creating-the-functionality-injecting-wrapper">
+<h3>Creating the Functionality-Injecting Wrapper<a class="headerlink" href="#creating-the-functionality-injecting-wrapper" title="Permalink to this headline">¶</a></h3>
+<p>Let’s create a <a class="reference external" href="https://realpython.com/primer-on-python-decorators/#simple-decorators">wrapper</a> that will take in our <code class="xref py py-class docutils literal notranslate"><span class="pre">game_library.Character</span></code> object,
+instantiate it, and then update its costume.</p>
+<p>We will incorporate the following code in <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code>.</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Defining the wrapper</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">halloween_update</span><span class="p">(</span><span class="n">CharClass</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># instantiate the Character</span>
+        <span class="n">char</span> <span class="o">=</span> <span class="n">CharClass</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">costume</span> <span class="o">=</span> <span class="n">char</span><span class="o">.</span><span class="n">inventory</span><span class="p">[</span><span class="s2">&quot;costume&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">costume</span><span class="p">:</span>
+            <span class="c1"># update the costume</span>
+            <span class="n">char</span><span class="o">.</span><span class="n">inventory</span><span class="p">[</span><span class="s2">&quot;costume&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;spooky </span><span class="si">{</span><span class="n">costume</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">char</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
+</pre></div>
+</div>
+</div>
+<p>To see this in action, let’s open a Python console (or Jupyter notebook) in the same
+directory as <code class="docutils literal notranslate"><span class="pre">game_library.py</span></code> and <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code>, and run the following.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">game_library</span></code> code used below comes from a script that we, the
+tutorial-readers, created ourselves. See <a class="reference internal" href="hierarchy.html#game-library"><span class="std std-ref">Creating (Fake) Library Code</span></a> for details.</p>
+</div>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Testing out the wrapper</span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">game_library</span> <span class="kn">import</span> <span class="n">Character</span><span class="p">,</span> <span class="n">inventory</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">halloween_update</span><span class="p">(</span><span class="n">CharClass</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="c1"># instantiate the Character</span>
+<span class="gp">... </span>        <span class="n">char</span> <span class="o">=</span> <span class="n">CharClass</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span>        <span class="n">costume</span> <span class="o">=</span> <span class="n">char</span><span class="o">.</span><span class="n">inventory</span><span class="p">[</span><span class="s2">&quot;costume&quot;</span><span class="p">]</span>
+<span class="gp">... </span>        <span class="k">if</span> <span class="n">costume</span><span class="p">:</span>
+<span class="gp">... </span>            <span class="c1"># update the costume</span>
+<span class="gp">... </span>            <span class="n">char</span><span class="o">.</span><span class="n">inventory</span><span class="p">[</span><span class="s2">&quot;costume&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;spooky </span><span class="si">{</span><span class="n">costume</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="n">char</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">wrapper</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">WrappedChar</span> <span class="o">=</span> <span class="n">halloween_update</span><span class="p">(</span><span class="n">Character</span><span class="p">)</span>  <span class="c1"># character&#39;s costume will be made spooky</span>
+</pre></div>
+</div>
+</div>
+<p>We see that the wrapped version of <code class="xref py py-class docutils literal notranslate"><span class="pre">game_library.Character</span></code> automatically has
+its costume updated for the holiday. Verify that you see the following behaviors.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">WrappedChar</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;ness&quot;</span><span class="p">,</span> <span class="n">inventory</span><span class="o">=</span><span class="n">inventory</span><span class="p">(</span><span class="n">gold</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">weapon</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">costume</span><span class="o">=</span><span class="s2">&quot;shirt&quot;</span><span class="p">))</span>
+<span class="go">ness, lvl: 1, has: {&#39;gold&#39;: 1, &#39;weapon&#39;: &#39;none&#39;, &#39;costume&#39;: &#39;spooky shirt&#39;}</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Character</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;ness&quot;</span><span class="p">,</span> <span class="n">inventory</span><span class="o">=</span><span class="n">inventory</span><span class="p">(</span><span class="n">gold</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">weapon</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">costume</span><span class="o">=</span><span class="s2">&quot;shirt&quot;</span><span class="p">))</span>
+<span class="go">ness, lvl: 1, has: {&#39;gold&#39;: 1, &#39;weapon&#39;: &#39;none&#39;, &#39;costume&#39;: &#39;shirt&#39;}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="including-the-wrapper-in-our-config">
+<h3>Including the Wrapper in Our Config<a class="headerlink" href="#including-the-wrapper-in-our-config" title="Permalink to this headline">¶</a></h3>
+<p>Incorporating this wrapper into our app simply involves specifying it as a
+“zen-wrapper” in our config for <code class="xref py py-class docutils literal notranslate"><span class="pre">game_library.Character</span></code>. I.e. we will update:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">CharConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">Character</span><span class="p">,</span> <span class="n">inventory</span><span class="o">=</span><span class="n">starter_gear</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>to be</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">CharConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">Character</span><span class="p">,</span> <span class="n">inventory</span><span class="o">=</span><span class="n">starter_gear</span><span class="p">,</span> <span class="n">zen_wrappers</span><span class="o">=</span><span class="n">halloween_update</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="putting-it-all-together">
+<h3>Putting It All Together<a class="headerlink" href="#putting-it-all-together" title="Permalink to this headline">¶</a></h3>
+<p>Let’s update the contents of <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code> to reflect the changes that we just went
+over. Modify your <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code> script to match the following code.</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Contents of <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code></span><a class="headerlink" href="#id3" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hydra</span>
+<span class="kn">from</span> <span class="nn">hydra.core.config_store</span> <span class="kn">import</span> <span class="n">ConfigStore</span>
+
+<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">instantiate</span><span class="p">,</span> <span class="n">make_config</span><span class="p">,</span> <span class="n">make_custom_builds_fn</span>
+
+<span class="kn">from</span> <span class="nn">game_library</span> <span class="kn">import</span> <span class="n">inventory</span><span class="p">,</span> <span class="n">Character</span>
+
+<span class="c1"># 1. Added our wrapper</span>
+<span class="k">def</span> <span class="nf">halloween_update</span><span class="p">(</span><span class="n">CharClass</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># instantiate the Character</span>
+        <span class="n">char</span> <span class="o">=</span> <span class="n">CharClass</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">costume</span> <span class="o">=</span> <span class="n">char</span><span class="o">.</span><span class="n">inventory</span><span class="p">[</span><span class="s2">&quot;costume&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">costume</span><span class="p">:</span>
+            <span class="c1"># update the costume</span>
+            <span class="n">char</span><span class="o">.</span><span class="n">inventory</span><span class="p">[</span><span class="s2">&quot;costume&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;spooky </span><span class="si">{</span><span class="n">costume</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">char</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span>
+
+
+<span class="n">builds</span> <span class="o">=</span> <span class="n">make_custom_builds_fn</span><span class="p">(</span><span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">cs</span> <span class="o">=</span> <span class="n">ConfigStore</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
+
+<span class="n">InventoryConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">inventory</span><span class="p">)</span>
+<span class="n">starter_gear</span> <span class="o">=</span> <span class="n">InventoryConf</span><span class="p">(</span><span class="n">gold</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">weapon</span><span class="o">=</span><span class="s2">&quot;stick&quot;</span><span class="p">,</span> <span class="n">costume</span><span class="o">=</span><span class="s2">&quot;tunic&quot;</span><span class="p">)</span>
+<span class="n">advanced_gear</span> <span class="o">=</span> <span class="n">InventoryConf</span><span class="p">(</span><span class="n">gold</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">weapon</span><span class="o">=</span><span class="s2">&quot;wand&quot;</span><span class="p">,</span> <span class="n">costume</span><span class="o">=</span><span class="s2">&quot;magic robe&quot;</span><span class="p">)</span>
+<span class="n">hard_mode_gear</span> <span class="o">=</span> <span class="n">InventoryConf</span><span class="p">(</span><span class="n">gold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">weapon</span><span class="o">=</span><span class="s2">&quot;inner thoughts&quot;</span><span class="p">,</span> <span class="n">costume</span><span class="o">=</span><span class="s2">&quot;rags&quot;</span><span class="p">)</span>
+
+<span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">&quot;player/inventory&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;starter&quot;</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">starter_gear</span><span class="p">)</span>
+<span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">&quot;player/inventory&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;advanced&quot;</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">advanced_gear</span><span class="p">)</span>
+<span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">&quot;player/inventory&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;hard_mode&quot;</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">hard_mode_gear</span><span class="p">)</span>
+
+<span class="c1"># 2. Included the wrapper in our config for `Character`</span>
+<span class="n">CharConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">Character</span><span class="p">,</span> <span class="n">inventory</span><span class="o">=</span><span class="n">starter_gear</span><span class="p">,</span> <span class="n">zen_wrappers</span><span class="o">=</span><span class="n">halloween_update</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+
+<span class="n">brinda_conf</span> <span class="o">=</span> <span class="n">CharConf</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;brinda&quot;</span><span class="p">,</span>
+    <span class="n">level</span><span class="o">=</span><span class="mi">47</span><span class="p">,</span>
+    <span class="n">inventory</span><span class="o">=</span><span class="n">InventoryConf</span><span class="p">(</span><span class="n">costume</span><span class="o">=</span><span class="s2">&quot;cape&quot;</span><span class="p">,</span> <span class="n">weapon</span><span class="o">=</span><span class="s2">&quot;flute&quot;</span><span class="p">,</span> <span class="n">gold</span><span class="o">=</span><span class="mi">52</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">rakesh_conf</span> <span class="o">=</span> <span class="n">CharConf</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;rakesh&quot;</span><span class="p">,</span>
+    <span class="n">level</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+    <span class="n">inventory</span><span class="o">=</span><span class="n">InventoryConf</span><span class="p">(</span><span class="n">costume</span><span class="o">=</span><span class="s2">&quot;PJs&quot;</span><span class="p">,</span> <span class="n">weapon</span><span class="o">=</span><span class="s2">&quot;pillow&quot;</span><span class="p">,</span> <span class="n">gold</span><span class="o">=</span><span class="mi">41</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">&quot;player&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;base&quot;</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">CharConf</span><span class="p">)</span>
+<span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">&quot;player&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;brinda&quot;</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">brinda_conf</span><span class="p">)</span>
+<span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">&quot;player&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;rakesh&quot;</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">rakesh_conf</span><span class="p">)</span>
+
+
+<span class="n">Config</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span><span class="s2">&quot;player&quot;</span><span class="p">,</span> <span class="n">defaults</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;_self_&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;player&quot;</span><span class="p">:</span> <span class="s2">&quot;base&quot;</span><span class="p">}])</span>
+
+<span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">Config</span><span class="p">)</span>
+
+
+<span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_name</span><span class="o">=</span><span class="s2">&quot;config&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Config</span><span class="p">):</span>
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+
+    <span class="n">player</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">player</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">player</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;player_log.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Game session log:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player: </span><span class="si">{</span><span class="n">player</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">player</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">task_function</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="running-our-app">
+<h2>Running Our App<a class="headerlink" href="#running-our-app" title="Permalink to this headline">¶</a></h2>
+<p>We can configure and launch our app exactly as we had before, but now all of the
+player’s costumes will automatically become 👻 spooky 👻.</p>
+<p>Open your terminal in the directory shared by both <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code> and
+<code class="docutils literal notranslate"><span class="pre">game_library.py</span></code> and run the following commands. Verify that you can reproduce the
+behavior shown below.</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Base character.</span><a class="headerlink" href="#id4" title="Permalink to this code">¶</a></div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python my_app.py player.name<span class="o">=</span>ivy
+<span class="go">ivy, lvl: 1, has: {&#39;gold&#39;: 10, &#39;weapon&#39;: &#39;stick&#39;, &#39;costume&#39;: &#39;spooky tunic&#39;}</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">Manually-specified costume.</span><a class="headerlink" href="#id5" title="Permalink to this code">¶</a></div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python my_app.py player.name<span class="o">=</span>ivy player.inventory.costume<span class="o">=</span>crown
+<span class="go">ivy, lvl: 1, has: {&#39;gold&#39;: 10, &#39;weapon&#39;: &#39;stick&#39;, &#39;costume&#39;: &#39;spooky crown&#39;}</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">Load Rakesh’s player-profile</span><a class="headerlink" href="#id6" title="Permalink to this code">¶</a></div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python my_app.py <span class="nv">player</span><span class="o">=</span>rakesh
+<span class="go">rakesh, lvl: 300, has: {&#39;gold&#39;: 41, &#39;weapon&#39;: &#39;pillow&#39;, &#39;costume&#39;: &#39;spooky PJs&#39;}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="inspecting-the-results">
+<h3>Inspecting the Results<a class="headerlink" href="#inspecting-the-results" title="Permalink to this headline">¶</a></h3>
+<p>Hydra will document our use of <code class="xref py py-func docutils literal notranslate"><span class="pre">halloween_update()</span></code> in the <code class="docutils literal notranslate"><span class="pre">config.yaml</span></code> for our
+job. To inspect the config for our most-recent job, let’s open a Python terminal in the same directory as <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code> and run the following code</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">print_file</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">with</span> <span class="n">x</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="n">latest_job</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">((</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;outputs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*/*&quot;</span><span class="p">))</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">print_file</span><span class="p">(</span><span class="n">latest_job</span> <span class="o">/</span> <span class="s2">&quot;.hydra&quot;</span> <span class="o">/</span> <span class="s2">&quot;config.yaml&quot;</span><span class="p">)</span>
+<span class="go">player:</span>
+<span class="go">  _target_: hydra_zen.funcs.zen_processing</span>
+<span class="go">  _zen_target: game_library.Character</span>
+<span class="go">  _zen_wrappers: __main__.halloween_update</span>
+<span class="go">  name: rakesh</span>
+<span class="go">  level: 300</span>
+<span class="go">  inventory:</span>
+<span class="go">    _target_: game_library.inventory</span>
+<span class="go">    gold: 41</span>
+<span class="go">    weapon: pillow</span>
+<span class="go">    costume: PJs</span>
+</pre></div>
+</div>
+<p>From this YAML config file, we can see explicitly that our app launched using the
+Halloween update; the update will also take effect if we were to re-launch our app
+using this particular YAML file to reproduce the job.</p>
+<p>Outstanding! We successfully leveraged the zen-wrappers feature of
+<a class="reference internal" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> to modify the behavior of our app, without touching our
+library’s source code. And we did so in a self-documenting, and reproducible manner.</p>
+<p>Although this achievement might not seem all that impressive in the context of this toy
+example, it should be emphasized that zen-wrappers can be used to inject arbitrary
+pre-processing, post-processing, and transformations into the config-instantiation
+process. For example, hydra-zen provides enhanced <a class="reference internal" href="../api_reference.html#data-val"><span class="std std-ref">data-validation capabilities</span></a> via zen-wrappers. Based on this tutorial, we hope that you feel emboldened
+to design and use zen-wrappers in your workflow!</p>
+<div class="admonition-references admonition">
+<p class="admonition-title">References</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a></p></li>
+<li><p><a class="reference external" href="https://realpython.com/primer-on-python-decorators/#simple-decorators">Real Python’s tutorial on wrappers (a.k.a decorators)</a></p></li>
+</ul>
+</div>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p><strong>Cleaning Up</strong>:
+To clean up after this tutorial, delete the <code class="docutils literal notranslate"><span class="pre">outputs</span></code> directory that Hydra created
+upon launching our app.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="config_groups.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Provide Swappable Configuration Groups</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="../how_tos.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">How-To Guides</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2021 Massachusetts Institute of Technology.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

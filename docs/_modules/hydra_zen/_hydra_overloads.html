@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hydra_zen._hydra_overloads &#8212; hydra-zen 0.3.0rc5+8.g05eb242 documentation</title>
+    <title>hydra_zen._hydra_overloads &#8212; hydra-zen 0.3.0rc5+11.g748fba6 documentation</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -24,7 +24,9 @@
     
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/css/blank.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/my_theme.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/tabs.css" />
     
   <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
 
@@ -32,6 +34,9 @@
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/tabs.js"></script>
     <link rel="shortcut icon" href="../../_static/hydra_zen_favicon_32x32.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -84,38 +89,26 @@
       <div class="navbar-center-item">
         <ul id="navbar-main-elements" class="navbar-nav">
     <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../installation.html">
-  Installation and Basic Usage
+ <a class="reference internal nav-link" href="../../tutorials.html">
+  Tutorials
  </a>
 </li>
 
 <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../overview.html">
-  Overview of hydra-zen
+ <a class="reference internal nav-link" href="../../how_tos.html">
+  How-To Guides
  </a>
 </li>
 
 <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../pytorch_lightning_example.html">
-  Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../structured_configs.html">
-  Dynamically Generating Structured Configs
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../experimental.html">
-  Running Experiments with Hydra
+ <a class="reference internal nav-link" href="../../explanation.html">
+  Explanation
  </a>
 </li>
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../api_reference.html">
-  API Reference
+  Reference
  </a>
 </li>
 
@@ -272,6 +265,8 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Instantiates the target of a targeted config.</span>
 
+<span class="sd">    This is an alias of :func:`hydra.utils.instantiate` [1]_.</span>
+
 <span class="sd">    By default, `instantiate` will recursively instantiate nested configurations [1]_.</span>
 
 <span class="sd">    Parameters</span>
@@ -311,7 +306,7 @@
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    .. [1] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation</span>
+<span class="sd">    .. [1] https://hydra.cc/docs/next/advanced/instantiate_objects/overview</span>
 <span class="sd">    .. [2] https://omegaconf.readthedocs.io/en/latest/structured_config.html#simple-types</span>
 <span class="sd">    .. [3] https://omegaconf.readthedocs.io/en/latest/structured_config.html#runtime-type-validation-and-conversion</span>
 <span class="sd">    .. [4] https://omegaconf.readthedocs.io/en/latest/usage.html#variable-interpolation</span>

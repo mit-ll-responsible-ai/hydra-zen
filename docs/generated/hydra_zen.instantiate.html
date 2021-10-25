@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>instantiate &#8212; hydra-zen 0.3.0rc5+8.g05eb242 documentation</title>
+    <title>instantiate &#8212; hydra-zen 0.3.0rc5+11.g748fba6 documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -24,7 +24,9 @@
     
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/blank.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/my_theme.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
     
   <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
 
@@ -32,11 +34,13 @@
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
     <link rel="shortcut icon" href="../_static/hydra_zen_favicon_32x32.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="make_custom_builds_fn" href="hydra_zen.make_custom_builds_fn.html" />
-    <link rel="prev" title="make_config" href="hydra_zen.make_config.html" />
+    <link rel="next" title="get_target" href="hydra_zen.get_target.html" />
+    <link rel="prev" title="hydrated_dataclass" href="hydra_zen.hydrated_dataclass.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -86,38 +90,26 @@
       <div class="navbar-center-item">
         <ul id="navbar-main-elements" class="navbar-nav">
     <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../installation.html">
-  Installation and Basic Usage
+ <a class="reference internal nav-link" href="../tutorials.html">
+  Tutorials
  </a>
 </li>
 
 <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../overview.html">
-  Overview of hydra-zen
+ <a class="reference internal nav-link" href="../how_tos.html">
+  How-To Guides
  </a>
 </li>
 
 <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../pytorch_lightning_example.html">
-  Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../structured_configs.html">
-  Dynamically Generating Structured Configs
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../experimental.html">
-  Running Experiments with Hydra
+ <a class="reference internal nav-link" href="../explanation.html">
+  Explanation
  </a>
 </li>
 
 <li class="toctree-l1 current active nav-item">
  <a class="reference internal nav-link" href="../api_reference.html">
-  API Reference
+  Reference
  </a>
 </li>
 
@@ -297,7 +289,8 @@
 <dt id="hydra_zen.instantiate">
 <code class="sig-prename descclassname"><span class="pre">hydra_zen.</span></code><code class="sig-name descname"><span class="pre">instantiate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/_hydra_overloads.html#instantiate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.instantiate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Instantiates the target of a targeted config.</p>
-<p>By default, <a class="reference internal" href="#hydra_zen.instantiate" title="hydra_zen.instantiate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">instantiate</span></code></a> will recursively instantiate nested configurations <a class="reference internal" href="#rfffea48737d8-1" id="id1">[1]</a>.</p>
+<p>This is an alias of <code class="xref py py-func docutils literal notranslate"><span class="pre">hydra.utils.instantiate()</span></code> <a class="reference internal" href="#rfffea48737d8-1" id="id1">[1]</a>.</p>
+<p>By default, <a class="reference internal" href="#hydra_zen.instantiate" title="hydra_zen.instantiate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">instantiate</span></code></a> will recursively instantiate nested configurations <a class="reference internal" href="#rfffea48737d8-1" id="id2">[1]</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -332,21 +325,21 @@ by <code class="docutils literal notranslate"><span class="pre">config</span></c
 <p>This is an alias for <code class="docutils literal notranslate"><span class="pre">hydra.utils.instantiate</span></code>, but adds additional static type
 information.</p>
 <p>During instantiation, Hydra performs runtime validation of data based on a limited set of
-type-annotations that can be associated with the fields of the provided config <a class="reference internal" href="#rfffea48737d8-2" id="id2">[2]</a> <a class="reference internal" href="#rfffea48737d8-3" id="id3">[3]</a>.</p>
+type-annotations that can be associated with the fields of the provided config <a class="reference internal" href="#rfffea48737d8-2" id="id3">[2]</a> <a class="reference internal" href="#rfffea48737d8-3" id="id4">[3]</a>.</p>
 <p>Hydra supports a string-based syntax for variable interpolation, which enables configured
-values to be set in a self-referential and dynamic manner <a class="reference internal" href="#rfffea48737d8-4" id="id4">[4]</a>.</p>
+values to be set in a self-referential and dynamic manner <a class="reference internal" href="#rfffea48737d8-4" id="id5">[4]</a>.</p>
 <p class="rubric">References</p>
 <dl class="citation">
-<dt class="label" id="rfffea48737d8-1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p><a class="reference external" href="https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation">https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation</a></p>
+<dt class="label" id="rfffea48737d8-1"><span class="brackets">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id2">2</a>)</span></dt>
+<dd><p><a class="reference external" href="https://hydra.cc/docs/next/advanced/instantiate_objects/overview">https://hydra.cc/docs/next/advanced/instantiate_objects/overview</a></p>
 </dd>
-<dt class="label" id="rfffea48737d8-2"><span class="brackets">2</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id10">2</a>)</span></dt>
+<dt class="label" id="rfffea48737d8-2"><span class="brackets">2</span><span class="fn-backref">(<a href="#id3">1</a>,<a href="#id11">2</a>)</span></dt>
 <dd><p><a class="reference external" href="https://omegaconf.readthedocs.io/en/latest/structured_config.html#simple-types">https://omegaconf.readthedocs.io/en/latest/structured_config.html#simple-types</a></p>
 </dd>
-<dt class="label" id="rfffea48737d8-3"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
+<dt class="label" id="rfffea48737d8-3"><span class="brackets"><a class="fn-backref" href="#id4">3</a></span></dt>
 <dd><p><a class="reference external" href="https://omegaconf.readthedocs.io/en/latest/structured_config.html#runtime-type-validation-and-conversion">https://omegaconf.readthedocs.io/en/latest/structured_config.html#runtime-type-validation-and-conversion</a></p>
 </dd>
-<dt class="label" id="rfffea48737d8-4"><span class="brackets">4</span><span class="fn-backref">(<a href="#id4">1</a>,<a href="#id9">2</a>)</span></dt>
+<dt class="label" id="rfffea48737d8-4"><span class="brackets">4</span><span class="fn-backref">(<a href="#id5">1</a>,<a href="#id10">2</a>)</span></dt>
 <dd><p><a class="reference external" href="https://omegaconf.readthedocs.io/en/latest/usage.html#variable-interpolation">https://omegaconf.readthedocs.io/en/latest/usage.html#variable-interpolation</a></p>
 </dd>
 </dl>
@@ -382,7 +375,7 @@ values to be set in a self-referential and dynamic manner <a class="reference in
 </div>
 <p><strong>Leveraging Variable Interpolation</strong></p>
 <p>Hydra provides a powerful language for absolute and relative
-interpolated variables among configs <a class="reference internal" href="#rfffea48737d8-4" id="id9">[4]</a>. Let’s make a config
+interpolated variables among configs <a class="reference internal" href="#rfffea48737d8-4" id="id10">[4]</a>. Let’s make a config
 where multiple fields reference the field <code class="docutils literal notranslate"><span class="pre">name</span></code> via absolute
 interpolation.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">make_config</span>
@@ -408,7 +401,7 @@ interpolation.</p>
 <span class="go">    object_type=Builds_g</span>
 </pre></div>
 </div>
-<p>Only a subset of primitive types are supported by Hydra’s validation system <a class="reference internal" href="#rfffea48737d8-2" id="id10">[2]</a>.
+<p>Only a subset of primitive types are supported by Hydra’s validation system <a class="reference internal" href="#rfffea48737d8-2" id="id11">[2]</a>.
 See <a class="reference internal" href="../api_reference.html#data-val"><span class="std std-ref">Runtime Data Validation</span></a> for more general data validation capabilities via hydra-zen.</p>
 </dd></dl>
 
@@ -420,17 +413,17 @@ See <a class="reference internal" href="../api_reference.html#data-val"><span cl
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
-    <a class='left-prev' id="prev-link" href="hydra_zen.make_config.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="hydra_zen.hydrated_dataclass.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">make_config</p>
+            <p class="prev-next-title">hydrated_dataclass</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="hydra_zen.make_custom_builds_fn.html" title="next page">
+    <a class='right-next' id="next-link" href="hydra_zen.get_target.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">make_custom_builds_fn</p>
+        <p class="prev-next-title">get_target</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

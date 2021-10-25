@@ -1,6 +1,6 @@
-#############
-API Reference
-#############
+#########
+Reference
+#########
 
 *************************
 Launching Jobs with Hydra
@@ -35,6 +35,7 @@ configs. Among these, the most essential functions for creating configs are
 :func:`~hydra_zen.instantiate` can be used to resolve these configs so that they return 
 the data and class-instances that we need for our application.
 
+.. _create-config:
 
 Creating Configs
 ****************
@@ -99,7 +100,7 @@ Third-Party Utilities
 Runtime Data Validation
 ***********************
 
-Although Hydra provides some runtime type-checking functionality, it only supports `a limited set of types and annotations <https://omegaconf.readthedocs.io/en/latest/structured_config.html#simple-types>`_. hydra-zen offers support for more robust runtime type-checking capabilities via various third-party libraries.
+Although Hydra provides some runtime type-checking functionality, it only supports :ref:`a limited set of types and annotations <type-support>`. hydra-zen offers support for more robust runtime type-checking capabilities via various third-party libraries.
 
 .. currentmodule:: hydra_zen.third_party
 

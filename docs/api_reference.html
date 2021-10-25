@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>API Reference &#8212; hydra-zen 0.3.0rc5+8.g05eb242 documentation</title>
+    <title>Reference &#8212; hydra-zen 0.3.0rc5+11.g748fba6 documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -24,7 +24,9 @@
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/css/blank.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/my_theme.css" />
+    <link rel="stylesheet" type="text/css" href="_static/tabs.css" />
     
   <link rel="preload" as="script" href="_static/js/index.be7d3bbb2ef33a8344ce.js">
 
@@ -32,11 +34,13 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
     <link rel="shortcut icon" href="_static/hydra_zen_favicon_32x32.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="launch" href="generated/hydra_zen.launch.html" />
-    <link rel="prev" title="hydra_multirun" href="generated/hydra_zen.experimental.hydra_multirun.html" />
+    <link rel="prev" title="Combining Statically-Defined and Dynamically-Generated Configurations" href="explanation/hydrated_dataclass.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -86,38 +90,26 @@
       <div class="navbar-center-item">
         <ul id="navbar-main-elements" class="navbar-nav">
     <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="installation.html">
-  Installation and Basic Usage
+ <a class="reference internal nav-link" href="tutorials.html">
+  Tutorials
  </a>
 </li>
 
 <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="overview.html">
-  Overview of hydra-zen
+ <a class="reference internal nav-link" href="how_tos.html">
+  How-To Guides
  </a>
 </li>
 
 <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="pytorch_lightning_example.html">
-  Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="structured_configs.html">
-  Dynamically Generating Structured Configs
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="experimental.html">
-  Running Experiments with Hydra
+ <a class="reference internal nav-link" href="explanation.html">
+  Explanation
  </a>
 </li>
 
 <li class="toctree-l1 current active nav-item">
  <a class="current reference internal nav-link" href="#">
-  API Reference
+  Reference
  </a>
 </li>
 
@@ -342,8 +334,8 @@
               
               <div>
                 
-  <div class="section" id="api-reference">
-<h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="reference">
+<h1>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="launching-jobs-with-hydra">
 <h2>Launching Jobs with Hydra<a class="headerlink" href="#launching-jobs-with-hydra" title="Permalink to this headline">¶</a></h2>
 <p>hydra-zen provides users the ability to launch a Hydra job via a
@@ -382,7 +374,7 @@ configs. Among these, the most essential functions for creating configs are
 <a class="reference internal" href="generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><code class="xref py py-func docutils literal notranslate"><span class="pre">instantiate()</span></code></a> can be used to resolve these configs so that they return
 the data and class-instances that we need for our application.</p>
 <div class="section" id="creating-configs">
-<h3>Creating Configs<a class="headerlink" href="#creating-configs" title="Permalink to this headline">¶</a></h3>
+<span id="create-config"></span><h3>Creating Configs<a class="headerlink" href="#creating-configs" title="Permalink to this headline">¶</a></h3>
 <table class="longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
@@ -465,7 +457,7 @@ The following utilities can be used to work with YAML-serialized configs.</p>
 <h2>Third-Party Utilities<a class="headerlink" href="#third-party-utilities" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="runtime-data-validation">
 <span id="data-val"></span><h3>Runtime Data Validation<a class="headerlink" href="#runtime-data-validation" title="Permalink to this headline">¶</a></h3>
-<p>Although Hydra provides some runtime type-checking functionality, it only supports <a class="reference external" href="https://omegaconf.readthedocs.io/en/latest/structured_config.html#simple-types">a limited set of types and annotations</a>. hydra-zen offers support for more robust runtime type-checking capabilities via various third-party libraries.</p>
+<p>Although Hydra provides some runtime type-checking functionality, it only supports <a class="reference internal" href="explanation/type_refinement.html#type-support"><span class="std std-ref">a limited set of types and annotations</span></a>. hydra-zen offers support for more robust runtime type-checking capabilities via various third-party libraries.</p>
 <table class="longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
@@ -490,11 +482,11 @@ The following utilities can be used to work with YAML-serialized configs.</p>
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
-    <a class='left-prev' id="prev-link" href="generated/hydra_zen.experimental.hydra_multirun.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="explanation/hydrated_dataclass.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">hydra_multirun</p>
+            <p class="prev-next-title">Combining Statically-Defined and Dynamically-Generated Configurations</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="generated/hydra_zen.launch.html" title="next page">

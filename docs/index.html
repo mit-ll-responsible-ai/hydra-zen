@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Welcome to hydra-zen’s documentation! &#8212; hydra-zen 0.3.0rc5+8.g05eb242 documentation</title>
+    <title>Welcome to hydra-zen’s documentation! &#8212; hydra-zen 0.3.0rc5+11.g748fba6 documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -24,7 +24,9 @@
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/css/blank.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/my_theme.css" />
+    <link rel="stylesheet" type="text/css" href="_static/tabs.css" />
     
   <link rel="preload" as="script" href="_static/js/index.be7d3bbb2ef33a8344ce.js">
 
@@ -32,10 +34,12 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
     <link rel="shortcut icon" href="_static/hydra_zen_favicon_32x32.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Installation and Basic Usage" href="installation.html" />
+    <link rel="next" title="Tutorials" href="tutorials.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -85,38 +89,26 @@
       <div class="navbar-center-item">
         <ul id="navbar-main-elements" class="navbar-nav">
     <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="installation.html">
-  Installation and Basic Usage
+ <a class="reference internal nav-link" href="tutorials.html">
+  Tutorials
  </a>
 </li>
 
 <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="overview.html">
-  Overview of hydra-zen
+ <a class="reference internal nav-link" href="how_tos.html">
+  How-To Guides
  </a>
 </li>
 
 <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="pytorch_lightning_example.html">
-  Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="structured_configs.html">
-  Dynamically Generating Structured Configs
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="experimental.html">
-  Running Experiments with Hydra
+ <a class="reference internal nav-link" href="explanation.html">
+  Explanation
  </a>
 </li>
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="api_reference.html">
-  API Reference
+  Reference
  </a>
 </li>
 
@@ -229,35 +221,25 @@ It helps to eliminate the boilerplate code you would write to configure, orchest
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation and Basic Usage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="installation.html#installing-hydra-zen">Installing hydra-zen</a></li>
-<li class="toctree-l2"><a class="reference internal" href="installation.html#basic-usage">Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/basic_app.html">Create and Launch a Basic App with Hydra</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/add_cli.html">Add a Command Line Interface to Our App</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/hierarchy.html">Design a Hierarchical App Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/config_groups.html">Provide Swappable Configuration Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/inject_wrapper.html">Inject Novel Functionality via the App’s Config</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview of hydra-zen</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="overview.html#what-is-hydra">What is Hydra?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview.html#what-is-hydra-zen">What is hydra-zen?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how_tos.html">How-To Guides</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="how_to/pytorch_lightning.html">Run Boilerplate-Free ML Experiments with PyTorch Lightning &amp; hydra-zen</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="pytorch_lightning_example.html">Boilerplate-Free ML: An Example Using hydra-zen and PyTorch Lightning</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pytorch_lightning_example.html#more-examples-of-hydra-zen-in-ml-projects">More Examples of hydra-zen in ML Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="explanation.html">Explanation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="explanation/type_refinement.html">hydra-zen’s Automatic Type Refinement Behavior</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanation/dont_repeat_yourself.html">Don’t Repeat Yourself: Keeping DRY with Dynamically-Generated Configs 🌞</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanation/hydrated_dataclass.html">Combining Statically-Defined and Dynamically-Generated Configurations</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="structured_configs.html">Dynamically Generating Structured Configs</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="structured_configs.html#api-reference">API Reference</a></li>
-<li class="toctree-l2"><a class="reference internal" href="structured_configs.html#basics-of-structured-configs">Basics of Structured Configs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="structured_configs.html#keeping-dry-with-dynamically-generated-configs">Keeping DRY with Dynamically-Generated Configs 🌞</a></li>
-<li class="toctree-l2"><a class="reference internal" href="structured_configs.html#the-essentials-of-builds">The Essentials of <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="structured_configs.html#the-bells-and-whistles-of-builds">The Bells and Whistles of <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="experimental.html">Running Experiments with Hydra</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="experimental.html#api-reference">API Reference</a></li>
-<li class="toctree-l2"><a class="reference internal" href="experimental.html#launching-hydra-jobs-in-python">Launching Hydra Jobs in Python</a></li>
-<li class="toctree-l2"><a class="reference internal" href="experimental.html#references">References</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api_reference.html#launching-jobs-with-hydra">Launching Jobs with Hydra</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api_reference.html#creating-and-working-with-configs">Creating and Working with Configs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api_reference.html#third-party-utilities">Third-Party Utilities</a></li>
@@ -287,10 +269,10 @@ It helps to eliminate the boilerplate code you would write to configure, orchest
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='right-next' id="next-link" href="installation.html" title="next page">
+    <a class='right-next' id="next-link" href="tutorials.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Installation and Basic Usage</p>
+        <p class="prev-next-title">Tutorials</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
