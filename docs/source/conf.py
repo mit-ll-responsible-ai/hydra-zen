@@ -41,7 +41,15 @@ extensions = [
     "sphinx.ext.githubpages",
     "sphinx.ext.autosummary",
     "numpydoc",
+    "sphinx_copybutton",
+    "sphinx_tabs.tabs",
 ]
+
+# Strip input prompts:
+# https://sphinx-copybutton.readthedocs.io/en/latest/#strip-and-configure-input-prompts-for-code-cells
+copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: "
+copybutton_prompt_is_regexp = True
+
 
 default_role = "py:obj"
 
@@ -70,6 +78,8 @@ extlinks = {
     "gh-link": (_repo + "%s", ""),
     "issue": (_repo + "issues/%s", "issue #"),
     "pull": (_repo + "pull/%s", "pull request #"),
+    "plymi": ("https://www.pythonlikeyoumeanit.com/%s", ""),
+    "hydra": ("https://hydra.cc/docs/%s", ""),
 }
 
 # -- Options for HTML output -------------------------------------------------

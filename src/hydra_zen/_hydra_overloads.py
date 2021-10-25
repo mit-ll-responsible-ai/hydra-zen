@@ -88,6 +88,8 @@ def instantiate(config: Any, *args, **kwargs) -> Any:
     """
     Instantiates the target of a targeted config.
 
+    This is an alias of :func:`hydra.utils.instantiate` [1]_.
+
     By default, `instantiate` will recursively instantiate nested configurations [1]_.
 
     Parameters
@@ -127,7 +129,7 @@ def instantiate(config: Any, *args, **kwargs) -> Any:
 
     References
     ----------
-    .. [1] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
+    .. [1] https://hydra.cc/docs/next/advanced/instantiate_objects/overview
     .. [2] https://omegaconf.readthedocs.io/en/latest/structured_config.html#simple-types
     .. [3] https://omegaconf.readthedocs.io/en/latest/structured_config.html#runtime-type-validation-and-conversion
     .. [4] https://omegaconf.readthedocs.io/en/latest/usage.html#variable-interpolation
