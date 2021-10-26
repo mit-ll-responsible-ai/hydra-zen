@@ -3,20 +3,59 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+=====================================
 Welcome to hydra-zen's documentation!
 =====================================
 
-hydra-zen helps you configure your project using the power of `Hydra <https://github.com/facebookresearch/hydra>`_, while enjoying the `Zen of Python <https://www.python.org/dev/peps/pep-0020/>`_!
+hydra-zen is a Python library that simplifies the process of writing code (be it research-grade or production-grade) that is:
 
-hydra-zen provides simple, Hydra-compatible tools that enable Python-centric workflows for designing, configuring, and running large-scale projects, such as machine learning experiments.
-It helps to eliminate the boilerplate code you would write to configure, orchestrate, and organize the results of your various experiments.
+- **Configurable**: you can configure all aspects of your code from the command line (or from a single Python function).
+- **Repeatable**: each run of your code will be self-documenting; the full configuration of your software is saved alongside your results.
+- **Scalable**: launch multiple runs of your software, be it on your local machine or across multiple nodes on a cluster.
 
-hydra-zen offers:
-  - Functions for automatically and dynamically generating `structured configs <https://hydra.cc/docs/next/tutorials/structured_config/schema/>`_ that can be used to fully or partially configure parts of your application.
-  - The ability to launch Hydra jobs, complete with parameter sweeps and multi-run configurations, from within a notebook or any other Python environment.
-  - Incisive type annotations that provide enriched context about your project's configurations to IDEs, type checkers, and other tooling.
-  - Runtime validation of configurations to catch mistakes before your application launches.
-  - Equal support for both object-oriented libraries (e.g., ``torch.nn``) and functional ones (e.g., ``jax`` and ``numpy``).
+It builds off -- and is fully compatible with -- `Hydra <https://hydra.cc/>`_, a 
+framework for elegantly configuring complex applications. hydra-zen helps simplify the 
+process of using Hydra by providing Python-centric tools for creating configs and 
+launching Hydra jobs.
+
+.. admonition:: Join the Discussion
+
+   Share ideas, ask questions, and chat with us over at `hydra-zen's discussion board <https://github.com/mit-ll-responsible-ai/hydra-zen/discussions>`_.
+
+
+.. tip::
+
+   Using hydra-zen for your research project? `Cite us <https://zenodo.org/record/5584711>`_! 😊
+
+Installation
+============
+
+hydra-zen is lightweight: its only dependencies are ``hydra-core`` and 
+``typing-extensions``. To install it, run.
+
+.. code:: console
+
+   $ pip install hydra-zen
+
+If instead you want to try out the features in the upcoming version, you can install 
+the latest pre-release of hydra-zen with:
+
+.. code:: console
+
+   $ pip install --pre hydra-zen
+
+Learning About hydra-zen
+========================
+
+Our docs are divided into four sections: Tutorials, How-Tos, Explanations, and 
+Reference.
+
+If you want to get a bird's-eye view of what hydra-zen is all about, or if you are 
+completely new to Hydra, check out our **Tutorials**. For folks who are savvy Hydra 
+users, our **How-Tos** and **Reference** materials can help acquaint you with the 
+unique capabilities that are offered by hydra-zen. Finally, **Explanations** provide 
+readers with taxonomies, design principles, recommendations, and other articles that 
+will enrich their understanding of hydra-zen and Hydra.
 
 .. toctree::
    :maxdepth: 2

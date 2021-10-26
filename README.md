@@ -45,6 +45,11 @@ pip install hydra-zen
 
 (Still working on these docs...)
 
+## Join the Discussion
+
+Share ideas, ask questions, and chat with us over at [hydra-zen's discussion board](https://github.com/mit-ll-responsible-ai/hydra-zen/discussions).
+
+
 ## Disclaimer
 
 DISTRIBUTION STATEMENT A. Approved for public release. Distribution is unlimited.

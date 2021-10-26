@@ -31,7 +31,8 @@ our app.
 Installing hydra-zen
 --------------------
 
-To install hydra-zen, run the following command in your terminal:
+To install hydra-zen in your Python environment, run the following command in your 
+terminal:
 
 .. code:: shell
     
@@ -98,8 +99,8 @@ code in this file.
 Launching the App
 -----------------
 
-It's time to run our app. Open a Python or IPython console - or a Jupyter notebook - in 
-the same directory as ``my_app.py``. First, we will import our config and our task function.
+It's time to run our app. Open a Python console -- or a Jupyter notebook -- in the same 
+directory as ``my_app.py``. First, we will import our config and our task function.
 
 
 .. code:: pycon
