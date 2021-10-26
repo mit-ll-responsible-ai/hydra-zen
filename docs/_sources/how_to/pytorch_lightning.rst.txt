@@ -178,20 +178,6 @@ model.
            final_fit.detach().numpy().ravel(),
        )
 
-.. note:: 
-    
-    Note that the our: optimizer, data-loader, and 
-    lightning module are only *partially* configured here. I.e. we will leverage 
-    ``builds(..., zen_partial=True)`` to create their configs. This is due to the fact 
-    that we do not have access to all of their required inputs during configuration 
-    time. For instance, our optimizer requires access to our model's parameters, which 
-    are not available until after the model has been instantiated.
-
-    Thus we provide what information we can to these objects, via our experiment's 
-    configurable interface, and the rest of the information is provided within our task 
-    function to fully-instantiate the objects. 
-
-
 Running Our Experiments
 ========================
 
@@ -386,7 +372,13 @@ at :math:`-\pi/2`, :math:`0`, and :math:`\pi/2` should return, approximately, :m
    
    where :math:`N` – the number of "neurons" in our layer – is a hyperparameter.
 
+.. attention:: **Cleaning Up**:
+   To clean up after this tutorial, delete the ``mutlirun`` directory that Hydra 
+   created upon launching our app. You can find this in the same directory as your 
+   ``experiment.py`` file.
+
 More Examples of Using hydra-zen in ML Projects
 ===============================================
 
 You can check out `this repository <https://github.com/mit-ll-responsible-ai/hydra-zen-examples>`_ for examples of larger-scale ML projects using hydra-zen.
+
