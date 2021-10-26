@@ -15,8 +15,8 @@ hydra-zen is a Python library that simplifies the process of writing code (be it
 
 It builds off -- and is fully compatible with -- `Hydra <https://hydra.cc/>`_, a 
 framework for elegantly configuring complex applications. hydra-zen helps simplify the 
-process of using Hydra by providing Python-centric tools for creating configs and 
-launching Hydra jobs.
+process of using Hydra by providing convenient functions for creating configs and 
+launching Hydra jobs. It also provides novel functionality such :ref:`wrapped instantiation <zen-wrapper>` and :ref:`meta fields <meta-field>` in configs.
 
 .. admonition:: Join the Discussion
 

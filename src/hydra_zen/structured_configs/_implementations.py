@@ -800,6 +800,8 @@ def builds(
     >>> issubclass(ChildConf, ParentConf)
     True
 
+    .. _meta-field:
+
     **Using meta-fields**
 
     Meta-fields are fields that are included in a config but are excluded by the
@@ -813,6 +815,8 @@ def builds(
     {'a': -10, 'b': -10}
     >>> instantiate(Conf, s=2)
     {'a': 2, 'b': 2}
+
+    .. _zen-wrapper:
 
     **Using zen-wrappers**
 

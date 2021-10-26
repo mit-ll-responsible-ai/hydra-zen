@@ -9,4 +9,5 @@ objectives.
    :maxdepth: 1
    :caption: Contents:
 
+   how_to/partial_config
    how_to/pytorch_lightning
