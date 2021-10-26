@@ -13,6 +13,10 @@ All previous releases should still be available on pip.
 
 This release adds many new features to hydra-zen, and is a big step towards ``v1.0.0``. It also introduces some significant API changes, meaning that there are notable deprecations of expressions that were valid in ``v0.2.0``.
 
+We have completely rewritten our docs! The docs now follow the `Diátaxis Framework for technical documentation authoring <https://diataxis.fr/>`_.
+
+The hydra-zen project `now has a discussion board <https://github.com/mit-ll-responsible-ai/hydra-zen/discussions>`_. Stop by and say "hi"! 
+
 New Features
 ------------
 - The introduction of ``builds(..., zen_wrappers=<>)``. 
