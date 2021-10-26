@@ -35,16 +35,16 @@ function as follows. Populate ``game_library.py`` with the following code.
 
    class Character:
        def __init__(self, name: str, level: int = 1, inventory=None):
-          self.name = name
-          self.level = level
-          self.inventory = inventory
+           self.name = name
+           self.level = level
+           self.inventory = inventory
  
        def __repr__(self):
-          out = ""
-          out += f"{self.name}, "
-          out += f"lvl: {self.level}, "
-          out += f"has: {self.inventory}"
-          return out
+           out = ""
+           out += f"{self.name}, "
+           out += f"lvl: {self.level}, "
+           out += f"has: {self.inventory}"
+           return out
 
 
    def inventory(gold: int, weapon: str, costume: str):

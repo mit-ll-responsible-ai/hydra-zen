@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Design a Hierarchical App Interface &#8212; hydra-zen 0.3.0rc5+17.gb8058bf documentation</title>
+    <title>Design a Hierarchical App Interface &#8212; hydra-zen 0.3.0rc5+18.g57dede5 documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -291,16 +291,16 @@ function as follows. Populate <code class="docutils literal notranslate"><span c
 
 <span class="k">class</span> <span class="nc">Character</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inventory</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-       <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
-       <span class="bp">self</span><span class="o">.</span><span class="n">level</span> <span class="o">=</span> <span class="n">level</span>
-       <span class="bp">self</span><span class="o">.</span><span class="n">inventory</span> <span class="o">=</span> <span class="n">inventory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">level</span> <span class="o">=</span> <span class="n">level</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inventory</span> <span class="o">=</span> <span class="n">inventory</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-       <span class="n">out</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-       <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, &quot;</span>
-       <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;lvl: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="si">}</span><span class="s2">, &quot;</span>
-       <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;has: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">inventory</span><span class="si">}</span><span class="s2">&quot;</span>
-       <span class="k">return</span> <span class="n">out</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, &quot;</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;lvl: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="si">}</span><span class="s2">, &quot;</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;has: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">inventory</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">out</span>
 
 
 <span class="k">def</span> <span class="nf">inventory</span><span class="p">(</span><span class="n">gold</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">weapon</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">costume</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
