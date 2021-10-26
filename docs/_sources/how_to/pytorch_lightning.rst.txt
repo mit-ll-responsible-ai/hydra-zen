@@ -5,6 +5,10 @@
    Your must install `PyTorch <https://pytorch.org/>`_ and `PyTorch Lightning <https://
    www.pytorchlightning.ai/>`_ in order to complete this How-To lesson.
 
+.. tip::
+
+   Using hydra-zen for your research project? `Cite us <https://zenodo.org/record/5584711>`_! 😊
+
 ======================================================================
 Run Boilerplate-Free ML Experiments with PyTorch Lightning & hydra-zen
 ======================================================================
@@ -102,7 +106,9 @@ following code. Here, we define our single-layer neural network and the `lightni
 Creating Our Configs and Task Function
 ======================================
 
-Create another script - named ``experiment.py`` - in the same directory as ``zen_model.py``. Here, we will create the configs for our experiments as well as the task function.
+Create another script - named ``experiment.py`` - in the same directory as ``zen_model.py``. Here, we will create the configs for our optimizer, model, data-loader, lightning 
+module, and trainer. We'll also define the task function that trains and tests our 
+model.
 
 
 .. code-block:: python

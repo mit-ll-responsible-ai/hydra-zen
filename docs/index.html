@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Welcome to hydra-zen’s documentation! &#8212; hydra-zen 0.3.0rc5+12.g565631b documentation</title>
+    <title>Welcome to hydra-zen’s documentation! &#8212; hydra-zen 0.3.0rc5+13.gb850e15 documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -172,12 +172,17 @@
 
 <nav id="bd-toc-nav">
     <ul class="visible nav section-nav flex-column">
- <li class="toc-h1 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#">
-   Welcome to hydra-zen’s documentation!
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#installation">
+   Installation
   </a>
  </li>
- <li class="toc-h1 nav-item toc-entry">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#learning-about-hydra-zen">
+   Learning About hydra-zen
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#indices-and-tables">
    Indices and tables
   </a>
@@ -205,19 +210,47 @@
                 
   <div class="section" id="welcome-to-hydra-zen-s-documentation">
 <h1>Welcome to hydra-zen’s documentation!<a class="headerlink" href="#welcome-to-hydra-zen-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>hydra-zen helps you configure your project using the power of <a class="reference external" href="https://github.com/facebookresearch/hydra">Hydra</a>, while enjoying the <a class="reference external" href="https://www.python.org/dev/peps/pep-0020/">Zen of Python</a>!</p>
-<p>hydra-zen provides simple, Hydra-compatible tools that enable Python-centric workflows for designing, configuring, and running large-scale projects, such as machine learning experiments.
-It helps to eliminate the boilerplate code you would write to configure, orchestrate, and organize the results of your various experiments.</p>
-<dl class="simple">
-<dt>hydra-zen offers:</dt><dd><ul class="simple">
-<li><p>Functions for automatically and dynamically generating <a class="reference external" href="https://hydra.cc/docs/next/tutorials/structured_config/schema/">structured configs</a> that can be used to fully or partially configure parts of your application.</p></li>
-<li><p>The ability to launch Hydra jobs, complete with parameter sweeps and multi-run configurations, from within a notebook or any other Python environment.</p></li>
-<li><p>Incisive type annotations that provide enriched context about your project’s configurations to IDEs, type checkers, and other tooling.</p></li>
-<li><p>Runtime validation of configurations to catch mistakes before your application launches.</p></li>
-<li><p>Equal support for both object-oriented libraries (e.g., <code class="docutils literal notranslate"><span class="pre">torch.nn</span></code>) and functional ones (e.g., <code class="docutils literal notranslate"><span class="pre">jax</span></code> and <code class="docutils literal notranslate"><span class="pre">numpy</span></code>).</p></li>
+<p>hydra-zen is a Python library that simplifies the process of writing code (be it research-grade or production-grade) that is:</p>
+<ul class="simple">
+<li><p><strong>Configurable</strong>: you can configure all aspects of your code from the command line (or from a single Python function).</p></li>
+<li><p><strong>Repeatable</strong>: each run of your code will be self-documenting; the full configuration of your software is saved alongside your results.</p></li>
+<li><p><strong>Scalable</strong>: launch multiple runs of your software, be it on your local machine or across multiple nodes on a cluster.</p></li>
 </ul>
-</dd>
-</dl>
+<p>It builds off – and is fully compatible with – <a class="reference external" href="https://hydra.cc/">Hydra</a>, a
+framework for elegantly configuring complex applications. hydra-zen helps simplify the
+process of using Hydra by providing Python-centric tools for creating configs and
+launching Hydra jobs.</p>
+<div class="admonition-join-the-discussion admonition">
+<p class="admonition-title">Join the Discussion</p>
+<p>Share ideas, ask questions, and chat with us over at <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/discussions">hydra-zen’s discussion board</a>.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Using hydra-zen for your research project? <a class="reference external" href="https://zenodo.org/record/5584711">Cite us</a>! 😊</p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>hydra-zen is lightweight: its only dependencies are <code class="docutils literal notranslate"><span class="pre">hydra-core</span></code> and
+<code class="docutils literal notranslate"><span class="pre">typing-extensions</span></code>. To install it, run.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install hydra-zen
+</pre></div>
+</div>
+<p>If instead you want to try out the features in the upcoming version, you can install
+the latest pre-release of hydra-zen with:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install --pre hydra-zen
+</pre></div>
+</div>
+</div>
+<div class="section" id="learning-about-hydra-zen">
+<h2>Learning About hydra-zen<a class="headerlink" href="#learning-about-hydra-zen" title="Permalink to this headline">¶</a></h2>
+<p>Our docs are divided into four sections: Tutorials, How-Tos, Explanations, and
+Reference.</p>
+<p>If you want to get a bird’s-eye view of what hydra-zen is all about, or if you are
+completely new to Hydra, check out our <strong>Tutorials</strong>. For folks who are savvy Hydra
+users, our <strong>How-Tos</strong> and <strong>Reference</strong> materials can help acquaint you with the
+unique capabilities that are offered by hydra-zen. Finally, <strong>Explanations</strong> provide
+readers with taxonomies, design principles, recommendations, and other articles that
+will enrich their understanding of hydra-zen and Hydra.</p>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
@@ -255,12 +288,13 @@ It helps to eliminate the boilerplate code you would write to configure, orchest
 </div>
 </div>
 <div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
 <li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
+</div>
 </div>
 
 
