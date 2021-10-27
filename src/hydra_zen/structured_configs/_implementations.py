@@ -101,8 +101,8 @@ def _target_as_kwarg_deprecation(func: _T2) -> Callable[..., _T2]:
             warnings.warn(
                 HydraZenDeprecationWarning(
                     "Specifying the target of `builds` as a keyword argument is deprecated "
-                    "as of 2021-09-18. Change `builds(target=<target>, ...)` to `builds(<target>, ...)`."
-                    "\n\nThis will be an error in hydra-zen 1.0.0, or by 2021-12-18 — whichever "
+                    "as of 2021-10-27. Change `builds(target=<target>, ...)` to `builds(<target>, ...)`."
+                    "\n\nThis will be an error in hydra-zen 1.0.0, or by 2021-01-27 — whichever "
                     "comes first.\n\nNote: This deprecation does not impact yaml configs "
                     "produced by `builds`."
                 ),
@@ -129,9 +129,9 @@ def _hydra_partial_deprecation(func: _T2) -> Callable[..., _T2]:
             # builds(..., hydra_partial=...) is deprecated
             warnings.warn(
                 HydraZenDeprecationWarning(
-                    "The argument `hydra_partial` is deprecated as of 2021-10-10.\n"
+                    "The argument `hydra_partial` is deprecated as of 2021-10-27.\n"
                     "Change `builds(..., hydra_partial=<..>)` to `builds(..., zen_partial=<..>)`."
-                    "\n\nThis will be an error in hydra-zen 1.0.0, or by 2022-01-10 — whichever "
+                    "\n\nThis will be an error in hydra-zen 1.0.0, or by 2022-01-27 — whichever "
                     "comes first.\n\nNote: This deprecation does not impact yaml configs "
                     "produced by `builds`."
                 ),
@@ -330,9 +330,9 @@ def hydrated_dataclass(
         # builds(..., hydra_partial=...) is deprecated
         warnings.warn(
             HydraZenDeprecationWarning(
-                "The argument `hydra_partial` is deprecated as of 2021-10-10.\n"
+                "The argument `hydra_partial` is deprecated as of 2021-10-27.\n"
                 "Change `builds(..., hydra_partial=<..>)` to `builds(..., zen_partial=<..>)`."
-                "\n\nThis will be an error in hydra-zen 1.0.0, or by 2022-01-10 — whichever "
+                "\n\nThis will be an error in hydra-zen 1.0.0, or by 2022-01-27 — whichever "
                 "comes first.\n\nNote: This deprecation does not impact yaml configs "
                 "produced by `builds`."
             ),

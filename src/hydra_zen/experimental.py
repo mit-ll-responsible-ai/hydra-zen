@@ -64,8 +64,8 @@ def hydra_run(
     warnings.warn(
         HydraZenDeprecationWarning(
             "hydra_zen.experimental.hydra_run is deprecated "
-            "as of 2021-10-13. Change `hydra_run(cfg, task_fn, overrides, ...)` to `launch(cfg, task_fn, overrides, ...)`."
-            "\n\nThis will be an error in hydra-zen 1.0.0, or by 2022-01-13 — whichever "
+            "as of 2021-10-27. Change `hydra_run(cfg, task_fn, overrides, ...)` to `launch(cfg, task_fn, overrides, ...)`."
+            "\n\nThis will be an error in hydra-zen 1.0.0, or by 2022-01-27 — whichever "
             "comes first.\n\nNote: This deprecation does not impact yaml configs "
             "produced by `builds`."
         ),
@@ -133,8 +133,8 @@ def hydra_multirun(
     warnings.warn(
         HydraZenDeprecationWarning(
             "hydra_zen.experimental.hydra_multirun is deprecated "
-            "as of 2021-10-13. Change `hydra_multirun(cfg, task_fn, overrides, ...)` to `launch(cfg, task_fn, overrides, multirun=True, ...)`."
-            "\n\nThis will be an error in hydra-zen 1.0.0, or by 2022-01-13 — whichever "
+            "as of 2021-10-27. Change `hydra_multirun(cfg, task_fn, overrides, ...)` to `launch(cfg, task_fn, overrides, multirun=True, ...)`."
+            "\n\nThis will be an error in hydra-zen 1.0.0, or by 2022-01-27 — whichever "
             "comes first.\n\nNote: This deprecation does not impact yaml configs "
             "produced by `builds`."
         ),
