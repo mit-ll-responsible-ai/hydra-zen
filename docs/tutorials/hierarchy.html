@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Design a Hierarchical App Interface &#8212; hydra-zen 0.3.0rc5+21.g7f59487 documentation</title>
+    <title>Design a Hierarchical App Interface &#8212; hydra-zen 0.3.0+1.g92b460b documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -400,8 +400,7 @@ inventory. We will use the following code in <code class="docutils literal notra
 <h3>Updating the Task Function<a class="headerlink" href="#updating-the-task-function" title="Permalink to this headline">¶</a></h3>
 <p>We’ll make some trivial modifications to our task function. We’re only dealing with one
 player now, not two, so we adjust accordingly. Let’s also print the
-<code class="docutils literal notranslate"><span class="pre">Character</span></code>-instance for <code class="docutils literal notranslate"><span class="pre">player</span></code> so that it is we get instant feedback as we
-prototype our app.</p>
+<code class="docutils literal notranslate"><span class="pre">Character</span></code>-instance for <code class="docutils literal notranslate"><span class="pre">player</span></code> so that we get instant feedback as we prototype our app.</p>
 <div class="literal-block-wrapper docutils container" id="id6">
 <div class="code-block-caption"><span class="caption-text">A revised task function (single-player only)</span><a class="headerlink" href="#id6" title="Permalink to this code">¶</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Config</span><span class="p">):</span>
@@ -556,7 +555,7 @@ contents of <code class="docutils literal notranslate"><span class="pre">.hydra/
 </div>
 <p>We can also check to see what the exact “overrides” that were used to launch the app
 for this job in <code class="docutils literal notranslate"><span class="pre">.hydra/overrides.yaml</span></code>.</p>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">print_file</span><span class="p">(</span><span class="n">latest_job</span> <span class="o">/</span> <span class="s2">&quot;.hydra&quot;</span> <span class="o">/</span> <span class="s2">&quot;config.yaml&quot;</span><span class="p">)</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">print_file</span><span class="p">(</span><span class="n">latest_job</span> <span class="o">/</span> <span class="s2">&quot;.hydra&quot;</span> <span class="o">/</span> <span class="s2">&quot;overrides.yaml&quot;</span><span class="p">)</span>
 <span class="go">- player.name=frodo</span>
 <span class="go">- player.level=2</span>
 <span class="go">- player.inventory.costume=robe</span>
@@ -566,7 +565,7 @@ for this job in <code class="docutils literal notranslate"><span class="pre">.hy
 dynamically - the library code that we are ultimately instantiating. We also see the
 power of Hydra’s ability to configure nested fields within our config.</p>
 <p>In the next tutorial, we will define swappable config groups so that we can load
-specific player profiles and inventory load-outs, from our app’s interface.</p>
+specific player profiles and inventory load-outs from our app’s interface.</p>
 <div class="admonition-references admonition">
 <p class="admonition-title">References</p>
 <ul class="simple">

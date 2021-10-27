@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hydra_zen.structured_configs._implementations &#8212; hydra-zen 0.3.0rc5+21.g7f59487 documentation</title>
+    <title>hydra_zen.structured_configs._implementations &#8212; hydra-zen 0.3.0+1.g92b460b documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -1480,7 +1480,7 @@
         <span class="c1"># Populate dataclass fields based on the target&#39;s signature.</span>
         <span class="c1">#</span>
         <span class="c1"># A user-specified parameter value (via `kwargs_for_target`) takes precedent over</span>
-        <span class="c1"># the default-value from the signature</span>
+        <span class="c1"># the default value from the signature</span>
 
         <span class="c1"># Fields with default values must come after those without defaults,</span>
         <span class="c1"># so we will collect these as we loop through the parameters and</span>
@@ -1802,7 +1802,7 @@
 <span class="sd">    returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    custom_builds</span>
-<span class="sd">        The function `builds`, but with customized default-values.</span>
+<span class="sd">        The function `builds`, but with customized default values.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -1814,7 +1814,7 @@
 
 <span class="sd">    **Basic usage**</span>
 
-<span class="sd">    The following will create a `builds` function whose default-value</span>
+<span class="sd">    The following will create a `builds` function whose default value</span>
 <span class="sd">    for ``zen_partial`` has been set to ``True``.</span>
 
 <span class="sd">    &gt;&gt;&gt; pbuilds = make_custom_builds_fn(zen_partial=True)</span>
@@ -1896,7 +1896,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    ZenField(hint=Any, default=&lt;class &#39;NOTHING&#39;&gt;, name=&lt;class &#39;NOTHING&#39;&gt;)</span>
 
-<span class="sd">    Specifies a field&#39;s name and/or type-annotation and/or default-value.</span>
+<span class="sd">    Specifies a field&#39;s name and/or type-annotation and/or default value.</span>
 <span class="sd">    Designed to specify fields in `make_config`.</span>
 
 <span class="sd">    See the Examples section of the docstring for `make_config` for examples of using</span>
@@ -1966,7 +1966,7 @@
 <span class="sd">        annotations, expressed via `ZenField` instances.</span>
 
 <span class="sd">    **fields_as_kwargs : Any | ZenField</span>
-<span class="sd">        Like ``fields_as_args``, but fieldname/default-value pairs are</span>
+<span class="sd">        Like ``fields_as_args``, but fieldname/default value pairs are</span>
 <span class="sd">        specified as keyword arguments. `ZenField` can also be used here</span>
 <span class="sd">        to express a fields type-annotation and/or its default value.</span>
 

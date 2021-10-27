@@ -12,7 +12,7 @@
 Add a Command Line Interface to Our App
 =======================================
 
-In this tutorial we will update our app so that it can be configured an launched 
+In this tutorial we will update our app so that it can be configured and launched 
 from a command line interface.
 
 
@@ -56,8 +56,8 @@ Modify your script to match this:
            f.write(f"Player 1: {p1}\n" f"Player 2: {p2}")
    
    
+   # 3) Executing `python my_app.py [...]` will run our task function
    if __name__ == "__main__":
-       # 3) Executing `python my_app.py [...]` will run our task function
        task_function()
 
 

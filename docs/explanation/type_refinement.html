@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hydra-zen’s Automatic Type Refinement Behavior &#8212; hydra-zen 0.3.0rc5+21.g7f59487 documentation</title>
+    <title>hydra-zen’s Automatic Type Refinement Behavior &#8212; hydra-zen 0.3.0+1.g92b460b documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -237,7 +237,7 @@
 refine user-supplied type annotations so that they are made compatible with Hydra’s
 limited type support. This eliminates a friction that will otherwise force users to
 modify their code’s type annotations. Furthermore, hydra-zen preserves
-type information such that third-party type checkers can be used to provided more
+type information such that third-party type checkers can be used to provide more
 robust support for more general type annotations.</p>
 <div class="section" id="hydra-s-limited-type-support">
 <h2>Hydra’s Limited Type Support<a class="headerlink" href="#hydra-s-limited-type-support" title="Permalink to this headline">¶</a></h2>
@@ -252,7 +252,7 @@ config:</p>
 <li><p>Optional fields</p></li>
 </ul>
 </div></blockquote>
-<p>Annotations that fall outside of this subset will cause Hydra’s to raise an error.
+<p>Annotations that fall outside of this subset will cause Hydra to raise an error.
 This means that the following config:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Literal</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
