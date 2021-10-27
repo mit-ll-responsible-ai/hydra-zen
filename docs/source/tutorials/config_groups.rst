@@ -112,7 +112,7 @@ default config for that group. Let's specify the ``CharConf`` config, which we n
    :caption: Specifying the player-group item named ``base`` as the default player-profile
 
    Config = make_config("player", defaults=["_self_", {"player": "base"}])
-   cs.store(name="config", node=Config)
+   cs.store(name="my_app", node=Config)
 
 
 Putting It All Together
@@ -169,10 +169,10 @@ over. Modify your ``my_app.py`` script to match the following code.
    # Specify default group for player to be: base
    Config = make_config("player", defaults=["_self_", {"player": "base"}])
    
-   cs.store(name="config", node=Config)
+   cs.store(name="my_app", node=Config)
    
    
-   @hydra.main(config_path=None, config_name="config")
+   @hydra.main(config_path=None, config_name="my_app")
    def task_function(cfg: Config):
        cfg = instantiate(cfg)
    

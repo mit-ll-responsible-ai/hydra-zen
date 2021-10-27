@@ -39,13 +39,13 @@ Modify your script to match this:
    
    # 1) Register our config with Hydra's config store
    cs = ConfigStore.instance()
-   cs.store(name="config", node=Config)
+   cs.store(name="my_app", node=Config)
    
    
    # 2) Tell Hydra what config to use for our task-function.
    #    The name specified here - 'config' - must match the
    #    name that we provided to `cs.store(name=<...>, node=Config)`
-   @hydra.main(config_path=None, config_name="config")
+   @hydra.main(config_path=None, config_name="my_app")
    def task_function(cfg: Config):
        cfg = instantiate(cfg)
        p1 = cfg.player1
