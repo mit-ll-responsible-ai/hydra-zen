@@ -7,9 +7,9 @@ All previous releases should still be available on pip.
 
 .. _v0.3.0:
 
----------------------
-0.3.0rc4 - 2021-10-14
----------------------
+------------------
+0.3.0 - 2021-10-27
+------------------
 
 This release adds many new features to hydra-zen, and is a big step towards ``v1.0.0``. It also introduces some significant API changes, meaning that there are notable deprecations of expressions that were valid in ``v0.2.0``.
 
