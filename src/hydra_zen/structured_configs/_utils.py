@@ -292,7 +292,7 @@ def sanitized_type(
             return Any
 
         args = get_args(type_)
-        if origin is Union:
+        if origin is Union:  # type: ignore
             # Hydra only supports Optional[<type>] unions
             if len(args) != 2 or NoneType not in args:
                 # isn't Optional[<type>]

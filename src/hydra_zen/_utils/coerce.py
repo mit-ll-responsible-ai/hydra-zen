@@ -127,7 +127,7 @@ def coerce_sequences(obj: _T) -> _T:
 
         _origin = get_origin(annotation)
 
-        if _origin is not None and _origin is Union:
+        if _origin is not None and _origin is Union:  # type: ignore
             # Check for Optional[A]
             _args = get_args(annotation)
             if len(_args) == 2:
