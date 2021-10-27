@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Create and Launch a Basic App with Hydra &#8212; hydra-zen 0.3.0rc5+18.g57dede5 documentation</title>
+    <title>Create and Launch a Basic App with Hydra &#8212; hydra-zen 0.3.0rc5+19.g5b97a61 documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -339,6 +339,8 @@ code in this file.</p>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;player_log.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Game session log:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 1: </span><span class="si">{</span><span class="n">p1</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="sa">f</span><span class="s2">&quot;Player 2: </span><span class="si">{</span><span class="n">p2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span>
 </pre></div>
 </div>
 </div>
@@ -368,6 +370,11 @@ Here, we will use the names <code class="docutils literal notranslate"><span cla
 indicate <code class="docutils literal notranslate"><span class="pre">COMPLETED</span></code>.</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">job</span><span class="o">.</span><span class="n">status</span>
 <span class="go">&lt;JobStatus.COMPLETED: 1&gt;</span>
+</pre></div>
+</div>
+<p>We can also directly access the value that is returned by our task-function.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">job</span><span class="o">.</span><span class="n">return_value</span>
+<span class="go">(&#39;link&#39;, &#39;zelda&#39;)</span>
 </pre></div>
 </div>
 <div class="admonition warning">

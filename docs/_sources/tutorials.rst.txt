@@ -18,4 +18,4 @@ with explicit, concrete steps through the process of creating and launching an a
 
 .. tip::
 
-   Did you enjoy these tutorials? Consider `giving us a start on GitHub <https://github.com/mit-ll-responsible-ai/hydra-zen>`_ to help others find this project. 😊
+   Did you enjoy these tutorials? Consider ⭐ `giving us a start on GitHub <https://github.com/mit-ll-responsible-ai/hydra-zen>`_ ⭐ to help others find this project.

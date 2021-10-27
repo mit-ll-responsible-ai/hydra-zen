@@ -18,14 +18,14 @@ framework for elegantly configuring complex applications. hydra-zen helps simpli
 process of using Hydra by providing convenient functions for creating configs and 
 launching Hydra jobs. It also provides novel functionality such :ref:`wrapped instantiation <zen-wrapper>` and :ref:`meta fields <meta-field>` in configs.
 
-.. admonition:: Join the Discussion
+.. admonition:: Join the Discussion 💬
 
    Share ideas, ask questions, and chat with us over at `hydra-zen's discussion board <https://github.com/mit-ll-responsible-ai/hydra-zen/discussions>`_.
 
 
 .. tip::
 
-   Using hydra-zen for your research project? `Cite us <https://zenodo.org/record/5584711>`_! 😊
+   🎓 Using hydra-zen for your research project? `Cite us <https://zenodo.org/record/5584711>`_!
 
 Installation
 ============
