@@ -373,7 +373,7 @@ at :math:`-\pi/2`, :math:`0`, and :math:`\pi/2` should return, approximately, :m
    where :math:`N` – the number of "neurons" in our layer – is a hyperparameter.
 
 .. attention:: **Cleaning Up**:
-   To clean up after this tutorial, delete the ``mutlirun`` directory that Hydra 
+   To clean up after this tutorial, delete the ``multirun`` directory that Hydra 
    created upon launching our app. You can find this in the same directory as your 
    ``experiment.py`` file.
 

@@ -170,10 +170,10 @@ over. Modify your ``my_app.py`` script to match the following code.
    
    Config = make_config("player", defaults=["_self_", {"player": "base"}])
    
-   cs.store(name="config", node=Config)
+   cs.store(name="my_app", node=Config)
    
    
-   @hydra.main(config_path=None, config_name="config")
+   @hydra.main(config_path=None, config_name="my_app")
    def task_function(cfg: Config):
        cfg = instantiate(cfg)
    
