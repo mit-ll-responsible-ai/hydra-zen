@@ -94,6 +94,8 @@ code in this file.
             f.write("Game session log:\n")
             f.write(f"Player 1: {p1}\n" f"Player 2: {p2}")
 
+        return p1, p2 
+
 .. _launch-basic-app:
 
 Launching the App
@@ -130,6 +132,14 @@ indicate ``COMPLETED``.
 
    >>> job.status
    <JobStatus.COMPLETED: 1>
+
+We can also directly access the value that is returned by our task-function.
+
+.. code:: pycon
+
+   >>> job.return_value
+   ('link', 'zelda')
+
 
 .. warning::
    If you modify the contents of ``my_app.py``, then you need to restart your Python 
@@ -218,4 +228,3 @@ In the next tutorial, we will add a command line interface to this app.
    To clean up after this tutorial, delete the ``outputs`` directory that Hydra created 
    upon launching our app. You can find this in the same directory as your 
    ``my_app.py`` file.
-
