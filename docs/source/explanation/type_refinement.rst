@@ -8,7 +8,7 @@ hydra-zen's :ref:`config-creation functions <create-config>` will automatically
 refine user-supplied type annotations so that they are made compatible with Hydra's 
 limited type support. This eliminates a friction that will otherwise force users to 
 modify their code's type annotations. Furthermore, hydra-zen preserves 
-type information such that third-party type checkers can be used to provided more 
+type information such that third-party type checkers can be used to provide more 
 robust support for more general type annotations.
 
 Hydra's Limited Type Support
@@ -23,7 +23,7 @@ config:
    - Containers (List and Dict) containing primitives or Structured Configs
    - Optional fields
 
-Annotations that fall outside of this subset will cause Hydra's to raise an error. 
+Annotations that fall outside of this subset will cause Hydra to raise an error. 
 This means that the following config:
 
 .. code:: python

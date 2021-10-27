@@ -1303,7 +1303,7 @@ def builds(
         # Populate dataclass fields based on the target's signature.
         #
         # A user-specified parameter value (via `kwargs_for_target`) takes precedent over
-        # the default-value from the signature
+        # the default value from the signature
 
         # Fields with default values must come after those without defaults,
         # so we will collect these as we loop through the parameters and
@@ -1625,7 +1625,7 @@ def make_custom_builds_fn(
     returns
     -------
     custom_builds
-        The function `builds`, but with customized default-values.
+        The function `builds`, but with customized default values.
 
     See Also
     --------
@@ -1637,7 +1637,7 @@ def make_custom_builds_fn(
 
     **Basic usage**
 
-    The following will create a `builds` function whose default-value
+    The following will create a `builds` function whose default value
     for ``zen_partial`` has been set to ``True``.
 
     >>> pbuilds = make_custom_builds_fn(zen_partial=True)
@@ -1719,7 +1719,7 @@ class ZenField:
     """
     ZenField(hint=Any, default=<class 'NOTHING'>, name=<class 'NOTHING'>)
 
-    Specifies a field's name and/or type-annotation and/or default-value.
+    Specifies a field's name and/or type-annotation and/or default value.
     Designed to specify fields in `make_config`.
 
     See the Examples section of the docstring for `make_config` for examples of using
@@ -1789,7 +1789,7 @@ def make_config(
         annotations, expressed via `ZenField` instances.
 
     **fields_as_kwargs : Any | ZenField
-        Like ``fields_as_args``, but fieldname/default-value pairs are
+        Like ``fields_as_args``, but fieldname/default value pairs are
         specified as keyword arguments. `ZenField` can also be used here
         to express a fields type-annotation and/or its default value.
 
