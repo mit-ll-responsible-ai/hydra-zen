@@ -194,10 +194,10 @@ script is as follows.
     Config = make_config(player=CharConf)
     
     cs = ConfigStore.instance()
-    cs.store(name="config", node=Config)
+    cs.store(name="my_app", node=Config)
     
     
-    @hydra.main(config_path=None, config_name="config")
+    @hydra.main(config_path=None, config_name="my_app")
     def task_function(cfg: Config):
         cfg = instantiate(cfg)
         

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Provide Swappable Configuration Groups &#8212; hydra-zen 0.3.0+1.g92b460b documentation</title>
+    <title>Provide Swappable Configuration Groups &#8212; hydra-zen 0.3.0+3.gd355fb2 documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -358,7 +358,7 @@ default config for that group. Let’s specify the <code class="docutils literal
 <div class="literal-block-wrapper docutils container" id="id5">
 <div class="code-block-caption"><span class="caption-text">Specifying the player-group item named <code class="docutils literal notranslate"><span class="pre">base</span></code> as the default player-profile</span><a class="headerlink" href="#id5" title="Permalink to this code">¶</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Config</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span><span class="s2">&quot;player&quot;</span><span class="p">,</span> <span class="n">defaults</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;_self_&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;player&quot;</span><span class="p">:</span> <span class="s2">&quot;base&quot;</span><span class="p">}])</span>
-<span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">Config</span><span class="p">)</span>
+<span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;my_app&quot;</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">Config</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -414,10 +414,10 @@ over. Modify your <code class="docutils literal notranslate"><span class="pre">m
 <span class="c1"># Specify default group for player to be: base</span>
 <span class="n">Config</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span><span class="s2">&quot;player&quot;</span><span class="p">,</span> <span class="n">defaults</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;_self_&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;player&quot;</span><span class="p">:</span> <span class="s2">&quot;base&quot;</span><span class="p">}])</span>
 
-<span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">Config</span><span class="p">)</span>
+<span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;my_app&quot;</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">Config</span><span class="p">)</span>
 
 
-<span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_name</span><span class="o">=</span><span class="s2">&quot;config&quot;</span><span class="p">)</span>
+<span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_name</span><span class="o">=</span><span class="s2">&quot;my_app&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Config</span><span class="p">):</span>
     <span class="n">cfg</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
 
