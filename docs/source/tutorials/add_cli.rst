@@ -56,8 +56,8 @@ Modify your script to match this:
            f.write(f"Player 1: {p1}\n" f"Player 2: {p2}")
    
    
+   # 3) Executing `python my_app.py [...]` will run our task function
    if __name__ == "__main__":
-       # 3) Executing `python my_app.py [...]` will run our task function
        task_function()
 
 
