@@ -1,7 +1,7 @@
 How-To Guides
 =============
 
-These how-to guides are here to help hydra-zen users who are wondering: "How do I ...". 
+These how-to guides are here to help hydra-zen users who are wondering: "How do I ___?". 
 Our guides help you learn by having you do; they provide simple steps towards concrete 
 objectives.
 
