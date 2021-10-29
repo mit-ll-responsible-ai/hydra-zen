@@ -153,9 +153,9 @@ player now, not two, so we adjust accordingly. Let's also print the
    :caption: A revised task function (single-player only)
 
    def task_function(cfg: Config):
-       cfg = instantiate(cfg)
+       obj = instantiate(cfg)
        
-       player = cfg.player
+       player = obj.player
        print(player)
 
        with open("player_log.txt", "w") as f:
@@ -199,9 +199,9 @@ script is as follows.
     
     @hydra.main(config_path=None, config_name="my_app")
     def task_function(cfg: Config):
-        cfg = instantiate(cfg)
+        obj = instantiate(cfg)
         
-        player = cfg.player
+        player = obj.player
         print(player)
         
         with open("player_log.txt", "w") as f:

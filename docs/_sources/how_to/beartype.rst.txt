@@ -53,6 +53,24 @@ containing the following code.
    def process_shape(shape: Union[int, Sequence[int]]):
        return shape
 
+Note that the annotation
+
+.. code-block:: python
+   :caption: Annotation of ``age``
+
+   PositiveInt = Annotated[int, Is[lambda x: x >= 0]]
+
+indicates that an associated value should not only be an :class:`int`, but also have a 
+non-negative value. Whereas
+
+.. code-block:: python
+   :caption: Annotation of ``shape``
+
+   Union[int, Sequence[int]]
+
+indicates that a value should either be an :class:`int` or any sequence (list, tuple, 
+etc.) of ints.
+
 Supposing that our Hydra app will configure these two "toy" functions, let's design 
 their configs so that beartype will validate their configured values upon 
 instantiation.
@@ -86,17 +104,21 @@ In the same console, verify that you can replicate the following behavior.
 
    >>> instantiate(ConfAge, age=12)  # OK
    12
+   
    >>> instantiate(ConfAge, age=-100)  # Bad: negative int
    BeartypeCallHintPepParamException- process_age() parameter age=-100 violates type 
    hint [...]
+
    >>> instantiate(ConfAge, age="twelve")  # Bad: not an int
    BeartypeCallHintPepParamException- process_age() parameter age='twelve' violates 
    type hint [...]
    
    >>> instantiate(ConfShape, shape=3)  # OK
    3
+   
    >>> instantiate(ConfShape, shape=[1, 2, 5])  # OK
    [1, 2, 5]
+   
    >>> instantiate(ConfShape, shape=["a", "b"])  # Bad: not a sequence of ints
    BeartypeCallHintPepParamException- process_shape() parameter shape=['a', 'b'] 
    violates type hint [...]

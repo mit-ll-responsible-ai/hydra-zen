@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Run Boilerplate-Free ML Experiments with PyTorch Lightning &amp; hydra-zen &#8212; hydra-zen 0.3.0+3.gd355fb2 documentation</title>
+    <title>Run Boilerplate-Free ML Experiments with PyTorch Lightning &amp; hydra-zen &#8212; hydra-zen 0.3.0+4.gd24ad8e documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -256,7 +256,8 @@
                 
   <div class="admonition-prerequisites admonition" id="lightning">
 <p class="admonition-title">Prerequisites</p>
-<p>Your must install <a class="reference external" href="https://pytorch.org/">PyTorch</a> and <a class="reference external" href="https://www.pytorchlightning.ai/">PyTorch Lightning</a> in order to complete this How-To lesson.</p>
+<p>Your must install <a class="reference external" href="https://pytorch.org/">PyTorch</a> and <a class="reference external" href="https://www.pytorchlightning.ai/">PyTorch Lightning</a> in your Python environment in order to follow this
+How-To guide.</p>
 </div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
@@ -402,13 +403,13 @@ model.</p>
 <span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">ExperimentConfig</span><span class="p">):</span>
     <span class="n">pl</span><span class="o">.</span><span class="n">seed_everything</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
 
-    <span class="n">cfg</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
 
     <span class="c1"># finish instantiating the lightning module, data-loader, and optimizer</span>
-    <span class="n">lit_module</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">lit_module</span><span class="p">(</span><span class="n">dataloader</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataloader</span><span class="p">,</span> <span class="n">optim</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">optim</span><span class="p">)</span>
+    <span class="n">lit_module</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">lit_module</span><span class="p">(</span><span class="n">dataloader</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">dataloader</span><span class="p">,</span> <span class="n">optim</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">optim</span><span class="p">)</span>
 
     <span class="c1"># train the model</span>
-    <span class="n">cfg</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">lit_module</span><span class="p">)</span>
+    <span class="n">obj</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">lit_module</span><span class="p">)</span>
 
     <span class="c1"># evaluate the model over the domain to assess the fit</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">lit_module</span><span class="o">.</span><span class="n">training_domain</span>

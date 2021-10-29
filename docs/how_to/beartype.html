@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Add Enhanced Runtime Type-Checking to a Hydra App &#8212; hydra-zen 0.3.0+3.gd355fb2 documentation</title>
+    <title>Add Enhanced Runtime Type-Checking to a Hydra App &#8212; hydra-zen 0.3.0+4.gd24ad8e documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -263,12 +263,29 @@ containing the following code.</p>
 </pre></div>
 </div>
 </div>
+<p>Note that the annotation</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Annotation of <code class="docutils literal notranslate"><span class="pre">age</span></code></span><a class="headerlink" href="#id4" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">PositiveInt</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Is</span><span class="p">[</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+<p>indicates that an associated value should not only be an <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, but also have a
+non-negative value. Whereas</p>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">Annotation of <code class="docutils literal notranslate"><span class="pre">shape</span></code></span><a class="headerlink" href="#id5" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+<p>indicates that a value should either be an <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> or any sequence (list, tuple,
+etc.) of ints.</p>
 <p>Supposing that our Hydra app will configure these two “toy” functions, let’s design
 their configs so that beartype will validate their configured values upon
 instantiation.</p>
 <p>Open a Python console – or Jupyter notebook – in the same directory as <code class="docutils literal notranslate"><span class="pre">toy_library.py</span></code> and create the following configs.</p>
-<div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text">3: Creating configs that include beartype validation.</span><a class="headerlink" href="#id4" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">3: Creating configs that include beartype validation.</span><a class="headerlink" href="#id6" title="Permalink to this code">¶</a></div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">toy_library</span> <span class="kn">import</span> <span class="n">process_age</span><span class="p">,</span> <span class="n">process_shape</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">make_custom_builds_fn</span>
@@ -287,23 +304,27 @@ instantiation.</p>
 </div>
 <p>Finally, let’s check that our configured values are validated as-expected.
 In the same console, verify that you can replicate the following behavior.</p>
-<div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-text">4: Test that the type-checker catches bad configured values.</span><a class="headerlink" href="#id5" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">4: Test that the type-checker catches bad configured values.</span><a class="headerlink" href="#id7" title="Permalink to this code">¶</a></div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">instantiate</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">ConfAge</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>  <span class="c1"># OK</span>
 <span class="go">12</span>
+
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">ConfAge</span><span class="p">,</span> <span class="n">age</span><span class="o">=-</span><span class="mi">100</span><span class="p">)</span>  <span class="c1"># Bad: negative int</span>
 <span class="go">BeartypeCallHintPepParamException- process_age() parameter age=-100 violates type</span>
 <span class="go">hint [...]</span>
+
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">ConfAge</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="s2">&quot;twelve&quot;</span><span class="p">)</span>  <span class="c1"># Bad: not an int</span>
 <span class="go">BeartypeCallHintPepParamException- process_age() parameter age=&#39;twelve&#39; violates</span>
 <span class="go">type hint [...]</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">ConfShape</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># OK</span>
 <span class="go">3</span>
+
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">ConfShape</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>  <span class="c1"># OK</span>
 <span class="go">[1, 2, 5]</span>
+
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">ConfShape</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">])</span>  <span class="c1"># Bad: not a sequence of ints</span>
 <span class="go">BeartypeCallHintPepParamException- process_shape() parameter shape=[&#39;a&#39;, &#39;b&#39;]</span>
 <span class="go">violates type hint [...]</span>
