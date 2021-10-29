@@ -2,7 +2,7 @@ Combining Statically-Defined and Dynamically-Generated Configurations
 =====================================================================
 
 hydra-zen provides a decorator, :func:`~hydra_zen.hydrated_dataclass`, which is similar 
-to :py:func:`dataclasses.dataclass`. It can be used to dynamically auto-populate configuration parameters, à la :func:`~hydra_zen.builds`. However, at also enabling users to define the config such that its properties are also statically available to various tools, like type-checkers and IDEs.
+to :py:func:`dataclasses.dataclass`. It can be used to dynamically auto-populate configuration parameters, à la :func:`~hydra_zen.builds`. However, it also enables users to define a config such that its attributes are statically available to various tools, like type-checkers and IDEs.
 
 E.g. in the following codeblock, we will use ``@hydrated_dataclass`` to create a frozen
 (i.e. immutable) config, which is designed to partially configure the class 
