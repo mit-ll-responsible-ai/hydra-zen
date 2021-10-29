@@ -174,9 +174,9 @@ over. Modify your ``my_app.py`` script to match the following code.
    
    @hydra.main(config_path=None, config_name="my_app")
    def task_function(cfg: Config):
-       cfg = instantiate(cfg)
+       obj = instantiate(cfg)
    
-       player = cfg.player
+       player = obj.player
        print(player)
    
        with open("player_log.txt", "w") as f:

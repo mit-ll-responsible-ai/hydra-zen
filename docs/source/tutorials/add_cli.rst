@@ -47,9 +47,9 @@ Modify your script to match this:
    #    name that we provided to `cs.store(name=<...>, node=Config)`
    @hydra.main(config_path=None, config_name="my_app")
    def task_function(cfg: Config):
-       cfg = instantiate(cfg)
-       p1 = cfg.player1
-       p2 = cfg.player2
+       obj = instantiate(cfg)
+       p1 = obj.player1
+       p2 = obj.player2
    
        with open("player_log.txt", "w") as f:
            f.write("Game session log:\n")
