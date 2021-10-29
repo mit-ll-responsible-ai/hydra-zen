@@ -83,11 +83,11 @@ code in this file.
     Config = make_config("player1", "player2")
     
     def task_function(cfg: Config):
-        cfg = instantiate(cfg)
+        obj = instantiate(cfg)
         
         # access the player names from the config
-        p1 = cfg.player1
-        p2 = cfg.player2
+        p1 = obj.player1
+        p2 = obj.player2
 
         # write the log with the names
         with open("player_log.txt", "w") as f:

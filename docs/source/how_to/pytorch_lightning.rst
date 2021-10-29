@@ -3,7 +3,8 @@
 .. admonition:: Prerequisites
 
    Your must install `PyTorch <https://pytorch.org/>`_ and `PyTorch Lightning <https://
-   www.pytorchlightning.ai/>`_ in order to complete this How-To lesson.
+   www.pytorchlightning.ai/>`_ in your Python environment in order to complete this 
+   How-To guide.
 
 .. tip::
 
@@ -160,13 +161,13 @@ model.
    def task_function(cfg: ExperimentConfig):
        pl.seed_everything(cfg.seed)
    
-       cfg = instantiate(cfg)
+       obj = instantiate(cfg)
        
        # finish instantiating the lightning module, data-loader, and optimizer
-       lit_module = cfg.lit_module(dataloader=cfg.dataloader, optim=cfg.optim)
+       lit_module = obj.lit_module(dataloader=obj.dataloader, optim=obj.optim)
    
        # train the model
-       cfg.trainer.fit(lit_module)
+       obj.trainer.fit(lit_module)
    
        # evaluate the model over the domain to assess the fit
        data = lit_module.training_domain
@@ -373,7 +374,7 @@ at :math:`-\pi/2`, :math:`0`, and :math:`\pi/2` should return, approximately, :m
    where :math:`N` – the number of "neurons" in our layer – is a hyperparameter.
 
 .. attention:: **Cleaning Up**:
-   To clean up after this tutorial, delete the ``multirun`` directory that Hydra 
+   To clean up after this tutorial, delete the ``mutlirun`` directory that Hydra 
    created upon launching our app. You can find this in the same directory as your 
    ``experiment.py`` file.
 
