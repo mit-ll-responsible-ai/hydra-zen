@@ -88,7 +88,6 @@ extlinks = {
 # a list of builtin themes.
 #
 html_theme = "pydata_sphinx_theme"
-html_favicon = "../../brand/hydra_zen_favicon_32x32.ico"
 html_logo = "../../brand/Hydra-Zen_logo_full_filled_bkgrnd_smaller.png"
 
 html_theme_options = {
@@ -98,17 +97,12 @@ html_theme_options = {
         {
             "rel": "icon",
             "sizes": "32x32",
-            "href": "../../brand/hydra_zen_favicon_32x32.ico",
+            "href": "hydra_zen_favicon_32x32.png",
         },
         {
             "rel": "icon",
             "sizes": "64x64",
-            "href": "../../brand/hydra_zen_favicon_64x64.ico",
-        },
-        {
-            "rel": "icon",
-            "sizes": "134x134",
-            "href": "../../brand/hydra_zen_favicon.ico",
+            "href": "hydra_zen_favicon_64x64.png",
         },
     ],
     "icon_links": [
