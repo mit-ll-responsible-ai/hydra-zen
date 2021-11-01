@@ -34,6 +34,13 @@ hydra-zen is a Python library that simplifies the process of writing code (resea
 - **Repeatable**: each run of your code will be self-documenting; the full configuration of your software is saved alongside your results.
 - **Scalable**: launch multiple runs of your software, be it on your local machine or across multiple nodes on a cluster.
 
+It builds off – and is fully compatible with – [Hydra](https://hydra.cc/), a framework for elegantly 
+configuring complex applications. 
+
+hydra-zen helps simplify the process of using Hydra by providing 
+convenient functions for creating configs and launching Hydra jobs. It also provides novel 
+functionality such as wrapped instantiation and meta fields in configs.
+    
 ## Installation
 `hydra-zen` is lightweight: its only dependencies are `hydra-core` and `typing-extensions`.
 
