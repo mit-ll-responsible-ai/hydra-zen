@@ -25,6 +25,9 @@
   <p align="center">
     Check out our <a href="https://mit-ll-responsible-ai.github.io/hydra-zen/">documentation</a> for more information.
   </p>
+  <p align="center">
+    Interested in machine learning? Check out our guide <a href="https://mit-ll-responsible-ai.github.io/hydra-zen/how_to/pytorch_lightning.html">for using PyTorch Lightning with hydra-zen.⚡</a>
+  </p>
 </p>
 
 
