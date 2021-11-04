@@ -146,7 +146,7 @@ model.
    )
    
    TrainerConf = builds(
-       pl.Trainer, max_epochs=100, gpus=0, progress_bar_refresh_rate=0, zen_partial=False
+       pl.Trainer, max_epochs=100, progress_bar_refresh_rate=0, zen_partial=False
    )
    
    ExperimentConfig = make_config(
