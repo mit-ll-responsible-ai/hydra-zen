@@ -20,7 +20,6 @@ pl_objects = [
     pl.accelerators.Accelerator,
     pl.callbacks.Callback,
     pl.callbacks.GPUStatsMonitor,
-    pl.core.decorators.auto_move_data,
     pl.callbacks.early_stopping.EarlyStopping,
     pl.loggers.base.LightningLoggerBase,
     pl.core.hooks.CheckpointHooks,
