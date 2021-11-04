@@ -63,8 +63,8 @@ setup(
     install_requires=INSTALL_REQUIRES,
     tests_require=TESTS_REQUIRE,
     url=URL,
-    download_url="https://github.com/mit-ll-responsible-ai/hydra-zen/tarball/"
-    + versioneer.get_version()["version"],
+    download_url="https://github.com/mit-ll-responsible-ai/hydra-zen/tarball/v"
+    + versioneer.get_version(),
     python_requires=">=3.6",
     packages=find_packages(where="src", exclude=["tests", "tests.*"]),
     package_dir={"": "src"},
