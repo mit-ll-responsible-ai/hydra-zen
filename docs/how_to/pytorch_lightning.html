@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Run Boilerplate-Free ML Experiments with PyTorch Lightning &amp; hydra-zen &#8212; hydra-zen 0.3.0+13.g3e7e924 documentation</title>
+    <title>Run Boilerplate-Free ML Experiments with PyTorch Lightning &amp; hydra-zen &#8212; hydra-zen 0.3.0+16.g7fe5002 documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -347,9 +347,9 @@ following code. Here, we define our single-layer neural network and the <a class
 </div>
 <div class="section" id="creating-our-configs-and-task-function">
 <h2>Creating Our Configs and Task Function<a class="headerlink" href="#creating-our-configs-and-task-function" title="Permalink to this headline">¶</a></h2>
-<p>Create another script - named <code class="docutils literal notranslate"><span class="pre">experiment.py</span></code> - in the same directory as <code class="docutils literal notranslate"><span class="pre">zen_model.py</span></code>. Here, we will create the configs for our optimizer, model, data-loader, lightning
-module, and trainer. We’ll also define the task function that trains and tests our
-model.</p>
+<p>Create another script - named <code class="docutils literal notranslate"><span class="pre">experiment.py</span></code> - in the same directory as <code class="docutils literal notranslate"><span class="pre">zen_model.py</span></code>.
+Here, we will create the configs for our optimizer, model, data-loader, lightning module,
+and trainer. We’ll also define the task function that trains and tests our model.</p>
 <div class="literal-block-wrapper docutils container" id="id4">
 <div class="code-block-caption"><span class="caption-text">Contents of <code class="docutils literal notranslate"><span class="pre">experiment.py</span></code></span><a class="headerlink" href="#id4" title="Permalink to this code">¶</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
@@ -408,15 +408,23 @@ model.</p>
 
     <span class="c1"># evaluate the model over the domain to assess the fit</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">lit_module</span><span class="o">.</span><span class="n">training_domain</span>
-    <span class="n">final_fit</span> <span class="o">=</span> <span class="n">lit_module</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">final_eval</span> <span class="o">=</span> <span class="n">lit_module</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">final_eval</span> <span class="o">=</span> <span class="n">final_eval</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
 
-    <span class="c1"># return the trained model instance and the final fit</span>
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="n">lit_module</span><span class="p">,</span>
-        <span class="n">final_fit</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
-    <span class="p">)</span>
+    <span class="c1"># return the final evaluation of our model:</span>
+    <span class="c1"># a shape-(N,) numpy-array</span>
+    <span class="k">return</span> <span class="n">final_eval</span>
 </pre></div>
 </div>
+</div>
+<div class="admonition-be-mindful-of-what-your-task-function-returns admonition">
+<p class="admonition-title">Be Mindful of What Your Task Function Returns</p>
+<p>We <em>could</em> make this task-function return our trained neural network, which would enable
+convenient access to it, in-memory, after our Hydra job completes. However, launching this
+task function in a multirun fashion will train multiple models and thus would keep <em>all</em> of
+those models in-memory (and perhaps on-GPU) simultaneously!</p>
+<p>By not returning the model from our task function, we avoid the risk of hitting out-of-memory
+errors when training multiple large models.</p>
 </div>
 </div>
 <div class="section" id="running-our-experiments">
@@ -456,9 +464,9 @@ our results.</p>
 <h2>Inspecting Our Results<a class="headerlink" href="#inspecting-our-results" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="visualizing-our-results">
 <h3>Visualizing Our Results<a class="headerlink" href="#visualizing-our-results" title="Permalink to this headline">¶</a></h3>
-<p>Let’s begin inspecting our results by plotting our four models on <span class="math notranslate nohighlight">\(x \in [-2\pi, 2\pi]\)</span>, alongside the target function: <span class="math notranslate nohighlight">\(\cos{x}\)</span>. Continuing to work in our
-current Python console (or Jupyter notebook), run the following code and verify that
-you see the plot shown below.</p>
+<p>Let’s begin inspecting our results by plotting our four models on <span class="math notranslate nohighlight">\(x \in [-2\pi, 2\pi]\)</span>, alongside the
+target function: <span class="math notranslate nohighlight">\(\cos{x}\)</span>. Continuing to work in our current Python console (or Jupyter notebook), run
+the following code and verify that you see the plot shown below.</p>
 <div class="literal-block-wrapper docutils container" id="id6">
 <div class="code-block-caption"><span class="caption-text">Plotting our models</span><a class="headerlink" href="#id6" title="Permalink to this code">¶</a></div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">instantiate</span>
@@ -471,7 +479,7 @@ you see the plot shown below.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">target_fn</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Target&quot;</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">jobs</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="n">out</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">return_value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="n">out</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">return_value</span>
 <span class="gp">... </span>    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">j</span><span class="o">.</span><span class="n">overrides</span><span class="p">))</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
@@ -578,14 +586,14 @@ at <span class="math notranslate nohighlight">\(-\pi/2\)</span>, <span class="ma
 <div class="code-block-caption"><span class="caption-text">Checkout our loaded model’s behavior</span><a class="headerlink" href="#id10" title="Permalink to this code">¶</a></div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">loaded</span><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="o">-</span><span class="mf">3.1415</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">3.1415</span> <span class="o">/</span> <span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-<span class="go">tensor([[0.0110],</span>
-<span class="go">        [0.9633],</span>
-<span class="go">        [0.0364]], grad_fn=&lt;MmBackward&gt;)</span>
+<span class="go">tensor([[0.0218],</span>
+<span class="go">        [0.9526],</span>
+<span class="go">        [0.0125]], grad_fn=&lt;MmBackward&gt;</span>
 </pre></div>
 </div>
 </div>
-<div class="admonition-nerdy-math-details admonition">
-<p class="admonition-title">Nerdy Math Details</p>
+<div class="admonition-math-details admonition">
+<p class="admonition-title">Math Details</p>
 <p>For the interested reader… In this toy-problem we are optimizing <a class="reference external" href="https://en.wikipedia.org/wiki/Universal_approximation_theorem#Arbitrary-width_case">arbitrary-width universal function approximators</a> to fit <span class="math notranslate nohighlight">\(\cos{x}\)</span>
 on <span class="math notranslate nohighlight">\(x \in [-2\pi, 2\pi]\)</span>.
 In mathematical notation, we want to solve the following optimization problem:</p>
