@@ -181,10 +181,12 @@ and trainer. We'll also define the task function that trains and tests our model
 .. admonition:: Be Mindful of What Your Task Function Returns
 
    We *could* make this task-function return our trained neural network, which would enable
-   convenient access to it, in-memory, after our Hydra job completes. However, launching this task function in a multirun fashion will train multiple models and thus would keep *all* of those 
-   models in-memory (and perhaps on-GPU) simultaneously! 
+   convenient access to it, in-memory, after our Hydra job completes. However, launching this
+   task function in a multirun fashion will train multiple models and thus would keep *all* of
+   those models in-memory (and perhaps on-GPU) simultaneously! 
    
-   By not returning the model from our task function, we avoid the risk of hitting out-of-memory errors when training multiple large models.
+   By not returning the model from our task function, we avoid the risk of hitting out-of-memory
+   errors when training multiple large models.
 
 
 Running Our Experiments
