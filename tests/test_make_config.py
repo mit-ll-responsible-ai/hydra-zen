@@ -7,7 +7,7 @@ from typing import Callable, Tuple, Union
 
 import hypothesis.strategies as st
 import pytest
-from hypothesis import example, given, note, settings
+from hypothesis import HealthCheck, example, given, note, settings
 from omegaconf import OmegaConf
 from omegaconf.errors import OmegaConfBaseException, ValidationError
 
@@ -24,7 +24,7 @@ def test_NOTHING_cannot_be_instantiated():
         NOTHING()
 
 
-@settings(max_examples=10)
+@settings(max_examples=10, suppress_health_check=[HealthCheck(3)])
 @given(not_a_string)
 def test_validate_ZenField_name(not_str):
     with pytest.raises(TypeError):
@@ -46,7 +46,7 @@ def test_zen_field_args_positional_ordering():
     assert field.default.default == 1
 
 
-@settings(max_examples=20)
+@settings(max_examples=20, suppress_health_check=[HealthCheck(3)])
 @given(
     args=st.lists(not_a_string | st.just(ZenField()), min_size=1),
     as_ZenField=st.booleans(),
