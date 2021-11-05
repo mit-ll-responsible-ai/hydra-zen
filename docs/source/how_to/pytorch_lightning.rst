@@ -320,7 +320,6 @@ it captures about this job.
    trainer:
      _target_: pytorch_lightning.trainer.trainer.Trainer
      max_epochs: 100
-     gpus: 0
      progress_bar_refresh_rate: 0
    seed: 1
 
