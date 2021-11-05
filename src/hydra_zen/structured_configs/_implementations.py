@@ -482,7 +482,7 @@ def create_just_if_needed(value: _T) -> Union[_T, Type[Just]]:
     ):
         return just(value)
 
-    return cast(_T, value)
+    return value
 
 
 def sanitized_default_value(value: Any) -> Field:
