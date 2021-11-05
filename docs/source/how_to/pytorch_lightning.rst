@@ -107,9 +107,9 @@ following code. Here, we define our single-layer neural network and the `lightni
 Creating Our Configs and Task Function
 ======================================
 
-Create another script - named ``experiment.py`` - in the same directory as ``zen_model.py``. Here, we will create the configs for our optimizer, model, data-loader, lightning 
-module, and trainer. We'll also define the task function that trains and tests our 
-model.
+Create another script - named ``experiment.py`` - in the same directory as ``zen_model.py``.
+Here, we will create the configs for our optimizer, model, data-loader, lightning module,
+and trainer. We'll also define the task function that trains and tests our model.
 
 
 .. code-block:: python
@@ -171,13 +171,23 @@ model.
    
        # evaluate the model over the domain to assess the fit
        data = lit_module.training_domain
-       final_fit = lit_module.forward(data.reshape(-1, 1))
+       final_eval = lit_module.forward(data.reshape(-1, 1))
+       final_eval = final_eval.detach().cpu().numpy().ravel()
+       
+       # return the final evaluation of our model:
+       # a shape-(N,) numpy-array
+       return final_eval
+
+.. admonition:: Be Mindful of What Your Task Function Returns
+
+   We *could* make this task-function return our trained neural network, which would enable
+   convenient access to it, in-memory, after our Hydra job completes. However, launching this
+   task function in a multirun fashion will train multiple models and thus would keep *all* of
+   those models in-memory (and perhaps on-GPU) simultaneously! 
    
-       # return the trained model instance and the final fit
-       return (
-           lit_module,
-           final_fit.detach().numpy().ravel(),
-       )
+   By not returning the model from our task function, we avoid the risk of hitting out-of-memory
+   errors when training multiple large models.
+
 
 Running Our Experiments
 ========================
@@ -219,9 +229,9 @@ Inspecting Our Results
 Visualizing Our Results
 -----------------------
 
-Let's begin inspecting our results by plotting our four models on :math:`x \in [-2\pi, 2\pi]`, alongside the target function: :math:`\cos{x}`. Continuing to work in our 
-current Python console (or Jupyter notebook), run the following code and verify that 
-you see the plot shown below.
+Let's begin inspecting our results by plotting our four models on :math:`x \in [-2\pi, 2\pi]`, alongside the
+target function: :math:`\cos{x}`. Continuing to work in our current Python console (or Jupyter notebook), run
+the following code and verify that you see the plot shown below.
 
 .. code-block:: pycon
    :caption: Plotting our models
@@ -236,7 +246,7 @@ you see the plot shown below.
    >>> ax.plot(x, target_fn(x), ls="--", label="Target")
 
    >>> for j in jobs:
-   ...     out = j.return_value[1]
+   ...     out = j.return_value
    ...     ax.plot(x, out, label=",".join(s.split(".")[-1] for s in j.overrides))
    ... 
    >>> ax.grid(True)
@@ -350,13 +360,13 @@ at :math:`-\pi/2`, :math:`0`, and :math:`\pi/2` should return, approximately, :m
    
    >>> import torch as tr
    >>> loaded(tr.tensor([-3.1415 / 2, 0.0, 3.1415 / 2]).reshape(-1, 1))
-   tensor([[0.0110],
-           [0.9633],
-           [0.0364]], grad_fn=<MmBackward>)
+   tensor([[0.0218],
+           [0.9526],
+           [0.0125]], grad_fn=<MmBackward>
 
 
 
-.. admonition:: Nerdy Math Details
+.. admonition:: Math Details
 
    For the interested reader... In this toy-problem we are optimizing `arbitrary-width universal function approximators    <https://en.wikipedia.org/wiki/Universal_approximation_theorem#Arbitrary-width_case>`_ to fit :math:`\cos{x}`
    on :math:`x \in [-2\pi, 2\pi]`.
