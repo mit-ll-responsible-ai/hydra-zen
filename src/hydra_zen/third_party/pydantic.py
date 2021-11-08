@@ -57,7 +57,7 @@ def validates_with_pydantic(
 
       - ``hydra_convert="all"``: to ensure omegaconf containers are converted to std-lib types
 
-    Users should be aware of pydantic's data conversion strategy [2]_; pydantic
+    Users should be aware of pydantic's data conversion strategy [3]_; pydantic
     may cast data so that it will conform to its annotated type.
 
     References
