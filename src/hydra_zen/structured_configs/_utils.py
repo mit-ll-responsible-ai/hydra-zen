@@ -257,7 +257,7 @@ NoneType = type(None)
 
 
 def sanitized_type(
-    type_: type, *, primitive_only: bool = False, wrap_optional: bool = False
+    type_: Any, *, primitive_only: bool = False, wrap_optional: bool = False
 ) -> type:
     """Returns ``type_`` unchanged if it is supported as an annotation by hydra,
     otherwise returns ``Any``.
