@@ -1272,33 +1272,6 @@ def builds(
         for name, value in kwargs_for_target.items()
     }
 
-    if zen_meta:
-        _meta_names = set(zen_meta)
-
-        if _meta_names & nameable_params_in_sig:
-            raise ValueError(
-                f"`builds(..., zen_meta=<...>)`: `zen_meta` cannot not specify "
-                f"names that exist in the target's signature: "
-                f"{','.join(_meta_names & nameable_params_in_sig)}"
-            )
-
-        if _meta_names & set(user_specified_named_params):
-            raise ValueError(
-                f"`builds(..., zen_meta=<...>)`: `zen_meta` cannot not specify "
-                f"names that are common with those specified in **kwargs_for_target: "
-                f"{','.join(_meta_names & set(user_specified_named_params))}"
-            )
-
-        # We don't check for collisions between `zen_meta` names and the
-        # names of inherited fields. Thus `zen_meta` can effectively be used
-        # to "delete" names from a config, via inheritance.
-        user_specified_named_params.update(
-            {
-                name: (name, Any, sanitized_default_value(value))
-                for name, value in zen_meta.items()
-            }
-        )
-
     if populate_full_signature is True:
         # Populate dataclass fields based on the target's signature.
         #
@@ -1370,6 +1343,31 @@ def builds(
             )
     else:
         base_fields.extend(user_specified_named_params.values())
+
+    if zen_meta:
+        _meta_names = set(zen_meta)
+
+        if _meta_names & nameable_params_in_sig:
+            raise ValueError(
+                f"`builds(..., zen_meta=<...>)`: `zen_meta` cannot not specify "
+                f"names that exist in the target's signature: "
+                f"{','.join(_meta_names & nameable_params_in_sig)}"
+            )
+
+        if _meta_names & set(user_specified_named_params):
+            raise ValueError(
+                f"`builds(..., zen_meta=<...>)`: `zen_meta` cannot not specify "
+                f"names that are common with those specified in **kwargs_for_target: "
+                f"{','.join(_meta_names & set(user_specified_named_params))}"
+            )
+
+        # We don't check for collisions between `zen_meta` names and the
+        # names of inherited fields. Thus `zen_meta` can effectively be used
+        # to "delete" names from a config, via inheritance.
+        base_fields.extend(
+            (name, Any, sanitized_default_value(value))
+            for name, value in zen_meta.items()
+        )
 
     if dataclass_name is None:
         if zen_partial is False:
