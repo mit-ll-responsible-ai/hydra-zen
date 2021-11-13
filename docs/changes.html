@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Changelog &#8212; hydra-zen 0.3.0+24.ga3e3e11 documentation</title>
+    <title>Changelog &#8212; hydra-zen 0.3.1+1.gaee6e75 documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -168,6 +168,11 @@
 <nav id="bd-toc-nav">
     <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#v0-3-1">
+   0.3.1 - 2021-11-13
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#v0-3-0">
    0.3.0 - 2021-10-27
   </a>
@@ -224,8 +229,15 @@
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
 <p>This is a record of all past hydra-zen releases and what went into them, in reverse chronological order.
 All previous releases should still be available on pip.</p>
+<div class="section" id="v0-3-1">
+<span id="id1"></span><h2>0.3.1 - 2021-11-13<a class="headerlink" href="#v0-3-1" title="Permalink to this headline">¶</a></h2>
+<p>The release fixes a bug that was reported in <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/issues/161">issue #161</a>. Prior to this patch,
+there was a bug in <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> where specifying <code class="docutils literal notranslate"><span class="pre">populate_full_sig=True</span></code>
+for a target that did not have <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code> caused all user-specified zen-meta fields
+to be excluded from the resulting config.</p>
+</div>
 <div class="section" id="v0-3-0">
-<span id="id1"></span><h2>0.3.0 - 2021-10-27<a class="headerlink" href="#v0-3-0" title="Permalink to this headline">¶</a></h2>
+<span id="id2"></span><h2>0.3.0 - 2021-10-27<a class="headerlink" href="#v0-3-0" title="Permalink to this headline">¶</a></h2>
 <p>This release adds many new features to hydra-zen, and is a big step towards <code class="docutils literal notranslate"><span class="pre">v1.0.0</span></code>. It also introduces some significant API changes, meaning that there are notable deprecations of expressions that were valid in <code class="docutils literal notranslate"><span class="pre">v0.2.0</span></code>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -292,7 +304,7 @@ utilized. See <a class="reference external" href="https://github.com/mit-ll-resp
 </div>
 </div>
 <div class="section" id="v0-2-0">
-<span id="id4"></span><h2>0.2.0 - 2021-08-12<a class="headerlink" href="#v0-2-0" title="Permalink to this headline">¶</a></h2>
+<span id="id5"></span><h2>0.2.0 - 2021-08-12<a class="headerlink" href="#v0-2-0" title="Permalink to this headline">¶</a></h2>
 <p>This release:</p>
 <ul class="simple">
 <li><p>Improves hydra-zen’s <a class="reference external" href="https://mit-ll-responsible-ai.github.io/hydra-zen/structured_configs.html#automatic-type-refinement">automatic type refinement</a>. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/84">pull request #84</a> for details</p></li>
@@ -304,7 +316,7 @@ utilized. See <a class="reference external" href="https://github.com/mit-ll-resp
 </ul>
 </div>
 <div class="section" id="v0-1-0">
-<span id="id5"></span><h2>0.1.0 - 2021-08-04<a class="headerlink" href="#v0-1-0" title="Permalink to this headline">¶</a></h2>
+<span id="id6"></span><h2>0.1.0 - 2021-08-04<a class="headerlink" href="#v0-1-0" title="Permalink to this headline">¶</a></h2>
 <p>This is hydra-zen’s first stable release on PyPI!
 Although we have not yet released version <code class="xref py py-obj docutils literal notranslate"><span class="pre">v1.0.0</span></code>, it should be noted that hydra-zen’s codebase is thoroughly tested.
 Its test suite makes keen use of the property-based testing library <a class="reference external" href="https://hypothesis.readthedocs.io/en/latest/">Hypothesis</a>.

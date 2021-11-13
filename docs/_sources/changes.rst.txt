@@ -5,6 +5,17 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse chronological order.
 All previous releases should still be available on pip.
 
+.. _v0.3.1:
+
+------------------
+0.3.1 - 2021-11-13
+------------------
+
+The release fixes a bug that was reported in :issue:`161`. Prior to this patch,
+there was a bug in :func:`~hydra_zen.builds` where specifying ``populate_full_sig=True``
+for a target that did not have ``**kwargs`` caused all user-specified zen-meta fields
+to be excluded from the resulting config.
+
 .. _v0.3.0:
 
 ------------------
