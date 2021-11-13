@@ -43,7 +43,7 @@ def test_basic_zen_meta_behavior(
         **kwargs,
         zen_meta=zen_meta,
         zen_partial=zen_partial,
-        populate_full_signature=pop_sig
+        populate_full_signature=pop_sig,
     )
 
     conf = Conf()
@@ -61,6 +61,62 @@ def test_basic_zen_meta_behavior(
     assert out_args == args
     assert out_kwargs == kwargs
     assert set(out_kwargs).isdisjoint(zen_meta)
+
+
+def f_concrete_sig(a, b):
+    return (a, b)
+
+
+@given(
+    a=st.integers(),
+    b=st.integers(),
+    as_kwarg=st.booleans(),
+    zen_meta=st.dictionaries(
+        st.text(string.ascii_letters, min_size=1, max_size=1).filter(
+            lambda x: x not in {"a", "b"}
+        ),
+        st.integers(),
+    ),
+    zen_partial=st.booleans(),
+    pop_sig=st.booleans(),
+)
+def test_basic_zen_meta_behavior_vs_concrete_sig(
+    a: int,
+    b: int,
+    as_kwarg: bool,
+    zen_meta: dict,
+    zen_partial: bool,
+    pop_sig: bool,
+):
+    if as_kwarg:
+        args = ()
+        kwargs = dict(a=a, b=b)
+    else:
+        args = (a, b)
+        kwargs = {}
+
+    Conf = builds(
+        f_concrete_sig,
+        *args,
+        **kwargs,
+        zen_meta=zen_meta,
+        zen_partial=zen_partial,
+        populate_full_signature=pop_sig,
+    )
+
+    conf = Conf()
+
+    # ensure all meta-fields are present
+    for meta_name, meta_val in zen_meta.items():
+        assert getattr(conf, meta_name) == meta_val
+
+    if not zen_partial:
+        out_args = instantiate(Conf)
+    else:
+        assert is_partial_builds(Conf)
+        out_args = instantiate(Conf)()
+
+    assert out_args == (a, b)
 
 
 def test_zen_meta_via_hydrated_dataclass():
