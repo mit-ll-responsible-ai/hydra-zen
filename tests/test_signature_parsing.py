@@ -49,7 +49,7 @@ def f2(x, y, z, has_default=101):
     return x, y, z, has_default
 
 
-@settings(max_examples=1000)
+@settings(max_examples=1000, deadline=None)
 @given(
     user_value_x=valid_hydra_literals,
     user_value_y=valid_hydra_literals,
