@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hydra_zen.structured_configs._implementations &#8212; hydra-zen 0.3.0+23.gbaa7fa0 documentation</title>
+    <title>hydra_zen.structured_configs._implementations &#8212; hydra-zen 0.3.0+24.ga3e3e11 documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -1444,33 +1444,6 @@
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs_for_target</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
     <span class="p">}</span>
 
-    <span class="k">if</span> <span class="n">zen_meta</span><span class="p">:</span>
-        <span class="n">_meta_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">zen_meta</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">_meta_names</span> <span class="o">&amp;</span> <span class="n">nameable_params_in_sig</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;`builds(..., zen_meta=&lt;...&gt;)`: `zen_meta` cannot not specify &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;names that exist in the target&#39;s signature: &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_meta_names</span> <span class="o">&amp;</span> <span class="n">nameable_params_in_sig</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">_meta_names</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">user_specified_named_params</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;`builds(..., zen_meta=&lt;...&gt;)`: `zen_meta` cannot not specify &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;names that are common with those specified in **kwargs_for_target: &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_meta_names</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">user_specified_named_params</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-
-        <span class="c1"># We don&#39;t check for collisions between `zen_meta` names and the</span>
-        <span class="c1"># names of inherited fields. Thus `zen_meta` can effectively be used</span>
-        <span class="c1"># to &quot;delete&quot; names from a config, via inheritance.</span>
-        <span class="n">user_specified_named_params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-            <span class="p">{</span>
-                <span class="n">name</span><span class="p">:</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">sanitized_default_value</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
-                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">zen_meta</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-            <span class="p">}</span>
-        <span class="p">)</span>
-
     <span class="k">if</span> <span class="n">populate_full_signature</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
         <span class="c1"># Populate dataclass fields based on the target&#39;s signature.</span>
         <span class="c1">#</span>
@@ -1542,6 +1515,31 @@
             <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">base_fields</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">user_specified_named_params</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+    <span class="k">if</span> <span class="n">zen_meta</span><span class="p">:</span>
+        <span class="n">_meta_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">zen_meta</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">_meta_names</span> <span class="o">&amp;</span> <span class="n">nameable_params_in_sig</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;`builds(..., zen_meta=&lt;...&gt;)`: `zen_meta` cannot not specify &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;names that exist in the target&#39;s signature: &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_meta_names</span> <span class="o">&amp;</span> <span class="n">nameable_params_in_sig</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">_meta_names</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">user_specified_named_params</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;`builds(..., zen_meta=&lt;...&gt;)`: `zen_meta` cannot not specify &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;names that are common with those specified in **kwargs_for_target: &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_meta_names</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">user_specified_named_params</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># We don&#39;t check for collisions between `zen_meta` names and the</span>
+        <span class="c1"># names of inherited fields. Thus `zen_meta` can effectively be used</span>
+        <span class="c1"># to &quot;delete&quot; names from a config, via inheritance.</span>
+        <span class="n">base_fields</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">sanitized_default_value</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">zen_meta</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">dataclass_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">zen_partial</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
