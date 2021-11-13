@@ -17,7 +17,7 @@ from typing import (
 
 import hypothesis.strategies as st
 import pytest
-from hypothesis import given, settings
+from hypothesis import assume, given, settings
 from omegaconf import OmegaConf
 from typing_extensions import Annotated, Final, Literal, TypedDict
 
@@ -232,6 +232,10 @@ def test_validations_missed_by_hydra(
     xf.check_xfail(annotation, validator)
     # draw valid input
     valid_input = data.draw(st.from_type(annotation), label="valid_input")
+
+    if isinstance(valid_input, str):
+        # prevent interpolated fields from being generated
+        assume("${" not in valid_input)
 
     # boilerplate: set annotation of target to-be-built
     a_func.__annotations__.clear()
