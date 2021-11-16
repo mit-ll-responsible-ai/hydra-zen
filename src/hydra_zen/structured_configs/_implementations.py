@@ -102,7 +102,7 @@ _KEYWORD_ONLY: Final = inspect.Parameter.KEYWORD_ONLY
 _VAR_KEYWORD: Final = inspect.Parameter.VAR_KEYWORD
 
 NoneType = type(None)
-HYDRA_SUPPORTED_PRIMITIVES = (int, float, bool, str, Enum, list, tuple, dict, NoneType)
+HYDRA_SUPPORTED_PRIMITIVES = {int, float, bool, str, Enum, list, tuple, dict, NoneType}
 
 _builtin_function_or_method_type = type(len)
 
@@ -512,13 +512,15 @@ def create_just_if_needed(value: _T) -> Union[_T, Type[Just]]:
 
 
 def sanitize_collection(x: _T) -> _T:
-    if isinstance(x, (list, tuple)):
-        return type(x)(sanitized_default_value(_x) for _x in x)
-    elif isinstance(x, dict):
-        return type(x)(
+    """Pass contents of lists, tuples, or dicts through sanitized_default_values"""
+    type_x = type(x)
+    if type_x in {list, tuple}:
+        return type_x(sanitized_default_value(_x) for _x in x)  # type: ignore
+    elif type_x is dict:
+        return type_x(
             {
                 sanitized_default_value(k): sanitized_default_value(v)
-                for k, v in x.items()
+                for k, v in x.items()  # type: ignore
             }
         )
     else:
@@ -535,16 +537,18 @@ def sanitized_default_value(
     value = sanitize_collection(value)
     resolved_value = create_just_if_needed(value)
 
-    if allow_zen_conversion and isinstance(resolved_value, ZEN_SUPPORTED_PRIMITIVES):
+    type_value = type(value)
+
+    # we don't use isinstance because we don't permit subclasses of supported
+    # primitives
+    if allow_zen_conversion and type_value in ZEN_SUPPORTED_PRIMITIVES:
         type_ = type(resolved_value)
         conversion_fn = ZEN_VALUE_CONVERSION.get(type_)
 
         if conversion_fn is not None:
             return conversion_fn(resolved_value)
 
-    if isinstance(resolved_value, HYDRA_SUPPORTED_PRIMITIVES) or is_dataclass(
-        resolved_value
-    ):
+    if type_value in HYDRA_SUPPORTED_PRIMITIVES or is_dataclass(resolved_value):
         return resolved_value
     if field_name:
         field_name = f", for field `{field_name}`,"
@@ -564,8 +568,10 @@ def sanitized_field(
     error_prefix: str = "",
     field_name: str = "",
 ) -> Field:
-    if isinstance(value, _utils.KNOWN_MUTABLE_TYPES) and isinstance(
-        value, HYDRA_SUPPORTED_PRIMITIVES
+    type_value = type(value)
+    if (
+        type_value in _utils.KNOWN_MUTABLE_TYPES
+        and type_value in HYDRA_SUPPORTED_PRIMITIVES
     ):
         return cast(Field, mutable_value(value))
     return _utils.field(

@@ -7,7 +7,7 @@ from typing import Any
 
 import hypothesis.strategies as st
 import pytest
-from hypothesis import HealthCheck, assume, given, settings
+from hypothesis import HealthCheck, assume, example, given, settings
 
 from hydra_zen import (
     ZenField,
@@ -33,7 +33,7 @@ def f_with_kwargs(*args, **kwargs):
 
 
 def make_hydrated_dataclass(target, a):
-    assume(not isinstance(a, KNOWN_MUTABLE_TYPES))
+    assume(not isinstance(a, tuple(KNOWN_MUTABLE_TYPES)))
 
     @hydrated_dataclass(target)
     class Config:
@@ -43,7 +43,7 @@ def make_hydrated_dataclass(target, a):
 
 
 def make_dataclass(a):
-    assume(not isinstance(a, KNOWN_MUTABLE_TYPES))
+    assume(not isinstance(a, tuple(KNOWN_MUTABLE_TYPES)))
 
     @dataclass
     class C:
@@ -56,6 +56,14 @@ class SomeType:
     pass
 
 
+class SubclassOfSupportedPrimitive(int):
+    def __repr__(self) -> str:
+        return "SubclassOfSupportedPrimitive(" + super().__repr__() + ")"
+
+    pass
+
+
+unsupported_subclass = SubclassOfSupportedPrimitive()
 unsupported_instance = SomeType()
 
 
@@ -85,19 +93,27 @@ construction_fn_variations = [
     "config_construction_fn",
     construction_fn_variations,
 )
+@example(unsupported=unsupported_instance)
+# test collections containing unsupported values
+@example(unsupported=[unsupported_instance])
+@example(unsupported=(unsupported_instance,))
+@example(unsupported={unsupported_instance: 1})
+@example(unsupported={1: unsupported_instance})
+@example(unsupported={unsupported_instance})
+@example(unsupported={unsupported_instance})
+@example(unsupported=unsupported_subclass)
+@example(unsupported=[unsupported_subclass])
+@example(unsupported=(unsupported_subclass,))
+@example(unsupported={unsupported_subclass: 1})
+@example(unsupported={1: unsupported_subclass})
+@example(unsupported={unsupported_subclass})
+@example(unsupported={unsupported_subclass})
 @settings(
     max_examples=20, deadline=None, suppress_health_check=(HealthCheck.data_too_large,)
 )
 @given(
-    unsupported=st.just(unsupported_instance)
-    # test collections containing unsupported values
-    | st.just([unsupported_instance])
-    | st.just((unsupported_instance,))
-    | st.just({unsupported_instance: 1})
-    | st.just({1: unsupported_instance})
-    | st.just({unsupported_instance})
-    | everything_except(
-        *(HYDRA_SUPPORTED_PRIMITIVES + ZEN_SUPPORTED_PRIMITIVES)
+    unsupported=everything_except(
+        *(HYDRA_SUPPORTED_PRIMITIVES | ZEN_SUPPORTED_PRIMITIVES)
     ).filter(lambda x: not inspect.isfunction(x))
 )
 def test_unsupported_config_value_raises_while_making_config(

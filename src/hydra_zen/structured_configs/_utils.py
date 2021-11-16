@@ -97,7 +97,7 @@ COMMON_MODULES_WITH_OBFUSCATED_IMPORTS: Tuple[str, ...] = (
 UNKNOWN_NAME: Final[str] = "<unknown>"
 HYDRA_SUPPORTED_PRIMITIVE_TYPES: Final = {int, float, bool, str, Enum}
 
-KNOWN_MUTABLE_TYPES = (list, dict, set)
+KNOWN_MUTABLE_TYPES = {list, dict, set}
 
 T = TypeVar("T")
 
