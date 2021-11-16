@@ -1,3 +1,6 @@
+# Copyright (c) 2021 Massachusetts Institute of Technology
+# SPDX-License-Identifier: MIT
+
 import inspect
 from dataclasses import dataclass
 from typing import Any
@@ -60,8 +63,7 @@ def f_with_bad_default_value(x=unsupported_instance):
     pass
 
 
-@pytest.mark.parametrize(
-    "config_construction_fn",
+construction_fn_variations = (
     [
         lambda x: make_config(a=x),
         lambda x: make_config(ZenField(name="a", default=x)),
@@ -78,6 +80,12 @@ def f_with_bad_default_value(x=unsupported_instance):
         # test validation via inheritance
         lambda x: builds(f_concrete_sig, builds_bases=(make_dataclass(x),)),
     ],
+)
+
+
+@pytest.mark.parametrize(
+    "config_construction_fn",
+    construction_fn_variations,
 )
 @settings(
     max_examples=20, deadline=None, suppress_health_check=(HealthCheck.data_too_large,)
@@ -95,25 +103,7 @@ def test_unsupported_config_value_raises_while_making_config(
         config_construction_fn(unsupported)
 
 
-@pytest.mark.parametrize(
-    "config_construction_fn",
-    [
-        lambda x: make_config(a=x),
-        lambda x: make_config(ZenField(name="a", default=x)),
-        lambda x: builds(f_concrete_sig, x=x, populate_full_signature=False),
-        lambda x: builds(f_concrete_sig, x, populate_full_signature=False),
-        lambda x: builds(f_with_kwargs, x=x, populate_full_signature=False),
-        lambda x: builds(f_with_kwargs, x, populate_full_signature=False),
-        lambda x: builds(f_concrete_sig, x=x, populate_full_signature=True),
-        lambda x: builds(f_concrete_sig, x, populate_full_signature=True),
-        lambda x: builds(f_with_kwargs, x=x, populate_full_signature=True),
-        lambda x: builds(f_with_kwargs, x, populate_full_signature=True),
-        lambda x: builds(f_with_bad_default_value, populate_full_signature=True),
-        lambda x: make_hydrated_dataclass(f_concrete_sig, x),
-        # test validation via inheritance
-        lambda x: builds(f_concrete_sig, builds_bases=(make_dataclass(x),)),
-    ],
-)
+@pytest.mark.parametrize("config_construction_fn", construction_fn_variations)
 @settings(suppress_health_check=(HealthCheck.data_too_large,), deadline=None)
 @given(value=everything_except())
 def test_that_configs_passed_by_zen_validation_are_serializable(
