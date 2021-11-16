@@ -19,7 +19,6 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
-    Collection,
     Dict,
     FrozenSet,
     List,
@@ -111,7 +110,19 @@ def _convert_set(value: set) -> Type[Builds[Type[Set]]]:
     return builds(set, tuple(value))
 
 
+@dataclass
+class _ConfigComplex:
+    real: Any
+    imag: Any
+    _target_: str = _utils.get_obj_path(complex)
+
+
+def _convert_complex(value: complex) -> Builds[Type[complex]]:
+    return cast(Builds[Type[complex]], _ConfigComplex(real=value.real, imag=value.imag))
+
+
 ZEN_VALUE_CONVERSION[set] = _convert_set
+ZEN_VALUE_CONVERSION[complex] = _convert_complex
 
 
 def _get_target(x):

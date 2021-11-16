@@ -19,7 +19,7 @@ def test_supported_primitives_in_sync_with_value_conversion():
     assert set(ZEN_SUPPORTED_PRIMITIVES) == set(ZEN_VALUE_CONVERSION)
 
 
-@pytest.mark.parametrize("zen_supported_type", (Set[Union[int, str]],))
+@pytest.mark.parametrize("zen_supported_type", (Set[Union[int, str, complex]], complex))
 @settings(deadline=None, max_examples=20)
 @given(st.data())
 def test_value_conversion(zen_supported_type, data: st.DataObject):
@@ -27,4 +27,8 @@ def test_value_conversion(zen_supported_type, data: st.DataObject):
     Conf = make_config(a=value)
     to_yaml(Conf)
     conf = instantiate(Conf)
-    assert conf.a == value
+    if value == value:  # avoid nans
+        if hasattr(value, "__iter__") and any(v != v for v in value):
+            pass
+        else:
+            assert conf.a == value
