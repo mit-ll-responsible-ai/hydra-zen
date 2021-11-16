@@ -3,7 +3,16 @@
 import inspect
 import warnings
 from collections import Counter, defaultdict
-from dataclasses import Field, dataclass, field, fields, is_dataclass, make_dataclass
+from dataclasses import (
+    MISSING,
+    Field,
+    dataclass,
+    field,
+    fields,
+    is_dataclass,
+    make_dataclass,
+)
+from enum import Enum
 from functools import wraps
 from itertools import chain
 from typing import (
@@ -28,11 +37,16 @@ from typing import (
 
 from typing_extensions import Final, Literal, TypeGuard
 
-from hydra_zen.errors import HydraZenDeprecationWarning
+from hydra_zen.errors import (
+    HydraZenDeprecationWarning,
+    HydraZenUnsupportedPrimitiveError,
+)
 from hydra_zen.funcs import get_obj, partial, zen_processing
 from hydra_zen.structured_configs import _utils
 from hydra_zen.typing import Builds, Importable, Just, PartialBuilds
 from hydra_zen.typing._implementations import DataClass, HasPartialTarget, HasTarget
+
+from ._value_conversion import ZEN_SUPPORTED_PRIMITIVES, ZEN_VALUE_CONVERSION
 
 try:
     # used to check if default values are ufuncs
@@ -85,6 +99,9 @@ _POSITIONAL_OR_KEYWORD: Final = inspect.Parameter.POSITIONAL_OR_KEYWORD
 _VAR_POSITIONAL: Final = inspect.Parameter.VAR_POSITIONAL
 _KEYWORD_ONLY: Final = inspect.Parameter.KEYWORD_ONLY
 _VAR_KEYWORD: Final = inspect.Parameter.VAR_KEYWORD
+
+NoneType = type(None)
+HYDRA_SUPPORTED_PRIMITIVES = (int, float, bool, str, Enum, list, tuple, dict, NoneType)
 
 _builtin_function_or_method_type = type(len)
 
@@ -175,6 +192,7 @@ def mutable_value(x: _T) -> _T:
     >>> HasMutableDefault()
     HasMutableDefault(a_list=[1, 2, 3])"""
     cast = type(x)  # ensure that we return a copy of the default value
+    # TODO: THIS IS A PROBLEM
     return field(default_factory=lambda: cast(x))
 
 
@@ -485,14 +503,57 @@ def create_just_if_needed(value: _T) -> Union[_T, Type[Just]]:
     return value
 
 
-def sanitized_default_value(value: Any) -> Field:
-    if isinstance(value, _utils.KNOWN_MUTABLE_TYPES):
-        return cast(Field, mutable_value(value))
+def sanitized_default_value(
+    value: Any,
+    allow_zen_conversion: bool = True,
+    *,
+    error_prefix: str = "",
+    field_name: str = "",
+) -> Any:
+
     resolved_value = create_just_if_needed(value)
-    return (
-        _utils.field(default=value)
-        if value is resolved_value
-        else _utils.field(default=resolved_value)
+
+    if allow_zen_conversion and isinstance(resolved_value, ZEN_SUPPORTED_PRIMITIVES):
+        type_ = type(resolved_value)
+        conversion_fn = ZEN_VALUE_CONVERSION.get(type_)
+
+        if conversion_fn is not None:
+            return conversion_fn(resolved_value)
+
+    if isinstance(resolved_value, HYDRA_SUPPORTED_PRIMITIVES) or is_dataclass(
+        resolved_value
+    ):
+        return resolved_value
+    if field_name:
+        field_name = f", for field `{field_name}`,"
+    raise HydraZenUnsupportedPrimitiveError(
+        error_prefix
+        + f" The configured value {value}{field_name} is not supported by Hydra. Serializing or "
+        f"instantiating this config would ultimately result in an error.\nConsider "
+        f"using `hydra_zen.builds` to create a config for this particular value."
+    )
+
+
+def sanitized_field(
+    value: Any,
+    init=True,
+    allow_zen_conversion: bool = True,
+    *,
+    error_prefix: str = "",
+    field_name: str = "",
+) -> Field:
+    if isinstance(value, _utils.KNOWN_MUTABLE_TYPES) and isinstance(
+        value, HYDRA_SUPPORTED_PRIMITIVES
+    ):
+        return cast(Field, mutable_value(value))
+    return _utils.field(
+        default=sanitized_default_value(
+            value,
+            allow_zen_conversion=allow_zen_conversion,
+            error_prefix=error_prefix,
+            field_name=field_name,
+        ),
+        init=init,
     )
 
 
@@ -1005,7 +1066,7 @@ def builds(
                 " You can manually create a dataclass to utilize this name in a structured config."
             )
 
-    target_field: List[Union[Tuple[str, Type[Any]], Tuple[str, Type[Any], Field[Any]]]]
+    target_field: List[Union[Tuple[str, Type[Any]], Tuple[str, Type[Any], Any]]]
 
     if zen_partial or zen_meta or validated_wrappers:
         target_field = [
@@ -1099,7 +1160,12 @@ def builds(
                 _POS_ARG_FIELD_NAME,
                 Tuple[Any, ...],
                 _utils.field(
-                    default=tuple(create_just_if_needed(x) for x in _pos_args),
+                    default=tuple(
+                        sanitized_default_value(
+                            x, error_prefix=_utils.building_error_prefix(target)
+                        )
+                        for x in _pos_args
+                    ),
                     init=False,
                 ),
             )
@@ -1156,6 +1222,12 @@ def builds(
         # pos_args is potentially inherited
         for _base in builds_bases:
             _pos_args = getattr(_base, _POS_ARG_FIELD_NAME, ())
+
+            # validates
+            _pos_args = tuple(
+                sanitized_default_value(x, allow_zen_conversion=False)
+                for x in _pos_args
+            )
             if _pos_args:
                 break
 
@@ -1254,7 +1326,7 @@ def builds(
     #    and is resolved to one of the type-annotations supported by hydra if possible,
     #    otherwise, is Any
     #  - arg-value: mutable values are automatically specified using default-factory
-    user_specified_named_params: Dict[str, Tuple[str, type, Field]] = {
+    user_specified_named_params: Dict[str, Tuple[str, type, Any]] = {
         name: (
             name,
             _utils.sanitized_type(type_hints.get(name, Any))
@@ -1267,7 +1339,7 @@ def builds(
             # Thus we will auto-broaden the annotation when we see that the user
             # has specified a `Builds` as a default value.
             if not is_builds(value) or hydra_recursive is False else Any,
-            sanitized_default_value(value),
+            value,
         )
         for name, value in kwargs_for_target.items()
     }
@@ -1328,7 +1400,7 @@ def builds(
                         # because we assume that they want to fill these in by using partial
                         base_fields.append(param_field)
                 else:
-                    param_field += (sanitized_default_value(param.default),)
+                    param_field += (param.default,)
                     _fields_with_default_values.append(param_field)
 
         base_fields.extend(_fields_with_default_values)
@@ -1364,10 +1436,7 @@ def builds(
         # We don't check for collisions between `zen_meta` names and the
         # names of inherited fields. Thus `zen_meta` can effectively be used
         # to "delete" names from a config, via inheritance.
-        base_fields.extend(
-            (name, Any, sanitized_default_value(value))
-            for name, value in zen_meta.items()
-        )
+        base_fields.extend((name, Any, value) for name, value in zen_meta.items())
 
     if dataclass_name is None:
         if zen_partial is False:
@@ -1375,8 +1444,40 @@ def builds(
         else:
             dataclass_name = f"PartialBuilds_{_utils.safe_name(target)}"
 
+    # validate that fields set via bases are OK; cannot perform zen-casting
+    # on fields
+    for base in builds_bases:
+        for field_ in fields(base):
+            if field_.default is not MISSING:
+                # performs validation
+                sanitized_default_value(
+                    field_.default,
+                    allow_zen_conversion=False,
+                    error_prefix=_utils.building_error_prefix(target),
+                    field_name=field.name + " (set via inheritance)",
+                )
+            del field_
+
+    sanitized_base_fields: List[Union[Tuple[str, Any], Tuple[str, Any, Field]]] = []
+
+    for item in base_fields:
+        if len(item) == 2:
+            # (name, type)   (no configured value)
+            sanitized_base_fields.append(item)
+        else:
+            assert len(item) == 3, item
+            value = item[-1]
+            if not isinstance(value, Field):
+                value = sanitized_field(
+                    value,
+                    error_prefix=_utils.building_error_prefix(target),
+                    field_name=item[0],
+                )
+            sanitized_base_fields.append((item[0], item[1], value))
+            del value
+
     out = make_dataclass(
-        dataclass_name, fields=base_fields, bases=builds_bases, frozen=frozen
+        dataclass_name, fields=sanitized_base_fields, bases=builds_bases, frozen=frozen
     )
 
     if zen_partial is False and hasattr(out, _PARTIAL_TARGET_FIELD_NAME):
@@ -1760,7 +1861,7 @@ class ZenField:
         self.hint = _utils.sanitized_type(self.hint)
 
         if self.default is not NOTHING:
-            self.default = sanitized_default_value(self.default)
+            self.default = sanitized_field(self.default)
 
 
 def make_config(
