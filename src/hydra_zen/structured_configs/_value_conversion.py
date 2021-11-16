@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pathlib import Path, PosixPath, WindowsPath
 from typing import Any, Callable, Dict, Set, Type, cast
 
 from hydra_zen.typing import Builds
@@ -6,19 +7,34 @@ from hydra_zen.typing import Builds
 from ._utils import get_obj_path
 
 # `set` support implemented in _implementations.py
-ZEN_SUPPORTED_PRIMITIVES: Set[type] = {set, complex}
+ZEN_SUPPORTED_PRIMITIVES: Set[type] = {set, complex, Path, PosixPath, WindowsPath}
 ZEN_VALUE_CONVERSION: Dict[type, Callable[[Any], Any]] = {}
 
 
 @dataclass
-class _ConfigComplex:
+class ConfigComplex:
     real: Any
     imag: Any
     _target_: str = get_obj_path(complex)
 
 
-def _convert_complex(value: complex) -> Builds[Type[complex]]:
-    return cast(Builds[Type[complex]], _ConfigComplex(real=value.real, imag=value.imag))
+def convert_complex(value: complex) -> Builds[Type[complex]]:
+    return cast(Builds[Type[complex]], ConfigComplex(real=value.real, imag=value.imag))
 
 
-ZEN_VALUE_CONVERSION[complex] = _convert_complex
+ZEN_VALUE_CONVERSION[complex] = convert_complex
+
+
+@dataclass
+class ConfigPath:
+    _args_: Any
+    _target_: str = get_obj_path(Path)
+
+
+def convert_path(value: Path) -> Builds[Type[Path]]:
+    return cast(Builds[Type[Path]], ConfigPath(_args_=(str(value),)))
+
+
+ZEN_VALUE_CONVERSION[Path] = convert_path
+ZEN_VALUE_CONVERSION[PosixPath] = convert_path
+ZEN_VALUE_CONVERSION[WindowsPath] = convert_path
