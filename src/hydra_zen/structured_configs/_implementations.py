@@ -106,6 +106,13 @@ HYDRA_SUPPORTED_PRIMITIVES = (int, float, bool, str, Enum, list, tuple, dict, No
 _builtin_function_or_method_type = type(len)
 
 
+def _convert_set(value: set) -> Type[Builds[Type[Set]]]:
+    return builds(set, list(value))
+
+
+ZEN_VALUE_CONVERSION[set] = _convert_set
+
+
 def _get_target(x):
     return getattr(x, _TARGET_FIELD_NAME)
 
@@ -192,7 +199,6 @@ def mutable_value(x: _T) -> _T:
     >>> HasMutableDefault()
     HasMutableDefault(a_list=[1, 2, 3])"""
     cast = type(x)  # ensure that we return a copy of the default value
-    # TODO: THIS IS A PROBLEM
     return field(default_factory=lambda: cast(x))
 
 
@@ -951,11 +957,13 @@ def builds(
 
     target, *_pos_args = pos_args
 
+    BUILDS_ERROR_PREFIX = _utils.building_error_prefix(target)
+
     del pos_args
 
     if not callable(target):
         raise TypeError(
-            _utils.building_error_prefix(target)
+            BUILDS_ERROR_PREFIX
             + "In `builds(<target>, ...), `<target>` must be callable/instantiable"
         )
 
@@ -1161,9 +1169,7 @@ def builds(
                 Tuple[Any, ...],
                 _utils.field(
                     default=tuple(
-                        sanitized_default_value(
-                            x, error_prefix=_utils.building_error_prefix(target)
-                        )
+                        sanitized_default_value(x, error_prefix=BUILDS_ERROR_PREFIX)
                         for x in _pos_args
                     ),
                     init=False,
@@ -1177,7 +1183,7 @@ def builds(
     except ValueError:
         if populate_full_signature:
             raise ValueError(
-                _utils.building_error_prefix(target)
+                BUILDS_ERROR_PREFIX
                 + f"{target} does not have an inspectable signature. "
                 f"`builds({_utils.safe_name(target)}, populate_full_signature=True)` is not supported"
             )
@@ -1254,7 +1260,7 @@ def builds(
             if not set(kwargs_for_target) <= nameable_params_in_sig:
                 _unexpected = set(kwargs_for_target) - nameable_params_in_sig
                 raise TypeError(
-                    _utils.building_error_prefix(target)
+                    BUILDS_ERROR_PREFIX
                     + f"The following unexpected keyword argument(s) was specified for {_utils.get_obj_path(target)} "
                     f"via `builds`: {', '.join(_unexpected)}"
                 )
@@ -1265,7 +1271,7 @@ def builds(
                 # AND it is not excluded via `zen_meta`
                 _unexpected = fields_set_by_bases - nameable_params_in_sig
                 raise TypeError(
-                    _utils.building_error_prefix(target)
+                    BUILDS_ERROR_PREFIX
                     + f"The following unexpected keyword argument(s) for {_utils.get_obj_path(target)} "
                     f"was specified via inheritance from a base class: "
                     f"{', '.join(_unexpected)}"
@@ -1288,7 +1294,7 @@ def builds(
                 ]:
                     if param.name in named_args:
                         raise TypeError(
-                            _utils.building_error_prefix(target)
+                            BUILDS_ERROR_PREFIX
                             + f"Multiple values for argument {param.name} were specified for "
                             f"{_utils.get_obj_path(target)} via `builds`"
                         )
@@ -1314,7 +1320,7 @@ def builds(
                     else f"{_num_positional - _num_with_default} to {_num_positional}"
                 )
                 raise TypeError(
-                    _utils.building_error_prefix(target)
+                    BUILDS_ERROR_PREFIX
                     + f"{_utils.get_obj_path(target)} takes {_permissible} positional args, but "
                     f"{len(_pos_args)} were specified via `builds`"
                 )
@@ -1453,7 +1459,7 @@ def builds(
                 sanitized_default_value(
                     field_.default,
                     allow_zen_conversion=False,
-                    error_prefix=_utils.building_error_prefix(target),
+                    error_prefix=BUILDS_ERROR_PREFIX,
                     field_name=field_.name + " (set via inheritance)",
                 )
             del field_
@@ -1467,12 +1473,14 @@ def builds(
         else:
             assert len(item) == 3, item
             value = item[-1]
+            # print(type(value))
             if not isinstance(value, Field):
                 value = sanitized_field(
                     value,
-                    error_prefix=_utils.building_error_prefix(target),
+                    error_prefix=BUILDS_ERROR_PREFIX,
                     field_name=item[0],
                 )
+
             sanitized_base_fields.append((item[0], item[1], value))
             del value
 
@@ -1485,7 +1493,7 @@ def builds(
         # hydra-instantiation occurs, since it will be passed to target.
         # There is not an easy way to delete this, since it comes from a parent class
         raise TypeError(
-            _utils.building_error_prefix(target)
+            BUILDS_ERROR_PREFIX
             + "`builds(..., zen_partial=False, builds_bases=(...))` does not "
             "permit `builds_bases` where a partial target has been specified."
         )
