@@ -19,6 +19,7 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
+    Collection,
     Dict,
     FrozenSet,
     List,
@@ -107,7 +108,7 @@ _builtin_function_or_method_type = type(len)
 
 
 def _convert_set(value: set) -> Type[Builds[Type[Set]]]:
-    return builds(set, list(value))
+    return builds(set, tuple(value))
 
 
 ZEN_VALUE_CONVERSION[set] = _convert_set
@@ -199,6 +200,7 @@ def mutable_value(x: _T) -> _T:
     >>> HasMutableDefault()
     HasMutableDefault(a_list=[1, 2, 3])"""
     cast = type(x)  # ensure that we return a copy of the default value
+    x = sanitize_collection(x)
     return field(default_factory=lambda: cast(x))
 
 
@@ -509,6 +511,20 @@ def create_just_if_needed(value: _T) -> Union[_T, Type[Just]]:
     return value
 
 
+def sanitize_collection(x: _T) -> _T:
+    if isinstance(x, (list, tuple)):
+        return type(x)(sanitized_default_value(_x) for _x in x)
+    elif isinstance(x, dict):
+        return type(x)(
+            {
+                sanitized_default_value(k): sanitized_default_value(v)
+                for k, v in x.items()
+            }
+        )
+    else:
+        return x
+
+
 def sanitized_default_value(
     value: Any,
     allow_zen_conversion: bool = True,
@@ -516,7 +532,7 @@ def sanitized_default_value(
     error_prefix: str = "",
     field_name: str = "",
 ) -> Any:
-
+    value = sanitize_collection(value)
     resolved_value = create_just_if_needed(value)
 
     if allow_zen_conversion and isinstance(resolved_value, ZEN_SUPPORTED_PRIMITIVES):

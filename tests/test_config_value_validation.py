@@ -67,13 +67,13 @@ construction_fn_variations = [
     lambda x: make_config(a=x),
     lambda x: make_config(ZenField(name="a", default=x)),
     lambda x: builds(f_concrete_sig, x=x, populate_full_signature=False),
-    lambda x: builds(f_concrete_sig, x, populate_full_signature=False),
+    lambda x: builds(f_concrete_sig, x, populate_full_signature=False),  #
     lambda x: builds(f_with_kwargs, x=x, populate_full_signature=False),
-    lambda x: builds(f_with_kwargs, x, populate_full_signature=False),
+    lambda x: builds(f_with_kwargs, x, populate_full_signature=False),  #
     lambda x: builds(f_concrete_sig, x=x, populate_full_signature=True),
-    lambda x: builds(f_concrete_sig, x, populate_full_signature=True),
+    lambda x: builds(f_concrete_sig, x, populate_full_signature=True),  #
     lambda x: builds(f_with_kwargs, x=x, populate_full_signature=True),
-    lambda x: builds(f_with_kwargs, x, populate_full_signature=True),
+    lambda x: builds(f_with_kwargs, x, populate_full_signature=True),  #
     lambda x: builds(f_with_bad_default_value, populate_full_signature=True),
     lambda x: make_hydrated_dataclass(f_concrete_sig, x),
     # test validation via inheritance
@@ -90,6 +90,12 @@ construction_fn_variations = [
 )
 @given(
     unsupported=st.just(unsupported_instance)
+    # test collections containing unsupported values
+    | st.just([unsupported_instance])
+    | st.just((unsupported_instance,))
+    | st.just({unsupported_instance: 1})
+    | st.just({1: unsupported_instance})
+    | st.just({unsupported_instance})
     | everything_except(
         *(HYDRA_SUPPORTED_PRIMITIVES + ZEN_SUPPORTED_PRIMITIVES)
     ).filter(lambda x: not inspect.isfunction(x))
