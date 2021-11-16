@@ -4,7 +4,7 @@ from typing import Any
 
 import hypothesis.strategies as st
 import pytest
-from hypothesis import assume, given, settings
+from hypothesis import HealthCheck, assume, given, settings
 
 from hydra_zen import (
     ZenField,
@@ -79,7 +79,9 @@ def f_with_bad_default_value(x=unsupported_instance):
         lambda x: builds(f_concrete_sig, builds_bases=(make_dataclass(x),)),
     ],
 )
-@settings(max_examples=20, deadline=None)
+@settings(
+    max_examples=20, deadline=None, suppress_health_check=(HealthCheck.data_too_large,)
+)
 @given(
     unsupported=st.just(unsupported_instance)
     | everything_except(
@@ -112,6 +114,7 @@ def test_unsupported_config_value_raises_while_making_config(
         lambda x: builds(f_concrete_sig, builds_bases=(make_dataclass(x),)),
     ],
 )
+@settings(suppress_health_check=(HealthCheck.data_too_large,), deadline=None)
 @given(value=everything_except())
 def test_that_configs_passed_by_zen_validation_are_serializable(
     config_construction_fn, value

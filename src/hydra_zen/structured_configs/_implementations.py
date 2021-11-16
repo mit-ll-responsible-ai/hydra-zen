@@ -1454,7 +1454,7 @@ def builds(
                     field_.default,
                     allow_zen_conversion=False,
                     error_prefix=_utils.building_error_prefix(target),
-                    field_name=field.name + " (set via inheritance)",
+                    field_name=field_.name + " (set via inheritance)",
                 )
             del field_
 
