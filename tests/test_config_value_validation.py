@@ -129,10 +129,14 @@ def test_unsupported_config_value_raises_while_making_config(
 def test_that_configs_passed_by_zen_validation_are_serializable(
     config_construction_fn, value
 ):
+    # `value` is literally any value that Hypothesis knows how to describe
     try:
         Conf = config_construction_fn(value)
     except (HydraZenUnsupportedPrimitiveError, ModuleNotFoundError):
+        # the drawn value is not compatible with Hydra -- should be caught
+        # by us
         return
-    # check serializability & instantiability
+    # The value passed our construction, thus the resulting config
+    # should be serializable & instantiable
     to_yaml(Conf)
     instantiate(Conf)

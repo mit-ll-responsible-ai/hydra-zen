@@ -2,7 +2,21 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import Field
-from typing import Any, Callable, Dict, Generic, NewType, Tuple, TypeVar
+from enum import Enum
+from pathlib import Path
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    NewType,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
 
 from typing_extensions import Protocol, runtime_checkable
 
@@ -12,6 +26,7 @@ __all__ = [
     "PartialBuilds",
     "Partial",
     "Importable",
+    "SupportedPrimitive",
 ]
 
 
@@ -80,3 +95,28 @@ class HasTarget(Protocol):  # pragma: no cover
 @runtime_checkable
 class HasPartialTarget(Protocol):  # pragma: no cover
     _zen_partial: bool = True
+
+
+__SupportedPrimitives = Union[
+    bool,
+    None,
+    int,
+    float,
+    str,
+    type,
+    Callable,
+    Enum,
+    DataClass,
+    Type[DataClass],
+    complex,
+    Path,
+]
+
+_SupportedPrimitives = Union[
+    __SupportedPrimitives,
+    Dict[__SupportedPrimitives, __SupportedPrimitives],
+    Set[__SupportedPrimitives],
+]
+
+
+SupportedPrimitive = Union[_SupportedPrimitives, Sequence[_SupportedPrimitives]]

@@ -2,18 +2,20 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass
-from typing import Any, Callable, List, Literal, Tuple, Type
+from pathlib import Path
+from typing import Callable, List, Literal, Tuple, Type
 
 from hydra_zen import (
+    ZenField,
     builds,
     get_target,
     instantiate,
     just,
+    make_config,
     make_custom_builds_fn,
     mutable_value,
 )
 from hydra_zen.typing import Builds
-from hydra_zen.typing._implementations import DataClass
 
 
 class A:
@@ -183,3 +185,60 @@ def custom_builds_fn():
     a2: Literal["Type[PartialBuilds[Type[int]]]"] = reveal_type(
         _builds(int, zen_partial=True)
     )
+
+
+def supported_primitives():
+    class M:
+        pass
+
+    def f():
+        pass
+
+    @dataclass
+    class ADataclass:
+        pass
+
+    a1: Literal["Type[DataClass]"] = reveal_type(
+        make_config(
+            a=(1, "hi", 2.0, 1j, set(), M, ADataclass, builds(dict), Path.cwd()),
+            b={M},
+            c={1: M},
+            d=[2.0 + 1j],
+            e=f,
+        )
+    )
+    a2: Literal["Type[DataClass]"] = reveal_type(
+        make_config(
+            ZenField(name="a", default={M}),
+            ZenField(name="b", default={1: M}),
+            ZenField(name="c", default=[2.0 + 1j]),
+            d=ZenField(default=(1, "hi", 2.0, 1j, set(), M, Path.cwd())),
+            e=ZenField(default=f),
+        )
+    )
+
+    a3: Literal["Type[Builds[Type[dict[Unknown, Unknown]]]]"] = reveal_type(
+        builds(
+            dict,
+            a=(1, "hi", 2.0, 1j, set(), M, ADataclass, builds(dict), Path.cwd()),
+            b={M},
+            c={1: M},
+            d=[2.0 + 1j],
+            e=f,
+        )
+    )
+
+    a4: Literal["Type[PartialBuilds[Type[dict[Unknown, Unknown]]]]"] = reveal_type(
+        builds(
+            dict,
+            a=(1, "hi", 2.0, 1j, set(), M, ADataclass, builds(dict), Path.cwd()),
+            b={M},
+            c={1: M},
+            d=[2.0 + 1j],
+            e=f,
+            zen_partial=True,
+        )
+    )
+
+    # make_config(a=M())   # should get marked as bad
+    # builds(dict, a=M())  # should get marked as bad

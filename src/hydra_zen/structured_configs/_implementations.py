@@ -43,7 +43,7 @@ from hydra_zen.errors import (
 )
 from hydra_zen.funcs import get_obj, partial, zen_processing
 from hydra_zen.structured_configs import _utils
-from hydra_zen.typing import Builds, Importable, Just, PartialBuilds
+from hydra_zen.typing import Builds, Importable, Just, PartialBuilds, SupportedPrimitive
 from hydra_zen.typing._implementations import DataClass, HasPartialTarget, HasTarget
 
 from ._value_conversion import ZEN_SUPPORTED_PRIMITIVES, ZEN_VALUE_CONVERSION
@@ -226,7 +226,7 @@ def __dataclass_transform__(
 @__dataclass_transform__()
 def hydrated_dataclass(
     target: Callable,
-    *pos_args: Any,
+    *pos_args: SupportedPrimitive,
     zen_partial: bool = False,
     zen_wrappers: ZenWrappers = tuple(),
     zen_meta: Optional[Mapping[str, Any]] = None,
@@ -588,17 +588,17 @@ def sanitized_field(
 @overload
 def builds(
     hydra_target: Importable,
-    *pos_args: Any,
+    *pos_args: SupportedPrimitive,
     zen_partial: Literal[False] = False,
     zen_wrappers: ZenWrappers = tuple(),
-    zen_meta: Optional[Mapping[str, Any]] = None,
+    zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
-    **kwargs_for_target,
+    **kwargs_for_target: SupportedPrimitive,
 ) -> Type[Builds[Importable]]:  # pragma: no cover
     ...
 
@@ -607,17 +607,17 @@ def builds(
 @overload
 def builds(
     hydra_target: Importable,
-    *pos_args: Any,
+    *pos_args: SupportedPrimitive,
     zen_partial: Literal[True],
     zen_wrappers: ZenWrappers = tuple(),
-    zen_meta: Optional[Mapping[str, Any]] = None,
+    zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
-    **kwargs_for_target,
+    **kwargs_for_target: SupportedPrimitive,
 ) -> Type[PartialBuilds[Importable]]:  # pragma: no cover
     ...
 
@@ -626,17 +626,17 @@ def builds(
 @overload
 def builds(
     hydra_target: Importable,
-    *pos_args: Any,
+    *pos_args: SupportedPrimitive,
     zen_partial: bool,
     zen_wrappers: ZenWrappers = tuple(),
-    zen_meta: Optional[Mapping[str, Any]] = None,
+    zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
-    **kwargs_for_target,
+    **kwargs_for_target: SupportedPrimitive,
 ) -> Union[
     Type[Builds[Importable]], Type[PartialBuilds[Importable]]
 ]:  # pragma: no cover
@@ -649,14 +649,14 @@ def builds(
     *pos_args: Any,
     zen_partial: bool = False,
     zen_wrappers: ZenWrappers = tuple(),
-    zen_meta: Optional[Mapping[str, Any]] = None,
+    zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     frozen: bool = False,
     builds_bases: Tuple[Any, ...] = (),
     dataclass_name: Optional[str] = None,
-    **kwargs_for_target,
+    **kwargs_for_target: SupportedPrimitive,
 ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]:
     """builds(hydra_target, /, *pos_args, zen_partial=False, zen_meta=None,
     hydra_recursive=None, populate_full_signature=False, hydra_convert=None,
@@ -1879,7 +1879,7 @@ class ZenField:
     """
 
     hint: type = Any
-    default: Any = NOTHING
+    default: Union[SupportedPrimitive, Field, Type[NOTHING]] = NOTHING
     name: Union[str, Type[NOTHING]] = NOTHING
 
     def __post_init__(self):
@@ -1900,7 +1900,7 @@ def make_config(
     config_name: str = "Config",
     frozen: bool = False,
     bases: Tuple[Type[DataClass], ...] = (),
-    **fields_as_kwargs,
+    **fields_as_kwargs: Union[SupportedPrimitive, ZenField],
 ) -> Type[DataClass]:
     """
     Creates a config with user-defined field names and, optionally,
@@ -2159,7 +2159,7 @@ def make_config(
                     f.hint
                     # f.default: Field
                     # f.default.default: Any
-                    if not is_builds(f.default.default) or hydra_recursive is False
+                    if not is_builds(f.default.default) or hydra_recursive is False  # type: ignore
                     else Any
                 ),
                 f.default,
