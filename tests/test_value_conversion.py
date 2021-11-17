@@ -6,7 +6,7 @@ from typing import Set, Union
 
 import hypothesis.strategies as st
 import pytest
-from hypothesis import given, settings
+from hypothesis import HealthCheck, given, settings
 
 from hydra_zen import instantiate, make_config, to_yaml
 from hydra_zen.structured_configs._value_conversion import (
@@ -23,7 +23,9 @@ def test_supported_primitives_in_sync_with_value_conversion():
 @pytest.mark.parametrize(
     "zen_supported_type", (set, Set[Union[int, str, complex, Path]], complex, Path)
 )
-@settings(deadline=None, max_examples=20)
+@settings(
+    deadline=None, max_examples=20, suppress_health_check=(HealthCheck.data_too_large,)
+)
 @given(st.data())
 def test_value_conversion(zen_supported_type, data: st.DataObject):
     value = data.draw(st.from_type(zen_supported_type))
