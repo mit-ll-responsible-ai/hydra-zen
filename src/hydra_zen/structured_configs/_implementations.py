@@ -521,13 +521,12 @@ def sanitize_collection(x: _T) -> _T:
     if type_x in {list, tuple}:
         return type_x(sanitized_default_value(_x) for _x in x)  # type: ignore
     elif type_x is dict:
-        return type_x(
-            {
-                sanitized_default_value(k): sanitized_default_value(v)
-                for k, v in x.items()  # type: ignore
-            }
-        )
+        return {
+            sanitized_default_value(k): sanitized_default_value(v)
+            for k, v in x.items()  # type: ignore
+        }
     else:
+        # pass-through
         return x
 
 
