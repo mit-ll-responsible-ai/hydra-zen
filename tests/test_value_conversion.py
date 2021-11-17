@@ -25,7 +25,7 @@ def test_supported_primitives_in_sync_with_value_conversion():
     (
         set,
         frozenset,
-        FrozenSet[int],
+        FrozenSet[Union[int, complex]],
         Set[Union[int, str, complex, Path]],
         complex,
         Path,
