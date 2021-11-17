@@ -109,7 +109,9 @@ construction_fn_variations = [
 @example(unsupported={unsupported_subclass})
 @example(unsupported={unsupported_subclass})
 @settings(
-    max_examples=20, deadline=None, suppress_health_check=(HealthCheck.data_too_large,)
+    max_examples=20,
+    deadline=None,
+    suppress_health_check=(HealthCheck.data_too_large, HealthCheck.too_slow),
 )
 @given(
     unsupported=everything_except(
@@ -124,7 +126,10 @@ def test_unsupported_config_value_raises_while_making_config(
 
 
 @pytest.mark.parametrize("config_construction_fn", construction_fn_variations)
-@settings(suppress_health_check=(HealthCheck.data_too_large,), deadline=None)
+@settings(
+    suppress_health_check=(HealthCheck.data_too_large, HealthCheck.too_slow),
+    deadline=None,
+)
 @given(value=everything_except())
 def test_that_configs_passed_by_zen_validation_are_serializable(
     config_construction_fn, value

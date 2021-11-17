@@ -32,7 +32,9 @@ def test_supported_primitives_in_sync_with_value_conversion():
     ),
 )
 @settings(
-    deadline=None, max_examples=20, suppress_health_check=(HealthCheck.data_too_large,)
+    deadline=None,
+    max_examples=20,
+    suppress_health_check=(HealthCheck.data_too_large, HealthCheck.too_slow),
 )
 @given(st.data())
 def test_value_conversion(zen_supported_type, data: st.DataObject):
