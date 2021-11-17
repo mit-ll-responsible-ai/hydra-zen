@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from pathlib import Path
-from typing import Set, Union
+from typing import FrozenSet, Set, Union
 
 import hypothesis.strategies as st
 import pytest
@@ -21,7 +21,15 @@ def test_supported_primitives_in_sync_with_value_conversion():
 
 
 @pytest.mark.parametrize(
-    "zen_supported_type", (set, Set[Union[int, str, complex, Path]], complex, Path)
+    "zen_supported_type",
+    (
+        set,
+        frozenset,
+        FrozenSet[int],
+        Set[Union[int, str, complex, Path]],
+        complex,
+        Path,
+    ),
 )
 @settings(
     deadline=None, max_examples=20, suppress_health_check=(HealthCheck.data_too_large,)

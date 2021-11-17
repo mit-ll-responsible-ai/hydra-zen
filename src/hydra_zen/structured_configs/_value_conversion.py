@@ -7,7 +7,14 @@ from hydra_zen.typing import Builds
 from ._utils import get_obj_path
 
 # `set` support implemented in _implementations.py
-ZEN_SUPPORTED_PRIMITIVES: Set[type] = {set, complex, Path, PosixPath, WindowsPath}
+ZEN_SUPPORTED_PRIMITIVES: Set[type] = {
+    set,
+    frozenset,
+    complex,
+    Path,
+    PosixPath,
+    WindowsPath,
+}
 ZEN_VALUE_CONVERSION: Dict[type, Callable[[Any], Any]] = {}
 
 

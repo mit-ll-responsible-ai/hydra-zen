@@ -110,7 +110,12 @@ def _convert_set(value: set) -> Type[Builds[Type[Set]]]:
     return builds(set, tuple(value))
 
 
+def _convert_frozenset(value: set) -> Type[Builds[Type[FrozenSet]]]:
+    return builds(frozenset, tuple(value))
+
+
 ZEN_VALUE_CONVERSION[set] = _convert_set
+ZEN_VALUE_CONVERSION[frozenset] = _convert_frozenset
 
 
 def _get_target(x):
