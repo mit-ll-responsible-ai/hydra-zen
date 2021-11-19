@@ -1938,7 +1938,7 @@ def make_config(
     >>> pp(ProfileConf(username="piro", age=False))  # age should be an integer
     <ValidationError: Value 'False' could not be converted to Integer>
 
-    These default values can be provides alongside type-annotations
+    These default values can be provided alongside type-annotations
 
     >>> C = make_config(age=zf(int, 0))  # signature: C(age: int = 0)
 
