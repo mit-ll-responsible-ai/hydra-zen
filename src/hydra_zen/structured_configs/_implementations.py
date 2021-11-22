@@ -101,7 +101,7 @@ _KEYWORD_ONLY: Final = inspect.Parameter.KEYWORD_ONLY
 _VAR_KEYWORD: Final = inspect.Parameter.VAR_KEYWORD
 
 NoneType = type(None)
-HYDRA_SUPPORTED_PRIMITIVES = {int, float, bool, str, Enum, list, tuple, dict, NoneType}
+HYDRA_SUPPORTED_PRIMITIVES = {int, float, bool, str, list, tuple, dict, NoneType}
 
 _builtin_function_or_method_type = type(len)
 
@@ -552,8 +552,20 @@ def sanitized_default_value(
             resolved_value = conversion_fn(resolved_value)
             type_value = type(resolved_value)
 
-    if type_value in HYDRA_SUPPORTED_PRIMITIVES or is_dataclass(resolved_value):
+    if isinstance(resolved_value, Enum):
+        # Leverages programmatic access to enum member via value.
+        # E.g.
+        # >>> Color(1)
+        # <Color.RED: 1>
+        resolved_value = builds(type(resolved_value), resolved_value.value)
+
+    if (
+        type_value in HYDRA_SUPPORTED_PRIMITIVES
+        or is_dataclass(resolved_value)
+        or isinstance(resolved_value, Enum)
+    ):
         return resolved_value
+
     if field_name:
         field_name = f", for field `{field_name}`,"
     raise HydraZenUnsupportedPrimitiveError(
