@@ -549,7 +549,8 @@ def sanitized_default_value(
         conversion_fn = ZEN_VALUE_CONVERSION.get(type_)
 
         if conversion_fn is not None:
-            return conversion_fn(resolved_value)
+            resolved_value = conversion_fn(resolved_value)
+            type_value = type(resolved_value)
 
     if type_value in HYDRA_SUPPORTED_PRIMITIVES or is_dataclass(resolved_value):
         return resolved_value
