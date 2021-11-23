@@ -521,6 +521,9 @@ def create_just_if_needed(value: _T) -> Union[_T, Type[Just]]:
     return value
 
 
+_KEY_ERROR_PREFIX = "Configuring dictionary key:"
+
+
 def sanitize_collection(x: _T) -> _T:
     """Pass contents of lists, tuples, or dicts through sanitized_default_values"""
     type_x = type(x)
@@ -528,7 +531,11 @@ def sanitize_collection(x: _T) -> _T:
         return type_x(sanitized_default_value(_x) for _x in x)  # type: ignore
     elif type_x is dict:
         return {
-            sanitized_default_value(k): sanitized_default_value(v)
+            # Hydra doesn't permit structured configs for keys, thus we only
+            # support its basic primitives here.
+            sanitized_default_value(
+                k, allow_zen_conversion=False, error_prefix=_KEY_ERROR_PREFIX
+            ): sanitized_default_value(v)
             for k, v in x.items()  # type: ignore
         }
     else:
