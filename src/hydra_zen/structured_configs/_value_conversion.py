@@ -1,7 +1,7 @@
 from collections import Counter, deque
 from dataclasses import dataclass
 from pathlib import Path, PosixPath, WindowsPath
-from typing import Any, Callable, Dict, Optional, Set, Type, cast
+from typing import Any, Callable, Dict, Set, Type, cast
 
 from hydra_zen.typing import Builds
 
