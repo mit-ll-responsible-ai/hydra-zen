@@ -1,12 +1,13 @@
+from collections import Counter, deque
 from dataclasses import dataclass
 from pathlib import Path, PosixPath, WindowsPath
-from typing import Any, Callable, Dict, Set, Type, cast
+from typing import Any, Callable, Dict, Optional, Set, Type, cast
 
 from hydra_zen.typing import Builds
 
 from ._utils import get_obj_path
 
-# `set` support implemented in _implementations.py
+# Some primitive support implemented in _implementations.py
 ZEN_SUPPORTED_PRIMITIVES: Set[type] = {
     set,
     frozenset,
@@ -14,7 +15,13 @@ ZEN_SUPPORTED_PRIMITIVES: Set[type] = {
     Path,
     PosixPath,
     WindowsPath,
+    bytes,
+    bytearray,
+    deque,
+    Counter,
+    range,
 }
+
 ZEN_VALUE_CONVERSION: Dict[type, Callable[[Any], Any]] = {}
 
 

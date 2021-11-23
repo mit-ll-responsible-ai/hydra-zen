@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 import inspect
 import warnings
-from collections import Counter, defaultdict
+from collections import Counter, defaultdict, deque
 from dataclasses import (
     MISSING,
     Field,
@@ -106,16 +106,24 @@ HYDRA_SUPPORTED_PRIMITIVES = {int, float, bool, str, list, tuple, dict, NoneType
 _builtin_function_or_method_type = type(len)
 
 
-def _convert_set(value: set) -> Type[Builds[Type[Set]]]:
-    return builds(set, tuple(value))
+def _cast_via_tuple(dest_type: Type[_T]) -> Callable[[_T], Type[Builds[Type[_T]]]]:
+    def converter(value):
+        return builds(dest_type, tuple(value))
+
+    return converter
 
 
-def _convert_frozenset(value: set) -> Type[Builds[Type[FrozenSet]]]:
-    return builds(frozenset, tuple(value))
+a = _cast_via_tuple(set)
 
-
-ZEN_VALUE_CONVERSION[set] = _convert_set
-ZEN_VALUE_CONVERSION[frozenset] = _convert_frozenset
+ZEN_VALUE_CONVERSION[set] = _cast_via_tuple(set)
+ZEN_VALUE_CONVERSION[frozenset] = _cast_via_tuple(frozenset)
+ZEN_VALUE_CONVERSION[deque] = _cast_via_tuple(deque)
+ZEN_VALUE_CONVERSION[bytes] = _cast_via_tuple(bytes)
+ZEN_VALUE_CONVERSION[bytearray] = _cast_via_tuple(bytearray)
+ZEN_VALUE_CONVERSION[range] = lambda value: builds(
+    range, value.start, value.stop, value.step
+)
+ZEN_VALUE_CONVERSION[Counter] = lambda counter: builds(Counter, dict(counter))
 
 
 def _get_target(x):
