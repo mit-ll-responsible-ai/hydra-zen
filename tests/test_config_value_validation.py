@@ -5,7 +5,6 @@ import inspect
 from dataclasses import dataclass
 from typing import Any
 
-import hypothesis.strategies as st
 import pytest
 from hypothesis import HealthCheck, assume, example, given, settings
 
@@ -59,8 +58,6 @@ class SomeType:
 class SubclassOfSupportedPrimitive(int):
     def __repr__(self) -> str:
         return "SubclassOfSupportedPrimitive(" + super().__repr__() + ")"
-
-    pass
 
 
 unsupported_subclass = SubclassOfSupportedPrimitive()

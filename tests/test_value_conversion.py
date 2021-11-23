@@ -3,7 +3,7 @@
 from collections import Counter, deque
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, FrozenSet, List, Set, Union
+from typing import Dict, FrozenSet, List, Set, Union
 
 import hypothesis.strategies as st
 import pytest
