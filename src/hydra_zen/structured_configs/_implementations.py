@@ -113,8 +113,6 @@ def _cast_via_tuple(dest_type: Type[_T]) -> Callable[[_T], Type[Builds[Type[_T]]
     return converter
 
 
-a = _cast_via_tuple(set)
-
 ZEN_VALUE_CONVERSION[set] = _cast_via_tuple(set)
 ZEN_VALUE_CONVERSION[frozenset] = _cast_via_tuple(frozenset)
 ZEN_VALUE_CONVERSION[deque] = _cast_via_tuple(deque)
