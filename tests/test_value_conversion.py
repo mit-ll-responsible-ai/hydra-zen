@@ -3,7 +3,7 @@
 from collections import Counter, deque
 from enum import Enum
 from pathlib import Path
-from typing import Dict, FrozenSet, List, Set, Union
+from typing import Any, Dict, FrozenSet, List, Set, Union
 
 import hypothesis.strategies as st
 import pytest
@@ -27,6 +27,15 @@ class Shake(Enum):
     CHOCOLATE = 4
     COOKIES = 9
     MINT = 3
+
+
+# Needed for python 3.6
+def is_ascii(x: str) -> bool:
+    try:
+        x.encode("ascii")
+        return True
+    except UnicodeEncodeError:
+        return False
 
 
 @pytest.mark.parametrize(
@@ -66,7 +75,7 @@ def test_value_supported_via_config_maker_functions(
 ):
     value = data.draw(st.from_type(zen_supported_type))
     if isinstance(value, str):
-        assume(value.isascii())
+        assume(is_ascii(value))
 
     Conf = (
         make_config(a=value, hydra_convert="all")
