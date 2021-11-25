@@ -7,7 +7,7 @@ from typing import Any
 
 import pytest
 from hypothesis import HealthCheck, assume, example, given, settings
-from omegaconf import OmegaConf
+from omegaconf import DictConfig, ListConfig, OmegaConf
 from omegaconf.errors import KeyValidationError
 
 from hydra_zen import (
@@ -120,6 +120,8 @@ construction_fn_variations = [
 @example(unsupported={make_dataclass(1): 1})
 @example(unsupported={SomeType: 1})
 @example(unsupported={1j: 1})
+@example(unsupported={ListConfig([1, 2]): 1})
+@example(unsupported={DictConfig({1: 1}): 1})
 @settings(
     max_examples=20,
     deadline=None,
