@@ -507,21 +507,6 @@ def just(obj: Importable) -> Type[Just[Importable]]:
     return cast(Type[Just[Importable]], out_class)
 
 
-def create_just_if_needed(value: _T) -> Union[_T, Type[Just]]:
-    # Hydra can serialize dataclasses directly, thus we
-    # don't want to wrap these in `just`
-
-    if callable(value) and (
-        inspect.isfunction(value)
-        or (inspect.isclass(value) and not is_dataclass(value))
-        or isinstance(value, _builtin_function_or_method_type)
-        or (ufunc is not None and isinstance(value, ufunc))
-    ):
-        return just(value)
-
-    return value
-
-
 _KEY_ERROR_PREFIX = "Configuring dictionary key:"
 
 
