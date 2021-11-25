@@ -7,6 +7,8 @@ from typing import Any
 
 import pytest
 from hypothesis import HealthCheck, assume, example, given, settings
+from omegaconf import OmegaConf
+from omegaconf.errors import KeyValidationError
 
 from hydra_zen import (
     ZenField,
@@ -68,6 +70,14 @@ def f_with_bad_default_value(x=unsupported_instance):
     pass
 
 
+def test_omegaconf_doesnt_permit_dataclasses_as_dict_keys():
+    C = builds(int, 1, frozen=True)
+    instantiate(OmegaConf.create({1: C}))  # should be OK
+
+    with pytest.raises(KeyValidationError):
+        OmegaConf.create(OmegaConf.create({C: 1}))
+
+
 construction_fn_variations = [
     lambda x: make_config(a=x),
     lambda x: make_config(ZenField(name="a", default=x)),
@@ -79,7 +89,7 @@ construction_fn_variations = [
     lambda x: builds(f_concrete_sig, x, populate_full_signature=True),  #
     lambda x: builds(f_with_kwargs, x=x, populate_full_signature=True),
     lambda x: builds(f_with_kwargs, x, populate_full_signature=True),  #
-    lambda x: builds(f_with_bad_default_value, populate_full_signature=True),
+    lambda _: builds(f_with_bad_default_value, populate_full_signature=True),
     lambda x: make_hydrated_dataclass(f_concrete_sig, x),
     # test validation via inheritance
     lambda x: builds(f_concrete_sig, builds_bases=(make_dataclass(x),)),
@@ -107,6 +117,8 @@ construction_fn_variations = [
 @example(unsupported={unsupported_subclass})
 # Hydra doesn't support dataclass nodes for keys; ensure
 # hydra-zen doesn't provide enhanced primitive support for keys
+@example(unsupported={make_dataclass(1): 1})
+@example(unsupported={SomeType: 1})
 @example(unsupported={1j: 1})
 @settings(
     max_examples=20,

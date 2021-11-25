@@ -524,58 +524,49 @@ def create_just_if_needed(value: _T) -> Union[_T, Type[Just]]:
 _KEY_ERROR_PREFIX = "Configuring dictionary key:"
 
 
-def sanitize_collection(x: _T) -> _T:
-    """Pass contents of lists, tuples, or dicts through sanitized_default_values"""
-    type_x = type(x)
-    if type_x in {list, tuple}:
-        return type_x(sanitized_default_value(_x) for _x in x)  # type: ignore
-    elif type_x is dict:
-        return {
-            # Hydra doesn't permit structured configs for keys, thus we only
-            # support its basic primitives here.
-            sanitized_default_value(
-                k, allow_zen_conversion=False, error_prefix=_KEY_ERROR_PREFIX
-            ): sanitized_default_value(v)
-            for k, v in x.items()  # type: ignore
-        }
-    else:
-        # pass-through
-        return x
-
-
 def sanitized_default_value(
     value: Any,
     allow_zen_conversion: bool = True,
     *,
     error_prefix: str = "",
     field_name: str = "",
+    structured_conf_permitted: bool = True,
 ) -> Any:
     value = sanitize_collection(value)
-    resolved_value = create_just_if_needed(value)
 
-    type_value = type(value)
+    if (
+        structured_conf_permitted
+        and callable(value)
+        and (
+            inspect.isfunction(value)
+            or (not is_dataclass(value) and inspect.isclass(value))
+            or isinstance(value, _builtin_function_or_method_type)
+            or (ufunc is not None and isinstance(value, ufunc))
+        )
+    ):
+        return just(value)
+    resolved_value = value
+    type_of_value = type(resolved_value)
 
     # we don't use isinstance because we don't permit subclasses of supported
     # primitives
-    if allow_zen_conversion and type_value in ZEN_SUPPORTED_PRIMITIVES:
+    if allow_zen_conversion and type_of_value in ZEN_SUPPORTED_PRIMITIVES:
         type_ = type(resolved_value)
         conversion_fn = ZEN_VALUE_CONVERSION.get(type_)
 
         if conversion_fn is not None:
             resolved_value = conversion_fn(resolved_value)
-            type_value = type(resolved_value)
+            type_of_value = type(resolved_value)
 
-    if isinstance(resolved_value, Enum):
+    if structured_conf_permitted and isinstance(resolved_value, Enum):
         # Leverages programmatic access to enum member via value.
         # E.g.
         # >>> Color(1)
         # <Color.RED: 1>
-        resolved_value = builds(type(resolved_value), resolved_value.value)
+        return builds(type(resolved_value), resolved_value.value)
 
-    if (
-        type_value in HYDRA_SUPPORTED_PRIMITIVES
-        or is_dataclass(resolved_value)
-        or isinstance(resolved_value, Enum)
+    if type_of_value in HYDRA_SUPPORTED_PRIMITIVES or (
+        structured_conf_permitted and is_dataclass(resolved_value)
     ):
         return resolved_value
 
@@ -587,6 +578,28 @@ def sanitized_default_value(
         f"instantiating this config would ultimately result in an error.\nConsider "
         f"using `hydra_zen.builds` to create a config for this particular value."
     )
+
+
+def sanitize_collection(x: _T) -> _T:
+    """Pass contents of lists, tuples, or dicts through sanitized_default_values"""
+    type_x = type(x)
+    if type_x in {list, tuple}:
+        return type_x(sanitized_default_value(_x) for _x in x)  # type: ignore
+    elif type_x is dict:
+        return {
+            # Hydra doesn't permit structured configs for keys, thus we only
+            # support its basic primitives here.
+            sanitized_default_value(
+                k,
+                allow_zen_conversion=False,
+                structured_conf_permitted=False,
+                error_prefix=_KEY_ERROR_PREFIX,
+            ): sanitized_default_value(v)
+            for k, v in x.items()  # type: ignore
+        }
+    else:
+        # pass-through
+        return x
 
 
 def sanitized_field(
