@@ -35,6 +35,7 @@ from typing import (
     overload,
 )
 
+from omegaconf import DictConfig, ListConfig
 from typing_extensions import Final, Literal, TypeGuard
 
 from hydra_zen.errors import (
@@ -566,7 +567,11 @@ def sanitized_default_value(
         return builds(type(resolved_value), resolved_value.value)
 
     if type_of_value in HYDRA_SUPPORTED_PRIMITIVES or (
-        structured_conf_permitted and is_dataclass(resolved_value)
+        structured_conf_permitted
+        and (
+            is_dataclass(resolved_value)
+            or isinstance(resolved_value, (ListConfig, DictConfig))
+        )
     ):
         return resolved_value
 

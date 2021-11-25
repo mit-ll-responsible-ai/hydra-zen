@@ -8,7 +8,7 @@ from typing import Dict, FrozenSet, List, Set, Union
 import hypothesis.strategies as st
 import pytest
 from hypothesis import HealthCheck, assume, given, settings
-from omegaconf import OmegaConf
+from omegaconf import DictConfig, ListConfig, OmegaConf
 
 from hydra_zen import builds, instantiate, make_config, to_yaml
 from hydra_zen.structured_configs._value_conversion import (
@@ -50,6 +50,8 @@ def is_ascii(x: str) -> bool:
         Shake,
         List[Union[int, List[int], Dict[int, int]]],
         Dict[int, Union[int, List[int], Dict[int, int]]],
+        ListConfig,
+        DictConfig,
         # hydra-zen supported primitives
         set,
         frozenset,
@@ -87,7 +89,10 @@ def test_value_supported_via_config_maker_functions(
         Conf = OmegaConf.structured(to_yaml(Conf))
 
     conf = instantiate(Conf)
-    assert isinstance(conf["a"], type(value))
+
+    if not isinstance(value, (ListConfig, DictConfig)):
+        assert isinstance(conf["a"], type(value))
+
     if value == value:  # avoid nans
         if (
             not isinstance(value, range)

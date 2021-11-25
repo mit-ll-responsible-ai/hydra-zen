@@ -7,7 +7,9 @@ import os
 import sys
 import tempfile
 
+import hypothesis.strategies as st
 import pytest
+from omegaconf import DictConfig, ListConfig
 
 # Skip collection of tests that don't work on the current version of Python.
 collect_ignore_glob = []
@@ -49,3 +51,9 @@ def cleandir():
         yield tmpdirname  # yields control to the test to be run
         os.chdir(old_dir)
         logging.shutdown()
+
+
+st.register_type_strategy(ListConfig, st.lists(st.integers()).map(ListConfig))
+st.register_type_strategy(
+    DictConfig, st.dictionaries(st.integers(), st.integers()).map(DictConfig)
+)
