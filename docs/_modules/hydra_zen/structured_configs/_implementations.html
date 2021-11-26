@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hydra_zen.structured_configs._implementations &#8212; hydra-zen 0.3.1+4.g6b39c41 documentation</title>
+    <title>hydra_zen.structured_configs._implementations &#8212; hydra-zen 0.3.1+5.gd70d29a documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -174,8 +174,17 @@
 <span class="c1"># SPDX-License-Identifier: MIT</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">is_dataclass</span><span class="p">,</span> <span class="n">make_dataclass</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">deque</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MISSING</span><span class="p">,</span>
+    <span class="n">Field</span><span class="p">,</span>
+    <span class="n">dataclass</span><span class="p">,</span>
+    <span class="n">field</span><span class="p">,</span>
+    <span class="n">fields</span><span class="p">,</span>
+    <span class="n">is_dataclass</span><span class="p">,</span>
+    <span class="n">make_dataclass</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
@@ -198,13 +207,19 @@
     <span class="n">overload</span><span class="p">,</span>
 <span class="p">)</span>
 
+<span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span>
 <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Final</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">TypeGuard</span>
 
-<span class="kn">from</span> <span class="nn">hydra_zen.errors</span> <span class="kn">import</span> <span class="n">HydraZenDeprecationWarning</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.errors</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">HydraZenDeprecationWarning</span><span class="p">,</span>
+    <span class="n">HydraZenUnsupportedPrimitiveError</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.funcs</span> <span class="kn">import</span> <span class="n">get_obj</span><span class="p">,</span> <span class="n">partial</span><span class="p">,</span> <span class="n">zen_processing</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.structured_configs</span> <span class="kn">import</span> <span class="n">_utils</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">Builds</span><span class="p">,</span> <span class="n">Importable</span><span class="p">,</span> <span class="n">Just</span><span class="p">,</span> <span class="n">PartialBuilds</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">Builds</span><span class="p">,</span> <span class="n">Importable</span><span class="p">,</span> <span class="n">Just</span><span class="p">,</span> <span class="n">PartialBuilds</span><span class="p">,</span> <span class="n">SupportedPrimitive</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass</span><span class="p">,</span> <span class="n">HasPartialTarget</span><span class="p">,</span> <span class="n">HasTarget</span>
+
+<span class="kn">from</span> <span class="nn">._value_conversion</span> <span class="kn">import</span> <span class="n">ZEN_SUPPORTED_PRIMITIVES</span><span class="p">,</span> <span class="n">ZEN_VALUE_CONVERSION</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="c1"># used to check if default values are ufuncs</span>
@@ -258,7 +273,28 @@
 <span class="n">_KEYWORD_ONLY</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">KEYWORD_ONLY</span>
 <span class="n">_VAR_KEYWORD</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">VAR_KEYWORD</span>
 
+<span class="n">NoneType</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">HYDRA_SUPPORTED_PRIMITIVES</span> <span class="o">=</span> <span class="p">{</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">}</span>
+
 <span class="n">_builtin_function_or_method_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="nb">len</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_cast_via_tuple</span><span class="p">(</span><span class="n">dest_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_T</span><span class="p">],</span> <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">]]]]:</span>
+    <span class="k">def</span> <span class="nf">converter</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">builds</span><span class="p">(</span><span class="n">dest_type</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">converter</span>
+
+
+<span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="nb">set</span><span class="p">]</span> <span class="o">=</span> <span class="n">_cast_via_tuple</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+<span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="nb">frozenset</span><span class="p">]</span> <span class="o">=</span> <span class="n">_cast_via_tuple</span><span class="p">(</span><span class="nb">frozenset</span><span class="p">)</span>
+<span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="n">deque</span><span class="p">]</span> <span class="o">=</span> <span class="n">_cast_via_tuple</span><span class="p">(</span><span class="n">deque</span><span class="p">)</span>
+<span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="n">_cast_via_tuple</span><span class="p">(</span><span class="nb">bytes</span><span class="p">)</span>
+<span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="nb">bytearray</span><span class="p">]</span> <span class="o">=</span> <span class="n">_cast_via_tuple</span><span class="p">(</span><span class="nb">bytearray</span><span class="p">)</span>
+<span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="nb">range</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">value</span><span class="p">:</span> <span class="n">builds</span><span class="p">(</span>
+    <span class="nb">range</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">step</span>
+<span class="p">)</span>
+<span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="n">Counter</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">counter</span><span class="p">:</span> <span class="n">builds</span><span class="p">(</span><span class="n">Counter</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">counter</span><span class="p">))</span>
 
 
 <span class="k">def</span> <span class="nf">_get_target</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
@@ -347,6 +383,7 @@
 <span class="sd">    &gt;&gt;&gt; HasMutableDefault()</span>
 <span class="sd">    HasMutableDefault(a_list=[1, 2, 3])&quot;&quot;&quot;</span>
     <span class="n">cast</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  <span class="c1"># ensure that we return a copy of the default value</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">sanitize_collection</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 
 
@@ -373,7 +410,7 @@
 <div class="viewcode-block" id="hydrated_dataclass"><a class="viewcode-back" href="../../../generated/hydra_zen.hydrated_dataclass.html#hydra_zen.hydrated_dataclass">[docs]</a><span class="nd">@__dataclass_transform__</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">hydrated_dataclass</span><span class="p">(</span>
     <span class="n">target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
-    <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(),</span>
     <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -456,6 +493,12 @@
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 <span class="sd">    builds : Create a targeted structured config designed to &quot;build&quot; a particular object.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    hydra_zen.errors.HydraZenUnsupportedPrimitiveError</span>
+<span class="sd">        The provided configured value cannot be serialized by Hydra, not does hydra-zen</span>
+<span class="sd">        provide specialized support for it. See :ref:`valid-types` for more details.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -642,29 +685,119 @@
     <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Type</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">out_class</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">create_just_if_needed</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">_T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">Just</span><span class="p">]]:</span>
-    <span class="c1"># Hydra can serialize dataclasses directly, thus we</span>
-    <span class="c1"># don&#39;t want to wrap these in `just`</span>
+<span class="n">_KEY_ERROR_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;Configuring dictionary key:&quot;</span>
 
-    <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
-        <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-        <span class="ow">or</span> <span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
-        <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">_builtin_function_or_method_type</span><span class="p">)</span>
-        <span class="ow">or</span> <span class="p">(</span><span class="n">ufunc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ufunc</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">sanitized_default_value</span><span class="p">(</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">allow_zen_conversion</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">error_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">field_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">structured_conf_permitted</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">sanitize_collection</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">structured_conf_permitted</span>
+        <span class="ow">and</span> <span class="n">callable</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="p">(</span>
+            <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">and</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+            <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">_builtin_function_or_method_type</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="p">(</span><span class="n">ufunc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ufunc</span><span class="p">))</span>
+        <span class="p">)</span>
     <span class="p">):</span>
         <span class="k">return</span> <span class="n">just</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="n">resolved_value</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="n">type_of_value</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">resolved_value</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">value</span>
+    <span class="c1"># we don&#39;t use isinstance because we don&#39;t permit subclasses of supported</span>
+    <span class="c1"># primitives</span>
+    <span class="k">if</span> <span class="n">allow_zen_conversion</span> <span class="ow">and</span> <span class="n">type_of_value</span> <span class="ow">in</span> <span class="n">ZEN_SUPPORTED_PRIMITIVES</span><span class="p">:</span>
+        <span class="n">type_</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">resolved_value</span><span class="p">)</span>
+        <span class="n">conversion_fn</span> <span class="o">=</span> <span class="n">ZEN_VALUE_CONVERSION</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">type_</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">conversion_fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">resolved_value</span> <span class="o">=</span> <span class="n">conversion_fn</span><span class="p">(</span><span class="n">resolved_value</span><span class="p">)</span>
+            <span class="n">type_of_value</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">resolved_value</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">structured_conf_permitted</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resolved_value</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+        <span class="c1"># Leverages programmatic access to enum member via value.</span>
+        <span class="c1"># E.g.</span>
+        <span class="c1"># &gt;&gt;&gt; Color(1)</span>
+        <span class="c1"># &lt;Color.RED: 1&gt;</span>
+        <span class="k">return</span> <span class="n">builds</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">resolved_value</span><span class="p">),</span> <span class="n">resolved_value</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">type_of_value</span> <span class="ow">in</span> <span class="n">HYDRA_SUPPORTED_PRIMITIVES</span> <span class="ow">or</span> <span class="p">(</span>
+        <span class="n">structured_conf_permitted</span>
+        <span class="ow">and</span> <span class="p">(</span>
+            <span class="n">is_dataclass</span><span class="p">(</span><span class="n">resolved_value</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resolved_value</span><span class="p">,</span> <span class="p">(</span><span class="n">ListConfig</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">))</span>
+        <span class="p">)</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="n">resolved_value</span>
+
+    <span class="k">if</span> <span class="n">field_name</span><span class="p">:</span>
+        <span class="n">field_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;, for field `</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">`,&quot;</span>
+
+    <span class="n">err_msg</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">error_prefix</span>
+        <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; The configured value </span><span class="si">{</span><span class="n">value</span><span class="si">}{</span><span class="n">field_name</span><span class="si">}</span><span class="s2"> is not supported by Hydra -- &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;serializing or instantiating this config would ultimately result in an error.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">structured_conf_permitted</span><span class="p">:</span>
+        <span class="n">err_msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Consider using `hydra_zen.builds(</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2">, ...)` to &quot;</span>
+        <span class="s2">&quot;create a config for this particular value.&quot;</span>
+
+    <span class="k">raise</span> <span class="n">HydraZenUnsupportedPrimitiveError</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">sanitized_default_value</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">_utils</span><span class="o">.</span><span class="n">KNOWN_MUTABLE_TYPES</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">sanitize_collection</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">_T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Pass contents of lists, tuples, or dicts through sanitized_default_values&quot;&quot;&quot;</span>
+    <span class="n">type_x</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">type_x</span> <span class="ow">in</span> <span class="p">{</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">}:</span>
+        <span class="k">return</span> <span class="n">type_x</span><span class="p">(</span><span class="n">sanitized_default_value</span><span class="p">(</span><span class="n">_x</span><span class="p">)</span> <span class="k">for</span> <span class="n">_x</span> <span class="ow">in</span> <span class="n">x</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+    <span class="k">elif</span> <span class="n">type_x</span> <span class="ow">is</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="c1"># Hydra doesn&#39;t permit structured configs for keys, thus we only</span>
+            <span class="c1"># support its basic primitives here.</span>
+            <span class="n">sanitized_default_value</span><span class="p">(</span>
+                <span class="n">k</span><span class="p">,</span>
+                <span class="n">allow_zen_conversion</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">structured_conf_permitted</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">error_prefix</span><span class="o">=</span><span class="n">_KEY_ERROR_PREFIX</span><span class="p">,</span>
+            <span class="p">):</span> <span class="n">sanitized_default_value</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
+        <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># pass-through</span>
+        <span class="k">return</span> <span class="n">x</span>
+
+
+<span class="k">def</span> <span class="nf">sanitized_field</span><span class="p">(</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">init</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">allow_zen_conversion</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">error_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">field_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
+    <span class="n">type_value</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">type_value</span> <span class="ow">in</span> <span class="n">_utils</span><span class="o">.</span><span class="n">KNOWN_MUTABLE_TYPES</span>
+        <span class="ow">and</span> <span class="n">type_value</span> <span class="ow">in</span> <span class="n">HYDRA_SUPPORTED_PRIMITIVES</span>
+    <span class="p">):</span>
         <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Field</span><span class="p">,</span> <span class="n">mutable_value</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
-    <span class="n">resolved_value</span> <span class="o">=</span> <span class="n">create_just_if_needed</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">resolved_value</span>
-        <span class="k">else</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">resolved_value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">sanitized_default_value</span><span class="p">(</span>
+            <span class="n">value</span><span class="p">,</span>
+            <span class="n">allow_zen_conversion</span><span class="o">=</span><span class="n">allow_zen_conversion</span><span class="p">,</span>
+            <span class="n">error_prefix</span><span class="o">=</span><span class="n">error_prefix</span><span class="p">,</span>
+            <span class="n">field_name</span><span class="o">=</span><span class="n">field_name</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">init</span><span class="o">=</span><span class="n">init</span><span class="p">,</span>
     <span class="p">)</span>
 
 
@@ -672,17 +805,17 @@
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
     <span class="n">hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
-    <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(),</span>
-    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SupportedPrimitive</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span>  <span class="c1"># pragma: no cover</span>
     <span class="o">...</span>
 
@@ -691,17 +824,17 @@
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
     <span class="n">hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
-    <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">],</span>
     <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(),</span>
-    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SupportedPrimitive</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span>  <span class="c1"># pragma: no cover</span>
     <span class="o">...</span>
 
@@ -710,17 +843,17 @@
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
     <span class="n">hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
-    <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(),</span>
-    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SupportedPrimitive</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
     <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]</span>
 <span class="p">]:</span>  <span class="c1"># pragma: no cover</span>
@@ -733,14 +866,14 @@
     <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(),</span>
-    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SupportedPrimitive</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
     <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]]:</span>
     <span class="sd">&quot;&quot;&quot;builds(hydra_target, /, *pos_args, zen_partial=False, zen_meta=None,</span>
 <span class="sd">    hydra_recursive=None, populate_full_signature=False, hydra_convert=None,</span>
@@ -843,6 +976,12 @@
 <span class="sd">    -------</span>
 <span class="sd">    Config : Type[Builds[Type[T]]]</span>
 <span class="sd">        A structured config that describes how to build ``hydra_target``</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    hydra_zen.errors.HydraZenUnsupportedPrimitiveError</span>
+<span class="sd">        The provided configured value cannot be serialized by Hydra, not does hydra-zen</span>
+<span class="sd">        provide specialized support for it. See :ref:`valid-types` for more details.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -1062,11 +1201,13 @@
 
     <span class="n">target</span><span class="p">,</span> <span class="o">*</span><span class="n">_pos_args</span> <span class="o">=</span> <span class="n">pos_args</span>
 
+    <span class="n">BUILDS_ERROR_PREFIX</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">building_error_prefix</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+
     <span class="k">del</span> <span class="n">pos_args</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="n">_utils</span><span class="o">.</span><span class="n">building_error_prefix</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+            <span class="n">BUILDS_ERROR_PREFIX</span>
             <span class="o">+</span> <span class="s2">&quot;In `builds(&lt;target&gt;, ...), `&lt;target&gt;` must be callable/instantiable&quot;</span>
         <span class="p">)</span>
 
@@ -1177,7 +1318,7 @@
                 <span class="s2">&quot; You can manually create a dataclass to utilize this name in a structured config.&quot;</span>
             <span class="p">)</span>
 
-    <span class="n">target_field</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Field</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]]</span>
+    <span class="n">target_field</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]]</span>
 
     <span class="k">if</span> <span class="n">zen_partial</span> <span class="ow">or</span> <span class="n">zen_meta</span> <span class="ow">or</span> <span class="n">validated_wrappers</span><span class="p">:</span>
         <span class="n">target_field</span> <span class="o">=</span> <span class="p">[</span>
@@ -1271,7 +1412,10 @@
                 <span class="n">_POS_ARG_FIELD_NAME</span><span class="p">,</span>
                 <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
                 <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span>
-                    <span class="n">default</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">create_just_if_needed</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_pos_args</span><span class="p">),</span>
+                    <span class="n">default</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span>
+                        <span class="n">sanitized_default_value</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">error_prefix</span><span class="o">=</span><span class="n">BUILDS_ERROR_PREFIX</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_pos_args</span>
+                    <span class="p">),</span>
                     <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="p">),</span>
             <span class="p">)</span>
@@ -1283,7 +1427,7 @@
     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">populate_full_signature</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="n">_utils</span><span class="o">.</span><span class="n">building_error_prefix</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+                <span class="n">BUILDS_ERROR_PREFIX</span>
                 <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2"> does not have an inspectable signature. &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;`builds(</span><span class="si">{</span><span class="n">_utils</span><span class="o">.</span><span class="n">safe_name</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2">, populate_full_signature=True)` is not supported&quot;</span>
             <span class="p">)</span>
@@ -1328,6 +1472,12 @@
         <span class="c1"># pos_args is potentially inherited</span>
         <span class="k">for</span> <span class="n">_base</span> <span class="ow">in</span> <span class="n">builds_bases</span><span class="p">:</span>
             <span class="n">_pos_args</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">_base</span><span class="p">,</span> <span class="n">_POS_ARG_FIELD_NAME</span><span class="p">,</span> <span class="p">())</span>
+
+            <span class="c1"># validates</span>
+            <span class="n">_pos_args</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+                <span class="n">sanitized_default_value</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">allow_zen_conversion</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_pos_args</span>
+            <span class="p">)</span>
             <span class="k">if</span> <span class="n">_pos_args</span><span class="p">:</span>
                 <span class="k">break</span>
 
@@ -1354,7 +1504,7 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs_for_target</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">nameable_params_in_sig</span><span class="p">:</span>
                 <span class="n">_unexpected</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs_for_target</span><span class="p">)</span> <span class="o">-</span> <span class="n">nameable_params_in_sig</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                    <span class="n">_utils</span><span class="o">.</span><span class="n">building_error_prefix</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+                    <span class="n">BUILDS_ERROR_PREFIX</span>
                     <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;The following unexpected keyword argument(s) was specified for </span><span class="si">{</span><span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;via `builds`: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_unexpected</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
@@ -1365,7 +1515,7 @@
                 <span class="c1"># AND it is not excluded via `zen_meta`</span>
                 <span class="n">_unexpected</span> <span class="o">=</span> <span class="n">fields_set_by_bases</span> <span class="o">-</span> <span class="n">nameable_params_in_sig</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                    <span class="n">_utils</span><span class="o">.</span><span class="n">building_error_prefix</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+                    <span class="n">BUILDS_ERROR_PREFIX</span>
                     <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;The following unexpected keyword argument(s) for </span><span class="si">{</span><span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;was specified via inheritance from a base class: &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_unexpected</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -1388,7 +1538,7 @@
                 <span class="p">]:</span>
                     <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">named_args</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                            <span class="n">_utils</span><span class="o">.</span><span class="n">building_error_prefix</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+                            <span class="n">BUILDS_ERROR_PREFIX</span>
                             <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;Multiple values for argument </span><span class="si">{</span><span class="n">param</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> were specified for &quot;</span>
                             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2"> via `builds`&quot;</span>
                         <span class="p">)</span>
@@ -1414,7 +1564,7 @@
                     <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_num_positional</span> <span class="o">-</span> <span class="n">_num_with_default</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">_num_positional</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                    <span class="n">_utils</span><span class="o">.</span><span class="n">building_error_prefix</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+                    <span class="n">BUILDS_ERROR_PREFIX</span>
                     <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2"> takes </span><span class="si">{</span><span class="n">_permissible</span><span class="si">}</span><span class="s2"> positional args, but &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">_pos_args</span><span class="p">)</span><span class="si">}</span><span class="s2"> were specified via `builds`&quot;</span>
                 <span class="p">)</span>
@@ -1426,7 +1576,7 @@
     <span class="c1">#    and is resolved to one of the type-annotations supported by hydra if possible,</span>
     <span class="c1">#    otherwise, is Any</span>
     <span class="c1">#  - arg-value: mutable values are automatically specified using default-factory</span>
-    <span class="n">user_specified_named_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">Field</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">user_specified_named_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">name</span><span class="p">:</span> <span class="p">(</span>
             <span class="n">name</span><span class="p">,</span>
             <span class="n">_utils</span><span class="o">.</span><span class="n">sanitized_type</span><span class="p">(</span><span class="n">type_hints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">Any</span><span class="p">))</span>
@@ -1439,7 +1589,7 @@
             <span class="c1"># Thus we will auto-broaden the annotation when we see that the user</span>
             <span class="c1"># has specified a `Builds` as a default value.</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">is_builds</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">or</span> <span class="n">hydra_recursive</span> <span class="ow">is</span> <span class="kc">False</span> <span class="k">else</span> <span class="n">Any</span><span class="p">,</span>
-            <span class="n">sanitized_default_value</span><span class="p">(</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">value</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs_for_target</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
     <span class="p">}</span>
@@ -1500,7 +1650,7 @@
                         <span class="c1"># because we assume that they want to fill these in by using partial</span>
                         <span class="n">base_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param_field</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">param_field</span> <span class="o">+=</span> <span class="p">(</span><span class="n">sanitized_default_value</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">default</span><span class="p">),)</span>
+                    <span class="n">param_field</span> <span class="o">+=</span> <span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">default</span><span class="p">,)</span>
                     <span class="n">_fields_with_default_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param_field</span><span class="p">)</span>
 
         <span class="n">base_fields</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">_fields_with_default_values</span><span class="p">)</span>
@@ -1536,10 +1686,7 @@
         <span class="c1"># We don&#39;t check for collisions between `zen_meta` names and the</span>
         <span class="c1"># names of inherited fields. Thus `zen_meta` can effectively be used</span>
         <span class="c1"># to &quot;delete&quot; names from a config, via inheritance.</span>
-        <span class="n">base_fields</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-            <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">sanitized_default_value</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
-            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">zen_meta</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-        <span class="p">)</span>
+        <span class="n">base_fields</span><span class="o">.</span><span class="n">extend</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">zen_meta</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
 
     <span class="k">if</span> <span class="n">dataclass_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">zen_partial</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
@@ -1547,8 +1694,42 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">dataclass_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;PartialBuilds_</span><span class="si">{</span><span class="n">_utils</span><span class="o">.</span><span class="n">safe_name</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
 
+    <span class="c1"># validate that fields set via bases are OK; cannot perform zen-casting</span>
+    <span class="c1"># on fields</span>
+    <span class="k">for</span> <span class="n">base</span> <span class="ow">in</span> <span class="n">builds_bases</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">field_</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">(</span><span class="n">base</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">field_</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">MISSING</span><span class="p">:</span>
+                <span class="c1"># performs validation</span>
+                <span class="n">sanitized_default_value</span><span class="p">(</span>
+                    <span class="n">field_</span><span class="o">.</span><span class="n">default</span><span class="p">,</span>
+                    <span class="n">allow_zen_conversion</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">error_prefix</span><span class="o">=</span><span class="n">BUILDS_ERROR_PREFIX</span><span class="p">,</span>
+                    <span class="n">field_name</span><span class="o">=</span><span class="n">field_</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; (set via inheritance)&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">del</span> <span class="n">field_</span>
+
+    <span class="n">sanitized_base_fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Field</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">base_fields</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="c1"># (name, type)   (no configured value)</span>
+            <span class="n">sanitized_base_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">,</span> <span class="n">item</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Field</span><span class="p">):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">sanitized_field</span><span class="p">(</span>
+                    <span class="n">value</span><span class="p">,</span>
+                    <span class="n">error_prefix</span><span class="o">=</span><span class="n">BUILDS_ERROR_PREFIX</span><span class="p">,</span>
+                    <span class="n">field_name</span><span class="o">=</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="p">)</span>
+
+            <span class="n">sanitized_base_fields</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">value</span><span class="p">))</span>
+            <span class="k">del</span> <span class="n">value</span>
+
     <span class="n">out</span> <span class="o">=</span> <span class="n">make_dataclass</span><span class="p">(</span>
-        <span class="n">dataclass_name</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">base_fields</span><span class="p">,</span> <span class="n">bases</span><span class="o">=</span><span class="n">builds_bases</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="n">frozen</span>
+        <span class="n">dataclass_name</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">sanitized_base_fields</span><span class="p">,</span> <span class="n">bases</span><span class="o">=</span><span class="n">builds_bases</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="n">frozen</span>
     <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">zen_partial</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">_PARTIAL_TARGET_FIELD_NAME</span><span class="p">):</span>
@@ -1556,7 +1737,7 @@
         <span class="c1"># hydra-instantiation occurs, since it will be passed to target.</span>
         <span class="c1"># There is not an easy way to delete this, since it comes from a parent class</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="n">_utils</span><span class="o">.</span><span class="n">building_error_prefix</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+            <span class="n">BUILDS_ERROR_PREFIX</span>
             <span class="o">+</span> <span class="s2">&quot;`builds(..., zen_partial=False, builds_bases=(...))` does not &quot;</span>
             <span class="s2">&quot;permit `builds_bases` where a partial target has been specified.&quot;</span>
         <span class="p">)</span>
@@ -1792,7 +1973,7 @@
 <span class="sd">    builds_bases : Tuple[DataClass, ...]</span>
 <span class="sd">        Specifies a new the default value for ``builds(..., builds_bases=&lt;..&gt;)``</span>
 
-<span class="sd">    returns</span>
+<span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    custom_builds</span>
 <span class="sd">        The function `builds`, but with customized default values.</span>
@@ -1921,7 +2102,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">hint</span><span class="p">:</span> <span class="nb">type</span> <span class="o">=</span> <span class="n">Any</span>
-    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">NOTHING</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportedPrimitive</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">NOTHING</span><span class="p">]]</span> <span class="o">=</span> <span class="n">NOTHING</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">NOTHING</span><span class="p">]]</span> <span class="o">=</span> <span class="n">NOTHING</span>
 
     <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1932,7 +2113,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">hint</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">sanitized_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hint</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NOTHING</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">sanitized_default_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">sanitized_field</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="make_config"><a class="viewcode-back" href="../../../generated/hydra_zen.make_config.html#hydra_zen.make_config">[docs]</a><span class="k">def</span> <span class="nf">make_config</span><span class="p">(</span>
@@ -1942,7 +2123,7 @@
     <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Config&quot;</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
-    <span class="o">**</span><span class="n">fields_as_kwargs</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">fields_as_kwargs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportedPrimitive</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataClass</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates a config with user-defined field names and, optionally,</span>
@@ -1999,6 +2180,12 @@
 <span class="sd">    Config : Type[DataClass]</span>
 <span class="sd">        The resulting config class; a dataclass that possess the user-specified fields.</span>
 
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    hydra_zen.errors.HydraZenUnsupportedPrimitiveError</span>
+<span class="sd">        The provided configured value cannot be serialized by Hydra, not does hydra-zen</span>
+<span class="sd">        provide specialized support for it. See :ref:`valid-types` for more details.</span>
+
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    The resulting &quot;config&quot; is a dataclass-object [4]_ with Hydra-specific attributes</span>
@@ -2036,6 +2223,8 @@
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; from hydra_zen import make_config, to_yaml</span>
 <span class="sd">    &gt;&gt;&gt; def pp(x): return print(to_yaml(x))  # pretty-print config as yaml</span>
+
+<span class="sd">    **Basic Usage**</span>
 
 <span class="sd">    Let&#39;s create a bare-bones config with two fields, named &#39;a&#39; and &#39;b&#39;.</span>
 
@@ -2094,6 +2283,19 @@
 
 <span class="sd">    &gt;&gt;&gt; issubclass(ConfInherit, Conf1) and issubclass(ConfInherit, Conf2)</span>
 <span class="sd">    True</span>
+
+<span class="sd">    **Support for Additional Types**</span>
+
+<span class="sd">    Types like :py:class:`complex` and :py:class:`pathlib.Path` are automatically supported by</span>
+<span class="sd">    hydra-zen.</span>
+
+<span class="sd">    &gt;&gt;&gt; ConfWithComplex = make_config(a=1+2j)</span>
+<span class="sd">    &gt;&gt;&gt; pp(ConfWithComplex)</span>
+<span class="sd">    a:</span>
+<span class="sd">      real: 1.0</span>
+<span class="sd">      imag: 2.0</span>
+<span class="sd">      _target_: builtins.complex</span>
+
 
 <span class="sd">    **Using ZenField to Provide Type Information**</span>
 
@@ -2201,7 +2403,7 @@
                     <span class="n">f</span><span class="o">.</span><span class="n">hint</span>
                     <span class="c1"># f.default: Field</span>
                     <span class="c1"># f.default.default: Any</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_builds</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">default</span><span class="p">)</span> <span class="ow">or</span> <span class="n">hydra_recursive</span> <span class="ow">is</span> <span class="kc">False</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_builds</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">default</span><span class="p">)</span> <span class="ow">or</span> <span class="n">hydra_recursive</span> <span class="ow">is</span> <span class="kc">False</span>  <span class="c1"># type: ignore</span>
                     <span class="k">else</span> <span class="n">Any</span>
                 <span class="p">),</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">default</span><span class="p">,</span>

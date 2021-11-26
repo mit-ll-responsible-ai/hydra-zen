@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Reference &#8212; hydra-zen 0.3.1+4.g6b39c41 documentation</title>
+    <title>Reference &#8212; hydra-zen 0.3.1+5.gd70d29a documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -297,6 +297,23 @@
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#configuration-value-types-supported-by-hydra-and-hydra-zen">
+   Configuration-Value Types Supported by Hydra and hydra-zen
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#types-supported-natively-by-hydra">
+     Types Supported Natively by Hydra
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#types-supported-via-hydra-zen">
+     Types Supported via hydra-zen
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#third-party-utilities">
    Third-Party Utilities
   </a>
@@ -449,6 +466,49 @@ The following utilities can be used to work with YAML-serialized configs.</p>
 </tr>
 </tbody>
 </table>
+</div>
+</div>
+<div class="section" id="configuration-value-types-supported-by-hydra-and-hydra-zen">
+<span id="valid-types"></span><h2>Configuration-Value Types Supported by Hydra and hydra-zen<a class="headerlink" href="#configuration-value-types-supported-by-hydra-and-hydra-zen" title="Permalink to this headline">¶</a></h2>
+<p>The types of values that can be specified in configs are limited by their ability to be
+serialized to a YAML format. hydra-zen provides automatic support for an additional set
+of common types via its <a class="reference internal" href="#create-config"><span class="std std-ref">config-creation functions</span></a>.</p>
+<div class="section" id="types-supported-natively-by-hydra">
+<h3>Types Supported Natively by Hydra<a class="headerlink" href="#types-supported-natively-by-hydra" title="Permalink to this headline">¶</a></h3>
+<p>Values of the following types can be specified directly in configs:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">NoneType</span></code></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p></li>
+</ul>
+</div>
+<div class="section" id="types-supported-via-hydra-zen">
+<h3>Types Supported via hydra-zen<a class="headerlink" href="#types-supported-via-hydra-zen" title="Permalink to this headline">¶</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This section refers to capabilities that are not yet available in a stable release
+of hydra-zen. They will be included in the release of <code class="xref py py-obj docutils literal notranslate"><span class="pre">v0.4.0</span></code>.</p>
+</div>
+<p>hydra-zen will automatically create targeted configs to represent values of the
+following types:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">complex</span></code></a></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.Counter" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">collections.Counter</span></code></a></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.deque" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">collections.deque</span></code></a></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.PosixPath" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.PosixPath</span></code></a></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.WindowsPath" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.WindowsPath</span></code></a></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#range" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">range</span></code></a></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#frozenset" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">frozenset</span></code></a></p></li>
+</ul>
 </div>
 </div>
 <div class="section" id="third-party-utilities">

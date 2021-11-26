@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>builds &#8212; hydra-zen 0.3.1+4.g6b39c41 documentation</title>
+    <title>builds &#8212; hydra-zen 0.3.1+5.gd70d29a documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -268,6 +268,13 @@ parent of a <code class="docutils literal notranslate"><span class="pre">Builds<
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
 <dt><strong>Config</strong><span class="classifier">Type[Builds[Type[T]]]</span></dt><dd><p>A structured config that describes how to build <code class="docutils literal notranslate"><span class="pre">hydra_target</span></code></p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>hydra_zen.errors.HydraZenUnsupportedPrimitiveError</dt><dd><p>The provided configured value cannot be serialized by Hydra, not does hydra-zen
+provide specialized support for it. See <a class="reference internal" href="../api_reference.html#valid-types"><span class="std std-ref">Configuration-Value Types Supported by Hydra and hydra-zen</span></a> for more details.</p>
 </dd>
 </dl>
 </dd>

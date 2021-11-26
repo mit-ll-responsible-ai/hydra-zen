@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>make_config &#8212; hydra-zen 0.3.1+4.g6b39c41 documentation</title>
+    <title>make_config &#8212; hydra-zen 0.3.1+5.gd70d29a documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -336,6 +336,13 @@ I.e. setting/deleting an attribute of an instance of the config will raise
 </dd>
 </dl>
 </dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>hydra_zen.errors.HydraZenUnsupportedPrimitiveError</dt><dd><p>The provided configured value cannot be serialized by Hydra, not does hydra-zen
+provide specialized support for it. See <a class="reference internal" href="../api_reference.html#valid-types"><span class="std std-ref">Configuration-Value Types Supported by Hydra and hydra-zen</span></a> for more details.</p>
+</dd>
+</dl>
+</dd>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -387,6 +394,7 @@ they can be utilized in the resulting config and by Hydra:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">pp</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="k">return</span> <span class="nb">print</span><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>  <span class="c1"># pretty-print config as yaml</span>
 </pre></div>
 </div>
+<p><strong>Basic Usage</strong></p>
 <p>Let’s create a bare-bones config with two fields, named ‘a’ and ‘b’.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Conf1</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">)</span>  <span class="c1"># sig: `Conf(a: Any, b: Any)`</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pp</span><span class="p">(</span><span class="n">Conf1</span><span class="p">)</span>
@@ -444,6 +452,17 @@ for providing associated default values.</p>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">issubclass</span><span class="p">(</span><span class="n">ConfInherit</span><span class="p">,</span> <span class="n">Conf1</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">ConfInherit</span><span class="p">,</span> <span class="n">Conf2</span><span class="p">)</span>
 <span class="go">True</span>
+</pre></div>
+</div>
+<p><strong>Support for Additional Types</strong></p>
+<p>Types like <a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">complex</span></code></a> and <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a> are automatically supported by
+hydra-zen.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ConfWithComplex</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="n">j</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pp</span><span class="p">(</span><span class="n">ConfWithComplex</span><span class="p">)</span>
+<span class="go">a:</span>
+<span class="go">  real: 1.0</span>
+<span class="go">  imag: 2.0</span>
+<span class="go">  _target_: builtins.complex</span>
 </pre></div>
 </div>
 <p><strong>Using ZenField to Provide Type Information</strong></p>
