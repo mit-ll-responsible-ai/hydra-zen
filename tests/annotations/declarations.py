@@ -7,7 +7,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Callable, List, Literal, Tuple, Type
 
-from omegaconf import DictConfig, ListConfig
+from omegaconf import MISSING, DictConfig, ListConfig
 
 from hydra_zen import (
     ZenField,
@@ -277,6 +277,8 @@ def supported_primitives():
 
     a7 = builds(
         f,
+        None,
+        MISSING,
         1,
         "hi",
         2.0,

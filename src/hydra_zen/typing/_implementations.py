@@ -16,7 +16,6 @@ from typing import (
     NewType,
     Set,
     Tuple,
-    Type,
     TypeVar,
     Union,
 )
