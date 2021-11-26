@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hydrated_dataclass &#8212; hydra-zen 0.4.0rc1+2.g3e6cacf documentation</title>
+    <title>hydrated_dataclass &#8212; hydra-zen 0.4.0rc1+4.gdb2f0ec documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -198,7 +198,7 @@ a config explicitly using the <a class="reference external" href="https://docs.p
 <dd class="field-odd"><dl>
 <dt><strong>hydra_target</strong><span class="classifier">T (Callable)</span></dt><dd><p>The target-object to be configured. This is a required, positional-only argument.</p>
 </dd>
-<dt><strong>*pos_args</strong><span class="classifier">Any</span></dt><dd><p>Positional arguments passed as <code class="docutils literal notranslate"><span class="pre">hydra_target(*pos_args,</span> <span class="pre">...)</span></code> upon instantiation.</p>
+<dt><strong>*pos_args</strong><span class="classifier">SupportedPrimitive</span></dt><dd><p>Positional arguments passed as <code class="docutils literal notranslate"><span class="pre">hydra_target(*pos_args,</span> <span class="pre">...)</span></code> upon instantiation.</p>
 <p>Arguments specified positionally are not included in the dataclass’ signature and
 are stored as a tuple bound to in the <code class="docutils literal notranslate"><span class="pre">_args_</span></code> field.</p>
 </dd>
@@ -220,7 +220,7 @@ E.g. specifying the wrappers <code class="docutils literal notranslate"><span cl
 <p>Wrappers can also be specified as interpolated strings <a class="reference internal" href="#r8dd265aa7612-2" id="id2">[2]</a> or targeted
 configs.</p>
 </dd>
-<dt><strong>zen_meta</strong><span class="classifier">Optional[Mapping[str, Any]]</span></dt><dd><p>Specifies field-names and corresponding values that will be included in the
+<dt><strong>zen_meta</strong><span class="classifier">Optional[Mapping[str, SupportedPrimitive]]</span></dt><dd><p>Specifies field-names and corresponding values that will be included in the
 resulting config, but that will <em>not</em> be used to builds <code class="docutils literal notranslate"><span class="pre">&lt;hydra_target&gt;</span></code>
 via instantiation. These are called “meta” fields.</p>
 </dd>
@@ -268,6 +268,7 @@ provide specialized support for it. See <a class="reference internal" href="../a
 with custom type annotations. Additionally, the resulting config’ attributes
 can be analyzed by static tooling, which can help to warn about errors prior
 to running one’s code.</p>
+<p>For details of the annotation <code class="xref py py-obj docutils literal notranslate"><span class="pre">SupportedPrimitive</span></code>, see <a class="reference internal" href="../api_reference.html#valid-types"><span class="std std-ref">Configuration-Value Types Supported by Hydra and hydra-zen</span></a>.</p>
 <p class="rubric">References</p>
 <dl class="citation">
 <dt class="label" id="r8dd265aa7612-1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>

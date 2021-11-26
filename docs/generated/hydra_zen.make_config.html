@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>make_config &#8212; hydra-zen 0.4.0rc1+2.g3e6cacf documentation</title>
+    <title>make_config &#8212; hydra-zen 0.4.0rc1+4.gdb2f0ec documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -294,11 +294,10 @@ object; rather, it can be used to create more general configs <a class="referenc
 the fields’ names and their default values and/or their type
 annotations, expressed via <a class="reference internal" href="hydra_zen.ZenField.html#hydra_zen.ZenField" title="hydra_zen.ZenField"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenField</span></code></a> instances.</p>
 </dd>
-<dt><strong>**fields_as_kwargs</strong><span class="classifier">Any | ZenField</span></dt><dd><p>Like <code class="docutils literal notranslate"><span class="pre">fields_as_args</span></code>, but fieldname/default value pairs are
+<dt><strong>**fields_as_kwargs</strong><span class="classifier">SupportedPrimitive | ZenField</span></dt><dd><p>Like <code class="docutils literal notranslate"><span class="pre">fields_as_args</span></code>, but fieldname/default value pairs are
 specified as keyword arguments. <a class="reference internal" href="hydra_zen.ZenField.html#hydra_zen.ZenField" title="hydra_zen.ZenField"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenField</span></code></a> can also be used here
 to express a fields type-annotation and/or its default value.</p>
-<p>Named parameters of the forms <code class="docutils literal notranslate"><span class="pre">hydra_xx</span></code>, <code class="docutils literal notranslate"><span class="pre">zen_xx</span></code>, and <code class="docutils literal notranslate"><span class="pre">_zen_xx</span></code> are reserved
-to ensure future-compatibility, and cannot be specified by the user.</p>
+<p>Named parameters of the forms <code class="docutils literal notranslate"><span class="pre">hydra_xx</span></code>, <code class="docutils literal notranslate"><span class="pre">zen_xx</span></code>, and <code class="docutils literal notranslate"><span class="pre">_zen_xx</span></code> are reserved to ensure future-compatibility, and cannot be specified by the user.</p>
 </dd>
 <dt><strong>hydra_recursive</strong><span class="classifier">Optional[bool], optional (default=True)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then Hydra will recursively instantiate all other
 hydra-config objects nested within this dataclass <a class="reference internal" href="#r9f8e996c6560-2" id="id2">[2]</a>.</p>
@@ -357,17 +356,19 @@ provide specialized support for it. See <a class="reference internal" href="../a
 <p>The resulting “config” is a dataclass-object <a class="reference internal" href="#r9f8e996c6560-4" id="id4">[4]</a> with Hydra-specific attributes
 attached to it, along with the attributes specified via <code class="docutils literal notranslate"><span class="pre">fields_as_args</span></code> and
 <code class="docutils literal notranslate"><span class="pre">fields_as_kwargs</span></code>.</p>
-<p>Any field specified without a type-annotation is automatically annotated with <code class="xref py py-class docutils literal notranslate"><span class="pre">typing.Any</span></code>.
-Hydra only supports a narrow subset of types <a class="reference internal" href="#r9f8e996c6560-5" id="id5">[5]</a>; <a class="reference internal" href="#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_config</span></code></a> will automatically ‘broaden’
-any user-specified annotations so that they are compatible with Hydra.</p>
-<p><a class="reference internal" href="#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_config</span></code></a> will automatically manipulate certain types of default values to ensure that
-they can be utilized in the resulting config and by Hydra:</p>
+<p>Any field specified without a type-annotation is automatically annotated with
+<code class="xref py py-class docutils literal notranslate"><span class="pre">typing.Any</span></code>. Hydra only supports a narrow subset of types <a class="reference internal" href="#r9f8e996c6560-5" id="id5">[5]</a>;
+<a class="reference internal" href="#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_config</span></code></a> will automatically ‘broaden’ any user-specified annotations so that
+they are compatible with Hydra.</p>
+<p><a class="reference internal" href="#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_config</span></code></a> will automatically manipulate certain types of default values to
+ensure that they can be utilized in the resulting config and by Hydra:</p>
 <ul class="simple">
 <li><p>Mutable default values will automatically be packaged in a default factory function <a class="reference internal" href="#r9f8e996c6560-6" id="id6">[6]</a></p></li>
 <li><p>A default value that is a class-object or function-object will automatically be wrapped by <a class="reference internal" href="hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a>, to ensure that the resulting config is serializable by Hydra.</p></li>
 </ul>
-<p>For finer-grain control over how type-annotations and default values are managed, consider using
-<a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.make_dataclass" title="(in Python v3.10)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataclasses.make_dataclass()</span></code></a>.</p>
+<p>For finer-grain control over how type-annotations and default values are managed,
+consider using <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.make_dataclass" title="(in Python v3.10)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataclasses.make_dataclass()</span></code></a>.</p>
+<p>For details of the annotation <code class="xref py py-obj docutils literal notranslate"><span class="pre">SupportedPrimitive</span></code>, see <a class="reference internal" href="../api_reference.html#valid-types"><span class="std std-ref">Configuration-Value Types Supported by Hydra and hydra-zen</span></a>.</p>
 <p class="rubric">References</p>
 <dl class="citation">
 <dt class="label" id="r9f8e996c6560-1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>

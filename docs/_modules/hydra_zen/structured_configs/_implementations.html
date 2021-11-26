@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hydra_zen.structured_configs._implementations &#8212; hydra-zen 0.4.0rc1+2.g3e6cacf documentation</title>
+    <title>hydra_zen.structured_configs._implementations &#8212; hydra-zen 0.4.0rc1+4.gdb2f0ec documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -431,7 +431,7 @@
 <span class="sd">    hydra_target : T (Callable)</span>
 <span class="sd">        The target-object to be configured. This is a required, positional-only argument.</span>
 
-<span class="sd">    *pos_args : Any</span>
+<span class="sd">    *pos_args : SupportedPrimitive</span>
 <span class="sd">        Positional arguments passed as ``hydra_target(*pos_args, ...)`` upon instantiation.</span>
 
 <span class="sd">        Arguments specified positionally are not included in the dataclass&#39; signature and</span>
@@ -458,7 +458,7 @@
 <span class="sd">        Wrappers can also be specified as interpolated strings [2]_ or targeted</span>
 <span class="sd">        configs.</span>
 
-<span class="sd">    zen_meta : Optional[Mapping[str, Any]]</span>
+<span class="sd">    zen_meta : Optional[Mapping[str, SupportedPrimitive]]</span>
 <span class="sd">        Specifies field-names and corresponding values that will be included in the</span>
 <span class="sd">        resulting config, but that will *not* be used to builds ``&lt;hydra_target&gt;``</span>
 <span class="sd">        via instantiation. These are called &quot;meta&quot; fields.</span>
@@ -506,6 +506,8 @@
 <span class="sd">    with custom type annotations. Additionally, the resulting config&#39; attributes</span>
 <span class="sd">    can be analyzed by static tooling, which can help to warn about errors prior</span>
 <span class="sd">    to running one&#39;s code.</span>
+
+<span class="sd">    For details of the annotation `SupportedPrimitive`, see :ref:`valid-types`.</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -891,14 +893,14 @@
 <span class="sd">        The target-object to be configured. This is a required, **positional-only**</span>
 <span class="sd">        argument.</span>
 
-<span class="sd">    *pos_args : Any</span>
+<span class="sd">    *pos_args : SupportedPrimitive</span>
 <span class="sd">        Positional arguments passed as ``&lt;hydra_target&gt;(*pos_args, ...)`` upon</span>
 <span class="sd">        instantiation.</span>
 
 <span class="sd">        Arguments specified positionally are not included in the dataclass&#39; signature</span>
 <span class="sd">        and are stored as a tuple bound to in the ``_args_`` field.</span>
 
-<span class="sd">    **kwargs_for_target : Any</span>
+<span class="sd">    **kwargs_for_target : SupportedPrimitive</span>
 <span class="sd">        The keyword arguments passed as ``&lt;hydra_target&gt;(..., **kwargs_for_target)``</span>
 <span class="sd">        upon instantiation.</span>
 
@@ -928,7 +930,7 @@
 <span class="sd">        Wrappers can also be specified as interpolated strings [2]_ or targeted</span>
 <span class="sd">        configs.</span>
 
-<span class="sd">    zen_meta : Optional[Mapping[str, Any]]</span>
+<span class="sd">    zen_meta : Optional[Mapping[str, SupportedPrimitive]]</span>
 <span class="sd">        Specifies field-names and corresponding values that will be included in the</span>
 <span class="sd">        resulting config, but that will *not* be used to builds ``&lt;hydra_target&gt;``</span>
 <span class="sd">        via instantiation. These are called &quot;meta&quot; fields.</span>
@@ -991,6 +993,8 @@
 <span class="sd">    Using any of the ``zen_xx`` features will result in a config that depends</span>
 <span class="sd">    explicitly on hydra-zen. I.e. hydra-zen must be installed in order to</span>
 <span class="sd">    instantiate the resulting config, including its yaml version.</span>
+
+<span class="sd">    For details of the annotation `SupportedPrimitive`, see :ref:`valid-types`.</span>
 
 <span class="sd">    Type annotations are inferred from the target&#39;s signature and are only</span>
 <span class="sd">    retained if they are compatible with Hydra&#39;s limited set of supported</span>
@@ -2139,13 +2143,12 @@
 <span class="sd">        the fields&#39; names and their default values and/or their type</span>
 <span class="sd">        annotations, expressed via `ZenField` instances.</span>
 
-<span class="sd">    **fields_as_kwargs : Any | ZenField</span>
+<span class="sd">    **fields_as_kwargs : SupportedPrimitive | ZenField</span>
 <span class="sd">        Like ``fields_as_args``, but fieldname/default value pairs are</span>
 <span class="sd">        specified as keyword arguments. `ZenField` can also be used here</span>
 <span class="sd">        to express a fields type-annotation and/or its default value.</span>
 
-<span class="sd">        Named parameters of the forms ``hydra_xx``, ``zen_xx``, and ``_zen_xx`` are reserved</span>
-<span class="sd">        to ensure future-compatibility, and cannot be specified by the user.</span>
+<span class="sd">        Named parameters of the forms ``hydra_xx``, ``zen_xx``, and ``_zen_xx`` are reserved to ensure future-compatibility, and cannot be specified by the user.</span>
 
 <span class="sd">    hydra_recursive : Optional[bool], optional (default=True)</span>
 <span class="sd">        If ``True``, then Hydra will recursively instantiate all other</span>
@@ -2192,18 +2195,21 @@
 <span class="sd">    attached to it, along with the attributes specified via ``fields_as_args`` and</span>
 <span class="sd">    ``fields_as_kwargs``.</span>
 
-<span class="sd">    Any field specified without a type-annotation is automatically annotated with :py:class:`typing.Any`.</span>
-<span class="sd">    Hydra only supports a narrow subset of types [5]_; `make_config` will automatically &#39;broaden&#39;</span>
-<span class="sd">    any user-specified annotations so that they are compatible with Hydra.</span>
+<span class="sd">    Any field specified without a type-annotation is automatically annotated with</span>
+<span class="sd">    :py:class:`typing.Any`. Hydra only supports a narrow subset of types [5]_;</span>
+<span class="sd">    `make_config` will automatically &#39;broaden&#39; any user-specified annotations so that</span>
+<span class="sd">    they are compatible with Hydra.</span>
 
-<span class="sd">    `make_config` will automatically manipulate certain types of default values to ensure that</span>
-<span class="sd">    they can be utilized in the resulting config and by Hydra:</span>
+<span class="sd">    `make_config` will automatically manipulate certain types of default values to</span>
+<span class="sd">    ensure that they can be utilized in the resulting config and by Hydra:</span>
 
 <span class="sd">    - Mutable default values will automatically be packaged in a default factory function [6]_</span>
 <span class="sd">    - A default value that is a class-object or function-object will automatically be wrapped by `just`, to ensure that the resulting config is serializable by Hydra.</span>
 
-<span class="sd">    For finer-grain control over how type-annotations and default values are managed, consider using</span>
-<span class="sd">    :func:`dataclasses.make_dataclass`.</span>
+<span class="sd">    For finer-grain control over how type-annotations and default values are managed,</span>
+<span class="sd">    consider using :func:`dataclasses.make_dataclass`.</span>
+
+<span class="sd">    For details of the annotation `SupportedPrimitive`, see :ref:`valid-types`.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
