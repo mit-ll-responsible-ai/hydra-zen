@@ -56,7 +56,7 @@ def is_ascii(x: str) -> bool:
         set,
         frozenset,
         FrozenSet[Union[int, complex]],
-        Set[Union[int, str, complex, Path]],
+        Set[Union[int, complex, Path]],
         complex,
         Path,
         bytes,
