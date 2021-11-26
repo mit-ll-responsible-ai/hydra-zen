@@ -1545,7 +1545,7 @@ def builds(
         else:
             assert len(item) == 3, item
             value = item[-1]
-            # print(type(value))
+
             if not isinstance(value, Field):
                 value = sanitized_field(
                     value,
