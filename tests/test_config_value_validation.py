@@ -93,6 +93,8 @@ construction_fn_variations = [
     lambda x: make_hydrated_dataclass(f_concrete_sig, x),
     # test validation via inheritance
     lambda x: builds(f_concrete_sig, builds_bases=(make_dataclass(x),)),
+    # test validation of meta-fields
+    lambda x: builds(f_concrete_sig, zen_meta=dict(a=x)),
 ]
 
 
