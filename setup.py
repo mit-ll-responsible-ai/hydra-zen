@@ -9,7 +9,7 @@ DISTNAME = "hydra_zen"
 LICENSE = "MIT"
 AUTHOR = "Justin Goodwin, Ryan Soklaski"
 AUTHOR_EMAIL = "ryan.soklaski@ll.mit.edu"
-URL = "https://github.com/mit-ll-responsible-ai/hydra_zen"
+URL = "https://github.com/mit-ll-responsible-ai/hydra-zen"
 CLASSIFIERS = [
     "Development Status :: 4 - Beta",
     "License :: OSI Approved :: MIT License",
@@ -21,7 +21,9 @@ CLASSIFIERS = [
     "Programming Language :: Python :: 3.9",
     "Topic :: Scientific/Engineering",
 ]
-KEYWORDS = "machine learning research configuration scalable reproducible"
+KEYWORDS = (
+    "machine learning research configuration scalable reproducible yaml Hydra dataclass"
+)
 INSTALL_REQUIRES = [
     "hydra-core >= 1.1.0",
     "typing-extensions >= 3.10.0.1",
@@ -31,21 +33,20 @@ TESTS_REQUIRE = [
     "hypothesis >= 6.16.0",
 ]
 
-DESCRIPTION = "Utilities for making hydra scale to ML workflows"
+DESCRIPTION = "Configurable, reproducible, and scalable workflows in Python, via Hydra"
 LONG_DESCRIPTION = """
-hydra-zen helps you configure your project using the power of Hydra, while enjoying the Zen of Python!
+hydra-zen is a Python library that simplifies the process of writing code (research-grade or production-grade) that is:
 
-hydra-zen eliminates the boilerplate code that you write to configure, orchestrate, and organize the results of large-scale projects, such as machine learning experiments. It does so by providing Hydra-compatible tools that dynamically generate "structured configurations" of your code, and enables Python-centric workflows for running configured instances of your code.
+- **Configurable**: you can configure all aspects of your code from a single interface (the command line or a single Python function).
+- **Repeatable**: each run of your code will be self-documenting; the full configuration of your software is saved alongside your results.
+- **Scalable**: launch multiple runs of your software, be it on your local machine or across multiple nodes on a cluster.
 
-hydra-zen offers:
+It builds off – and is fully compatible with – Hydra, a framework for elegantly
+ configuring complex applications.
 
-    - Functions for automatically and dynamically generating structured configs that can be used to fully or partially instantiate objects in your application.
-    - The ability to launch Hydra jobs, complete with parameter sweeps and multi-run configurations, from within a notebook or any other Python environment.
-    - Incisive type annotations that provide enriched context about your project's configurations to IDEs, type checkers, and other tooling.
-    - Runtime validation of configurations to catch mistakes before your application launches.
-    - Equal support for both object-oriented libraries (e.g., torch.nn) and functional ones (e.g., jax and numpy).
-
-These functions and capabilities can be used to great effect alongside PyTorch Lightning to design boilerplate-free machine learning projects!
+hydra-zen helps simplify the process of using Hydra by providing convenient functions
+for creating and validating configs, as well as launching Hydra jobs. It also provides
+novel functionality such as wrapped instantiation and meta fields in configs.
 """
 
 
