@@ -322,6 +322,12 @@ def hydrated_dataclass(
     --------
     builds : Create a targeted structured config designed to "build" a particular object.
 
+    Raises
+    ------
+    hydra_zen.errors.HydraZenUnsupportedPrimitiveError
+        The provided configured value cannot be serialized by Hydra, not does hydra-zen
+        provide specialized support for it. See :ref:`valid-types` for more details.
+
     Notes
     -----
     Unlike `builds`, `hydrated_dataclass` enables config fields to be set explicitly
@@ -562,12 +568,16 @@ def sanitized_default_value(
 
     if field_name:
         field_name = f", for field `{field_name}`,"
-    raise HydraZenUnsupportedPrimitiveError(
+
+    err_msg = (
         error_prefix
-        + f" The configured value {value}{field_name} is not supported by Hydra. Serializing or "
-        f"instantiating this config would ultimately result in an error.\nConsider "
-        f"using `hydra_zen.builds` to create a config for this particular value."
+        + f" The configured value {value}{field_name} is not supported by Hydra -- serializing or instantiating this config would ultimately result in an error."
     )
+
+    if structured_conf_permitted:
+        err_msg += f"\n\nConsider using `hydra_zen.builds({type(value)}, ...)` to create a config for this particular value."
+
+    raise HydraZenUnsupportedPrimitiveError(err_msg)
 
 
 def sanitize_collection(x: _T) -> _T:
@@ -792,6 +802,12 @@ def builds(
     -------
     Config : Type[Builds[Type[T]]]
         A structured config that describes how to build ``hydra_target``
+
+    Raises
+    ------
+    hydra_zen.errors.HydraZenUnsupportedPrimitiveError
+        The provided configured value cannot be serialized by Hydra, not does hydra-zen
+        provide specialized support for it. See :ref:`valid-types` for more details.
 
     Notes
     -----
@@ -1783,7 +1799,7 @@ def make_custom_builds_fn(
     builds_bases : Tuple[DataClass, ...]
         Specifies a new the default value for ``builds(..., builds_bases=<..>)``
 
-    returns
+    Returns
     -------
     custom_builds
         The function `builds`, but with customized default values.
@@ -1990,6 +2006,12 @@ def make_config(
     Config : Type[DataClass]
         The resulting config class; a dataclass that possess the user-specified fields.
 
+    Raises
+    ------
+    hydra_zen.errors.HydraZenUnsupportedPrimitiveError
+        The provided configured value cannot be serialized by Hydra, not does hydra-zen
+        provide specialized support for it. See :ref:`valid-types` for more details.
+
     Notes
     -----
     The resulting "config" is a dataclass-object [4]_ with Hydra-specific attributes
@@ -2027,6 +2049,8 @@ def make_config(
     --------
     >>> from hydra_zen import make_config, to_yaml
     >>> def pp(x): return print(to_yaml(x))  # pretty-print config as yaml
+
+    **Basic Usage**
 
     Let's create a bare-bones config with two fields, named 'a' and 'b'.
 
@@ -2085,6 +2109,19 @@ def make_config(
 
     >>> issubclass(ConfInherit, Conf1) and issubclass(ConfInherit, Conf2)
     True
+
+    **Support for Additional Types**
+
+    Types like :py:class:`complex` and :py:class:`pathlib.Path` are automatically supported by
+    hydra-zen.
+
+    >>> ConfWithComplex = make_config(a=1+2j)
+    >>> pp(ConfWithComplex)
+    a:
+      real: 1.0
+      imag: 2.0
+      _target_: builtins.complex
+
 
     **Using ZenField to Provide Type Information**
 
