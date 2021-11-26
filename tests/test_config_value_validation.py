@@ -94,7 +94,7 @@ construction_fn_variations = [
     # test validation via inheritance
     lambda x: builds(f_concrete_sig, builds_bases=(make_dataclass(x),)),
     # test validation of meta-fields
-    lambda x: builds(f_concrete_sig, zen_meta=dict(a=x)),
+    lambda x: builds(f_concrete_sig, x=1, zen_meta=dict(a=x)),
 ]
 
 
