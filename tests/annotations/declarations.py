@@ -1,9 +1,13 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
+from collections import Counter, deque
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 from typing import Callable, List, Literal, Tuple, Type
+
+from omegaconf import DictConfig, ListConfig
 
 from hydra_zen import (
     ZenField,
@@ -191,20 +195,43 @@ def supported_primitives():
     class M:
         pass
 
-    def f():
+    def f(*args):
         pass
 
     @dataclass
     class ADataclass:
-        pass
+        x: int = 1
+
+    class AnEnum(Enum):
+        a = 1
+        b = 2
+
+    olist = ListConfig([1, 2, 3])
+    odict = DictConfig({"1": 1})
 
     a1: Literal["Type[DataClass]"] = reveal_type(
         make_config(
-            a=(1, "hi", 2.0, 1j, set(), M, ADataclass, builds(dict), Path.cwd()),
+            a=(
+                1,
+                "hi",
+                2.0,
+                1j,
+                set(),
+                M,
+                ADataclass,
+                builds(dict),
+                Path.cwd(),
+                olist,
+                odict,
+                AnEnum.a,
+            ),
             b={M},
             c={1: M},
             d=[2.0 + 1j],
             e=f,
+            f=ADataclass(),
+            g=builds(int)(),  # dataclass instance
+            h=builds(int, zen_partial=True)(),  # dataclass instance
         )
     )
     a2: Literal["Type[DataClass]"] = reveal_type(
@@ -240,5 +267,40 @@ def supported_primitives():
         )
     )
 
-    # make_config(a=M())   # should get marked as bad
-    # builds(dict, a=M())  # should get marked as bad
+    # check lists
+    a5 = make_config(a=[], b=[1], c=[[1]], d=[[[M]]])
+
+    # check dicts
+    a6 = make_config(
+        a={}, b={1: 1}, c=[{1: 1}], d={1: {"a": "a"}}, e={"a": 1j}, f={"a": [1j]}
+    )
+
+    a7 = builds(
+        f,
+        1,
+        "hi",
+        2.0,
+        1j,
+        M,
+        ADataclass,
+        builds(dict),
+        Path.cwd(),
+        set(),
+        frozenset(),
+        {1, 1j, Path.cwd()},
+        deque(),
+        Counter(),
+        [deque(), Counter(), 1j],
+        (deque(), Counter(), 1j),
+        range(1, 10, 2),
+        odict,
+        olist,
+    )
+
+    # The following should be marked as "bad by type-checkers
+    # make_config(a=M())
+    # builds(dict, a=M())
+    # make_config(a={1j: 1})
+    # make_config(a={M: 1})
+    # make_config(a={ADataclass: 1})
+    # make_config(a={ADataclass(): 1})

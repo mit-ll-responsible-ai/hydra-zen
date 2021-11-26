@@ -1,16 +1,21 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
+from __future__ import annotations
+
 from dataclasses import Field
 from enum import Enum
 from pathlib import Path
 from typing import (
     Any,
     Callable,
+    Counter,
+    Deque,
     Dict,
+    FrozenSet,
     Generic,
+    List,
     NewType,
-    Sequence,
     Set,
     Tuple,
     Type,
@@ -18,6 +23,7 @@ from typing import (
     Union,
 )
 
+from omegaconf import DictConfig, ListConfig
 from typing_extensions import Protocol, runtime_checkable
 
 __all__ = [
@@ -97,26 +103,34 @@ class HasPartialTarget(Protocol):  # pragma: no cover
     _zen_partial: bool = True
 
 
-__SupportedPrimitives = Union[
+_HydraPrimitive = Union[
     bool,
     None,
     int,
     float,
     str,
+]
+
+_SupportedPrimitive = Union[
+    _HydraPrimitive,
+    ListConfig,
+    DictConfig,
     type,
     Callable,
     Enum,
-    DataClass,
-    Type[DataClass],
+    _DataClass,
     complex,
     Path,
+    range,
 ]
 
-_SupportedPrimitives = Union[
-    __SupportedPrimitives,
-    Dict[__SupportedPrimitives, __SupportedPrimitives],
-    Set[__SupportedPrimitives],
+SupportedPrimitive = Union[
+    _SupportedPrimitive,
+    Dict[_HydraPrimitive, "SupportedPrimitive"],
+    Counter[_HydraPrimitive],
+    Set["SupportedPrimitive"],
+    FrozenSet["SupportedPrimitive"],
+    Deque["SupportedPrimitive"],
+    List["SupportedPrimitive"],
+    Tuple["SupportedPrimitive", ...],
 ]
-
-
-SupportedPrimitive = Union[_SupportedPrimitives, Sequence[_SupportedPrimitives]]
