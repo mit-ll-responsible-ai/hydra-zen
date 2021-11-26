@@ -1,8 +1,6 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
-from __future__ import annotations
-
 from dataclasses import Field
 from enum import Enum
 from pathlib import Path
