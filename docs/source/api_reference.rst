@@ -96,6 +96,55 @@ The following utilities can be used to work with YAML-serialized configs.
    load_from_yaml
 
 
+.. _valid-types:
+
+**********************************************************
+Configuration-Value Types Supported by Hydra and hydra-zen
+**********************************************************
+
+The types of values that can be specified in configs are limited by their ability to be 
+serialized to a YAML format. hydra-zen provides automatic support for an additional set 
+of common types via its :ref:`config-creation functions <create-config>`.
+
+Types Supported Natively by Hydra
+*********************************
+
+Values of the following types can be specified directly in configs:
+
+- ``NoneType``
+- :py:class:`bool`
+- :py:class:`int`
+- :py:class:`float`
+- :py:class:`str`
+- :py:class:`list`
+- :py:class:`dict`
+- :py:class:`enum.Enum`
+
+
+Types Supported via hydra-zen
+*****************************
+
+.. warning:: 
+   
+   This section refers to capabilities that are not yet available in a stable release 
+   of hydra-zen. They will be included in the release of `v0.4.0`.
+
+hydra-zen will automatically create targeted configs to represent values of the 
+following types:
+
+- :py:class:`bytes`
+- :py:class:`bytearray`
+- :py:class:`complex`
+- :py:class:`collections.Counter`
+- :py:class:`collections.deque`
+- :py:class:`pathlib.Path`
+- :py:class:`pathlib.PosixPath`
+- :py:class:`pathlib.WindowsPath`
+- :py:class:`range`
+- :py:class:`set`
+- :py:class:`frozenset`
+
+
 *********************
 Third-Party Utilities
 *********************

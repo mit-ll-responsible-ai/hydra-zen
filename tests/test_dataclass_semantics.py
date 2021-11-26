@@ -118,7 +118,6 @@ def test_frozen_via_hydrated_dataclass():
     | st.dictionaries(st.integers(), st.integers(), min_size=1).map(
         lambda x: {0: 0, **x}
     )
-    | st.sets(st.integers(), min_size=1)
 )
 def test_mutable_defaults_generated_from_factory(mutable):
     Conf = builds(dict, x=mutable)

@@ -2,8 +2,113 @@
 Changelog
 =========
 
-This is a record of all past hydra-zen releases and what went into them, in reverse chronological order.
-All previous releases should still be available on pip.
+This is a record of all past hydra-zen releases and what went into them, in reverse 
+chronological order. All previous releases should still be available on pip.
+
+.. _v0.4.0dev:
+
+---------------------
+0.4.0dev - 2021-11-26
+---------------------
+
+.. warning:: 
+   
+   This section refers to capabilities that are not yet available in a stable release 
+   of hydra-zen. They will be included in the release of `v0.4.0`.
+
+This release makes improvements to the validation performed by hydra-zen's 
+:ref:`config-creation functions <create-config>`. It also adds specialized support for 
+types that are not natively supported by Hydra.
+
+
+New Features
+------------
+
+Strict (Runtime and Static) Validation of Configuration-Value Types
+===================================================================
+
+See :pull:`163` for a detailed description of these features and their implementation 
+details.
+
+hydra-zen's :ref:`config-creation functions <create-config>` (e.g. 
+:func:`~hydra_zen.make_config` and :func:`~hydra_zen.builds`) now provide both strict 
+runtime and static validation of the configured values that they are fed.
+That is, creating a config that contains values of unsupported types will cause 
+hydra-zen to raise an error. hydra-zen's internal type annotations have also be refined 
+so that static type-checkers will "flag" such invalid configs as well.
+
+Consider the following example:
+
+.. code-block:: pycon
+   :caption: Demonstrating hydra-zen's runtime validation of configured values.
+
+   >>> from hydra_zen import make_config
+
+   >>> class SomeClass:
+   ...     pass
+
+   >>> unsupported_value = SomeClass()
+   >>> make_config(a=unsupported_value)  # static type-checkers will mark this as invalid
+   HydraZenUnsupportedPrimitiveError: ...
+
+
+Previously, no such error would be raised by hydra-zen; instead, the config would 
+eventually cause an error when it would be used to actually configure a Hydra job.
+Now, invalid configs will be caught upon construction.
+
+Consult :ref:`valid-types` for a complete list of the supported types of configuration 
+values.
+
+Specialized Support for Additional Configuration-Value Types
+============================================================
+
+See :pull:`163` for a detailed description of these features and their implementation 
+details.
+
+hydra-zen's :ref:`config-creation functions <create-config>` (e.g. 
+:func:`~hydra_zen.make_config` and :func:`~hydra_zen.builds`) now provide automatic 
+support for common configuration-value types, like :py:class:`complex` and 
+:py:class:`pathlib.Path`, which are not natively supported by Hydra; values of these
+types will automatically be transformed into structured configs.
+
+For example, consider the following config that contains values whose types are not 
+natively supported by Hydra.
+
+.. code-block:: python
+   :caption: Leveraging hydra-zen's built-in support for additional types.
+
+   from hydra_zen import make_config, instantiate, to_yaml
+
+   from pathlib import Path
+
+   Conf = make_config(value=1+2j, home=Path.home())
+
+hydra-zen automatically creates nested structured configs to represent these values; 
+note that these configs do not carry any direct dependencies on hydra-zen.
+
+.. code-block:: pycon
+
+   >>> print(to_yaml(Conf))
+   value:
+     real: 1.0
+     imag: 2.0
+     _target_: builtins.complex
+   home:
+     _args_:
+     - C:\Users\Ryan Soklaski
+     _target_: pathlib.Path
+
+ 
+Instantiating ``Conf`` will produce the expected values:
+
+.. code-block:: pycon
+
+   >>> instantiate(Conf)
+   {'value': (1+2j), 'home': WindowsPath('C:/Users/Ryan Soklaski')}
+
+
+Consult :ref:`valid-types` for a complete list of the additional types that hydra-zen 
+supports in this fashion.
 
 .. _v0.3.1:
 
@@ -11,7 +116,7 @@ All previous releases should still be available on pip.
 0.3.1 - 2021-11-13
 ------------------
 
-The release fixes a bug that was reported in :issue:`161`. Prior to this patch,
+This release fixes a bug that was reported in :issue:`161`. Prior to this patch,
 there was a bug in :func:`~hydra_zen.builds` where specifying ``populate_full_sig=True``
 for a target that did not have ``**kwargs`` caused all user-specified zen-meta fields
 to be excluded from the resulting config.

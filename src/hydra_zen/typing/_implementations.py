@@ -2,8 +2,25 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import Field
-from typing import Any, Callable, Dict, Generic, NewType, Tuple, TypeVar
+from enum import Enum
+from pathlib import Path
+from typing import (
+    Any,
+    Callable,
+    Counter,
+    Deque,
+    Dict,
+    FrozenSet,
+    Generic,
+    List,
+    NewType,
+    Set,
+    Tuple,
+    TypeVar,
+    Union,
+)
 
+from omegaconf import DictConfig, ListConfig
 from typing_extensions import Protocol, runtime_checkable
 
 __all__ = [
@@ -12,6 +29,7 @@ __all__ = [
     "PartialBuilds",
     "Partial",
     "Importable",
+    "SupportedPrimitive",
 ]
 
 
@@ -80,3 +98,36 @@ class HasTarget(Protocol):  # pragma: no cover
 @runtime_checkable
 class HasPartialTarget(Protocol):  # pragma: no cover
     _zen_partial: bool = True
+
+
+_HydraPrimitive = Union[
+    bool,
+    None,
+    int,
+    float,
+    str,
+]
+
+_SupportedPrimitive = Union[
+    _HydraPrimitive,
+    ListConfig,
+    DictConfig,
+    type,
+    Callable,
+    Enum,
+    _DataClass,
+    complex,
+    Path,
+    range,
+]
+
+SupportedPrimitive = Union[
+    _SupportedPrimitive,
+    Dict[_HydraPrimitive, "SupportedPrimitive"],
+    Counter[_HydraPrimitive],
+    Set["SupportedPrimitive"],
+    FrozenSet["SupportedPrimitive"],
+    Deque["SupportedPrimitive"],
+    List["SupportedPrimitive"],
+    Tuple["SupportedPrimitive", ...],
+]

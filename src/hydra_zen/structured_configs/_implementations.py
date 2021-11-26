@@ -2,8 +2,17 @@
 # SPDX-License-Identifier: MIT
 import inspect
 import warnings
-from collections import Counter, defaultdict
-from dataclasses import Field, dataclass, field, fields, is_dataclass, make_dataclass
+from collections import Counter, defaultdict, deque
+from dataclasses import (
+    MISSING,
+    Field,
+    dataclass,
+    field,
+    fields,
+    is_dataclass,
+    make_dataclass,
+)
+from enum import Enum
 from functools import wraps
 from itertools import chain
 from typing import (
@@ -26,13 +35,19 @@ from typing import (
     overload,
 )
 
+from omegaconf import DictConfig, ListConfig
 from typing_extensions import Final, Literal, TypeGuard
 
-from hydra_zen.errors import HydraZenDeprecationWarning
+from hydra_zen.errors import (
+    HydraZenDeprecationWarning,
+    HydraZenUnsupportedPrimitiveError,
+)
 from hydra_zen.funcs import get_obj, partial, zen_processing
 from hydra_zen.structured_configs import _utils
-from hydra_zen.typing import Builds, Importable, Just, PartialBuilds
+from hydra_zen.typing import Builds, Importable, Just, PartialBuilds, SupportedPrimitive
 from hydra_zen.typing._implementations import DataClass, HasPartialTarget, HasTarget
+
+from ._value_conversion import ZEN_SUPPORTED_PRIMITIVES, ZEN_VALUE_CONVERSION
 
 try:
     # used to check if default values are ufuncs
@@ -86,7 +101,28 @@ _VAR_POSITIONAL: Final = inspect.Parameter.VAR_POSITIONAL
 _KEYWORD_ONLY: Final = inspect.Parameter.KEYWORD_ONLY
 _VAR_KEYWORD: Final = inspect.Parameter.VAR_KEYWORD
 
+NoneType = type(None)
+HYDRA_SUPPORTED_PRIMITIVES = {int, float, bool, str, list, tuple, dict, NoneType}
+
 _builtin_function_or_method_type = type(len)
+
+
+def _cast_via_tuple(dest_type: Type[_T]) -> Callable[[_T], Type[Builds[Type[_T]]]]:
+    def converter(value):
+        return builds(dest_type, tuple(value))
+
+    return converter
+
+
+ZEN_VALUE_CONVERSION[set] = _cast_via_tuple(set)
+ZEN_VALUE_CONVERSION[frozenset] = _cast_via_tuple(frozenset)
+ZEN_VALUE_CONVERSION[deque] = _cast_via_tuple(deque)
+ZEN_VALUE_CONVERSION[bytes] = _cast_via_tuple(bytes)
+ZEN_VALUE_CONVERSION[bytearray] = _cast_via_tuple(bytearray)
+ZEN_VALUE_CONVERSION[range] = lambda value: builds(
+    range, value.start, value.stop, value.step
+)
+ZEN_VALUE_CONVERSION[Counter] = lambda counter: builds(Counter, dict(counter))
 
 
 def _get_target(x):
@@ -175,6 +211,7 @@ def mutable_value(x: _T) -> _T:
     >>> HasMutableDefault()
     HasMutableDefault(a_list=[1, 2, 3])"""
     cast = type(x)  # ensure that we return a copy of the default value
+    x = sanitize_collection(x)
     return field(default_factory=lambda: cast(x))
 
 
@@ -201,7 +238,7 @@ def __dataclass_transform__(
 @__dataclass_transform__()
 def hydrated_dataclass(
     target: Callable,
-    *pos_args: Any,
+    *pos_args: SupportedPrimitive,
     zen_partial: bool = False,
     zen_wrappers: ZenWrappers = tuple(),
     zen_meta: Optional[Mapping[str, Any]] = None,
@@ -284,6 +321,12 @@ def hydrated_dataclass(
     See Also
     --------
     builds : Create a targeted structured config designed to "build" a particular object.
+
+    Raises
+    ------
+    hydra_zen.errors.HydraZenUnsupportedPrimitiveError
+        The provided configured value cannot be serialized by Hydra, not does hydra-zen
+        provide specialized support for it. See :ref:`valid-types` for more details.
 
     Notes
     -----
@@ -470,29 +513,119 @@ def just(obj: Importable) -> Type[Just[Importable]]:
     return cast(Type[Just[Importable]], out_class)
 
 
-def create_just_if_needed(value: _T) -> Union[_T, Type[Just]]:
-    # Hydra can serialize dataclasses directly, thus we
-    # don't want to wrap these in `just`
+_KEY_ERROR_PREFIX = "Configuring dictionary key:"
 
-    if callable(value) and (
-        inspect.isfunction(value)
-        or (inspect.isclass(value) and not is_dataclass(value))
-        or isinstance(value, _builtin_function_or_method_type)
-        or (ufunc is not None and isinstance(value, ufunc))
+
+def sanitized_default_value(
+    value: Any,
+    allow_zen_conversion: bool = True,
+    *,
+    error_prefix: str = "",
+    field_name: str = "",
+    structured_conf_permitted: bool = True,
+) -> Any:
+    value = sanitize_collection(value)
+
+    if (
+        structured_conf_permitted
+        and callable(value)
+        and (
+            inspect.isfunction(value)
+            or (not is_dataclass(value) and inspect.isclass(value))
+            or isinstance(value, _builtin_function_or_method_type)
+            or (ufunc is not None and isinstance(value, ufunc))
+        )
     ):
         return just(value)
+    resolved_value = value
+    type_of_value = type(resolved_value)
 
-    return value
+    # we don't use isinstance because we don't permit subclasses of supported
+    # primitives
+    if allow_zen_conversion and type_of_value in ZEN_SUPPORTED_PRIMITIVES:
+        type_ = type(resolved_value)
+        conversion_fn = ZEN_VALUE_CONVERSION.get(type_)
+
+        if conversion_fn is not None:
+            resolved_value = conversion_fn(resolved_value)
+            type_of_value = type(resolved_value)
+
+    if structured_conf_permitted and isinstance(resolved_value, Enum):
+        # Leverages programmatic access to enum member via value.
+        # E.g.
+        # >>> Color(1)
+        # <Color.RED: 1>
+        return builds(type(resolved_value), resolved_value.value)
+
+    if type_of_value in HYDRA_SUPPORTED_PRIMITIVES or (
+        structured_conf_permitted
+        and (
+            is_dataclass(resolved_value)
+            or isinstance(resolved_value, (ListConfig, DictConfig))
+        )
+    ):
+        return resolved_value
+
+    if field_name:
+        field_name = f", for field `{field_name}`,"
+
+    err_msg = (
+        error_prefix
+        + f" The configured value {value}{field_name} is not supported by Hydra -- "
+        f"serializing or instantiating this config would ultimately result in an error."
+    )
+
+    if structured_conf_permitted:
+        err_msg += f"\n\nConsider using `hydra_zen.builds({type(value)}, ...)` to "
+        "create a config for this particular value."
+
+    raise HydraZenUnsupportedPrimitiveError(err_msg)
 
 
-def sanitized_default_value(value: Any) -> Field:
-    if isinstance(value, _utils.KNOWN_MUTABLE_TYPES):
+def sanitize_collection(x: _T) -> _T:
+    """Pass contents of lists, tuples, or dicts through sanitized_default_values"""
+    type_x = type(x)
+    if type_x in {list, tuple}:
+        return type_x(sanitized_default_value(_x) for _x in x)  # type: ignore
+    elif type_x is dict:
+        return {
+            # Hydra doesn't permit structured configs for keys, thus we only
+            # support its basic primitives here.
+            sanitized_default_value(
+                k,
+                allow_zen_conversion=False,
+                structured_conf_permitted=False,
+                error_prefix=_KEY_ERROR_PREFIX,
+            ): sanitized_default_value(v)
+            for k, v in x.items()  # type: ignore
+        }
+    else:
+        # pass-through
+        return x
+
+
+def sanitized_field(
+    value: Any,
+    init=True,
+    allow_zen_conversion: bool = True,
+    *,
+    error_prefix: str = "",
+    field_name: str = "",
+) -> Field:
+    type_value = type(value)
+    if (
+        type_value in _utils.KNOWN_MUTABLE_TYPES
+        and type_value in HYDRA_SUPPORTED_PRIMITIVES
+    ):
         return cast(Field, mutable_value(value))
-    resolved_value = create_just_if_needed(value)
-    return (
-        _utils.field(default=value)
-        if value is resolved_value
-        else _utils.field(default=resolved_value)
+    return _utils.field(
+        default=sanitized_default_value(
+            value,
+            allow_zen_conversion=allow_zen_conversion,
+            error_prefix=error_prefix,
+            field_name=field_name,
+        ),
+        init=init,
     )
 
 
@@ -500,17 +633,17 @@ def sanitized_default_value(value: Any) -> Field:
 @overload
 def builds(
     hydra_target: Importable,
-    *pos_args: Any,
+    *pos_args: SupportedPrimitive,
     zen_partial: Literal[False] = False,
     zen_wrappers: ZenWrappers = tuple(),
-    zen_meta: Optional[Mapping[str, Any]] = None,
+    zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
-    **kwargs_for_target,
+    **kwargs_for_target: SupportedPrimitive,
 ) -> Type[Builds[Importable]]:  # pragma: no cover
     ...
 
@@ -519,17 +652,17 @@ def builds(
 @overload
 def builds(
     hydra_target: Importable,
-    *pos_args: Any,
+    *pos_args: SupportedPrimitive,
     zen_partial: Literal[True],
     zen_wrappers: ZenWrappers = tuple(),
-    zen_meta: Optional[Mapping[str, Any]] = None,
+    zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
-    **kwargs_for_target,
+    **kwargs_for_target: SupportedPrimitive,
 ) -> Type[PartialBuilds[Importable]]:  # pragma: no cover
     ...
 
@@ -538,17 +671,17 @@ def builds(
 @overload
 def builds(
     hydra_target: Importable,
-    *pos_args: Any,
+    *pos_args: SupportedPrimitive,
     zen_partial: bool,
     zen_wrappers: ZenWrappers = tuple(),
-    zen_meta: Optional[Mapping[str, Any]] = None,
+    zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Any, ...] = (),
     frozen: bool = False,
-    **kwargs_for_target,
+    **kwargs_for_target: SupportedPrimitive,
 ) -> Union[
     Type[Builds[Importable]], Type[PartialBuilds[Importable]]
 ]:  # pragma: no cover
@@ -561,14 +694,14 @@ def builds(
     *pos_args: Any,
     zen_partial: bool = False,
     zen_wrappers: ZenWrappers = tuple(),
-    zen_meta: Optional[Mapping[str, Any]] = None,
+    zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     frozen: bool = False,
     builds_bases: Tuple[Any, ...] = (),
     dataclass_name: Optional[str] = None,
-    **kwargs_for_target,
+    **kwargs_for_target: SupportedPrimitive,
 ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]:
     """builds(hydra_target, /, *pos_args, zen_partial=False, zen_meta=None,
     hydra_recursive=None, populate_full_signature=False, hydra_convert=None,
@@ -671,6 +804,12 @@ def builds(
     -------
     Config : Type[Builds[Type[T]]]
         A structured config that describes how to build ``hydra_target``
+
+    Raises
+    ------
+    hydra_zen.errors.HydraZenUnsupportedPrimitiveError
+        The provided configured value cannot be serialized by Hydra, not does hydra-zen
+        provide specialized support for it. See :ref:`valid-types` for more details.
 
     Notes
     -----
@@ -890,11 +1029,13 @@ def builds(
 
     target, *_pos_args = pos_args
 
+    BUILDS_ERROR_PREFIX = _utils.building_error_prefix(target)
+
     del pos_args
 
     if not callable(target):
         raise TypeError(
-            _utils.building_error_prefix(target)
+            BUILDS_ERROR_PREFIX
             + "In `builds(<target>, ...), `<target>` must be callable/instantiable"
         )
 
@@ -1005,7 +1146,7 @@ def builds(
                 " You can manually create a dataclass to utilize this name in a structured config."
             )
 
-    target_field: List[Union[Tuple[str, Type[Any]], Tuple[str, Type[Any], Field[Any]]]]
+    target_field: List[Union[Tuple[str, Type[Any]], Tuple[str, Type[Any], Any]]]
 
     if zen_partial or zen_meta or validated_wrappers:
         target_field = [
@@ -1099,7 +1240,10 @@ def builds(
                 _POS_ARG_FIELD_NAME,
                 Tuple[Any, ...],
                 _utils.field(
-                    default=tuple(create_just_if_needed(x) for x in _pos_args),
+                    default=tuple(
+                        sanitized_default_value(x, error_prefix=BUILDS_ERROR_PREFIX)
+                        for x in _pos_args
+                    ),
                     init=False,
                 ),
             )
@@ -1111,7 +1255,7 @@ def builds(
     except ValueError:
         if populate_full_signature:
             raise ValueError(
-                _utils.building_error_prefix(target)
+                BUILDS_ERROR_PREFIX
                 + f"{target} does not have an inspectable signature. "
                 f"`builds({_utils.safe_name(target)}, populate_full_signature=True)` is not supported"
             )
@@ -1156,6 +1300,12 @@ def builds(
         # pos_args is potentially inherited
         for _base in builds_bases:
             _pos_args = getattr(_base, _POS_ARG_FIELD_NAME, ())
+
+            # validates
+            _pos_args = tuple(
+                sanitized_default_value(x, allow_zen_conversion=False)
+                for x in _pos_args
+            )
             if _pos_args:
                 break
 
@@ -1182,7 +1332,7 @@ def builds(
             if not set(kwargs_for_target) <= nameable_params_in_sig:
                 _unexpected = set(kwargs_for_target) - nameable_params_in_sig
                 raise TypeError(
-                    _utils.building_error_prefix(target)
+                    BUILDS_ERROR_PREFIX
                     + f"The following unexpected keyword argument(s) was specified for {_utils.get_obj_path(target)} "
                     f"via `builds`: {', '.join(_unexpected)}"
                 )
@@ -1193,7 +1343,7 @@ def builds(
                 # AND it is not excluded via `zen_meta`
                 _unexpected = fields_set_by_bases - nameable_params_in_sig
                 raise TypeError(
-                    _utils.building_error_prefix(target)
+                    BUILDS_ERROR_PREFIX
                     + f"The following unexpected keyword argument(s) for {_utils.get_obj_path(target)} "
                     f"was specified via inheritance from a base class: "
                     f"{', '.join(_unexpected)}"
@@ -1216,7 +1366,7 @@ def builds(
                 ]:
                     if param.name in named_args:
                         raise TypeError(
-                            _utils.building_error_prefix(target)
+                            BUILDS_ERROR_PREFIX
                             + f"Multiple values for argument {param.name} were specified for "
                             f"{_utils.get_obj_path(target)} via `builds`"
                         )
@@ -1242,7 +1392,7 @@ def builds(
                     else f"{_num_positional - _num_with_default} to {_num_positional}"
                 )
                 raise TypeError(
-                    _utils.building_error_prefix(target)
+                    BUILDS_ERROR_PREFIX
                     + f"{_utils.get_obj_path(target)} takes {_permissible} positional args, but "
                     f"{len(_pos_args)} were specified via `builds`"
                 )
@@ -1254,7 +1404,7 @@ def builds(
     #    and is resolved to one of the type-annotations supported by hydra if possible,
     #    otherwise, is Any
     #  - arg-value: mutable values are automatically specified using default-factory
-    user_specified_named_params: Dict[str, Tuple[str, type, Field]] = {
+    user_specified_named_params: Dict[str, Tuple[str, type, Any]] = {
         name: (
             name,
             _utils.sanitized_type(type_hints.get(name, Any))
@@ -1267,7 +1417,7 @@ def builds(
             # Thus we will auto-broaden the annotation when we see that the user
             # has specified a `Builds` as a default value.
             if not is_builds(value) or hydra_recursive is False else Any,
-            sanitized_default_value(value),
+            value,
         )
         for name, value in kwargs_for_target.items()
     }
@@ -1328,7 +1478,7 @@ def builds(
                         # because we assume that they want to fill these in by using partial
                         base_fields.append(param_field)
                 else:
-                    param_field += (sanitized_default_value(param.default),)
+                    param_field += (param.default,)
                     _fields_with_default_values.append(param_field)
 
         base_fields.extend(_fields_with_default_values)
@@ -1364,10 +1514,7 @@ def builds(
         # We don't check for collisions between `zen_meta` names and the
         # names of inherited fields. Thus `zen_meta` can effectively be used
         # to "delete" names from a config, via inheritance.
-        base_fields.extend(
-            (name, Any, sanitized_default_value(value))
-            for name, value in zen_meta.items()
-        )
+        base_fields.extend((name, Any, value) for name, value in zen_meta.items())
 
     if dataclass_name is None:
         if zen_partial is False:
@@ -1375,8 +1522,42 @@ def builds(
         else:
             dataclass_name = f"PartialBuilds_{_utils.safe_name(target)}"
 
+    # validate that fields set via bases are OK; cannot perform zen-casting
+    # on fields
+    for base in builds_bases:
+        for field_ in fields(base):
+            if field_.default is not MISSING:
+                # performs validation
+                sanitized_default_value(
+                    field_.default,
+                    allow_zen_conversion=False,
+                    error_prefix=BUILDS_ERROR_PREFIX,
+                    field_name=field_.name + " (set via inheritance)",
+                )
+            del field_
+
+    sanitized_base_fields: List[Union[Tuple[str, Any], Tuple[str, Any, Field]]] = []
+
+    for item in base_fields:
+        if len(item) == 2:
+            # (name, type)   (no configured value)
+            sanitized_base_fields.append(item)
+        else:
+            assert len(item) == 3, item
+            value = item[-1]
+
+            if not isinstance(value, Field):
+                value = sanitized_field(
+                    value,
+                    error_prefix=BUILDS_ERROR_PREFIX,
+                    field_name=item[0],
+                )
+
+            sanitized_base_fields.append((item[0], item[1], value))
+            del value
+
     out = make_dataclass(
-        dataclass_name, fields=base_fields, bases=builds_bases, frozen=frozen
+        dataclass_name, fields=sanitized_base_fields, bases=builds_bases, frozen=frozen
     )
 
     if zen_partial is False and hasattr(out, _PARTIAL_TARGET_FIELD_NAME):
@@ -1384,7 +1565,7 @@ def builds(
         # hydra-instantiation occurs, since it will be passed to target.
         # There is not an easy way to delete this, since it comes from a parent class
         raise TypeError(
-            _utils.building_error_prefix(target)
+            BUILDS_ERROR_PREFIX
             + "`builds(..., zen_partial=False, builds_bases=(...))` does not "
             "permit `builds_bases` where a partial target has been specified."
         )
@@ -1620,7 +1801,7 @@ def make_custom_builds_fn(
     builds_bases : Tuple[DataClass, ...]
         Specifies a new the default value for ``builds(..., builds_bases=<..>)``
 
-    returns
+    Returns
     -------
     custom_builds
         The function `builds`, but with customized default values.
@@ -1749,7 +1930,7 @@ class ZenField:
     """
 
     hint: type = Any
-    default: Any = NOTHING
+    default: Union[SupportedPrimitive, Field, Type[NOTHING]] = NOTHING
     name: Union[str, Type[NOTHING]] = NOTHING
 
     def __post_init__(self):
@@ -1760,7 +1941,7 @@ class ZenField:
         self.hint = _utils.sanitized_type(self.hint)
 
         if self.default is not NOTHING:
-            self.default = sanitized_default_value(self.default)
+            self.default = sanitized_field(self.default)
 
 
 def make_config(
@@ -1770,7 +1951,7 @@ def make_config(
     config_name: str = "Config",
     frozen: bool = False,
     bases: Tuple[Type[DataClass], ...] = (),
-    **fields_as_kwargs,
+    **fields_as_kwargs: Union[SupportedPrimitive, ZenField],
 ) -> Type[DataClass]:
     """
     Creates a config with user-defined field names and, optionally,
@@ -1827,6 +2008,12 @@ def make_config(
     Config : Type[DataClass]
         The resulting config class; a dataclass that possess the user-specified fields.
 
+    Raises
+    ------
+    hydra_zen.errors.HydraZenUnsupportedPrimitiveError
+        The provided configured value cannot be serialized by Hydra, not does hydra-zen
+        provide specialized support for it. See :ref:`valid-types` for more details.
+
     Notes
     -----
     The resulting "config" is a dataclass-object [4]_ with Hydra-specific attributes
@@ -1864,6 +2051,8 @@ def make_config(
     --------
     >>> from hydra_zen import make_config, to_yaml
     >>> def pp(x): return print(to_yaml(x))  # pretty-print config as yaml
+
+    **Basic Usage**
 
     Let's create a bare-bones config with two fields, named 'a' and 'b'.
 
@@ -1922,6 +2111,19 @@ def make_config(
 
     >>> issubclass(ConfInherit, Conf1) and issubclass(ConfInherit, Conf2)
     True
+
+    **Support for Additional Types**
+
+    Types like :py:class:`complex` and :py:class:`pathlib.Path` are automatically supported by
+    hydra-zen.
+
+    >>> ConfWithComplex = make_config(a=1+2j)
+    >>> pp(ConfWithComplex)
+    a:
+      real: 1.0
+      imag: 2.0
+      _target_: builtins.complex
+
 
     **Using ZenField to Provide Type Information**
 
@@ -2029,7 +2231,7 @@ def make_config(
                     f.hint
                     # f.default: Field
                     # f.default.default: Any
-                    if not is_builds(f.default.default) or hydra_recursive is False
+                    if not is_builds(f.default.default) or hydra_recursive is False  # type: ignore
                     else Any
                 ),
                 f.default,
