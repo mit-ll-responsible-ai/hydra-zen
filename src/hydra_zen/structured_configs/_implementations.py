@@ -571,11 +571,13 @@ def sanitized_default_value(
 
     err_msg = (
         error_prefix
-        + f" The configured value {value}{field_name} is not supported by Hydra -- serializing or instantiating this config would ultimately result in an error."
+        + f" The configured value {value}{field_name} is not supported by Hydra -- "
+        f"serializing or instantiating this config would ultimately result in an error."
     )
 
     if structured_conf_permitted:
-        err_msg += f"\n\nConsider using `hydra_zen.builds({type(value)}, ...)` to create a config for this particular value."
+        err_msg += f"\n\nConsider using `hydra_zen.builds({type(value)}, ...)` to "
+        "create a config for this particular value."
 
     raise HydraZenUnsupportedPrimitiveError(err_msg)
 
