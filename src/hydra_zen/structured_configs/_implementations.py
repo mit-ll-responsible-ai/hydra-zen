@@ -718,7 +718,7 @@ def builds(
     Parameters
     ----------
     hydra_target : T (Callable)
-        The target-object to be configured. This is a required, **positional-only**
+        The target object to be configured. This is a required, **positional-only**
         argument.
 
     *pos_args : SupportedPrimitive
@@ -760,8 +760,8 @@ def builds(
 
     zen_meta : Optional[Mapping[str, SupportedPrimitive]]
         Specifies field-names and corresponding values that will be included in the
-        resulting config, but that will *not* be used to builds ``<hydra_target>``
-        via instantiation. These are called "meta" fields.
+        resulting config, but that will *not* be used to instantiate
+        ``<hydra_target>``. These are called "meta" fields.
 
     populate_full_signature : bool, optional (default=False)
         If ``True``, then the resulting config's signature and fields will be populated
@@ -804,8 +804,8 @@ def builds(
 
     Returns
     -------
-    Config : Type[Builds[Type[T]]]
-        A structured config that describes how to build ``hydra_target``
+    Config : Type[Builds[Type[T]]] | Type[PartialBuilds[Type[T]]]
+        A structured config that describes how to build ``hydra_target``.
 
     Raises
     ------
@@ -1405,7 +1405,7 @@ def builds(
     #
     # user_specified_params: arg-name -> (arg-name, arg-type, field-w-value)
     #  - arg-type: taken from the parameter's annotation in the target's signature
-    #    and is resolved to one of the type-annotations supported by hydra if possible,
+    #    and is resolved to one of the type annotations supported by hydra if possible,
     #    otherwise, is Any
     #  - arg-value: mutable values are automatically specified using default-factory
     user_specified_named_params: Dict[str, Tuple[str, type, Any]] = {
@@ -1959,7 +1959,7 @@ def make_config(
 ) -> Type[DataClass]:
     """
     Creates a config with user-defined field names and, optionally,
-    associated default values and/or type-annotations.
+    associated default values and/or type annotations.
 
     Unlike `builds`, `make_config` is not used to configure a particular target
     object; rather, it can be used to create more general configs [1]_.
@@ -1967,14 +1967,14 @@ def make_config(
     Parameters
     ----------
     *fields_as_args : str | ZenField
-        The names of the fields to be be included in the config. Or,
-        the fields' names and their default values and/or their type
-        annotations, expressed via `ZenField` instances.
+        The names of the fields to be be included in the config. Or, `ZenField`
+        instances, each of which details the name and their default value and/or the
+        type annotation of a given field.
 
     **fields_as_kwargs : SupportedPrimitive | ZenField
-        Like ``fields_as_args``, but fieldname/default value pairs are
+        Like ``fields_as_args``, but field-name/default-value pairs are
         specified as keyword arguments. `ZenField` can also be used here
-        to express a fields type-annotation and/or its default value.
+        to express a field's type-annotation and/or its default value.
 
         Named parameters of the forms ``hydra_xx``, ``zen_xx``, and ``_zen_xx`` are reserved to ensure future-compatibility, and cannot be specified by the user.
 
@@ -1988,10 +1988,8 @@ def make_config(
         Determines how Hydra handles the non-primitive objects passed to configuration [3]_.
 
         - ``"none"``: Passed objects are DictConfig and ListConfig, default
-        - ``"partial"``: Passed objects are converted to dict and list, with
-            the exception of Structured Configs (and their fields).
-        - ``"all"``: Passed objects are dicts, lists and primitives without
-            a trace of OmegaConf containers
+        - ``"partial"``: Passed objects are converted to dict and list, with the exception of Structured Configs (and their fields).
+        - ``"all"``: Passed objects are dicts, lists and primitives without a trace of OmegaConf containers
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting config.
 
@@ -2034,7 +2032,7 @@ def make_config(
     - Mutable default values will automatically be packaged in a default factory function [6]_
     - A default value that is a class-object or function-object will automatically be wrapped by `just`, to ensure that the resulting config is serializable by Hydra.
 
-    For finer-grain control over how type-annotations and default values are managed,
+    For finer-grain control over how type annotations and default values are managed,
     consider using :func:`dataclasses.make_dataclass`.
 
     For details of the annotation `SupportedPrimitive`, see :ref:`valid-types`.
@@ -2042,7 +2040,7 @@ def make_config(
     See Also
     --------
     builds : Create a targeted structured config designed to "build" a particular object.
-    just : Create a config that 'just' returns a class-object or function, without instantiating/calling it.
+    just : Create a config that "just" returns a class-object or function, without instantiating/calling it.
 
     References
     ----------
@@ -2146,7 +2144,7 @@ def make_config(
     >>> pp(ProfileConf(username="piro", age=False))  # age should be an integer
     <ValidationError: Value 'False' could not be converted to Integer>
 
-    These default values can be provided alongside type-annotations
+    These default values can be provided alongside type annotations
 
     >>> C = make_config(age=zf(int, 0))  # signature: C(age: int = 0)
 
