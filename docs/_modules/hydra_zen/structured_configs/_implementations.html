@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hydra_zen.structured_configs._implementations &#8212; hydra-zen 0.4.0rc1+4.gdb2f0ec documentation</title>
+    <title>hydra_zen.structured_configs._implementations &#8212; hydra-zen 0.4.0rc1+7.g3d2bafd documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -890,7 +890,7 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    hydra_target : T (Callable)</span>
-<span class="sd">        The target-object to be configured. This is a required, **positional-only**</span>
+<span class="sd">        The target object to be configured. This is a required, **positional-only**</span>
 <span class="sd">        argument.</span>
 
 <span class="sd">    *pos_args : SupportedPrimitive</span>
@@ -932,8 +932,8 @@
 
 <span class="sd">    zen_meta : Optional[Mapping[str, SupportedPrimitive]]</span>
 <span class="sd">        Specifies field-names and corresponding values that will be included in the</span>
-<span class="sd">        resulting config, but that will *not* be used to builds ``&lt;hydra_target&gt;``</span>
-<span class="sd">        via instantiation. These are called &quot;meta&quot; fields.</span>
+<span class="sd">        resulting config, but that will *not* be used to instantiate</span>
+<span class="sd">        ``&lt;hydra_target&gt;``. These are called &quot;meta&quot; fields.</span>
 
 <span class="sd">    populate_full_signature : bool, optional (default=False)</span>
 <span class="sd">        If ``True``, then the resulting config&#39;s signature and fields will be populated</span>
@@ -976,8 +976,8 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    Config : Type[Builds[Type[T]]]</span>
-<span class="sd">        A structured config that describes how to build ``hydra_target``</span>
+<span class="sd">    Config : Type[Builds[Type[T]]] | Type[PartialBuilds[Type[T]]]</span>
+<span class="sd">        A structured config that describes how to build ``hydra_target``.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -1577,7 +1577,7 @@
     <span class="c1">#</span>
     <span class="c1"># user_specified_params: arg-name -&gt; (arg-name, arg-type, field-w-value)</span>
     <span class="c1">#  - arg-type: taken from the parameter&#39;s annotation in the target&#39;s signature</span>
-    <span class="c1">#    and is resolved to one of the type-annotations supported by hydra if possible,</span>
+    <span class="c1">#    and is resolved to one of the type annotations supported by hydra if possible,</span>
     <span class="c1">#    otherwise, is Any</span>
     <span class="c1">#  - arg-value: mutable values are automatically specified using default-factory</span>
     <span class="n">user_specified_named_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
@@ -2131,7 +2131,7 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataClass</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates a config with user-defined field names and, optionally,</span>
-<span class="sd">    associated default values and/or type-annotations.</span>
+<span class="sd">    associated default values and/or type annotations.</span>
 
 <span class="sd">    Unlike `builds`, `make_config` is not used to configure a particular target</span>
 <span class="sd">    object; rather, it can be used to create more general configs [1]_.</span>
@@ -2139,14 +2139,14 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    *fields_as_args : str | ZenField</span>
-<span class="sd">        The names of the fields to be be included in the config. Or,</span>
-<span class="sd">        the fields&#39; names and their default values and/or their type</span>
-<span class="sd">        annotations, expressed via `ZenField` instances.</span>
+<span class="sd">        The names of the fields to be be included in the config. Or, `ZenField`</span>
+<span class="sd">        instances, each of which details the name and their default value and/or the</span>
+<span class="sd">        type annotation of a given field.</span>
 
 <span class="sd">    **fields_as_kwargs : SupportedPrimitive | ZenField</span>
-<span class="sd">        Like ``fields_as_args``, but fieldname/default value pairs are</span>
+<span class="sd">        Like ``fields_as_args``, but field-name/default-value pairs are</span>
 <span class="sd">        specified as keyword arguments. `ZenField` can also be used here</span>
-<span class="sd">        to express a fields type-annotation and/or its default value.</span>
+<span class="sd">        to express a field&#39;s type-annotation and/or its default value.</span>
 
 <span class="sd">        Named parameters of the forms ``hydra_xx``, ``zen_xx``, and ``_zen_xx`` are reserved to ensure future-compatibility, and cannot be specified by the user.</span>
 
@@ -2160,10 +2160,8 @@
 <span class="sd">        Determines how Hydra handles the non-primitive objects passed to configuration [3]_.</span>
 
 <span class="sd">        - ``&quot;none&quot;``: Passed objects are DictConfig and ListConfig, default</span>
-<span class="sd">        - ``&quot;partial&quot;``: Passed objects are converted to dict and list, with</span>
-<span class="sd">            the exception of Structured Configs (and their fields).</span>
-<span class="sd">        - ``&quot;all&quot;``: Passed objects are dicts, lists and primitives without</span>
-<span class="sd">            a trace of OmegaConf containers</span>
+<span class="sd">        - ``&quot;partial&quot;``: Passed objects are converted to dict and list, with the exception of Structured Configs (and their fields).</span>
+<span class="sd">        - ``&quot;all&quot;``: Passed objects are dicts, lists and primitives without a trace of OmegaConf containers</span>
 
 <span class="sd">        If ``None``, the ``_convert_`` attribute is not set on the resulting config.</span>
 
@@ -2206,7 +2204,7 @@
 <span class="sd">    - Mutable default values will automatically be packaged in a default factory function [6]_</span>
 <span class="sd">    - A default value that is a class-object or function-object will automatically be wrapped by `just`, to ensure that the resulting config is serializable by Hydra.</span>
 
-<span class="sd">    For finer-grain control over how type-annotations and default values are managed,</span>
+<span class="sd">    For finer-grain control over how type annotations and default values are managed,</span>
 <span class="sd">    consider using :func:`dataclasses.make_dataclass`.</span>
 
 <span class="sd">    For details of the annotation `SupportedPrimitive`, see :ref:`valid-types`.</span>
@@ -2214,7 +2212,7 @@
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 <span class="sd">    builds : Create a targeted structured config designed to &quot;build&quot; a particular object.</span>
-<span class="sd">    just : Create a config that &#39;just&#39; returns a class-object or function, without instantiating/calling it.</span>
+<span class="sd">    just : Create a config that &quot;just&quot; returns a class-object or function, without instantiating/calling it.</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -2318,7 +2316,7 @@
 <span class="sd">    &gt;&gt;&gt; pp(ProfileConf(username=&quot;piro&quot;, age=False))  # age should be an integer</span>
 <span class="sd">    &lt;ValidationError: Value &#39;False&#39; could not be converted to Integer&gt;</span>
 
-<span class="sd">    These default values can be provided alongside type-annotations</span>
+<span class="sd">    These default values can be provided alongside type annotations</span>
 
 <span class="sd">    &gt;&gt;&gt; C = make_config(age=zf(int, 0))  # signature: C(age: int = 0)</span>
 

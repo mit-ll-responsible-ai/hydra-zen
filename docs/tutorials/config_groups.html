@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Provide Swappable Configuration Groups &#8212; hydra-zen 0.4.0rc1+4.gdb2f0ec documentation</title>
+    <title>Provide Swappable Configuration Groups &#8212; hydra-zen 0.4.0rc1+7.g3d2bafd documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -356,6 +356,14 @@ default config for that group. Let’s specify the <code class="docutils literal
 <span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;my_app&quot;</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">Config</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">defaults</span></code> field in our top-level config has special meaning in the context of
+Hydra; it specifies a list that instructs Hydra how to build the resulting config,
+and the list itself is not included in the config. You can read about the
+<code class="docutils literal notranslate"><span class="pre">defaults</span></code> list in <a class="reference external" href="https://hydra.cc/docs/tutorials/structured_config/defaults">this tutorial</a>
+and in this <a class="reference external" href="https://hydra.cc/docs/advanced/defaults_list">technical reference</a>.</p>
 </div>
 </div>
 <div class="section" id="putting-it-all-together">

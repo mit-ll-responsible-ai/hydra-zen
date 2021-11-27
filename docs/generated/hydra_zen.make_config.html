@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>make_config &#8212; hydra-zen 0.4.0rc1+4.gdb2f0ec documentation</title>
+    <title>make_config &#8212; hydra-zen 0.4.0rc1+7.g3d2bafd documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -284,19 +284,19 @@
 <dt id="hydra_zen.make_config">
 <code class="sig-prename descclassname"><span class="pre">hydra_zen.</span></code><code class="sig-name descname"><span class="pre">make_config</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">fields_as_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_recursive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Config'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frozen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">fields_as_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/structured_configs/_implementations.html#make_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.make_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a config with user-defined field names and, optionally,
-associated default values and/or type-annotations.</p>
+associated default values and/or type annotations.</p>
 <p>Unlike <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>, <a class="reference internal" href="#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_config</span></code></a> is not used to configure a particular target
 object; rather, it can be used to create more general configs <a class="reference internal" href="#r9f8e996c6560-1" id="id1">[1]</a>.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>*fields_as_args</strong><span class="classifier">str | ZenField</span></dt><dd><p>The names of the fields to be be included in the config. Or,
-the fields’ names and their default values and/or their type
-annotations, expressed via <a class="reference internal" href="hydra_zen.ZenField.html#hydra_zen.ZenField" title="hydra_zen.ZenField"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenField</span></code></a> instances.</p>
+<dt><strong>*fields_as_args</strong><span class="classifier">str | ZenField</span></dt><dd><p>The names of the fields to be be included in the config. Or, <a class="reference internal" href="hydra_zen.ZenField.html#hydra_zen.ZenField" title="hydra_zen.ZenField"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenField</span></code></a>
+instances, each of which details the name and their default value and/or the
+type annotation of a given field.</p>
 </dd>
-<dt><strong>**fields_as_kwargs</strong><span class="classifier">SupportedPrimitive | ZenField</span></dt><dd><p>Like <code class="docutils literal notranslate"><span class="pre">fields_as_args</span></code>, but fieldname/default value pairs are
+<dt><strong>**fields_as_kwargs</strong><span class="classifier">SupportedPrimitive | ZenField</span></dt><dd><p>Like <code class="docutils literal notranslate"><span class="pre">fields_as_args</span></code>, but field-name/default-value pairs are
 specified as keyword arguments. <a class="reference internal" href="hydra_zen.ZenField.html#hydra_zen.ZenField" title="hydra_zen.ZenField"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenField</span></code></a> can also be used here
-to express a fields type-annotation and/or its default value.</p>
+to express a field’s type-annotation and/or its default value.</p>
 <p>Named parameters of the forms <code class="docutils literal notranslate"><span class="pre">hydra_xx</span></code>, <code class="docutils literal notranslate"><span class="pre">zen_xx</span></code>, and <code class="docutils literal notranslate"><span class="pre">_zen_xx</span></code> are reserved to ensure future-compatibility, and cannot be specified by the user.</p>
 </dd>
 <dt><strong>hydra_recursive</strong><span class="classifier">Optional[bool], optional (default=True)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then Hydra will recursively instantiate all other
@@ -306,16 +306,8 @@ hydra-config objects nested within this dataclass <a class="reference internal" 
 <dt><strong>hydra_convert</strong><span class="classifier">Optional[Literal[“none”, “partial”, “all”]], optional (default=”none”)</span></dt><dd><p>Determines how Hydra handles the non-primitive objects passed to configuration <a class="reference internal" href="#r9f8e996c6560-3" id="id3">[3]</a>.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code>: Passed objects are DictConfig and ListConfig, default</p></li>
-<li><dl class="simple">
-<dt><code class="docutils literal notranslate"><span class="pre">&quot;partial&quot;</span></code>: Passed objects are converted to dict and list, with</dt><dd><p>the exception of Structured Configs (and their fields).</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>: Passed objects are dicts, lists and primitives without</dt><dd><p>a trace of OmegaConf containers</p>
-</dd>
-</dl>
-</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;partial&quot;</span></code>: Passed objects are converted to dict and list, with the exception of Structured Configs (and their fields).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>: Passed objects are dicts, lists and primitives without a trace of OmegaConf containers</p></li>
 </ul>
 <p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_convert_</span></code> attribute is not set on the resulting config.</p>
 </dd>
@@ -348,7 +340,7 @@ provide specialized support for it. See <a class="reference internal" href="../a
 <dl class="simple">
 <dt><a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a></dt><dd><p>Create a targeted structured config designed to “build” a particular object.</p>
 </dd>
-<dt><a class="reference internal" href="hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a></dt><dd><p>Create a config that ‘just’ returns a class-object or function, without instantiating/calling it.</p>
+<dt><a class="reference internal" href="hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a></dt><dd><p>Create a config that “just” returns a class-object or function, without instantiating/calling it.</p>
 </dd>
 </dl>
 </div>
@@ -366,7 +358,7 @@ ensure that they can be utilized in the resulting config and by Hydra:</p>
 <li><p>Mutable default values will automatically be packaged in a default factory function <a class="reference internal" href="#r9f8e996c6560-6" id="id6">[6]</a></p></li>
 <li><p>A default value that is a class-object or function-object will automatically be wrapped by <a class="reference internal" href="hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a>, to ensure that the resulting config is serializable by Hydra.</p></li>
 </ul>
-<p>For finer-grain control over how type-annotations and default values are managed,
+<p>For finer-grain control over how type annotations and default values are managed,
 consider using <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.make_dataclass" title="(in Python v3.10)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataclasses.make_dataclass()</span></code></a>.</p>
 <p>For details of the annotation <code class="xref py py-obj docutils literal notranslate"><span class="pre">SupportedPrimitive</span></code>, see <a class="reference internal" href="../api_reference.html#valid-types"><span class="std std-ref">Configuration-Value Types Supported by Hydra and hydra-zen</span></a>.</p>
 <p class="rubric">References</p>
@@ -480,7 +472,7 @@ checks at runtime to ensure that a configured value matches its associated type 
 <span class="go">&lt;ValidationError: Value &#39;False&#39; could not be converted to Integer&gt;</span>
 </pre></div>
 </div>
-<p>These default values can be provided alongside type-annotations</p>
+<p>These default values can be provided alongside type annotations</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span><span class="n">age</span><span class="o">=</span><span class="n">zf</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>  <span class="c1"># signature: C(age: int = 0)</span>
 </pre></div>
 </div>

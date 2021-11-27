@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>builds &#8212; hydra-zen 0.4.0rc1+4.gdb2f0ec documentation</title>
+    <title>builds &#8212; hydra-zen 0.4.0rc1+7.g3d2bafd documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -196,7 +196,7 @@ user-specified and auto-populated parameter values.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>hydra_target</strong><span class="classifier">T (Callable)</span></dt><dd><p>The target-object to be configured. This is a required, <strong>positional-only</strong>
+<dt><strong>hydra_target</strong><span class="classifier">T (Callable)</span></dt><dd><p>The target object to be configured. This is a required, <strong>positional-only</strong>
 argument.</p>
 </dd>
 <dt><strong>*pos_args</strong><span class="classifier">SupportedPrimitive</span></dt><dd><p>Positional arguments passed as <code class="docutils literal notranslate"><span class="pre">&lt;hydra_target&gt;(*pos_args,</span> <span class="pre">...)</span></code> upon
@@ -229,8 +229,8 @@ E.g. specifying the wrappers <code class="docutils literal notranslate"><span cl
 configs.</p>
 </dd>
 <dt><strong>zen_meta</strong><span class="classifier">Optional[Mapping[str, SupportedPrimitive]]</span></dt><dd><p>Specifies field-names and corresponding values that will be included in the
-resulting config, but that will <em>not</em> be used to builds <code class="docutils literal notranslate"><span class="pre">&lt;hydra_target&gt;</span></code>
-via instantiation. These are called “meta” fields.</p>
+resulting config, but that will <em>not</em> be used to instantiate
+<code class="docutils literal notranslate"><span class="pre">&lt;hydra_target&gt;</span></code>. These are called “meta” fields.</p>
 </dd>
 <dt><strong>populate_full_signature</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then the resulting config’s signature and fields will be populated
 according to the signature of <code class="docutils literal notranslate"><span class="pre">&lt;hydra_target&gt;</span></code>; values also specified in
@@ -267,7 +267,7 @@ parent of a <code class="docutils literal notranslate"><span class="pre">Builds<
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt><strong>Config</strong><span class="classifier">Type[Builds[Type[T]]]</span></dt><dd><p>A structured config that describes how to build <code class="docutils literal notranslate"><span class="pre">hydra_target</span></code></p>
+<dt><strong>Config</strong><span class="classifier">Type[Builds[Type[T]]] | Type[PartialBuilds[Type[T]]]</span></dt><dd><p>A structured config that describes how to build <code class="docutils literal notranslate"><span class="pre">hydra_target</span></code>.</p>
 </dd>
 </dl>
 </dd>
