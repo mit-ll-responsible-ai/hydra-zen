@@ -43,11 +43,11 @@ configs carry no dependency on hydra-zen.
 ### Validation of general configs
 
 hydra-zen should provide a `hydra_zen.validate` function that is capable of processing any yaml-string or 
-structured config and validating that:
+structured config and validate that:
    1. All configured values are compatible with Hydra's supported primitive types.
-   2. Fields specified in targeted configs are compatible with the target's signature
-   3. The annotations specified in structured configs are compatible with the subset of annotations that are natively supported by Hydra
-   4. **MAYBE** runtime type-checking of values against annotated types. In the case that a targeted config is specified as a value, we could "look ahead" at the type that will be produced via recursive instantiation. If this is something we want to enable, I would strongly prefer that we either leverage a third-party type-checker to handle this (e.g. pydantic or beartype), or that we utilize omegaconf/Hydra's internal type-checking utilities.
+   2. Fields specified in targeted configs are compatible with the target's signature.
+   3. The annotations specified in structured configs are compatible with the subset of annotations that are natively supported by Hydra.
+   4. **MAYBE** perform runtime type-checking of values against annotated types. In the case that a targeted config is specified as a value, we could "look ahead" at the type that will be produced via recursive instantiation. If this is something we want to enable, we would strongly prefer that we either leverage a third-party type-checker to handle this (e.g. pydantic or beartype), or that we utilize omegaconf/Hydra's internal type-checking utilities.
 
 This will involve being able to recurse through nested configs.
 
