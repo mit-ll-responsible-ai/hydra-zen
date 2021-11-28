@@ -95,8 +95,9 @@ COMMON_MODULES_WITH_OBFUSCATED_IMPORTS: Tuple[str, ...] = (
     "torch",
 )
 UNKNOWN_NAME: Final[str] = "<unknown>"
-HYDRA_SUPPORTED_PRIMITIVES: Final = {int, float, bool, str, Enum}
-KNOWN_MUTABLE_TYPES = (list, dict, set)
+HYDRA_SUPPORTED_PRIMITIVE_TYPES: Final = {int, float, bool, str, Enum}
+
+KNOWN_MUTABLE_TYPES = {list, dict, set}
 
 T = TypeVar("T")
 
@@ -350,7 +351,7 @@ def sanitized_type(
 
     if (
         type_ is Any
-        or type_ in HYDRA_SUPPORTED_PRIMITIVES
+        or type_ in HYDRA_SUPPORTED_PRIMITIVE_TYPES
         or is_dataclass(type_)
         or (isinstance(type_, type) and issubclass(type_, Enum))
     ):

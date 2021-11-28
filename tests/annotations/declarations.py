@@ -1,19 +1,25 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
+from collections import Counter, deque
 from dataclasses import dataclass
-from typing import Any, Callable, List, Literal, Tuple, Type
+from enum import Enum
+from pathlib import Path
+from typing import Callable, List, Literal, Tuple, Type
+
+from omegaconf import MISSING, DictConfig, ListConfig
 
 from hydra_zen import (
+    ZenField,
     builds,
     get_target,
     instantiate,
     just,
+    make_config,
     make_custom_builds_fn,
     mutable_value,
 )
 from hydra_zen.typing import Builds
-from hydra_zen.typing._implementations import DataClass
 
 
 class A:
@@ -183,3 +189,120 @@ def custom_builds_fn():
     a2: Literal["Type[PartialBuilds[Type[int]]]"] = reveal_type(
         _builds(int, zen_partial=True)
     )
+
+
+def supported_primitives():
+    class M:
+        pass
+
+    def f(*args):
+        pass
+
+    @dataclass
+    class ADataclass:
+        x: int = 1
+
+    class AnEnum(Enum):
+        a = 1
+        b = 2
+
+    olist = ListConfig([1, 2, 3])
+    odict = DictConfig({"1": 1})
+
+    a1: Literal["Type[DataClass]"] = reveal_type(
+        make_config(
+            a=(
+                1,
+                "hi",
+                2.0,
+                1j,
+                set(),
+                M,
+                ADataclass,
+                builds(dict),
+                Path.cwd(),
+                olist,
+                odict,
+                AnEnum.a,
+            ),
+            b={M},
+            c={1: M},
+            d=[2.0 + 1j],
+            e=f,
+            f=ADataclass(),
+            g=builds(int)(),  # dataclass instance
+            h=builds(int, zen_partial=True)(),  # dataclass instance
+        )
+    )
+    a2: Literal["Type[DataClass]"] = reveal_type(
+        make_config(
+            ZenField(name="a", default={M}),
+            ZenField(name="b", default={1: M}),
+            ZenField(name="c", default=[2.0 + 1j]),
+            d=ZenField(default=(1, "hi", 2.0, 1j, set(), M, Path.cwd())),
+            e=ZenField(default=f),
+        )
+    )
+
+    a3: Literal["Type[Builds[Type[dict[Unknown, Unknown]]]]"] = reveal_type(
+        builds(
+            dict,
+            a=(1, "hi", 2.0, 1j, set(), M, ADataclass, builds(dict), Path.cwd()),
+            b={M},
+            c={1: M},
+            d=[2.0 + 1j],
+            e=f,
+        )
+    )
+
+    a4: Literal["Type[PartialBuilds[Type[dict[Unknown, Unknown]]]]"] = reveal_type(
+        builds(
+            dict,
+            a=(1, "hi", 2.0, 1j, set(), M, ADataclass, builds(dict), Path.cwd()),
+            b={M},
+            c={1: M},
+            d=[2.0 + 1j],
+            e=f,
+            zen_partial=True,
+        )
+    )
+
+    # check lists
+    a5 = make_config(a=[], b=[1], c=[[1]], d=[[[M]]])
+
+    # check dicts
+    a6 = make_config(
+        a={}, b={1: 1}, c=[{1: 1}], d={1: {"a": "a"}}, e={"a": 1j}, f={"a": [1j]}
+    )
+
+    a7 = builds(
+        f,
+        None,
+        MISSING,
+        1,
+        "hi",
+        2.0,
+        1j,
+        M,
+        ADataclass,
+        builds(dict),
+        Path.cwd(),
+        set(),
+        frozenset(),
+        {1, 1j, Path.cwd()},
+        deque(),
+        Counter(),
+        [deque(), Counter(), 1j],
+        (deque(), Counter(), 1j),
+        range(1, 10, 2),
+        odict,
+        olist,
+    )
+
+    # The following should be marked as "bad by type-checkers
+    # make_config(a=M())
+    # builds(dict, a=M())
+    # make_config(a={1j: 1})
+    # make_config(a={M: 1})
+    # make_config(a={ADataclass: 1})
+    # make_config(a={ADataclass(): 1})

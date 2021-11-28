@@ -14,3 +14,7 @@ class HydraZenDeprecationWarning(HydraZenException, FutureWarning):
     This is a subclass of FutureWarning, rather than DeprecationWarning, so
     that the warnings that it emits are not filtered by default.
     """
+
+
+class HydraZenUnsupportedPrimitiveError(HydraZenException, ValueError):
+    pass

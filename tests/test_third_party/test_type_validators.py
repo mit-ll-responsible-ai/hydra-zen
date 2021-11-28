@@ -216,7 +216,7 @@ class UserIdentity(TypedDict):
     ],
 )
 @pytest.mark.parametrize("validator", all_validators)
-@settings(max_examples=20)
+@settings(max_examples=20, deadline=None)
 @given(data=st.data(), as_yaml=st.booleans())
 def test_validations_missed_by_hydra(
     annotation, fools_hydra, validator, as_yaml: bool, data: st.DataObject
