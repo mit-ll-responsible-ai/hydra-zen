@@ -129,8 +129,10 @@ Types Supported via hydra-zen
    This section refers to capabilities that are not yet available in a stable release 
    of hydra-zen. They will be included in the release of `v0.4.0`.
 
-hydra-zen will automatically create targeted configs to represent values of the 
-following types:
+Values of the following types can be specified directly via hydra-zen's 
+:ref:`config-creation functions <config-creation>`, and hydra-zen will automatically 
+create targeted configs to represent values those values in a way that is compatible 
+with Hydra.
 
 - :py:class:`bytes`
 - :py:class:`bytearray`
