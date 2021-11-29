@@ -325,7 +325,7 @@ def hydrated_dataclass(
     Raises
     ------
     hydra_zen.errors.HydraZenUnsupportedPrimitiveError
-        The provided configured value cannot be serialized by Hydra, not does hydra-zen
+        The provided configured value cannot be serialized by Hydra, nor does hydra-zen
         provide specialized support for it. See :ref:`valid-types` for more details.
 
     Notes
@@ -810,7 +810,7 @@ def builds(
     Raises
     ------
     hydra_zen.errors.HydraZenUnsupportedPrimitiveError
-        The provided configured value cannot be serialized by Hydra, not does hydra-zen
+        The provided configured value cannot be serialized by Hydra, nor does hydra-zen
         provide specialized support for it. See :ref:`valid-types` for more details.
 
     Notes
@@ -2012,7 +2012,7 @@ def make_config(
     Raises
     ------
     hydra_zen.errors.HydraZenUnsupportedPrimitiveError
-        The provided configured value cannot be serialized by Hydra, not does hydra-zen
+        The provided configured value cannot be serialized by Hydra, nor does hydra-zen
         provide specialized support for it. See :ref:`valid-types` for more details.
 
     Notes
