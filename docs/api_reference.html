@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Reference &#8212; hydra-zen 0.4.0rc1+8.ge1ec7e3 documentation</title>
+    <title>Reference &#8212; hydra-zen 0.4.0rc1+9.gf35422b documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -307,8 +307,8 @@
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#types-supported-via-hydra-zen">
-     Types Supported via hydra-zen
+    <a class="reference internal nav-link" href="#additional-types-supported-via-hydra-zen">
+     Additional Types, Supported via hydra-zen
     </a>
    </li>
   </ul>
@@ -487,15 +487,27 @@ of common types via its <a class="reference internal" href="#create-config"><spa
 <li><p><a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p></li>
 </ul>
 </div>
-<div class="section" id="types-supported-via-hydra-zen">
-<h3>Types Supported via hydra-zen<a class="headerlink" href="#types-supported-via-hydra-zen" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="additional-types-supported-via-hydra-zen">
+<h3>Additional Types, Supported via hydra-zen<a class="headerlink" href="#additional-types-supported-via-hydra-zen" title="Permalink to this headline">¶</a></h3>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>This section refers to capabilities that are not yet available in a stable release
 of hydra-zen. They will be included in the release of <code class="xref py py-obj docutils literal notranslate"><span class="pre">v0.4.0</span></code>.</p>
 </div>
-<p>hydra-zen will automatically create targeted configs to represent values of the
-following types:</p>
+<p>Values of additional types can be specified directly via hydra-zen’s
+<a class="reference internal" href="#create-config"><span class="std std-ref">config-creation functions</span></a>, and hydra-zen will automatically
+create targeted configs to represent values those values in a way that is compatible
+with Hydra. For example, a <a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">complex</span></code></a> value can be specified directly via <a class="reference internal" href="generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_config()</span></code></a>, and a targeted config will be created for that value.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">make_config</span><span class="p">,</span> <span class="n">to_yaml</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">2.0</span> <span class="o">+</span> <span class="mf">3.0</span><span class="n">j</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">Conf</span><span class="p">))</span>
+<span class="go">value:</span>
+<span class="go">  real: 2.0</span>
+<span class="go">  imag: 3.0</span>
+<span class="go">  _target_: builtins.complex</span>
+</pre></div>
+</div>
+<p>hydra-zen provides such support for values of the following types:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a></p></li>
