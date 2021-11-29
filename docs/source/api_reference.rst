@@ -121,18 +121,30 @@ Values of the following types can be specified directly in configs:
 - :py:class:`enum.Enum`
 
 
-Types Supported via hydra-zen
-*****************************
+Additional Types, Supported via hydra-zen
+*****************************************
 
 .. warning:: 
    
    This section refers to capabilities that are not yet available in a stable release 
    of hydra-zen. They will be included in the release of `v0.4.0`.
 
-Values of the following types can be specified directly via hydra-zen's 
-:ref:`config-creation functions <config-creation>`, and hydra-zen will automatically 
+Values of additional types can be specified directly via hydra-zen's 
+:ref:`config-creation functions <create-config>`, and hydra-zen will automatically 
 create targeted configs to represent values those values in a way that is compatible 
-with Hydra.
+with Hydra. For example, a :py:class:`complex` value can be specified directly via :func:`~hydra_zen.make_config`, and a targeted config will be created for that value.
+
+.. code-block:: pycon
+
+   >>> from hydra_zen import make_config, to_yaml
+   >>> Conf = make_config(value=2.0 + 3.0j)
+   >>> print(to_yaml(Conf))
+   value:
+     real: 2.0
+     imag: 3.0
+     _target_: builtins.complex
+
+hydra-zen provides such support for values of the following types:
 
 - :py:class:`bytes`
 - :py:class:`bytearray`
