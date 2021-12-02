@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hydra_zen.structured_configs._implementations &#8212; hydra-zen 0.4.0rc1+11.g5b37430 documentation</title>
+    <title>hydra_zen.structured_configs._implementations &#8212; hydra-zen 0.4.0rc1+12.g49728ec documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -173,6 +173,7 @@
 <span></span><span class="c1"># Copyright (c) 2021 Massachusetts Institute of Technology</span>
 <span class="c1"># SPDX-License-Identifier: MIT</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">deque</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="p">(</span>
@@ -220,12 +221,6 @@
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass</span><span class="p">,</span> <span class="n">HasPartialTarget</span><span class="p">,</span> <span class="n">HasTarget</span>
 
 <span class="kn">from</span> <span class="nn">._value_conversion</span> <span class="kn">import</span> <span class="n">ZEN_SUPPORTED_PRIMITIVES</span><span class="p">,</span> <span class="n">ZEN_VALUE_CONVERSION</span>
-
-<span class="k">try</span><span class="p">:</span>
-    <span class="c1"># used to check if default values are ufuncs</span>
-    <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">ufunc</span>  <span class="c1"># type: ignore</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-    <span class="n">ufunc</span> <span class="o">=</span> <span class="kc">None</span>
 
 <span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T&quot;</span><span class="p">)</span>
 <span class="n">_T2</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T2&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">)</span>
@@ -690,6 +685,16 @@
 <span class="n">_KEY_ERROR_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;Configuring dictionary key:&quot;</span>
 
 
+<span class="k">def</span> <span class="nf">_is_ufunc</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="c1"># checks without importing numpy</span>
+    <span class="n">numpy</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;numpy&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">numpy</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="c1"># we do actually cover this branch some runs of our CI,</span>
+        <span class="c1"># but our coverage job installs numpy</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ufunc</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+
+
 <span class="k">def</span> <span class="nf">sanitized_default_value</span><span class="p">(</span>
     <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">allow_zen_conversion</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -707,7 +712,7 @@
             <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
             <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">and</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
             <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">_builtin_function_or_method_type</span><span class="p">)</span>
-            <span class="ow">or</span> <span class="p">(</span><span class="n">ufunc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ufunc</span><span class="p">))</span>
+            <span class="ow">or</span> <span class="n">_is_ufunc</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="p">)</span>
     <span class="p">):</span>
         <span class="k">return</span> <span class="n">just</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
