@@ -117,10 +117,15 @@ import sys
 
 def test_no_numpy_import():
     assert "numpy" not in sys.modules
+
+    from hydra_zen import builds, launch, make_config
+    make_config(a=1)
+    builds(dict, a=make_config)  # specifically exercises auto-just
+    assert "numpy" not in sys.modules
 """
 
 
-def test_hypothesis_is_not_the_first_to_import_numpy(pytester):
+def test_hydra_zen_is_not_the_first_to_import_numpy(pytester):
     # We only import numpy if the user did so first.
     pytester.makepyfile(SHOULD_NOT_IMPORT_NUMPY)
     pytester.makeconftest("")
