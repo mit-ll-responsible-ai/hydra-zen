@@ -516,7 +516,9 @@ _KEY_ERROR_PREFIX = "Configuring dictionary key:"
 def _is_ufunc(value) -> bool:
     # checks without importing numpy
     numpy = sys.modules.get("numpy")
-    if numpy is None:
+    if numpy is None:  # pragma: no cover
+        # we do actually cover this branch some runs of our CI,
+        # but our coverage job installs numpy
         return False
     return isinstance(value, numpy.ufunc)  # type: ignore
 
