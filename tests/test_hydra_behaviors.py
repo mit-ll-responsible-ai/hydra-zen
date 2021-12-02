@@ -7,10 +7,16 @@ from typing import Any, List, Tuple
 import hypothesis.strategies as st
 import pytest
 from hypothesis import assume, given
-from omegaconf import DictConfig, ListConfig
+from omegaconf import MISSING, DictConfig, ListConfig, OmegaConf
 from omegaconf.errors import ValidationError
 
-from hydra_zen import builds, hydrated_dataclass, instantiate, mutable_value
+from hydra_zen import (
+    builds,
+    hydrated_dataclass,
+    instantiate,
+    make_config,
+    mutable_value,
+)
 from hydra_zen.structured_configs._utils import get_obj_path
 
 
@@ -202,3 +208,30 @@ def test_type_checking():
 
     # should be ok
     instantiate(builds(g2, x=[conf_C, conf_C]))
+
+
+valid_defaults = st.sampled_from([1, "a", None, MISSING, True, [1], {"a": 1}])
+
+
+@given(
+    parent_field_name=st.sampled_from(["x", "y"]),
+    parent_default=valid_defaults,
+    child_default=valid_defaults,
+)
+def test_known_inheritance_issues_in_omegaconf_are_circumvented(
+    parent_field_name, parent_default, child_default
+):
+    # Exercises omegaconf bug documented in https://github.com/omry/omegaconf/issues/830
+    # Should pass either because:
+    #  - the test env is running a new version of omegaconf, which has patched this
+    #  - hydra-zen is providing a workaround
+    assume(parent_field_name != "y" or parent_default is not MISSING)
+
+    Parent = make_config(**{parent_field_name: parent_default})
+    Child = make_config(x=child_default, bases=(Parent,))
+    Obj = OmegaConf.create(Child)
+    if child_default is MISSING:
+        assert OmegaConf.is_missing(Obj, "x")
+    else:
+        Obj = instantiate(Obj)
+        assert Obj.x == child_default
