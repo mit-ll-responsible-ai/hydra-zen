@@ -1,13 +1,13 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
-import importlib
 import logging
 import os
 import sys
 import tempfile
 
 import hypothesis.strategies as st
+import pkg_resources
 import pytest
 from omegaconf import DictConfig, ListConfig
 
@@ -23,10 +23,10 @@ OPTIONAL_TEST_DEPENDENCIES = (
     "beartype",
 )
 
+_installed = {pkg.key for pkg in pkg_resources.working_set}
+
 for _module_name in OPTIONAL_TEST_DEPENDENCIES:
-    try:
-        importlib.import_module(_module_name)
-    except ModuleNotFoundError:
+    if _module_name not in _installed:
         collect_ignore_glob.append(f"**/*{_module_name}*.py")
 
 if sys.version_info < (3, 8):
@@ -52,6 +52,8 @@ def cleandir():
         os.chdir(old_dir)
         logging.shutdown()
 
+
+pytest_plugins = "pytester"
 
 st.register_type_strategy(ListConfig, st.lists(st.integers()).map(ListConfig))
 st.register_type_strategy(

@@ -110,3 +110,33 @@ def test_obfuscated_modules_dont_get_mixed_up():
 
     assert get_target(builds(np.random.random)) is np.random.random
     assert get_target(builds(random.random)) is random.random
+
+
+SHOULD_NOT_IMPORT_NUMPY = """
+import sys
+
+def test_no_numpy_import():
+    assert "numpy" not in sys.modules
+
+    from hydra_zen import builds, launch, make_config
+    from hydra_zen.funcs import get_obj
+
+    make_config(a=1)
+    builds(dict, a=make_config)  # specifically exercises auto-just
+
+    # jogs imports through potential obfuscated modules
+    try:
+        get_obj(path="blahblah")
+    except ImportError:
+        pass
+
+    assert "numpy" not in sys.modules
+"""
+
+
+def test_hydra_zen_is_not_the_first_to_import_numpy(pytester):
+    # We only import numpy if the user did so first.
+    pytester.makepyfile(SHOULD_NOT_IMPORT_NUMPY)
+    pytester.makeconftest("")
+    result = pytester.runpytest_subprocess()
+    result.assert_outcomes(passed=1, failed=0)

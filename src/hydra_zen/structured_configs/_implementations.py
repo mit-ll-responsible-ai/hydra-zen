@@ -1,6 +1,7 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import inspect
+import sys
 import warnings
 from collections import Counter, defaultdict, deque
 from dataclasses import (
@@ -48,12 +49,6 @@ from hydra_zen.typing import Builds, Importable, Just, PartialBuilds, SupportedP
 from hydra_zen.typing._implementations import DataClass, HasPartialTarget, HasTarget
 
 from ._value_conversion import ZEN_SUPPORTED_PRIMITIVES, ZEN_VALUE_CONVERSION
-
-try:
-    # used to check if default values are ufuncs
-    from numpy import ufunc  # type: ignore
-except ImportError:  # pragma: no cover
-    ufunc = None
 
 _T = TypeVar("_T")
 _T2 = TypeVar("_T2", bound=Callable)
@@ -518,6 +513,16 @@ def just(obj: Importable) -> Type[Just[Importable]]:
 _KEY_ERROR_PREFIX = "Configuring dictionary key:"
 
 
+def _is_ufunc(value) -> bool:
+    # checks without importing numpy
+    numpy = sys.modules.get("numpy")
+    if numpy is None:  # pragma: no cover
+        # we do actually cover this branch some runs of our CI,
+        # but our coverage job installs numpy
+        return False
+    return isinstance(value, numpy.ufunc)  # type: ignore
+
+
 def sanitized_default_value(
     value: Any,
     allow_zen_conversion: bool = True,
@@ -535,7 +540,7 @@ def sanitized_default_value(
             inspect.isfunction(value)
             or (not is_dataclass(value) and inspect.isclass(value))
             or isinstance(value, _builtin_function_or_method_type)
-            or (ufunc is not None and isinstance(value, ufunc))
+            or _is_ufunc(value)
         )
     ):
         return just(value)

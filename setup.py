@@ -30,7 +30,7 @@ INSTALL_REQUIRES = [
 ]
 TESTS_REQUIRE = [
     "pytest >= 3.8",
-    "hypothesis >= 6.16.0",
+    "hypothesis >= 6.28.0",
 ]
 
 DESCRIPTION = "Configurable, reproducible, and scalable workflows in Python, via Hydra"
