@@ -119,8 +119,17 @@ def test_no_numpy_import():
     assert "numpy" not in sys.modules
 
     from hydra_zen import builds, launch, make_config
+    from hydra_zen.funcs import get_obj
+
     make_config(a=1)
     builds(dict, a=make_config)  # specifically exercises auto-just
+
+    # jogs imports through potential obfuscated modules
+    try:
+        get_obj(path="blahblah")
+    except ImportError:
+        pass
+
     assert "numpy" not in sys.modules
 """
 
