@@ -16,5 +16,9 @@ class HydraZenDeprecationWarning(HydraZenException, FutureWarning):
     """
 
 
-class HydraZenUnsupportedPrimitiveError(HydraZenException, ValueError):
+class HydraZenValidationError(HydraZenException):
+    pass
+
+
+class HydraZenUnsupportedPrimitiveError(HydraZenValidationError, ValueError):
     pass
