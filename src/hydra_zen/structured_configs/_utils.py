@@ -9,6 +9,7 @@ from typing import (
     Any,
     Callable,
     Dict,
+    Iterable,
     List,
     Mapping,
     Optional,
@@ -23,7 +24,9 @@ from typing import (
 from omegaconf import II
 from typing_extensions import Final, TypeGuard
 
-from hydra_zen.typing._implementations import InterpStr
+from hydra_zen.typing._implementations import InterpStr, _DataClass
+
+PATCH_OMEGACONF_830: Final[bool] = True
 
 try:
     from typing import get_args, get_origin
@@ -407,3 +410,17 @@ def check_suspicious_interpolations(
                     f"change {_w} to {_expected}"
                 )
                 yield _expected
+
+
+def mutable_default_permitted(bases: Iterable[_DataClass], field_name: str) -> bool:
+    if not PATCH_OMEGACONF_830:  # pragma: no cover
+        return True
+
+    for base in bases:
+        if (
+            field_name in base.__dataclass_fields__
+            and base.__dataclass_fields__[field_name].default is not MISSING
+        ):
+            # see https://github.com/omry/omegaconf/issues/830
+            return False
+    return True
