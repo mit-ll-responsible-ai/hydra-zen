@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hydra_zen.structured_configs._implementations &#8212; hydra-zen 0.4.0rc1+16.gbbb5330 documentation</title>
+    <title>hydra_zen.structured_configs._implementations &#8212; hydra-zen 0.4.0rc1+17.g931fc4f documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -588,7 +588,7 @@
                     <span class="c1"># TODO: update error message with fixed omegaconf version</span>
                     <span class="n">_value</span> <span class="o">=</span> <span class="n">field_</span><span class="o">.</span><span class="n">default_factory</span><span class="p">()</span>
                     <span class="k">raise</span> <span class="n">HydraZenValidationError</span><span class="p">(</span>
-                        <span class="s2">&quot;This config will not instantiatie properly.</span><span class="se">\n</span><span class="s2">This is due to a &quot;</span>
+                        <span class="s2">&quot;This config will not instantiate properly.</span><span class="se">\n</span><span class="s2">This is due to a &quot;</span>
                         <span class="s2">&quot;known bug in omegaconf: The config specifies a &quot;</span>
                         <span class="sa">f</span><span class="s2">&quot;default-factory for field </span><span class="si">{</span><span class="n">field_</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, and inherits from a &quot;</span>
                         <span class="s2">&quot;parent that specifies the same field with a non-factory value &quot;</span>
@@ -598,9 +598,23 @@
                         <span class="s2">&quot;information, see: https://github.com/omry/omegaconf/issues/830&quot;</span>
                     <span class="p">)</span>
 
+        <span class="k">if</span> <span class="n">populate_full_signature</span><span class="p">:</span>
+            <span class="c1"># we need to ensure that the fields specified via the class definition</span>
+            <span class="c1"># take precedence over the fields that will be auto-populated by builds</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">default</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">MISSING</span> <span class="k">else</span> <span class="n">f</span><span class="o">.</span><span class="n">default_factory</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">(</span><span class="n">decorated_obj</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="n">MISSING</span> <span class="ow">and</span> <span class="n">f</span><span class="o">.</span><span class="n">default_factory</span> <span class="ow">is</span> <span class="n">MISSING</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_HYDRA_FIELD_NAMES</span>
+                <span class="ow">and</span> <span class="ow">not</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_zen_&quot;</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+
         <span class="k">return</span> <span class="n">builds</span><span class="p">(</span>
             <span class="n">target</span><span class="p">,</span>
             <span class="o">*</span><span class="n">pos_args</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
             <span class="n">populate_full_signature</span><span class="o">=</span><span class="n">populate_full_signature</span><span class="p">,</span>
             <span class="n">hydra_recursive</span><span class="o">=</span><span class="n">hydra_recursive</span><span class="p">,</span>
             <span class="n">hydra_convert</span><span class="o">=</span><span class="n">hydra_convert</span><span class="p">,</span>
@@ -1676,9 +1690,6 @@
                     <span class="n">user_specified_named_params</span><span class="p">[</span><span class="n">param</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
                 <span class="p">)</span>
                 <span class="n">_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">param</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">fields_set_by_bases</span><span class="p">:</span>
-                <span class="c1"># don&#39;t populate a parameter that can be derived from a base</span>
-                <span class="k">continue</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># any parameter whose default value is None is automatically</span>
                 <span class="c1"># annotated with `Optional[...]`. This improves flexibility with</span>
