@@ -9,10 +9,17 @@ from typing import Any, Callable, Dict, Mapping, Optional, Tuple, Type
 
 import hypothesis.strategies as st
 import pytest
-from hypothesis import given, settings
+from hypothesis import given, note, settings
 from omegaconf.errors import ValidationError
 
-from hydra_zen import builds, hydrated_dataclass, instantiate, mutable_value, to_yaml
+from hydra_zen import (
+    builds,
+    hydrated_dataclass,
+    instantiate,
+    make_config,
+    mutable_value,
+    to_yaml,
+)
 from hydra_zen.typing import Just
 from tests import valid_hydra_literals
 
@@ -319,3 +326,50 @@ def test_setting_default_with_Builds_widens_type(builds_as_default, hydra_recurs
     with pytest.raises(ValidationError):
         # ensure that type annotation is broadened only when hydra_recursive=False
         instantiate(builds(expects_int, x=builds_as_default, hydra_recursive=False))
+
+
+def func_with_various_defaults(x=1, y="a", z=[1, 2]):
+    pass
+
+
+valid_defaults = (
+    st.none()
+    | st.booleans()
+    | st.text(alphabet="abcde")
+    | st.integers(-3, 3)
+    | st.lists(st.integers(-2, 2))
+    | st.fixed_dictionaries({"a": st.integers(-2, 2)})
+)
+
+
+@given(
+    passed_args=st.fixed_dictionaries(
+        {}, optional=dict(x=st.just(1), y=st.just("a"), z=st.just([1, 2]))
+    ),
+    parent=st.just(())
+    | st.dictionaries(st.sampled_from(["x", "y", "z"]), valid_defaults).map(
+        lambda kw: (make_config(**kw),)
+    ),
+)
+def test_pop_full_sig_is_always_identical_to_manually_specifying_sig_args(
+    passed_args: dict, parent: tuple
+):
+    Conf = builds(
+        func_with_various_defaults,
+        x=1,
+        y="a",
+        z=[1, 2],
+        populate_full_signature=False,
+        builds_bases=parent,
+    )
+    ConfWithPopSig = builds(
+        func_with_various_defaults,
+        **passed_args,
+        builds_bases=parent,
+        populate_full_signature=True,
+    )
+    if parent:
+        note(str(parent[0]()))
+    note(to_yaml(Conf))
+    note(to_yaml(ConfWithPopSig))
+    assert to_yaml(Conf) == to_yaml(ConfWithPopSig)
