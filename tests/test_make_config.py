@@ -184,6 +184,8 @@ def test_default_values_get_set_as_expected(default, input_type):
 )
 def test_mutable_default_value_uses_default_factory(input_type):
     default = [1, 2, 3]
+    make_config(a=default)
+    make_config(a=[1, 2, 3])
 
     if input_type is InputType.kwargs:
         Conf = make_config(a=default)

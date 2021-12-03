@@ -7,6 +7,7 @@ from collections import Counter, defaultdict, deque
 from dataclasses import (
     MISSING,
     Field,
+    InitVar,
     dataclass,
     field,
     fields,
@@ -42,11 +43,17 @@ from typing_extensions import Final, Literal, TypeGuard
 from hydra_zen.errors import (
     HydraZenDeprecationWarning,
     HydraZenUnsupportedPrimitiveError,
+    HydraZenValidationError,
 )
 from hydra_zen.funcs import get_obj, partial, zen_processing
 from hydra_zen.structured_configs import _utils
 from hydra_zen.typing import Builds, Importable, Just, PartialBuilds, SupportedPrimitive
-from hydra_zen.typing._implementations import DataClass, HasPartialTarget, HasTarget
+from hydra_zen.typing._implementations import (
+    DataClass,
+    HasPartialTarget,
+    HasTarget,
+    _DataClass,
+)
 
 from ._value_conversion import ZEN_SUPPORTED_PRIMITIVES, ZEN_VALUE_CONVERSION
 
@@ -399,6 +406,26 @@ def hydrated_dataclass(
         decorated_obj = cast(Any, decorated_obj)
         decorated_obj = dataclass(frozen=frozen)(decorated_obj)
 
+        if _utils.PATCH_OMEGACONF_830 and 2 < len(decorated_obj.__mro__):
+            parents = decorated_obj.__mro__[1:-1]
+            # this class inherits from a parent
+            for field_ in fields(decorated_obj):
+                if field_.default_factory is not MISSING and any(
+                    hasattr(p, field_.name) for p in parents
+                ):
+                    # TODO: update error message with fixed omegaconf version
+                    _value = field_.default_factory()
+                    raise HydraZenValidationError(
+                        "This config will not instantiatie properly.\nThis is due to a "
+                        "known bug in omegaconf: The config specifies a "
+                        f"default-factory for field {field_.name}, and inherits from a "
+                        "parent that specifies the same field with a non-factory value "
+                        "-- the parent's value will take precedence.\nTo circumvent "
+                        f"this, specify {field_.name} using: "
+                        f"`builds({type(_value).__name__}, {_value})`\n\nFor more "
+                        "information, see: https://github.com/omry/omegaconf/issues/830"
+                    )
+
         return builds(
             target,
             *pos_args,
@@ -618,13 +645,25 @@ def sanitized_field(
     *,
     error_prefix: str = "",
     field_name: str = "",
+    _mutable_default_permitted: bool = True,
 ) -> Field:
     type_value = type(value)
     if (
         type_value in _utils.KNOWN_MUTABLE_TYPES
         and type_value in HYDRA_SUPPORTED_PRIMITIVES
     ):
-        return cast(Field, mutable_value(value))
+        if _mutable_default_permitted:
+            return cast(Field, mutable_value(value))
+        else:
+            return _utils.field(
+                default=sanitized_default_value(
+                    builds(type(value), value),
+                    allow_zen_conversion=allow_zen_conversion,
+                    error_prefix=error_prefix,
+                    field_name=field_name,
+                ),
+                init=init,
+            )
     return _utils.field(
         default=sanitized_default_value(
             value,
@@ -648,7 +687,7 @@ def builds(
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     dataclass_name: Optional[str] = None,
-    builds_bases: Tuple[Any, ...] = (),
+    builds_bases: Tuple[Type[_DataClass], ...] = (),
     frozen: bool = False,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Type[Builds[Importable]]:  # pragma: no cover
@@ -667,7 +706,7 @@ def builds(
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     dataclass_name: Optional[str] = None,
-    builds_bases: Tuple[Any, ...] = (),
+    builds_bases: Tuple[Type[_DataClass], ...] = (),
     frozen: bool = False,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Type[PartialBuilds[Importable]]:  # pragma: no cover
@@ -686,7 +725,7 @@ def builds(
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     dataclass_name: Optional[str] = None,
-    builds_bases: Tuple[Any, ...] = (),
+    builds_bases: Tuple[Type[_DataClass], ...] = (),
     frozen: bool = False,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Union[
@@ -706,7 +745,7 @@ def builds(
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     frozen: bool = False,
-    builds_bases: Tuple[Any, ...] = (),
+    builds_bases: Tuple[Type[_DataClass], ...] = (),
     dataclass_name: Optional[str] = None,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]:
@@ -1554,12 +1593,34 @@ def builds(
         else:
             assert len(item) == 3, item
             value = item[-1]
+            name = item[0]
 
             if not isinstance(value, Field):
                 value = sanitized_field(
                     value,
                     error_prefix=BUILDS_ERROR_PREFIX,
                     field_name=item[0],
+                    _mutable_default_permitted=_utils.mutable_default_permitted(
+                        builds_bases, name
+                    ),
+                )
+            elif (
+                _utils.PATCH_OMEGACONF_830
+                and builds_bases
+                and value.default_factory is not MISSING
+            ):
+
+                # Addresses omegaconf #830 https://github.com/omry/omegaconf/issues/830
+                #
+                # Value was passed as a field-with-default-factory, we'll
+                # access the default from the factory and will reconstruct the field
+                value = sanitized_field(
+                    value.default_factory(),
+                    error_prefix=BUILDS_ERROR_PREFIX,
+                    field_name=item[0],
+                    _mutable_default_permitted=_utils.mutable_default_permitted(
+                        builds_bases, name
+                    ),
                 )
 
             sanitized_base_fields.append((item[0], item[1], value))
@@ -1941,8 +2002,9 @@ class ZenField:
     hint: type = Any
     default: Union[SupportedPrimitive, Field, Type[NOTHING]] = NOTHING
     name: Union[str, Type[NOTHING]] = NOTHING
+    _permit_default_factory: InitVar[bool] = True
 
-    def __post_init__(self):
+    def __post_init__(self, _permit_default_factory):
         if not isinstance(self.name, str):
             if self.name is not NOTHING:
                 raise TypeError(f"`ZenField.name` expects a string, got: {self.name}")
@@ -1950,7 +2012,9 @@ class ZenField:
         self.hint = _utils.sanitized_type(self.hint)
 
         if self.default is not NOTHING:
-            self.default = sanitized_field(self.default)
+            self.default = sanitized_field(
+                self.default, _mutable_default_permitted=_permit_default_factory
+            )
 
 
 def make_config(
@@ -1959,7 +2023,7 @@ def make_config(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     config_name: str = "Config",
     frozen: bool = False,
-    bases: Tuple[Type[DataClass], ...] = (),
+    bases: Tuple[Type[_DataClass], ...] = (),
     **fields_as_kwargs: Union[SupportedPrimitive, ZenField],
 ) -> Type[DataClass]:
     """
@@ -2217,13 +2281,24 @@ def make_config(
             normalized_fields[_field] = ZenField(name=_field, hint=Any)
         else:
             assert isinstance(_field.name, str)
-            normalized_fields[_field.name] = _field
+            normalized_fields[_field.name] = _repack_zenfield(
+                _field, _field.name, bases
+            )
 
     for name, value in fields_as_kwargs.items():
         if not isinstance(value, ZenField):
-            normalized_fields[name] = ZenField(name=name, default=value)
+            default_factory_permitted = (
+                not bases or _utils.mutable_default_permitted(bases, field_name=name)
+                if _utils.PATCH_OMEGACONF_830
+                else True
+            )
+            normalized_fields[name] = ZenField(
+                name=name,
+                default=value,
+                _permit_default_factory=default_factory_permitted,
+            )
         else:
-            normalized_fields[name] = value
+            normalized_fields[name] = _repack_zenfield(value, name=name, bases=bases)
 
     # fields without defaults must come first
     config_fields: List[Union[Tuple[str, type], Tuple[str, type, Any]]] = [
@@ -2270,3 +2345,22 @@ def make_config(
             cls_name=config_name, fields=config_fields, frozen=frozen, bases=bases
         ),
     )
+
+
+def _repack_zenfield(value: ZenField, name: str, bases: Tuple[_DataClass, ...]):
+    default = value.default
+
+    if (
+        _utils.PATCH_OMEGACONF_830
+        and bases
+        and not _utils.mutable_default_permitted(bases, field_name=name)
+        and isinstance(default, Field)
+        and default.default_factory is not MISSING
+    ):
+        return ZenField(
+            hint=value.hint,
+            default=default.default_factory(),
+            name=value.name,
+            _permit_default_factory=False,
+        )
+    return value
