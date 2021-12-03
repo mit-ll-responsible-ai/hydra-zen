@@ -239,7 +239,14 @@ class A_inheritance:
     y: Any = 1
 
 
-valid_defaults = st.sampled_from([1, "a", None, True, [1], {"a": 1}])
+valid_defaults = (
+    st.none()
+    | st.booleans()
+    | st.text(alphabet="abcde")
+    | st.integers(-3, 3)
+    | st.lists(st.integers(-2, 2))
+    | st.fixed_dictionaries({"a": st.integers(-2, 2)})
+)
 
 
 def via_hydrated(x, Parent):
