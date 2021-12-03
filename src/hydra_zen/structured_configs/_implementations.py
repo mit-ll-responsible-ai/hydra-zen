@@ -416,7 +416,7 @@ def hydrated_dataclass(
                     # TODO: update error message with fixed omegaconf version
                     _value = field_.default_factory()
                     raise HydraZenValidationError(
-                        "This config will not instantiatie properly.\nThis is due to a "
+                        "This config will not instantiate properly.\nThis is due to a "
                         "known bug in omegaconf: The config specifies a "
                         f"default-factory for field {field_.name}, and inherits from a "
                         "parent that specifies the same field with a non-factory value "
@@ -426,9 +426,23 @@ def hydrated_dataclass(
                         "information, see: https://github.com/omry/omegaconf/issues/830"
                     )
 
+        if populate_full_signature:
+            # we need to ensure that the fields specified via the class definition
+            # take precedence over the fields that will be auto-populated by builds
+            kwargs = {
+                f.name: f.default if f.default is not MISSING else f.default_factory()
+                for f in fields(decorated_obj)
+                if not (f.default is MISSING and f.default_factory is MISSING)
+                and f.name not in _HYDRA_FIELD_NAMES
+                and not f.name.startswith("_zen_")
+            }
+        else:
+            kwargs = {}
+
         return builds(
             target,
             *pos_args,
+            **kwargs,
             populate_full_signature=populate_full_signature,
             hydra_recursive=hydra_recursive,
             hydra_convert=hydra_convert,
@@ -1504,9 +1518,6 @@ def builds(
                     user_specified_named_params[param.name]
                 )
                 _seen.add(param.name)
-            elif param.name in fields_set_by_bases:
-                # don't populate a parameter that can be derived from a base
-                continue
             else:
                 # any parameter whose default value is None is automatically
                 # annotated with `Optional[...]`. This improves flexibility with
