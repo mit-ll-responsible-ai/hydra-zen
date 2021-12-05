@@ -37,8 +37,6 @@ def requires_A(x: int):
 
 # test type behaviors
 def f1():
-    # test builds(..., zen_partial=True)
-    # there is something really weird where annotating : PartialBuilds[Type[A]] breaks this..
     a: Literal["Type[PartialBuilds[Type[A]]]"] = reveal_type(
         builds(A, zen_partial=True)
     )
@@ -181,6 +179,10 @@ def zen_wrappers():
         builds(str, zen_partial=True, zen_wrappers=(f, J, B, PB, None))
     )
 
+    # should fail
+    # builds(str, zen_wrappers=(2.0, 1))
+    # builds(str, zen_wrappers=False)
+
 
 def custom_builds_fn():
     _builds = make_custom_builds_fn()
@@ -319,3 +321,20 @@ def supported_primitives():
     # make_config(a={1j: 1})
     # make_config(a={M: 1})
     # make_config(a={ADataclass: 1})
+
+
+def check_inheritance():
+    P1 = make_config(x=1)
+    P2 = builds(dict)
+
+    @dataclass
+    class P3:
+        pass
+
+    C: Literal["Type[DataClass]"] = reveal_type(make_config(x=1, bases=(P1, P2, P3)))
+    D: Literal["Type[Builds[Type[int]]]"] = reveal_type(builds(int, bases=(P1, P2, P3)))
+
+    # should fail
+    # make_config(x=1, bases=(lambda x: x,))
+    # make_config(x=1, bases=(None,))
+    # make_config(x=1, bases=(A,))
