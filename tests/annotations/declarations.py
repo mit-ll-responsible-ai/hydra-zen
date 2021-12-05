@@ -309,7 +309,9 @@ def supported_primitives():
 
     # The following should be marked as "bad by type-checkers
     # make_config(a=M())
+    # make_config(a={"a": M()})
     # make_config(a=(1, M()))
+    # make_config(a=[1, M()])
     # builds(dict, a=M())
 
     # The following *should* be invalid, but we are limited
@@ -317,4 +319,3 @@ def supported_primitives():
     # make_config(a={1j: 1})
     # make_config(a={M: 1})
     # make_config(a={ADataclass: 1})
-    # make_config(a={ADataclass(): 1})

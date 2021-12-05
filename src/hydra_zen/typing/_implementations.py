@@ -7,18 +7,19 @@ from pathlib import Path
 from typing import (
     Any,
     Callable,
-    Deque,
     Dict,
     FrozenSet,
     Generic,
+    Mapping,
     NewType,
+    Sequence,
     Tuple,
     TypeVar,
     Union,
 )
 
 from omegaconf import DictConfig, ListConfig
-from typing_extensions import Protocol, runtime_checkable
+from typing_extensions import Protocol, TypedDict, runtime_checkable
 
 __all__ = [
     "Just",
@@ -28,6 +29,10 @@ __all__ = [
     "Importable",
     "SupportedPrimitive",
 ]
+
+
+class EmptyDict(TypedDict):
+    pass
 
 
 _T = TypeVar("_T", covariant=True)
@@ -116,21 +121,21 @@ _SupportedPrimitive = Union[
     complex,
     Path,
     range,
-    # Very sadly, mutable generic containers need to be invariant.
-    # See: https://mypy.readthedocs.io/en/stable/common_issues.html#invariance-vs-covariance
-    #
-    # So we can't do e.g. List['SupportedPrimitive'] for accurate, recursive
-    # lists. We would need to so List[int] | List[str] | ... ad naeseum
-    # in order to avoide hitting users with false-positives.
-    # But hey! At least our frozen-sets are very accurately typed :P
-    list,
-    dict,
     set,
-    Deque,
+    EmptyDict,  # not covered by Mapping[..., ...]
 ]
 
 SupportedPrimitive = Union[
     _SupportedPrimitive,
     FrozenSet["SupportedPrimitive"],
-    Tuple["SupportedPrimitive", ...],
+    # Even thought this is redundant with Sequence, it seems to
+    # be needed for pyright to do proper checking of tuple contents
+    Tuple["SupportedPrimitive"],
+    # Mutable generic containers need to be invariant, so
+    # we have to settle for Sequence/Mapping. While this
+    # is overly permissive in terms of sequence-type, it
+    # at least affords quality checking of sequence content
+    Sequence["SupportedPrimitive"],
+    # Mapping is covariant only in value
+    Mapping[Any, "SupportedPrimitive"],
 ]
