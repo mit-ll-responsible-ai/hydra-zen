@@ -124,10 +124,7 @@ Values of the following types can be specified directly in configs:
 Additional Types, Supported via hydra-zen
 *****************************************
 
-.. warning:: 
-   
-   This section refers to capabilities that are not yet available in a stable release 
-   of hydra-zen. They will be included in the release of `v0.4.0`.
+    This feature was introduced in hydra-zen ``v0.4.0``
 
 Values of additional types can be specified directly via hydra-zen's 
 :ref:`config-creation functions <create-config>`, and hydra-zen will automatically 
