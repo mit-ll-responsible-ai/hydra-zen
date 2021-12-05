@@ -7,21 +7,19 @@ from pathlib import Path
 from typing import (
     Any,
     Callable,
-    Counter,
-    Deque,
     Dict,
     FrozenSet,
     Generic,
-    List,
+    Mapping,
     NewType,
-    Set,
+    Sequence,
     Tuple,
     TypeVar,
     Union,
 )
 
 from omegaconf import DictConfig, ListConfig
-from typing_extensions import Protocol, runtime_checkable
+from typing_extensions import Protocol, TypedDict, runtime_checkable
 
 __all__ = [
     "Just",
@@ -31,6 +29,10 @@ __all__ = [
     "Importable",
     "SupportedPrimitive",
 ]
+
+
+class EmptyDict(TypedDict):
+    pass
 
 
 _T = TypeVar("_T", covariant=True)
@@ -119,15 +121,21 @@ _SupportedPrimitive = Union[
     complex,
     Path,
     range,
+    set,
+    EmptyDict,  # not covered by Mapping[..., ...]
 ]
 
 SupportedPrimitive = Union[
     _SupportedPrimitive,
-    Dict[_HydraPrimitive, "SupportedPrimitive"],
-    Counter[_HydraPrimitive],
-    Set["SupportedPrimitive"],
     FrozenSet["SupportedPrimitive"],
-    Deque["SupportedPrimitive"],
-    List["SupportedPrimitive"],
-    Tuple["SupportedPrimitive", ...],
+    # Even thought this is redundant with Sequence, it seems to
+    # be needed for pyright to do proper checking of tuple contents
+    Tuple["SupportedPrimitive"],
+    # Mutable generic containers need to be invariant, so
+    # we have to settle for Sequence/Mapping. While this
+    # is overly permissive in terms of sequence-type, it
+    # at least affords quality checking of sequence content
+    Sequence["SupportedPrimitive"],
+    # Mapping is covariant only in value
+    Mapping[Any, "SupportedPrimitive"],
 ]
