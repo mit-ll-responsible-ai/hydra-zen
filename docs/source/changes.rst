@@ -16,8 +16,10 @@ This release makes improvements to the validation performed by hydra-zen's
 types that are not natively supported by Hydra.
 
 Also included is an important compatibility-breaking change and a downstream 
-fix for an upstream bug in `omegaconf <https://omegaconf.readthedocs.io/en/2.1_branch/>`_ (a library on which Hydra intimately depends). Thus it is highly recommended that users 
-prioritize upgrading to hydra-zen v0.4.0.
+fix for an upstream bug in 
+`omegaconf <https://omegaconf.readthedocs.io/en/2.1_branch/>`_ (a library on which 
+Hydra intimately depends). Thus it is highly recommended that users prioritize 
+upgrading to hydra-zen v0.4.0.
 
 New Features
 ------------
