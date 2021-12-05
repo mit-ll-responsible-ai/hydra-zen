@@ -7,14 +7,11 @@ from pathlib import Path
 from typing import (
     Any,
     Callable,
-    Counter,
     Deque,
     Dict,
     FrozenSet,
     Generic,
-    List,
     NewType,
-    Set,
     Tuple,
     TypeVar,
     Union,
@@ -119,15 +116,21 @@ _SupportedPrimitive = Union[
     complex,
     Path,
     range,
+    # Very sadly, mutable generic containers need to be invariant.
+    # See: https://mypy.readthedocs.io/en/stable/common_issues.html#invariance-vs-covariance
+    #
+    # So we can't do e.g. List['SupportedPrimitive'] for accurate, recursive
+    # lists. We would need to so List[int] | List[str] | ... ad naeseum
+    # in order to avoide hitting users with false-positives.
+    # But hey! At least our frozen-sets are very accurately typed :P
+    list,
+    dict,
+    set,
+    Deque,
 ]
 
 SupportedPrimitive = Union[
     _SupportedPrimitive,
-    Dict[_HydraPrimitive, "SupportedPrimitive"],
-    Counter[_HydraPrimitive],
-    Set["SupportedPrimitive"],
     FrozenSet["SupportedPrimitive"],
-    Deque["SupportedPrimitive"],
-    List["SupportedPrimitive"],
     Tuple["SupportedPrimitive", ...],
 ]

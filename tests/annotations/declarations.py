@@ -299,9 +299,21 @@ def supported_primitives():
         olist,
     )
 
+    a_list = [1, 2, [1, 2]]
+    a_dict = {"a": [1, 2, [1, 2]]}
+    a_set = {1, 2.0, (1, 2)}
+
+    # make sure we don't hit this issue again
+    # https://github.com/microsoft/pyright/issues/2659
+    a8 = make_config(x=a_list, y=a_dict, z=a_set)
+
     # The following should be marked as "bad by type-checkers
     # make_config(a=M())
+    # make_config(a=(1, M()))
     # builds(dict, a=M())
+
+    # The following *should* be invalid, but we are limited
+    # by mutable invariants being generic
     # make_config(a={1j: 1})
     # make_config(a={M: 1})
     # make_config(a={ADataclass: 1})
