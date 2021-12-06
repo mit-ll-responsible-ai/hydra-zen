@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Changelog &#8212; hydra-zen 0.4.0rc1+18.g3d4dc27 documentation</title>
+    <title>Changelog &#8212; hydra-zen 0.4.0rc1+19.g6f96cc7 documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -168,26 +168,29 @@
 <nav id="bd-toc-nav">
     <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#dev-2021-11-26">
-   0.4.0dev - 2021-11-26
+  <a class="reference internal nav-link" href="#v0-4-0">
+   0.4.0 - 2021-12-05
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#new-features">
      New Features
     </a>
-    <ul class="nav section-nav flex-column">
-     <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#strict-runtime-and-static-validation-of-configuration-value-types">
-       Strict (Runtime and Static) Validation of Configuration-Value Types
-      </a>
-     </li>
-     <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#specialized-support-for-additional-configuration-value-types">
-       Specialized Support for Additional Configuration-Value Types
-      </a>
-     </li>
-    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#compatibility-breaking-changes">
+     Compatibility-Breaking Changes
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#bug-fixes">
+     Bug Fixes
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#other-improvements">
+     Other improvements
+    </a>
    </li>
   </ul>
  </li>
@@ -202,7 +205,7 @@
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#id3">
+    <a class="reference internal nav-link" href="#id4">
      New Features
     </a>
    </li>
@@ -253,101 +256,65 @@
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
 <p>This is a record of all past hydra-zen releases and what went into them, in reverse
 chronological order. All previous releases should still be available on pip.</p>
-<div class="section" id="dev-2021-11-26">
-<span id="v0-4-0dev"></span><h2>0.4.0dev - 2021-11-26<a class="headerlink" href="#dev-2021-11-26" title="Permalink to this headline">¶</a></h2>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>This section refers to capabilities that are not yet available in a stable release
-of hydra-zen. They will be included in the release of <code class="xref py py-obj docutils literal notranslate"><span class="pre">v0.4.0</span></code>.</p>
-</div>
+<div class="section" id="v0-4-0">
+<span id="id1"></span><h2>0.4.0 - 2021-12-05<a class="headerlink" href="#v0-4-0" title="Permalink to this headline">¶</a></h2>
 <p>This release makes improvements to the validation performed by hydra-zen’s
 <a class="reference internal" href="api_reference.html#create-config"><span class="std std-ref">config-creation functions</span></a>. It also adds specialized support for
 types that are not natively supported by Hydra.</p>
+<p>Also included is an important compatibility-breaking change and a downstream
+fix for an upstream bug in
+<a class="reference external" href="https://omegaconf.readthedocs.io/en/2.1_branch/">omegaconf</a> (a library on which
+Hydra intimately depends). Thus it is highly recommended that users prioritize
+upgrading to hydra-zen v0.4.0.</p>
 <div class="section" id="new-features">
 <h3>New Features<a class="headerlink" href="#new-features" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="strict-runtime-and-static-validation-of-configuration-value-types">
-<h4>Strict (Runtime and Static) Validation of Configuration-Value Types<a class="headerlink" href="#strict-runtime-and-static-validation-of-configuration-value-types" title="Permalink to this headline">¶</a></h4>
-<p>See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/163">pull request #163</a> for a detailed description of these features and their implementation
-details.</p>
-<p>hydra-zen’s <a class="reference internal" href="api_reference.html#create-config"><span class="std std-ref">config-creation functions</span></a> (e.g.
-<a class="reference internal" href="generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_config()</span></code></a> and <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a>) now provide both strict
-runtime and static validation of the configured values that they are fed.
-That is, creating a config that contains values of unsupported types will cause
-hydra-zen to raise an error. hydra-zen’s internal type annotations have also be refined
-so that static type-checkers will “flag” such invalid configs as well.</p>
-<p>Consider the following example:</p>
-<div class="literal-block-wrapper docutils container" id="id8">
-<div class="code-block-caption"><span class="caption-text">Demonstrating hydra-zen’s runtime validation of configured values.</span><a class="headerlink" href="#id8" title="Permalink to this code">¶</a></div>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">make_config</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">SomeClass</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="k">pass</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="n">unsupported_value</span> <span class="o">=</span> <span class="n">SomeClass</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">make_config</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">unsupported_value</span><span class="p">)</span>  <span class="c1"># static type-checkers will mark this as invalid</span>
-<span class="go">HydraZenUnsupportedPrimitiveError: ...</span>
-</pre></div>
+<ul>
+<li><p>Strict runtime <em>and</em> static validation of configuration types. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/163">pull request #163</a> for detailed descriptions and examples.</p>
+<blockquote>
+<div><p>hydra-zen’s <a class="reference internal" href="api_reference.html#create-config"><span class="std std-ref">config-creation functions</span></a> now provide both strict runtime and static validation of the configured values that they are fed. Thus users will have a much easier time identifying and diagnosing bad configs, before launching a Hydra job.</p>
+</div></blockquote>
+</li>
+<li><p>Specialized support for additional configuration-value types. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/163">pull request #163</a> for detailed descriptions and examples.</p>
+<blockquote>
+<div><p>Now values of types like <a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">complex</span></code></a> and <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a> can be specified directly in hydra-zen’s configuration functions, and hydra-zen will automatically construct nested configs for those values. Consult <a class="reference internal" href="api_reference.html#valid-types"><span class="std std-ref">Configuration-Value Types Supported by Hydra and hydra-zen</span></a> for a complete list of the additional types that are supported.</p>
+</div></blockquote>
+</li>
+</ul>
 </div>
+<div class="section" id="compatibility-breaking-changes">
+<h3>Compatibility-Breaking Changes<a class="headerlink" href="#compatibility-breaking-changes" title="Permalink to this headline">¶</a></h3>
+<p>We changed the behavior of <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> when
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">populate_full_signature=True</span></code> and one or more base-classes are specified for
+inheritance.</p>
+<p>Previously, fields specified by the parent class would take priority over those that
+would be auto-populated. However, this behavior is unintuitive as
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">populate_full_signature=True</span></code> should behave identically as the case where one
+manually-specifies the arguments from a target’s signature. Thus we have changed the
+behavior accordingly. Please read more about it in <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/174">pull request #174</a>.</p>
 </div>
-<p>Previously, no such error would be raised by hydra-zen; instead, the config would
-eventually cause an error when it would be used to actually configure a Hydra job.
-Now, invalid configs will be caught upon construction.</p>
-<p>Consult <a class="reference internal" href="api_reference.html#valid-types"><span class="std std-ref">Configuration-Value Types Supported by Hydra and hydra-zen</span></a> for a complete list of the supported types of configuration
-values.</p>
+<div class="section" id="bug-fixes">
+<h3>Bug Fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h3>
+<p>The following bug was discovered in <code class="docutils literal notranslate"><span class="pre">omegaconf</span> <span class="pre">&lt;=</span> <span class="pre">2.1.1</span></code>: a config that specifies a
+mutable default value for a field, but inherits from a parent that provides a
+non-mutable value for that field, will instantiate with the parent’s field. Please read more about this issue, and our downstream fix for it, at <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/172">pull request #172</a>.</p>
+<p>It is recommended that users upgrade to the latest version of omegaconf once it is
+released, which will likely include a proper upstream fix of the bug.</p>
 </div>
-<div class="section" id="specialized-support-for-additional-configuration-value-types">
-<h4>Specialized Support for Additional Configuration-Value Types<a class="headerlink" href="#specialized-support-for-additional-configuration-value-types" title="Permalink to this headline">¶</a></h4>
-<p>See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/163">pull request #163</a> for a detailed description of these features and their implementation
-details.</p>
-<p>hydra-zen’s <a class="reference internal" href="api_reference.html#create-config"><span class="std std-ref">config-creation functions</span></a> (e.g.
-<a class="reference internal" href="generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_config()</span></code></a> and <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a>) now provide automatic
-support for common configuration-value types, like <a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">complex</span></code></a> and
-<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a>, which are not natively supported by Hydra; values of these
-types will automatically be transformed into structured configs.</p>
-<p>For example, consider the following config that contains values whose types are not
-natively supported by Hydra.</p>
-<div class="literal-block-wrapper docutils container" id="id9">
-<div class="code-block-caption"><span class="caption-text">Leveraging hydra-zen’s built-in support for additional types.</span><a class="headerlink" href="#id9" title="Permalink to this code">¶</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">make_config</span><span class="p">,</span> <span class="n">instantiate</span><span class="p">,</span> <span class="n">to_yaml</span>
-
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-
-<span class="n">Conf</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="n">j</span><span class="p">,</span> <span class="n">home</span><span class="o">=</span><span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">())</span>
-</pre></div>
-</div>
-</div>
-<p>hydra-zen automatically creates nested structured configs to represent these values;
-note that these configs do not carry any direct dependencies on hydra-zen.</p>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">Conf</span><span class="p">))</span>
-<span class="go">value:</span>
-<span class="go">  real: 1.0</span>
-<span class="go">  imag: 2.0</span>
-<span class="go">  _target_: builtins.complex</span>
-<span class="go">home:</span>
-<span class="go">  _args_:</span>
-<span class="go">  - C:\Users\Ryan Soklaski</span>
-<span class="go">  _target_: pathlib.Path</span>
-</pre></div>
-</div>
-<p>Instantiating <code class="docutils literal notranslate"><span class="pre">Conf</span></code> will produce the expected values:</p>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf</span><span class="p">)</span>
-<span class="go">{&#39;value&#39;: (1+2j), &#39;home&#39;: WindowsPath(&#39;C:/Users/Ryan Soklaski&#39;)}</span>
-</pre></div>
-</div>
-<p>Consult <a class="reference internal" href="api_reference.html#valid-types"><span class="std std-ref">Configuration-Value Types Supported by Hydra and hydra-zen</span></a> for a complete list of the additional types that hydra-zen
-supports in this fashion.</p>
-</div>
+<div class="section" id="other-improvements">
+<h3>Other improvements<a class="headerlink" href="#other-improvements" title="Permalink to this headline">¶</a></h3>
+<p>hydra-zen will never be the first to import third-party libraries for which it provides
+specialized support (e.g., NumPy).</p>
 </div>
 </div>
 <div class="section" id="v0-3-1">
-<span id="id1"></span><h2>0.3.1 - 2021-11-13<a class="headerlink" href="#v0-3-1" title="Permalink to this headline">¶</a></h2>
+<span id="id2"></span><h2>0.3.1 - 2021-11-13<a class="headerlink" href="#v0-3-1" title="Permalink to this headline">¶</a></h2>
 <p>This release fixes a bug that was reported in <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/issues/161">issue #161</a>. Prior to this patch,
 there was a bug in <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> where specifying <code class="docutils literal notranslate"><span class="pre">populate_full_sig=True</span></code>
 for a target that did not have <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code> caused all user-specified zen-meta fields
 to be excluded from the resulting config.</p>
 </div>
 <div class="section" id="v0-3-0">
-<span id="id2"></span><h2>0.3.0 - 2021-10-27<a class="headerlink" href="#v0-3-0" title="Permalink to this headline">¶</a></h2>
+<span id="id3"></span><h2>0.3.0 - 2021-10-27<a class="headerlink" href="#v0-3-0" title="Permalink to this headline">¶</a></h2>
 <p>This release adds many new features to hydra-zen, and is a big step towards <code class="docutils literal notranslate"><span class="pre">v1.0.0</span></code>. It also introduces some significant API changes, meaning that there are notable deprecations of expressions that were valid in <code class="docutils literal notranslate"><span class="pre">v0.2.0</span></code>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -357,8 +324,8 @@ to be excluded from the resulting config.</p>
 <p class="admonition-title">Join the Discussion 💬</p>
 <p>The hydra-zen project <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/discussions">now has a discussion board</a>. Stop by and say “hi”!</p>
 </div>
-<div class="section" id="id3">
-<h3>New Features<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id4">
+<h3>New Features<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <ul>
 <li><p>The introduction of <code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">zen_wrappers=&lt;&gt;)</span></code>.</p>
 <blockquote>
@@ -414,7 +381,7 @@ utilized. See <a class="reference external" href="https://github.com/mit-ll-resp
 </div>
 </div>
 <div class="section" id="v0-2-0">
-<span id="id6"></span><h2>0.2.0 - 2021-08-12<a class="headerlink" href="#v0-2-0" title="Permalink to this headline">¶</a></h2>
+<span id="id7"></span><h2>0.2.0 - 2021-08-12<a class="headerlink" href="#v0-2-0" title="Permalink to this headline">¶</a></h2>
 <p>This release:</p>
 <ul class="simple">
 <li><p>Improves hydra-zen’s <a class="reference external" href="https://mit-ll-responsible-ai.github.io/hydra-zen/structured_configs.html#automatic-type-refinement">automatic type refinement</a>. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/84">pull request #84</a> for details</p></li>
@@ -426,7 +393,7 @@ utilized. See <a class="reference external" href="https://github.com/mit-ll-resp
 </ul>
 </div>
 <div class="section" id="v0-1-0">
-<span id="id7"></span><h2>0.1.0 - 2021-08-04<a class="headerlink" href="#v0-1-0" title="Permalink to this headline">¶</a></h2>
+<span id="id8"></span><h2>0.1.0 - 2021-08-04<a class="headerlink" href="#v0-1-0" title="Permalink to this headline">¶</a></h2>
 <p>This is hydra-zen’s first stable release on PyPI!
 Although we have not yet released version <code class="xref py py-obj docutils literal notranslate"><span class="pre">v1.0.0</span></code>, it should be noted that hydra-zen’s codebase is thoroughly tested.
 Its test suite makes keen use of the property-based testing library <a class="reference external" href="https://hypothesis.readthedocs.io/en/latest/">Hypothesis</a>.
