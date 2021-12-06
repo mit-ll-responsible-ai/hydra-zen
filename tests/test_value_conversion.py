@@ -90,6 +90,10 @@ def test_value_supported_via_config_maker_functions(
     )
 
     if via_yaml:
+        if isinstance(value, Enum):
+            # Default omegaconf support for enums doesn't roundtrip from yamls
+            assume(False)
+
         Conf = OmegaConf.structured(to_yaml(Conf))
 
     conf = instantiate(Conf)

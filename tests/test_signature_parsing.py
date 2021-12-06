@@ -4,6 +4,7 @@
 import inspect
 from abc import ABC
 from dataclasses import dataclass
+from enum import Enum
 from inspect import Parameter
 from typing import Any, Callable, Dict, Mapping, Optional, Tuple, Type
 
@@ -373,3 +374,16 @@ def test_pop_full_sig_is_always_identical_to_manually_specifying_sig_args(
     note(to_yaml(Conf))
     note(to_yaml(ConfWithPopSig))
     assert to_yaml(Conf) == to_yaml(ConfWithPopSig)
+
+
+class Color(Enum):
+    red = 1
+    green = 2
+
+
+def f_with_color(x: Color = Color.red):
+    return x
+
+
+def test_populate_annotated_enum_regression():
+    assert instantiate(builds(f_with_color, populate_full_signature=True)) is Color.red

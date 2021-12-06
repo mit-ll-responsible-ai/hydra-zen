@@ -598,18 +598,11 @@ def sanitized_default_value(
             resolved_value = conversion_fn(resolved_value)
             type_of_value = type(resolved_value)
 
-    if structured_conf_permitted and isinstance(resolved_value, Enum):
-        # Leverages programmatic access to enum member via value.
-        # E.g.
-        # >>> Color(1)
-        # <Color.RED: 1>
-        return builds(type(resolved_value), resolved_value.value)
-
     if type_of_value in HYDRA_SUPPORTED_PRIMITIVES or (
         structured_conf_permitted
         and (
             is_dataclass(resolved_value)
-            or isinstance(resolved_value, (ListConfig, DictConfig))
+            or isinstance(resolved_value, (Enum, ListConfig, DictConfig))
         )
     ):
         return resolved_value
