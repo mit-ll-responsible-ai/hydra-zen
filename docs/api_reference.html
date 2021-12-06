@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Reference &#8212; hydra-zen 0.4.0rc1+19.g6f96cc7 documentation</title>
+    <title>Reference &#8212; hydra-zen 0.4.0+1.g0b3282f documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -494,7 +494,7 @@ of common types via its <a class="reference internal" href="#create-config"><spa
 </div></blockquote>
 <p>Values of additional types can be specified directly via hydra-zen’s
 <a class="reference internal" href="#create-config"><span class="std std-ref">config-creation functions</span></a>, and hydra-zen will automatically
-create targeted configs to represent values those values in a way that is compatible
+create targeted configs to represent those values in a way that is compatible
 with Hydra. For example, a <a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">complex</span></code></a> value can be specified directly via <a class="reference internal" href="generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_config()</span></code></a>, and a targeted config will be created for that value.</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">make_config</span><span class="p">,</span> <span class="n">to_yaml</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">2.0</span> <span class="o">+</span> <span class="mf">3.0</span><span class="n">j</span><span class="p">)</span>

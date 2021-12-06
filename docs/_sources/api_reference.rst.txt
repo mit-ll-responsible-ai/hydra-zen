@@ -128,7 +128,7 @@ Additional Types, Supported via hydra-zen
 
 Values of additional types can be specified directly via hydra-zen's 
 :ref:`config-creation functions <create-config>`, and hydra-zen will automatically 
-create targeted configs to represent values those values in a way that is compatible 
+create targeted configs to represent those values in a way that is compatible 
 with Hydra. For example, a :py:class:`complex` value can be specified directly via :func:`~hydra_zen.make_config`, and a targeted config will be created for that value.
 
 .. code-block:: pycon
