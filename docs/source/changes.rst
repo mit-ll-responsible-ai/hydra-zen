@@ -5,110 +5,57 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse 
 chronological order. All previous releases should still be available on pip.
 
-.. _v0.4.0dev:
+.. _v0.4.0:
 
----------------------
-0.4.0dev - 2021-11-26
----------------------
-
-.. warning:: 
-   
-   This section refers to capabilities that are not yet available in a stable release 
-   of hydra-zen. They will be included in the release of `v0.4.0`.
+------------------
+0.4.0 - 2021-12-05
+------------------
 
 This release makes improvements to the validation performed by hydra-zen's 
 :ref:`config-creation functions <create-config>`. It also adds specialized support for 
 types that are not natively supported by Hydra.
 
+Also included is an important compatibility-breaking change and a downstream 
+fix for an upstream bug in 
+`omegaconf <https://omegaconf.readthedocs.io/en/2.1_branch/>`_ (a library on which 
+Hydra intimately depends). Thus it is highly recommended that users prioritize 
+upgrading to hydra-zen v0.4.0.
 
 New Features
 ------------
 
-Strict (Runtime and Static) Validation of Configuration-Value Types
-===================================================================
+- Strict runtime *and* static validation of configuration types. See :pull:`163` for detailed descriptions and examples.
+  
+    hydra-zen's :ref:`config-creation functions <create-config>` now provide both strict runtime and static validation of the configured values that they are fed. Thus users will have a much easier time identifying and diagnosing bad configs, before launching a Hydra job.
+- Specialized support for additional configuration-value types. See :pull:`163` for detailed descriptions and examples.
 
-See :pull:`163` for a detailed description of these features and their implementation 
-details.
+   Now values of types like :py:class:`complex` and :py:class:`pathlib.Path` can be specified directly in hydra-zen's configuration functions, and hydra-zen will automatically construct nested configs for those values. Consult :ref:`valid-types` for a complete list of the additional types that are supported.
 
-hydra-zen's :ref:`config-creation functions <create-config>` (e.g. 
-:func:`~hydra_zen.make_config` and :func:`~hydra_zen.builds`) now provide both strict 
-runtime and static validation of the configured values that they are fed.
-That is, creating a config that contains values of unsupported types will cause 
-hydra-zen to raise an error. hydra-zen's internal type annotations have also be refined 
-so that static type-checkers will "flag" such invalid configs as well.
+Compatibility-Breaking Changes
+------------------------------
+We changed the behavior of :func:`~hydra_zen.builds` when 
+`populate_full_signature=True` and one or more base-classes are specified for 
+inheritance. 
 
-Consider the following example:
+Previously, fields specified by the parent class would take priority over those that 
+would be auto-populated. However, this behavior is unintuitive as 
+`populate_full_signature=True` should behave identically as the case where one 
+manually-specifies the arguments from a target's signature. Thus we have changed the 
+behavior accordingly. Please read more about it in :pull:`174`.
 
-.. code-block:: pycon
-   :caption: Demonstrating hydra-zen's runtime validation of configured values.
+Bug Fixes
+---------
+The following bug was discovered in ``omegaconf <= 2.1.1``: a config that specifies a 
+mutable default value for a field, but inherits from a parent that provides a 
+non-mutable value for that field, will instantiate with the parent's field. Please read more about this issue, and our downstream fix for it, at :pull:`172`. 
 
-   >>> from hydra_zen import make_config
+It is recommended that users upgrade to the latest version of omegaconf once it is 
+released, which will likely include a proper upstream fix of the bug.
 
-   >>> class SomeClass:
-   ...     pass
-
-   >>> unsupported_value = SomeClass()
-   >>> make_config(a=unsupported_value)  # static type-checkers will mark this as invalid
-   HydraZenUnsupportedPrimitiveError: ...
-
-
-Previously, no such error would be raised by hydra-zen; instead, the config would 
-eventually cause an error when it would be used to actually configure a Hydra job.
-Now, invalid configs will be caught upon construction.
-
-Consult :ref:`valid-types` for a complete list of the supported types of configuration 
-values.
-
-Specialized Support for Additional Configuration-Value Types
-============================================================
-
-See :pull:`163` for a detailed description of these features and their implementation 
-details.
-
-hydra-zen's :ref:`config-creation functions <create-config>` (e.g. 
-:func:`~hydra_zen.make_config` and :func:`~hydra_zen.builds`) now provide automatic 
-support for common configuration-value types, like :py:class:`complex` and 
-:py:class:`pathlib.Path`, which are not natively supported by Hydra; values of these
-types will automatically be transformed into structured configs.
-
-For example, consider the following config that contains values whose types are not 
-natively supported by Hydra.
-
-.. code-block:: python
-   :caption: Leveraging hydra-zen's built-in support for additional types.
-
-   from hydra_zen import make_config, instantiate, to_yaml
-
-   from pathlib import Path
-
-   Conf = make_config(value=1+2j, home=Path.home())
-
-hydra-zen automatically creates nested structured configs to represent these values; 
-note that these configs do not carry any direct dependencies on hydra-zen.
-
-.. code-block:: pycon
-
-   >>> print(to_yaml(Conf))
-   value:
-     real: 1.0
-     imag: 2.0
-     _target_: builtins.complex
-   home:
-     _args_:
-     - C:\Users\Ryan Soklaski
-     _target_: pathlib.Path
-
- 
-Instantiating ``Conf`` will produce the expected values:
-
-.. code-block:: pycon
-
-   >>> instantiate(Conf)
-   {'value': (1+2j), 'home': WindowsPath('C:/Users/Ryan Soklaski')}
-
-
-Consult :ref:`valid-types` for a complete list of the additional types that hydra-zen 
-supports in this fashion.
+Other improvements
+------------------
+hydra-zen will never be the first to import third-party libraries for which it provides 
+specialized support (e.g., NumPy).
 
 .. _v0.3.1:
 

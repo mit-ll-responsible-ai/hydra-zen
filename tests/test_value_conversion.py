@@ -78,6 +78,10 @@ def test_value_supported_via_config_maker_functions(
     value = data.draw(st.from_type(zen_supported_type))
     if isinstance(value, str):
         assume(is_ascii(value) and value != "???")
+        try:
+            float(value)
+        except ValueError:
+            assume(False)
 
     Conf = (
         make_config(a=value, hydra_convert="all")
