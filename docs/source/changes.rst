@@ -47,8 +47,7 @@ Bug Fixes
 ---------
 The following bug was discovered in ``omegaconf <= 2.1.1``: a config that specifies a 
 mutable default value for a field, but inherits from a parent that provides a 
-non-mutable value for that, will instantiate with the parent's field. Please read more 
-about this issue, and our downstream fix for it, at :pull:`172`. 
+non-mutable value for that field, will instantiate with the parent's field. Please read more about this issue, and our downstream fix for it, at :pull:`172`. 
 
 It is recommended that users upgrade to the latest version of omegaconf once it is 
 released, which will likely include a proper upstream fix of the bug.
