@@ -5,6 +5,14 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse 
 chronological order. All previous releases should still be available on pip.
 
+.. _v0.4.1:
+
+------------------
+0.4.1 - 2021-12-06
+------------------
+
+:ref:`v0.4.0` introduced an undocumented, compatibility-breaking change to how hydra-zen treats :py:class:`enum.Enum` values. This patch reverts that change.
+
 .. _v0.4.0:
 
 ------------------
