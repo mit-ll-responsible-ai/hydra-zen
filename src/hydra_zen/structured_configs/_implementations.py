@@ -786,7 +786,8 @@ def builds(
         The arguments specified here solely determine the signature of the resulting
         config, unless ``populate_full_signature=True`` is specified (see below).
 
-        Named parameters of the forms that have the prefixes ``hydra_``, ``zen_`` or ``_zen_`` are reserved to ensure future-compatibility, and thus cannot be
+        Named parameters of the forms that have the prefixes ``hydra_``, ``zen_`` or 
+        ``_zen_`` are reserved to ensure future-compatibility, and thus cannot be
         specified by the user.
 
     zen_partial : bool, optional (default=False)
