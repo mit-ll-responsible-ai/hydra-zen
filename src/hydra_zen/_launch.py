@@ -18,7 +18,8 @@ from hydra_zen.typing._implementations import DataClass
 
 
 def _store_config(
-    cfg: Union[DataClass, DictConfig, Mapping], config_name: str = "hydra_launch"
+    cfg: Union[DataClass, Type[DataClass], DictConfig, Mapping],
+    config_name: str = "hydra_launch",
 ) -> str:
     """Stores configuration object in Hydra's ConfigStore.
 
