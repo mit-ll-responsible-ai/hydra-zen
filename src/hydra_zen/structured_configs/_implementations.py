@@ -64,6 +64,9 @@ ZenWrapper = Union[
     Builds[Callable[[_T2], _T2]],
     PartialBuilds[Callable[[_T2], _T2]],
     Just[Callable[[_T2], _T2]],
+    Type[Builds[Callable[[_T2], _T2]]],
+    Type[PartialBuilds[Callable[[_T2], _T2]]],
+    Type[Just[Callable[[_T2], _T2]]],
     Callable[[_T2], _T2],
     str,
 ]
@@ -786,7 +789,7 @@ def builds(
         The arguments specified here solely determine the signature of the resulting
         config, unless ``populate_full_signature=True`` is specified (see below).
 
-        Named parameters of the forms that have the prefixes ``hydra_``, ``zen_`` or 
+        Named parameters of the forms that have the prefixes ``hydra_``, ``zen_`` or
         ``_zen_`` are reserved to ensure future-compatibility, and thus cannot be
         specified by the user.
 
