@@ -1565,6 +1565,7 @@ def builds(
                 )
             del field_
 
+    # sanitize all types and configured values
     sanitized_base_fields: List[Union[Tuple[str, Any], Tuple[str, Any, Field]]] = []
 
     for item in base_fields:
@@ -1614,9 +1615,10 @@ def builds(
                 # the recursive instantiation will appropriately produce `int` for
                 # that field. This will not be addressed by hydra/omegaconf:
                 #    https://github.com/facebookresearch/hydra/issues/1759
-                # Thus we will auto-broaden the annotation when we see that the user
-                # has specified a `Builds` as a default value.
-                if not is_builds(value) or hydra_recursive is False
+                # Thus we will auto-broaden the annotation when we see that a field
+                # is set with a structured config as a default value - assuming that
+                # the field isn't annotated with a structured config type.
+                if hydra_recursive is False or not is_builds(value) or is_builds(type_)
                 else Any
             )
             sanitized_base_fields.append((name, sanitized_type, _field))

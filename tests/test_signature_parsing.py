@@ -317,7 +317,7 @@ def expects_int(x: int) -> int:
     ],
 )
 @pytest.mark.parametrize("hydra_recursive", [True, None])
-def test_setting_default_with_Builds_widens_type(builds_as_default, hydra_recursive):
+def test_setting_default_with_builds_widens_type(builds_as_default, hydra_recursive):
     # tests that we address https://github.com/facebookresearch/hydra/issues/1759
     # via auto type-widening
     kwargs = {} if hydra_recursive is None else dict(hydra_recursive=hydra_recursive)
@@ -327,6 +327,43 @@ def test_setting_default_with_Builds_widens_type(builds_as_default, hydra_recurs
     with pytest.raises(ValidationError):
         # ensure that type annotation is broadened only when hydra_recursive=False
         instantiate(builds(expects_int, x=builds_as_default, hydra_recursive=False))
+
+
+BuildsInt = builds(int)
+
+
+def f_with_dataclass_annotation(x: BuildsInt = BuildsInt()):
+    return x
+
+
+@pytest.mark.parametrize(
+    "bad_value",
+    [
+        1,  # not a structured config
+        builds(str)(),  # instance of different structured config
+    ],
+)
+def test_builds_doesnt_widen_dataclass_type_annotation(bad_value):
+
+    with pytest.raises(ValidationError):
+        instantiate(builds(f_with_dataclass_annotation, x=bad_value))
+
+    with pytest.raises(ValidationError):
+        instantiate(
+            builds(f_with_dataclass_annotation, populate_full_signature=True),
+            x=bad_value,
+        )
+
+
+def test_dataclass_type_annotation_with_subclass_default():
+    Child = builds(str, builds_bases=(BuildsInt,))
+    assert (
+        instantiate(
+            builds(f_with_dataclass_annotation, populate_full_signature=True), x=Child()
+        )
+        == ""
+    )
+    assert instantiate(builds(f_with_dataclass_annotation, x=Child())) == ""
 
 
 def func_with_various_defaults(x=1, y="a", z=[1, 2]):
