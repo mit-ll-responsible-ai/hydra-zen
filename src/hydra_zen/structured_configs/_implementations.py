@@ -1623,8 +1623,7 @@ def builds(
                 #    https://github.com/facebookresearch/hydra/issues/1759
                 # Thus we will auto-broaden the annotation when we see that the user
                 # has specified a `Builds` as a default value.
-                if not (is_builds(value) or is_dataclass(type_))
-                or hydra_recursive is False
+                if not is_builds(value) or hydra_recursive is False
                 else Any
             )
             sanitized_base_fields.append((name, sanitized_type, sanitized_value))
