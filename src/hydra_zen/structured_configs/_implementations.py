@@ -664,16 +664,9 @@ def sanitized_field(
     ):
         if _mutable_default_permitted:
             return cast(Field, mutable_value(value))
-        else:
-            return _utils.field(
-                default=sanitized_default_value(
-                    builds(type(value), value),
-                    allow_zen_conversion=allow_zen_conversion,
-                    error_prefix=error_prefix,
-                    field_name=field_name,
-                ),
-                init=init,
-            )
+
+        value = builds(type(value), value)
+
     return _utils.field(
         default=sanitized_default_value(
             value,
@@ -1234,7 +1227,7 @@ def builds(
             target_field.append(
                 (
                     _META_FIELD_NAME,
-                    _utils.sanitized_type(Tuple[str, ...]),
+                    Tuple[str, ...],
                     _utils.field(default=tuple(zen_meta), init=False),
                 ),
             )
@@ -1252,21 +1245,17 @@ def builds(
                 target_field.append(
                     (
                         _ZEN_WRAPPERS_FIELD_NAME,
-                        _utils.sanitized_type(
-                            Union[Union[str, Builds], Tuple[Union[str, Builds], ...]]
-                        ),
+                        Union[Union[str, Builds], Tuple[Union[str, Builds], ...]],
                         _utils.field(default=validated_wrappers[0], init=False),
-                    ),
+                    ),  # type: ignore
                 )
             else:
                 target_field.append(
                     (
                         _ZEN_WRAPPERS_FIELD_NAME,
-                        _utils.sanitized_type(
-                            Union[Union[str, Builds], Tuple[Union[str, Builds], ...]]
-                        ),
+                        Union[Union[str, Builds], Tuple[Union[str, Builds], ...]],
                         _utils.field(default=validated_wrappers, init=False),
-                    ),
+                    ),  # type: ignore
                 )
     else:
         target_field = [
@@ -1464,20 +1453,7 @@ def builds(
     #    otherwise, is Any
     #  - arg-value: mutable values are automatically specified using default-factory
     user_specified_named_params: Dict[str, Tuple[str, type, Any]] = {
-        name: (
-            name,
-            _utils.sanitized_type(type_hints.get(name, Any))
-            # OmegaConf's type-checking occurs before instantiation occurs.
-            # This means that, e.g., passing `Builds[int]` to a field `x: int`
-            # will fail Hydra's type-checking upon instantiation, even though
-            # the recursive instantiation will appropriately produce `int` for
-            # that field. This will not be addressed by hydra/omegaconf:
-            #    https://github.com/facebookresearch/hydra/issues/1759
-            # Thus we will auto-broaden the annotation when we see that the user
-            # has specified a `Builds` as a default value.
-            if not is_builds(value) or hydra_recursive is False else Any,
-            value,
-        )
+        name: (name, type_hints.get(name, Any), value)
         for name, value in kwargs_for_target.items()
     }
 
@@ -1521,10 +1497,7 @@ def builds(
                 # Hydra's type-validation
                 param_field = (
                     param.name,
-                    _utils.sanitized_type(
-                        type_hints.get(param.name, Any),
-                        wrap_optional=param.default is None,
-                    ),
+                    type_hints.get(param.name, Any),
                 )
 
                 if param.default is inspect.Parameter.empty:
@@ -1595,16 +1568,16 @@ def builds(
     sanitized_base_fields: List[Union[Tuple[str, Any], Tuple[str, Any, Field]]] = []
 
     for item in base_fields:
+        name = item[0]
+        type_ = item[1]
         if len(item) == 2:
-            # (name, type)   (no configured value)
-            sanitized_base_fields.append(item)
+            sanitized_base_fields.append((name, _utils.sanitized_type(type_)))
         else:
             assert len(item) == 3, item
             value = item[-1]
-            name = item[0]
 
             if not isinstance(value, Field):
-                value = sanitized_field(
+                _field = sanitized_field(
                     value,
                     error_prefix=BUILDS_ERROR_PREFIX,
                     field_name=item[0],
@@ -1622,7 +1595,7 @@ def builds(
                 #
                 # Value was passed as a field-with-default-factory, we'll
                 # access the default from the factory and will reconstruct the field
-                value = sanitized_field(
+                _field = sanitized_field(
                     value.default_factory(),
                     error_prefix=BUILDS_ERROR_PREFIX,
                     field_name=item[0],
@@ -1630,9 +1603,25 @@ def builds(
                         builds_bases, name
                     ),
                 )
+            else:
+                _field = value
 
-            sanitized_base_fields.append((item[0], item[1], value))
+            sanitized_type = (
+                _utils.sanitized_type(type_, wrap_optional=value is None)
+                # OmegaConf's type-checking occurs before instantiation occurs.
+                # This means that, e.g., passing `Builds[int]` to a field `x: int`
+                # will fail Hydra's type-checking upon instantiation, even though
+                # the recursive instantiation will appropriately produce `int` for
+                # that field. This will not be addressed by hydra/omegaconf:
+                #    https://github.com/facebookresearch/hydra/issues/1759
+                # Thus we will auto-broaden the annotation when we see that the user
+                # has specified a `Builds` as a default value.
+                if not is_builds(value) or hydra_recursive is False
+                else Any
+            )
+            sanitized_base_fields.append((name, sanitized_type, _field))
             del value
+            del _field
 
     out = make_dataclass(
         dataclass_name, fields=sanitized_base_fields, bases=builds_bases, frozen=frozen
