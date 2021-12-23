@@ -664,16 +664,9 @@ def sanitized_field(
     ):
         if _mutable_default_permitted:
             return cast(Field, mutable_value(value))
-        else:
-            return _utils.field(
-                default=sanitized_default_value(
-                    builds(type(value), value),
-                    allow_zen_conversion=allow_zen_conversion,
-                    error_prefix=error_prefix,
-                    field_name=field_name,
-                ),
-                init=init,
-            )
+
+        value = (builds(type(value), value),)
+
     return _utils.field(
         default=sanitized_default_value(
             value,
@@ -1584,7 +1577,7 @@ def builds(
             value = item[-1]
 
             if not isinstance(value, Field):
-                sanitized_value = sanitized_field(
+                _field = sanitized_field(
                     value,
                     error_prefix=BUILDS_ERROR_PREFIX,
                     field_name=item[0],
@@ -1602,7 +1595,7 @@ def builds(
                 #
                 # Value was passed as a field-with-default-factory, we'll
                 # access the default from the factory and will reconstruct the field
-                sanitized_value = sanitized_field(
+                _field = sanitized_field(
                     value.default_factory(),
                     error_prefix=BUILDS_ERROR_PREFIX,
                     field_name=item[0],
@@ -1611,7 +1604,7 @@ def builds(
                     ),
                 )
             else:
-                sanitized_value = value
+                _field = value
 
             sanitized_type = (
                 _utils.sanitized_type(type_, wrap_optional=value is None)
@@ -1626,8 +1619,9 @@ def builds(
                 if not is_builds(value) or hydra_recursive is False
                 else Any
             )
-            sanitized_base_fields.append((name, sanitized_type, sanitized_value))
+            sanitized_base_fields.append((name, sanitized_type, _field))
             del value
+            del _field
 
     out = make_dataclass(
         dataclass_name, fields=sanitized_base_fields, bases=builds_bases, frozen=frozen
