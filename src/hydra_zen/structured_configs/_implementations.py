@@ -1607,8 +1607,11 @@ def builds(
             else:
                 _field = value
 
+            # If `.default` is not set, then `value` is a Hydra-supported mutable
+            # value, and thus it is "sanitized"
+            sanitized_value = getattr(_field, "default", value)
             sanitized_type = (
-                _utils.sanitized_type(type_, wrap_optional=value is None)
+                _utils.sanitized_type(type_, wrap_optional=sanitized_value is None)
                 # OmegaConf's type-checking occurs before instantiation occurs.
                 # This means that, e.g., passing `Builds[int]` to a field `x: int`
                 # will fail Hydra's type-checking upon instantiation, even though
@@ -1618,12 +1621,15 @@ def builds(
                 # Thus we will auto-broaden the annotation when we see that a field
                 # is set with a structured config as a default value - assuming that
                 # the field isn't annotated with a structured config type.
-                if hydra_recursive is False or not is_builds(value) or is_builds(type_)
+                if hydra_recursive is False
+                or not is_builds(sanitized_value)
+                or is_builds(type_)
                 else Any
             )
             sanitized_base_fields.append((name, sanitized_type, _field))
             del value
             del _field
+            del sanitized_value
 
     out = make_dataclass(
         dataclass_name, fields=sanitized_base_fields, bases=builds_bases, frozen=frozen

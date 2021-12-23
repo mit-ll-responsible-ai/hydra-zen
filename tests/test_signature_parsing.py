@@ -6,7 +6,7 @@ from abc import ABC
 from dataclasses import dataclass
 from enum import Enum
 from inspect import Parameter
-from typing import Any, Callable, Dict, Mapping, Optional, Tuple, Type
+from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, Type
 
 import hypothesis.strategies as st
 import pytest
@@ -344,7 +344,6 @@ def f_with_dataclass_annotation(x: BuildsInt = BuildsInt()):
     ],
 )
 def test_builds_doesnt_widen_dataclass_type_annotation(bad_value):
-
     with pytest.raises(ValidationError):
         instantiate(builds(f_with_dataclass_annotation, x=bad_value))
 
@@ -356,6 +355,8 @@ def test_builds_doesnt_widen_dataclass_type_annotation(bad_value):
 
 
 def test_dataclass_type_annotation_with_subclass_default():
+    # ensures that configs that inherite from a base class used
+    # in an annotation passes Hydra's validation
     Child = builds(str, builds_bases=(BuildsInt,))
     assert (
         instantiate(
@@ -364,6 +365,30 @@ def test_dataclass_type_annotation_with_subclass_default():
         == ""
     )
     assert instantiate(builds(f_with_dataclass_annotation, x=Child())) == ""
+
+
+def func_with_list_annotation(x: List[int]):
+    return x
+
+
+def test_type_widening_with_internal_conversion_to_Builds():
+    # This test relies on omegaconf <= 2.1.1 to exercise the desired behavior,
+    # but should pass regardless.
+    #
+    # We contrive a case where an annotation is supported by Hydra, but the supplied
+    # value requires us to cast internally to a targeted conf; this is due to the
+    # downstream patch: https://github.com/mit-ll-responsible-ai/hydra-zen/pull/172
+    #
+    # Thus in this case we detect that, even though the original configured value is
+    # valid, we must represent the value with a structured config. Thus we should widen
+    # the annotation from `List[int]` to `Any`.
+    #
+    # Generally, in cases where we need to internally cast to a Builds, the associated
+    # type annotation is not supported by Hydra to begin with, and thus is broadened
+    # via type-sanitization.
+    Base = make_config(x=1)
+    Conf = builds(func_with_list_annotation, x=[1, 2], builds_bases=(Base,))
+    instantiate(Conf)
 
 
 def func_with_various_defaults(x=1, y="a", z=[1, 2]):
