@@ -665,7 +665,7 @@ def sanitized_field(
         if _mutable_default_permitted:
             return cast(Field, mutable_value(value))
 
-        value = (builds(type(value), value),)
+        value = builds(type(value), value)
 
     return _utils.field(
         default=sanitized_default_value(
