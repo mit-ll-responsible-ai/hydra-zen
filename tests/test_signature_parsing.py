@@ -6,7 +6,7 @@ from abc import ABC
 from dataclasses import dataclass
 from enum import Enum
 from inspect import Parameter
-from typing import Any, Callable, Dict, Mapping, Optional, Tuple, Type
+from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, Type
 
 import hypothesis.strategies as st
 import pytest
@@ -317,7 +317,7 @@ def expects_int(x: int) -> int:
     ],
 )
 @pytest.mark.parametrize("hydra_recursive", [True, None])
-def test_setting_default_with_Builds_widens_type(builds_as_default, hydra_recursive):
+def test_setting_default_with_builds_widens_type(builds_as_default, hydra_recursive):
     # tests that we address https://github.com/facebookresearch/hydra/issues/1759
     # via auto type-widening
     kwargs = {} if hydra_recursive is None else dict(hydra_recursive=hydra_recursive)
@@ -327,6 +327,68 @@ def test_setting_default_with_Builds_widens_type(builds_as_default, hydra_recurs
     with pytest.raises(ValidationError):
         # ensure that type annotation is broadened only when hydra_recursive=False
         instantiate(builds(expects_int, x=builds_as_default, hydra_recursive=False))
+
+
+BuildsInt = builds(int)
+
+
+def f_with_dataclass_annotation(x: BuildsInt = BuildsInt()):
+    return x
+
+
+@pytest.mark.parametrize(
+    "bad_value",
+    [
+        1,  # not a structured config
+        builds(str)(),  # instance of different structured config
+    ],
+)
+def test_builds_doesnt_widen_dataclass_type_annotation(bad_value):
+    with pytest.raises(ValidationError):
+        instantiate(builds(f_with_dataclass_annotation, x=bad_value))
+
+    with pytest.raises(ValidationError):
+        instantiate(
+            builds(f_with_dataclass_annotation, populate_full_signature=True),
+            x=bad_value,
+        )
+
+
+def test_dataclass_type_annotation_with_subclass_default():
+    # ensures that configs that inherite from a base class used
+    # in an annotation passes Hydra's validation
+    Child = builds(str, builds_bases=(BuildsInt,))
+    assert (
+        instantiate(
+            builds(f_with_dataclass_annotation, populate_full_signature=True), x=Child()
+        )
+        == ""
+    )
+    assert instantiate(builds(f_with_dataclass_annotation, x=Child())) == ""
+
+
+def func_with_list_annotation(x: List[int]):
+    return x
+
+
+def test_type_widening_with_internal_conversion_to_Builds():
+    # This test relies on omegaconf <= 2.1.1 to exercise the desired behavior,
+    # but should pass regardless.
+    #
+    # We contrive a case where an annotation is supported by Hydra, but the supplied
+    # value requires us to cast internally to a targeted conf; this is due to the
+    # downstream patch: https://github.com/mit-ll-responsible-ai/hydra-zen/pull/172
+    #
+    # Thus in this case we detect that, even though the original configured value is
+    # valid, we must represent the value with a structured config. Thus we should widen
+    # the annotation from `List[int]` to `Any`.
+    #
+    # Generally, in cases where we need to internally cast to a Builds, the associated
+    # type annotation is not supported by Hydra to begin with, and thus is broadened
+    # via type-sanitization.
+    Base = make_config(x=1)
+    Conf = builds(func_with_list_annotation, x=[1, 2], builds_bases=(Base,))
+    instantiate(Conf)
 
 
 def func_with_various_defaults(x=1, y="a", z=[1, 2]):
