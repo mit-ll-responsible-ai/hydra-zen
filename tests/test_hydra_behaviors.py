@@ -213,27 +213,6 @@ def test_type_checking():
     instantiate(builds(g2, x=[conf_C, conf_C]))
 
 
-def test_PATCH_OMEGACONF_830_is_set_properly():
-    # test that PATCH_OMEGACONF_830 is True only if local version
-    # of omegaconf has known bug
-    assert isinstance(PATCH_OMEGACONF_830, bool)
-
-    @dataclass
-    class BasicConf:
-        setup: Any = 1
-
-    @dataclass
-    class Config(BasicConf):
-        setup: Any = field(default_factory=lambda: list(["hi"]))
-
-    conf = OmegaConf.structured(Config)
-    if PATCH_OMEGACONF_830:
-        assert conf.setup == 1
-    else:
-        # local version of omegaconf should have correct behavior
-        assert conf.setup == ["hi"]
-
-
 @dataclass
 class A_inheritance:
     x: Any
