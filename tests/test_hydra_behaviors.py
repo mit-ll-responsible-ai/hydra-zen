@@ -18,8 +18,9 @@ from hydra_zen import (
     make_config,
     mutable_value,
 )
+from hydra_zen._compatibility import PATCH_OMEGACONF_830
 from hydra_zen.errors import HydraZenValidationError
-from hydra_zen.structured_configs._utils import PATCH_OMEGACONF_830, get_obj_path
+from hydra_zen.structured_configs._utils import get_obj_path
 
 
 def f_three_vars(x, y, z):

@@ -40,6 +40,7 @@ from typing import (
 from omegaconf import DictConfig, ListConfig
 from typing_extensions import Final, Literal, TypeGuard
 
+from hydra_zen._compatibility import PATCH_OMEGACONF_830
 from hydra_zen.errors import (
     HydraZenDeprecationWarning,
     HydraZenUnsupportedPrimitiveError,
@@ -409,7 +410,7 @@ def hydrated_dataclass(
         decorated_obj = cast(Any, decorated_obj)
         decorated_obj = dataclass(frozen=frozen)(decorated_obj)
 
-        if _utils.PATCH_OMEGACONF_830 and 2 < len(decorated_obj.__mro__):
+        if PATCH_OMEGACONF_830 and 2 < len(decorated_obj.__mro__):
             parents = decorated_obj.__mro__[1:-1]
             # this class inherits from a parent
             for field_ in fields(decorated_obj):
@@ -1587,7 +1588,7 @@ def builds(
                     ),
                 )
             elif (
-                _utils.PATCH_OMEGACONF_830
+                PATCH_OMEGACONF_830
                 and builds_bases
                 and value.default_factory is not MISSING
             ):
@@ -2294,7 +2295,7 @@ def make_config(
         if not isinstance(value, ZenField):
             default_factory_permitted = (
                 not bases or _utils.mutable_default_permitted(bases, field_name=name)
-                if _utils.PATCH_OMEGACONF_830
+                if PATCH_OMEGACONF_830
                 else True
             )
             normalized_fields[name] = ZenField(
@@ -2356,7 +2357,7 @@ def _repack_zenfield(value: ZenField, name: str, bases: Tuple[_DataClass, ...]):
     default = value.default
 
     if (
-        _utils.PATCH_OMEGACONF_830
+        PATCH_OMEGACONF_830
         and bases
         and not _utils.mutable_default_permitted(bases, field_name=name)
         and isinstance(default, Field)
