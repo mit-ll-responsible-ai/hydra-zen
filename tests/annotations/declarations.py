@@ -5,7 +5,7 @@ from collections import Counter, deque
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Callable, List, Literal, Tuple, Type
+from typing import Callable, List, Literal, Tuple, Type, TypeVar
 
 from omegaconf import MISSING, DictConfig, ListConfig
 
@@ -19,7 +19,9 @@ from hydra_zen import (
     make_custom_builds_fn,
     mutable_value,
 )
-from hydra_zen.typing import Builds
+from hydra_zen.typing import Builds, HydraPartialBuilds
+
+T = TypeVar("T")
 
 
 class A:
@@ -338,3 +340,12 @@ def check_inheritance():
     # make_config(x=1, bases=(lambda x: x,))
     # make_config(x=1, bases=(None,))
     # make_config(x=1, bases=(A,))
+
+
+def make_hydra_partial(x: T) -> HydraPartialBuilds[Type[T]]:
+    ...
+
+
+def check_HydraPartialBuilds():
+    cfg = make_hydra_partial(int)
+    a: Literal["Partial[int]"] = reveal_type(instantiate(cfg))

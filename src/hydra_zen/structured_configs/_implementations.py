@@ -40,7 +40,7 @@ from typing import (
 from omegaconf import DictConfig, ListConfig
 from typing_extensions import Final, Literal, TypeGuard
 
-from hydra_zen._compatibility import PATCH_OMEGACONF_830
+from hydra_zen._compatibility import HYDRA_SUPPORTS_PARTIAL, PATCH_OMEGACONF_830
 from hydra_zen.errors import (
     HydraZenDeprecationWarning,
     HydraZenUnsupportedPrimitiveError,
@@ -78,6 +78,7 @@ else:
 
 # Hydra-specific fields
 _TARGET_FIELD_NAME: Final[str] = "_target_"
+_PARTIAL_FIELD_NAME: Final[str] = "_partial_"
 _RECURSIVE_FIELD_NAME: Final[str] = "_recursive_"
 _CONVERT_FIELD_NAME: Final[str] = "_convert_"
 _POS_ARG_FIELD_NAME: Final[str] = "_args_"
@@ -94,7 +95,7 @@ _HYDRA_FIELD_NAMES: FrozenSet[str] = frozenset(
 # hydra-zen-specific fields
 _ZEN_PROCESSING_LOCATION: Final[str] = _utils.get_obj_path(zen_processing)
 _ZEN_TARGET_FIELD_NAME: Final[str] = "_zen_target"
-_PARTIAL_TARGET_FIELD_NAME: Final[str] = "_zen_partial"
+_ZEN_PARTIAL_TARGET_FIELD_NAME: Final[str] = "_zen_partial"
 _META_FIELD_NAME: Final[str] = "_zen_exclude"
 _ZEN_WRAPPERS_FIELD_NAME: Final[str] = "_zen_wrappers"
 _JUST_FIELD_NAME: Final[str] = "path"
@@ -1201,7 +1202,28 @@ def builds(
 
     target_field: List[Union[Tuple[str, Type[Any]], Tuple[str, Type[Any], Any]]]
 
-    if zen_partial or zen_meta or validated_wrappers:
+    if (
+        HYDRA_SUPPORTS_PARTIAL
+        and zen_partial
+        # check that no other zen-processing is needed
+        and not zen_meta
+        and not validated_wrappers
+    ):  # pragma: no cover
+        # TODO: require test-coverage once Hydra publishes nightly builds
+        target_field = [
+            (
+                _TARGET_FIELD_NAME,
+                str,
+                _utils.field(default=_utils.get_obj_path(target), init=False),
+            ),
+            (
+                _PARTIAL_FIELD_NAME,
+                str,
+                _utils.field(default=zen_partial, init=False),
+            ),
+        ]
+    elif zen_partial or zen_meta or validated_wrappers:
+        # target is `hydra_zen.funcs.zen_processing`
         target_field = [
             (
                 _TARGET_FIELD_NAME,
@@ -1218,7 +1240,7 @@ def builds(
         if zen_partial:
             target_field.append(
                 (
-                    _PARTIAL_TARGET_FIELD_NAME,
+                    _ZEN_PARTIAL_TARGET_FIELD_NAME,
                     bool,
                     _utils.field(default=True, init=False),
                 ),
@@ -1636,7 +1658,7 @@ def builds(
         dataclass_name, fields=sanitized_base_fields, bases=builds_bases, frozen=frozen
     )
 
-    if zen_partial is False and hasattr(out, _PARTIAL_TARGET_FIELD_NAME):
+    if zen_partial is False and hasattr(out, _ZEN_PARTIAL_TARGET_FIELD_NAME):
         # `out._partial_target_` has been inherited; this will lead to an error when
         # hydra-instantiation occurs, since it will be passed to target.
         # There is not an easy way to delete this, since it comes from a parent class
@@ -1711,7 +1733,13 @@ def uses_zen_processing(x: Any) -> TypeGuard[Builds]:
 
 def is_partial_builds(x: Any) -> TypeGuard[PartialBuilds]:
     return (
-        uses_zen_processing(x) and getattr(x, _PARTIAL_TARGET_FIELD_NAME, False) is True
+        # check if partial'd config via Hydra
+        HYDRA_SUPPORTS_PARTIAL
+        and getattr(x, _PARTIAL_FIELD_NAME, False) is True
+    ) or (
+        # check if partial'd config via `zen_processing`
+        uses_zen_processing(x)
+        and (getattr(x, _ZEN_PARTIAL_TARGET_FIELD_NAME, False) is True)
     )
 
 
@@ -1807,7 +1835,7 @@ def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:
     else:
         raise TypeError(
             f"`obj` must specify a target; i.e. it must have an attribute named"
-            f" {_TARGET_FIELD_NAME} or named {_PARTIAL_TARGET_FIELD_NAME} that"
+            f" {_TARGET_FIELD_NAME} or named {_ZEN_PARTIAL_TARGET_FIELD_NAME} that"
             f" points to a target-object or target-string"
         )
     target = getattr(obj, field_name)

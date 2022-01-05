@@ -3,6 +3,7 @@
 
 from ._implementations import (
     Builds,
+    HydraPartialBuilds,
     Importable,
     Just,
     Partial,
@@ -12,6 +13,7 @@ from ._implementations import (
 
 __all__ = [
     "Builds",
+    "HydraPartialBuilds",
     "Importable",
     "Just",
     "Partial",

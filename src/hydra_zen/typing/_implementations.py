@@ -66,16 +66,15 @@ class DataClass(_DataClass, Protocol):  # pragma: no cover
     def __init__(self, *args, **kwargs) -> None:
         ...
 
-    def __getattribute__(self, name: str) -> Any:
+    def __getattribute__(self, __name: str) -> Any:
         ...
 
-    def __setattr__(self, name: str, value: Any) -> None:
+    def __setattr__(self, __name: str, __value: Any) -> None:
         ...
 
 
 @runtime_checkable
 class Builds(DataClass, Protocol[_T]):  # pragma: no cover
-
     _target_: str
 
 
@@ -90,6 +89,11 @@ class PartialBuilds(Builds, Protocol[_T]):  # pragma: no cover
     _target_: str = "hydra_zen.funcs.zen_processing"
     _zen_target: str
     _zen_partial: bool = True
+
+
+@runtime_checkable
+class HydraPartialBuilds(Builds, Protocol[_T]):  # pragma: no cover
+    _partial_: bool = True
 
 
 @runtime_checkable
