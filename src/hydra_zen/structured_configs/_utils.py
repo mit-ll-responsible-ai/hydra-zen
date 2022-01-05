@@ -24,9 +24,8 @@ from typing import (
 from omegaconf import II
 from typing_extensions import Final, TypeGuard
 
+from hydra_zen._compatibility import PATCH_OMEGACONF_830
 from hydra_zen.typing._implementations import InterpStr, _DataClass
-
-PATCH_OMEGACONF_830: Final[bool] = True
 
 try:
     from typing import get_args, get_origin
