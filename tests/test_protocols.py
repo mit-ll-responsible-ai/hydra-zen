@@ -124,6 +124,7 @@ class NotZenPartial3:
         (just(int), True, True, False),
         (AJust, True, True, False),
         (builds(int, zen_partial=True), True, False, True),
+        (builds(int, zen_partial=True, zen_meta=dict(a=1)), True, False, True),
         (AZenPartial, True, False, True),
         (NotJust, True, False, False),
         (NotZenPartial, True, False, False),
