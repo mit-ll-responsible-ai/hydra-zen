@@ -40,7 +40,12 @@ from typing import (
 from omegaconf import DictConfig, ListConfig
 from typing_extensions import Final, Literal, TypeGuard
 
-from hydra_zen._compatibility import HYDRA_SUPPORTS_PARTIAL, PATCH_OMEGACONF_830
+from hydra_zen._compatibility import (
+    HYDRA_SUPPORTED_PRIMITIVES,
+    HYDRA_SUPPORTS_PARTIAL,
+    PATCH_OMEGACONF_830,
+    ZEN_SUPPORTED_PRIMITIVES,
+)
 from hydra_zen.errors import (
     HydraZenDeprecationWarning,
     HydraZenUnsupportedPrimitiveError,
@@ -56,7 +61,7 @@ from hydra_zen.typing._implementations import (
     _DataClass,
 )
 
-from ._value_conversion import ZEN_SUPPORTED_PRIMITIVES, ZEN_VALUE_CONVERSION
+from ._value_conversion import ZEN_VALUE_CONVERSION
 
 _T = TypeVar("_T")
 _T2 = TypeVar("_T2", bound=Callable)
@@ -107,9 +112,6 @@ _POSITIONAL_OR_KEYWORD: Final = inspect.Parameter.POSITIONAL_OR_KEYWORD
 _VAR_POSITIONAL: Final = inspect.Parameter.VAR_POSITIONAL
 _KEYWORD_ONLY: Final = inspect.Parameter.KEYWORD_ONLY
 _VAR_KEYWORD: Final = inspect.Parameter.VAR_KEYWORD
-
-NoneType = type(None)
-HYDRA_SUPPORTED_PRIMITIVES = {int, float, bool, str, list, tuple, dict, NoneType}
 
 _builtin_function_or_method_type = type(len)
 

@@ -18,10 +18,10 @@ from hydra_zen import (
     make_config,
     to_yaml,
 )
+from hydra_zen._compatibility import ZEN_SUPPORTED_PRIMITIVES
 from hydra_zen.errors import HydraZenUnsupportedPrimitiveError
 from hydra_zen.structured_configs._implementations import HYDRA_SUPPORTED_PRIMITIVES
 from hydra_zen.structured_configs._utils import KNOWN_MUTABLE_TYPES
-from hydra_zen.structured_configs._value_conversion import ZEN_SUPPORTED_PRIMITIVES
 from tests import everything_except
 
 
