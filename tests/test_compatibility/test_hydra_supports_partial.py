@@ -29,8 +29,10 @@ def test_HYDRA_SUPPORTS_PARTIAL_is_set_properly():
 
     obj = instantiate(HydraPartialConf)
     if HYDRA_SUPPORTS_PARTIAL:
+        # instantiation should produce `functools.partial(dict, x=1)`
         assert callable(obj) and obj() == {"x": 1}
     else:
+        # instantiation should product `dict(x=1, _partial_=True)`
         assert obj == {"x": 1, "_partial_": True}
 
 
