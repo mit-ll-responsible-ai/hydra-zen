@@ -112,6 +112,7 @@ NoneType = type(None)
         (bool, bool),
         (Color, Color),
         (C, Any),  # unsupported primitives
+        (type(None), Any),
         (set, Any),
         (list, Any),
         (tuple, Any),
