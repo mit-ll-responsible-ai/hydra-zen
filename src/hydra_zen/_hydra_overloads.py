@@ -25,8 +25,8 @@ from typing import IO, Any, Callable, Type, TypeVar, Union, overload
 from hydra.utils import instantiate as hydra_instantiate
 from omegaconf import MISSING, DictConfig, ListConfig, OmegaConf
 
-from .typing import Builds, HydraPartialBuilds, Just, Partial, PartialBuilds
-from .typing._implementations import _DataClass
+from .typing import Builds, Just, Partial, PartialBuilds
+from .typing._implementations import HydraPartialBuilds, _DataClass
 
 __all__ = ["instantiate", "to_yaml", "save_as_yaml", "load_from_yaml", "MISSING"]
 
