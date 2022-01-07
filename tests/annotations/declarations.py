@@ -19,7 +19,8 @@ from hydra_zen import (
     make_custom_builds_fn,
     mutable_value,
 )
-from hydra_zen.typing import Builds, HydraPartialBuilds
+from hydra_zen.typing import Builds
+from hydra_zen.typing._implementations import HydraPartialBuilds
 
 T = TypeVar("T")
 
