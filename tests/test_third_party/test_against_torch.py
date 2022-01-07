@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import inspect
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from typing import Any
 
 import hypothesis.strategies as st
@@ -11,6 +11,7 @@ import torch as tr
 from hypothesis import assume, given
 from omegaconf import OmegaConf
 from torch.optim import Adam, AdamW
+from torch.utils.data import DataLoader, Dataset
 
 from hydra_zen import builds, hydrated_dataclass, instantiate, just, to_yaml
 from hydra_zen.structured_configs._utils import safe_name
@@ -42,6 +43,7 @@ torch_objects = [
     tr.linalg.cholesky,
     tr.overrides.get_ignored_functions,
     tr.profiler.profile,
+    DataLoader,
 ]
 
 
@@ -110,3 +112,36 @@ def test_documented_inheritance_example():
     partialed = instantiate(AdamWConfig)
     assert partialed.keywords == {"lr": 0.001, "eps": 1e-08, "weight_decay": 0.01}
     assert partialed.func is AdamW
+
+
+def test_parse_dataloader_sig():
+    with pytest.raises(TypeError):
+        # should be `batch_size` not `batch_sizes`
+        builds(DataLoader, batch_sizes=2)
+
+
+# DataSet and DataLoader both inherit from `typing.Generic`, which obfuscates
+# their signatures
+# >>> inspect.signature(DataLoader)
+# Signature(*args, **kwargs)
+
+
+class CustomDataSet(Dataset):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def __getitem__(self, index):
+        return tr.tensor((float(index)))
+
+    def __len__(self):
+        return 5
+
+
+def test_dataloader_sig_doesnt_have_self():
+    Conf = builds(
+        DataLoader, dataset=builds(CustomDataSet), populate_full_signature=True
+    )
+    _fields = fields(Conf)
+    assert "self" not in {f.name for f in _fields}
+    assert len(_fields) > 2
+    assert list(instantiate(Conf)) == [tr.tensor(float(i)) for i in range(5)]

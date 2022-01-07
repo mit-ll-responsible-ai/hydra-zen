@@ -1299,6 +1299,18 @@ def builds(
 
     try:
         signature_params = inspect.signature(target).parameters
+
+        # dealing with this bug: https://bugs.python.org/issue40897
+        if (
+            len(signature_params) == 2
+            and inspect.isclass(target)
+            and hasattr(type, "__init__")
+            and {p.kind for p in signature_params.values()}
+            == {_VAR_POSITIONAL, _VAR_KEYWORD}
+        ):
+            signature_params = dict(inspect.signature(target.__init__).parameters)
+            signature_params.pop("self", None)
+
         target_has_valid_signature: bool = True
     except ValueError:
         if populate_full_signature:
