@@ -10,7 +10,8 @@ from hydra_zen.structured_configs._implementations import (
     uses_zen_processing,
 )
 from hydra_zen.structured_configs._utils import get_obj_path
-from hydra_zen.typing import HydraPartialBuilds, PartialBuilds
+from hydra_zen.typing import PartialBuilds
+from hydra_zen.typing._implementations import HydraPartialBuilds
 
 
 @dataclass
