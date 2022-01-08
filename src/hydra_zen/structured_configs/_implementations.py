@@ -40,6 +40,12 @@ from typing import (
 from omegaconf import DictConfig, ListConfig
 from typing_extensions import Final, Literal, TypeGuard
 
+from hydra_zen._compatibility import (
+    HYDRA_SUPPORTED_PRIMITIVES,
+    HYDRA_SUPPORTS_PARTIAL,
+    PATCH_OMEGACONF_830,
+    ZEN_SUPPORTED_PRIMITIVES,
+)
 from hydra_zen.errors import (
     HydraZenDeprecationWarning,
     HydraZenUnsupportedPrimitiveError,
@@ -55,7 +61,7 @@ from hydra_zen.typing._implementations import (
     _DataClass,
 )
 
-from ._value_conversion import ZEN_SUPPORTED_PRIMITIVES, ZEN_VALUE_CONVERSION
+from ._value_conversion import ZEN_VALUE_CONVERSION
 
 _T = TypeVar("_T")
 _T2 = TypeVar("_T2", bound=Callable)
@@ -77,6 +83,7 @@ else:
 
 # Hydra-specific fields
 _TARGET_FIELD_NAME: Final[str] = "_target_"
+_PARTIAL_FIELD_NAME: Final[str] = "_partial_"
 _RECURSIVE_FIELD_NAME: Final[str] = "_recursive_"
 _CONVERT_FIELD_NAME: Final[str] = "_convert_"
 _POS_ARG_FIELD_NAME: Final[str] = "_args_"
@@ -93,7 +100,7 @@ _HYDRA_FIELD_NAMES: FrozenSet[str] = frozenset(
 # hydra-zen-specific fields
 _ZEN_PROCESSING_LOCATION: Final[str] = _utils.get_obj_path(zen_processing)
 _ZEN_TARGET_FIELD_NAME: Final[str] = "_zen_target"
-_PARTIAL_TARGET_FIELD_NAME: Final[str] = "_zen_partial"
+_ZEN_PARTIAL_TARGET_FIELD_NAME: Final[str] = "_zen_partial"
 _META_FIELD_NAME: Final[str] = "_zen_exclude"
 _ZEN_WRAPPERS_FIELD_NAME: Final[str] = "_zen_wrappers"
 _JUST_FIELD_NAME: Final[str] = "path"
@@ -105,9 +112,6 @@ _POSITIONAL_OR_KEYWORD: Final = inspect.Parameter.POSITIONAL_OR_KEYWORD
 _VAR_POSITIONAL: Final = inspect.Parameter.VAR_POSITIONAL
 _KEYWORD_ONLY: Final = inspect.Parameter.KEYWORD_ONLY
 _VAR_KEYWORD: Final = inspect.Parameter.VAR_KEYWORD
-
-NoneType = type(None)
-HYDRA_SUPPORTED_PRIMITIVES = {int, float, bool, str, list, tuple, dict, NoneType}
 
 _builtin_function_or_method_type = type(len)
 
@@ -409,7 +413,7 @@ def hydrated_dataclass(
         decorated_obj = cast(Any, decorated_obj)
         decorated_obj = dataclass(frozen=frozen)(decorated_obj)
 
-        if _utils.PATCH_OMEGACONF_830 and 2 < len(decorated_obj.__mro__):
+        if PATCH_OMEGACONF_830 and 2 < len(decorated_obj.__mro__):
             parents = decorated_obj.__mro__[1:-1]
             # this class inherits from a parent
             for field_ in fields(decorated_obj):
@@ -1200,7 +1204,28 @@ def builds(
 
     target_field: List[Union[Tuple[str, Type[Any]], Tuple[str, Type[Any], Any]]]
 
-    if zen_partial or zen_meta or validated_wrappers:
+    if (
+        HYDRA_SUPPORTS_PARTIAL
+        and zen_partial
+        # check that no other zen-processing is needed
+        and not zen_meta
+        and not validated_wrappers
+    ):  # pragma: no cover
+        # TODO: require test-coverage once Hydra publishes nightly builds
+        target_field = [
+            (
+                _TARGET_FIELD_NAME,
+                str,
+                _utils.field(default=_utils.get_obj_path(target), init=False),
+            ),
+            (
+                _PARTIAL_FIELD_NAME,
+                str,
+                _utils.field(default=zen_partial, init=False),
+            ),
+        ]
+    elif zen_partial or zen_meta or validated_wrappers:
+        # target is `hydra_zen.funcs.zen_processing`
         target_field = [
             (
                 _TARGET_FIELD_NAME,
@@ -1217,7 +1242,7 @@ def builds(
         if zen_partial:
             target_field.append(
                 (
-                    _PARTIAL_TARGET_FIELD_NAME,
+                    _ZEN_PARTIAL_TARGET_FIELD_NAME,
                     bool,
                     _utils.field(default=True, init=False),
                 ),
@@ -1599,7 +1624,7 @@ def builds(
                     ),
                 )
             elif (
-                _utils.PATCH_OMEGACONF_830
+                PATCH_OMEGACONF_830
                 and builds_bases
                 and value.default_factory is not MISSING
             ):
@@ -1647,7 +1672,7 @@ def builds(
         dataclass_name, fields=sanitized_base_fields, bases=builds_bases, frozen=frozen
     )
 
-    if zen_partial is False and hasattr(out, _PARTIAL_TARGET_FIELD_NAME):
+    if zen_partial is False and hasattr(out, _ZEN_PARTIAL_TARGET_FIELD_NAME):
         # `out._partial_target_` has been inherited; this will lead to an error when
         # hydra-instantiation occurs, since it will be passed to target.
         # There is not an easy way to delete this, since it comes from a parent class
@@ -1722,7 +1747,13 @@ def uses_zen_processing(x: Any) -> TypeGuard[Builds]:
 
 def is_partial_builds(x: Any) -> TypeGuard[PartialBuilds]:
     return (
-        uses_zen_processing(x) and getattr(x, _PARTIAL_TARGET_FIELD_NAME, False) is True
+        # check if partial'd config via Hydra
+        HYDRA_SUPPORTS_PARTIAL
+        and getattr(x, _PARTIAL_FIELD_NAME, False) is True
+    ) or (
+        # check if partial'd config via `zen_processing`
+        uses_zen_processing(x)
+        and (getattr(x, _ZEN_PARTIAL_TARGET_FIELD_NAME, False) is True)
     )
 
 
@@ -1818,7 +1849,7 @@ def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:
     else:
         raise TypeError(
             f"`obj` must specify a target; i.e. it must have an attribute named"
-            f" {_TARGET_FIELD_NAME} or named {_PARTIAL_TARGET_FIELD_NAME} that"
+            f" {_TARGET_FIELD_NAME} or named {_ZEN_PARTIAL_TARGET_FIELD_NAME} that"
             f" points to a target-object or target-string"
         )
     target = getattr(obj, field_name)
@@ -2306,7 +2337,7 @@ def make_config(
         if not isinstance(value, ZenField):
             default_factory_permitted = (
                 not bases or _utils.mutable_default_permitted(bases, field_name=name)
-                if _utils.PATCH_OMEGACONF_830
+                if PATCH_OMEGACONF_830
                 else True
             )
             normalized_fields[name] = ZenField(
@@ -2368,7 +2399,7 @@ def _repack_zenfield(value: ZenField, name: str, bases: Tuple[_DataClass, ...]):
     default = value.default
 
     if (
-        _utils.PATCH_OMEGACONF_830
+        PATCH_OMEGACONF_830
         and bases
         and not _utils.mutable_default_permitted(bases, field_name=name)
         and isinstance(default, Field)
