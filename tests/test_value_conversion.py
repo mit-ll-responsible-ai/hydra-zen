@@ -11,10 +11,8 @@ from hypothesis import HealthCheck, assume, given, settings
 from omegaconf import DictConfig, ListConfig, OmegaConf
 
 from hydra_zen import builds, instantiate, make_config, to_yaml
-from hydra_zen.structured_configs._value_conversion import (
-    ZEN_SUPPORTED_PRIMITIVES,
-    ZEN_VALUE_CONVERSION,
-)
+from hydra_zen._compatibility import ZEN_SUPPORTED_PRIMITIVES
+from hydra_zen.structured_configs._value_conversion import ZEN_VALUE_CONVERSION
 
 
 def test_supported_primitives_in_sync_with_value_conversion():

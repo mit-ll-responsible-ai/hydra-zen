@@ -24,9 +24,11 @@ from typing import (
 from omegaconf import II
 from typing_extensions import Final, TypeGuard
 
+from hydra_zen._compatibility import (
+    HYDRA_SUPPORTED_PRIMITIVE_TYPES,
+    PATCH_OMEGACONF_830,
+)
 from hydra_zen.typing._implementations import InterpStr, _DataClass
-
-PATCH_OMEGACONF_830: Final[bool] = True
 
 try:
     from typing import get_args, get_origin
@@ -98,8 +100,6 @@ COMMON_MODULES_WITH_OBFUSCATED_IMPORTS: Tuple[str, ...] = (
     "torch",
 )
 UNKNOWN_NAME: Final[str] = "<unknown>"
-HYDRA_SUPPORTED_PRIMITIVE_TYPES: Final = {int, float, bool, str, Enum}
-
 KNOWN_MUTABLE_TYPES = {list, dict, set}
 
 T = TypeVar("T")

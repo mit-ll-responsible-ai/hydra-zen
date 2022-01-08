@@ -174,6 +174,7 @@ def test_just_roundtrip(obj):
         just,
         lambda x: builds(x, zen_partial=True),
         lambda x: builds(x, zen_meta=dict(_some_obscure_name=1)),
+        lambda x: builds(x, zen_partial=True, zen_meta=dict(_some_obscure_name=1)),
     ],
 )
 def test_get_target_roundtrip(x, fn):

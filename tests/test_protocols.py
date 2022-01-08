@@ -7,7 +7,7 @@ from typing import Any
 
 import pytest
 
-from hydra_zen import builds, instantiate, just
+from hydra_zen import builds, instantiate, just, make_custom_builds_fn
 from hydra_zen.funcs import get_obj, zen_processing
 from hydra_zen.structured_configs._implementations import (
     is_builds,
@@ -33,7 +33,7 @@ def test_runtime_checkability_of_protocols(fn, protocol):
     assert isinstance(conf, protocol)
 
 
-def test_Builds_is_not_PartialBuilds():
+def test_Builds_is_not_ZenPartialBuilds():
     Conf = builds(dict)
     assert not isinstance(Conf, PartialBuilds)
 
@@ -60,7 +60,10 @@ def test_targeted_dataclass_is_Builds():
     "fn,protocol",
     [
         (just, Just),
-        (partial(builds, zen_partial=True), PartialBuilds),
+        (
+            make_custom_builds_fn(zen_partial=True, zen_meta=dict(_y=None)),
+            PartialBuilds,
+        ),
     ],
 )
 def test_protocol_target_is_correct(fn, protocol):
@@ -79,7 +82,7 @@ class AJust:
 
 
 @dataclass
-class APartial:
+class AZenPartial:
     _target_: Any = zen_processing
     _zen_target: Any = "builtins.int"
     _zen_partial: bool = True
@@ -92,21 +95,21 @@ class NotJust:
 
 
 @dataclass
-class NotPartial:
+class NotZenPartial:
     _target_: Any = "builtins.dict"  # wrong target
     _zen_target: Any = "builtins.int"
     _zen_partial: bool = True
 
 
 @dataclass
-class NotPartial2:
+class NotZenPartial2:
     _target_: Any = "builtins.dict"
     # MISSING _zen_target
     _zen_partial: bool = True
 
 
 @dataclass
-class NotPartial3:
+class NotZenPartial3:
     # partial is False
     _target_: Any = zen_processing
     _zen_target: Any = "builtins.int"
@@ -121,11 +124,12 @@ class NotPartial3:
         (just(int), True, True, False),
         (AJust, True, True, False),
         (builds(int, zen_partial=True), True, False, True),
-        (APartial, True, False, True),
+        (builds(int, zen_partial=True, zen_meta=dict(a=1)), True, False, True),
+        (AZenPartial, True, False, True),
         (NotJust, True, False, False),
-        (NotPartial, True, False, False),
-        (NotPartial2, True, False, False),
-        (NotPartial3, True, False, False),
+        (NotZenPartial, True, False, False),
+        (NotZenPartial2, True, False, False),
+        (NotZenPartial3, True, False, False),
     ],
 )
 def test_protocol_checkers(x, yes_builds, yes_just, yes_partial):
