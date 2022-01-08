@@ -106,3 +106,13 @@ def test_value_supported_via_config_maker_functions(
             pass
         else:
             assert conf["a"] == value
+
+
+@given(x=st.lists(st.integers(-2, 2)))
+def test_Counter_roundtrip(x):
+    counter = Counter(x)
+    BuildsConf = builds(dict, counter=counter)
+
+    out_counter = instantiate(OmegaConf.structured(to_yaml(BuildsConf)))["counter"]
+
+    assert counter == out_counter
