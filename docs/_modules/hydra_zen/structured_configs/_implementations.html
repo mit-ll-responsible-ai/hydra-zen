@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hydra_zen.structured_configs._implementations &#8212; hydra-zen 0.4.1+9.g67d0b86 documentation</title>
+    <title>hydra_zen.structured_configs._implementations &#8212; hydra-zen 0.4.1+10.g22f7176 documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -212,6 +212,12 @@
 <span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span>
 <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Final</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">TypeGuard</span>
 
+<span class="kn">from</span> <span class="nn">hydra_zen._compatibility</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">HYDRA_SUPPORTED_PRIMITIVES</span><span class="p">,</span>
+    <span class="n">HYDRA_SUPPORTS_PARTIAL</span><span class="p">,</span>
+    <span class="n">PATCH_OMEGACONF_830</span><span class="p">,</span>
+    <span class="n">ZEN_SUPPORTED_PRIMITIVES</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.errors</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">HydraZenDeprecationWarning</span><span class="p">,</span>
     <span class="n">HydraZenUnsupportedPrimitiveError</span><span class="p">,</span>
@@ -227,7 +233,7 @@
     <span class="n">_DataClass</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">._value_conversion</span> <span class="kn">import</span> <span class="n">ZEN_SUPPORTED_PRIMITIVES</span><span class="p">,</span> <span class="n">ZEN_VALUE_CONVERSION</span>
+<span class="kn">from</span> <span class="nn">._value_conversion</span> <span class="kn">import</span> <span class="n">ZEN_VALUE_CONVERSION</span>
 
 <span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T&quot;</span><span class="p">)</span>
 <span class="n">_T2</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T2&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">)</span>
@@ -249,6 +255,7 @@
 
 <span class="c1"># Hydra-specific fields</span>
 <span class="n">_TARGET_FIELD_NAME</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_target_&quot;</span>
+<span class="n">_PARTIAL_FIELD_NAME</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_partial_&quot;</span>
 <span class="n">_RECURSIVE_FIELD_NAME</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_recursive_&quot;</span>
 <span class="n">_CONVERT_FIELD_NAME</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_convert_&quot;</span>
 <span class="n">_POS_ARG_FIELD_NAME</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_args_&quot;</span>
@@ -265,7 +272,7 @@
 <span class="c1"># hydra-zen-specific fields</span>
 <span class="n">_ZEN_PROCESSING_LOCATION</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">zen_processing</span><span class="p">)</span>
 <span class="n">_ZEN_TARGET_FIELD_NAME</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_zen_target&quot;</span>
-<span class="n">_PARTIAL_TARGET_FIELD_NAME</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_zen_partial&quot;</span>
+<span class="n">_ZEN_PARTIAL_TARGET_FIELD_NAME</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_zen_partial&quot;</span>
 <span class="n">_META_FIELD_NAME</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_zen_exclude&quot;</span>
 <span class="n">_ZEN_WRAPPERS_FIELD_NAME</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_zen_wrappers&quot;</span>
 <span class="n">_JUST_FIELD_NAME</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;path&quot;</span>
@@ -277,9 +284,6 @@
 <span class="n">_VAR_POSITIONAL</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">VAR_POSITIONAL</span>
 <span class="n">_KEYWORD_ONLY</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">KEYWORD_ONLY</span>
 <span class="n">_VAR_KEYWORD</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">VAR_KEYWORD</span>
-
-<span class="n">NoneType</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-<span class="n">HYDRA_SUPPORTED_PRIMITIVES</span> <span class="o">=</span> <span class="p">{</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">}</span>
 
 <span class="n">_builtin_function_or_method_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="nb">len</span><span class="p">)</span>
 
@@ -581,7 +585,7 @@
         <span class="n">decorated_obj</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">decorated_obj</span><span class="p">)</span>
         <span class="n">decorated_obj</span> <span class="o">=</span> <span class="n">dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="n">frozen</span><span class="p">)(</span><span class="n">decorated_obj</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">_utils</span><span class="o">.</span><span class="n">PATCH_OMEGACONF_830</span> <span class="ow">and</span> <span class="mi">2</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">decorated_obj</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">PATCH_OMEGACONF_830</span> <span class="ow">and</span> <span class="mi">2</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">decorated_obj</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">):</span>
             <span class="n">parents</span> <span class="o">=</span> <span class="n">decorated_obj</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="c1"># this class inherits from a parent</span>
             <span class="k">for</span> <span class="n">field_</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">(</span><span class="n">decorated_obj</span><span class="p">):</span>
@@ -1372,7 +1376,28 @@
 
     <span class="n">target_field</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]]</span>
 
-    <span class="k">if</span> <span class="n">zen_partial</span> <span class="ow">or</span> <span class="n">zen_meta</span> <span class="ow">or</span> <span class="n">validated_wrappers</span><span class="p">:</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">HYDRA_SUPPORTS_PARTIAL</span>
+        <span class="ow">and</span> <span class="n">zen_partial</span>
+        <span class="c1"># check that no other zen-processing is needed</span>
+        <span class="ow">and</span> <span class="ow">not</span> <span class="n">zen_meta</span>
+        <span class="ow">and</span> <span class="ow">not</span> <span class="n">validated_wrappers</span>
+    <span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+        <span class="c1"># TODO: require test-coverage once Hydra publishes nightly builds</span>
+        <span class="n">target_field</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span>
+                <span class="n">_TARGET_FIELD_NAME</span><span class="p">,</span>
+                <span class="nb">str</span><span class="p">,</span>
+                <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">target</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="p">(</span>
+                <span class="n">_PARTIAL_FIELD_NAME</span><span class="p">,</span>
+                <span class="nb">str</span><span class="p">,</span>
+                <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">zen_partial</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+            <span class="p">),</span>
+        <span class="p">]</span>
+    <span class="k">elif</span> <span class="n">zen_partial</span> <span class="ow">or</span> <span class="n">zen_meta</span> <span class="ow">or</span> <span class="n">validated_wrappers</span><span class="p">:</span>
+        <span class="c1"># target is `hydra_zen.funcs.zen_processing`</span>
         <span class="n">target_field</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">(</span>
                 <span class="n">_TARGET_FIELD_NAME</span><span class="p">,</span>
@@ -1389,7 +1414,7 @@
         <span class="k">if</span> <span class="n">zen_partial</span><span class="p">:</span>
             <span class="n">target_field</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="p">(</span>
-                    <span class="n">_PARTIAL_TARGET_FIELD_NAME</span><span class="p">,</span>
+                    <span class="n">_ZEN_PARTIAL_TARGET_FIELD_NAME</span><span class="p">,</span>
                     <span class="nb">bool</span><span class="p">,</span>
                     <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
                 <span class="p">),</span>
@@ -1759,7 +1784,7 @@
                     <span class="p">),</span>
                 <span class="p">)</span>
             <span class="k">elif</span> <span class="p">(</span>
-                <span class="n">_utils</span><span class="o">.</span><span class="n">PATCH_OMEGACONF_830</span>
+                <span class="n">PATCH_OMEGACONF_830</span>
                 <span class="ow">and</span> <span class="n">builds_bases</span>
                 <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">default_factory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">MISSING</span>
             <span class="p">):</span>
@@ -1807,7 +1832,7 @@
         <span class="n">dataclass_name</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">sanitized_base_fields</span><span class="p">,</span> <span class="n">bases</span><span class="o">=</span><span class="n">builds_bases</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="n">frozen</span>
     <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">zen_partial</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">_PARTIAL_TARGET_FIELD_NAME</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">zen_partial</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">_ZEN_PARTIAL_TARGET_FIELD_NAME</span><span class="p">):</span>
         <span class="c1"># `out._partial_target_` has been inherited; this will lead to an error when</span>
         <span class="c1"># hydra-instantiation occurs, since it will be passed to target.</span>
         <span class="c1"># There is not an easy way to delete this, since it comes from a parent class</span>
@@ -1882,7 +1907,13 @@
 
 <span class="k">def</span> <span class="nf">is_partial_builds</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">]:</span>
     <span class="k">return</span> <span class="p">(</span>
-        <span class="n">uses_zen_processing</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_PARTIAL_TARGET_FIELD_NAME</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="c1"># check if partial&#39;d config via Hydra</span>
+        <span class="n">HYDRA_SUPPORTS_PARTIAL</span>
+        <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_PARTIAL_FIELD_NAME</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+    <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
+        <span class="c1"># check if partial&#39;d config via `zen_processing`</span>
+        <span class="n">uses_zen_processing</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_ZEN_PARTIAL_TARGET_FIELD_NAME</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span>
     <span class="p">)</span>
 
 
@@ -1978,7 +2009,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;`obj` must specify a target; i.e. it must have an attribute named&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">_TARGET_FIELD_NAME</span><span class="si">}</span><span class="s2"> or named </span><span class="si">{</span><span class="n">_PARTIAL_TARGET_FIELD_NAME</span><span class="si">}</span><span class="s2"> that&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">_TARGET_FIELD_NAME</span><span class="si">}</span><span class="s2"> or named </span><span class="si">{</span><span class="n">_ZEN_PARTIAL_TARGET_FIELD_NAME</span><span class="si">}</span><span class="s2"> that&quot;</span>
             <span class="sa">f</span><span class="s2">&quot; points to a target-object or target-string&quot;</span>
         <span class="p">)</span>
     <span class="n">target</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">field_name</span><span class="p">)</span>
@@ -2466,7 +2497,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">):</span>
             <span class="n">default_factory_permitted</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="ow">not</span> <span class="n">bases</span> <span class="ow">or</span> <span class="n">_utils</span><span class="o">.</span><span class="n">mutable_default_permitted</span><span class="p">(</span><span class="n">bases</span><span class="p">,</span> <span class="n">field_name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">_utils</span><span class="o">.</span><span class="n">PATCH_OMEGACONF_830</span>
+                <span class="k">if</span> <span class="n">PATCH_OMEGACONF_830</span>
                 <span class="k">else</span> <span class="kc">True</span>
             <span class="p">)</span>
             <span class="n">normalized_fields</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ZenField</span><span class="p">(</span>
@@ -2528,7 +2559,7 @@
     <span class="n">default</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">default</span>
 
     <span class="k">if</span> <span class="p">(</span>
-        <span class="n">_utils</span><span class="o">.</span><span class="n">PATCH_OMEGACONF_830</span>
+        <span class="n">PATCH_OMEGACONF_830</span>
         <span class="ow">and</span> <span class="n">bases</span>
         <span class="ow">and</span> <span class="ow">not</span> <span class="n">_utils</span><span class="o">.</span><span class="n">mutable_default_permitted</span><span class="p">(</span><span class="n">bases</span><span class="p">,</span> <span class="n">field_name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
         <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="n">Field</span><span class="p">)</span>
