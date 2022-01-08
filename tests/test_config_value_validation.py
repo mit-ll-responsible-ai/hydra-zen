@@ -109,13 +109,11 @@ construction_fn_variations = [
 @example(unsupported={unsupported_instance: 1})
 @example(unsupported={1: unsupported_instance})
 @example(unsupported={unsupported_instance})
-@example(unsupported={unsupported_instance})
 @example(unsupported=unsupported_subclass)
 @example(unsupported=[unsupported_subclass])
 @example(unsupported=(unsupported_subclass,))
 @example(unsupported={unsupported_subclass: 1})
 @example(unsupported={1: unsupported_subclass})
-@example(unsupported={unsupported_subclass})
 @example(unsupported={unsupported_subclass})
 # Hydra doesn't support dataclass nodes for keys; ensure
 # hydra-zen doesn't provide enhanced primitive support for keys
