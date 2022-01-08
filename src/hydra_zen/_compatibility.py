@@ -18,14 +18,15 @@ class Version(NamedTuple):
     patch: Optional[int] = None
 
 
-def get_version(ver_str: str) -> Version:
-    assert ver_str.count(".") >= 2
+def _get_version(ver_str: str) -> Version:
+    # Not for general use. Tested only for Hydra and OmegaConf
+    # version string styles
     major, minor, *_ = (int(v) for v in ver_str.split("."))
     return Version(major=major, minor=minor)
 
 
-OMEGACONF_VERSION: Final = get_version(omegaconf.__version__)
-HYDRA_VERSION: Final = get_version(hydra.__version__)
+OMEGACONF_VERSION: Final = _get_version(omegaconf.__version__)
+HYDRA_VERSION: Final = _get_version(hydra.__version__)
 
 
 # OmegaConf issue 830 describes a bug associated with structured configs
