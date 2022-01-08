@@ -1359,8 +1359,15 @@ def builds(
             and "__init__" in target.__dict__
             and "__new__" not in target.__dict__
         ):
-            # exclude self/cls
-            _, *_params = inspect.signature(target.__init__).parameters.items()
+            _params = tuple(inspect.signature(target.__init__).parameters.items())
+
+            if _params and _params[0][1].kind is not _VAR_POSITIONAL:
+                # Exclude self/cls
+                #
+                # There are weird edge cases, like in collections.Counter for Python 3.7
+                # where the first arg is *args, not self.
+                _params = _params[1:]
+
             signature_params = {k: v for k, v in _params}
             del _params
 
@@ -1373,18 +1380,21 @@ def builds(
             # This implements the same method prioritization as
             # `inspect.signature` for Python >= 3.9.1
             if "__new__" in target.__dict__:
-                type_hints = get_type_hints(target.__new__)
+                _annotation_target = target.__new__
             elif "__init__" in target.__dict__:
-                type_hints = get_type_hints(target.__init__)
+                _annotation_target = target.__init__
             elif len(target.__mro__) > 2 and any(
                 "__new__" in parent.__dict__ for parent in target.__mro__[1:-1]
             ):
-                type_hints = get_type_hints(target.__new__)
+                _annotation_target = target.__new__
             else:  # pragam: no cover
-                type_hints = get_type_hints(target.__init__)
+                _annotation_target = target.__init__
         else:
-            type_hints = get_type_hints(target)
+            _annotation_target = target
 
+        type_hints = get_type_hints(_annotation_target)
+
+        del _annotation_target
         # We don't need to pop self/class because we only make on-demand
         # requests from `type_hints`
 
