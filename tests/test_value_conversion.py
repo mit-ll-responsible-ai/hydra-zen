@@ -1,5 +1,6 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+import string
 from collections import Counter, deque
 from enum import Enum
 from pathlib import Path
@@ -73,13 +74,22 @@ def is_ascii(x: str) -> bool:
 def test_value_supported_via_config_maker_functions(
     zen_supported_type, data: st.DataObject, as_builds: bool, via_yaml: bool
 ):
-    value = data.draw(st.from_type(zen_supported_type))
-    if isinstance(value, str):
-        assume(is_ascii(value) and value != "???")
+    if zen_supported_type is str:
+        value = data.draw(st.text(alphabet=string.printable))
+        # don't permit bytes: https://github.com/omry/omegaconf/pull/845
+        # or missing values
+        assume(not value.startswith(('b"', "b'")) and value != "???")
+
+        # don't permit strings that can be parsed as floats
         try:
             float(value)
         except ValueError:
+            pass
+        else:
             assume(False)
+            return
+    else:
+        value = data.draw(st.from_type(zen_supported_type))
 
     Conf = (
         make_config(a=value, hydra_convert="all")
