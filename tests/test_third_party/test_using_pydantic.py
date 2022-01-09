@@ -1,8 +1,13 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+import hypothesis.strategies as st
 import pytest
+from hypothesis import given, settings
 from pydantic import AnyUrl, PositiveFloat
+from pydantic.dataclasses import dataclass as pyd_dataclass
+from typing_extensions import Literal
 
+from hydra_zen import builds, instantiate
 from hydra_zen.third_party.pydantic import validates_with_pydantic
 
 parametrize_pydantic_fields = pytest.mark.parametrize(
@@ -68,3 +73,27 @@ def test_custom_validation_config():
 
     with pytest.raises(RuntimeError):
         no_arb_types(f)(A())
+
+
+@pyd_dataclass
+class PydanticConf:
+    x: Literal[1, 2]
+    y: int = 2
+
+
+@pytest.mark.parametrize("x", [1, 2])
+def test_documented_example_passes(x):
+    HydraConf = builds(PydanticConf, populate_full_signature=True)
+    conf = instantiate(HydraConf, x=x)
+    assert isinstance(conf, PydanticConf)
+    assert conf == PydanticConf(x=x, y=2)
+
+
+@settings(max_examples=20)
+@given(x=(st.integers() | st.floats()).filter(lambda x: x != 1 and x != 2))
+def test_documented_example_raises(x):
+    HydraConf = builds(PydanticConf, populate_full_signature=True)
+    with pytest.raises(Exception):
+        # using a broad exception here because of
+        # re-raising incompatibilities with Hydra
+        instantiate(HydraConf, x=x)
