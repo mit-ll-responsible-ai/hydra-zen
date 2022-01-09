@@ -505,7 +505,7 @@ def test_Counter():
     assert instantiate(builds(Counter, [1, 1, 2, 1])) == Counter([1, 1, 2, 1])
     assert instantiate(builds(Counter, a=1, b=2)) == Counter(a=1, b=2)
 
-    if sys.version_info > (3, 7):
+    if sys.version_info > (3, 8):
         with pytest.raises(TypeError):
             # signature: Counter(iterable=None, /, **kwds)
             builds(Counter, [1], [2])
