@@ -41,7 +41,10 @@ PATCH_OMEGACONF_830: Final = True  # OMEGACONF_VERSION <= Version(2, 1)
 # Hydra's instantiate API now supports partial-instantiation, indicated
 # by a `_partial_ = True` attribute.
 # https://github.com/facebookresearch/hydra/pull/1905
-HYDRA_SUPPORTS_PARTIAL: Final = Version(1, 1) < HYDRA_VERSION
+#
+# Uncomment dynamice setting of `HYDRA_SUPPORTS_PARTIAL` once we can
+# begin testing against nightly builds of Hydra
+HYDRA_SUPPORTS_PARTIAL: Final = False  # Version(1, 1) < HYDRA_VERSION
 
 # Indicates primitive types permitted in type-hints of structured configs
 HYDRA_SUPPORTED_PRIMITIVE_TYPES: Final = {int, float, bool, str, Enum}
