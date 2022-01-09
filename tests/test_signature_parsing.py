@@ -1,8 +1,9 @@
 # Copyright (c) 2021 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-
 import inspect
+import sys
 from abc import ABC
+from collections import Counter
 from dataclasses import dataclass
 from enum import Enum
 from inspect import Parameter
@@ -449,3 +450,62 @@ def f_with_color(x: Color = Color.red):
 
 def test_populate_annotated_enum_regression():
     assert instantiate(builds(f_with_color, populate_full_signature=True)) is Color.red
+
+
+class A:
+    # Manually verified using `inspect.signature` after
+    # the fix of https://bugs.python.org/issue40897
+    py_310_sig = (("a", int),)
+
+    def __new__(cls, a: int):
+        return object.__new__(cls)
+
+
+class B(A):
+    py_310_sig = (("b", float),)
+
+    def __init__(self, b: float):
+        pass
+
+
+class C(A):
+    py_310_sig = (("c", str),)
+
+    def __new__(cls, c: str):
+        return object.__new__(cls)
+
+
+class D(A):
+    py_310_sig = (("a", int),)
+    pass
+
+
+class E(B):
+    py_310_sig = (("a", int),)
+    pass
+
+
+@pytest.mark.parametrize("Obj", [A, B, C, D, E])
+def test_parse_sig_with_new_vs_init(Obj):
+    # Ensure that `builds` inspects __new__ for signature and annotations
+    # with same priority as `inspect.signature` in Python >= 3.9.1
+    Conf = builds(Obj, populate_full_signature=True)
+
+    sig_via_builds = tuple(
+        (p.name, p.annotation) for p in inspect.signature(Conf).parameters.values()
+    )
+
+    assert sig_via_builds == Obj.py_310_sig
+
+
+def test_Counter():
+    # Counter has an interesting signature
+    # Python 3.7: (*args, **kwds)                   -- no self!
+    #      >=3.8: (self, iterable=None, /, **kwds)  -- pos-only
+    assert instantiate(builds(Counter, [1, 1, 2, 1])) == Counter([1, 1, 2, 1])
+    assert instantiate(builds(Counter, a=1, b=2)) == Counter(a=1, b=2)
+
+    if sys.version_info > (3, 8):
+        with pytest.raises(TypeError):
+            # signature: Counter(iterable=None, /, **kwds)
+            builds(Counter, [1], [2])

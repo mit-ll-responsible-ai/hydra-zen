@@ -75,19 +75,7 @@ def test_value_supported_via_config_maker_functions(
     zen_supported_type, data: st.DataObject, as_builds: bool, via_yaml: bool
 ):
     if zen_supported_type is str:
-        value = data.draw(st.text(alphabet=string.printable))
-        # don't permit bytes: https://github.com/omry/omegaconf/pull/845
-        # or missing values
-        assume(not value.startswith(('b"', "b'")) and value != "???")
-
-        # don't permit strings that can be parsed as floats
-        try:
-            float(value)
-        except ValueError:
-            pass
-        else:
-            assume(False)
-            return
+        value = data.draw(st.text(alphabet=string.ascii_letters))
     else:
         value = data.draw(st.from_type(zen_supported_type))
 
@@ -118,3 +106,13 @@ def test_value_supported_via_config_maker_functions(
             pass
         else:
             assert conf["a"] == value
+
+
+@given(x=st.lists(st.integers(-2, 2)))
+def test_Counter_roundtrip(x):
+    counter = Counter(x)
+    BuildsConf = builds(dict, counter=counter)
+
+    out_counter = instantiate(OmegaConf.structured(to_yaml(BuildsConf)))["counter"]
+
+    assert counter == out_counter

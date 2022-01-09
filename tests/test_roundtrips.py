@@ -9,6 +9,7 @@ import random
 import re
 import statistics
 import string
+from collections import Counter, defaultdict, deque
 from dataclasses import dataclass
 from typing import Any, Dict, List
 
@@ -147,6 +148,9 @@ a_bunch_of_objects = [
     operator.add,
     statistics.mean,
     os.getcwd,
+    Counter,
+    deque,
+    defaultdict,
 ]
 
 

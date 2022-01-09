@@ -1323,8 +1323,10 @@ def builds(
         )
 
     try:
+        # We want to rely on `inspect.signature` logic for raising
+        # against an uninspectable sig, before we start inspecting
+        # class-specific attributes below.
         signature_params = inspect.signature(target).parameters
-        target_has_valid_signature: bool = True
     except ValueError:
         if populate_full_signature:
             raise ValueError(
@@ -1336,19 +1338,71 @@ def builds(
         # We will turn off signature validation for objects that didn't have
         # a valid signature. This will enable us to do things like `build(dict, a=1)`
         target_has_valid_signature: bool = False
+    else:
+        # Dealing with this bug: https://bugs.python.org/issue40897
+        #
+        # In Python < 3.9.1, `inspect.signature will look first to
+        # any implementation __new__, even if it is inherited and if
+        # there is a "fresher" __init__.
+        #
+        # E.g. anything that inherits from `typing.Generic` and
+        # does not implement its own __new__ will have a reported sig
+        # of (*args, **kwargs)
+        #
+        # This looks specifically for the scenario that the target
+        # has inherited from a parent that implements __new__ and
+        # the target implements only __init__.
+        if (
+            inspect.isclass(target)
+            and len(target.__mro__) > 2
+            and any("__new__" in parent.__dict__ for parent in target.__mro__[1:-1])
+            and "__init__" in target.__dict__
+            and "__new__" not in target.__dict__
+        ):
+            _params = tuple(inspect.signature(target.__init__).parameters.items())
 
-    # this properly resolves forward references, whereas the annotations
-    # from signature do not
+            if _params and _params[0][1].kind is not _VAR_POSITIONAL:
+                # Exclude self/cls
+                #
+                # There are weird edge cases, like in collections.Counter for Python 3.7
+                # where the first arg is *args, not self.
+                _params = _params[1:]
+
+            signature_params = {k: v for k, v in _params}
+            del _params
+
+        target_has_valid_signature: bool = True
+
+    # `get_type_hints` properly resolves forward references, whereas annotations from
+    # `inspect.signature` do not
     try:
-        if inspect.isclass(target) and hasattr(type, "__init__"):
-            # target is class object...
-            # calling `get_type_hints(target)` returns empty dict
-            type_hints = get_type_hints(target.__init__)
+        if inspect.isclass(target):
+            # This implements the same method prioritization as
+            # `inspect.signature` for Python >= 3.9.1
+            if "__new__" in target.__dict__:
+                _annotation_target = target.__new__
+            elif "__init__" in target.__dict__:
+                _annotation_target = target.__init__
+            elif len(target.__mro__) > 2 and any(
+                "__new__" in parent.__dict__ for parent in target.__mro__[1:-1]
+            ):
+                _annotation_target = target.__new__
+            else:
+                _annotation_target = target.__init__
         else:
-            type_hints = get_type_hints(target)
-    except (TypeError, NameError):
-        # TypeError: Covers case for ufuncs, which do not have inspectable type hints
-        # NameError: Covers case for unresolved forward reference
+            _annotation_target = target
+
+        type_hints = get_type_hints(_annotation_target)
+
+        del _annotation_target
+        # We don't need to pop self/class because we only make on-demand
+        # requests from `type_hints`
+
+    except (
+        TypeError,  # ufuncs, which do not have inspectable type hints
+        NameError,  # Unresolvable forward reference
+        AttributeError,  # Class doesn't have "__new__" or "__init__"
+    ):
         type_hints = defaultdict(lambda: Any)
 
     sig_by_kind: Dict[Any, List[inspect.Parameter]] = {
