@@ -1387,7 +1387,7 @@ def builds(
                 "__new__" in parent.__dict__ for parent in target.__mro__[1:-1]
             ):
                 _annotation_target = target.__new__
-            else:  # pragam: no cover
+            else:
                 _annotation_target = target.__init__
         else:
             _annotation_target = target
@@ -1398,10 +1398,11 @@ def builds(
         # We don't need to pop self/class because we only make on-demand
         # requests from `type_hints`
 
-    except (TypeError, NameError, AttributeError):
-        # TypeError: Covers case for ufuncs, which do not have inspectable type hints
-        # NameError: Covers case for unresolved forward reference
-        # AttributeError: Class doesn't have "__new__" or "__init__"
+    except (
+        TypeError,  # ufuncs, which do not have inspectable type hints
+        NameError,  # Unresolvable forward reference
+        AttributeError,  # Class doesn't have "__new__" or "__init__"
+    ):
         type_hints = defaultdict(lambda: Any)
 
     sig_by_kind: Dict[Any, List[inspect.Parameter]] = {
