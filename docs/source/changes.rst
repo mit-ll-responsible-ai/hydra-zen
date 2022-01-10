@@ -5,6 +5,70 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse 
 chronological order. All previous releases should still be available on pip.
 
+.. _v0.5.0:
+
+---------------------
+0.5.0rc1 - 2022-01-10
+---------------------
+
+This release primarily improves the ability of :func:`~hydra_zen.builds` to inspect and
+the signatures of its targets; thus its ability to both auto-generate and validate configs
+is improved. 
+
+Improvements
+------------
+- Fixed an edge case `caused by an upstream bug in inspect.signature <https://bugs.python.org/issue40897>`_, which prevented :func:`~hydra_zen.builds` from accessing the appropriate signature for some target classes. This affected a couple of popular PyTorch classes, such as ``torch.utils.data.DataLoader`` and ``torch.utils.data.Dataset``. See :pull:`189` for examples. 
+- When appropriate, ``builds(<target>, ...)`` will now consult ``<target>.__new__`` to acquire the type-hints of the target's signature. See :pull:`189` for examples. 
+- Fixed an edge case in the :ref:`type-widening behavior <type-support>` in :func:`~hydra_zen.builds` where a ``Builds``-like annotation would be widened to ``Any``; this widening was too aggressive. See :pull:`185` for examples. 
+- Fixed incomplete annotations for ``builds(..., zen_wrappers=<..>)``. See :pull:`180`
+
+Notes
+-----
+There are no compatibility-breaking changes in this release. However, it should be
+noted that the aforementioned improvements to :func:`~hydra_zen.builds` can change
+the interface to your app.
+
+For instance, if you were configuring ``torch.utils.data.DataLoader``, note the 
+following difference in behavior:
+
+.. code-block:: python
+
+   import torch as tr
+   from hydra_zen import builds, to_yaml
+
+   # DataLoader was affected by a bug in `inspect.signature`
+   ConfLoader = builds(tr.utils.data.DataLoader, populate_full_signature=True)
+
+Before 0.5.0:
+
+.. code-block:: pycon
+
+   >>> print(to_yaml(ConfLoader))  # builds could not access signature
+   _target_: torch.utils.data.dataloader.DataLoader
+
+After:
+
+.. code-block:: pycon
+
+   >>> print(to_yaml(ConfLoader))
+   _target_: torch.utils.data.dataloader.DataLoader
+   dataset: ???
+   batch_size: 1
+   shuffle: false
+   sampler: null
+   batch_sampler: null
+   num_workers: 0
+   collate_fn: null
+   pin_memory: false
+   drop_last: false
+   timeout: 0.0
+   worker_init_fn: null
+   multiprocessing_context: null
+   generator: null
+   prefetch_factor: 2
+   persistent_workers: false
+
+
 .. _v0.4.1:
 
 ------------------
