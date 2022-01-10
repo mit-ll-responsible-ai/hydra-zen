@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Massachusetts Institute of Technology
+# Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
 from pathlib import Path
@@ -6,6 +6,9 @@ from pathlib import Path
 import pytest
 from hydra import compose, initialize
 from hydra.core.config_store import ConfigStore
+from hydra.core.override_parser.overrides_parser import OverridesParser
+from hydra.errors import ConfigCompositionException
+from hydra.plugins.sweeper import Sweeper
 from omegaconf.omegaconf import OmegaConf
 
 from hydra_zen import builds, instantiate, launch
@@ -129,9 +132,6 @@ def test_launch_multirun(
         assert Path("test_hydra_overrided").exists()
 
 
-from hydra.errors import ConfigCompositionException
-
-
 @pytest.mark.usefixtures("cleandir")
 def test_launch_with_multirun_overrides():
     cfg = builds(dict, a=1, b=1)
@@ -143,9 +143,6 @@ def test_launch_with_multirun_overrides():
 ###############################################
 # Test local plugins work with hydra_zen.launch
 ###############################################
-
-from hydra.core.override_parser.overrides_parser import OverridesParser
-from hydra.plugins.sweeper import Sweeper
 
 
 class LocalBasicSweeper(Sweeper):
