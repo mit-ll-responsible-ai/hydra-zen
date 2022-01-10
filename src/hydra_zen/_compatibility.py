@@ -21,7 +21,7 @@ class Version(NamedTuple):
 def _get_version(ver_str: str) -> Version:
     # Not for general use. Tested only for Hydra and OmegaConf
     # version string styles
-    major, minor, *_ = (int(v) for v in ver_str.split("."))
+    major, minor = (int(v) for v in ver_str.split(".")[:2])
     return Version(major=major, minor=minor)
 
 

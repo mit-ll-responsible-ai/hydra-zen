@@ -1355,9 +1355,9 @@ def builds(
         if (
             inspect.isclass(target)
             and len(target.__mro__) > 2
-            and any("__new__" in parent.__dict__ for parent in target.__mro__[1:-1])
             and "__init__" in target.__dict__
             and "__new__" not in target.__dict__
+            and any("__new__" in parent.__dict__ for parent in target.__mro__[1:-1])
         ):
             _params = tuple(inspect.signature(target.__init__).parameters.items())
 
