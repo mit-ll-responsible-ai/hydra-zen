@@ -21,6 +21,7 @@ from omegaconf.errors import (
 from typing_extensions import Final, Literal
 
 from hydra_zen import builds, instantiate, mutable_value
+from hydra_zen._compatibility import Version, _get_version
 from hydra_zen.structured_configs._utils import (
     field,
     is_interpolated_string,
@@ -277,3 +278,27 @@ def test_strings_that_fail_to_interpolate_are_not_interpolated_strings(any_text)
 
     # If `any_text` is a valid interpolated string, then `out == 1`
     assert out == 1 or not is_interpolated_string(any_text)
+
+
+@pytest.mark.parametrize(
+    "version_string, expected",
+    [
+        ("1.2.0", Version(1, 2)),
+        ("2.1.0dev24", Version(2, 1)),
+    ],
+)
+def test_get_version(version_string, expected):
+    assert _get_version(version_string) == expected
+
+
+@pytest.mark.parametrize(
+    "smaller, larger",
+    [
+        (Version(1, 0), Version(2, 0)),
+        (Version(1, 0), Version(1, 1)),
+        (Version(1, 0, 0), Version(1, 0, 1)),
+        (Version(1, 0, 1), Version(1, 1, 0)),
+    ],
+)
+def test_version_comparison(smaller, larger):
+    assert smaller < larger
