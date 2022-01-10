@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Changelog &#8212; hydra-zen 0.4.1+22.g48aa51a documentation</title>
+    <title>Changelog &#8212; hydra-zen 0.4.1+25.g00c50b7 documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -168,6 +168,23 @@
 <nav id="bd-toc-nav">
     <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#rc1-2022-01-10">
+   0.5.0rc1 - 2022-01-10
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#improvements">
+     Improvements
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#notes">
+     Notes
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#v0-4-1">
    0.4.1 - 2021-12-06
   </a>
@@ -261,6 +278,61 @@
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
 <p>This is a record of all past hydra-zen releases and what went into them, in reverse
 chronological order. All previous releases should still be available on pip.</p>
+<div class="section" id="rc1-2022-01-10">
+<span id="v0-5-0"></span><h2>0.5.0rc1 - 2022-01-10<a class="headerlink" href="#rc1-2022-01-10" title="Permalink to this headline">¶</a></h2>
+<p>This release primarily improves the ability of <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> to inspect and
+the signatures of its targets; thus its ability to both auto-generate and validate configs
+is improved.</p>
+<div class="section" id="improvements">
+<h3>Improvements<a class="headerlink" href="#improvements" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed an edge case <a class="reference external" href="https://bugs.python.org/issue40897">caused by an upstream bug in inspect.signature</a>, which prevented <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> from accessing the appropriate signature for some target classes. This affected a couple of popular PyTorch classes, such as <code class="docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code> and <code class="docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code>. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/189">pull request #189</a> for examples.</p></li>
+<li><p>When appropriate, <code class="docutils literal notranslate"><span class="pre">builds(&lt;target&gt;,</span> <span class="pre">...)</span></code> will now consult <code class="docutils literal notranslate"><span class="pre">&lt;target&gt;.__new__</span></code> to acquire the type-hints of the target’s signature. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/189">pull request #189</a> for examples.</p></li>
+<li><p>Fixed an edge case in the <a class="reference internal" href="explanation/type_refinement.html#type-support"><span class="std std-ref">type-widening behavior</span></a> in <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> where a <code class="docutils literal notranslate"><span class="pre">Builds</span></code>-like annotation would be widened to <code class="docutils literal notranslate"><span class="pre">Any</span></code>; this widening was too aggressive. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/185">pull request #185</a> for examples.</p></li>
+<li><p>Fixed incomplete annotations for <code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">zen_wrappers=&lt;..&gt;)</span></code>. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/180">pull request #180</a></p></li>
+</ul>
+</div>
+<div class="section" id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h3>
+<p>There are no compatibility-breaking changes in this release. However, it should be
+noted that the aforementioned improvements to <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> can change
+the interface to your app.</p>
+<p>For instance, if you were configuring <code class="docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code>, note the
+following difference in behavior:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
+<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">builds</span><span class="p">,</span> <span class="n">to_yaml</span>
+
+<span class="c1"># DataLoader was affected by a bug in `inspect.signature`</span>
+<span class="n">ConfLoader</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Before 0.5.0:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">ConfLoader</span><span class="p">))</span>  <span class="c1"># builds could not access signature</span>
+<span class="go">_target_: torch.utils.data.dataloader.DataLoader</span>
+</pre></div>
+</div>
+<p>After:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">ConfLoader</span><span class="p">))</span>
+<span class="go">_target_: torch.utils.data.dataloader.DataLoader</span>
+<span class="go">dataset: ???</span>
+<span class="go">batch_size: 1</span>
+<span class="go">shuffle: false</span>
+<span class="go">sampler: null</span>
+<span class="go">batch_sampler: null</span>
+<span class="go">num_workers: 0</span>
+<span class="go">collate_fn: null</span>
+<span class="go">pin_memory: false</span>
+<span class="go">drop_last: false</span>
+<span class="go">timeout: 0.0</span>
+<span class="go">worker_init_fn: null</span>
+<span class="go">multiprocessing_context: null</span>
+<span class="go">generator: null</span>
+<span class="go">prefetch_factor: 2</span>
+<span class="go">persistent_workers: false</span>
+</pre></div>
+</div>
+</div>
+</div>
 <div class="section" id="v0-4-1">
 <span id="id1"></span><h2>0.4.1 - 2021-12-06<a class="headerlink" href="#v0-4-1" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="#v0-4-0"><span class="std std-ref">0.4.0 - 2021-12-05</span></a> introduced an undocumented, compatibility-breaking change to how hydra-zen treats <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a> values. This patch reverts that change.</p>
