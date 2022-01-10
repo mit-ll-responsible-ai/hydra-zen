@@ -7,7 +7,17 @@ from collections import Counter
 from dataclasses import dataclass
 from enum import Enum
 from inspect import Parameter
-from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, Type
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    Type,
+    get_type_hints,
+)
 
 import hypothesis.strategies as st
 import pytest
@@ -337,6 +347,14 @@ def f_with_dataclass_annotation(x: BuildsInt = BuildsInt()):
     return x
 
 
+instantiaters = [
+    lambda x: instantiate(
+        builds(f_with_dataclass_annotation, populate_full_signature=True), x=x
+    ),
+    lambda x: instantiate(builds(f_with_dataclass_annotation, x=x)),
+]
+
+
 @pytest.mark.parametrize(
     "bad_value",
     [
@@ -344,28 +362,32 @@ def f_with_dataclass_annotation(x: BuildsInt = BuildsInt()):
         builds(str)(),  # instance of different structured config
     ],
 )
-def test_builds_doesnt_widen_dataclass_type_annotation(bad_value):
+@pytest.mark.parametrize("instantiater", instantiaters)
+def test_builds_doesnt_widen_dataclass_type_annotation(bad_value, instantiater):
     with pytest.raises(ValidationError):
-        instantiate(builds(f_with_dataclass_annotation, x=bad_value))
-
-    with pytest.raises(ValidationError):
-        instantiate(
-            builds(f_with_dataclass_annotation, populate_full_signature=True),
-            x=bad_value,
-        )
+        instantiater(bad_value)
 
 
-def test_dataclass_type_annotation_with_subclass_default():
+@pytest.mark.parametrize("instantiater", instantiaters)
+def test_dataclass_type_annotation_with_subclass_default(instantiater):
     # ensures that configs that inherite from a base class used
     # in an annotation passes Hydra's validation
     Child = builds(str, builds_bases=(BuildsInt,))
-    assert (
-        instantiate(
-            builds(f_with_dataclass_annotation, populate_full_signature=True), x=Child()
-        )
-        == ""
-    )
-    assert instantiate(builds(f_with_dataclass_annotation, x=Child())) == ""
+    assert instantiater(Child()) == ""
+
+
+class LooksLikeBuilds:
+    _target_: str = "hello world"
+
+
+def f_with_builds_like_annotation(x: LooksLikeBuilds):
+    pass
+
+
+def test_builds_widens_non_dataclass_type_with_target():
+    Conf = builds(f_with_builds_like_annotation, x=builds(int))
+    hints = get_type_hints(Conf)
+    assert hints["x"] is Any
 
 
 def func_with_list_annotation(x: List[int]):
