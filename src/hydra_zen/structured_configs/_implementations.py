@@ -2402,10 +2402,12 @@ def make_config(
             (
                 str(f.name),
                 (
-                    f.hint
                     # f.default: Field
                     # f.default.default: Any
-                    if not is_builds(f.default.default) or hydra_recursive is False  # type: ignore
+                    f.hint
+                    if hydra_recursive is False
+                    or not is_builds(f.default.default)  # type: ignore
+                    or is_builds(f.hint)
                     else Any
                 ),
                 f.default,

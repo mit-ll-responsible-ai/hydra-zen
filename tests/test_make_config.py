@@ -1,9 +1,11 @@
+# Copyright (c) 2022 Massachusetts Institute of Technology
+# SPDX-License-Identifier: MIT
 import inspect
 import string
 from dataclasses import FrozenInstanceError
 from enum import Enum
 from itertools import chain
-from typing import Callable, Tuple, Union
+from typing import Any, Callable, Tuple, Union, get_type_hints
 
 import hypothesis.strategies as st
 import pytest
@@ -113,6 +115,7 @@ def test_to_yaml_validates_hydra_compat_types():
 @example(int)
 @example(str)
 @example(bool)
+@example(builds(int))
 @example(Tuple[int, str, bool])
 @example(Callable[[int], int])
 @example(Union[Callable, int])
@@ -291,3 +294,12 @@ def test_hydra_options(hydra_convert, hydra_recursive):
         assert c_yaml == "{}\n"  # yaml for empty config
     else:
         assert b_yaml.splitlines()[1:] == c_yaml.splitlines()
+
+
+def test_make_config_annotation_widening_behavior():
+    BuildsInt = builds(int)
+    Conf1 = make_config(a=ZenField(hint=BuildsInt, default=BuildsInt()))
+    assert get_type_hints(Conf1)["a"] is BuildsInt
+
+    Conf2 = make_config(b=ZenField(hint=int, default=BuildsInt()))
+    assert get_type_hints(Conf2)["b"] is Any
