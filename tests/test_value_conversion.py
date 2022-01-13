@@ -14,6 +14,7 @@ from omegaconf import DictConfig, ListConfig, OmegaConf
 
 from hydra_zen import builds, instantiate, make_config, to_yaml
 from hydra_zen._compatibility import ZEN_SUPPORTED_PRIMITIVES
+from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.structured_configs._value_conversion import ZEN_VALUE_CONVERSION
 
 
@@ -137,7 +138,9 @@ def f2(*args, **kwargs):
     as_builds=st.booleans(),
     via_yaml=st.booleans(),
 )
-def test_functools_partial(target, args, kwargs, as_builds: bool, via_yaml: bool):
+def test_functools_partial_as_configured_value(
+    target, args, kwargs, as_builds: bool, via_yaml: bool
+):
     partiald_obj = partial(target, *args, **kwargs)
     Conf = (
         make_config(field=partiald_obj)
@@ -154,3 +157,14 @@ def test_functools_partial(target, args, kwargs, as_builds: bool, via_yaml: bool
     assert out.func is target
     assert out.args == args
     assert out.keywords == kwargs
+
+
+def f3(z):
+    return
+
+
+def test_functools_partial_gets_validated():
+    make_config(x=partial(f3, z=2))  # OK
+
+    with pytest.raises(TypeError):
+        make_config(x=partial(f3, y=2))  # no param named `y`
