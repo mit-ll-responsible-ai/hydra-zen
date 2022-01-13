@@ -8,7 +8,7 @@ chronological order. All previous releases should still be available on pip.
 .. _v0.5.0:
 
 ---------------------
-0.5.0rc1 - 2022-01-10
+0.5.0rc2 - 2022-01-13
 ---------------------
 
 This release primarily improves the ability of :func:`~hydra_zen.builds` to inspect and
