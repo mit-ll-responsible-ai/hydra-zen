@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>builds &#8212; hydra-zen 0.5.0rc1+6.g764eee6 documentation</title>
+    <title>builds &#8212; hydra-zen 0.5.0rc1+7.g5d30544 documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -190,7 +190,7 @@
 <dt id="hydra_zen.builds">
 <code class="sig-prename descclassname"><span class="pre">hydra_zen.</span></code><code class="sig-name descname"><span class="pre">builds</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hydra_target</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">pos_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_partial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_recursive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">populate_full_signature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frozen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataclass_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">builds_bases</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs_for_target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/structured_configs/_implementations.html#builds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.builds" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a config, which describes how to instantiate/call <code class="docutils literal notranslate"><span class="pre">&lt;hydra_target&gt;</span></code> with
-user-specified and auto-populated parameter values.</p>
+both user-specified and auto-populated parameter values.</p>
 <p>Consult the Examples section of the docstring to see the various features of
 <a class="reference internal" href="#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> in action.</p>
 <dl class="field-list">
@@ -419,6 +419,26 @@ compose configs via class inheritance.</p>
 <span class="go">True</span>
 </pre></div>
 </div>
+<p id="builds-validation"><strong>Runtime validation perfomed by builds</strong></p>
+<p>Misspelled parameter names and other invalid configurations for the target’s
+signature will be caught by <a class="reference internal" href="#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>, so that such errors are caught prior to
+instantiation.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">a_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span> <span class="k">pass</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">builds</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">a_nmbr</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># misspelled parameter name</span>
+<span class="go">TypeError: Building: func ..</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">builds</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># too many arguments</span>
+<span class="go">TypeError: Building: func ..</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">BaseConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">a_number</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">builds</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">builds_bases</span><span class="o">=</span><span class="p">(</span><span class="n">BaseConf</span><span class="p">,))</span>  <span class="c1"># too many args (via inheritance)</span>
+<span class="go">TypeError: Building: func ..</span>
+</pre></div>
+</div>
 <p id="meta-field"><strong>Using meta-fields</strong></p>
 <p>Meta-fields are fields that are included in a config but are excluded by the
 instantiation process. Thus arbitrary metadata can be attached to a config.</p>
@@ -467,24 +487,16 @@ instead.</p>
 <span class="go">FrozenInstanceError: cannot assign to field &#39;ip_address&#39;</span>
 </pre></div>
 </div>
-<p id="builds-validation"><strong>Runtime validation perfomed by builds</strong></p>
-<p>Misspelled parameter names and other invalid configurations for the target’s
-signature will be caught by <a class="reference internal" href="#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>, so that the error surfaces immediately while
-creating the configuration.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">a_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span> <span class="k">pass</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">builds</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">a_nmbr</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># misspelled parameter name</span>
-<span class="go">TypeError: Building: func ..</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">builds</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># too many arguments</span>
-<span class="go">TypeError: Building: func ..</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">BaseConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">a_number</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">builds</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">builds_bases</span><span class="o">=</span><span class="p">(</span><span class="n">BaseConf</span><span class="p">,))</span>  <span class="c1"># too many args (via inheritance)</span>
-<span class="go">TypeError: Building: func ..</span>
+<p><strong>Support for partial’d objects</strong></p>
+<p>Specifying <code class="docutils literal notranslate"><span class="pre">builds(functools.partial(&lt;target&gt;,</span> <span class="pre">...),</span> <span class="pre">...)</span></code> is supported; <a class="reference internal" href="#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>
+will automatically “unpack” a partial’d object that is passed as its target.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">functools</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">partiald_dict</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">partiald_dict</span><span class="p">)</span>  <span class="c1"># signature: (a = 1, b = 2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">Conf</span><span class="o">.</span><span class="n">b</span>
+<span class="go">(1, 2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf</span><span class="p">(</span><span class="n">a</span><span class="o">=-</span><span class="mi">4</span><span class="p">))</span>  <span class="c1"># equivalent to calling: `partiald_dict(a=-4)`</span>
+<span class="go">{&#39;a&#39;: -4, &#39;b&#39;: 2}</span>
 </pre></div>
 </div>
 </dd></dl>

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>make_config &#8212; hydra-zen 0.5.0rc1+6.g764eee6 documentation</title>
+    <title>make_config &#8212; hydra-zen 0.5.0rc1+7.g5d30544 documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -384,7 +384,8 @@ consider using <a class="reference external" href="https://docs.python.org/3/lib
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">make_config</span><span class="p">,</span> <span class="n">to_yaml</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">pp</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="k">return</span> <span class="nb">print</span><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>  <span class="c1"># pretty-print config as yaml</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">pp</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="nb">print</span><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>  <span class="c1"># pretty-print config as yaml</span>
 </pre></div>
 </div>
 <p><strong>Basic Usage</strong></p>
@@ -448,8 +449,8 @@ for providing associated default values.</p>
 </pre></div>
 </div>
 <p><strong>Support for Additional Types</strong></p>
-<p>Types like <a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">complex</span></code></a> and <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a> are automatically supported by
-hydra-zen.</p>
+<p>Types like <a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">complex</span></code></a> and <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a> are automatically
+supported by hydra-zen.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ConfWithComplex</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="n">j</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pp</span><span class="p">(</span><span class="n">ConfWithComplex</span><span class="p">)</span>
 <span class="go">a:</span>
@@ -458,6 +459,7 @@ hydra-zen.</p>
 <span class="go">  _target_: builtins.complex</span>
 </pre></div>
 </div>
+<p>See <a class="reference internal" href="../api_reference.html#additional-types"><span class="std std-ref">Additional Types, Supported via hydra-zen</span></a> for a complete list of supported types.</p>
 <p><strong>Using ZenField to Provide Type Information</strong></p>
 <p>The <a class="reference internal" href="hydra_zen.ZenField.html#hydra_zen.ZenField" title="hydra_zen.ZenField"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenField</span></code></a> class can be used to include a type-annotation in association
 with a field.</p>
@@ -467,7 +469,8 @@ with a field.</p>
 </pre></div>
 </div>
 <p>Providing type annotations is optional, but doing so enables Hydra to perform
-checks at runtime to ensure that a configured value matches its associated type <a class="reference internal" href="#r9f8e996c6560-4" id="id13">[4]</a>.</p>
+checks at runtime to ensure that a configured value matches its associated
+type <a class="reference internal" href="#r9f8e996c6560-4" id="id13">[4]</a>.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pp</span><span class="p">(</span><span class="n">ProfileConf</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;piro&quot;</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>  <span class="c1"># age should be an integer</span>
 <span class="go">&lt;ValidationError: Value &#39;False&#39; could not be converted to Integer&gt;</span>
 </pre></div>

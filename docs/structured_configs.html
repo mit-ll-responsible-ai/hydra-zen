@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dynamically Generating Structured Configs &#8212; hydra-zen 0.5.0rc1+6.g764eee6 documentation</title>
+    <title>Dynamically Generating Structured Configs &#8212; hydra-zen 0.5.0rc1+7.g5d30544 documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -336,10 +336,10 @@ This helps to keep the process of configuring complex applications simple, intui
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>(hydra_target, /, *pos_args[, …])</p></td>
-<td><p>Returns a config, which describes how to instantiate/call <code class="docutils literal notranslate"><span class="pre">&lt;hydra_target&gt;</span></code> with user-specified and auto-populated parameter values.</p></td>
+<td><p>Returns a config, which describes how to instantiate/call <code class="docutils literal notranslate"><span class="pre">&lt;hydra_target&gt;</span></code> with both user-specified and auto-populated parameter values.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a>(obj)</p></td>
-<td><p>Produces a targeted config that, when instantiated by Hydra, ‘just’ returns the target (un-instantiated).</p></td>
+<td><p>Produces a config that, when instantiated by Hydra, “just” returns the un-instantiated target-object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.hydrated_dataclass.html#hydra_zen.hydrated_dataclass" title="hydra_zen.hydrated_dataclass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydrated_dataclass</span></code></a>(target, *pos_args[, …])</p></td>
 <td><p>A decorator that uses <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> to create a dataclass with the appropriate Hydra-specific fields for specifying a targeted config <a class="reference internal" href="generated/hydra_zen.hydrated_dataclass.html#r8dd265aa7612-1" id="id1"><span>[R8dd265aa7612-1]</span></a>.</p></td>

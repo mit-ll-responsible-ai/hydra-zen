@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hydra_zen.structured_configs._implementations &#8212; hydra-zen 0.5.0rc1+6.g764eee6 documentation</title>
+    <title>hydra_zen.structured_configs._implementations &#8212; hydra-zen 0.5.0rc1+7.g5d30544 documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -423,7 +423,8 @@
 <span class="sd">    Hydra-specific fields for specifying a targeted config [1]_.</span>
 
 <span class="sd">    This provides similar functionality to `builds`, but enables a user to define</span>
-<span class="sd">    a config explicitly using the :func:`dataclasses.dataclass` syntax.</span>
+<span class="sd">    a config explicitly using the :func:`dataclasses.dataclass` syntax, which can</span>
+<span class="sd">    enable enhanced static analysis of the resulting config.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -627,8 +628,7 @@
 
 
 <div class="viewcode-block" id="just"><a class="viewcode-back" href="../../../generated/hydra_zen.just.html#hydra_zen.just">[docs]</a><span class="k">def</span> <span class="nf">just</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Importable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span>
-    <span class="sd">&quot;&quot;&quot;Produces a targeted config that, when instantiated by Hydra, &#39;just&#39;</span>
-<span class="sd">    returns the target (un-instantiated).</span>
+    <span class="sd">&quot;&quot;&quot;Produces a config that, when instantiated by Hydra, &quot;just&quot; returns the un-instantiated target-object.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -923,7 +923,7 @@
 <span class="sd">    frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)</span>
 
 <span class="sd">    Returns a config, which describes how to instantiate/call ``&lt;hydra_target&gt;`` with</span>
-<span class="sd">    user-specified and auto-populated parameter values.</span>
+<span class="sd">    both user-specified and auto-populated parameter values.</span>
 
 <span class="sd">    Consult the Examples section of the docstring to see the various features of</span>
 <span class="sd">    `builds` in action.</span>
@@ -1157,6 +1157,26 @@
 <span class="sd">    &gt;&gt;&gt; issubclass(ChildConf, ParentConf)</span>
 <span class="sd">    True</span>
 
+<span class="sd">    .. _builds-validation:</span>
+
+<span class="sd">    **Runtime validation perfomed by builds**</span>
+
+<span class="sd">    Misspelled parameter names and other invalid configurations for the target’s</span>
+<span class="sd">    signature will be caught by `builds`, so that such errors are caught prior to</span>
+<span class="sd">    instantiation.</span>
+
+<span class="sd">    &gt;&gt;&gt; def func(a_number: int): pass</span>
+
+<span class="sd">    &gt;&gt;&gt; builds(func, a_nmbr=2)  # misspelled parameter name</span>
+<span class="sd">    TypeError: Building: func ..</span>
+
+<span class="sd">    &gt;&gt;&gt; builds(func, 1, 2)  # too many arguments</span>
+<span class="sd">    TypeError: Building: func ..</span>
+
+<span class="sd">    &gt;&gt;&gt; BaseConf = builds(func, a_number=2)</span>
+<span class="sd">    &gt;&gt;&gt; builds(func, 1, builds_bases=(BaseConf,))  # too many args (via inheritance)</span>
+<span class="sd">    TypeError: Building: func ..</span>
+
 <span class="sd">    .. _meta-field:</span>
 
 <span class="sd">    **Using meta-fields**</span>
@@ -1212,25 +1232,18 @@
 <span class="sd">    &gt;&gt;&gt; my_router.ip_address = &quot;148.109.37.2&quot;</span>
 <span class="sd">    FrozenInstanceError: cannot assign to field &#39;ip_address&#39;</span>
 
-<span class="sd">    .. _builds-validation:</span>
+<span class="sd">    **Support for partial&#39;d objects**</span>
 
-<span class="sd">    **Runtime validation perfomed by builds**</span>
+<span class="sd">    Specifying ``builds(functools.partial(&lt;target&gt;, ...), ...)`` is supported; `builds`</span>
+<span class="sd">    will automatically &quot;unpack&quot; a partial&#39;d object that is passed as its target.</span>
 
-<span class="sd">    Misspelled parameter names and other invalid configurations for the target’s</span>
-<span class="sd">    signature will be caught by `builds`, so that the error surfaces immediately while</span>
-<span class="sd">    creating the configuration.</span>
-
-<span class="sd">    &gt;&gt;&gt; def func(a_number: int): pass</span>
-
-<span class="sd">    &gt;&gt;&gt; builds(func, a_nmbr=2)  # misspelled parameter name</span>
-<span class="sd">    TypeError: Building: func ..</span>
-
-<span class="sd">    &gt;&gt;&gt; builds(func, 1, 2)  # too many arguments</span>
-<span class="sd">    TypeError: Building: func ..</span>
-
-<span class="sd">    &gt;&gt;&gt; BaseConf = builds(func, a_number=2)</span>
-<span class="sd">    &gt;&gt;&gt; builds(func, 1, builds_bases=(BaseConf,))  # too many args (via inheritance)</span>
-<span class="sd">    TypeError: Building: func ..</span>
+<span class="sd">    &gt;&gt;&gt; import functools</span>
+<span class="sd">    &gt;&gt;&gt; partiald_dict = functools.partial(dict, a=1, b=2)</span>
+<span class="sd">    &gt;&gt;&gt; Conf = builds(partiald_dict)  # signature: (a = 1, b = 2)</span>
+<span class="sd">    &gt;&gt;&gt; Conf.a, Conf.b</span>
+<span class="sd">    (1, 2)</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(Conf(a=-4))  # equivalent to calling: `partiald_dict(a=-4)`</span>
+<span class="sd">    {&#39;a&#39;: -4, &#39;b&#39;: 2}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">pos_args</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">kwargs_for_target</span><span class="p">:</span>
@@ -1246,6 +1259,14 @@
         <span class="p">)</span>
 
     <span class="n">target</span><span class="p">,</span> <span class="o">*</span><span class="n">_pos_args</span> <span class="o">=</span> <span class="n">pos_args</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">):</span>
+        <span class="c1"># partial&#39;d args must come first, then user-specified args</span>
+        <span class="c1"># otherwise, the parial&#39;d args will take precedent, which</span>
+        <span class="c1"># does not align with the behavior of partial itself</span>
+        <span class="n">_pos_args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">+</span> <span class="n">_pos_args</span>
+        <span class="n">kwargs_for_target</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">target</span><span class="o">.</span><span class="n">keywords</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">}</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">func</span>
 
     <span class="n">BUILDS_ERROR_PREFIX</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">building_error_prefix</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
 
@@ -2375,7 +2396,8 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; from hydra_zen import make_config, to_yaml</span>
-<span class="sd">    &gt;&gt;&gt; def pp(x): return print(to_yaml(x))  # pretty-print config as yaml</span>
+<span class="sd">    &gt;&gt;&gt; def pp(x):</span>
+<span class="sd">    ...     return print(to_yaml(x))  # pretty-print config as yaml</span>
 
 <span class="sd">    **Basic Usage**</span>
 
@@ -2439,8 +2461,8 @@
 
 <span class="sd">    **Support for Additional Types**</span>
 
-<span class="sd">    Types like :py:class:`complex` and :py:class:`pathlib.Path` are automatically supported by</span>
-<span class="sd">    hydra-zen.</span>
+<span class="sd">    Types like :py:class:`complex` and :py:class:`pathlib.Path` are automatically</span>
+<span class="sd">    supported by hydra-zen.</span>
 
 <span class="sd">    &gt;&gt;&gt; ConfWithComplex = make_config(a=1+2j)</span>
 <span class="sd">    &gt;&gt;&gt; pp(ConfWithComplex)</span>
@@ -2449,6 +2471,7 @@
 <span class="sd">      imag: 2.0</span>
 <span class="sd">      _target_: builtins.complex</span>
 
+<span class="sd">    See :ref:`additional-types` for a complete list of supported types.</span>
 
 <span class="sd">    **Using ZenField to Provide Type Information**</span>
 
@@ -2460,7 +2483,8 @@
 <span class="sd">    &gt;&gt;&gt; # signature: ProfileConf(username: str, age: int)</span>
 
 <span class="sd">    Providing type annotations is optional, but doing so enables Hydra to perform</span>
-<span class="sd">    checks at runtime to ensure that a configured value matches its associated type [4]_.</span>
+<span class="sd">    checks at runtime to ensure that a configured value matches its associated</span>
+<span class="sd">    type [4]_.</span>
 
 <span class="sd">    &gt;&gt;&gt; pp(ProfileConf(username=&quot;piro&quot;, age=False))  # age should be an integer</span>
 <span class="sd">    &lt;ValidationError: Value &#39;False&#39; could not be converted to Integer&gt;</span>
