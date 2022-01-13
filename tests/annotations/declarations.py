@@ -4,6 +4,7 @@
 from collections import Counter, deque
 from dataclasses import dataclass
 from enum import Enum
+from functools import partial
 from pathlib import Path
 from typing import Callable, List, Literal, Tuple, Type, TypeVar
 
@@ -19,7 +20,7 @@ from hydra_zen import (
     make_custom_builds_fn,
     mutable_value,
 )
-from hydra_zen.typing import Builds
+from hydra_zen.typing import Builds, Partial
 from hydra_zen.typing._implementations import HydraPartialBuilds
 
 T = TypeVar("T")
@@ -350,3 +351,9 @@ def make_hydra_partial(x: T) -> HydraPartialBuilds[Type[T]]:
 def check_HydraPartialBuilds():
     cfg = make_hydra_partial(int)
     a: Literal["Partial[int]"] = reveal_type(instantiate(cfg))
+
+
+def check_partial_protocol():
+    x: Partial[int]
+    x = partial(int)
+    # x = partial(str)  # should fail
