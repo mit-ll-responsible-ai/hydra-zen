@@ -3,6 +3,7 @@
 import string
 from collections import Counter, deque
 from enum import Enum
+from functools import partial
 from pathlib import Path
 from typing import Dict, FrozenSet, List, Set, Union
 
@@ -116,3 +117,40 @@ def test_Counter_roundtrip(x):
     out_counter = instantiate(OmegaConf.structured(to_yaml(BuildsConf)))["counter"]
 
     assert counter == out_counter
+
+
+def f1(*args, **kwargs):
+    return
+
+
+def f2(*args, **kwargs):
+    return
+
+
+@given(
+    target=st.sampled_from([f1, f2]),
+    args=st.lists(st.integers() | st.text(string.ascii_letters)).map(tuple),
+    kwargs=st.dictionaries(
+        keys=st.text("abcd", min_size=1),
+        values=st.integers() | st.text(string.ascii_letters),
+    ),
+    as_builds=st.booleans(),
+    via_yaml=st.booleans(),
+)
+def test_functools_partial(target, args, kwargs, as_builds: bool, via_yaml: bool):
+    partiald_obj = partial(target, *args, **kwargs)
+    Conf = (
+        make_config(field=partiald_obj)
+        if not as_builds
+        else builds(dict, field=partiald_obj)
+    )
+
+    if via_yaml:
+        Conf = OmegaConf.structured(to_yaml(Conf))
+
+    out = instantiate(Conf)["field"]
+
+    assert isinstance(out, partial)
+    assert out.func is target
+    assert out.args == args
+    assert out.keywords == kwargs
