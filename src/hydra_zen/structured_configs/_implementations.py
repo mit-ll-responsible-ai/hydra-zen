@@ -1075,6 +1075,14 @@ def builds(
 
     target, *_pos_args = pos_args
 
+    if isinstance(target, functools.partial):
+        # partial'd args must come first, then user-specified args
+        # otherwise, the parial'd args will take precedent, which
+        # does not align with the behavior of partial itself
+        _pos_args = list(target.args) + _pos_args
+        kwargs_for_target = {**target.keywords, **kwargs_for_target}
+        target = target.func
+
     BUILDS_ERROR_PREFIX = _utils.building_error_prefix(target)
 
     del pos_args

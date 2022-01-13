@@ -168,3 +168,34 @@ def test_functools_partial_gets_validated():
 
     with pytest.raises(TypeError):
         make_config(x=partial(f3, y=2))  # no param named `y`
+
+
+def f4(a, b=1, c="2"):
+    return a, b, c
+
+
+@given(
+    partial_args=st.lists(st.integers(1, 4), max_size=3),
+    partial_kwargs=st.dictionaries(
+        keys=st.sampled_from("abc"), values=st.integers(-5, -2)
+    ),
+    args=st.lists(st.integers(1, 4), max_size=3),
+    kwargs=st.dictionaries(keys=st.sampled_from("abc"), values=st.integers(-5, -2)),
+)
+def test_functools_partial_as_target(partial_args, partial_kwargs, args, kwargs):
+    # Ensures that resolving a partial'd object behaves the exact same way as
+    # configuring the object via `builds` and instantiating it.
+
+    partiald_obj = partial(f4, *partial_args, **partial_kwargs)
+    try:
+        # might be under or over-specified
+        out = partiald_obj(*args, **kwargs)
+    except Exception as e:
+        # `builds` should raise the same error, if over-specified
+        # (under-specified configs are ok)
+        if partial_args or args or "a" in partial_kwargs or "a" in kwargs:
+            with pytest.raises(type(e)):
+                builds(partiald_obj, *args, **kwargs)
+    else:
+        Conf = builds(partiald_obj, *args, **kwargs)
+        assert out == instantiate(Conf)
