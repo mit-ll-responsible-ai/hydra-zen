@@ -365,6 +365,6 @@ def check_target_annotation():
     builds(partial(int))
 
     # should fail:
-    builds()
-    builds(1)
-    builds(None)
+    # builds()
+    # builds(1)
+    # builds(None)
