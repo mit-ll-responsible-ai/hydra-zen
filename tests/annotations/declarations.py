@@ -357,3 +357,14 @@ def check_partial_protocol():
     x: Partial[int]
     x = partial(int)
     # x = partial(str)  # should fail
+
+
+def check_target_annotation():
+    builds(int)
+    builds(print)
+    builds(partial(int))
+
+    # should fail:
+    # builds()
+    # builds(1)
+    # builds(None)
