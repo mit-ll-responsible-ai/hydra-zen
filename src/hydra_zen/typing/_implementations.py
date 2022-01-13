@@ -128,6 +128,7 @@ _SupportedPrimitive = Union[
     _DataClass,
     complex,
     Path,
+    Partial,
     range,
     set,
     EmptyDict,  # not covered by Mapping[..., ...]
