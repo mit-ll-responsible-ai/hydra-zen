@@ -174,18 +174,18 @@ def f4(a, b=1, c="2"):
     return a, b, c
 
 
+@settings(max_examples=500)
 @given(
     partial_args=st.lists(st.integers(1, 4), max_size=3),
     partial_kwargs=st.dictionaries(
         keys=st.sampled_from("abc"), values=st.integers(-5, -2)
     ),
-    args=st.lists(st.integers(1, 4), max_size=3),
+    args=st.lists(st.integers(10, 14), max_size=3),
     kwargs=st.dictionaries(keys=st.sampled_from("abc"), values=st.integers(-5, -2)),
 )
 def test_functools_partial_as_target(partial_args, partial_kwargs, args, kwargs):
     # Ensures that resolving a partial'd object behaves the exact same way as
     # configuring the object via `builds` and instantiating it.
-
     partiald_obj = partial(f4, *partial_args, **partial_kwargs)
     try:
         # might be under or over-specified
