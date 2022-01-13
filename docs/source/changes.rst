@@ -12,8 +12,15 @@ chronological order. All previous releases should still be available on pip.
 ---------------------
 
 This release primarily improves the ability of :func:`~hydra_zen.builds` to inspect and
-the signatures of its targets; thus its ability to both auto-generate and validate configs
-is improved. 
+the signatures of its targets; thus its ability to both auto-generate and validate 
+configs is improved. This includes automatic support for specifying "partial'd" objects 
+-- objects produced by :py:func:`functools.partial` -- as configured values, and even as
+the target of :func:`~hydra_zen.builds`.
+
+New Features
+------------
+- Objects produced by :py:func:`functools.partial` can now be specified directly as configured values in :func:`~hydra_zen.make_config` and :func:`~hydra_zen.builds`. See :pull:`198` for examples.
+- An object produced by :py:func:`functools.partial` can now be specified as the target of :func:`~hydra_zen.builds`; ``builds`` will automatically "unpack" this partial'd object and incorporate its arguments into the config. See :pull:`199` for examples.
 
 Improvements
 ------------
