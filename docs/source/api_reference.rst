@@ -148,6 +148,7 @@ hydra-zen provides such support for values of the following types:
 - :py:class:`complex`
 - :py:class:`collections.Counter`
 - :py:class:`collections.deque`
+- :py:func:`functools.partial`  (*added in v0.5.0*)
 - :py:class:`pathlib.Path`
 - :py:class:`pathlib.PosixPath`
 - :py:class:`pathlib.WindowsPath`

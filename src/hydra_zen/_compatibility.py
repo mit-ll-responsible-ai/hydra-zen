@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 from collections import Counter, deque
 from enum import Enum
+from functools import partial
 from pathlib import Path, PosixPath, WindowsPath
 from typing import NamedTuple, Optional, Set
 
@@ -54,6 +55,7 @@ ZEN_SUPPORTED_PRIMITIVES: Set[type] = {
     set,
     frozenset,
     complex,
+    partial,
     Path,
     PosixPath,
     WindowsPath,

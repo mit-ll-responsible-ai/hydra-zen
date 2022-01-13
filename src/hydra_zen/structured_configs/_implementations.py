@@ -1,5 +1,6 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+import functools
 import inspect
 import sys
 import warnings
@@ -53,7 +54,14 @@ from hydra_zen.errors import (
 )
 from hydra_zen.funcs import get_obj, partial, zen_processing
 from hydra_zen.structured_configs import _utils
-from hydra_zen.typing import Builds, Importable, Just, PartialBuilds, SupportedPrimitive
+from hydra_zen.typing import (
+    Builds,
+    Importable,
+    Just,
+    Partial,
+    PartialBuilds,
+    SupportedPrimitive,
+)
 from hydra_zen.typing._implementations import (
     DataClass,
     HasPartialTarget,
@@ -114,24 +122,6 @@ _KEYWORD_ONLY: Final = inspect.Parameter.KEYWORD_ONLY
 _VAR_KEYWORD: Final = inspect.Parameter.VAR_KEYWORD
 
 _builtin_function_or_method_type = type(len)
-
-
-def _cast_via_tuple(dest_type: Type[_T]) -> Callable[[_T], Type[Builds[Type[_T]]]]:
-    def converter(value):
-        return builds(dest_type, tuple(value))
-
-    return converter
-
-
-ZEN_VALUE_CONVERSION[set] = _cast_via_tuple(set)
-ZEN_VALUE_CONVERSION[frozenset] = _cast_via_tuple(frozenset)
-ZEN_VALUE_CONVERSION[deque] = _cast_via_tuple(deque)
-ZEN_VALUE_CONVERSION[bytes] = _cast_via_tuple(bytes)
-ZEN_VALUE_CONVERSION[bytearray] = _cast_via_tuple(bytearray)
-ZEN_VALUE_CONVERSION[range] = lambda value: builds(
-    range, value.start, value.stop, value.step
-)
-ZEN_VALUE_CONVERSION[Counter] = lambda counter: builds(Counter, dict(counter))
 
 
 def _get_target(x):
@@ -2456,3 +2446,28 @@ def _repack_zenfield(value: ZenField, name: str, bases: Tuple[_DataClass, ...]):
             _permit_default_factory=False,
         )
     return value
+
+
+# registering value-conversions that depend on `builds`
+def _cast_via_tuple(dest_type: Type[_T]) -> Callable[[_T], Type[Builds[Type[_T]]]]:
+    def converter(value):
+        return builds(dest_type, tuple(value))
+
+    return converter
+
+
+def _unpack_partial(value: Partial[_T]) -> Type[PartialBuilds[Type[_T]]]:
+    target = cast(Type[_T], value.func)
+    return builds(target, *value.args, **value.keywords, zen_partial=True)
+
+
+ZEN_VALUE_CONVERSION[set] = _cast_via_tuple(set)
+ZEN_VALUE_CONVERSION[frozenset] = _cast_via_tuple(frozenset)
+ZEN_VALUE_CONVERSION[deque] = _cast_via_tuple(deque)
+ZEN_VALUE_CONVERSION[bytes] = _cast_via_tuple(bytes)
+ZEN_VALUE_CONVERSION[bytearray] = _cast_via_tuple(bytearray)
+ZEN_VALUE_CONVERSION[range] = lambda value: builds(
+    range, value.start, value.stop, value.step
+)
+ZEN_VALUE_CONVERSION[Counter] = lambda counter: builds(Counter, dict(counter))
+ZEN_VALUE_CONVERSION[functools.partial] = _unpack_partial
