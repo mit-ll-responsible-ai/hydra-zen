@@ -9,7 +9,6 @@ from typing import (
     Callable,
     Dict,
     FrozenSet,
-    Generic,
     Mapping,
     NewType,
     Sequence,
@@ -57,8 +56,6 @@ class Partial(Protocol[T2]):
 
 
 InterpStr = NewType("InterpStr", str)
-
-Importable = TypeVar("Importable")
 
 
 class _DataClass(Protocol):  # pragma: no cover
@@ -109,6 +106,8 @@ class HasTarget(Protocol):  # pragma: no cover
 class HasPartialTarget(Protocol):  # pragma: no cover
     _zen_partial: bool = True
 
+
+Importable = TypeVar("Importable", bound=Callable)
 
 _HydraPrimitive = Union[
     bool,

@@ -357,3 +357,26 @@ def check_partial_protocol():
     x: Partial[int]
     x = partial(int)
     # x = partial(str)  # should fail
+
+
+def check_partiald_target():
+    A: Literal["Type[Builds[partial[int]]]"] = reveal_type(builds(partial(int)))
+    B: Literal["Type[PartialBuilds[partial[int]]]"] = reveal_type(
+        builds(partial(int), zen_partial=True)
+    )
+    a = builds(partial(int))
+    out_a: Literal["int"] = reveal_type(instantiate(a))
+
+    b = builds(partial(int), zen_partial=True)
+    out_b: Literal["Partial[int]"] = reveal_type(instantiate(b))
+
+
+def check_target_annotation():
+    builds(int)
+    builds(print)
+    builds(partial(int))
+
+    # should fail:
+    # builds()
+    # builds(1)
+    # builds(None)
