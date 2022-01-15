@@ -12,7 +12,7 @@ import pytest
 from hypothesis import HealthCheck, assume, given, settings
 from omegaconf import DictConfig, ListConfig, OmegaConf
 
-from hydra_zen import builds, instantiate, make_config, to_yaml
+from hydra_zen import builds, get_target, instantiate, make_config, to_yaml
 from hydra_zen._compatibility import ZEN_SUPPORTED_PRIMITIVES
 from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.structured_configs._value_conversion import ZEN_VALUE_CONVERSION
@@ -121,7 +121,7 @@ def test_Counter_roundtrip(x):
 
 
 def f1(*args, **kwargs):
-    return
+    return args, kwargs
 
 
 def f2(*args, **kwargs):
@@ -199,3 +199,17 @@ def test_functools_partial_as_target(partial_args, partial_kwargs, args, kwargs)
     else:
         Conf = builds(partiald_obj, *args, **kwargs)
         assert out == instantiate(Conf)
+
+
+def test_builds_handles_recursive_partial():
+    # `functools.partial` automatically flattens itself:
+    # partial(partial(dict, a=1) b=2) -> partial(dict, a=1, b=2)
+    #
+    # Thus `builds` should handle arbitrarily-nested partials "for free".
+    # This test ensures this doesnt regress.
+    partiald_obj = partial(partial(partial(f1, "a", a=1), "b"), b=2)
+    Conf = builds(partiald_obj)
+
+    assert get_target(Conf) is f1
+    assert instantiate(Conf) == partiald_obj()
+    assert partiald_obj() == (("a", "b"), dict(a=1, b=2))
