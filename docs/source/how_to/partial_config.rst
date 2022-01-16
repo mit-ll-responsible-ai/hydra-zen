@@ -76,7 +76,7 @@ Lastly, let's inspect the YAML-serialized config for :class:`OptimConf`.
 .. code-block:: pycon
    :caption: 4: Examining a YAML-serialized partial config.
 
-   >>> from hydra-zen import to_yaml
+   >>> from hydra_zen import to_yaml
 
    >>> print(to_yaml(OptimConf))
    _target_: hydra_zen.funcs.zen_processing
