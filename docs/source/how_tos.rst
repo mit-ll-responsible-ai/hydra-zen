@@ -1,3 +1,8 @@
+.. meta::
+   :description: How-to guides for using Hydra and hydra-zen.
+
+.. _hydra-zen-how-to:
+
 How-To Guides
 =============
 

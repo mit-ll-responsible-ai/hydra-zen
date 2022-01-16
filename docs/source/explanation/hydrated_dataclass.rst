@@ -1,3 +1,7 @@
+.. meta::
+   :description: hydra-zen provides a dataclass-like decorator for users to combine statically-defined and dynamically-generated fields in a configuration for a Hydra application.
+
+
 Combining Statically-Defined and Dynamically-Generated Configurations
 =====================================================================
 

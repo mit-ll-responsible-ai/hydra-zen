@@ -1,3 +1,6 @@
+.. meta::
+   :description: A tutorial that adds configuration groups to a Hydra project.
+
 .. admonition:: Prerequisites
 
    This tutorial is a direct follow-on to: :ref:`hierarchy-app`.

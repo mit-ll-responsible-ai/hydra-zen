@@ -1,3 +1,6 @@
+.. meta::
+   :description: A tutorial that demonstrates hydra-zen's function-injection mechanisms for instantiating structured configurations.
+
 .. admonition:: Prerequisites
 
    This tutorial is a direct follow-on to: :ref:`config-groups-tutorial`.

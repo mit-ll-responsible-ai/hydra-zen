@@ -1,3 +1,6 @@
+.. meta::
+   :description: hydra-zen's builds function can be used to create partial configurations for Hydra applications.
+
 .. admonition:: The Answer
    
    Simply use ``builds(<target>, zen_partial=True)`` to create a partial config.

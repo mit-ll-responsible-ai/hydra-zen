@@ -1,3 +1,6 @@
+.. meta::
+   :description: A tutorial for creating a basic program using hydra-zen and Hydra.
+
 .. tip:: 
    Hover your cursor over any code block in this tutorial, and a clipboard will appear.
    Click it to copy the contents of the code block.
