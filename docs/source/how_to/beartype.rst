@@ -1,5 +1,5 @@
 .. meta::
-   :description: hydra_zen provides a wrapped-instantiation mechanism that enables the use runtime type-checkers, like pydantic and beartype, with Hydra applications.
+   :description: hydra-zen provides a wrapped-instantiation mechanism that enables the use runtime type-checkers, like pydantic and beartype, with Hydra applications.
 
 .. admonition:: Prerequisites
 
