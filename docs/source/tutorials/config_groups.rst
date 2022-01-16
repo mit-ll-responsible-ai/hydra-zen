@@ -8,18 +8,18 @@
 Provide Swappable Configuration Groups
 ======================================
 
-In this tutorial we will create swappable configuration groups for our app; this will 
-enable us to create specific player profiles and inventory load-outs. These config 
-groups can then be specified by name when we launch our app.
+In this tutorial we will create swappable configuration groups for our application; 
+this will enable us to create specific player profiles and inventory load-outs. These 
+config groups can then be specified by name when we launch our application.
 
-Modifying Our App
-=================
+Modifying Our Application
+=========================
 
 We will need to make three modifications to our code in ``my_app.py``:
 
 1. Create additional inventory configs and player-profile configs.
 2. Register these configs - by name - in Hydra's config store, under the appropriate respective groups.
-3. Update our app's top-level config to include a "defaults" list, which is a special field that Hydra uses to define the interface to our app.
+3. Update our application's top-level config to include a "defaults" list, which is a special field that Hydra uses to define the interface to our application.
 
 
 Creating Inventory-Config Groups
@@ -90,7 +90,7 @@ and then add them to the config store.
    )
 
 We will add these to Hydra's config store under the ``player`` group, so that these 
-particular player-profiles can be used by-name when we launch our app.
+particular player-profiles can be used by-name when we launch our application.
 
 
 .. code-block:: python
@@ -203,13 +203,13 @@ over. Modify your ``my_app.py`` script to match the following code.
    ``task_function``. They can be defined - and added to the config store - in a 
    separate file in our library, e.g. ``configs.py``, or across multiple files. This is 
    nice from an organizational perspective, plus it enables to use these configs
-   across multiple apps.
+   across multiple applications.
 
 
-Running Our App
-===============
+Running Our Application
+=======================
 
-In addition to configuring any aspect of the player manually, we can now also reference particular config-group items by-name when we launch our app.
+In addition to configuring any aspect of the player manually, we can now also reference particular config-group items by-name when we launch our application.
 
 Open your terminal in the directory shared by both ``my_app.py`` and 
 ``game_library.py`` and run the following commands. Verify that you can reproduce the 
@@ -263,5 +263,4 @@ functionality into our code without having to modify our library's source code n
 
 .. attention:: **Cleaning Up**:
    To clean up after this tutorial, delete the ``outputs`` directory that Hydra created 
-   upon launching our app.
-
+   upon launching our application.

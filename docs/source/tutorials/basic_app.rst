@@ -13,20 +13,21 @@
 
 .. _basic-app:
 
-========================================
-Create and Launch a Basic App with Hydra
-========================================
+================================================
+Create and Launch a Basic Application with Hydra
+================================================
 
-In this tutorial we will create a basic app that we can launch using Hydra.
-While the app itself will be trivial, we will see that it is designed to 
-be configurable and that it can be run in a reproducible way.
+In this tutorial we will create a basic application that we can configure and launch 
+using Hydra. Although this project will be trivial, we will be introduced to the 
+overarching design that is used for any Hydra-based project, as well to the 
+core functionality provided by hydra-zen.
 
 
 Getting Started
 ===============
 
 We will install hydra-zen and then we will create a Python script where we will create 
-our app.
+our application.
 
 Installing hydra-zen
 --------------------
@@ -48,31 +49,32 @@ importing ``hydra_zen``.
     >>> import hydra_zen
 
 
-Creating a Script for our App
------------------------------
+Creating a Script for our Application
+-------------------------------------
 
 Navigate to (or create) a directory where you are comfortable with files being written; 
-running our app will leave behind some "artifacts" here. Create a new text file called
+running our code will leave behind some "artifacts" here. Create a new text file called
 ``my_app.py`` and open it in an editor.
 
-Creating a Simple App
-=====================
+Creating a Simple Hydra-Based Application
+=========================================
 
-Let's design this app to take in two (configurable) player names, and to log the 
+Let's design our program to take in two (configurable) player names, and to log the 
 players' names to a text file called ``player_log.txt``.
 
-Our app will consist of two components:
+Our program will consist of two components, which comprises the structure of any 
+Hydra-based application:
 
-1. A "config", which defines the configurable interface of our app.
-2. A task function, which accepts the populated config, and whose body determines the task that will be completed.
+1. A "config", which defines the configurable interface of our application.
+2. A task function, which accepts the populated config, and whose body specifies the code that will be executed when our application is launched.
 
 
-Writing the App
----------------
+Writing the Application
+-----------------------
 
-In ``my_app.py`` we'll define a config and task function for this app. We will use
-:func:`~hydra_zen.make_config` to create the config. Write the following 
-code in this file.
+In ``my_app.py`` we'll define a config and task function for this application. We will 
+use :func:`~hydra_zen.make_config` to create the config. Write the following code in 
+this file.
 
 
 .. code-block:: python
@@ -98,11 +100,12 @@ code in this file.
 
 .. _launch-basic-app:
 
-Launching the App
------------------
+Launching the Application
+-------------------------
 
-It's time to run our app. Open a Python console -- or a Jupyter notebook -- in the same 
-directory as ``my_app.py``. First, we will import our config and our task function.
+It's time to run our application. Open a Python console -- or a Jupyter notebook -- in 
+the same directory as ``my_app.py``. First, we will import our config and our task 
+function.
 
 
 .. code:: pycon
@@ -115,13 +118,13 @@ We will also need to import hydra-zen's :func:`~hydra_zen.launch` function.
     
     >>> from hydra_zen import launch
 
-Next, we will launch our app by providing the :func:`~hydra_zen.launch` function with: 
-our config, our task function, and specific configured values for the player's names.
-Here, we will use the names ``link`` and ``zelda`` for the names of player 1 and player 
-2, respectively.
+Next, we will launch our application by providing the :func:`~hydra_zen.launch` 
+function with: our config, our task function, and specific configured values for the 
+player's names. Here, we will use the names ``link`` and ``zelda`` for the names of 
+player 1 and player 2, respectively.
 
 .. code-block:: pycon
-   :caption: Launching our app
+   :caption: Launching our application
 
    >>> job = launch(Config, task_function, overrides=["player1=link", "player2=zelda"])
 
@@ -143,15 +146,15 @@ We can also directly access the value that is returned by our task-function.
 
 .. warning::
    If you modify the contents of ``my_app.py``, then you need to restart your Python 
-   console (or restart the kernel of your Jupyter notebook) and re-launch the app in 
-   order for these changes to take effect.
+   console (or restart the kernel of your Jupyter notebook) and re-launch the 
+   application in order for these changes to take effect.
 
 Inspecting the Results
 ----------------------
 
-Our app was designed to log the names of the players for that particular game session;
-let's check that this log was written as-expected, and familiarize ourselves with the
-other files that Hydra writes when it launches an app.
+Our application was designed to log the names of the players for that particular game 
+session; let's check that this log was written as-expected, and familiarize ourselves 
+with the other files that Hydra writes when it launches an application.
 
 First, we'll create a simple Python function that will make it easy to print files 
 in our Python console
@@ -163,8 +166,8 @@ in our Python console
    ...     with x.open("r") as f: 
    ...         print(f.read())
 
-By default, Hydra will create a directory called ``outputs``, and will store the app's 
-outputs in a time-stamped subdirectory of the form 
+By default, Hydra will create a directory called ``outputs``, and will store the 
+application's outputs in a time-stamped subdirectory of the form  
 ``outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}``. The particular subdirectory for our job is 
 provided by ``job.working_dir``.
 
@@ -174,7 +177,7 @@ provided by ``job.working_dir``.
    >>> job_dir  # output will vary based on reader's date/time/OS
    WindowsPath('outputs/2021-10-21/10-36-23')
 
-The contents of this directory consists of: the log-file that our app wrote, a 
+The contents of this directory consists of: the log-file that our application wrote, a 
 ``.hydra`` directory that details the configurations of this particular job, and a 
 log-file written by Hydra.
 
@@ -185,7 +188,7 @@ log-file written by Hydra.
     WindowsPath('outputs/2021-10-21/10-36-23/player_log.txt'),
     WindowsPath('outputs/2021-10-21/10-36-23/zen_launch.log')]
 
-Let's verify that our app wrote the player-log as-expected.
+Let's verify that our application wrote the player-log as-expected.
 
 .. code:: pycon
    
@@ -214,8 +217,8 @@ we can inspect ``config.yaml``.
    player1: link
    player2: zelda
 
-We successfully designed, configured, and launched an app using hydra-zen and Hydra!
-In the next tutorial, we will add a command line interface to this app.
+We successfully designed, configured, and launched an application using hydra-zen and 
+Hydra! In the next tutorial, we will add a command line interface to this app.
 
 .. admonition:: References
 
@@ -226,5 +229,5 @@ In the next tutorial, we will add a command line interface to this app.
 
 .. attention:: **Cleaning Up**:
    To clean up after this tutorial, delete the ``outputs`` directory that Hydra created 
-   upon launching our app. You can find this in the same directory as your 
+   upon launching our application. You can find this in the same directory as your 
    ``my_app.py`` file.

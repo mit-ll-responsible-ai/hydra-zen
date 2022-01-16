@@ -8,16 +8,16 @@
 
 .. _cli-app:
 
-=======================================
-Add a Command Line Interface to Our App
-=======================================
+===============================================
+Add a Command Line Interface to Our Application
+===============================================
 
-In this tutorial we will update our app so that it can be configured and launched 
-from a command line interface.
+In this tutorial we will update our project so that it can be configured and launched 
+from a command line interface, using Hydra.
 
 
-Modifying Our App
-=================
+Modifying Our Project
+=====================
 
 Open ``my_app.py`` in your editor. We will make the following modifications to it:
 
@@ -61,26 +61,26 @@ Modify your script to match this:
        task_function()
 
 
-Launching Our App from the Command Line
-=======================================
+Launching Our Application from the Command Line
+===============================================
 
-With the above modifications to ``my_app.py`` complete, we can launch our app from the 
-command line. The following will launch a job with ``mario`` and ``luigi`` as the names
-for player 1 and player 2, respectively.
+With the above modifications to ``my_app.py`` complete, we can launch our application 
+from the command line. The following will launch a job with ``mario`` and ``luigi`` as 
+the names for player 1 and player 2, respectively.
 
 Open your terminal in the same directory as ``my_app.py`` and execute the following 
 command.
 
 .. code-block:: console
-   :caption: Launching our app from the command line
+   :caption: Launching our application from the command line
 
    $ python my_app.py player1=mario player2=luigi
 
 .. tip::
-   You can `add tab-completion <https://hydra.cc/docs/tutorials/basic/running_your_app/tab_completion/>`_ to your app's command line interface. This is helpful once you 
-   start writing apps that have many configurable components.
+   You can `add tab-completion <https://hydra.cc/docs/tutorials/basic/running_your_app/tab_completion/>`_ to your application's command line interface. This is helpful 
+   once you start writing applications that have many configurable components.
 
-To inspect the log written by our app, let's open a Python terminal in the same 
+To inspect the log written by our application, let's open a Python terminal in the same 
 directory as ``my_app.py`` and define the following function for reading files
 
 .. code-block:: pycon
@@ -98,8 +98,8 @@ Getting the directory containing the output of this job:
    >>> latest_job  # changes based  on reader's date, time, and OS
    WindowsPath('C:/outputs/2021-10-21/12-58-13')
 
-Let's verify that our app still operates as-expected; ``player_log.txt`` should read
-as follows:
+Let's verify that our application still operates as-expected; ``player_log.txt`` should 
+read as follows:
 
 .. code-block:: pycon
    
@@ -109,9 +109,9 @@ as follows:
    Player 2: luigi
 
 
-Voilà! As demonstrated, our app can now be configured and launched from the command 
-line. It should be noted that we can still launch our app from a Python console, using
-:func:`~hydra_zen.launch`, as we did :ref:`in the previous tutorial <launch-basic-app>`.
+Voilà! As demonstrated, our application can now be configured and launched from the 
+command line. It should be noted that we can still launch our app from a Python 
+console, using :func:`~hydra_zen.launch`, as we did :ref:`in the previous tutorial <launch-basic-app>`.
 
 .. admonition:: References
 
@@ -121,4 +121,4 @@ line. It should be noted that we can still launch our app from a Python console,
 
 .. attention:: **Cleaning Up**:
    To clean up after this tutorial, delete the ``outputs`` directory that Hydra created 
-   upon launching our app.
+   upon launching our application.
