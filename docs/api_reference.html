@@ -2,352 +2,281 @@
 <!DOCTYPE html>
 
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Reference &#8212; hydra-zen 0.5.0rc2+2.gd06c70e documentation</title>
-    
-  <link href="_static/css/theme.css" rel="stylesheet">
-  <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
-
-    
-  <link rel="stylesheet"
-    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
-
-    
-      
-
-    
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/css/blank.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="_static/my_theme.css" />
-    <link rel="stylesheet" type="text/css" href="_static/tabs.css" />
-    
-  <link rel="preload" as="script" href="_static/js/index.be7d3bbb2ef33a8344ce.js">
-
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/clipboard.min.js"></script>
-    <script src="_static/copybutton.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="launch" href="generated/hydra_zen.launch.html" />
-    <link rel="prev" title="Combining Statically-Defined and Dynamically-Generated Configurations" href="explanation/hydrated_dataclass.html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
-    
-      
-      <link rel="icon" sizes="32x32" href="_static/hydra_zen_favicon_32x32.png">
-      
-    
-      
-      <link rel="icon" sizes="64x64" href="_static/hydra_zen_favicon_64x64.png">
-      
-    
-
-    <!-- Google Analytics -->
-    
-  </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
-    
-    <div class="container-fluid" id="banner"></div>
-
-    
-    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
-
-  <div id="navbar-start">
-    
-    
-
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="Reference documentation for hydra-zen." name="description"/>
+<title>Reference — hydra-zen  documentation</title>
+<link href="_static/css/theme.css" rel="stylesheet"/>
+<link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet"/>
+<link href="_static/vendor/fontawesome/5.13.0/css/all.min.css" rel="stylesheet"/>
+<link as="font" crossorigin="" href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2" rel="preload" type="font/woff2"/>
+<link as="font" crossorigin="" href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2" rel="preload" type="font/woff2"/>
+<link href="_static/pygments.css" rel="stylesheet" type="text/css">
+<link href="_static/css/blank.css" rel="stylesheet" type="text/css">
+<link href="_static/copybutton.css" rel="stylesheet" type="text/css">
+<link href="_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css">
+<link href="_static/my_theme.css" rel="stylesheet" type="text/css">
+<link href="_static/tabs.css" rel="stylesheet" type="text/css"/>
+<link as="script" href="_static/js/index.be7d3bbb2ef33a8344ce.js" rel="preload"/>
+<script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+<script src="_static/jquery.js"></script>
+<script src="_static/underscore.js"></script>
+<script src="_static/doctools.js"></script>
+<script src="_static/clipboard.min.js"></script>
+<script src="_static/copybutton.js"></script>
+<link href="genindex.html" rel="index" title="Index">
+<link href="search.html" rel="search" title="Search"/>
+<link href="generated/hydra_zen.launch.html" rel="next" title="launch"/>
+<link href="explanation/hydrated_dataclass.html" rel="prev" title="Combining Statically-Defined and Dynamically-Generated Configurations"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="None" name="docsearch:language"/>
+<link href="_static/hydra_zen_favicon_32x32.png" rel="icon" sizes="32x32"/>
+<link href="_static/hydra_zen_favicon_64x64.png" rel="icon" sizes="64x64"/>
+<!-- Google Analytics -->
+</link></link></link></link></link></link></head>
+<body data-offset="80" data-spy="scroll" data-target="#bd-toc-nav">
+<div class="container-fluid" id="banner"></div>
+<nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+<div id="navbar-start">
 <a class="navbar-brand" href="index.html">
-  <img src="_static/Hydra-Zen_logo_full_filled_bkgrnd_smaller.png" class="logo" alt="logo">
+<img alt="logo" class="logo" src="_static/Hydra-Zen_logo_full_filled_bkgrnd_smaller.png"/>
 </a>
-
-
-    
-  </div>
-
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-  
-  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
-    <div id="navbar-center" class="mr-auto">
-      
-      <div class="navbar-center-item">
-        <ul id="navbar-main-elements" class="navbar-nav">
-    <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="tutorials.html">
+</div>
+<button aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-target="#navbar-collapsible" data-toggle="collapse" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="col-lg-9 collapse navbar-collapse" id="navbar-collapsible">
+<div class="mr-auto" id="navbar-center">
+<div class="navbar-center-item">
+<ul class="navbar-nav" id="navbar-main-elements">
+<li class="toctree-l1 nav-item">
+<a class="reference internal nav-link" href="tutorials.html">
   Tutorials
  </a>
 </li>
-
 <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="how_tos.html">
+<a class="reference internal nav-link" href="how_tos.html">
   How-To Guides
  </a>
 </li>
-
 <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="explanation.html">
+<a class="reference internal nav-link" href="explanation.html">
   Explanation
  </a>
 </li>
-
 <li class="toctree-l1 current active nav-item">
- <a class="current reference internal nav-link" href="#">
+<a class="current reference internal nav-link" href="#">
   Reference
  </a>
 </li>
-
 <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="changes.html">
+<a class="reference internal nav-link" href="changes.html">
   Changelog
  </a>
 </li>
-
-    
 </ul>
-      </div>
-      
-    </div>
-
-    <div id="navbar-end">
-      
-      <div class="navbar-end-item">
-        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
-        <li class="nav-item">
-          <a class="nav-link" href="https://github.com/mit-ll-responsible-ai/hydra-zen" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
-        </li>
-      </ul>
-      </div>
-      
-    </div>
-  </div>
 </div>
-    </nav>
-    
-
-    <div class="container-xl">
-      <div class="row">
-          
-            
-            <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
-</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
-  <div class="bd-toc-item active">
-    <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/hydra_zen.launch.html">
+</div>
+<div id="navbar-end">
+<div class="navbar-end-item">
+<ul aria-label="Icon Links" class="navbar-nav" id="navbar-icon-links">
+<li class="nav-item">
+<a class="nav-link" href="https://github.com/mit-ll-responsible-ai/hydra-zen" rel="noopener" target="_blank" title="GitHub">
+<span><i class="fab fa-github-square"></i></span>
+<label class="sr-only">GitHub</label>
+</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</nav>
+<div class="container-xl">
+<div class="row">
+<!-- Only show if we have sidebars configured, else just a small margin  -->
+<div class="col-12 col-md-3 bd-sidebar"><form action="search.html" class="bd-search d-flex align-items-center" method="get">
+<i class="icon fas fa-search"></i>
+<input aria-label="Search the docs ..." autocomplete="off" class="form-control" id="search-input" name="q" placeholder="Search the docs ..." type="search"/>
+</form><nav aria-label="Main navigation" class="bd-links" id="bd-docs-nav">
+<div class="bd-toc-item active">
+<ul class="nav bd-sidenav">
+<li class="toctree-l1">
+<a class="reference internal" href="generated/hydra_zen.launch.html">
    launch
   </a>
- </li>
+</li>
 </ul>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/hydra_zen.experimental.hydra_run.html">
+<li class="toctree-l1">
+<a class="reference internal" href="generated/hydra_zen.experimental.hydra_run.html">
    hydra_run
   </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/hydra_zen.experimental.hydra_multirun.html">
+</li>
+<li class="toctree-l1">
+<a class="reference internal" href="generated/hydra_zen.experimental.hydra_multirun.html">
    hydra_multirun
   </a>
- </li>
+</li>
 </ul>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/hydra_zen.make_config.html">
+<li class="toctree-l1">
+<a class="reference internal" href="generated/hydra_zen.make_config.html">
    make_config
   </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/hydra_zen.builds.html">
+</li>
+<li class="toctree-l1">
+<a class="reference internal" href="generated/hydra_zen.builds.html">
    builds
   </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/hydra_zen.just.html">
+</li>
+<li class="toctree-l1">
+<a class="reference internal" href="generated/hydra_zen.just.html">
    just
   </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/hydra_zen.hydrated_dataclass.html">
+</li>
+<li class="toctree-l1">
+<a class="reference internal" href="generated/hydra_zen.hydrated_dataclass.html">
    hydrated_dataclass
   </a>
- </li>
+</li>
 </ul>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/hydra_zen.instantiate.html">
+<li class="toctree-l1">
+<a class="reference internal" href="generated/hydra_zen.instantiate.html">
    instantiate
   </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/hydra_zen.get_target.html">
+</li>
+<li class="toctree-l1">
+<a class="reference internal" href="generated/hydra_zen.get_target.html">
    get_target
   </a>
- </li>
+</li>
 </ul>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/hydra_zen.make_custom_builds_fn.html">
+<li class="toctree-l1">
+<a class="reference internal" href="generated/hydra_zen.make_custom_builds_fn.html">
    make_custom_builds_fn
   </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/hydra_zen.ZenField.html">
+</li>
+<li class="toctree-l1">
+<a class="reference internal" href="generated/hydra_zen.ZenField.html">
    ZenField
   </a>
- </li>
+</li>
 </ul>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/hydra_zen.to_yaml.html">
+<li class="toctree-l1">
+<a class="reference internal" href="generated/hydra_zen.to_yaml.html">
    to_yaml
   </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/hydra_zen.save_as_yaml.html">
+</li>
+<li class="toctree-l1">
+<a class="reference internal" href="generated/hydra_zen.save_as_yaml.html">
    save_as_yaml
   </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/hydra_zen.load_from_yaml.html">
+</li>
+<li class="toctree-l1">
+<a class="reference internal" href="generated/hydra_zen.load_from_yaml.html">
    load_from_yaml
   </a>
- </li>
+</li>
 </ul>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/hydra_zen.third_party.beartype.validates_with_beartype.html">
+<li class="toctree-l1">
+<a class="reference internal" href="generated/hydra_zen.third_party.beartype.validates_with_beartype.html">
    validates_with_beartype
   </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="generated/hydra_zen.third_party.pydantic.validates_with_pydantic.html">
+</li>
+<li class="toctree-l1">
+<a class="reference internal" href="generated/hydra_zen.third_party.pydantic.validates_with_pydantic.html">
    validates_with_pydantic
   </a>
- </li>
+</li>
 </ul>
-
-  </div>
-</nav>
-            </div>
-            
-          
-
-          
-          <div class="d-none d-xl-block col-xl-2 bd-toc">
-            
-              
-              <div class="toc-item">
-                
-<div class="tocsection onthispage pt-5 pb-3">
-    <i class="fas fa-list"></i> On this page
 </div>
-
+</nav>
+</div>
+<div class="d-none d-xl-block col-xl-2 bd-toc">
+<div class="toc-item">
+<div class="tocsection onthispage pt-5 pb-3">
+<i class="fas fa-list"></i> On this page
+</div>
 <nav id="bd-toc-nav">
-    <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#launching-jobs-with-hydra">
+<ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry">
+<a class="reference internal nav-link" href="#launching-jobs-with-hydra">
    Launching Jobs with Hydra
   </a>
-  <ul class="nav section-nav flex-column">
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#creating-and-working-with-configs">
+<ul class="nav section-nav flex-column">
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry">
+<a class="reference internal nav-link" href="#creating-and-working-with-configs">
    Creating and Working with Configs
   </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#creating-configs">
+<ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry">
+<a class="reference internal nav-link" href="#creating-configs">
      Creating Configs
     </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#instantiating-and-resolving-configs">
+</li>
+<li class="toc-h3 nav-item toc-entry">
+<a class="reference internal nav-link" href="#instantiating-and-resolving-configs">
      Instantiating and Resolving Configs
     </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#utilities">
+</li>
+<li class="toc-h3 nav-item toc-entry">
+<a class="reference internal nav-link" href="#utilities">
      Utilities
     </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#working-with-yamls">
+</li>
+<li class="toc-h3 nav-item toc-entry">
+<a class="reference internal nav-link" href="#working-with-yamls">
      Working with YAMLs
     </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#configuration-value-types-supported-by-hydra-and-hydra-zen">
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry">
+<a class="reference internal nav-link" href="#configuration-value-types-supported-by-hydra-and-hydra-zen">
    Configuration-Value Types Supported by Hydra and hydra-zen
   </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#types-supported-natively-by-hydra">
+<ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry">
+<a class="reference internal nav-link" href="#types-supported-natively-by-hydra">
      Types Supported Natively by Hydra
     </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#additional-types-supported-via-hydra-zen">
+</li>
+<li class="toc-h3 nav-item toc-entry">
+<a class="reference internal nav-link" href="#additional-types-supported-via-hydra-zen">
      Additional Types, Supported via hydra-zen
     </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#third-party-utilities">
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry">
+<a class="reference internal nav-link" href="#third-party-utilities">
    Third-Party Utilities
   </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#runtime-data-validation">
+<ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry">
+<a class="reference internal nav-link" href="#runtime-data-validation">
      Runtime Data Validation
     </a>
-   </li>
-  </ul>
- </li>
+</li>
 </ul>
-
+</li>
+</ul>
 </nav>
-              </div>
-              
-              <div class="toc-item">
-                
-              </div>
-              
-            
-          </div>
-          
-
-          
-          
-            
-          
-          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
-              
-              <div>
-                
-  <div class="section" id="reference">
-<h1>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="toc-item">
+</div>
+</div>
+<main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+<div>
+<div class="section" id="reference">
+<span id="hydra-zen-reference"></span><h1>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h1>
 <p>Encyclopedia Hydrazennica.</p>
 <p>All reference documentation includes detailed Examples sections. Please scroll to the
 bottom of any given reference page to see the examples.</p>
@@ -357,8 +286,8 @@ bottom of any given reference page to see the examples.</p>
 Python function instead of from a commandline interface.</p>
 <table class="longtable table autosummary">
 <colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
+<col style="width: 10%"/>
+<col style="width: 90%"/>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">launch</span></code></a>(config, task_function[, overrides, …])</p></td>
@@ -368,8 +297,8 @@ Python function instead of from a commandline interface.</p>
 </table>
 <table class="longtable table autosummary">
 <colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
+<col style="width: 10%"/>
+<col style="width: 90%"/>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.experimental.hydra_run.html#hydra_zen.experimental.hydra_run" title="hydra_zen.experimental.hydra_run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_run</span></code></a>(config, task_function[, …])</p></td>
@@ -392,8 +321,8 @@ the data and class-instances that we need for our application.</p>
 <span id="create-config"></span><h3>Creating Configs<a class="headerlink" href="#creating-configs" title="Permalink to this headline">¶</a></h3>
 <table class="longtable table autosummary">
 <colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
+<col style="width: 10%"/>
+<col style="width: 90%"/>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_config</span></code></a>(*fields_as_args[, …])</p></td>
@@ -415,8 +344,8 @@ the data and class-instances that we need for our application.</p>
 <h3>Instantiating and Resolving Configs<a class="headerlink" href="#instantiating-and-resolving-configs" title="Permalink to this headline">¶</a></h3>
 <table class="longtable table autosummary">
 <colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
+<col style="width: 10%"/>
+<col style="width: 90%"/>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">instantiate</span></code></a>(config, *args, **kwargs)</p></td>
@@ -432,8 +361,8 @@ the data and class-instances that we need for our application.</p>
 <h3>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h3>
 <table class="longtable table autosummary">
 <colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
+<col style="width: 10%"/>
+<col style="width: 90%"/>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_custom_builds_fn</span></code></a>(*[, zen_partial, …])</p></td>
@@ -451,8 +380,8 @@ the data and class-instances that we need for our application.</p>
 The following utilities can be used to work with YAML-serialized configs.</p>
 <table class="longtable table autosummary">
 <colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
+<col style="width: 10%"/>
+<col style="width: 90%"/>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_yaml</span></code></a>(cfg, *[, resolve, sort_keys])</p></td>
@@ -496,9 +425,9 @@ of common types via its <a class="reference internal" href="#create-config"><spa
 <a class="reference internal" href="#create-config"><span class="std std-ref">config-creation functions</span></a>, and hydra-zen will automatically
 create targeted configs to represent those values in a way that is compatible
 with Hydra. For example, a <a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">complex</span></code></a> value can be specified directly via <a class="reference internal" href="generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_config()</span></code></a>, and a targeted config will be created for that value.</p>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">make_config</span><span class="p">,</span> <span class="n">to_yaml</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">2.0</span> <span class="o">+</span> <span class="mf">3.0</span><span class="n">j</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">Conf</span><span class="p">))</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">2.0</span> <span class="o">+</span> <span class="mf">3.0</span><span class="n">j</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">(</span><span class="n">Conf</span><span class="p">))</span>
 <span class="go">value:</span>
 <span class="go">  real: 2.0</span>
 <span class="go">  imag: 3.0</span>
@@ -529,8 +458,8 @@ with Hydra. For example, a <a class="reference external" href="https://docs.pyth
 <p>Although Hydra provides some runtime type-checking functionality, it only supports <a class="reference internal" href="explanation/type_refinement.html#type-support"><span class="std std-ref">a limited set of types and annotations</span></a>. hydra-zen offers support for more robust runtime type-checking capabilities via various third-party libraries.</p>
 <table class="longtable table autosummary">
 <colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
+<col style="width: 10%"/>
+<col style="width: 90%"/>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.third_party.beartype.validates_with_beartype.html#hydra_zen.third_party.beartype.validates_with_beartype" title="hydra_zen.third_party.beartype.validates_with_beartype"><code class="xref py py-obj docutils literal notranslate"><span class="pre">beartype.validates_with_beartype</span></code></a>(obj)</p></td>
@@ -544,52 +473,41 @@ with Hydra. For example, a <a class="reference external" href="https://docs.pyth
 </div>
 </div>
 </div>
-
-
-              </div>
-              
-              
-              <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
-    <a class='left-prev' id="prev-link" href="explanation/hydrated_dataclass.html" title="previous page">
-        <i class="fas fa-angle-left"></i>
-        <div class="prev-next-info">
-            <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Combining Statically-Defined and Dynamically-Generated Configurations</p>
-        </div>
-    </a>
-    <a class='right-next' id="next-link" href="generated/hydra_zen.launch.html" title="next page">
-    <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">launch</p>
-    </div>
-    <i class="fas fa-angle-right"></i>
-    </a>
 </div>
-              
-          </main>
-          
-
-      </div>
-    </div>
-  
-  <script src="_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<!-- Previous / next buttons -->
+<div class="prev-next-area">
+<a class="left-prev" href="explanation/hydrated_dataclass.html" id="prev-link" title="previous page">
+<i class="fas fa-angle-left"></i>
+<div class="prev-next-info">
+<p class="prev-next-subtitle">previous</p>
+<p class="prev-next-title">Combining Statically-Defined and Dynamically-Generated Configurations</p>
+</div>
+</a>
+<a class="right-next" href="generated/hydra_zen.launch.html" id="next-link" title="next page">
+<div class="prev-next-info">
+<p class="prev-next-subtitle">next</p>
+<p class="prev-next-title">launch</p>
+</div>
+<i class="fas fa-angle-right"></i>
+</a>
+</div>
+</main>
+</div>
+</div>
+<script src="_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
 <footer class="footer mt-5 mt-md-0">
-  <div class="container">
-    
-    <div class="footer-item">
-      <p class="copyright">
-    &copy; Copyright 2022 Massachusetts Institute of Technology.<br>
+<div class="container">
+<div class="footer-item">
+<p class="copyright">
+    © Copyright 2022 Massachusetts Institute of Technology.<br/>
 </p>
-    </div>
-    
-    <div class="footer-item">
-      <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br>
+</div>
+<div class="footer-item">
+<p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
 </p>
-    </div>
-    
-  </div>
+</div>
+</div>
 </footer>
-  </body>
+</body>
 </html>

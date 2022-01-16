@@ -1,9 +1,13 @@
+.. meta::
+   :description: Tutorials for getting started with Hydra and hydra-zen.
+
 Tutorials
 =========
 
 These tutorials will acquaint you with all of the essential functionality of hydra-zen 
 and Hydra. They require no prior experience with these tools. Our tutorials guide you 
-with explicit, concrete steps through the process of creating and launching an app that is configurable, reproducible, and scalable.
+with explicit, concrete steps through the process of creating and launching a Python 
+application that is configurable, reproducible, and scalable.
 
 .. toctree::
    :maxdepth: 1
@@ -19,3 +23,9 @@ with explicit, concrete steps through the process of creating and launching an a
 .. tip::
 
    Did you enjoy these tutorials? Consider ⭐ `giving us a start on GitHub <https://github.com/mit-ll-responsible-ai/hydra-zen>`_ ⭐ to help others find this project.
+
+These tutorials are meant to only focus on practical steps towards concrete outcomes, 
+and thus they do not explain *how* Hydra and hydra-zen work. To gain a deeper 
+understanding of the technical details here, please refer to the 
+:ref:`hydra-zen-reference` and :ref:`hydra-zen-explanation` sections of our 
+documentation.

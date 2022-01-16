@@ -1,3 +1,6 @@
+.. meta::
+   :description: hydra-zen can be used to design a boilerplate-free Hydra application for running PyTorch Lightning experiments.
+
 .. _Lightning:
 
 .. admonition:: Prerequisites

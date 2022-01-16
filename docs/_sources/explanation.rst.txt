@@ -1,3 +1,5 @@
+.. _hydra-zen-explanation:
+
 Explanation
 ===========
 

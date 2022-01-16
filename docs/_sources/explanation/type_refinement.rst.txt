@@ -26,7 +26,7 @@ config:
 Annotations that fall outside of this subset will cause Hydra to raise an error. 
 This means that the following config:
 
-.. code:: python
+.. code-block:: python
 
    from typing_extensions import Literal
    from dataclasses import dataclass
@@ -38,7 +38,7 @@ This means that the following config:
 will cause Hydra to raise an error during instantiation, due to the presence of an
 unsupported type-annotation (``Literal[1, 2]``). E.g.
 
-.. code:: pycon
+.. code-block:: pycon
 
     >>> from hydra_zen import instantiate
     >>> instantiate(A, x=1)
@@ -56,7 +56,7 @@ type-annotations for the sake of Hydra.
 For example, to address the incompatibility seen in the previous example, we can use 
 :func:`~hydra_zen.builds`.
 
-.. code:: pycon
+.. code-block:: pycon
 
     >>> from hydra_zen import builds
     >>> BuildsA = builds(A, populate_full_signature=True)
@@ -68,7 +68,7 @@ This type-broadening behavior will try to preserve as much type information as i
 without creating compatibility issues with Hydra. For example, suppose that we want to 
 configure the following function:
 
-.. code:: python
+.. code-block:: python
 
    from typing import List
 
@@ -79,14 +79,14 @@ As we saw above, ``Literal[1, 2]`` is not supported by Hydra. That being said,
 ``List`` *is* supported, thus :func:`~hydra_zen.builds` will "broaden" 
 ``List[Literal[1, 2]]`` to ``List[Any]``.
 
-.. code:: python
+.. code-block:: python
 
    # signature: `Builds_func(ones_and_twos: List[Any])`
    Builds_func = builds(func, populate_full_signature=True)
 
 In this way, we can still configure and build this function, but we also retain some level of type-validation
 
-.. code:: pycon
+.. code-block:: pycon
 
    >>> instantiate(Builds_func, ones_and_twos="not a list")
    ---------------------------------------------------------------------------------
@@ -113,26 +113,26 @@ E.g. let's return to the original example involving the dataclass ``A``. Assumin
 we have installed ``pydantic``, we can use it to recreate this dataclass so that it 
 will perform general, runtime type-checking for us.
 
-.. code:: python
+.. code-block:: python
 
-    from pydantic.dataclasses import dataclass as pyd_dataclass
+   from pydantic.dataclasses import dataclass as pyd_dataclass
     
-    @pyd_dataclass
-    class A:
-        x: Literal[1, 2]
+   @pyd_dataclass
+   class A:
+       x: Literal[1, 2]
 
    BuildsA = builds(A, populate_full_signature=True)
 
 As we saw earlier, Hydra will no longer complain about this type-annotation.
 
-.. code:: pycon
+.. code-block:: pycon
 
     >>> instantiate(BuildsA, x=1)
     A(x=1)
 
 But now ``pydantic`` will actually ensure that ``x`` is either ``1`` or ``2``.
 
-.. code:: pycon
+.. code-block:: pycon
 
     >>> instantiate(BuildsA, x=-10)
     ValidationError: 1 validation error for A

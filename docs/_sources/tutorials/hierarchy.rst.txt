@@ -5,23 +5,24 @@
 
 .. _hierarchy-app:
 
-===================================
-Design a Hierarchical App Interface
-===================================
+==================================================
+Design a Hierarchical Interface for an Application
+==================================================
 
-In this tutorial we will design an app that has an interface that is hierarchical in
-nature. This particular app will describe a player in a video game; this player has a 
-configurable name and experience-level, as well as an inventory, which itself has 
-configurable components.
+In this tutorial we will design an application that has an interface that is 
+hierarchical in nature. This particular application will describe a player in a video 
+game; this player has a configurable name and experience-level, as well as an 
+inventory, which itself has configurable components.
 
 .. _game-library:
 
 Creating (Fake) Library Code
 ============================
 
-Often times the interface of an app is determined by existing classes and functions in 
-our library's code. Let's create a new Python script, ``game_library.py``, in the same
-directory as ``my_app.py``. This will serve as a mimic of a "real" Python library.
+Often times the interface of an application is determined by existing classes and 
+functions in our library's code. Let's create a new Python script, ``game_library.py``, 
+in the same directory as ``my_app.py``. This will serve as a mimic of a "real" Python 
+library.
 
 In this script we'll define a :class:`Character` class and an :func:`inventory` 
 function as follows. Populate ``game_library.py`` with the following code.
@@ -52,7 +53,7 @@ function as follows. Populate ``game_library.py`` with the following code.
 
 .. note::
 
-   :plymi:`Type-annotations <Module5_OddsAndEnds/Writing_Good_Code.html#Type-Hinting>` are **not** required by hydra-zen. However, they do enable :ref:`runtime type-checking of configured values <type-support>` for our app.
+   :plymi:`Type-annotations <Module5_OddsAndEnds/Writing_Good_Code.html#Type-Hinting>` are **not** required by hydra-zen. However, they do enable :ref:`runtime type-checking of configured values <type-support>` for our application.
 
 
 To see this code in action, open a Python console (or Jupyter notebook) in the same 
@@ -68,11 +69,12 @@ directory as ``game_library.py`` and reproduce the following steps.
    bowser, lvl: 1, has: {'gold': 12, 'weapon': 'stick', 'costume': 'bball jersey'}
 
 
-Modifying Our App
-=================
+Modifying Our Application
+=========================
 
-Let's change our app so that the interface describes only one player, instead of two.
-We want to be able to configure the player based on the following hierarchy of fields:
+Let's change our application so that the interface describes only one player, instead 
+of two. We want to be able to configure the player based on the following hierarchy of 
+fields:
 
 **Player**
 
@@ -90,9 +92,9 @@ These fields reflect the interfaces/structure of :class:`Character` and
 Dynamically Generating Configs
 ------------------------------
 
-Because configurable aspects of our app should directly reflect the interfaces of 
-:class:`Character` class and :func:`inventory`, we can use
-:func:`~hydra_zen.builds` to generate configs that reflect these interfaces. 
+Because configurable aspects of our application should directly reflect the interfaces 
+of :class:`Character` class and :func:`inventory`, we can use :func:`~hydra_zen.builds` 
+to generate configs that reflect these interfaces. 
 
 To see :func:`~hydra_zen.builds` in action, open a Python console (or Jupyter notebook) in the same directory as ``game_library.py``. Follow along with these inputs.
 
@@ -132,10 +134,11 @@ inventory. We will use the following code in ``my_app.py``.
    # config for `Character`.
    CharConf = builds(Character, inventory=starter_gear)
 
-Finally, the top-level config for our app will simply specify that ``player`` is described by this character config:
+Finally, the top-level config for our application will simply specify that ``player`` 
+is described by this character config:
 
 .. code-block:: python
-   :caption: The top-level config for our app
+   :caption: The top-level config for our application
 
    from hydra_zen import make_config
 
@@ -147,7 +150,7 @@ Updating the Task Function
 
 We'll make some trivial modifications to our task function. We're only dealing with one 
 player now, not two, so we adjust accordingly. Let's also print the 
-``Character``-instance for ``player`` so that we get instant feedback as we prototype our app.
+``Character``-instance for ``player`` so that we get instant feedback as we prototype our application.
 
 .. code-block:: python
    :caption: A revised task function (single-player only)
@@ -190,7 +193,7 @@ script is as follows.
     
     CharConf = builds(Character, inventory=starter_gear)
     
-    # creating the top-level config for our app
+    # creating the top-level config for our application
     Config = make_config(player=CharConf)
     
     cs = ConfigStore.instance()
@@ -214,11 +217,11 @@ script is as follows.
         task_function()
 
 
-Running Our App
-===============
+Running Our Application
+=======================
 
-We can now configure any aspect of the player when launching our app; let's try a few 
-examples in order to get a feel for the syntax. 
+We can now configure any aspect of the player when launching our application; let's try 
+a few examples in order to get a feel for the syntax. 
 
 Open your terminal in the directory shared by both ``my_app.py`` and 
 ``game_library.py`` and run the following commands. Verify that you can reproduce the 
@@ -244,8 +247,8 @@ behavior shown below.
 
 .. note:: 
     
-   We can use :func:`hydra_zen.launch` to launch our app, instead of using our app's 
-   CLI. The following command line expression
+   We can use :func:`hydra_zen.launch` to launch our application, instead of using our 
+   application's CLI. The following command line expression
 
    .. code-block:: console
    
@@ -270,7 +273,9 @@ behavior shown below.
 Inspecting the Results
 ----------------------
 
-To inspect the most-recent log written by our app, let's open a Python terminal in the same directory as ``my_app.py`` and define the following function for reading files
+To inspect the most-recent log written by our application, let's open a Python terminal 
+in the same directory as ``my_app.py`` and define the following function for reading 
+files
 
 .. code-block:: pycon
 
@@ -288,7 +293,8 @@ Getting the directory containing the output of the most-recent job:
    >>> latest_job  # changes based  on reader's date, time, and OS
    WindowsPath('C:/outputs/2021-10-22/00-19-52')
 
-Let's check the log file that our app wrote. ``player_log.txt`` should read as follows.
+Let's check the log file that our application wrote. ``player_log.txt`` should read as 
+follows.
 
 .. code-block:: pycon
    
@@ -313,8 +319,8 @@ contents of ``.hydra/config.yaml``.
        costume: robe
 
 
-We can also check to see what the exact "overrides" that were used to launch the app 
-for this job in ``.hydra/overrides.yaml``.
+We can also check to see what the exact "overrides" that were used to launch the 
+application for this job in ``.hydra/overrides.yaml``.
 
 .. code-block:: pycon
    
@@ -323,12 +329,12 @@ for this job in ``.hydra/overrides.yaml``.
    - player.level=2
    - player.inventory.costume=robe
 
-Great! Our app is now much more sophisticated: its configurable interface reflects - 
-dynamically - the library code that we are ultimately instantiating. We also see the 
-power of Hydra's ability to configure nested fields within our config.
+Great! Our application is now much more sophisticated: its configurable interface 
+reflects - dynamically - the library code that we are ultimately instantiating. We also 
+see the power of Hydra's ability to configure nested fields within our config.
 
 In the next tutorial, we will define swappable config groups so that we can load 
-specific player profiles and inventory load-outs from our app's interface.
+specific player profiles and inventory load-outs from our application's interface.
 
 .. admonition:: References
 
@@ -339,5 +345,4 @@ specific player profiles and inventory load-outs from our app's interface.
 
 .. attention:: **Cleaning Up**:
    To clean up after this tutorial, delete the ``outputs`` directory that Hydra created 
-   upon launching our app.
-
+   upon launching our application.
