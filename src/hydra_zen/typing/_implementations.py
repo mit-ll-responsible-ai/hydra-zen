@@ -9,11 +9,11 @@ from typing import (
     Callable,
     Dict,
     FrozenSet,
-    Generic,
     Mapping,
     NewType,
     Sequence,
     Tuple,
+    Type,
     TypeVar,
     Union,
 )
@@ -36,25 +36,26 @@ class EmptyDict(TypedDict):
 
 
 _T = TypeVar("_T", covariant=True)
+T2 = TypeVar("T2")
+T3 = TypeVar("T3")
 
 
-class Partial(Generic[_T]):
-    func: Callable[..., _T]
+@runtime_checkable
+class Partial(Protocol[T2]):
+    func: Callable[..., T2]
     args: Tuple[Any, ...]
     keywords: Dict[str, Any]
 
-    def __init__(
-        self, func: Callable[..., _T], *args: Any, **kwargs: Any
-    ) -> None:  # pragma: no cover
+    def __new__(
+        cls: Type[T3], func: Callable[..., T2], *args: Any, **kwargs: Any
+    ) -> T3:  # pragma: no cover
         ...
 
-    def __call__(self, *args: Any, **kwargs: Any) -> _T:  # pragma: no cover
+    def __call__(self, *args: Any, **kwargs: Any) -> T2:  # pragma: no cover
         ...
 
 
 InterpStr = NewType("InterpStr", str)
-
-Importable = TypeVar("Importable")
 
 
 class _DataClass(Protocol):  # pragma: no cover
@@ -106,6 +107,8 @@ class HasPartialTarget(Protocol):  # pragma: no cover
     _zen_partial: bool = True
 
 
+Importable = TypeVar("Importable", bound=Callable)
+
 _HydraPrimitive = Union[
     bool,
     None,
@@ -124,6 +127,7 @@ _SupportedPrimitive = Union[
     _DataClass,
     complex,
     Path,
+    Partial,
     range,
     set,
     EmptyDict,  # not covered by Mapping[..., ...]

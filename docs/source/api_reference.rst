@@ -121,6 +121,8 @@ Values of the following types can be specified directly in configs:
 - :py:class:`enum.Enum`
 
 
+.. _additional-types:
+
 Additional Types, Supported via hydra-zen
 *****************************************
 
@@ -141,13 +143,14 @@ with Hydra. For example, a :py:class:`complex` value can be specified directly v
      imag: 3.0
      _target_: builtins.complex
 
-hydra-zen provides such support for values of the following types:
+hydra-zen provides specialized support for values of the following types:
 
 - :py:class:`bytes`
 - :py:class:`bytearray`
 - :py:class:`complex`
 - :py:class:`collections.Counter`
 - :py:class:`collections.deque`
+- :py:func:`functools.partial`  (*added in v0.5.0*)
 - :py:class:`pathlib.Path`
 - :py:class:`pathlib.PosixPath`
 - :py:class:`pathlib.WindowsPath`

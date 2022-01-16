@@ -3,6 +3,7 @@
 import string
 from collections import Counter, deque
 from enum import Enum
+from functools import partial
 from pathlib import Path
 from typing import Dict, FrozenSet, List, Set, Union
 
@@ -11,8 +12,9 @@ import pytest
 from hypothesis import HealthCheck, assume, given, settings
 from omegaconf import DictConfig, ListConfig, OmegaConf
 
-from hydra_zen import builds, instantiate, make_config, to_yaml
+from hydra_zen import builds, get_target, instantiate, make_config, to_yaml
 from hydra_zen._compatibility import ZEN_SUPPORTED_PRIMITIVES
+from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.structured_configs._value_conversion import ZEN_VALUE_CONVERSION
 
 
@@ -116,3 +118,98 @@ def test_Counter_roundtrip(x):
     out_counter = instantiate(OmegaConf.structured(to_yaml(BuildsConf)))["counter"]
 
     assert counter == out_counter
+
+
+def f1(*args, **kwargs):
+    return args, kwargs
+
+
+def f2(*args, **kwargs):
+    return
+
+
+@given(
+    target=st.sampled_from([f1, f2]),
+    args=st.lists(st.integers() | st.text(string.ascii_letters)).map(tuple),
+    kwargs=st.dictionaries(
+        keys=st.text("abcd", min_size=1),
+        values=st.integers() | st.text(string.ascii_letters),
+    ),
+    as_builds=st.booleans(),
+    via_yaml=st.booleans(),
+)
+def test_functools_partial_as_configured_value(
+    target, args, kwargs, as_builds: bool, via_yaml: bool
+):
+    partiald_obj = partial(target, *args, **kwargs)
+    Conf = (
+        make_config(field=partiald_obj)
+        if not as_builds
+        else builds(dict, field=partiald_obj)
+    )
+
+    if via_yaml:
+        Conf = OmegaConf.structured(to_yaml(Conf))
+
+    out = instantiate(Conf)["field"]
+
+    assert isinstance(out, partial)
+    assert out.func is target
+    assert out.args == args
+    assert out.keywords == kwargs
+
+
+def f3(z):
+    return
+
+
+def test_functools_partial_gets_validated():
+    make_config(x=partial(f3, z=2))  # OK
+
+    with pytest.raises(TypeError):
+        make_config(x=partial(f3, y=2))  # no param named `y`
+
+
+def f4(a, b=1, c="2"):
+    return a, b, c
+
+
+@settings(max_examples=500)
+@given(
+    partial_args=st.lists(st.integers(1, 4), max_size=3),
+    partial_kwargs=st.dictionaries(
+        keys=st.sampled_from("abc"), values=st.integers(-5, -2)
+    ),
+    args=st.lists(st.integers(10, 14), max_size=3),
+    kwargs=st.dictionaries(keys=st.sampled_from("abc"), values=st.integers(-5, -2)),
+)
+def test_functools_partial_as_target(partial_args, partial_kwargs, args, kwargs):
+    # Ensures that resolving a partial'd object behaves the exact same way as
+    # configuring the object via `builds` and instantiating it.
+    partiald_obj = partial(f4, *partial_args, **partial_kwargs)
+    try:
+        # might be under or over-specified
+        out = partiald_obj(*args, **kwargs)
+    except Exception as e:
+        # `builds` should raise the same error, if over-specified
+        # (under-specified configs are ok)
+        if partial_args or args or "a" in partial_kwargs or "a" in kwargs:
+            with pytest.raises(type(e)):
+                builds(partiald_obj, *args, **kwargs)
+    else:
+        Conf = builds(partiald_obj, *args, **kwargs)
+        assert out == instantiate(Conf)
+
+
+def test_builds_handles_recursive_partial():
+    # `functools.partial` automatically flattens itself:
+    # partial(partial(dict, a=1) b=2) -> partial(dict, a=1, b=2)
+    #
+    # Thus `builds` should handle arbitrarily-nested partials "for free".
+    # This test ensures this doesnt regress.
+    partiald_obj = partial(partial(partial(f1, "a", a=1), "b"), b=2)
+    Conf = builds(partiald_obj)
+
+    assert get_target(Conf) is f1
+    assert instantiate(Conf) == partiald_obj()
+    assert partiald_obj() == (("a", "b"), dict(a=1, b=2))

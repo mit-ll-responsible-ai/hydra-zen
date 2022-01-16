@@ -1,5 +1,6 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+import functools
 import inspect
 import sys
 import warnings
@@ -53,7 +54,14 @@ from hydra_zen.errors import (
 )
 from hydra_zen.funcs import get_obj, partial, zen_processing
 from hydra_zen.structured_configs import _utils
-from hydra_zen.typing import Builds, Importable, Just, PartialBuilds, SupportedPrimitive
+from hydra_zen.typing import (
+    Builds,
+    Importable,
+    Just,
+    Partial,
+    PartialBuilds,
+    SupportedPrimitive,
+)
 from hydra_zen.typing._implementations import (
     DataClass,
     HasPartialTarget,
@@ -114,24 +122,6 @@ _KEYWORD_ONLY: Final = inspect.Parameter.KEYWORD_ONLY
 _VAR_KEYWORD: Final = inspect.Parameter.VAR_KEYWORD
 
 _builtin_function_or_method_type = type(len)
-
-
-def _cast_via_tuple(dest_type: Type[_T]) -> Callable[[_T], Type[Builds[Type[_T]]]]:
-    def converter(value):
-        return builds(dest_type, tuple(value))
-
-    return converter
-
-
-ZEN_VALUE_CONVERSION[set] = _cast_via_tuple(set)
-ZEN_VALUE_CONVERSION[frozenset] = _cast_via_tuple(frozenset)
-ZEN_VALUE_CONVERSION[deque] = _cast_via_tuple(deque)
-ZEN_VALUE_CONVERSION[bytes] = _cast_via_tuple(bytes)
-ZEN_VALUE_CONVERSION[bytearray] = _cast_via_tuple(bytearray)
-ZEN_VALUE_CONVERSION[range] = lambda value: builds(
-    range, value.start, value.stop, value.step
-)
-ZEN_VALUE_CONVERSION[Counter] = lambda counter: builds(Counter, dict(counter))
 
 
 def _get_target(x):
@@ -261,7 +251,8 @@ def hydrated_dataclass(
     Hydra-specific fields for specifying a targeted config [1]_.
 
     This provides similar functionality to `builds`, but enables a user to define
-    a config explicitly using the :func:`dataclasses.dataclass` syntax.
+    a config explicitly using the :func:`dataclasses.dataclass` syntax, which can
+    enable enhanced static analysis of the resulting config.
 
     Parameters
     ----------
@@ -465,8 +456,7 @@ def hydrated_dataclass(
 
 
 def just(obj: Importable) -> Type[Just[Importable]]:
-    """Produces a targeted config that, when instantiated by Hydra, 'just'
-    returns the target (un-instantiated).
+    """Produces a config that, when instantiated by Hydra, "just" returns the un-instantiated target-object.
 
     Parameters
     ----------
@@ -761,7 +751,7 @@ def builds(
     frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
 
     Returns a config, which describes how to instantiate/call ``<hydra_target>`` with
-    user-specified and auto-populated parameter values.
+    both user-specified and auto-populated parameter values.
 
     Consult the Examples section of the docstring to see the various features of
     `builds` in action.
@@ -995,6 +985,26 @@ def builds(
     >>> issubclass(ChildConf, ParentConf)
     True
 
+    .. _builds-validation:
+
+    **Runtime validation perfomed by builds**
+
+    Misspelled parameter names and other invalid configurations for the target’s
+    signature will be caught by `builds`, so that such errors are caught prior to
+    instantiation.
+
+    >>> def func(a_number: int): pass
+
+    >>> builds(func, a_nmbr=2)  # misspelled parameter name
+    TypeError: Building: func ..
+
+    >>> builds(func, 1, 2)  # too many arguments
+    TypeError: Building: func ..
+
+    >>> BaseConf = builds(func, a_number=2)
+    >>> builds(func, 1, builds_bases=(BaseConf,))  # too many args (via inheritance)
+    TypeError: Building: func ..
+
     .. _meta-field:
 
     **Using meta-fields**
@@ -1050,25 +1060,18 @@ def builds(
     >>> my_router.ip_address = "148.109.37.2"
     FrozenInstanceError: cannot assign to field 'ip_address'
 
-    .. _builds-validation:
+    **Support for partial'd objects**
 
-    **Runtime validation perfomed by builds**
+    Specifying ``builds(functools.partial(<target>, ...), ...)`` is supported; `builds`
+    will automatically "unpack" a partial'd object that is passed as its target.
 
-    Misspelled parameter names and other invalid configurations for the target’s
-    signature will be caught by `builds`, so that the error surfaces immediately while
-    creating the configuration.
-
-    >>> def func(a_number: int): pass
-
-    >>> builds(func, a_nmbr=2)  # misspelled parameter name
-    TypeError: Building: func ..
-
-    >>> builds(func, 1, 2)  # too many arguments
-    TypeError: Building: func ..
-
-    >>> BaseConf = builds(func, a_number=2)
-    >>> builds(func, 1, builds_bases=(BaseConf,))  # too many args (via inheritance)
-    TypeError: Building: func ..
+    >>> import functools
+    >>> partiald_dict = functools.partial(dict, a=1, b=2)
+    >>> Conf = builds(partiald_dict)  # signature: (a = 1, b = 2)
+    >>> Conf.a, Conf.b
+    (1, 2)
+    >>> instantiate(Conf(a=-4))  # equivalent to calling: `partiald_dict(a=-4)`
+    {'a': -4, 'b': 2}
     """
 
     if not pos_args and not kwargs_for_target:
@@ -1084,6 +1087,14 @@ def builds(
         )
 
     target, *_pos_args = pos_args
+
+    if isinstance(target, functools.partial):
+        # partial'd args must come first, then user-specified args
+        # otherwise, the parial'd args will take precedent, which
+        # does not align with the behavior of partial itself
+        _pos_args = list(target.args) + _pos_args
+        kwargs_for_target = {**target.keywords, **kwargs_for_target}
+        target = target.func
 
     BUILDS_ERROR_PREFIX = _utils.building_error_prefix(target)
 
@@ -2213,7 +2224,8 @@ def make_config(
     Examples
     --------
     >>> from hydra_zen import make_config, to_yaml
-    >>> def pp(x): return print(to_yaml(x))  # pretty-print config as yaml
+    >>> def pp(x):
+    ...     return print(to_yaml(x))  # pretty-print config as yaml
 
     **Basic Usage**
 
@@ -2277,8 +2289,8 @@ def make_config(
 
     **Support for Additional Types**
 
-    Types like :py:class:`complex` and :py:class:`pathlib.Path` are automatically supported by
-    hydra-zen.
+    Types like :py:class:`complex` and :py:class:`pathlib.Path` are automatically
+    supported by hydra-zen.
 
     >>> ConfWithComplex = make_config(a=1+2j)
     >>> pp(ConfWithComplex)
@@ -2287,6 +2299,7 @@ def make_config(
       imag: 2.0
       _target_: builtins.complex
 
+    See :ref:`additional-types` for a complete list of supported types.
 
     **Using ZenField to Provide Type Information**
 
@@ -2298,7 +2311,8 @@ def make_config(
     >>> # signature: ProfileConf(username: str, age: int)
 
     Providing type annotations is optional, but doing so enables Hydra to perform
-    checks at runtime to ensure that a configured value matches its associated type [4]_.
+    checks at runtime to ensure that a configured value matches its associated
+    type [4]_.
 
     >>> pp(ProfileConf(username="piro", age=False))  # age should be an integer
     <ValidationError: Value 'False' could not be converted to Integer>
@@ -2402,10 +2416,12 @@ def make_config(
             (
                 str(f.name),
                 (
-                    f.hint
                     # f.default: Field
                     # f.default.default: Any
-                    if not is_builds(f.default.default) or hydra_recursive is False  # type: ignore
+                    f.hint
+                    if hydra_recursive is False
+                    or not is_builds(f.default.default)  # type: ignore
+                    or is_builds(f.hint)
                     else Any
                 ),
                 f.default,
@@ -2454,3 +2470,28 @@ def _repack_zenfield(value: ZenField, name: str, bases: Tuple[_DataClass, ...]):
             _permit_default_factory=False,
         )
     return value
+
+
+# registering value-conversions that depend on `builds`
+def _cast_via_tuple(dest_type: Type[_T]) -> Callable[[_T], Type[Builds[Type[_T]]]]:
+    def converter(value):
+        return builds(dest_type, tuple(value))
+
+    return converter
+
+
+def _unpack_partial(value: Partial[_T]) -> Type[PartialBuilds[Type[_T]]]:
+    target = cast(Type[_T], value.func)
+    return builds(target, *value.args, **value.keywords, zen_partial=True)
+
+
+ZEN_VALUE_CONVERSION[set] = _cast_via_tuple(set)
+ZEN_VALUE_CONVERSION[frozenset] = _cast_via_tuple(frozenset)
+ZEN_VALUE_CONVERSION[deque] = _cast_via_tuple(deque)
+ZEN_VALUE_CONVERSION[bytes] = _cast_via_tuple(bytes)
+ZEN_VALUE_CONVERSION[bytearray] = _cast_via_tuple(bytearray)
+ZEN_VALUE_CONVERSION[range] = lambda value: builds(
+    range, value.start, value.stop, value.step
+)
+ZEN_VALUE_CONVERSION[Counter] = lambda counter: builds(Counter, dict(counter))
+ZEN_VALUE_CONVERSION[functools.partial] = _unpack_partial

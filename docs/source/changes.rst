@@ -8,18 +8,25 @@ chronological order. All previous releases should still be available on pip.
 .. _v0.5.0:
 
 ---------------------
-0.5.0rc1 - 2022-01-10
+0.5.0rc2 - 2022-01-13
 ---------------------
 
 This release primarily improves the ability of :func:`~hydra_zen.builds` to inspect and
-the signatures of its targets; thus its ability to both auto-generate and validate configs
-is improved. 
+the signatures of its targets; thus its ability to both auto-generate and validate 
+configs is improved. This includes automatic support for specifying "partial'd" objects 
+-- objects produced by :py:func:`functools.partial` -- as configured values, and even as
+the target of :func:`~hydra_zen.builds`.
+
+New Features
+------------
+- Objects produced by :py:func:`functools.partial` can now be specified directly as configured values in :func:`~hydra_zen.make_config` and :func:`~hydra_zen.builds`. See :pull:`198` for examples.
+- An object produced by :py:func:`functools.partial` can now be specified as the target of :func:`~hydra_zen.builds`; ``builds`` will automatically "unpack" this partial'd object and incorporate its arguments into the config. See :pull:`199` for examples.
 
 Improvements
 ------------
 - Fixed an edge case `caused by an upstream bug in inspect.signature <https://bugs.python.org/issue40897>`_, which prevented :func:`~hydra_zen.builds` from accessing the appropriate signature for some target classes. This affected a couple of popular PyTorch classes, such as ``torch.utils.data.DataLoader`` and ``torch.utils.data.Dataset``. See :pull:`189` for examples. 
 - When appropriate, ``builds(<target>, ...)`` will now consult ``<target>.__new__`` to acquire the type-hints of the target's signature. See :pull:`189` for examples. 
-- Fixed an edge case in the :ref:`type-widening behavior <type-support>` in :func:`~hydra_zen.builds` where a ``Builds``-like annotation would be widened to ``Any``; this widening was too aggressive. See :pull:`185` for examples. 
+- Fixed an edge case in the :ref:`type-widening behavior <type-support>` in both :func:`~hydra_zen.builds` and :func:`~hydra_zen.make_config` where a ``Builds``-like annotation would be widened to ``Any``; this widening was too aggressive. See :pull:`185` for examples. 
 - Fixed incomplete annotations for ``builds(..., zen_wrappers=<..>)``. See :pull:`180`
 
 Notes

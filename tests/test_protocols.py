@@ -14,7 +14,7 @@ from hydra_zen.structured_configs._implementations import (
     is_just,
     is_partial_builds,
 )
-from hydra_zen.typing import Builds, Just, PartialBuilds
+from hydra_zen.typing import Builds, Just, Partial, PartialBuilds
 
 
 @pytest.mark.parametrize(
@@ -139,3 +139,8 @@ def test_protocol_checkers(x, yes_builds, yes_just, yes_partial):
 
     if yes_builds or yes_just or yes_partial:
         instantiate(x)
+
+
+def test_partial_protocol():
+    assert isinstance(partial(int), Partial)
+    assert not isinstance(print, Partial)
