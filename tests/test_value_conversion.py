@@ -14,7 +14,6 @@ from omegaconf import DictConfig, ListConfig, OmegaConf
 
 from hydra_zen import builds, get_target, instantiate, make_config, to_yaml
 from hydra_zen._compatibility import ZEN_SUPPORTED_PRIMITIVES
-from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.structured_configs._value_conversion import ZEN_VALUE_CONVERSION
 
 

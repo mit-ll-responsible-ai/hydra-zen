@@ -1,22 +1,25 @@
+.. meta::
+   :description: A tutorial that demonstrates hydra-zen's function-injection mechanisms for instantiating structured configurations.
+
 .. admonition:: Prerequisites
 
    This tutorial is a direct follow-on to: :ref:`config-groups-tutorial`.
 
-===============================================
-Inject Novel Functionality via the App's Config
-===============================================
+=======================================================================
+Inject Novel Functionality via the Application's Configurable Interface
+=======================================================================
 
-In this tutorial we will add new functionality into our app without modifying either 
-our library's code or our task function. 
+In this tutorial we will add new functionality into our application without modifying 
+either our library's code or our task function. 
 
 Let's suppose that the Halloween holiday is 
 approaching, and we want to surprise our players with a treat: all of their costumes 
 will display as "spooky" renditions during this season 🎃. We can use the 
 "zen-wrappers" feature of `~hydra_zen.builds` to "inject" these updated costumes into 
-the game, simply by modifying our app's config.
+the game, simply by modifying our application's config.
 
-Modifying Our App
-=================
+Modifying Our Application
+=========================
 
 We will need to make two modifications to our code in ``my_app.py``:
 
@@ -90,7 +93,7 @@ its costume updated for the holiday. Verify that you see the following behaviors
 Including the Wrapper in Our Config
 -----------------------------------
 
-Incorporating this wrapper into our app simply involves specifying it as a 
+Incorporating this wrapper into our application simply involves specifying it as a 
 "zen-wrapper" in our config for :class:`game_library.Character`. I.e. we will update:
 
 .. code:: python 
@@ -190,11 +193,11 @@ over. Modify your ``my_app.py`` script to match the following code.
    if __name__ == "__main__":
        task_function()
 
-Running Our App
-===============
+Running Our Application
+=======================
 
-We can configure and launch our app exactly as we had before, but now all of the 
-player's costumes will automatically become 👻 spooky 👻.
+We can configure and launch our application exactly as we had before, but now all of 
+the player's costumes will automatically become 👻 spooky 👻.
 
 Open your terminal in the directory shared by both ``my_app.py`` and 
 ``game_library.py`` and run the following commands. Verify that you can reproduce the 
@@ -246,13 +249,13 @@ job. To inspect the config for our most-recent job, let's open a Python terminal
        weapon: pillow
        costume: PJs
 
-From this YAML config file, we can see explicitly that our app launched using the 
-Halloween update; the update will also take effect if we were to re-launch our app 
-using this particular YAML file to reproduce the job.
+From this YAML config file, we can see explicitly that our application launched using 
+the Halloween update; the update will also take effect if we were to re-launch our 
+application using this particular YAML file to reproduce the job.
 
 Outstanding! We successfully leveraged the zen-wrappers feature of
-:func:`~hydra_zen.builds` to modify the behavior of our app, without touching our 
-library's source code. And we did so in a self-documenting, and reproducible manner.
+:func:`~hydra_zen.builds` to modify the behavior of our application, without touching 
+our library's source code. And we did so in a self-documenting, and reproducible manner.
 
 Although this achievement might not seem all that impressive in the context of this toy 
 example, it should be emphasized that zen-wrappers can be used to inject arbitrary 
@@ -267,5 +270,4 @@ to design and use zen-wrappers in your workflow!
 
 .. attention:: **Cleaning Up**:
    To clean up after this tutorial, delete the ``outputs`` directory that Hydra created 
-   upon launching our app.
-
+   upon launching our application.

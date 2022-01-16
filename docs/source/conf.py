@@ -22,9 +22,9 @@ copyright = "2022 Massachusetts Institute of Technology"
 author = "Ryan Soklaski, Justin Goodwin"
 
 # The short X.Y version
-version = ".".join(hydra_zen.__version__.split(".")[:2])
+version = ""
 # The full version, including alpha/beta/rc tags
-release = hydra_zen.__version__
+release = ""
 
 
 # -- General configuration ---------------------------------------------------
@@ -43,6 +43,7 @@ extensions = [
     "numpydoc",
     "sphinx_copybutton",
     "sphinx_tabs.tabs",
+    "sphinx_codeautolink",
 ]
 
 # Strip input prompts:

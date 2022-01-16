@@ -1,3 +1,8 @@
+.. meta::
+   :description: Reference documentation for hydra-zen.
+
+.. _hydra-zen-reference:
+
 #########
 Reference
 #########

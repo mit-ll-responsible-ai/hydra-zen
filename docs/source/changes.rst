@@ -1,3 +1,6 @@
+.. meta::
+   :description: The changelog for hydra-zen, including what's new.
+
 =========
 Changelog
 =========

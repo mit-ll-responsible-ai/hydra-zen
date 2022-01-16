@@ -1,3 +1,7 @@
+.. meta::
+   :description: hydra-zen eliminates the repetitive patterns involved in designing a Hydra-based project by providing users with functions for dynamically generating configurations for their project.
+
+
 ========================================================================
 Don't Repeat Yourself: Keeping DRY with Dynamically-Generated Configs 🌞
 ========================================================================

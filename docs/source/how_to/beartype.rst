@@ -1,3 +1,6 @@
+.. meta::
+   :description: hydra-zen provides a wrapped-instantiation mechanism that enables the use runtime type-checkers, like pydantic and beartype, with Hydra applications.
+
 .. admonition:: Prerequisites
 
    Your must install `beartype <https://github.com/beartype/beartype>`_ in your Python environment in order to complete this How-To guide.

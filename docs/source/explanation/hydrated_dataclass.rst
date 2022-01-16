@@ -1,3 +1,7 @@
+.. meta::
+   :description: hydra-zen provides a dataclass-like decorator for users to combine statically-defined and dynamically-generated fields in a configuration for a Hydra application.
+
+
 Combining Statically-Defined and Dynamically-Generated Configurations
 =====================================================================
 
@@ -9,7 +13,7 @@ E.g. in the following codeblock, we will use ``@hydrated_dataclass`` to create a
 ``torch.optim.Adam``. Here, static tooling can "see" the types associated with the
 configured fields, and flag bad inputs in our code. That this config is immutable is also salient to static analysis.
 
-.. code:: python
+.. code-block:: python
 
    from hydra_zen import hydrated_dataclass 
 
@@ -26,7 +30,7 @@ configured fields, and flag bad inputs in our code. That this config is immutabl
    conf.lr = 10.0  # static type-checker flags as invalid (mutating "frozen" dataclass)
 
 
-.. code:: pycon
+.. code-block:: pycon
 
    >>> from hydra_zen import instantiate
    >>> instantiate(BuildsAdam)
@@ -37,7 +41,7 @@ decorator handled this for us. Furthermore, we also benefit from the additional 
 code will raise an error during the creation of ``BuildsAdam`` because the field name 
 ``momentum`` was misspelled.
 
-.. code:: python
+.. code-block:: python
 
    # @hydrated_dataclass will catch the misspelled parameter name
    # and will raise a TypeError
