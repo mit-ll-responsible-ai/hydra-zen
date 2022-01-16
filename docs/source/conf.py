@@ -118,11 +118,11 @@ html_theme_options = {
 
 def setup(app):
     app.add_css_file("my_theme.css")
-    app.add_javascript(
+    app.add_js_file(
         "https://www.googletagmanager.com/gtag/js?id=UA-115029372-2",
         loading_method="async",
     )
-    app.add_javascript("gtag.js")
+    app.add_js_file("gtag.js")
 
 
 # Add any paths that contain custom static files (such as style sheets) here,
