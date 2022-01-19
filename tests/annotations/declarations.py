@@ -41,67 +41,68 @@ def requires_A(x: int):
 
 # test type behaviors
 def f1():
-    a: Literal["Type[PartialBuilds[Type[A]]]"] = reveal_type(
-        builds(A, zen_partial=True)
+    reveal_type(
+        builds(A, zen_partial=True), expected_text="Type[PartialBuilds[Type[A]]]"
     )
     conf_a_partial = builds(A, zen_partial=True)
-    b: Literal["Partial[A]"] = reveal_type(instantiate(conf_a_partial))
-    c: Literal["A"] = reveal_type(instantiate(conf_a_partial)())
+    reveal_type(instantiate(conf_a_partial), expected_text="Partial[A]")
+    reveal_type(instantiate(conf_a_partial)(), expected_text="A")
 
 
 f_sig = Callable[[int], int]
 
 
 def f2():
-    a: Literal["Type[PartialBuilds[(x: int) -> int]]"] = reveal_type(
-        builds(f, zen_partial=True)
+    reveal_type(
+        builds(f, zen_partial=True),
+        expected_text="Type[PartialBuilds[(x: int) -> int]]",
     )
 
     conf_f_partial = builds(f, zen_partial=True)
 
-    b: Literal["PartialBuilds[(x: int) -> int]"] = reveal_type(conf_f_partial())
+    reveal_type(conf_f_partial(), expected_text="PartialBuilds[(x: int) -> int]")
 
     conf_f_partial_instance = conf_f_partial()
-    c: Literal["Partial[int]"] = reveal_type(instantiate(conf_f_partial))
-    d: Literal["Partial[int]"] = reveal_type(instantiate(conf_f_partial_instance))
-    e: Literal["int"] = reveal_type(instantiate(conf_f_partial)())
+    reveal_type(instantiate(conf_f_partial), expected_text="Partial[int]")
+    reveal_type(instantiate(conf_f_partial_instance), expected_text="Partial[int]")
+    reveal_type(instantiate(conf_f_partial)(), expected_text="int")
 
 
 def f3():
     # test builds(..., zen_partial=False)
-    a: Literal["Type[Builds[Type[A]]]"] = reveal_type(builds(A, zen_partial=False))
+    reveal_type(builds(A, zen_partial=False), expected_text="Type[Builds[Type[A]]]")
     conf_A_1 = builds(A, zen_partial=False)
-    b: Literal["A"] = reveal_type(instantiate(conf_A_1))
+    reveal_type(instantiate(conf_A_1), expected_text="A")
 
-    c: Literal["Type[Builds[(x: int) -> int]]"] = reveal_type(
-        builds(f, zen_partial=False)
+    reveal_type(
+        builds(f, zen_partial=False, expected_text="Type[Builds[(x: int) -> int]]")
     )
     conf_f_1: Type[Builds[f_sig]] = builds(f, zen_partial=False)
-    d: Literal["int"] = reveal_type(instantiate(conf_f_1))
+    reveal_type(instantiate(conf_f_1), expected_text="int")
 
 
 def f4():
     # test builds(...)
-    a: Literal["Type[Builds[Type[A]]]"] = reveal_type(builds(A))
+    reveal_type(builds(A), expected_text="Type[Builds[Type[A]]]")
     conf_A_2 = builds(A)
-    b: Literal["A"] = reveal_type(instantiate(conf_A_2))
+    reveal_type(instantiate(conf_A_2), expected_text="A")
 
-    c: Literal["Builds[Type[A]]"] = reveal_type(conf_A_2())
+    reveal_type(conf_A_2(), expected_text="Builds[Type[A]]")
     conf_a_instance = conf_A_2()
-    d: Literal["A"] = reveal_type(instantiate(conf_a_instance))
+    reveal_type(instantiate(conf_a_instance), expected_text="A")
 
-    e: Literal["Type[Builds[(x: int) -> int]]"] = reveal_type(builds(f))
+    reveal_type(builds(f), expected_text="Type[Builds[(x: int) -> int]]")
     conf_f_2 = builds(f)
-    ee: Literal["int"] = reveal_type(instantiate(conf_f_2))
+    reveal_type(instantiate(conf_f_2), expected_text="int")
 
 
 def f5():
     # test just(...)
-    a: Literal["Type[Just[(x: int) -> int]]"] = reveal_type(just(f))
-    b: Literal["Type[Just[Type[A]]]"] = reveal_type(just(A))
-    c: Literal["(x: int) -> int"] = reveal_type(instantiate(just(f)))
-    d: Literal["Type[A]"] = reveal_type(instantiate(just(A)))
-    e: Literal["Type[A]"] = reveal_type(instantiate(just(A)()))  # instance of Just
+    reveal_type(just(f), expected_text="Type[Just[(x: int) -> int]]")
+    reveal_type(just(A), expected_text="Type[Just[Type[A]]]")
+    reveal_type(instantiate(just(f)), expected_text="(x: int) -> int")
+    reveal_type(instantiate(just(A)), expected_text="Type[A]")
+    reveal_type(instantiate(just(A)()), expected_text="Type[A]")  # instance of Just
 
 
 @dataclass
@@ -118,25 +119,25 @@ def f6():
 
 def f7():
     # get_target(Type[Builds[T]]) -> T
-    a1: Literal["Type[str]"] = reveal_type(get_target(builds(str)))
-    a2: Literal["Type[str]"] = reveal_type(get_target(builds(str, zen_partial=False)))
-    a3: Literal["Type[str]"] = reveal_type(get_target(builds(str, zen_partial=True)))
-    a4: Literal["Type[str]"] = reveal_type(get_target(just(str)))
+    reveal_type(get_target(builds(str)), expected_text="Type[str]")
+    reveal_type(get_target(builds(str, zen_partial=False)), expected_text="Type[str]")
+    reveal_type(get_target(builds(str, zen_partial=True)), expected_text="Type[str]")
+    reveal_type(get_target(just(str)), expected_text="Type[str]")
 
     # get_target(Builds[Callable[...]]) -> Callable[...]
-    b1: Literal["(x: int) -> int"] = reveal_type(get_target(builds(f)))
-    b2: Literal["(x: int) -> int"] = reveal_type(
-        get_target(builds(f, zen_partial=False))
+    reveal_type(get_target(builds(f)), expected_text="(x: int) -> int")
+    reveal_type(
+        get_target(builds(f, zen_partial=False)), expected_text="(x: int) -> int"
     )
-    b3: Literal["(x: int) -> int"] = reveal_type(
-        get_target(builds(f, zen_partial=True))
+    reveal_type(
+        get_target(builds(f, zen_partial=True)), expected_text="(x: int) -> int"
     )
-    b4: Literal["(x: int) -> int"] = reveal_type(get_target(just(f)))
+    reveal_type(get_target(just(f)), expected_text="(x: int) -> int")
 
-    c1: Literal["Type[str]"] = reveal_type(get_target(builds(str)()))
-    c2: Literal["Type[str]"] = reveal_type(get_target(builds(str, zen_partial=False)()))
-    c3: Literal["Type[str]"] = reveal_type(get_target(builds(str, zen_partial=True)()))
-    c4: Literal["Type[str]"] = reveal_type(get_target(just(str)()))
+    reveal_type(get_target(builds(str)()), expected_text="Type[str]")
+    reveal_type(get_target(builds(str, zen_partial=False)()), expected_text="Type[str]")
+    reveal_type(get_target(builds(str, zen_partial=True)()), expected_text="Type[str]")
+    reveal_type(get_target(just(str)()), expected_text="Type[str]")
 
 
 def f8():
@@ -152,35 +153,42 @@ def zen_wrappers():
     J = just(f)
     B = builds(f, zen_partial=True)
     PB = builds(f, zen_partial=True)
-    a1: Literal["Type[Builds[Type[str]]]"] = reveal_type(builds(str, zen_wrappers=f))
-    a2: Literal["Type[Builds[Type[str]]]"] = reveal_type(builds(str, zen_wrappers=J))
-    a3: Literal["Type[Builds[Type[str]]]"] = reveal_type(builds(str, zen_wrappers=B))
-    a4: Literal["Type[Builds[Type[str]]]"] = reveal_type(builds(str, zen_wrappers=PB))
-    a5: Literal["Type[Builds[Type[str]]]"] = reveal_type(
-        builds(str, zen_wrappers=(None,))
+    reveal_type(builds(str, zen_wrappers=f), expected_text="Type[Builds[Type[str]]]")
+    reveal_type(builds(str, zen_wrappers=J), expected_text="Type[Builds[Type[str]]]")
+    reveal_type(builds(str, zen_wrappers=B), expected_text="Type[Builds[Type[str]]]")
+    reveal_type(builds(str, zen_wrappers=PB), expected_text="Type[Builds[Type[str]]]")
+    reveal_type(
+        builds(str, zen_wrappers=(None,), expected_text="Type[Builds[Type[str]]]")
     )
 
-    a6: Literal["Type[Builds[Type[str]]]"] = reveal_type(
-        builds(str, zen_wrappers=(f, J, B, PB, None))
+    reveal_type(
+        builds(str, zen_wrappers=(f, J, B, PB, None)),
+        expected_text="Type[Builds[Type[str]]]",
     )
 
-    b1: Literal["Type[PartialBuilds[Type[str]]]"] = reveal_type(
-        builds(str, zen_partial=True, zen_wrappers=f)
+    reveal_type(
+        builds(str, zen_partial=True, zen_wrappers=f),
+        expected_text="Type[PartialBuilds[Type[str]]]",
     )
-    b2: Literal["Type[PartialBuilds[Type[str]]]"] = reveal_type(
-        builds(str, zen_partial=True, zen_wrappers=J)
+    reveal_type(
+        builds(str, zen_partial=True, zen_wrappers=J),
+        expected_text="Type[PartialBuilds[Type[str]]]",
     )
-    b3: Literal["Type[PartialBuilds[Type[str]]]"] = reveal_type(
-        builds(str, zen_partial=True, zen_wrappers=B)
+    reveal_type(
+        builds(str, zen_partial=True, zen_wrappers=B),
+        expected_text="Type[PartialBuilds[Type[str]]]",
     )
-    b4: Literal["Type[PartialBuilds[Type[str]]]"] = reveal_type(
-        builds(str, zen_partial=True, zen_wrappers=PB)
+    reveal_type(
+        builds(str, zen_partial=True, zen_wrappers=PB),
+        expected_text="Type[PartialBuilds[Type[str]]]",
     )
-    b5: Literal["Type[PartialBuilds[Type[str]]]"] = reveal_type(
-        builds(str, zen_partial=True, zen_wrappers=(None,))
+    reveal_type(
+        builds(str, zen_partial=True, zen_wrappers=(None,)),
+        expected_text="Type[PartialBuilds[Type[str]]]",
     )
-    b6: Literal["Type[PartialBuilds[Type[str]]]"] = reveal_type(
-        builds(str, zen_partial=True, zen_wrappers=(f, J, B, PB, None))
+    reveal_type(
+        builds(str, zen_partial=True, zen_wrappers=(f, J, B, PB, None)),
+        expected_text="Type[PartialBuilds[Type[str]]]",
     )
 
     # should fail
@@ -191,9 +199,9 @@ def zen_wrappers():
 def custom_builds_fn():
     _builds = make_custom_builds_fn()
 
-    a1: Literal["Type[Builds[Type[int]]]"] = reveal_type(_builds(int))
-    a2: Literal["Type[PartialBuilds[Type[int]]]"] = reveal_type(
-        _builds(int, zen_partial=True)
+    reveal_type(_builds(int), expected_text="Type[Builds[Type[int]]]")
+    reveal_type(
+        _builds(int, zen_partial=True), expected_text="Type[PartialBuilds[Type[int]]]"
     )
 
 
@@ -215,7 +223,7 @@ def supported_primitives():
     olist = ListConfig([1, 2, 3])
     odict = DictConfig({"1": 1})
 
-    a1: Literal["Type[DataClass]"] = reveal_type(
+    reveal_type(
         make_config(
             a=(
                 1,
@@ -238,19 +246,21 @@ def supported_primitives():
             f=ADataclass(),
             g=builds(int)(),  # dataclass instance
             h=builds(int, zen_partial=True)(),  # dataclass instance
-        )
+        ),
+        expected_text="Type[DataClass]",
     )
-    a2: Literal["Type[DataClass]"] = reveal_type(
+    reveal_type(
         make_config(
             ZenField(name="a", default={M}),
             ZenField(name="b", default={1: M}),
             ZenField(name="c", default=[2.0 + 1j]),
             d=ZenField(default=(1, "hi", 2.0, 1j, set(), M, Path.cwd())),
             e=ZenField(default=f),
-        )
+        ),
+        expected_text="Type[DataClass]",
     )
 
-    a3: Literal["Type[Builds[Type[dict[Unknown, Unknown]]]]"] = reveal_type(
+    reveal_type(
         builds(
             dict,
             a=(1, "hi", 2.0, 1j, set(), M, ADataclass, builds(dict), Path.cwd()),
@@ -258,10 +268,11 @@ def supported_primitives():
             c={1: M},
             d=[2.0 + 1j],
             e=f,
-        )
+        ),
+        expected_text="Type[Builds[Type[dict[Unknown, Unknown]]]]",
     )
 
-    a4: Literal["Type[PartialBuilds[Type[dict[Unknown, Unknown]]]]"] = reveal_type(
+    reveal_type(
         builds(
             dict,
             a=(1, "hi", 2.0, 1j, set(), M, ADataclass, builds(dict), Path.cwd()),
@@ -270,7 +281,8 @@ def supported_primitives():
             d=[2.0 + 1j],
             e=f,
             zen_partial=True,
-        )
+        ),
+        expected_text="Type[PartialBuilds[Type[dict[Unknown, Unknown]]]]",
     )
 
     # check lists
@@ -335,8 +347,10 @@ def check_inheritance():
     class P3:
         pass
 
-    C: Literal["Type[DataClass]"] = reveal_type(make_config(x=1, bases=(P1, P2, P3)))
-    D: Literal["Type[Builds[Type[int]]]"] = reveal_type(builds(int, bases=(P1, P2, P3)))
+    reveal_type(make_config(x=1, bases=(P1, P2, P3)), expected_text="Type[DataClass]")
+    reveal_type(
+        builds(int, bases=(P1, P2, P3)), expected_text="Type[Builds[Type[int]]]"
+    )
 
     # should fail
     # make_config(x=1, bases=(lambda x: x,))
@@ -350,7 +364,7 @@ def make_hydra_partial(x: T) -> HydraPartialBuilds[Type[T]]:
 
 def check_HydraPartialBuilds():
     cfg = make_hydra_partial(int)
-    a: Literal["Partial[int]"] = reveal_type(instantiate(cfg))
+    reveal_type(instantiate(cfg), expected_text="Partial[int]")
 
 
 def check_partial_protocol():
@@ -360,15 +374,16 @@ def check_partial_protocol():
 
 
 def check_partiald_target():
-    A: Literal["Type[Builds[partial[int]]]"] = reveal_type(builds(partial(int)))
-    B: Literal["Type[PartialBuilds[partial[int]]]"] = reveal_type(
-        builds(partial(int), zen_partial=True)
+    reveal_type(builds(partial(int)), expected_text="Type[Builds[partial[int]]]")
+    reveal_type(
+        builds(partial(int), zen_partial=True),
+        expected_text="Type[PartialBuilds[partial[int]]]",
     )
     a = builds(partial(int))
-    out_a: Literal["int"] = reveal_type(instantiate(a))
+    reveal_type(instantiate(a), expected_text="int")
 
     b = builds(partial(int), zen_partial=True)
-    out_b: Literal["Partial[int]"] = reveal_type(instantiate(b))
+    reveal_type(instantiate(b), expected_text="Partial[int]")
 
 
 def check_target_annotation():
