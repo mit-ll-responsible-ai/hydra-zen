@@ -411,7 +411,22 @@ def test_type_widening_with_internal_conversion_to_Builds():
     # via type-sanitization.
     Base = make_config(x=1)
     Conf = builds(func_with_list_annotation, x=[1, 2], builds_bases=(Base,))
-    instantiate(Conf)
+    instantiate(Conf)  # shouldn't raise
+
+
+def f1(data: List[float]):
+    return data
+
+
+def get_data():
+    return [5.0, 2.0]
+
+
+def test_type_widening_for_interpolated_field():
+
+    cfg = builds(f1, data="${data}")
+    Config = make_config(data=builds(get_data), task=cfg)
+    instantiate(Config)  # shouldn't raise
 
 
 def func_with_various_defaults(x=1, y="a", z=[1, 2]):
