@@ -128,6 +128,32 @@ def _get_target(x):
     return getattr(x, _TARGET_FIELD_NAME)
 
 
+def _retain_type_info(type_: type, value: Any, hydra_recursive: Optional[bool]):
+    # OmegaConf's type-checking occurs before instantiation occurs.
+    # This means that, e.g., passing `Builds[int]` to a field `x: int`
+    # will fail Hydra's type-checking upon instantiation, even though
+    # the recursive instantiation will appropriately produce `int` for
+    # that field. This will not be addressed by hydra/omegaconf:
+    #    https://github.com/facebookresearch/hydra/issues/1759
+    # Thus we will auto-broaden the annotation when we see that a field
+    # is set with a structured config as a default value - assuming that
+    # the field isn't annotated with a structured config type.
+
+    # Each condition is included separately to ensure that our tests
+    # cover all scenarios
+    if hydra_recursive is False:
+        return True
+    elif not is_builds(value):
+        if _utils.is_interpolated_string(value):
+            # an interpolated field may resolve to a structured conf, which may
+            # instantiate to a value of the specified type
+            return False
+        return True
+    elif is_builds(type_):
+        return True
+    return False
+
+
 def _target_as_kwarg_deprecation(func: _T2) -> Callable[..., _T2]:
     @wraps(func)
     def wrapped(*args, **kwargs):
@@ -1702,18 +1728,9 @@ def builds(
             sanitized_value = getattr(_field, "default", value)
             sanitized_type = (
                 _utils.sanitized_type(type_, wrap_optional=sanitized_value is None)
-                # OmegaConf's type-checking occurs before instantiation occurs.
-                # This means that, e.g., passing `Builds[int]` to a field `x: int`
-                # will fail Hydra's type-checking upon instantiation, even though
-                # the recursive instantiation will appropriately produce `int` for
-                # that field. This will not be addressed by hydra/omegaconf:
-                #    https://github.com/facebookresearch/hydra/issues/1759
-                # Thus we will auto-broaden the annotation when we see that a field
-                # is set with a structured config as a default value - assuming that
-                # the field isn't annotated with a structured config type.
-                if hydra_recursive is False
-                or not is_builds(sanitized_value)
-                or is_builds(type_)
+                if _retain_type_info(
+                    type_=type_, value=sanitized_value, hydra_recursive=hydra_recursive
+                )
                 else Any
             )
             sanitized_base_fields.append((name, sanitized_type, _field))
@@ -2419,9 +2436,11 @@ def make_config(
                     # f.default: Field
                     # f.default.default: Any
                     f.hint
-                    if hydra_recursive is False
-                    or not is_builds(f.default.default)  # type: ignore
-                    or is_builds(f.hint)
+                    if _retain_type_info(
+                        type_=f.hint,
+                        value=f.default.default,  # type: ignore
+                        hydra_recursive=hydra_recursive,
+                    )
                     else Any
                 ),
                 f.default,
