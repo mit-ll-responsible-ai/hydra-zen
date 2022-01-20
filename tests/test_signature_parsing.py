@@ -414,7 +414,7 @@ def test_type_widening_with_internal_conversion_to_Builds():
     instantiate(Conf)  # shouldn't raise
 
 
-def f1(data: List[float]):
+def use_data(data: List[float]):
     return data
 
 
@@ -424,7 +424,7 @@ def get_data():
 
 def test_type_widening_for_interpolated_field():
 
-    cfg = builds(f1, data="${data}")
+    cfg = builds(use_data, data="${data}")
     Config = make_config(data=builds(get_data), task=cfg)
     instantiate(Config)  # shouldn't raise
 
