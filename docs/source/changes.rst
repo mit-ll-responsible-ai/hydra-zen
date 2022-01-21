@@ -11,7 +11,7 @@ chronological order. All previous releases should still be available on pip.
 .. _v0.5.0:
 
 ---------------------
-0.5.0rc2 - 2022-01-13
+0.5.0rc3 - 2022-01-21
 ---------------------
 
 This release primarily improves the ability of :func:`~hydra_zen.builds` to inspect and
@@ -29,7 +29,8 @@ Improvements
 ------------
 - Fixed an edge case `caused by an upstream bug in inspect.signature <https://bugs.python.org/issue40897>`_, which prevented :func:`~hydra_zen.builds` from accessing the appropriate signature for some target classes. This affected a couple of popular PyTorch classes, such as ``torch.utils.data.DataLoader`` and ``torch.utils.data.Dataset``. See :pull:`189` for examples. 
 - When appropriate, ``builds(<target>, ...)`` will now consult ``<target>.__new__`` to acquire the type-hints of the target's signature. See :pull:`189` for examples. 
-- Fixed an edge case in the :ref:`type-widening behavior <type-support>` in both :func:`~hydra_zen.builds` and :func:`~hydra_zen.make_config` where a ``Builds``-like annotation would be widened to ``Any``; this widening was too aggressive. See :pull:`185` for examples. 
+- Fixed an edge case in the :ref:`type-widening behavior <type-support>` in both :func:`~hydra_zen.builds` and :func:`~hydra_zen.make_config` where a ``Builds``-like annotation would be widened to ``Any``; this widening was too aggressive. See :pull:`185` for examples.
+- :ref:`Type widening <type-support>` will now be applied to configured fields where an interpolated variable -- a string of form ``"${<var-name>}"`` -- is specified. See :issue:`206` for rationale and examples.
 - Fixed incomplete annotations for ``builds(..., zen_wrappers=<..>)``. See :pull:`180`
 
 Notes
