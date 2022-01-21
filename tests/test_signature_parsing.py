@@ -25,6 +25,7 @@ from hypothesis import given, note, settings
 from omegaconf.errors import ValidationError
 
 from hydra_zen import (
+    ZenField,
     builds,
     hydrated_dataclass,
     instantiate,
@@ -411,7 +412,31 @@ def test_type_widening_with_internal_conversion_to_Builds():
     # via type-sanitization.
     Base = make_config(x=1)
     Conf = builds(func_with_list_annotation, x=[1, 2], builds_bases=(Base,))
-    instantiate(Conf)
+    instantiate(Conf)  # shouldn't raise
+
+
+def test_type_widening_for_interpolated_field():
+    C1 = make_config(x=ZenField(str, "A"))
+    assert get_type_hints(C1)["x"] is str
+
+    # field is interpolated entry
+    C2 = make_config(x=ZenField(str, "${A}"))
+    assert get_type_hints(C2)["x"] is Any
+
+
+def use_data(data: List[float]):
+    return data
+
+
+def get_data():
+    return [5.0, 2.0]
+
+
+def test_type_widening_for_interpolated_field_regression_example():
+    cfg = builds(use_data, data="${data}")
+    Config = make_config(data=builds(get_data), out=cfg)
+    obj = instantiate(Config)  # shouldn't raise
+    assert obj.out == get_data()
 
 
 def func_with_various_defaults(x=1, y="a", z=[1, 2]):
