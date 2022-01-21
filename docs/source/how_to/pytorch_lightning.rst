@@ -51,7 +51,7 @@ following code. Here, we define our single-layer neural network and the `lightni
    import torch as tr
    import torch.nn as nn
    import torch.nn.functional as F
-   import torch.optim as optim
+   from torch.optim import Optimizer
    from torch.utils.data import DataLoader, TensorDataset
    
    from hydra_zen.typing import Partial
@@ -70,7 +70,7 @@ following code. Here, we define our single-layer neural network and the `lightni
        def __init__(
            self,
            model: nn.Module,
-           optim: Partial[optim.Adam],
+           optim: Partial[Optimizer],
            dataloader: Type[DataLoader],
            target_fn: Callable[[tr.Tensor], tr.Tensor],
            training_domain: tr.Tensor,
