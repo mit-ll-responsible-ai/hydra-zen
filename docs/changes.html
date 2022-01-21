@@ -112,8 +112,8 @@
 <nav id="bd-toc-nav">
 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry">
-<a class="reference internal nav-link" href="#rc2-2022-01-13">
-   0.5.0rc2 - 2022-01-13
+<a class="reference internal nav-link" href="#rc3-2022-01-21">
+   0.5.0rc3 - 2022-01-21
   </a>
 <ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry">
@@ -214,8 +214,8 @@
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
 <p>This is a record of all past hydra-zen releases and what went into them, in reverse
 chronological order. All previous releases should still be available on pip.</p>
-<div class="section" id="rc2-2022-01-13">
-<span id="v0-5-0"></span><h2>0.5.0rc2 - 2022-01-13<a class="headerlink" href="#rc2-2022-01-13" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="rc3-2022-01-21">
+<span id="v0-5-0"></span><h2>0.5.0rc3 - 2022-01-21<a class="headerlink" href="#rc3-2022-01-21" title="Permalink to this headline">¶</a></h2>
 <p>This release primarily improves the ability of <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> to inspect and
 the signatures of its targets; thus its ability to both auto-generate and validate
 configs is improved. This includes automatic support for specifying “partial’d” objects
@@ -234,6 +234,7 @@ the target of <a class="reference internal" href="generated/hydra_zen.builds.htm
 <li><p>Fixed an edge case <a class="reference external" href="https://bugs.python.org/issue40897">caused by an upstream bug in inspect.signature</a>, which prevented <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> from accessing the appropriate signature for some target classes. This affected a couple of popular PyTorch classes, such as <code class="docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code> and <code class="docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code>. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/189">pull request #189</a> for examples.</p></li>
 <li><p>When appropriate, <code class="docutils literal notranslate"><span class="pre">builds(&lt;target&gt;,</span> <span class="pre">...)</span></code> will now consult <code class="docutils literal notranslate"><span class="pre">&lt;target&gt;.__new__</span></code> to acquire the type-hints of the target’s signature. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/189">pull request #189</a> for examples.</p></li>
 <li><p>Fixed an edge case in the <a class="reference internal" href="explanation/type_refinement.html#type-support"><span class="std std-ref">type-widening behavior</span></a> in both <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> and <a class="reference internal" href="generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_config()</span></code></a> where a <code class="docutils literal notranslate"><span class="pre">Builds</span></code>-like annotation would be widened to <code class="docutils literal notranslate"><span class="pre">Any</span></code>; this widening was too aggressive. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/185">pull request #185</a> for examples.</p></li>
+<li><p><a class="reference internal" href="explanation/type_refinement.html#type-support"><span class="std std-ref">Type widening</span></a> will now be applied to configured fields where an interpolated variable – a string of form <code class="docutils literal notranslate"><span class="pre">"${&lt;var-name&gt;}"</span></code> – is specified. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/issues/206">issue #206</a> for rationale and examples.</p></li>
 <li><p>Fixed incomplete annotations for <code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">zen_wrappers=&lt;..&gt;)</span></code>. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/180">pull request #180</a></p></li>
 </ul>
 </div>
