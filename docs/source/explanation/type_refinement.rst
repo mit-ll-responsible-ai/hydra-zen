@@ -100,6 +100,8 @@ In this way, we can still configure and build this function, but we also retain 
 In general, hydra-zen will broaden types as-needed so that dynamically-generated configs will never include annotations that would cause Hydra to raise an error due
 to lack of support for that type.
 
+.. _pydantic-support:
+
 Using Third-Party Runtime Type-Checkers
 ---------------------------------------
 Although hydra-zen will broaden the types that get exposed to Hydra, the original 
