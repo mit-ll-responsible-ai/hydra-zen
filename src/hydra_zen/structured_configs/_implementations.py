@@ -1056,7 +1056,7 @@ def builds(
 
     Let's use a wrapper to add a unit-conversion step to a config. We'll modify a
     config that builds a function, which converts a temperature in Farenheit to
-    Celcius, and add a wrapper it so that it will convert from Farenheit to Kelvin
+    Celcius, and add a wrapper to it so that it will convert from Farenheit to Kelvin
     instead.
 
     >>> def faren_to_celsius(temp_f):  # our target
