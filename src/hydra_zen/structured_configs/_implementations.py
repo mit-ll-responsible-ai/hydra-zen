@@ -584,7 +584,7 @@ def _is_ufunc(value) -> bool:
         # we do actually cover this branch some runs of our CI,
         # but our coverage job installs numpy
         return False
-    return isinstance(value, numpy.ufunc)  # type: ignore
+    return isinstance(value, numpy.ufunc)
 
 
 def sanitized_default_value(

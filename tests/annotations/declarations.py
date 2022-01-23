@@ -1,12 +1,24 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
+# These tests help to ensure that our typed interfaces have the desired behvarior, when
+# being processed by static type-checkers. Specifically we test using pyright.
+#
+# We perform contrapositive testing using lines with the pattern:
+#
+#  builds(dict, a=M())  # type: ignore
+#
+# We are testing that the type-checker raises an error on that line of code.
+# We achieve this by configuring pyright to raise whenever `# type: ignore`
+# is included unnecessarily. Thus we are ensuring that the type-checker does
+# indeed need to ignore an error on that line.
+
 from collections import Counter, deque
 from dataclasses import dataclass
 from enum import Enum
 from functools import partial
 from pathlib import Path
-from typing import Callable, List, Literal, Tuple, Type, TypeVar
+from typing import Callable, List, Tuple, Type, TypeVar
 
 from omegaconf import MISSING, DictConfig, ListConfig
 
@@ -192,8 +204,8 @@ def zen_wrappers():
     )
 
     # should fail
-    # builds(str, zen_wrappers=(2.0, 1))
-    # builds(str, zen_wrappers=False)
+    builds(str, zen_wrappers=(2.0, 1))  # type: ignore
+    builds(str, zen_wrappers=False)  # type: ignore
 
 
 def custom_builds_fn():
@@ -326,11 +338,13 @@ def supported_primitives():
     a8 = make_config(x=a_list, y=a_dict, z=a_set)
 
     # The following should be marked as "bad by type-checkers
-    # make_config(a=M())
-    # make_config(a={"a": M()})
-    # make_config(a=(1, M()))
-    # make_config(a=[1, M()])
-    # builds(dict, a=M())
+    make_config(a=M())  # type: ignore
+    make_config(a=(1, M()))  # type: ignore
+    make_config(a=[1, M()])  # type: ignore
+    builds(dict, a=M())  # type: ignore
+
+    # This should fail, but doesn't. Seems like a pyright bug
+    # make_config(a={"a": M()})  # type: ignore
 
     # The following *should* be invalid, but we are limited
     # by mutable invariants being generic
@@ -353,9 +367,9 @@ def check_inheritance():
     )
 
     # should fail
-    # make_config(x=1, bases=(lambda x: x,))
-    # make_config(x=1, bases=(None,))
-    # make_config(x=1, bases=(A,))
+    make_config(x=1, bases=(lambda x: x,))  # type: ignore
+    make_config(x=1, bases=(None,))  # type: ignore
+    make_config(x=1, bases=(A,))  # type: ignore
 
 
 def make_hydra_partial(x: T) -> HydraPartialBuilds[Type[T]]:
@@ -370,7 +384,7 @@ def check_HydraPartialBuilds():
 def check_partial_protocol():
     x: Partial[int]
     x = partial(int)
-    # x = partial(str)  # should fail
+    x = partial(str)  # type: ignore
 
 
 def check_partiald_target():
@@ -392,6 +406,6 @@ def check_target_annotation():
     builds(partial(int))
 
     # should fail:
-    # builds()
-    # builds(1)
-    # builds(None)
+    builds()  # type: ignore
+    builds(1)  # type: ignore
+    builds(None)  # type: ignore
