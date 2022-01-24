@@ -41,27 +41,12 @@ def test_hydra_partial_is_error():
         builds(int, hydra_partial=True)
 
 
-@pytest.mark.filterwarnings("ignore:The argument `hydra_partial` is deprecated")
-def test_hydra_partial_via_hydrated_dataclass_is_deprecated():
-    with pytest.warns(HydraZenDeprecationWarning):
+def test_hydra_partial_via_hydrated_dataclass_is_error():
+    with pytest.raises(TypeError):
 
-        @hydrated_dataclass(int, hydra_partial=True)
+        @hydrated_dataclass(int, hydra_partial=True)  # type: ignore
         class A:
             pass
-
-
-@pytest.mark.filterwarnings("ignore:The argument `hydra_partial` is deprecated")
-@given(st.booleans())
-def test_hydra_partial_via_hydrated_dataclass_still_works(as_partial):
-    @hydrated_dataclass(int, hydra_partial=as_partial)
-    class A:
-        pass
-
-    out = instantiate(A)
-    if as_partial:
-        assert out() == 0
-    else:
-        assert out == 0
 
 
 @given(hydra_partial=st.booleans(), zen_partial=st.booleans())

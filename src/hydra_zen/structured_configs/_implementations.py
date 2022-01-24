@@ -221,7 +221,6 @@ def hydrated_dataclass(
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     frozen: bool = False,
-    **_kw,  # reserved to deprecate hydra_partial
 ) -> Callable[[Type[_T]], Type[_T]]:
     """A decorator that uses `builds` to create a dataclass with the appropriate
     Hydra-specific fields for specifying a targeted config [1]_.
@@ -339,31 +338,6 @@ def hydrated_dataclass(
 
     For more detailed examples, refer to `builds`.
     """
-
-    if "hydra_partial" in _kw:
-        if zen_partial is True:
-            raise TypeError(
-                "Both `hydra_partial` and `zen_partial` are specified. "
-                "Specifying `hydra_partial` is deprecated, use `zen_partial` "
-                "instead."
-            )
-
-        # builds(..., hydra_partial=...) is deprecated
-        warnings.warn(
-            HydraZenDeprecationWarning(
-                "The argument `hydra_partial` is deprecated as of 2021-10-27.\n"
-                "Change `builds(..., hydra_partial=<..>)` to `builds(..., zen_partial=<..>)`."
-                "\n\nThis will be an error in hydra-zen 1.0.0, or by 2022-01-27 — whichever "
-                "comes first.\n\nNote: This deprecation does not impact yaml configs "
-                "produced by `builds`."
-            ),
-            stacklevel=2,
-        )
-        zen_partial = _kw.pop("hydra_partial")
-    if _kw:
-        raise TypeError(
-            f"hydrated_dataclass got an unexpected argument: {', '.join(_kw)}"
-        )
 
     def wrapper(decorated_obj: Any) -> Any:
 
