@@ -26,14 +26,6 @@ Python function instead of from a commandline interface.
 
    launch
 
-.. currentmodule:: hydra_zen.experimental
-
-.. autosummary::
-   :toctree: generated/
-   
-   hydra_run
-   hydra_multirun
-
 
 *********************************
 Creating and Working with Configs
