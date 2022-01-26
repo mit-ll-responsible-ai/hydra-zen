@@ -31,63 +31,29 @@ def test_builds_no_positional_target_raises():
         builds(hydra_target=dict)
 
 
-@pytest.mark.filterwarnings("ignore:Specifying the target of")
-def test_target_as_kwarg_is_deprecated():
-    with pytest.warns(HydraZenDeprecationWarning):
+def test_target_as_kwarg_is_an_error():
+    with pytest.raises(TypeError):
         builds(target=int)  # type: ignore
 
 
-@pytest.mark.filterwarnings("ignore:Specifying the target of")
-def test_builds_target_as_kwarg_is_still_correct():
-    out = instantiate(builds(target=dict, a=2, b=3, zen_partial=True))()  # type: ignore
-    assert out == {"a": 2, "b": 3}
-
-
-@pytest.mark.filterwarnings("ignore:The argument `hydra_partial` is deprecated")
-def test_hydra_partial_is_deprecated():
-    with pytest.warns(HydraZenDeprecationWarning):
+def test_hydra_partial_is_error():
+    with pytest.raises(ValueError):
         builds(int, hydra_partial=True)
 
 
-@pytest.mark.filterwarnings("ignore:The argument `hydra_partial` is deprecated")
-@given(st.booleans())
-def test_hydra_partial_is_still_works(as_partial):
-    out = instantiate(builds(int, hydra_partial=as_partial))
+def test_hydra_partial_via_hydrated_dataclass_is_error():
+    with pytest.raises(TypeError):
 
-    if as_partial:
-        assert out() == 0  # type: ignore
-    else:
-        assert out == 0
-
-
-@pytest.mark.filterwarnings("ignore:The argument `hydra_partial` is deprecated")
-def test_hydra_partial_via_hydrated_dataclass_is_deprecated():
-    with pytest.warns(HydraZenDeprecationWarning):
-
-        @hydrated_dataclass(int, hydra_partial=True)
+        @hydrated_dataclass(int, hydra_partial=True)  # type: ignore
         class A:
             pass
-
-
-@pytest.mark.filterwarnings("ignore:The argument `hydra_partial` is deprecated")
-@given(st.booleans())
-def test_hydra_partial_via_hydrated_dataclass_still_works(as_partial):
-    @hydrated_dataclass(int, hydra_partial=as_partial)
-    class A:
-        pass
-
-    out = instantiate(A)
-    if as_partial:
-        assert out() == 0
-    else:
-        assert out == 0
 
 
 @given(hydra_partial=st.booleans(), zen_partial=st.booleans())
 def test_specifying_hydra_partial_and_zen_partial_raises(
     hydra_partial: bool, zen_partial: bool
 ):
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         builds(int, hydra_partial=hydra_partial, zen_partial=zen_partial)
 
 

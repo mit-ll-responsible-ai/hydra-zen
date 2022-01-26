@@ -58,7 +58,7 @@ def zen_processing(
     if isinstance(_zen_wrappers, str) or not isinstance(
         _zen_wrappers, _typing.Sequence
     ):
-        unresolved_wrappers: _typing.Sequence[_WrapperConf] = (_zen_wrappers,)  # type: ignore
+        unresolved_wrappers: _typing.Sequence[_WrapperConf] = (_zen_wrappers,)
     else:
         unresolved_wrappers: _typing.Sequence[_WrapperConf] = _zen_wrappers
     del _zen_wrappers

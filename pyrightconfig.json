@@ -8,4 +8,5 @@
         "src/hydra_zen/_version.py",
         "**/third_party",
     ],
+    "reportUnnecessaryTypeIgnoreComment": true,
 }

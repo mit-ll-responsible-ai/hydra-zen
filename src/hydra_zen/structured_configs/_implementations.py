@@ -154,56 +154,6 @@ def _retain_type_info(type_: type, value: Any, hydra_recursive: Optional[bool]):
     return False
 
 
-def _target_as_kwarg_deprecation(func: _T2) -> Callable[..., _T2]:
-    @wraps(func)
-    def wrapped(*args, **kwargs):
-        if not args and "target" in kwargs:
-            # builds(target=<>, ...) is deprecated
-            warnings.warn(
-                HydraZenDeprecationWarning(
-                    "Specifying the target of `builds` as a keyword argument is deprecated "
-                    "as of 2021-10-27. Change `builds(target=<target>, ...)` to `builds(<target>, ...)`."
-                    "\n\nThis will be an error in hydra-zen 1.0.0, or by 2021-01-27 — whichever "
-                    "comes first.\n\nNote: This deprecation does not impact yaml configs "
-                    "produced by `builds`."
-                ),
-                stacklevel=2,
-            )
-            target = kwargs.pop("target")
-            return func(target, *args, **kwargs)
-        return func(*args, **kwargs)
-
-    return wrapped
-
-
-def _hydra_partial_deprecation(func: _T2) -> Callable[..., _T2]:
-    @wraps(func)
-    def wrapped(*args, **kwargs):
-        if "hydra_partial" in kwargs:
-            if "zen_partial" in kwargs:
-                raise TypeError(
-                    "Both `hydra_partial` and `zen_partial` are specified. "
-                    "Specifying `hydra_partial` is deprecated, use `zen_partial` "
-                    "instead."
-                )
-
-            # builds(..., hydra_partial=...) is deprecated
-            warnings.warn(
-                HydraZenDeprecationWarning(
-                    "The argument `hydra_partial` is deprecated as of 2021-10-27.\n"
-                    "Change `builds(..., hydra_partial=<..>)` to `builds(..., zen_partial=<..>)`."
-                    "\n\nThis will be an error in hydra-zen 1.0.0, or by 2022-01-27 — whichever "
-                    "comes first.\n\nNote: This deprecation does not impact yaml configs "
-                    "produced by `builds`."
-                ),
-                stacklevel=2,
-            )
-            kwargs["zen_partial"] = kwargs.pop("hydra_partial")
-        return func(*args, **kwargs)
-
-    return wrapped
-
-
 def mutable_value(x: _T) -> _T:
     """Used to set a mutable object as a default value for a field
     in a dataclass.
@@ -271,7 +221,6 @@ def hydrated_dataclass(
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     frozen: bool = False,
-    **_kw,  # reserved to deprecate hydra_partial
 ) -> Callable[[Type[_T]], Type[_T]]:
     """A decorator that uses `builds` to create a dataclass with the appropriate
     Hydra-specific fields for specifying a targeted config [1]_.
@@ -389,31 +338,6 @@ def hydrated_dataclass(
 
     For more detailed examples, refer to `builds`.
     """
-
-    if "hydra_partial" in _kw:
-        if zen_partial is True:
-            raise TypeError(
-                "Both `hydra_partial` and `zen_partial` are specified. "
-                "Specifying `hydra_partial` is deprecated, use `zen_partial` "
-                "instead."
-            )
-
-        # builds(..., hydra_partial=...) is deprecated
-        warnings.warn(
-            HydraZenDeprecationWarning(
-                "The argument `hydra_partial` is deprecated as of 2021-10-27.\n"
-                "Change `builds(..., hydra_partial=<..>)` to `builds(..., zen_partial=<..>)`."
-                "\n\nThis will be an error in hydra-zen 1.0.0, or by 2022-01-27 — whichever "
-                "comes first.\n\nNote: This deprecation does not impact yaml configs "
-                "produced by `builds`."
-            ),
-            stacklevel=2,
-        )
-        zen_partial = _kw.pop("hydra_partial")
-    if _kw:
-        raise TypeError(
-            f"hydrated_dataclass got an unexpected argument: {', '.join(_kw)}"
-        )
 
     def wrapper(decorated_obj: Any) -> Any:
 
@@ -584,7 +508,7 @@ def _is_ufunc(value) -> bool:
         # we do actually cover this branch some runs of our CI,
         # but our coverage job installs numpy
         return False
-    return isinstance(value, numpy.ufunc)  # type: ignore
+    return isinstance(value, numpy.ufunc)
 
 
 def sanitized_default_value(
@@ -757,20 +681,18 @@ def builds(
     ...
 
 
-@_hydra_partial_deprecation
-@_target_as_kwarg_deprecation
 def builds(
-    *pos_args: Any,
-    zen_partial: bool = False,
-    zen_wrappers: ZenWrappers = tuple(),
-    zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
-    populate_full_signature: bool = False,
-    hydra_recursive: Optional[bool] = None,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    *pos_args,
+    zen_partial=False,
+    zen_wrappers=tuple(),
+    zen_meta=None,
+    populate_full_signature=False,
+    hydra_recursive=None,
+    hydra_convert=None,
     frozen: bool = False,
-    builds_bases: Tuple[Type[_DataClass], ...] = (),
-    dataclass_name: Optional[str] = None,
-    **kwargs_for_target: SupportedPrimitive,
+    builds_bases=(),
+    dataclass_name=None,
+    **kwargs_for_target,
 ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]:
     """builds(hydra_target, /, *pos_args, zen_partial=False, zen_meta=None,
     hydra_recursive=None, populate_full_signature=False, hydra_convert=None,
