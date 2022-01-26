@@ -862,7 +862,7 @@ def builds(
         I.e. setting/deleting an attribute of an instance will raise
         :py:class:`dataclasses.FrozenInstanceError` at runtime.
 
-    builds_bases : Tuple[DataClass, ...]
+    builds_bases : Tuple[Type[DataClass], ...]
         Specifies a tuple of parent classes that the resulting config inherits from.
         A ``PartialBuilds`` class (resulting from ``zen_partial=True``) cannot be a
         parent of a ``Builds`` class (i.e. where `zen_partial=False` was specified).
@@ -1030,6 +1030,10 @@ def builds(
     >>> BaseConf = builds(func, a_number=2)
     >>> builds(func, 1, builds_bases=(BaseConf,))  # too many args (via inheritance)
     TypeError: Building: func ..
+
+    >>> builds(int, (i for i in range(10)))  # value type not supported by Hydra
+    hydra_zen.errors.HydraZenUnsupportedPrimitiveError: Building: int ..
+
 
     .. _meta-field:
 
