@@ -117,7 +117,6 @@ html_theme_options = {
 
 
 def setup(app):
-    app.add_css_file("my_theme.css")
     app.add_js_file(
         "https://www.googletagmanager.com/gtag/js?id=UA-115029372-2",
         loading_method="async",
