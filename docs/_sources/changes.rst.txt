@@ -33,11 +33,16 @@ Improvements
 - :ref:`Type widening <type-support>` will now be applied to configured fields where an interpolated variable -- a string of form ``"${<var-name>}"`` -- is specified. See :issue:`206` for rationale and examples.
 - Fixed incomplete annotations for ``builds(..., zen_wrappers=<..>)``. See :pull:`180`
 
+Compatibility-Breaking Changes
+------------------------------
+
+The deprecations :ref:`introduced in v0.3.0 <0p3p0-deprecations>` are now errors. Refer to those notes for details and for solutions for fixing stale code.
+
+
 Notes
 -----
-There are no compatibility-breaking changes in this release. However, it should be
-noted that the aforementioned improvements to :func:`~hydra_zen.builds` can change
-the interface to your app.
+It should be noted that the aforementioned improvements to :func:`~hydra_zen.builds` 
+can change the interface to your app.
 
 For instance, if you were configuring ``torch.utils.data.DataLoader``, note the 
 following difference in behavior:
@@ -192,6 +197,7 @@ New Features
    interpolation will be valid no matter where the configuration is
    utilized. See :pull:`112`.
 
+.. _0p3p0-deprecations:
 
 Deprecations
 ------------
