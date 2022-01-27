@@ -580,7 +580,7 @@
 
 
 <div class="viewcode-block" id="just"><a class="viewcode-back" href="../../../generated/hydra_zen.just.html#hydra_zen.just">[docs]</a><span class="k">def</span> <span class="nf">just</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Importable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span>
-    <span class="sd">&quot;&quot;&quot;Produces a config that, when instantiated by Hydra, &quot;just&quot; returns the un-instantiated target-object.</span>
+    <span class="sd">&quot;&quot;&quot;Returns a config that, when instantiated by Hydra, &quot;just&quot; returns the un-instantiated target-object.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -872,8 +872,8 @@
 <span class="sd">    hydra_recursive=None, populate_full_signature=False, hydra_convert=None,</span>
 <span class="sd">    frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)</span>
 
-<span class="sd">    Returns a config, which describes how to instantiate/call ``&lt;hydra_target&gt;`` with</span>
-<span class="sd">    both user-specified and auto-populated parameter values.</span>
+<span class="sd">    Returns a structured config, which describes how to instantiate/call</span>
+<span class="sd">    ``&lt;hydra_target&gt;`` with both user-specified and auto-populated parameter values.</span>
 
 <span class="sd">    Consult the Examples section of the docstring to see the various features of</span>
 <span class="sd">    `builds` in action.</span>
@@ -2245,7 +2245,7 @@
     <span class="o">**</span><span class="n">fields_as_kwargs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportedPrimitive</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataClass</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Creates a config with user-defined field names and, optionally,</span>
+<span class="sd">    Returns a config with user-defined field names and, optionally,</span>
 <span class="sd">    associated default values and/or type annotations.</span>
 
 <span class="sd">    Unlike `builds`, `make_config` is not used to configure a particular target</span>
