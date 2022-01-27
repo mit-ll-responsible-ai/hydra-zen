@@ -15,8 +15,7 @@
 <link href="../_static/css/blank.css" rel="stylesheet" type="text/css">
 <link href="../_static/copybutton.css" rel="stylesheet" type="text/css">
 <link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css">
-<link href="../_static/my_theme.css" rel="stylesheet" type="text/css">
-<link href="../_static/tabs.css" rel="stylesheet" type="text/css"/>
+<link href="../_static/tabs.css" rel="stylesheet" type="text/css">
 <link as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js" rel="preload"/>
 <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
 <script src="../_static/jquery.js"></script>
@@ -271,7 +270,7 @@ a trace of OmegaConf containers.</p></li>
 I.e. setting/deleting an attribute of an instance will raise
 <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.FrozenInstanceError" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataclasses.FrozenInstanceError</span></code></a> at runtime.</p>
 </dd>
-<dt><strong>builds_bases</strong><span class="classifier">Tuple[DataClass, …]</span></dt><dd><p>Specifies a tuple of parent classes that the resulting config inherits from.
+<dt><strong>builds_bases</strong><span class="classifier">Tuple[Type[DataClass], …]</span></dt><dd><p>Specifies a tuple of parent classes that the resulting config inherits from.
 A <code class="docutils literal notranslate"><span class="pre">PartialBuilds</span></code> class (resulting from <code class="docutils literal notranslate"><span class="pre">zen_partial=True</span></code>) cannot be a
 parent of a <code class="docutils literal notranslate"><span class="pre">Builds</span></code> class (i.e. where <code class="xref py py-obj docutils literal notranslate"><span class="pre">zen_partial=False</span></code> was specified).</p>
 </dd>
@@ -452,6 +451,10 @@ instantiation.</p>
 <span class="go">TypeError: Building: func ..</span>
 </pre></div>
 </div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">builds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="p">(</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#range" title="range"><span class="nb">range</span></a><span class="p">(</span><span class="mi">10</span><span class="p">)))</span>  <span class="c1"># value type not supported by Hydra</span>
+<span class="go">hydra_zen.errors.HydraZenUnsupportedPrimitiveError: Building: int ..</span>
+</pre></div>
+</div>
 <p id="meta-field"><strong>Using meta-fields</strong></p>
 <p>Meta-fields are fields that are included in a config but are excluded by the
 instantiation process. Thus arbitrary metadata can be attached to a config.</p>
@@ -469,7 +472,7 @@ relative-interpolation <a class="reference internal" href="#rbd228efbc5f2-6" id=
 and/or its outputs during the instantiation process.</p>
 <p>Let’s use a wrapper to add a unit-conversion step to a config. We’ll modify a
 config that builds a function, which converts a temperature in Farenheit to
-Celcius, and add a wrapper it so that it will convert from Farenheit to Kelvin
+Celcius, and add a wrapper to it so that it will convert from Farenheit to Kelvin
 instead.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">faren_to_celsius</span><span class="p">(</span><span class="n">temp_f</span><span class="p">):</span>  <span class="c1"># our target</span>
 <span class="gp">... </span>    <span class="k">return</span> <span class="p">((</span><span class="n">temp_f</span> <span class="o">-</span> <span class="mi">32</span><span class="p">)</span> <span class="o">*</span> <span class="mi">5</span><span class="p">)</span> <span class="o">/</span> <span class="mi">9</span>

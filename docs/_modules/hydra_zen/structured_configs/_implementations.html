@@ -26,7 +26,6 @@
     <link rel="stylesheet" href="../../../_static/css/blank.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-codeautolink.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/my_theme.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/tabs.css" />
     
   <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
@@ -959,7 +958,7 @@
 <span class="sd">        I.e. setting/deleting an attribute of an instance will raise</span>
 <span class="sd">        :py:class:`dataclasses.FrozenInstanceError` at runtime.</span>
 
-<span class="sd">    builds_bases : Tuple[DataClass, ...]</span>
+<span class="sd">    builds_bases : Tuple[Type[DataClass], ...]</span>
 <span class="sd">        Specifies a tuple of parent classes that the resulting config inherits from.</span>
 <span class="sd">        A ``PartialBuilds`` class (resulting from ``zen_partial=True``) cannot be a</span>
 <span class="sd">        parent of a ``Builds`` class (i.e. where `zen_partial=False` was specified).</span>
@@ -1128,6 +1127,10 @@
 <span class="sd">    &gt;&gt;&gt; builds(func, 1, builds_bases=(BaseConf,))  # too many args (via inheritance)</span>
 <span class="sd">    TypeError: Building: func ..</span>
 
+<span class="sd">    &gt;&gt;&gt; builds(int, (i for i in range(10)))  # value type not supported by Hydra</span>
+<span class="sd">    hydra_zen.errors.HydraZenUnsupportedPrimitiveError: Building: int ..</span>
+
+
 <span class="sd">    .. _meta-field:</span>
 
 <span class="sd">    **Using meta-fields**</span>
@@ -1153,7 +1156,7 @@
 
 <span class="sd">    Let&#39;s use a wrapper to add a unit-conversion step to a config. We&#39;ll modify a</span>
 <span class="sd">    config that builds a function, which converts a temperature in Farenheit to</span>
-<span class="sd">    Celcius, and add a wrapper it so that it will convert from Farenheit to Kelvin</span>
+<span class="sd">    Celcius, and add a wrapper to it so that it will convert from Farenheit to Kelvin</span>
 <span class="sd">    instead.</span>
 
 <span class="sd">    &gt;&gt;&gt; def faren_to_celsius(temp_f):  # our target</span>

@@ -1,6 +1,8 @@
 .. meta::
    :description: Tutorials for getting started with Hydra and hydra-zen.
 
+.. _tutorials:
+
 Tutorials
 =========
 
