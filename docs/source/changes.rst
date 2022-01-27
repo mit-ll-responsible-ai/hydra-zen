@@ -10,9 +10,9 @@ chronological order. All previous releases should still be available on pip.
 
 .. _v0.5.0:
 
----------------------
-0.5.0rc3 - 2022-01-21
----------------------
+------------------
+0.5.0 - 2022-01-27
+------------------
 
 This release primarily improves the ability of :func:`~hydra_zen.builds` to inspect and
 the signatures of its targets; thus its ability to both auto-generate and validate 
