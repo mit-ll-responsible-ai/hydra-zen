@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import (
     Any,
     Callable,
+    ClassVar,
     Dict,
     FrozenSet,
     Mapping,
@@ -19,7 +20,7 @@ from typing import (
 )
 
 from omegaconf import DictConfig, ListConfig
-from typing_extensions import Protocol, TypedDict, runtime_checkable
+from typing_extensions import Literal, Protocol, TypedDict, runtime_checkable
 
 __all__ = [
     "Just",
@@ -60,7 +61,7 @@ InterpStr = NewType("InterpStr", str)
 
 class _DataClass(Protocol):  # pragma: no cover
     # doesn't provide __init__, __getattribute__, etc.
-    __dataclass_fields__: Dict[str, Field]
+    __dataclass_fields__: ClassVar[Dict[str, Field]]
 
 
 class DataClass(_DataClass, Protocol):  # pragma: no cover
@@ -76,25 +77,27 @@ class DataClass(_DataClass, Protocol):  # pragma: no cover
 
 @runtime_checkable
 class Builds(DataClass, Protocol[_T]):  # pragma: no cover
-    _target_: str
+    _target_: ClassVar[str]
 
 
 @runtime_checkable
 class Just(Builds, Protocol[_T]):  # pragma: no cover
-    path: str  # interpolated string for importing obj
-    _target_: str = "hydra_zen.funcs.get_obj"
+    path: ClassVar[str]  # interpolated string for importing obj
+    _target_: ClassVar[Literal["hydra_zen.funcs.get_obj"]] = "hydra_zen.funcs.get_obj"
 
 
 @runtime_checkable
 class PartialBuilds(Builds, Protocol[_T]):  # pragma: no cover
-    _target_: str = "hydra_zen.funcs.zen_processing"
-    _zen_target: str
-    _zen_partial: bool = True
+    _target_: ClassVar[
+        Literal["hydra_zen.funcs.zen_processing"]
+    ] = "hydra_zen.funcs.zen_processing"
+    _zen_target: ClassVar[str]
+    _zen_partial: ClassVar[Literal[True]] = True
 
 
 @runtime_checkable
 class HydraPartialBuilds(Builds, Protocol[_T]):  # pragma: no cover
-    _partial_: bool = True
+    _partial_: ClassVar[bool] = True
 
 
 @runtime_checkable

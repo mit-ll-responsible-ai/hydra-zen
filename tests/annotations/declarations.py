@@ -409,3 +409,26 @@ def check_target_annotation():
     builds()  # type: ignore
     builds(1)  # type: ignore
     builds(None)  # type: ignore
+
+
+def check_protocols():
+    reveal_type(builds(int)._target_, expected_text="str")
+    reveal_type(builds(int)()._target_, expected_text="str")
+
+    PBuilds = builds(int, zen_partial=True)
+    reveal_type(
+        PBuilds._target_, expected_text="Literal['hydra_zen.funcs.zen_processing']"
+    )
+    reveal_type(
+        PBuilds()._target_, expected_text="Literal['hydra_zen.funcs.zen_processing']"
+    )
+
+    reveal_type(PBuilds._zen_target, expected_text="str")
+    reveal_type(PBuilds()._zen_target, expected_text="str")
+
+    reveal_type(PBuilds._zen_partial, expected_text="Literal[True]")
+    reveal_type(PBuilds()._zen_partial, expected_text="Literal[True]")
+
+    Just = just(int)
+    reveal_type(Just._target_, expected_text="Literal['hydra_zen.funcs.get_obj']")
+    reveal_type(Just()._target_, expected_text="Literal['hydra_zen.funcs.get_obj']")
