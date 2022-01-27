@@ -698,7 +698,8 @@ def builds(
     hydra_recursive=None, populate_full_signature=False, hydra_convert=None,
     frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
 
-    Returns a structured config, which describes how to instantiate/call ``<hydra_target>`` with both user-specified and auto-populated parameter values.
+    Returns a structured config, which describes how to instantiate/call
+    ``<hydra_target>`` with both user-specified and auto-populated parameter values.
 
     Consult the Examples section of the docstring to see the various features of
     `builds` in action.
