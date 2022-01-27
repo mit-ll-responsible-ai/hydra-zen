@@ -5,6 +5,8 @@
 
    Your must install `beartype <https://github.com/beartype/beartype>`_ in your Python environment in order to complete this How-To guide.
 
+.. _runtime-type-checking:
+
 =================================================
 Add Enhanced Runtime Type-Checking to a Hydra App
 =================================================

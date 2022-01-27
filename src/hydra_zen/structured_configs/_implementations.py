@@ -784,7 +784,7 @@ def builds(
         I.e. setting/deleting an attribute of an instance will raise
         :py:class:`dataclasses.FrozenInstanceError` at runtime.
 
-    builds_bases : Tuple[DataClass, ...]
+    builds_bases : Tuple[Type[DataClass], ...]
         Specifies a tuple of parent classes that the resulting config inherits from.
         A ``PartialBuilds`` class (resulting from ``zen_partial=True``) cannot be a
         parent of a ``Builds`` class (i.e. where `zen_partial=False` was specified).
@@ -953,6 +953,10 @@ def builds(
     >>> builds(func, 1, builds_bases=(BaseConf,))  # too many args (via inheritance)
     TypeError: Building: func ..
 
+    >>> builds(int, (i for i in range(10)))  # value type not supported by Hydra
+    hydra_zen.errors.HydraZenUnsupportedPrimitiveError: Building: int ..
+
+
     .. _meta-field:
 
     **Using meta-fields**
@@ -978,7 +982,7 @@ def builds(
 
     Let's use a wrapper to add a unit-conversion step to a config. We'll modify a
     config that builds a function, which converts a temperature in Farenheit to
-    Celcius, and add a wrapper it so that it will convert from Farenheit to Kelvin
+    Celcius, and add a wrapper to it so that it will convert from Farenheit to Kelvin
     instead.
 
     >>> def faren_to_celsius(temp_f):  # our target

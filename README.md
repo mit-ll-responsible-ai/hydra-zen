@@ -37,12 +37,20 @@ hydra-zen is a Python library that simplifies the process of writing code (resea
 - **Repeatable**: each run of your code will be self-documenting; the full configuration of your software is saved alongside your results.
 - **Scalable**: launch multiple runs of your software, be it on your local machine or across multiple nodes on a cluster.
 
-It builds off – and is fully compatible with – [Hydra](https://hydra.cc/), a framework for elegantly 
-configuring complex applications. 
 
-hydra-zen helps simplify the process of using Hydra by providing 
-convenient functions for creating and validating configs, as well as launching Hydra jobs. It also provides novel 
-functionality such as wrapped instantiation and meta fields in configs.
+It builds off – and is fully compatible with – [Hydra](https://hydra.cc/), a framework for elegantly 
+configuring complex applications. hydra-zen helps simplify the 
+process of using Hydra by providing specialized functions for :ref:`creating configs <create-config>` and 
+launching Hydra jobs. 
+
+hydra-zen also also provides Hydra users with powerful, novel functionality. With it, we can:
+
+- Add enhanced runtime type-checking for our Hydra application, via pydantic, beartype, and other third-party libraries.
+- Design configs with specialized behaviors, like partial configs, or configs with meta-fields. 
+- Use additional data types in our configs, like `pathlib.Path`, that are not natively supported by Hydra.
+- Validate our configs at runtime, prior to launching our application.
+- Leverage a powerful functionality-injection framework in our Hydra applications.
+- Run static type-checkers on our config-creation code to catch incompatibilities with Hydra.
     
 ## Installation
 `hydra-zen` is lightweight: its only dependencies are `hydra-core` and `typing-extensions`.
