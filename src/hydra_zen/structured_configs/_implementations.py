@@ -406,7 +406,7 @@ def hydrated_dataclass(
 
 
 def just(obj: Importable) -> Type[Just[Importable]]:
-    """Produces a config that, when instantiated by Hydra, "just" returns the un-instantiated target-object.
+    """Returns a config that, when instantiated by Hydra, "just" returns the un-instantiated target-object.
 
     Parameters
     ----------
@@ -698,8 +698,8 @@ def builds(
     hydra_recursive=None, populate_full_signature=False, hydra_convert=None,
     frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
 
-    Returns a config, which describes how to instantiate/call ``<hydra_target>`` with
-    both user-specified and auto-populated parameter values.
+    Returns a structured config, which describes how to instantiate/call
+    ``<hydra_target>`` with both user-specified and auto-populated parameter values.
 
     Consult the Examples section of the docstring to see the various features of
     `builds` in action.
@@ -2071,7 +2071,7 @@ def make_config(
     **fields_as_kwargs: Union[SupportedPrimitive, ZenField],
 ) -> Type[DataClass]:
     """
-    Creates a config with user-defined field names and, optionally,
+    Returns a config with user-defined field names and, optionally,
     associated default values and/or type annotations.
 
     Unlike `builds`, `make_config` is not used to configure a particular target
