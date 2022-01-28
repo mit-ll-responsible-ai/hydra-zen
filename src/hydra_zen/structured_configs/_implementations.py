@@ -47,11 +47,7 @@ from hydra_zen._compatibility import (
     PATCH_OMEGACONF_830,
     ZEN_SUPPORTED_PRIMITIVES,
 )
-from hydra_zen.errors import (
-    HydraZenDeprecationWarning,
-    HydraZenUnsupportedPrimitiveError,
-    HydraZenValidationError,
-)
+from hydra_zen.errors import HydraZenUnsupportedPrimitiveError, HydraZenValidationError
 from hydra_zen.funcs import get_obj, partial, zen_processing
 from hydra_zen.structured_configs import _utils
 from hydra_zen.typing import (
