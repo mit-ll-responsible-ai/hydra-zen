@@ -415,6 +415,15 @@ def test_type_widening_with_internal_conversion_to_Builds():
     instantiate(Conf)  # shouldn't raise
 
 
+def test_type_widening_for_interpolated_field_is_needed():
+    @dataclass
+    class Config:
+        x: str = "${A}"
+
+    with pytest.raises(ValidationError):
+        instantiate(Config, x=builds(str))
+
+
 def test_type_widening_for_interpolated_field():
     C1 = make_config(x=ZenField(str, "A"))
     assert get_type_hints(C1)["x"] is str
