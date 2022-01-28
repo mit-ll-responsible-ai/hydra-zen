@@ -47,11 +47,7 @@ from hydra_zen._compatibility import (
     PATCH_OMEGACONF_830,
     ZEN_SUPPORTED_PRIMITIVES,
 )
-from hydra_zen.errors import (
-    HydraZenDeprecationWarning,
-    HydraZenUnsupportedPrimitiveError,
-    HydraZenValidationError,
-)
+from hydra_zen.errors import HydraZenUnsupportedPrimitiveError, HydraZenValidationError
 from hydra_zen.funcs import get_obj, partial, zen_processing
 from hydra_zen.structured_configs import _utils
 from hydra_zen.typing import (
@@ -62,12 +58,7 @@ from hydra_zen.typing import (
     PartialBuilds,
     SupportedPrimitive,
 )
-from hydra_zen.typing._implementations import (
-    DataClass,
-    HasPartialTarget,
-    HasTarget,
-    _DataClass,
-)
+from hydra_zen.typing._implementations import DataClass, HasTarget, _DataClass
 
 from ._value_conversion import ZEN_VALUE_CONVERSION
 
@@ -1771,11 +1762,11 @@ def get_target(obj: Union[Builds[_T], Type[Builds[_T]]]) -> _T:  # pragma: no co
 
 
 @overload
-def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:  # pragma: no cover
+def get_target(obj: HasTarget) -> Any:  # pragma: no cover
     ...
 
 
-def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:
+def get_target(obj):
     """
     Returns the target-object from a targeted config.
 
