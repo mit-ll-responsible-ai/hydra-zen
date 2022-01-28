@@ -221,11 +221,7 @@
     <span class="n">PATCH_OMEGACONF_830</span><span class="p">,</span>
     <span class="n">ZEN_SUPPORTED_PRIMITIVES</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.errors</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">HydraZenDeprecationWarning</span><span class="p">,</span>
-    <span class="n">HydraZenUnsupportedPrimitiveError</span><span class="p">,</span>
-    <span class="n">HydraZenValidationError</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.errors</span> <span class="kn">import</span> <span class="n">HydraZenUnsupportedPrimitiveError</span><span class="p">,</span> <span class="n">HydraZenValidationError</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.funcs</span> <span class="kn">import</span> <span class="n">get_obj</span><span class="p">,</span> <span class="n">partial</span><span class="p">,</span> <span class="n">zen_processing</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.structured_configs</span> <span class="kn">import</span> <span class="n">_utils</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="p">(</span>
@@ -236,12 +232,7 @@
     <span class="n">PartialBuilds</span><span class="p">,</span>
     <span class="n">SupportedPrimitive</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">DataClass</span><span class="p">,</span>
-    <span class="n">HasPartialTarget</span><span class="p">,</span>
-    <span class="n">HasTarget</span><span class="p">,</span>
-    <span class="n">_DataClass</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass</span><span class="p">,</span> <span class="n">HasTarget</span><span class="p">,</span> <span class="n">_DataClass</span>
 
 <span class="kn">from</span> <span class="nn">._value_conversion</span> <span class="kn">import</span> <span class="n">ZEN_VALUE_CONVERSION</span>
 
@@ -1945,11 +1936,11 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">HasTarget</span><span class="p">,</span> <span class="n">HasPartialTarget</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">HasTarget</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="o">...</span>
 
 
-<div class="viewcode-block" id="get_target"><a class="viewcode-back" href="../../../generated/hydra_zen.get_target.html#hydra_zen.get_target">[docs]</a><span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">HasTarget</span><span class="p">,</span> <span class="n">HasPartialTarget</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<div class="viewcode-block" id="get_target"><a class="viewcode-back" href="../../../generated/hydra_zen.get_target.html#hydra_zen.get_target">[docs]</a><span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the target-object from a targeted config.</span>
 
