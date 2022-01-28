@@ -97,17 +97,12 @@ class PartialBuilds(Builds, Protocol[_T]):  # pragma: no cover
 
 @runtime_checkable
 class HydraPartialBuilds(Builds, Protocol[_T]):  # pragma: no cover
-    _partial_: ClassVar[bool] = True
+    _partial_: ClassVar[Literal[True]] = True
 
 
 @runtime_checkable
 class HasTarget(Protocol):  # pragma: no cover
     _target_: str
-
-
-@runtime_checkable
-class HasPartialTarget(Protocol):  # pragma: no cover
-    _zen_partial: bool = True
 
 
 Importable = TypeVar("Importable", bound=Callable)

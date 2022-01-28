@@ -62,12 +62,7 @@ from hydra_zen.typing import (
     PartialBuilds,
     SupportedPrimitive,
 )
-from hydra_zen.typing._implementations import (
-    DataClass,
-    HasPartialTarget,
-    HasTarget,
-    _DataClass,
-)
+from hydra_zen.typing._implementations import DataClass, HasTarget, _DataClass
 
 from ._value_conversion import ZEN_VALUE_CONVERSION
 
@@ -1771,11 +1766,11 @@ def get_target(obj: Union[Builds[_T], Type[Builds[_T]]]) -> _T:  # pragma: no co
 
 
 @overload
-def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:  # pragma: no cover
+def get_target(obj: HasTarget) -> Any:  # pragma: no cover
     ...
 
 
-def get_target(obj: Union[HasTarget, HasPartialTarget]) -> Any:
+def get_target(obj):
     """
     Returns the target-object from a targeted config.
 
