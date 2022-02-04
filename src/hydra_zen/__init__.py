@@ -9,6 +9,7 @@ from ._hydra_overloads import (
     to_yaml,
 )
 from ._launch import launch
+from ._like import like
 from ._version import get_versions
 from .structured_configs import (
     ZenField,
@@ -36,6 +37,7 @@ __all__ = [
     "ZenField",
     "make_custom_builds_fn",
     "launch",
+    "like",
 ]
 
 __version__ = get_versions()["version"]

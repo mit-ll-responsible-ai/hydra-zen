@@ -60,6 +60,7 @@ from hydra_zen.typing import (
 )
 from hydra_zen.typing._implementations import DataClass, HasTarget, _DataClass
 
+from .._like import _Tracker
 from ._value_conversion import ZEN_VALUE_CONVERSION
 
 _T = TypeVar("_T")
@@ -396,6 +397,20 @@ def hydrated_dataclass(
     return wrapper
 
 
+def make_like(target, tracks):
+    from hydra._internal import utils as _hydra_internal_utils
+
+    obj = _hydra_internal_utils._locate(target)
+
+    for item in tracks:
+        if not isinstance(item, str):
+            _, args, kwargs = item
+            obj = obj(*args, **kwargs)
+        else:
+            obj = getattr(obj, item)
+    return obj
+
+
 def just(obj: Importable) -> Type[Just[Importable]]:
     """Returns a config that, when instantiated by Hydra, "just" returns the un-instantiated target-object.
 
@@ -457,6 +472,9 @@ def just(obj: Importable) -> Type[Just[Importable]]:
     >>> conf.reduction_fn(conf.data)
     6
     """
+    if isinstance(obj, _Tracker):
+        return builds(make_like, _utils.get_obj_path(obj.origin), obj.tracker)
+
     try:
         obj_path = _utils.get_obj_path(obj)
     except AttributeError:
