@@ -119,7 +119,6 @@ _SupportedPrimitive = Union[
     _HydraPrimitive,
     ListConfig,
     DictConfig,
-    type,
     Callable,
     Enum,
     _DataClass,
@@ -136,7 +135,7 @@ SupportedPrimitive = Union[
     FrozenSet["SupportedPrimitive"],
     # Even thought this is redundant with Sequence, it seems to
     # be needed for pyright to do proper checking of tuple contents
-    Tuple["SupportedPrimitive"],
+    Tuple["SupportedPrimitive", ...],
     # Mutable generic containers need to be invariant, so
     # we have to settle for Sequence/Mapping. While this
     # is overly permissive in terms of sequence-type, it
