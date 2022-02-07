@@ -341,10 +341,8 @@ def supported_primitives():
     make_config(a=M())  # type: ignore
     make_config(a=(1, M()))  # type: ignore
     make_config(a=[1, M()])  # type: ignore
+    make_config(a={"a": M()})  # type: ignore
     builds(dict, a=M())  # type: ignore
-
-    # This should fail, but doesn't. Seems like a pyright bug
-    # make_config(a={"a": M()})  # type: ignore
 
     # The following *should* be invalid, but we are limited
     # by mutable invariants being generic

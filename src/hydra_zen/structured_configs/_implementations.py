@@ -369,7 +369,7 @@ def hydrated_dataclass(
             # we need to ensure that the fields specified via the class definition
             # take precedence over the fields that will be auto-populated by builds
             kwargs = {
-                f.name: f.default if f.default is not MISSING else f.default_factory()
+                f.name: f.default if f.default is not MISSING else f.default_factory()  # type: ignore
                 for f in fields(decorated_obj)
                 if not (f.default is MISSING and f.default_factory is MISSING)
                 and f.name not in _HYDRA_FIELD_NAMES
