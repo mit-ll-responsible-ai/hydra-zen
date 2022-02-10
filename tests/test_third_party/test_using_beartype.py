@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: MIT
 
 import pytest
-from beartype.cave import RegexTypes  # type: ignore
-from beartype.vale import Is  # type: ignore
+from beartype.cave import RegexTypes
+from beartype.vale import Is
 from typing_extensions import Annotated
 
 from hydra_zen.third_party.beartype import validates_with_beartype
