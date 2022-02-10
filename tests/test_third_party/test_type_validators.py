@@ -163,7 +163,7 @@ def test_coerces_lists_to_annotated_sequence_type(
 
     wrapped_f = validator(f)
     coerced_out = wrapped_f(x)
-    assert isinstance(f(x), list)  # type: ignore
+    assert isinstance(f(x), list)
     assert isinstance(coerced_out, caster)
     if caster is not MyNamedTuple:
         assert coerced_out == caster(x)
