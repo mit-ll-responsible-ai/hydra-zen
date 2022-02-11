@@ -2456,17 +2456,3 @@ ZEN_VALUE_CONVERSION[range] = lambda value: builds(
 )
 ZEN_VALUE_CONVERSION[Counter] = lambda counter: builds(Counter, dict(counter))
 ZEN_VALUE_CONVERSION[functools.partial] = _unpack_partial
-
-
-def f(x: int, y: str):
-    return 1
-
-
-not_full = builds(f, populate_full_signature=False)
-
-not_full()
-
-
-full = builds(f, populate_full_signature=True, zen_partial=True)
-
-full()
