@@ -92,6 +92,13 @@ def instantiate(
 
 @overload
 def instantiate(
+    config: Callable[..., Builds[Type[T]]], *args: Any, **kwargs: Any
+) -> T:  # pragma: no cover
+    ...
+
+
+@overload
+def instantiate(
     config: Union[Builds[Type[T]], Type[Builds[Type[T]]]], *args: Any, **kwargs: Any
 ) -> T:  # pragma: no cover
     ...
