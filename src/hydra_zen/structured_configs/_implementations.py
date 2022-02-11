@@ -39,7 +39,7 @@ from typing import (
 )
 
 from omegaconf import DictConfig, ListConfig
-from typing_extensions import Final, Literal, TypeGuard
+from typing_extensions import Final, Literal, ParamSpec, TypeGuard
 
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVES,
@@ -613,6 +613,10 @@ def sanitized_field(
     )
 
 
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
 # overloads when `zen_partial=False`
 @overload
 def builds(
@@ -621,7 +625,7 @@ def builds(
     zen_partial: Literal[False] = False,
     zen_wrappers: ZenWrappers = tuple(),
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
-    populate_full_signature: bool = False,
+    populate_full_signature: Literal[False] = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     dataclass_name: Optional[str] = None,
@@ -629,6 +633,25 @@ def builds(
     frozen: bool = False,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Type[Builds[Importable]]:  # pragma: no cover
+    ...
+
+
+# overloads when `zen_partial=False`
+@overload
+def builds(
+    hydra_target: Callable[P, R],
+    *pos_args: SupportedPrimitive,
+    zen_partial: Literal[False] = False,
+    zen_wrappers: ZenWrappers = tuple(),
+    zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
+    populate_full_signature: Literal[True] = True,
+    hydra_recursive: Optional[bool] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    dataclass_name: Optional[str] = None,
+    builds_bases: Tuple[Type[_DataClass], ...] = (),
+    frozen: bool = False,
+    **kwargs_for_target: SupportedPrimitive,
+) -> Callable[P, Builds[Type[R]]]:  # pragma: no cover
     ...
 
 
@@ -654,7 +677,7 @@ def builds(
 # overloads when `zen_partial: bool`
 @overload
 def builds(
-    hydra_target: Importable,
+    hydra_target: Union[Importable, Callable[P, R]],
     *pos_args: SupportedPrimitive,
     zen_partial: bool,
     zen_wrappers: ZenWrappers = tuple(),
@@ -667,7 +690,9 @@ def builds(
     frozen: bool = False,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Union[
-    Type[Builds[Importable]], Type[PartialBuilds[Importable]]
+    Type[Builds[Importable]],
+    Type[PartialBuilds[Importable]],
+    Callable[P, Builds[Type[R]]],
 ]:  # pragma: no cover
     ...
 
@@ -684,7 +709,7 @@ def builds(
     builds_bases=(),
     dataclass_name=None,
     **kwargs_for_target,
-) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]:
+):
     """builds(hydra_target, /, *pos_args, zen_partial=False, zen_meta=None,
     hydra_recursive=None, populate_full_signature=False, hydra_convert=None,
     frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
@@ -1679,7 +1704,7 @@ def builds(
             out.__doc__ += (
                 f"\n\nThe docstring for {_utils.safe_name(target)} :\n\n" + target_doc
             )
-    return cast(Type[Builds[Importable]], out)
+    return cast(Union[Type[Builds[Importable]], Callable[P, Builds[Type[R]]]], out)
 
 
 # We need to check if things are Builds, Just, PartialBuilds to a higher
@@ -2431,3 +2456,17 @@ ZEN_VALUE_CONVERSION[range] = lambda value: builds(
 )
 ZEN_VALUE_CONVERSION[Counter] = lambda counter: builds(Counter, dict(counter))
 ZEN_VALUE_CONVERSION[functools.partial] = _unpack_partial
+
+
+def f(x: int, y: str):
+    return 1
+
+
+not_full = builds(f, populate_full_signature=False)
+
+not_full()
+
+
+full = builds(f, populate_full_signature=True, zen_partial=True)
+
+full()
