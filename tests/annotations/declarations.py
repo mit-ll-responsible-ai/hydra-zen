@@ -430,3 +430,43 @@ def check_protocols():
     Just = just(int)
     reveal_type(Just._target_, expected_text="Literal['hydra_zen.funcs.get_obj']")
     reveal_type(Just()._target_, expected_text="Literal['hydra_zen.funcs.get_obj']")
+
+
+def check_populate_full_sig():
+    class C:
+        def __init__(self) -> None:
+            pass
+
+    def f(x: int, y: str, z: bool = False):
+        return C()
+
+    Conf_f = builds(f, populate_full_signature=True)
+
+    # The following should get flagged by type-checkers
+
+    Conf_f()  # type: ignore
+    Conf_f(not_a_arg=1)  # type: ignore
+    Conf_f("not int", "a string")  # type: ignore
+    Conf_f(x="not int", y="a string")  # type: ignore
+    Conf_f(x=1, y=2)  # type: ignore
+    Conf_f(x=1, y="a string", z="not a bool")  # type: ignore
+
+    # The following should be ok
+    reveal_type(Conf_f(1, "hi"), expected_text="Builds[Type[C]]")
+    reveal_type(Conf_f(1, "hi", True), expected_text="Builds[Type[C]]")
+    reveal_type(Conf_f(1, y="hi"), expected_text="Builds[Type[C]]")
+    reveal_type(Conf_f(x=1, y="hi", z=False), expected_text="Builds[Type[C]]")
+
+    # check instantiation
+    reveal_type(instantiate(Conf_f), expected_text="C")
+
+    conf = Conf_f(1, "hi")
+    reveal_type(instantiate(conf), expected_text="C")
+
+    Conf_C = builds(C, populate_full_signature=True)
+
+    # Should be flagged by type-checker
+    Conf_C(not_a_arg=1)  # type: ignore
+
+    reveal_type(instantiate(Conf_C), expected_text="C")
+    reveal_type(instantiate(Conf_C()), expected_text="C")
