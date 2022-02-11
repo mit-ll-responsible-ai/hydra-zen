@@ -440,7 +440,14 @@ def check_populate_full_sig():
     def f(x: int, y: str, z: bool = False):
         return C()
 
-    Conf_f = builds(f, populate_full_signature=True)
+    # should be able to specify arguments other than `populate_full_signature=True`
+    Conf_f = builds(
+        f,
+        populate_full_signature=True,
+        zen_wrappers=[None],
+        zen_meta=dict(a=1),
+        hydra_convert="all",
+    )
 
     # The following should get flagged by type-checkers
 
@@ -460,8 +467,8 @@ def check_populate_full_sig():
     # check instantiation
     reveal_type(instantiate(Conf_f), expected_text="C")
 
-    conf = Conf_f(1, "hi")
-    reveal_type(instantiate(conf), expected_text="C")
+    conf1 = Conf_f(1, "hi")
+    reveal_type(instantiate(conf1), expected_text="C")
 
     Conf_C = builds(C, populate_full_signature=True)
 
@@ -470,3 +477,20 @@ def check_populate_full_sig():
 
     reveal_type(instantiate(Conf_C), expected_text="C")
     reveal_type(instantiate(Conf_C()), expected_text="C")
+
+    # specifying `zen_partial=True` should disable sig-inspection
+    Conf_f_partial = builds(f, populate_full_signature=True, zen_partial=True)
+    conf2 = Conf_f_partial(not_a_valid_arg=1)  # should be ok
+    reveal_type(
+        conf2, expected_text="PartialBuilds[(x: int, y: str, z: bool = False) -> C]"
+    )
+
+    # specifying `populate_full_signature=False` should disable sig-inspection
+    Conf_f_not_full = builds(f, populate_full_signature=False)
+    conf3 = Conf_f_not_full(not_a_valid_arg=1)  # should be ok
+    reveal_type(conf3, expected_text="Builds[(x: int, y: str, z: bool = False) -> C]")
+
+    # not specifying `populate_full_signature` should disable sig-inspection
+    Conf_f_not_full2 = builds(f)
+    conf4 = Conf_f_not_full2(not_a_valid_arg=1)  # should be ok
+    reveal_type(conf4, expected_text="Builds[(x: int, y: str, z: bool = False) -> C]")
