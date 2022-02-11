@@ -617,7 +617,7 @@ P = ParamSpec("P")
 R = TypeVar("R")
 
 
-# overloads when `zen_partial=False`
+# `builds(<t>, [*args], [**kwargs], zen_partial=False, populate_full_signature=False)`
 @overload
 def builds(
     hydra_target: Importable,
@@ -636,11 +636,11 @@ def builds(
     ...
 
 
-# overloads when `zen_partial=False`
+# `builds(<t>, zen_partial=False, populate_full_signature=True)`
+# -- without any user-specified args/kwargs for the target
 @overload
 def builds(
     hydra_target: Callable[P, R],
-    *pos_args: SupportedPrimitive,
     zen_partial: Literal[False] = False,
     zen_wrappers: ZenWrappers = tuple(),
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
@@ -650,12 +650,30 @@ def builds(
     dataclass_name: Optional[str] = None,
     builds_bases: Tuple[Type[_DataClass], ...] = (),
     frozen: bool = False,
-    **kwargs_for_target: SupportedPrimitive,
 ) -> Callable[P, Builds[Type[R]]]:  # pragma: no cover
     ...
 
 
-# overloads when `zen_partial=True`
+# `builds(<t>, *args, **kwargs, zen_partial=False, populate_full_signature=True)`
+@overload
+def builds(
+    hydra_target: Importable,
+    *pos_args: SupportedPrimitive,
+    zen_partial: Literal[False] = False,
+    zen_wrappers: ZenWrappers = tuple(),
+    zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
+    populate_full_signature: bool = False,
+    hydra_recursive: Optional[bool] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    dataclass_name: Optional[str] = None,
+    builds_bases: Tuple[Type[_DataClass], ...] = (),
+    frozen: bool = False,
+    **kwargs_for_target: SupportedPrimitive,
+) -> Type[Builds[Importable]]:  # pragma: no cover
+    ...
+
+
+# `builds(<t>, [*args], [**kwargs], zen_partial=True)`
 @overload
 def builds(
     hydra_target: Importable,
@@ -674,7 +692,7 @@ def builds(
     ...
 
 
-# overloads when `zen_partial: bool`
+# broadest annotation
 @overload
 def builds(
     hydra_target: Union[Importable, Callable[P, R]],

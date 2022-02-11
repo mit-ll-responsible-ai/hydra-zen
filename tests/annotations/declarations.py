@@ -478,19 +478,29 @@ def check_populate_full_sig():
     reveal_type(instantiate(Conf_C), expected_text="C")
     reveal_type(instantiate(Conf_C()), expected_text="C")
 
-    # specifying `zen_partial=True` should disable sig-inspection
+    # specifying `zen_partial=True` should disable sig-reflection
     Conf_f_partial = builds(f, populate_full_signature=True, zen_partial=True)
     conf2 = Conf_f_partial(not_a_valid_arg=1)  # should be ok
     reveal_type(
         conf2, expected_text="PartialBuilds[(x: int, y: str, z: bool = False) -> C]"
     )
 
-    # specifying `populate_full_signature=False` should disable sig-inspection
+    # specifying `populate_full_signature=False` should disable sig-reflection
     Conf_f_not_full = builds(f, populate_full_signature=False)
     conf3 = Conf_f_not_full(not_a_valid_arg=1)  # should be ok
     reveal_type(conf3, expected_text="Builds[(x: int, y: str, z: bool = False) -> C]")
 
-    # not specifying `populate_full_signature` should disable sig-inspection
+    # not specifying `populate_full_signature` should disable sig-reflection
     Conf_f_not_full2 = builds(f)
     conf4 = Conf_f_not_full2(not_a_valid_arg=1)  # should be ok
     reveal_type(conf4, expected_text="Builds[(x: int, y: str, z: bool = False) -> C]")
+
+    # Providing any *args directly in `builds` should distable sig-reflection
+    Conf_f_with_args = builds(f, 1, populate_full_signature=True)
+    conf5 = Conf_f_with_args()  # should be ok
+    reveal_type(conf5, expected_text="Builds[(x: int, y: str, z: bool = False) -> C]")
+
+    # Providing any **kwargs directly in `builds` should distable sig-reflection
+    Conf_f_with_kwargs = builds(f, x=1, populate_full_signature=True)
+    conf6 = Conf_f_with_kwargs()  # should be ok
+    reveal_type(conf6, expected_text="Builds[(x: int, y: str, z: bool = False) -> C]")
