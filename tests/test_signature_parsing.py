@@ -166,8 +166,8 @@ def test_builds_with_full_sig_mirrors_target_sig(
     assert expected_sig == actual_sig
 
     if not partial:
-        conf = Conf(x=-100)
-        assert conf.x == -100
+        conf = Conf(x="-100")
+        assert conf.x == "-100"
     else:
         # x should be excluded when partial=True and full-sig is populated
         conf = Conf()
@@ -565,3 +565,20 @@ def test_Counter():
         with pytest.raises(TypeError):
             # signature: Counter(iterable=None, /, **kwds)
             builds(Counter, [1], [2])
+
+
+def f_x(x: int):
+    return int
+
+
+def test_inheritance_populates_init_field():
+    Parent = make_config(x=1)
+    Conf1 = builds(f_x, populate_full_signature=True)
+    Conf2 = builds(f_x, populate_full_signature=True, builds_bases=(Parent,))
+
+    with pytest.raises(TypeError):
+        # x is missing
+        Conf1()  # type: ignore
+
+    # x is 'filled' via inheritance
+    Conf2()
