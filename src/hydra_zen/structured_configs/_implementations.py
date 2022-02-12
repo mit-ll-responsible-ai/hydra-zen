@@ -641,6 +641,7 @@ def builds(
 @overload
 def builds(
     hydra_target: Callable[P, R],
+    *,
     zen_partial: Literal[False] = False,
     zen_wrappers: ZenWrappers = tuple(),
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
