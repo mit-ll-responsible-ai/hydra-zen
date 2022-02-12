@@ -64,6 +64,10 @@ from ._value_conversion import ZEN_VALUE_CONVERSION
 
 _T = TypeVar("_T")
 _T2 = TypeVar("_T2", bound=Callable)
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
 ZenWrapper = Union[
     None,
     Builds[Callable[[_T2], _T2]],
@@ -613,10 +617,6 @@ def sanitized_field(
     )
 
 
-P = ParamSpec("P")
-R = TypeVar("R")
-
-
 # `builds(<t>, [*args], [**kwargs], zen_partial=False, populate_full_signature=False)`
 @overload
 def builds(
@@ -637,7 +637,7 @@ def builds(
 
 
 # `builds(<t>, zen_partial=False, populate_full_signature=True)`
-# -- without any user-specified args/kwargs for the target
+# -- without any user-specified args/kwargs or bases for the target
 @overload
 def builds(
     hydra_target: Callable[P, R],
@@ -648,7 +648,7 @@ def builds(
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     dataclass_name: Optional[str] = None,
-    builds_bases: Tuple[Type[_DataClass], ...] = (),
+    builds_bases: Tuple[()] = (),
     frozen: bool = False,
 ) -> Callable[P, Builds[Type[R]]]:  # pragma: no cover
     ...

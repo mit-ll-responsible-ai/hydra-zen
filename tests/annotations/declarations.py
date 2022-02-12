@@ -504,3 +504,9 @@ def check_populate_full_sig():
     Conf_f_with_kwargs = builds(f, x=1, populate_full_signature=True)
     conf6 = Conf_f_with_kwargs()  # should be ok
     reveal_type(conf6, expected_text="Builds[(x: int, y: str, z: bool = False) -> C]")
+
+    # Providing any bases in `builds` should distable sig-reflection
+    Parent = make_config(x=1)
+    Conf_f_with_base = builds(f, populate_full_signature=True, builds_bases=(Parent,))
+    conf7 = Conf_f_with_base()  # should be ok
+    reveal_type(conf7, expected_text="Builds[(x: int, y: str, z: bool = False) -> C]")
