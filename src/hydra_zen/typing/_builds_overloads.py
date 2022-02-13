@@ -121,7 +121,7 @@ def full_builds(  # type: ignore
     zen_partial=False,
     zen_wrappers=tuple(),
     zen_meta=None,
-    populate_full_signature=True,
+    populate_full_signature=True,  # updated default
     hydra_recursive=None,
     hydra_convert=None,
     frozen: bool = False,
@@ -230,7 +230,7 @@ def partial_builds(
 
 def partial_builds(  # type: ignore
     *pos_args,
-    zen_partial=True,
+    zen_partial=True,  # updated default
     zen_wrappers=tuple(),
     zen_meta=None,
     populate_full_signature=False,
@@ -240,5 +240,5 @@ def partial_builds(  # type: ignore
     builds_bases=(),
     dataclass_name=None,
     **kwargs_for_target,
-):  # pragma: no coer
+):  # pragma: no cover
     raise NotImplementedError()
