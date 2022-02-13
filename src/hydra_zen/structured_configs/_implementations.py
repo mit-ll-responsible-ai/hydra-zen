@@ -19,7 +19,6 @@ from enum import Enum
 from functools import wraps
 from itertools import chain
 from typing import (
-    TYPE_CHECKING,
     Any,
     Callable,
     Dict,
@@ -57,6 +56,7 @@ from hydra_zen.typing import (
     Partial,
     PartialBuilds,
     SupportedPrimitive,
+    ZenWrappers,
 )
 from hydra_zen.typing._implementations import DataClass, HasTarget, _DataClass
 
@@ -68,21 +68,6 @@ _T2 = TypeVar("_T2", bound=Callable)
 P = ParamSpec("P")
 R = TypeVar("R")
 
-ZenWrapper = Union[
-    None,
-    Builds[Callable[[_T2], _T2]],
-    PartialBuilds[Callable[[_T2], _T2]],
-    Just[Callable[[_T2], _T2]],
-    Type[Builds[Callable[[_T2], _T2]]],
-    Type[PartialBuilds[Callable[[_T2], _T2]]],
-    Type[Just[Callable[[_T2], _T2]]],
-    Callable[[_T2], _T2],
-    str,
-]
-if TYPE_CHECKING:  # pragma: no cover
-    ZenWrappers = Union[ZenWrapper, Sequence[ZenWrapper]]
-else:
-    ZenWrappers = TypeVar("ZenWrappers")
 
 # Hydra-specific fields
 _TARGET_FIELD_NAME: Final[str] = "_target_"

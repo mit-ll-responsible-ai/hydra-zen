@@ -5,6 +5,7 @@ from dataclasses import Field
 from enum import Enum
 from pathlib import Path
 from typing import (
+    TYPE_CHECKING,
     Any,
     Callable,
     ClassVar,
@@ -29,6 +30,7 @@ __all__ = [
     "Partial",
     "Importable",
     "SupportedPrimitive",
+    "ZenWrappers",
 ]
 
 
@@ -36,9 +38,11 @@ class EmptyDict(TypedDict):
     pass
 
 
-_T = TypeVar("_T", covariant=True)
+T = TypeVar("T", covariant=True)
 T2 = TypeVar("T2")
 T3 = TypeVar("T3")
+
+T4 = TypeVar("T4", bound=Callable)
 
 
 @runtime_checkable
@@ -76,18 +80,18 @@ class DataClass(_DataClass, Protocol):  # pragma: no cover
 
 
 @runtime_checkable
-class Builds(DataClass, Protocol[_T]):  # pragma: no cover
+class Builds(DataClass, Protocol[T]):  # pragma: no cover
     _target_: ClassVar[str]
 
 
 @runtime_checkable
-class Just(Builds, Protocol[_T]):  # pragma: no cover
+class Just(Builds, Protocol[T]):  # pragma: no cover
     path: ClassVar[str]  # interpolated string for importing obj
     _target_: ClassVar[Literal["hydra_zen.funcs.get_obj"]] = "hydra_zen.funcs.get_obj"
 
 
 @runtime_checkable
-class PartialBuilds(Builds, Protocol[_T]):  # pragma: no cover
+class PartialBuilds(Builds, Protocol[T]):  # pragma: no cover
     _target_: ClassVar[
         Literal["hydra_zen.funcs.zen_processing"]
     ] = "hydra_zen.funcs.zen_processing"
@@ -96,7 +100,7 @@ class PartialBuilds(Builds, Protocol[_T]):  # pragma: no cover
 
 
 @runtime_checkable
-class HydraPartialBuilds(Builds, Protocol[_T]):  # pragma: no cover
+class HydraPartialBuilds(Builds, Protocol[T]):  # pragma: no cover
     _partial_: ClassVar[Literal[True]] = True
 
 
@@ -144,3 +148,20 @@ SupportedPrimitive = Union[
     # Mapping is covariant only in value
     Mapping[Any, "SupportedPrimitive"],
 ]
+
+
+ZenWrapper = Union[
+    None,
+    Builds[Callable[[T4], T4]],
+    PartialBuilds[Callable[[T4], T4]],
+    Just[Callable[[T4], T4]],
+    Type[Builds[Callable[[T4], T4]]],
+    Type[PartialBuilds[Callable[[T4], T4]]],
+    Type[Just[Callable[[T4], T4]]],
+    Callable[[T4], T4],
+    str,
+]
+if TYPE_CHECKING:  # pragma: no cover
+    ZenWrappers = Union[ZenWrapper, Sequence[ZenWrapper]]
+else:
+    ZenWrappers = TypeVar("ZenWrappers")
