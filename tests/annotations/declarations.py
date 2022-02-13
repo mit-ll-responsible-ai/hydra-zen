@@ -33,6 +33,7 @@ from hydra_zen import (
     mutable_value,
 )
 from hydra_zen.typing import Builds, Partial
+from hydra_zen.typing._builds_overloads import full_builds, partial_builds
 from hydra_zen.typing._implementations import HydraPartialBuilds
 
 T = TypeVar("T")
@@ -510,3 +511,47 @@ def check_populate_full_sig():
     Conf_f_with_base = builds(f, populate_full_signature=True, builds_bases=(Parent,))
     conf7 = Conf_f_with_base()  # should be ok
     reveal_type(conf7, expected_text="Builds[(x: int, y: str, z: bool = False) -> C]")
+
+
+def check_full_builds():
+    def f(x: int, y: str, z: bool = False):
+        return 1
+
+    # type-checker should see default: `populate_full_signature=True`
+    Conf_f = full_builds(f)
+    Conf_f()  # type: ignore
+
+    # explicitly specifying `populate_full_signature=True` should produce
+    # same behaviore
+    Conf_f2 = full_builds(f, populate_full_signature=True)
+    Conf_f2()  # type: ignore
+
+    Conf_f3 = full_builds(f, zen_partial=True)
+    reveal_type(
+        Conf_f3,
+        expected_text="Type[PartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]]",
+    )
+    Conf_f3()
+
+
+def check_partial_builds():
+    def f(x: int, y: str, z: bool = False):
+        return 1
+
+    # type-checker should see default: `populate_full_signature=True`
+    Conf_f = partial_builds(f)
+    reveal_type(
+        Conf_f,
+        expected_text="Type[PartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]]",
+    )
+
+    # type-checker should see default: `populate_full_signature=True`
+    Conf_f2 = partial_builds(f, zen_partial=True)
+    reveal_type(
+        Conf_f2,
+        expected_text="Type[PartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]]",
+    )
+
+    # signature should be required
+    Conf_f3 = partial_builds(f, zen_partial=False, populate_full_signature=True)
+    Conf_f3()  # type: ignore
