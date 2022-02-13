@@ -555,3 +555,84 @@ def check_partial_builds():
     # signature should be required
     Conf_f3 = partial_builds(f, zen_partial=False, populate_full_signature=True)
     Conf_f3()  # type: ignore
+
+
+def check_make_custom_builds_no_args():
+    def f(x: int, y: str, z: bool = False):
+        return 1
+
+    builds_ = make_custom_builds_fn()
+    Conf = builds_(f)
+    Conf()  # should be OK
+
+    reveal_type(
+        Conf,
+        expected_text="Type[Builds[(x: int, y: str, z: bool = False) -> Literal[1]]]",
+    )
+
+    Parent = make_config(x=1)
+
+    # specifying parent should produce default `builds`
+    builds2 = make_custom_builds_fn(
+        populate_full_signature=True, builds_bases=(Parent,)
+    )
+
+    Conf2 = builds2(f)
+
+    reveal_type(
+        Conf2,
+        expected_text="Type[Builds[(x: int, y: str, z: bool = False) -> Literal[1]]]",
+    )
+
+
+def check_make_custom_builds_pop_sig():
+    def f(x: int, y: str, z: bool = False):
+        return 1
+
+    full_builds = make_custom_builds_fn(populate_full_signature=True)
+
+    Conf = full_builds(f)
+    Conf()  # type: ignore
+
+    reveal_type(
+        Conf,
+        expected_text="(x: int, y: str, z: bool = ...) -> Builds[Type[int]]",
+    )
+
+
+def check_make_custom_builds_partial():
+    def f(x: int, y: str, z: bool = False) -> int:
+        return 1
+
+    partial_builds = make_custom_builds_fn(zen_partial=True)
+
+    Conf = partial_builds(f)
+
+    reveal_type(
+        Conf,
+        expected_text="Type[PartialBuilds[(x: int, y: str, z: bool = False) -> int]]",
+    )
+
+    partial_builds2 = make_custom_builds_fn(
+        zen_partial=True, populate_full_signature=True
+    )
+
+    Conf2 = partial_builds2(f)
+
+    reveal_type(
+        Conf2,
+        expected_text="Type[PartialBuilds[(x: int, y: str, z: bool = False) -> int]]",
+    )
+
+    Parent = make_config(x=1)
+
+    partial_builds3 = make_custom_builds_fn(
+        zen_partial=True, builds_bases=(Parent,), populate_full_signature=True
+    )
+
+    Conf3 = partial_builds3(f)
+
+    reveal_type(
+        Conf3,
+        expected_text="Type[PartialBuilds[(x: int, y: str, z: bool = False) -> int]]",
+    )
