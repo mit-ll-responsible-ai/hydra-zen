@@ -15,7 +15,7 @@ chronological order. All previous releases should still be available on pip.
 ---------------------
 
 This release focuses on improving hydra-zen's type-annotations; it increases the 
-degree to which IDE's and static-analysis tools can infer information about common
+degree to which IDEs and static-analysis tools can infer information about common
 hydra-zen code patterns.
 
 It should be noted that hydra-zen leverages advanced typing features (e.g. recursive 
@@ -23,7 +23,7 @@ types) and that some type-checkers do not support these features yet. hydra-zen'
 annotations are validated by `pyright <https://github.com/microsoft/pyright>`_. Thus we recommend that users leverage pyright and pyright-based language servers in their 
 IDEs (e.g. using Pylance in VSCode) for the best experience.
 
-(A note to VSCode users: make sure to set `Type Checking Mode` to `basic` in your IDE -- it disabled by default!)
+(A note to VSCode users: make sure to set `Type Checking Mode` to `basic` in your IDE -- it is disabled by default!)
 
 
 Improvements
