@@ -56,7 +56,8 @@ pip install hydra-zen
 
 ## Contributing
 
-(Still working on these docs...)
+Please refer to [these docs](https://github.com/mit-ll-responsible-ai/hydra-zen/blob/main/CONTRIBUTING.md)
+
 
 ## Join the Discussion
 
