@@ -192,7 +192,7 @@
 
 
 <span class="k">def</span> <span class="nf">_store_config</span><span class="p">(</span>
-    <span class="n">cfg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataClass</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataClass</span><span class="p">],</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">],</span>
+    <span class="n">cfg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataClass</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataClass</span><span class="p">],</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
     <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;hydra_launch&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Stores configuration object in Hydra&#39;s ConfigStore.</span>

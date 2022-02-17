@@ -178,10 +178,10 @@
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">deque</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">deque</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># use this for runtime checks</span>
     <span class="n">MISSING</span><span class="p">,</span>
-    <span class="n">Field</span><span class="p">,</span>
+    <span class="n">Field</span> <span class="k">as</span> <span class="n">_Field</span><span class="p">,</span>
     <span class="n">InitVar</span><span class="p">,</span>
     <span class="n">dataclass</span><span class="p">,</span>
     <span class="n">field</span><span class="p">,</span>
@@ -236,12 +236,12 @@
     <span class="n">full_builds</span> <span class="k">as</span> <span class="n">_full_builds</span><span class="p">,</span>
     <span class="n">partial_builds</span> <span class="k">as</span> <span class="n">_partial_builds</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass</span><span class="p">,</span> <span class="n">HasTarget</span><span class="p">,</span> <span class="n">_DataClass</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass</span><span class="p">,</span> <span class="n">DataClass_</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">HasTarget</span>
 
 <span class="kn">from</span> <span class="nn">._value_conversion</span> <span class="kn">import</span> <span class="n">ZEN_VALUE_CONVERSION</span>
 
 <span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T&quot;</span><span class="p">)</span>
-<span class="n">_T2</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T2&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">)</span>
+<span class="n">_T2</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T2&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
 
 <span class="n">P</span> <span class="o">=</span> <span class="n">ParamSpec</span><span class="p">(</span><span class="s2">&quot;P&quot;</span><span class="p">)</span>
 <span class="n">R</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;R&quot;</span><span class="p">)</span>
@@ -282,7 +282,7 @@
 <span class="n">_builtin_function_or_method_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="nb">len</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_target</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_get_target</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_TARGET_FIELD_NAME</span><span class="p">)</span>
 
 
@@ -348,7 +348,7 @@
     <span class="k">return</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 
 
-<span class="n">Field_Entry</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">Field</span><span class="p">]</span>
+<span class="n">Field_Entry</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">Field</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
 
 
 <span class="c1"># Alternate form, from PEP proposal:</span>
@@ -370,10 +370,10 @@
 
 <div class="viewcode-block" id="hydrated_dataclass"><a class="viewcode-back" href="../../../generated/hydra_zen.hydrated_dataclass.html#hydra_zen.hydrated_dataclass">[docs]</a><span class="nd">@__dataclass_transform__</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">hydrated_dataclass</span><span class="p">(</span>
-    <span class="n">target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="n">target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
     <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(),</span>
+    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(),</span>
     <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -543,7 +543,7 @@
                 <span class="ow">and</span> <span class="ow">not</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_zen_&quot;</span><span class="p">)</span>
             <span class="p">}</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="k">return</span> <span class="n">builds</span><span class="p">(</span>
             <span class="n">target</span><span class="p">,</span>
@@ -631,24 +631,23 @@
             <span class="sa">f</span><span class="s2">&quot;`just(</span><span class="si">{</span><span class="n">obj</span><span class="si">}</span><span class="s2">)`: `obj` is not importable; it is missing the attributes `__module__` and/or `__qualname__`&quot;</span>
         <span class="p">)</span>
 
-    <span class="n">out_class</span> <span class="o">=</span> <span class="n">make_dataclass</span><span class="p">(</span>
-        <span class="p">(</span><span class="s2">&quot;Just_&quot;</span> <span class="o">+</span> <span class="n">_utils</span><span class="o">.</span><span class="n">safe_name</span><span class="p">(</span><span class="n">obj</span><span class="p">)),</span>
-        <span class="p">[</span>
-            <span class="p">(</span>
-                <span class="n">_TARGET_FIELD_NAME</span><span class="p">,</span>
-                <span class="nb">str</span><span class="p">,</span>
-                <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">get_obj</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="n">entry</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Field</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span>
+            <span class="n">_TARGET_FIELD_NAME</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">,</span>
+            <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">get_obj</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="p">),</span>
+        <span class="p">(</span>
+            <span class="s2">&quot;path&quot;</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">,</span>
+            <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span>
+                <span class="n">default</span><span class="o">=</span><span class="n">obj_path</span><span class="p">,</span>
+                <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="p">),</span>
-            <span class="p">(</span>
-                <span class="s2">&quot;path&quot;</span><span class="p">,</span>
-                <span class="nb">str</span><span class="p">,</span>
-                <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span>
-                    <span class="n">default</span><span class="o">=</span><span class="n">obj_path</span><span class="p">,</span>
-                    <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="p">),</span>
-            <span class="p">),</span>
-        <span class="p">],</span>
-    <span class="p">)</span>
+        <span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="n">out_class</span> <span class="o">=</span> <span class="n">make_dataclass</span><span class="p">((</span><span class="s2">&quot;Just_&quot;</span> <span class="o">+</span> <span class="n">_utils</span><span class="o">.</span><span class="n">safe_name</span><span class="p">(</span><span class="n">obj</span><span class="p">)),</span> <span class="n">entry</span><span class="p">)</span>
     <span class="n">out_class</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="p">(</span>
         <span class="sa">f</span><span class="s2">&quot;A structured config designed to return </span><span class="si">{</span><span class="n">obj</span><span class="si">}</span><span class="s2"> when it is instantiated by hydra&quot;</span>
     <span class="p">)</span>
@@ -659,7 +658,7 @@
 <span class="n">_KEY_ERROR_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;Configuring dictionary key:&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">_is_ufunc</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_is_ufunc</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="c1"># checks without importing numpy</span>
     <span class="n">numpy</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;numpy&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">numpy</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
@@ -752,20 +751,20 @@
 
 <span class="k">def</span> <span class="nf">sanitized_field</span><span class="p">(</span>
     <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-    <span class="n">init</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">init</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">allow_zen_conversion</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">error_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">field_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">_mutable_default_permitted</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
     <span class="n">type_value</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="n">type_value</span> <span class="ow">in</span> <span class="n">_utils</span><span class="o">.</span><span class="n">KNOWN_MUTABLE_TYPES</span>
         <span class="ow">and</span> <span class="n">type_value</span> <span class="ow">in</span> <span class="n">HYDRA_SUPPORTED_PRIMITIVES</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">_mutable_default_permitted</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Field</span><span class="p">,</span> <span class="n">mutable_value</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Field</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">mutable_value</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
 
         <span class="n">value</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="n">value</span><span class="p">)</span>
 
@@ -786,13 +785,13 @@
     <span class="n">hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
     <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SupportedPrimitive</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">_DataClass</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span>  <span class="c1"># pragma: no cover</span>
@@ -806,7 +805,7 @@
     <span class="n">hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SupportedPrimitive</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">],</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -824,13 +823,13 @@
     <span class="n">hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
     <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SupportedPrimitive</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">_DataClass</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span>  <span class="c1"># pragma: no cover</span>
@@ -843,13 +842,13 @@
     <span class="n">hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
     <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SupportedPrimitive</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">_DataClass</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span>  <span class="c1"># pragma: no cover</span>
@@ -862,13 +861,13 @@
     <span class="n">hydra_target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Importable</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]],</span>
     <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SupportedPrimitive</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">_DataClass</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
@@ -880,18 +879,22 @@
 
 
 <div class="viewcode-block" id="builds"><a class="viewcode-back" href="../../../generated/hydra_zen.builds.html#hydra_zen.builds">[docs]</a><span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-    <span class="o">*</span><span class="n">pos_args</span><span class="p">,</span>
-    <span class="n">zen_partial</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">zen_wrappers</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(),</span>
-    <span class="n">zen_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">hydra_recursive</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">hydra_convert</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Importable</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="n">SupportedPrimitive</span><span class="p">],</span>
+    <span class="n">zen_partial</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(),</span>
+    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SupportedPrimitive</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">builds_bases</span><span class="o">=</span><span class="p">(),</span>
-    <span class="n">dataclass_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">,</span>
-<span class="p">):</span>
+    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
+    <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
+    <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
+    <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
+    <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">R</span><span class="p">]]],</span>
+<span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;builds(hydra_target, /, *pos_args, zen_partial=False, zen_meta=None,</span>
 <span class="sd">    hydra_recursive=None, populate_full_signature=False, hydra_convert=None,</span>
 <span class="sd">    frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)</span>
@@ -1303,7 +1306,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">zen_wrappers</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">zen_wrappers</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">zen_wrappers</span> <span class="o">=</span> <span class="p">(</span><span class="n">zen_wrappers</span><span class="p">,)</span>
 
-        <span class="n">validated_wrappers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Builds</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">validated_wrappers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">wrapper</span> <span class="ow">in</span> <span class="n">zen_wrappers</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">wrapper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">continue</span>
@@ -1431,7 +1434,9 @@
                 <span class="n">target_field</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="p">(</span>
                         <span class="n">_ZEN_WRAPPERS_FIELD_NAME</span><span class="p">,</span>
-                        <span class="n">Union</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Builds</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Builds</span><span class="p">],</span> <span class="o">...</span><span class="p">]],</span>
+                        <span class="n">Union</span><span class="p">[</span>
+                            <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="o">...</span><span class="p">]</span>
+                        <span class="p">],</span>
                         <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">validated_wrappers</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
                     <span class="p">),</span>  <span class="c1"># type: ignore</span>
                 <span class="p">)</span>
@@ -1439,7 +1444,9 @@
                 <span class="n">target_field</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="p">(</span>
                         <span class="n">_ZEN_WRAPPERS_FIELD_NAME</span><span class="p">,</span>
-                        <span class="n">Union</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Builds</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Builds</span><span class="p">],</span> <span class="o">...</span><span class="p">]],</span>
+                        <span class="n">Union</span><span class="p">[</span>
+                            <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="o">...</span><span class="p">]</span>
+                        <span class="p">],</span>
                         <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">validated_wrappers</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
                     <span class="p">),</span>  <span class="c1"># type: ignore</span>
                 <span class="p">)</span>
@@ -1564,7 +1571,7 @@
         <span class="ne">NameError</span><span class="p">,</span>  <span class="c1"># Unresolvable forward reference</span>
         <span class="ne">AttributeError</span><span class="p">,</span>  <span class="c1"># Class doesn&#39;t have &quot;__new__&quot; or &quot;__init__&quot;</span>
     <span class="p">):</span>
-        <span class="n">type_hints</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span>
+        <span class="n">type_hints</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="n">sig_by_kind</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">_POSITIONAL_ONLY</span><span class="p">:</span> <span class="p">[],</span>
@@ -1806,7 +1813,9 @@
             <span class="k">del</span> <span class="n">field_</span>
 
     <span class="c1"># sanitize all types and configured values</span>
-    <span class="n">sanitized_base_fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Field</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">sanitized_base_fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span>
+        <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Field</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">base_fields</span><span class="p">:</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -1817,7 +1826,7 @@
             <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">,</span> <span class="n">item</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Field</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">_Field</span><span class="p">):</span>
                 <span class="n">_field</span> <span class="o">=</span> <span class="n">sanitized_field</span><span class="p">(</span>
                     <span class="n">value</span><span class="p">,</span>
                     <span class="n">error_prefix</span><span class="o">=</span><span class="n">BUILDS_ERROR_PREFIX</span><span class="p">,</span>
@@ -1900,11 +1909,11 @@
 <span class="c1"># with omegaconf containers.</span>
 <span class="c1">#</span>
 <span class="c1"># These are not part of the public API for now, but they may be in the future.</span>
-<span class="k">def</span> <span class="nf">is_builds</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">Builds</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">is_builds</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
     <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_TARGET_FIELD_NAME</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">is_just</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">Just</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">is_just</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
     <span class="k">if</span> <span class="n">is_builds</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_JUST_FIELD_NAME</span><span class="p">):</span>
         <span class="n">attr</span> <span class="o">=</span> <span class="n">_get_target</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">attr</span> <span class="o">==</span> <span class="n">_get_target</span><span class="p">(</span><span class="n">Just</span><span class="p">)</span> <span class="ow">or</span> <span class="n">attr</span> <span class="ow">is</span> <span class="n">get_obj</span><span class="p">:</span>
@@ -1930,7 +1939,7 @@
     <span class="k">return</span> <span class="kc">False</span>
 
 
-<span class="k">def</span> <span class="nf">uses_zen_processing</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">Builds</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">uses_zen_processing</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">is_builds</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_ZEN_TARGET_FIELD_NAME</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="n">attr</span> <span class="o">=</span> <span class="n">_get_target</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -1939,7 +1948,7 @@
     <span class="k">return</span> <span class="kc">True</span>
 
 
-<span class="k">def</span> <span class="nf">is_partial_builds</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">is_partial_builds</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="c1"># check if partial&#39;d config via Hydra</span>
         <span class="n">HYDRA_SUPPORTS_PARTIAL</span>
@@ -1973,7 +1982,7 @@
     <span class="o">...</span>
 
 
-<div class="viewcode-block" id="get_target"><a class="viewcode-back" href="../../../generated/hydra_zen.get_target.html#hydra_zen.get_target">[docs]</a><span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<div class="viewcode-block" id="get_target"><a class="viewcode-back" href="../../../generated/hydra_zen.get_target.html#hydra_zen.get_target">[docs]</a><span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">HasTarget</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the target-object from a targeted config.</span>
 
@@ -2071,13 +2080,13 @@
 <span class="k">def</span> <span class="nf">make_custom_builds_fn</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">__b</span><span class="p">:</span> <span class="n">_T2</span> <span class="o">=</span> <span class="n">builds</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T2</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="o">...</span>
@@ -2087,7 +2096,7 @@
 <span class="k">def</span> <span class="nf">make_custom_builds_fn</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>  <span class="c1"># &lt;- special case</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -2103,13 +2112,13 @@
 <span class="k">def</span> <span class="nf">make_custom_builds_fn</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">__b</span><span class="p">:</span> <span class="n">_T2</span> <span class="o">=</span> <span class="n">builds</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T2</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="o">...</span>
@@ -2119,13 +2128,13 @@
 <span class="k">def</span> <span class="nf">make_custom_builds_fn</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>  <span class="c1"># &lt;- special case</span>
-    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">__b</span><span class="p">:</span> <span class="n">_T2</span> <span class="o">=</span> <span class="n">_partial_builds</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T2</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="o">...</span>
@@ -2133,18 +2142,18 @@
 
 <div class="viewcode-block" id="make_custom_builds_fn"><a class="viewcode-back" href="../../../generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn">[docs]</a><span class="k">def</span> <span class="nf">make_custom_builds_fn</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">zen_partial</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">zen_wrappers</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(),</span>
-    <span class="n">zen_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">hydra_recursive</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">hydra_convert</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">frozen</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">builds_bases</span><span class="o">=</span><span class="p">(),</span>
+    <span class="n">zen_partial</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(),</span>
+    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
     <span class="c1"># This is the easiest way to get static tooling to see the output</span>
     <span class="c1"># as `builds`.</span>
-    <span class="n">__b</span><span class="o">=</span><span class="n">builds</span><span class="p">,</span>
-<span class="p">):</span>
+    <span class="n">__b</span><span class="p">:</span> <span class="n">_T2</span> <span class="o">=</span> <span class="n">builds</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T2</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Returns the `builds` function, but with customized default values.</span>
 
 <span class="sd">    E.g. ``make_custom_builds_fn(hydra_convert=&#39;all&#39;)`` will return a version</span>
@@ -2255,8 +2264,8 @@
     <span class="n">builds</span><span class="p">(</span><span class="n">builds</span><span class="p">,</span> <span class="o">**</span><span class="n">_new_defaults</span><span class="p">)</span>
 
     <span class="nd">@wraps</span><span class="p">(</span><span class="n">builds</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">merged_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+        <span class="n">merged_kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">merged_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_new_defaults</span><span class="p">)</span>
         <span class="n">merged_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">builds</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">merged_kwargs</span><span class="p">)</span>
@@ -2306,11 +2315,11 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">hint</span><span class="p">:</span> <span class="nb">type</span> <span class="o">=</span> <span class="n">Any</span>
-    <span class="n">default</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportedPrimitive</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">NOTHING</span><span class="p">]]</span> <span class="o">=</span> <span class="n">NOTHING</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportedPrimitive</span><span class="p">,</span> <span class="n">Field</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">NOTHING</span><span class="p">)</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">NOTHING</span><span class="p">]]</span> <span class="o">=</span> <span class="n">NOTHING</span>
     <span class="n">_permit_default_factory</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_permit_default_factory</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_permit_default_factory</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NOTHING</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`ZenField.name` expects a string, got: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -2329,7 +2338,7 @@
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Config&quot;</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">_DataClass</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
+    <span class="n">bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
     <span class="o">**</span><span class="n">fields_as_kwargs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportedPrimitive</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataClass</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -2660,14 +2669,14 @@
     <span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_repack_zenfield</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">ZenField</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">_DataClass</span><span class="p">,</span> <span class="o">...</span><span class="p">]):</span>
+<span class="k">def</span> <span class="nf">_repack_zenfield</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">ZenField</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">,</span> <span class="o">...</span><span class="p">]):</span>
     <span class="n">default</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">default</span>
 
     <span class="k">if</span> <span class="p">(</span>
         <span class="n">PATCH_OMEGACONF_830</span>
         <span class="ow">and</span> <span class="n">bases</span>
         <span class="ow">and</span> <span class="ow">not</span> <span class="n">_utils</span><span class="o">.</span><span class="n">mutable_default_permitted</span><span class="p">(</span><span class="n">bases</span><span class="p">,</span> <span class="n">field_name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="n">Field</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="n">_Field</span><span class="p">)</span>
         <span class="ow">and</span> <span class="n">default</span><span class="o">.</span><span class="n">default_factory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">MISSING</span>
     <span class="p">):</span>
         <span class="k">return</span> <span class="n">ZenField</span><span class="p">(</span>
