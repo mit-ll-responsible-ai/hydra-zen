@@ -6,7 +6,7 @@ Simple helper functions used to implement `just` and `builds`. This module is de
 that these functions have a legible module-path when they appear in configuration files.
 """
 import functools as _functools
-import typing as _typing
+import typing as _tp
 
 from hydra._internal import utils as _hydra_internal_utils
 from hydra.utils import log as _log
@@ -18,24 +18,22 @@ from hydra_zen.typing import Partial as _Partial
 
 __all__ = ["partial", "get_obj", "zen_processing"]
 
-_T = _typing.TypeVar("_T")
-_WrapperConf = _typing.Union[
-    str, _typing.Callable[[_typing.Callable], _typing.Callable]
-]
+_T = _tp.TypeVar("_T")
+
+_Wrapper = _tp.Callable[[_tp.Callable[..., _tp.Any]], _tp.Callable[..., _tp.Any]]
+_WrapperConf = _tp.Union[str, _Wrapper]
 
 
 def partial(
-    *args: _typing.Any,
-    _partial_target_: _typing.Callable[..., _T],
-    **kwargs: _typing.Any,
+    *args: _tp.Any,
+    _partial_target_: _tp.Callable[..., _T],
+    **kwargs: _tp.Any,
 ) -> _Partial[_T]:
     """Equivalent to ``functools.partial`` but provides a named parameter for the callable."""
-    return _typing.cast(
-        _Partial[_T], _functools.partial(_partial_target_, *args, **kwargs)
-    )
+    return _tp.cast(_Partial[_T], _functools.partial(_partial_target_, *args, **kwargs))
 
 
-def get_obj(*, path: str) -> _typing.Union[type, _typing.Callable[..., _typing.Any]]:
+def get_obj(*, path: str) -> _tp.Union[type, _tp.Callable[..., _tp.Any]]:
     """Imports an object given the specified path."""
     try:
         cl = _hydra_internal_utils._locate(path)
@@ -46,24 +44,20 @@ def get_obj(*, path: str) -> _typing.Union[type, _typing.Callable[..., _typing.A
 
 
 def zen_processing(
-    *args,
+    *args: _tp.Any,
     _zen_target: str,
     _zen_partial: bool = False,
-    _zen_exclude: _typing.Sequence[str] = tuple(),
-    _zen_wrappers: _typing.Union[
-        _WrapperConf, _typing.Sequence[_WrapperConf]
-    ] = tuple(),
-    **kwargs,
-):
-    if isinstance(_zen_wrappers, str) or not isinstance(
-        _zen_wrappers, _typing.Sequence
-    ):
-        unresolved_wrappers: _typing.Sequence[_WrapperConf] = (_zen_wrappers,)
+    _zen_exclude: _tp.Sequence[str] = tuple(),
+    _zen_wrappers: _tp.Union[_WrapperConf, _tp.Sequence[_WrapperConf]] = tuple(),
+    **kwargs: _tp.Any,
+) -> _tp.Any:
+    if isinstance(_zen_wrappers, str) or not isinstance(_zen_wrappers, _tp.Sequence):
+        unresolved_wrappers: _tp.Sequence[_WrapperConf] = (_zen_wrappers,)
     else:
-        unresolved_wrappers: _typing.Sequence[_WrapperConf] = _zen_wrappers
+        unresolved_wrappers: _tp.Sequence[_WrapperConf] = _zen_wrappers
     del _zen_wrappers
 
-    resolved_wrappers = []
+    resolved_wrappers: _tp.List[_Wrapper] = []
 
     for _unresolved in unresolved_wrappers:
         if _unresolved is None:

@@ -4,10 +4,10 @@ import functools
 import inspect
 import sys
 import warnings
-from collections import Counter, defaultdict, deque
-from dataclasses import (
+from collections import Counter, deque
+from dataclasses import (  # use this for runtime checks
     MISSING,
-    Field,
+    Field as _Field,
     InitVar,
     dataclass,
     field,
@@ -62,12 +62,12 @@ from hydra_zen.typing._builds_overloads import (
     full_builds as _full_builds,
     partial_builds as _partial_builds,
 )
-from hydra_zen.typing._implementations import DataClass, HasTarget, _DataClass
+from hydra_zen.typing._implementations import DataClass, DataClass_, Field, HasTarget
 
 from ._value_conversion import ZEN_VALUE_CONVERSION
 
 _T = TypeVar("_T")
-_T2 = TypeVar("_T2", bound=Callable)
+_T2 = TypeVar("_T2", bound=Callable[..., Any])
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -108,7 +108,7 @@ _VAR_KEYWORD: Final = inspect.Parameter.VAR_KEYWORD
 _builtin_function_or_method_type = type(len)
 
 
-def _get_target(x):
+def _get_target(x: Any):
     return getattr(x, _TARGET_FIELD_NAME)
 
 
@@ -174,7 +174,7 @@ def mutable_value(x: _T) -> _T:
     return field(default_factory=lambda: cast(x))
 
 
-Field_Entry = Tuple[str, type, Field]
+Field_Entry = Tuple[str, type, Field[Any]]
 
 
 # Alternate form, from PEP proposal:
@@ -196,10 +196,10 @@ def __dataclass_transform__(
 
 @__dataclass_transform__()
 def hydrated_dataclass(
-    target: Callable,
+    target: Callable[..., Any],
     *pos_args: SupportedPrimitive,
     zen_partial: bool = False,
-    zen_wrappers: ZenWrappers = tuple(),
+    zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
@@ -369,7 +369,7 @@ def hydrated_dataclass(
                 and not f.name.startswith("_zen_")
             }
         else:
-            kwargs = {}
+            kwargs: Dict[str, Any] = {}
 
         return builds(
             target,
@@ -457,24 +457,23 @@ def just(obj: Importable) -> Type[Just[Importable]]:
             f"`just({obj})`: `obj` is not importable; it is missing the attributes `__module__` and/or `__qualname__`"
         )
 
-    out_class = make_dataclass(
-        ("Just_" + _utils.safe_name(obj)),
-        [
-            (
-                _TARGET_FIELD_NAME,
-                str,
-                _utils.field(default=_utils.get_obj_path(get_obj), init=False),
+    entry: List[Tuple[Any, Any, Field[Any]]] = [
+        (
+            _TARGET_FIELD_NAME,
+            str,
+            _utils.field(default=_utils.get_obj_path(get_obj), init=False),
+        ),
+        (
+            "path",
+            str,
+            _utils.field(
+                default=obj_path,
+                init=False,
             ),
-            (
-                "path",
-                str,
-                _utils.field(
-                    default=obj_path,
-                    init=False,
-                ),
-            ),
-        ],
-    )
+        ),
+    ]
+
+    out_class = make_dataclass(("Just_" + _utils.safe_name(obj)), entry)
     out_class.__doc__ = (
         f"A structured config designed to return {obj} when it is instantiated by hydra"
     )
@@ -485,7 +484,7 @@ def just(obj: Importable) -> Type[Just[Importable]]:
 _KEY_ERROR_PREFIX = "Configuring dictionary key:"
 
 
-def _is_ufunc(value) -> bool:
+def _is_ufunc(value: Any) -> bool:
     # checks without importing numpy
     numpy = sys.modules.get("numpy")
     if numpy is None:  # pragma: no cover
@@ -578,20 +577,20 @@ def sanitize_collection(x: _T) -> _T:
 
 def sanitized_field(
     value: Any,
-    init=True,
+    init: bool = True,
     allow_zen_conversion: bool = True,
     *,
     error_prefix: str = "",
     field_name: str = "",
     _mutable_default_permitted: bool = True,
-) -> Field:
+) -> Field[Any]:
     type_value = type(value)
     if (
         type_value in _utils.KNOWN_MUTABLE_TYPES
         and type_value in HYDRA_SUPPORTED_PRIMITIVES
     ):
         if _mutable_default_permitted:
-            return cast(Field, mutable_value(value))
+            return cast(Field[Any], mutable_value(value))
 
         value = builds(type(value), value)
 
@@ -612,13 +611,13 @@ def builds(
     hydra_target: Importable,
     *pos_args: SupportedPrimitive,
     zen_partial: Literal[False] = ...,
-    zen_wrappers: ZenWrappers = ...,
+    zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
     populate_full_signature: Literal[False] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     dataclass_name: Optional[str] = ...,
-    builds_bases: Tuple[Type[_DataClass], ...] = ...,
+    builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Type[Builds[Importable]]:  # pragma: no cover
@@ -632,7 +631,7 @@ def builds(
     hydra_target: Callable[P, R],
     *,
     zen_partial: Literal[False] = ...,
-    zen_wrappers: ZenWrappers = ...,
+    zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
     populate_full_signature: Literal[True],
     hydra_recursive: Optional[bool] = ...,
@@ -650,13 +649,13 @@ def builds(
     hydra_target: Importable,
     *pos_args: SupportedPrimitive,
     zen_partial: Literal[False] = ...,
-    zen_wrappers: ZenWrappers = ...,
+    zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
     populate_full_signature: bool = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     dataclass_name: Optional[str] = ...,
-    builds_bases: Tuple[Type[_DataClass], ...] = ...,
+    builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Type[Builds[Importable]]:  # pragma: no cover
@@ -669,13 +668,13 @@ def builds(
     hydra_target: Importable,
     *pos_args: SupportedPrimitive,
     zen_partial: Literal[True] = ...,
-    zen_wrappers: ZenWrappers = ...,
+    zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
     populate_full_signature: bool = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     dataclass_name: Optional[str] = ...,
-    builds_bases: Tuple[Type[_DataClass], ...] = ...,
+    builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Type[PartialBuilds[Importable]]:  # pragma: no cover
@@ -688,13 +687,13 @@ def builds(
     hydra_target: Union[Importable, Callable[P, R]],
     *pos_args: SupportedPrimitive,
     zen_partial: bool = ...,
-    zen_wrappers: ZenWrappers = ...,
+    zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
     populate_full_signature: bool = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     dataclass_name: Optional[str] = ...,
-    builds_bases: Tuple[Type[_DataClass], ...] = ...,
+    builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Union[
@@ -706,18 +705,22 @@ def builds(
 
 
 def builds(
-    *pos_args,
-    zen_partial=False,
-    zen_wrappers=tuple(),
-    zen_meta=None,
-    populate_full_signature=False,
-    hydra_recursive=None,
-    hydra_convert=None,
+    *pos_args: Union[Importable, Callable[P, R], SupportedPrimitive],
+    zen_partial: bool = False,
+    zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
+    zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
+    populate_full_signature: bool = False,
+    hydra_recursive: Optional[bool] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     frozen: bool = False,
-    builds_bases=(),
-    dataclass_name=None,
-    **kwargs_for_target,
-):
+    builds_bases: Tuple[Type[DataClass_], ...] = (),
+    dataclass_name: Optional[str] = None,
+    **kwargs_for_target: SupportedPrimitive,
+) -> Union[
+    Type[Builds[Importable]],
+    Type[PartialBuilds[Importable]],
+    Callable[P, Builds[Type[R]]],
+]:
     """builds(hydra_target, /, *pos_args, zen_partial=False, zen_meta=None,
     hydra_recursive=None, populate_full_signature=False, hydra_convert=None,
     frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
@@ -1129,7 +1132,7 @@ def builds(
         if not isinstance(zen_wrappers, Sequence) or isinstance(zen_wrappers, str):
             zen_wrappers = (zen_wrappers,)
 
-        validated_wrappers: Sequence[Union[str, Builds]] = []
+        validated_wrappers: Sequence[Union[str, Builds[Any]]] = []
         for wrapper in zen_wrappers:
             if wrapper is None:
                 continue
@@ -1257,7 +1260,9 @@ def builds(
                 target_field.append(
                     (
                         _ZEN_WRAPPERS_FIELD_NAME,
-                        Union[Union[str, Builds], Tuple[Union[str, Builds], ...]],
+                        Union[
+                            Union[str, Builds[Any]], Tuple[Union[str, Builds[Any]], ...]
+                        ],
                         _utils.field(default=validated_wrappers[0], init=False),
                     ),  # type: ignore
                 )
@@ -1265,7 +1270,9 @@ def builds(
                 target_field.append(
                     (
                         _ZEN_WRAPPERS_FIELD_NAME,
-                        Union[Union[str, Builds], Tuple[Union[str, Builds], ...]],
+                        Union[
+                            Union[str, Builds[Any]], Tuple[Union[str, Builds[Any]], ...]
+                        ],
                         _utils.field(default=validated_wrappers, init=False),
                     ),  # type: ignore
                 )
@@ -1390,7 +1397,7 @@ def builds(
         NameError,  # Unresolvable forward reference
         AttributeError,  # Class doesn't have "__new__" or "__init__"
     ):
-        type_hints = defaultdict(lambda: Any)
+        type_hints: Dict[str, Any] = {}
 
     sig_by_kind: Dict[Any, List[inspect.Parameter]] = {
         _POSITIONAL_ONLY: [],
@@ -1632,7 +1639,9 @@ def builds(
             del field_
 
     # sanitize all types and configured values
-    sanitized_base_fields: List[Union[Tuple[str, Any], Tuple[str, Any, Field]]] = []
+    sanitized_base_fields: List[
+        Union[Tuple[str, Any], Tuple[str, Any, Field[Any]]]
+    ] = []
 
     for item in base_fields:
         name = item[0]
@@ -1643,7 +1652,7 @@ def builds(
             assert len(item) == 3, item
             value = item[-1]
 
-            if not isinstance(value, Field):
+            if not isinstance(value, _Field):
                 _field = sanitized_field(
                     value,
                     error_prefix=BUILDS_ERROR_PREFIX,
@@ -1726,11 +1735,11 @@ def builds(
 # with omegaconf containers.
 #
 # These are not part of the public API for now, but they may be in the future.
-def is_builds(x: Any) -> TypeGuard[Builds]:
+def is_builds(x: Any) -> TypeGuard[Builds[Any]]:
     return hasattr(x, _TARGET_FIELD_NAME)
 
 
-def is_just(x: Any) -> TypeGuard[Just]:
+def is_just(x: Any) -> TypeGuard[Just[Any]]:
     if is_builds(x) and hasattr(x, _JUST_FIELD_NAME):
         attr = _get_target(x)
         if attr == _get_target(Just) or attr is get_obj:
@@ -1756,7 +1765,7 @@ def _is_old_partial_builds(x: Any) -> bool:  # pragma: no cover
     return False
 
 
-def uses_zen_processing(x: Any) -> TypeGuard[Builds]:
+def uses_zen_processing(x: Any) -> TypeGuard[Builds[Any]]:
     if not is_builds(x) or not hasattr(x, _ZEN_TARGET_FIELD_NAME):
         return False
     attr = _get_target(x)
@@ -1765,7 +1774,7 @@ def uses_zen_processing(x: Any) -> TypeGuard[Builds]:
     return True
 
 
-def is_partial_builds(x: Any) -> TypeGuard[PartialBuilds]:
+def is_partial_builds(x: Any) -> TypeGuard[PartialBuilds[Any]]:
     return (
         # check if partial'd config via Hydra
         HYDRA_SUPPORTS_PARTIAL
@@ -1799,7 +1808,7 @@ def get_target(obj: HasTarget) -> Any:  # pragma: no cover
     ...
 
 
-def get_target(obj):
+def get_target(obj: HasTarget) -> Any:
     """
     Returns the target-object from a targeted config.
 
@@ -1897,13 +1906,13 @@ del _builds_sig
 def make_custom_builds_fn(
     *,
     zen_partial: Literal[False] = ...,
-    zen_wrappers: ZenWrappers = ...,
+    zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
     populate_full_signature: Literal[False] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
-    builds_bases: Tuple[Any, ...] = ...,
+    builds_bases: Tuple[Type[DataClass_], ...] = ...,
     __b: _T2 = builds,
 ) -> _T2:  # pragma: no cover
     ...
@@ -1913,7 +1922,7 @@ def make_custom_builds_fn(
 def make_custom_builds_fn(
     *,
     zen_partial: Literal[False] = ...,
-    zen_wrappers: ZenWrappers = ...,
+    zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
     populate_full_signature: Literal[True] = ...,  # <- special case
     hydra_recursive: Optional[bool] = ...,
@@ -1929,13 +1938,13 @@ def make_custom_builds_fn(
 def make_custom_builds_fn(
     *,
     zen_partial: Literal[False] = ...,
-    zen_wrappers: ZenWrappers = ...,
+    zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
     populate_full_signature: Literal[True] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
-    builds_bases: Tuple[Any, ...] = ...,
+    builds_bases: Tuple[Type[DataClass_], ...] = ...,
     __b: _T2 = builds,
 ) -> _T2:  # pragma: no cover
     ...
@@ -1945,13 +1954,13 @@ def make_custom_builds_fn(
 def make_custom_builds_fn(
     *,
     zen_partial: Literal[True] = ...,  # <- special case
-    zen_wrappers: ZenWrappers = ...,
+    zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
     populate_full_signature: bool = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
-    builds_bases: Tuple[Any, ...] = ...,
+    builds_bases: Tuple[Type[DataClass_], ...] = ...,
     __b: _T2 = _partial_builds,
 ) -> _T2:  # pragma: no cover
     ...
@@ -1959,18 +1968,18 @@ def make_custom_builds_fn(
 
 def make_custom_builds_fn(
     *,
-    zen_partial=False,
-    zen_wrappers=tuple(),
-    zen_meta=None,
-    populate_full_signature=False,
-    hydra_recursive=None,
-    hydra_convert=None,
-    frozen=False,
-    builds_bases=(),
+    zen_partial: bool = False,
+    zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
+    zen_meta: Optional[Mapping[str, Any]] = None,
+    populate_full_signature: bool = False,
+    hydra_recursive: Optional[bool] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    frozen: bool = False,
+    builds_bases: Tuple[Type[DataClass_], ...] = (),
     # This is the easiest way to get static tooling to see the output
     # as `builds`.
-    __b=builds,
-):
+    __b: _T2 = builds,
+) -> _T2:
     """Returns the `builds` function, but with customized default values.
 
     E.g. ``make_custom_builds_fn(hydra_convert='all')`` will return a version
@@ -2081,8 +2090,8 @@ def make_custom_builds_fn(
     builds(builds, **_new_defaults)
 
     @wraps(builds)
-    def wrapped(*args, **kwargs):
-        merged_kwargs = {}
+    def wrapped(*args: Any, **kwargs: Any):
+        merged_kwargs: Dict[str, Any] = {}
         merged_kwargs.update(_new_defaults)
         merged_kwargs.update(kwargs)
         return builds(*args, **merged_kwargs)
@@ -2132,11 +2141,11 @@ class ZenField:
     """
 
     hint: type = Any
-    default: Union[SupportedPrimitive, Field, Type[NOTHING]] = NOTHING
+    default: Union[SupportedPrimitive, Field[Any]] = _utils.field(default=NOTHING)
     name: Union[str, Type[NOTHING]] = NOTHING
     _permit_default_factory: InitVar[bool] = True
 
-    def __post_init__(self, _permit_default_factory):
+    def __post_init__(self, _permit_default_factory: bool) -> None:
         if not isinstance(self.name, str):
             if self.name is not NOTHING:
                 raise TypeError(f"`ZenField.name` expects a string, got: {self.name}")
@@ -2155,7 +2164,7 @@ def make_config(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     config_name: str = "Config",
     frozen: bool = False,
-    bases: Tuple[Type[_DataClass], ...] = (),
+    bases: Tuple[Type[DataClass_], ...] = (),
     **fields_as_kwargs: Union[SupportedPrimitive, ZenField],
 ) -> Type[DataClass]:
     """
@@ -2486,14 +2495,14 @@ def make_config(
     )
 
 
-def _repack_zenfield(value: ZenField, name: str, bases: Tuple[_DataClass, ...]):
+def _repack_zenfield(value: ZenField, name: str, bases: Tuple[DataClass_, ...]):
     default = value.default
 
     if (
         PATCH_OMEGACONF_830
         and bases
         and not _utils.mutable_default_permitted(bases, field_name=name)
-        and isinstance(default, Field)
+        and isinstance(default, _Field)
         and default.default_factory is not MISSING
     ):
         return ZenField(

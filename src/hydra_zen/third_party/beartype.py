@@ -1,13 +1,13 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import inspect
-from typing import Callable, TypeVar, cast
+from typing import Any, Callable, TypeVar, cast
 
 import beartype as bt
 
 from hydra_zen._utils.coerce import coerce_sequences
 
-_T = TypeVar("_T", bound=Callable)
+_T = TypeVar("_T", bound=Callable[..., Any])
 
 __all__ = ["validates_with_beartype"]
 

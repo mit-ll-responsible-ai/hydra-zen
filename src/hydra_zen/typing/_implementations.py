@@ -1,7 +1,6 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
-from dataclasses import Field
 from enum import Enum
 from pathlib import Path
 from typing import (
@@ -11,9 +10,12 @@ from typing import (
     ClassVar,
     Dict,
     FrozenSet,
+    Generic,
     Mapping,
     NewType,
+    Optional,
     Sequence,
+    Set,
     Tuple,
     Type,
     TypeVar,
@@ -42,7 +44,22 @@ T = TypeVar("T", covariant=True)
 T2 = TypeVar("T2")
 T3 = TypeVar("T3")
 
-T4 = TypeVar("T4", bound=Callable)
+T4 = TypeVar("T4", bound=Callable[..., Any])
+
+if TYPE_CHECKING:  # pragma: no cover
+    from dataclasses import Field  # provided by typestub but not generic at runtime
+else:
+
+    class Field(Protocol[T2]):  # pragma: no cover
+        name: str
+        type: Type[T2]
+        default: T2
+        default_factory: Callable[[], T2]
+        repr: bool
+        hash: Optional[bool]
+        init: bool
+        compare: bool
+        metadata: Mapping[str, Any]
 
 
 @runtime_checkable
@@ -63,13 +80,13 @@ class Partial(Protocol[T2]):
 InterpStr = NewType("InterpStr", str)
 
 
-class _DataClass(Protocol):  # pragma: no cover
+class DataClass_(Protocol):  # pragma: no cover
     # doesn't provide __init__, __getattribute__, etc.
-    __dataclass_fields__: ClassVar[Dict[str, Field]]
+    __dataclass_fields__: ClassVar[Dict[str, Field[Any]]]
 
 
-class DataClass(_DataClass, Protocol):  # pragma: no cover
-    def __init__(self, *args, **kwargs) -> None:
+class DataClass(DataClass_, Protocol):  # pragma: no cover
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         ...
 
     def __getattribute__(self, __name: str) -> Any:
@@ -85,13 +102,13 @@ class Builds(DataClass, Protocol[T]):  # pragma: no cover
 
 
 @runtime_checkable
-class Just(Builds, Protocol[T]):  # pragma: no cover
+class Just(Builds[T], Protocol[T]):  # pragma: no cover
     path: ClassVar[str]  # interpolated string for importing obj
     _target_: ClassVar[Literal["hydra_zen.funcs.get_obj"]] = "hydra_zen.funcs.get_obj"
 
 
 @runtime_checkable
-class PartialBuilds(Builds, Protocol[T]):  # pragma: no cover
+class PartialBuilds(Builds[T], Protocol[T]):  # pragma: no cover
     _target_: ClassVar[
         Literal["hydra_zen.funcs.zen_processing"]
     ] = "hydra_zen.funcs.zen_processing"
@@ -100,7 +117,7 @@ class PartialBuilds(Builds, Protocol[T]):  # pragma: no cover
 
 
 @runtime_checkable
-class HydraPartialBuilds(Builds, Protocol[T]):  # pragma: no cover
+class HydraPartialBuilds(Builds[T], Protocol[T]):  # pragma: no cover
     _partial_: ClassVar[Literal[True]] = True
 
 
@@ -109,7 +126,7 @@ class HasTarget(Protocol):  # pragma: no cover
     _target_: str
 
 
-Importable = TypeVar("Importable", bound=Callable)
+Importable = TypeVar("Importable", bound=Callable[..., Any])
 
 _HydraPrimitive = Union[
     bool,
@@ -123,31 +140,35 @@ _SupportedPrimitive = Union[
     _HydraPrimitive,
     ListConfig,
     DictConfig,
-    Callable,
+    Callable[..., Any],
     Enum,
-    _DataClass,
+    DataClass_,
     complex,
     Path,
-    Partial,
+    Partial[Any],
     range,
-    set,
+    Set[Any],
     EmptyDict,  # not covered by Mapping[..., ...]
 ]
 
-SupportedPrimitive = Union[
-    _SupportedPrimitive,
-    FrozenSet["SupportedPrimitive"],
-    # Even thought this is redundant with Sequence, it seems to
-    # be needed for pyright to do proper checking of tuple contents
-    Tuple["SupportedPrimitive", ...],
-    # Mutable generic containers need to be invariant, so
-    # we have to settle for Sequence/Mapping. While this
-    # is overly permissive in terms of sequence-type, it
-    # at least affords quality checking of sequence content
-    Sequence["SupportedPrimitive"],
-    # Mapping is covariant only in value
-    Mapping[Any, "SupportedPrimitive"],
-]
+if TYPE_CHECKING:  # pragma: no cover
+    SupportedPrimitive = Union[
+        _SupportedPrimitive,
+        FrozenSet["SupportedPrimitive"],
+        # Even thought this is redundant with Sequence, it seems to
+        # be needed for pyright to do proper checking of tuple contents
+        Tuple["SupportedPrimitive", ...],
+        # Mutable generic containers need to be invariant, so
+        # we have to settle for Sequence/Mapping. While this
+        # is overly permissive in terms of sequence-type, it
+        # at least affords quality checking of sequence content
+        Sequence["SupportedPrimitive"],
+        # Mapping is covariant only in value
+        Mapping[Any, "SupportedPrimitive"],
+    ]
+else:
+    # cleans up annotations for REPLs
+    SupportedPrimitive = TypeVar("SupportedPrimitive")
 
 
 ZenWrapper = Union[
@@ -162,6 +183,8 @@ ZenWrapper = Union[
     str,
 ]
 if TYPE_CHECKING:  # pragma: no cover
-    ZenWrappers = Union[ZenWrapper, Sequence[ZenWrapper]]
+    ZenWrappers = Union[ZenWrapper[T4], Sequence[ZenWrapper[T4]]]
 else:
-    ZenWrappers = TypeVar("ZenWrappers")
+    # cleans up annotations for REPLs
+    class ZenWrappers(Generic[T2]):  # pragma: no cover
+        pass

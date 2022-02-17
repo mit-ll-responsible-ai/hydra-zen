@@ -9,4 +9,5 @@
         "**/third_party",
     ],
     "reportUnnecessaryTypeIgnoreComment": true,
+    "reportUnnecessaryIsInstance": false,
 }
