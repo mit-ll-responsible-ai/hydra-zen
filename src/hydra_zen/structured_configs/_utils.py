@@ -3,7 +3,7 @@
 import inspect
 import sys
 import warnings
-from dataclasses import MISSING, Field, field as _field, is_dataclass
+from dataclasses import MISSING, field as _field, is_dataclass
 from enum import Enum
 from typing import (
     Any,
@@ -14,7 +14,9 @@ from typing import (
     Mapping,
     Optional,
     Sequence,
+    Set,
     Tuple,
+    Type,
     TypeVar,
     Union,
     cast,
@@ -28,7 +30,7 @@ from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVE_TYPES,
     PATCH_OMEGACONF_830,
 )
-from hydra_zen.typing._implementations import InterpStr, _DataClass
+from hydra_zen.typing._implementations import DataClass_, Field, InterpStr
 
 try:
     from typing import get_args, get_origin
@@ -100,7 +102,9 @@ COMMON_MODULES_WITH_OBFUSCATED_IMPORTS: Tuple[str, ...] = (
     "torch",
 )
 UNKNOWN_NAME: Final[str] = "<unknown>"
-KNOWN_MUTABLE_TYPES = {list, dict, set}
+KNOWN_MUTABLE_TYPES: Set[
+    Union[Type[List[Any]], Type[Dict[Any, Any]], Type[Set[Any]]]
+] = {list, dict, set}
 
 T = TypeVar("T")
 
@@ -121,7 +125,7 @@ def field(
     hash: Optional[bool] = ...,
     compare: bool = ...,
     metadata: Optional[Mapping[Any, Any]] = ...,
-) -> Field:  # pragma: no cover
+) -> Field[Any]:  # pragma: no cover
     ...
 
 
@@ -134,23 +138,23 @@ def field(
     hash: Optional[bool] = ...,
     compare: bool = ...,
     metadata: Optional[Mapping[Any, Any]] = ...,
-) -> Field:  # pragma: no cover
+) -> Field[Any]:  # pragma: no cover
     ...
 
 
 def field(
     *,
-    default=MISSING,
-    default_factory=MISSING,
-    init=True,
-    repr=True,
-    hash=None,
-    compare=True,
-    metadata=None,
-) -> Field:
+    default: Any = MISSING,
+    default_factory: Union[Callable[[], Any], Any] = MISSING,
+    init: bool = True,
+    repr: bool = True,
+    hash: Optional[bool] = None,
+    compare: bool = True,
+    metadata: Optional[Mapping[Any, Any]] = None,
+) -> Field[Any]:
     if default is MISSING:
         return cast(
-            Field,
+            Field[Any],
             _field(
                 default_factory=default_factory,
                 init=init,
@@ -162,7 +166,7 @@ def field(
         )
     else:
         return cast(
-            Field,
+            Field[Any],
             _field(
                 default=default,
                 init=init,
@@ -174,7 +178,7 @@ def field(
         )
 
 
-def safe_name(obj: Any, repr_allowed=True) -> str:
+def safe_name(obj: Any, repr_allowed: bool = True) -> str:
     """Tries to get a descriptive name for an object. Returns '<unknown>`
     instead of raising - useful for writing descriptive/dafe error messages."""
 
@@ -187,7 +191,7 @@ def safe_name(obj: Any, repr_allowed=True) -> str:
     return UNKNOWN_NAME
 
 
-def is_classmethod(obj) -> bool:
+def is_classmethod(obj: Any) -> bool:
     """
     https://stackoverflow.com/a/19228282/6592114
 
@@ -213,7 +217,7 @@ def is_classmethod(obj) -> bool:
     return False  # pragma: no cover
 
 
-def building_error_prefix(target) -> str:
+def building_error_prefix(target: Any) -> str:
     return f"Building: {safe_name(target)} ..\n"
 
 
@@ -412,7 +416,7 @@ def check_suspicious_interpolations(
                 yield _expected
 
 
-def mutable_default_permitted(bases: Iterable[_DataClass], field_name: str) -> bool:
+def mutable_default_permitted(bases: Iterable[DataClass_], field_name: str) -> bool:
     if not PATCH_OMEGACONF_830:  # pragma: no cover
         return True
 

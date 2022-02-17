@@ -352,9 +352,9 @@ def supported_primitives():
     # make_config(a={ADataclass: 1})
 
 
-def check_inheritance():
+def check_base_annotations():
     P1 = make_config(x=1)
-    P2 = builds(dict)
+    P2 = builds(int)
 
     @dataclass
     class P3:
@@ -369,6 +369,11 @@ def check_inheritance():
     make_config(x=1, bases=(lambda x: x,))  # type: ignore
     make_config(x=1, bases=(None,))  # type: ignore
     make_config(x=1, bases=(A,))  # type: ignore
+
+    # should fail
+    make_custom_builds_fn(builds_bases=(lambda x: x,))  # type: ignore
+    make_custom_builds_fn(builds_bases=(None,))  # type: ignore
+    make_custom_builds_fn(builds_bases=(A,))  # type: ignore
 
 
 def make_hydra_partial(x: T) -> HydraPartialBuilds[Type[T]]:
