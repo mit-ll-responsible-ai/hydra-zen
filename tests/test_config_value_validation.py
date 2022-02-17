@@ -149,6 +149,10 @@ def test_that_configs_passed_by_zen_validation_are_serializable(
     config_construction_fn, value
 ):
     # `value` is literally any value that Hypothesis knows how to describe
+    if isinstance(value, str):
+        # avoid interpolation issues
+        assume(not value.startswith("${"))
+
     try:
         Conf = config_construction_fn(value)
     except (HydraZenUnsupportedPrimitiveError, ModuleNotFoundError):
