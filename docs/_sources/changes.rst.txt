@@ -8,6 +8,31 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse 
 chronological order. All previous releases should still be available on pip.
 
+.. _v0.6.0:
+
+---------------------
+0.6.0rc1 - 2022-02-17
+---------------------
+
+This release focuses on improving hydra-zen's type-annotations; it increases the 
+degree to which IDE's and static-analysis tools can infer information about common
+hydra-zen code patterns.
+
+It should be noted that hydra-zen leverages advanced typing features (e.g. recursive 
+types) and that some type-checkers do not support these features yet. hydra-zen's type 
+annotations are validated by `pyright <https://github.com/microsoft/pyright>`_. Thus we recommend that users leverage pyright and pyright-based language servers in their 
+IDEs (e.g. using Pylance in VSCode) for the best experience.
+
+(A note to VSCode users: make sure to set `Type Checking Mode` to `basic` in your IDE -- it disabled by default!)
+
+
+Improvements
+------------
+- ``builds(<target>, populate_full_signature=True)`` now carries accurate type information about the target's signature. Thus IDEs can now auto-complete the signature of the resulting structured config. See :pull:`224` for examples and details.
+- Type-information is now dispatched by :func:`~hydra_zen.make_custom_builds_fn` for the common use-cases of ``populate_full_signature=True`` and ``zen_partial=True``, respectively. See :pull:`224` for examples and details.
+- ``hydra_zen.typing.ZenWrappers`` is now a publicly-available annotation. It reflects valid types for ``builds(..., zen_wrappers=<...>)``.
+- hydra-zen now has a pyright-verified `type completeness score <https://github.com/microsoft/pyright/blob/92b4028cd5fd483efcf3f1cdb8597b2d4edd8866/docs/typed-libraries.md#verifying-type-completeness>`_ of 100%. Our CI now requires that this score does not drop below 100%. See :pull:`226` for more details.
+
 .. _v0.5.0:
 
 ------------------
