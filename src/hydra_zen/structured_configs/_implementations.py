@@ -19,7 +19,6 @@ from enum import Enum
 from functools import wraps
 from itertools import chain
 from typing import (
-    TYPE_CHECKING,
     Any,
     Callable,
     Dict,
@@ -39,7 +38,7 @@ from typing import (
 )
 
 from omegaconf import DictConfig, ListConfig
-from typing_extensions import Final, Literal, TypeGuard
+from typing_extensions import Final, Literal, ParamSpec, TypeGuard
 
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVES,
@@ -57,6 +56,11 @@ from hydra_zen.typing import (
     Partial,
     PartialBuilds,
     SupportedPrimitive,
+    ZenWrappers,
+)
+from hydra_zen.typing._builds_overloads import (
+    full_builds as _full_builds,
+    partial_builds as _partial_builds,
 )
 from hydra_zen.typing._implementations import DataClass, HasTarget, _DataClass
 
@@ -64,21 +68,10 @@ from ._value_conversion import ZEN_VALUE_CONVERSION
 
 _T = TypeVar("_T")
 _T2 = TypeVar("_T2", bound=Callable)
-ZenWrapper = Union[
-    None,
-    Builds[Callable[[_T2], _T2]],
-    PartialBuilds[Callable[[_T2], _T2]],
-    Just[Callable[[_T2], _T2]],
-    Type[Builds[Callable[[_T2], _T2]]],
-    Type[PartialBuilds[Callable[[_T2], _T2]]],
-    Type[Just[Callable[[_T2], _T2]]],
-    Callable[[_T2], _T2],
-    str,
-]
-if TYPE_CHECKING:  # pragma: no cover
-    ZenWrappers = Union[ZenWrapper, Sequence[ZenWrapper]]
-else:
-    ZenWrappers = TypeVar("ZenWrappers")
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
 
 # Hydra-specific fields
 _TARGET_FIELD_NAME: Final[str] = "_target_"
@@ -613,61 +606,101 @@ def sanitized_field(
     )
 
 
-# overloads when `zen_partial=False`
+# `builds(<t>, [*args], [**kwargs], zen_partial=False, populate_full_signature=False)`
 @overload
 def builds(
     hydra_target: Importable,
     *pos_args: SupportedPrimitive,
-    zen_partial: Literal[False] = False,
-    zen_wrappers: ZenWrappers = tuple(),
-    zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
-    populate_full_signature: bool = False,
-    hydra_recursive: Optional[bool] = None,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
-    dataclass_name: Optional[str] = None,
-    builds_bases: Tuple[Type[_DataClass], ...] = (),
-    frozen: bool = False,
+    zen_partial: Literal[False] = ...,
+    zen_wrappers: ZenWrappers = ...,
+    zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+    populate_full_signature: Literal[False] = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    dataclass_name: Optional[str] = ...,
+    builds_bases: Tuple[Type[_DataClass], ...] = ...,
+    frozen: bool = ...,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Type[Builds[Importable]]:  # pragma: no cover
     ...
 
 
-# overloads when `zen_partial=True`
+# `builds(<t>, zen_partial=False, populate_full_signature=True)`
+# -- without any user-specified args/kwargs or bases for the target
+@overload
+def builds(
+    hydra_target: Callable[P, R],
+    *,
+    zen_partial: Literal[False] = ...,
+    zen_wrappers: ZenWrappers = ...,
+    zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+    populate_full_signature: Literal[True],
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    dataclass_name: Optional[str] = ...,
+    builds_bases: Tuple[()] = ...,
+    frozen: bool = ...,
+) -> Callable[P, Builds[Type[R]]]:  # pragma: no cover
+    ...
+
+
+# `builds(<t>, *args, **kwargs, zen_partial=False, populate_full_signature=True)`
 @overload
 def builds(
     hydra_target: Importable,
     *pos_args: SupportedPrimitive,
-    zen_partial: Literal[True],
-    zen_wrappers: ZenWrappers = tuple(),
-    zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
-    populate_full_signature: bool = False,
-    hydra_recursive: Optional[bool] = None,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
-    dataclass_name: Optional[str] = None,
-    builds_bases: Tuple[Type[_DataClass], ...] = (),
-    frozen: bool = False,
+    zen_partial: Literal[False] = ...,
+    zen_wrappers: ZenWrappers = ...,
+    zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+    populate_full_signature: bool = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    dataclass_name: Optional[str] = ...,
+    builds_bases: Tuple[Type[_DataClass], ...] = ...,
+    frozen: bool = ...,
+    **kwargs_for_target: SupportedPrimitive,
+) -> Type[Builds[Importable]]:  # pragma: no cover
+    ...
+
+
+# `builds(<t>, [*args], [**kwargs], zen_partial=True)`
+@overload
+def builds(
+    hydra_target: Importable,
+    *pos_args: SupportedPrimitive,
+    zen_partial: Literal[True] = ...,
+    zen_wrappers: ZenWrappers = ...,
+    zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+    populate_full_signature: bool = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    dataclass_name: Optional[str] = ...,
+    builds_bases: Tuple[Type[_DataClass], ...] = ...,
+    frozen: bool = ...,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Type[PartialBuilds[Importable]]:  # pragma: no cover
     ...
 
 
-# overloads when `zen_partial: bool`
+# broadest annotation
 @overload
 def builds(
-    hydra_target: Importable,
+    hydra_target: Union[Importable, Callable[P, R]],
     *pos_args: SupportedPrimitive,
-    zen_partial: bool,
-    zen_wrappers: ZenWrappers = tuple(),
-    zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
-    populate_full_signature: bool = False,
-    hydra_recursive: Optional[bool] = None,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
-    dataclass_name: Optional[str] = None,
-    builds_bases: Tuple[Type[_DataClass], ...] = (),
-    frozen: bool = False,
+    zen_partial: bool = ...,
+    zen_wrappers: ZenWrappers = ...,
+    zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+    populate_full_signature: bool = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    dataclass_name: Optional[str] = ...,
+    builds_bases: Tuple[Type[_DataClass], ...] = ...,
+    frozen: bool = ...,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Union[
-    Type[Builds[Importable]], Type[PartialBuilds[Importable]]
+    Type[Builds[Importable]],
+    Type[PartialBuilds[Importable]],
+    Callable[P, Builds[Type[R]]],
 ]:  # pragma: no cover
     ...
 
@@ -684,7 +717,7 @@ def builds(
     builds_bases=(),
     dataclass_name=None,
     **kwargs_for_target,
-) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]:
+):
     """builds(hydra_target, /, *pos_args, zen_partial=False, zen_meta=None,
     hydra_recursive=None, populate_full_signature=False, hydra_convert=None,
     frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
@@ -1679,7 +1712,7 @@ def builds(
             out.__doc__ += (
                 f"\n\nThe docstring for {_utils.safe_name(target)} :\n\n" + target_doc
             )
-    return cast(Type[Builds[Importable]], out)
+    return cast(Union[Type[Builds[Importable]], Callable[P, Builds[Type[R]]]], out)
 
 
 # We need to check if things are Builds, Just, PartialBuilds to a higher
@@ -1860,20 +1893,84 @@ __BUILDS_DEFAULTS: Final[Dict[str, Any]] = {
 del _builds_sig
 
 
+@overload
 def make_custom_builds_fn(
     *,
-    zen_partial: bool = False,
-    zen_wrappers: ZenWrappers = tuple(),
-    zen_meta: Optional[Mapping[str, Any]] = None,
-    populate_full_signature: bool = False,
-    hydra_recursive: Optional[bool] = None,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
-    frozen: bool = False,
-    builds_bases: Tuple[Any, ...] = (),
+    zen_partial: Literal[False] = ...,
+    zen_wrappers: ZenWrappers = ...,
+    zen_meta: Optional[Mapping[str, Any]] = ...,
+    populate_full_signature: Literal[False] = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    frozen: bool = ...,
+    builds_bases: Tuple[Any, ...] = ...,
+    __b: _T2 = builds,
+) -> _T2:  # pragma: no cover
+    ...
+
+
+@overload
+def make_custom_builds_fn(
+    *,
+    zen_partial: Literal[False] = ...,
+    zen_wrappers: ZenWrappers = ...,
+    zen_meta: Optional[Mapping[str, Any]] = ...,
+    populate_full_signature: Literal[True] = ...,  # <- special case
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    frozen: bool = ...,
+    builds_bases: Tuple[()] = ...,
+    __b: _T2 = _full_builds,
+) -> _T2:  # pragma: no cover
+    ...
+
+
+@overload
+def make_custom_builds_fn(
+    *,
+    zen_partial: Literal[False] = ...,
+    zen_wrappers: ZenWrappers = ...,
+    zen_meta: Optional[Mapping[str, Any]] = ...,
+    populate_full_signature: Literal[True] = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    frozen: bool = ...,
+    builds_bases: Tuple[Any, ...] = ...,
+    __b: _T2 = builds,
+) -> _T2:  # pragma: no cover
+    ...
+
+
+@overload
+def make_custom_builds_fn(
+    *,
+    zen_partial: Literal[True] = ...,  # <- special case
+    zen_wrappers: ZenWrappers = ...,
+    zen_meta: Optional[Mapping[str, Any]] = ...,
+    populate_full_signature: bool = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    frozen: bool = ...,
+    builds_bases: Tuple[Any, ...] = ...,
+    __b: _T2 = _partial_builds,
+) -> _T2:  # pragma: no cover
+    ...
+
+
+def make_custom_builds_fn(
+    *,
+    zen_partial=False,
+    zen_wrappers=tuple(),
+    zen_meta=None,
+    populate_full_signature=False,
+    hydra_recursive=None,
+    hydra_convert=None,
+    frozen=False,
+    builds_bases=(),
     # This is the easiest way to get static tooling to see the output
     # as `builds`.
-    __b: _T2 = builds,
-) -> _T2:
+    __b=builds,
+):
     """Returns the `builds` function, but with customized default values.
 
     E.g. ``make_custom_builds_fn(hydra_convert='all')`` will return a version

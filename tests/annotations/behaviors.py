@@ -80,7 +80,7 @@ def behaviors():
 
     # Check that @hydrated_dataclass reveals init/attr info
     b = B(x=2)
-    b.x = 3
+    reveal_type(b.x, expected_str="int")
 
     # Check that `Builds` constructor can take arguments
     X = builds(dict, a=1)
@@ -89,3 +89,6 @@ def behaviors():
     PartialBuild_g = builds(g, x=1, zen_partial=True)
     partial_g = instantiate(PartialBuild_g)
     g_out: str = partial_g(y=10)
+
+    Conf = builds(f, populate_full_signature=True)
+    reveal_type(Conf(x=1).x, expected_str="Any")

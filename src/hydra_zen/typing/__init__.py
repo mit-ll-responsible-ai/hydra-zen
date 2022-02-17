@@ -8,6 +8,7 @@ from ._implementations import (
     Partial,
     PartialBuilds,
     SupportedPrimitive,
+    ZenWrappers,
 )
 
 __all__ = [
@@ -17,4 +18,5 @@ __all__ = [
     "Partial",
     "PartialBuilds",
     "SupportedPrimitive",
+    "ZenWrappers",
 ]
