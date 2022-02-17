@@ -36,7 +36,7 @@ First install pre-commit in your Python environment. Run:
 pip install pre-commit
 ```
 
-Then, in the top-level of the `rai_toolbox` repo, run:
+Then, in the top-level of the `hydra_zen` repo, run:
 
 ```console
 pre-commit install
@@ -57,7 +57,7 @@ It also runs [flake8](https://github.com/PyCQA/flake8) to enforce PEP8 standards
 
 Install the latest version of pytest and hypothesis:
 
-```shell
+```console
 pip install pytest hypothesis
 ```
 
@@ -74,7 +74,7 @@ automated tests against various Python versions and dependencies.
 
 Install `tox`:
 
-```shell
+```console
 pip install tox
 ```
 
@@ -82,13 +82,13 @@ pip install tox
 
 List the various tox-jobs that are defined for hydra-zen:
 
-```shell
+```console
 tox -a
 ```
 
 Then, run the job of choice using:
 
-```shell
+```console
 tox -e [job-name]
 ```
 
@@ -98,7 +98,7 @@ tox -e [job-name]
 Our CI requires that our tests achieve 100% code coverage. The easiest way to measure
 code-coverage is by using `tox`:
 
-```shell
+```console
 tox -e coverage
 ```
 
@@ -112,6 +112,6 @@ If you use VSCode with Pylance, then make sure that `Type Checking Mode` is set 
 
 While this is helpful for getting immediate feedback about your code, it is no substitute for running `pyright` from the commandline. To do so, [install pyright](https://github.com/microsoft/pyright#command-line) and, from the top-level hydra-zen directory, run:
 
-```shell
+```console
 pyright --lib tests/annotations/ src/
 ```

@@ -50,7 +50,7 @@ launching Hydra jobs. Please refer to [our documentation](https://mit-ll-respons
 ## Installation
 `hydra-zen` is lightweight: its only dependencies are `hydra-core` and `typing-extensions`.
 
-```shell script
+```console
 pip install hydra-zen
 ```
 
