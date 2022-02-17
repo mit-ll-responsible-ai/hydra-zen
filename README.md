@@ -56,7 +56,11 @@ pip install hydra-zen
 
 ## Contributing
 
-Please refer to [these docs](https://github.com/mit-ll-responsible-ai/hydra-zen/blob/main/CONTRIBUTING.md)
+Before opening a PR to this repo, consider posting an [issue](https://github.com/mit-ll-responsible-ai/hydra-zen/issues) or a [discussion topic](https://github.com/mit-ll-responsible-ai/hydra-zen/discussions) to share your ideas with us. We will work with you to ensure your feature is well-scoped and that your hard work goes to good use.
+
+(See an obvious bug or typo? Go ahead and just open a PR :) )
+
+Please refer to [these docs](https://github.com/mit-ll-responsible-ai/hydra-zen/blob/main/CONTRIBUTING.md).
 
 
 ## Join the Discussion
