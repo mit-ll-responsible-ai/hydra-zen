@@ -18,7 +18,7 @@ from dataclasses import dataclass
 from enum import Enum
 from functools import partial
 from pathlib import Path
-from typing import Callable, List, Tuple, Type, TypeVar
+from typing import Any, Callable, List, Tuple, Type, TypeVar, Union
 
 from omegaconf import MISSING, DictConfig, ListConfig
 
@@ -350,6 +350,18 @@ def supported_primitives():
     # make_config(a={1j: 1})
     # make_config(a={M: 1})
     # make_config(a={ADataclass: 1})
+
+
+def check_zen_field():
+    ZenField(int)
+    ZenField(Callable[..., Any])
+    ZenField(List[int])
+
+    ZenField(1.0)  # type: ignore
+
+    # this is a known limitation
+    # TODO: open pyright issue
+    ZenField(Union[int, str])  # type: ignore
 
 
 def check_base_annotations():
