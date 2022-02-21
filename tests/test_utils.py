@@ -280,25 +280,30 @@ def test_strings_that_fail_to_interpolate_are_not_interpolated_strings(any_text)
     assert out == 1 or not is_interpolated_string(any_text)
 
 
-@pytest.mark.parametrize(
-    "version_string, expected",
-    [
-        ("1.2.0", Version(1, 2)),
-        ("2.1.0dev24", Version(2, 1)),
-    ],
+@given(
+    major=st.integers(0, 100),
+    minor=st.integers(0, 100),
+    patch=st.integers(0, 100),
+    # tests Hydra-style and OmegaConf-style dev/rc-style
+    # release strings. See:
+    # https://pypi.org/project/hydra-core/#history
+    # https://pypi.org/project/omegaconf/#history
+    patch_suffix=st.just("")
+    | st.integers(0, 100).map(lambda x: f"rc{x}")
+    | st.integers(0, 100).map(lambda x: f".dev{x}"),
 )
-def test_get_version(version_string, expected):
+def test_get_version(major: int, minor: int, patch: int, patch_suffix: str):
+    version_string = f"{major}.{minor}.{patch}{patch_suffix}"
+    expected = Version(major, minor, patch)
     assert _get_version(version_string) == expected
 
 
-@pytest.mark.parametrize(
-    "smaller, larger",
-    [
-        (Version(1, 0), Version(2, 0)),
-        (Version(1, 0), Version(1, 1)),
-        (Version(1, 0, 0), Version(1, 0, 1)),
-        (Version(1, 0, 1), Version(1, 1, 0)),
-    ],
-)
-def test_version_comparison(smaller, larger):
-    assert smaller < larger
+def test_version_comparisons():
+    assert Version(1, 0, 0) == Version(1, 0, 0)
+    assert Version(1, 0, 0) <= Version(1, 0, 0)
+    assert Version(1, 0, 0) != Version(2, 0, 0)
+    assert Version(1, 1, 1) < Version(2, 0, 0)
+    assert Version(1, 0, 0) < Version(2, 0, 0)
+    assert Version(1, 0, 0) < Version(1, 1, 0)
+    assert Version(1, 0, 0) < Version(1, 0, 1)
+    assert Version(1, 0, 1) < Version(1, 1, 0)

@@ -16,14 +16,21 @@ NoneType = type(None)
 class Version(NamedTuple):
     major: int
     minor: int
-    patch: Optional[int] = None
+    patch: int
 
 
 def _get_version(ver_str: str) -> Version:
     # Not for general use. Tested only for Hydra and OmegaConf
     # version string styles
-    major, minor = (int(v) for v in ver_str.split(".")[:2])
-    return Version(major=major, minor=minor)
+
+    splits = ver_str.split(".")[:3]
+    if not len(splits) == 3:  # pragma: no cover
+        raise ValueError(f"Version string {ver_str} couldn't be parsed")
+
+    major, minor = (int(v) for v in splits[:2])
+    patch_str, *_ = splits[-1].split("rc")
+
+    return Version(major=major, minor=minor, patch=int(patch_str))
 
 
 OMEGACONF_VERSION: Final = _get_version(omegaconf.__version__)
@@ -37,7 +44,7 @@ HYDRA_VERSION: Final = _get_version(hydra.__version__)
 #
 # Uncomment dynamic setting once OmegaConf merges fix:
 # https://github.com/omry/omegaconf/pull/832
-PATCH_OMEGACONF_830: Final = True  # OMEGACONF_VERSION <= Version(2, 1)
+PATCH_OMEGACONF_830: Final = True  # OMEGACONF_VERSION < Version(2, 1, 1)
 
 # Hydra's instantiate API now supports partial-instantiation, indicated
 # by a `_partial_ = True` attribute.
@@ -45,7 +52,7 @@ PATCH_OMEGACONF_830: Final = True  # OMEGACONF_VERSION <= Version(2, 1)
 #
 # Uncomment dynamice setting of `HYDRA_SUPPORTS_PARTIAL` once we can
 # begin testing against nightly builds of Hydra
-HYDRA_SUPPORTS_PARTIAL: Final = False  # Version(1, 1) < HYDRA_VERSION
+HYDRA_SUPPORTS_PARTIAL: Final = False  # Version(1, 1, 1) < HYDRA_VERSION
 
 # Indicates primitive types permitted in type-hints of structured configs
 HYDRA_SUPPORTED_PRIMITIVE_TYPES: Final = {int, float, bool, str, Enum}
