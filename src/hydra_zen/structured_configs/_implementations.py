@@ -80,14 +80,19 @@ _RECURSIVE_FIELD_NAME: Final[str] = "_recursive_"
 _CONVERT_FIELD_NAME: Final[str] = "_convert_"
 _POS_ARG_FIELD_NAME: Final[str] = "_args_"
 
-_HYDRA_FIELD_NAMES: FrozenSet[str] = frozenset(
-    (
-        _TARGET_FIELD_NAME,
-        _RECURSIVE_FIELD_NAME,
-        _CONVERT_FIELD_NAME,
-        _POS_ARG_FIELD_NAME,
-    )
-)
+_names = [
+    _TARGET_FIELD_NAME,
+    _RECURSIVE_FIELD_NAME,
+    _CONVERT_FIELD_NAME,
+    _POS_ARG_FIELD_NAME,
+]
+
+if HYDRA_SUPPORTS_PARTIAL:
+    _names.append(_PARTIAL_FIELD_NAME)
+
+_HYDRA_FIELD_NAMES: FrozenSet[str] = frozenset(_names)
+
+del _names
 
 # hydra-zen-specific fields
 _ZEN_PROCESSING_LOCATION: Final[str] = _utils.get_obj_path(zen_processing)
@@ -1210,7 +1215,7 @@ def builds(
             ),
             (
                 _PARTIAL_FIELD_NAME,
-                str,
+                bool,
                 _utils.field(default=zen_partial, init=False),
             ),
         ]
@@ -1701,8 +1706,12 @@ def builds(
         dataclass_name, fields=sanitized_base_fields, bases=builds_bases, frozen=frozen
     )
 
-    if zen_partial is False and hasattr(out, _ZEN_PARTIAL_TARGET_FIELD_NAME):
-        # `out._partial_target_` has been inherited; this will lead to an error when
+    # TODO: revisit this constraint
+    if zen_partial is False and (
+        hasattr(out, _ZEN_PARTIAL_TARGET_FIELD_NAME)
+        or (HYDRA_SUPPORTS_PARTIAL and hasattr(out, _PARTIAL_FIELD_NAME))
+    ):
+        # `out._partial_` has been inherited; this will lead to an error when
         # hydra-instantiation occurs, since it will be passed to target.
         # There is not an easy way to delete this, since it comes from a parent class
         raise TypeError(
