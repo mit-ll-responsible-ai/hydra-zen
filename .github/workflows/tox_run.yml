@@ -138,7 +138,7 @@ jobs:
     - name: Test with tox
       run: tox -e pre-release
 
-  test-against-hydra-1.1.2dev:
+  test-against-hydra-1_1_2dev:
     runs-on: ubuntu-latest
 
     strategy:
