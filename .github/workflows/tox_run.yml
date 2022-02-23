@@ -138,6 +138,29 @@ jobs:
     - name: Test with tox
       run: tox -e pre-release
 
+  test-against-hydra-1_1_2dev:
+    runs-on: ubuntu-latest
+
+    strategy:
+      max-parallel: 3
+      matrix:
+        python-version: [3.8]
+      fail-fast: false
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox tox-gh-actions
+    - name: Test with tox
+      run: tox -e hydra-1p1p2-pre-release
+
+
   run-pyright:
     runs-on: ubuntu-latest
 

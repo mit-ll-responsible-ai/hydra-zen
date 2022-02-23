@@ -5,6 +5,7 @@ from typing import Any, Callable, Dict, List, TypeVar, Union
 
 import hypothesis.strategies as st
 import pytest
+from hydra.errors import InstantiationException
 from hypothesis import given, settings
 from omegaconf import OmegaConf
 from omegaconf.errors import InterpolationKeyError, InterpolationResolutionError
@@ -34,7 +35,7 @@ def _coordinate_meta_fields_for_interpolation(wrappers, zen_meta):
     # interpolated strings map to the named decorators
     if is_interpolated_string(wrappers):
         # change level of interpolation
-        wrappers = wrappers.replace("..", ".")  # type: ignore
+        wrappers = wrappers.replace("..", ".")
         dec_name: str = wrappers[3:-1]
         item = decorators_by_name[dec_name]
         zen_meta[dec_name] = item if item is None else just(item)
@@ -134,7 +135,7 @@ a_tracked_wrapper = st.sampled_from(tracked_funcs)
     as_yaml=st.booleans(),
 )
 def test_zen_wrappers_expected_behavior(
-    wrappers: Union[  # type: ignore
+    wrappers: Union[
         Union[TrackedFunc, Just[TrackedFunc], PartialBuilds[TrackedFunc], InterpStr],
         List[
             Union[TrackedFunc, Just[TrackedFunc], PartialBuilds[TrackedFunc], InterpStr]
@@ -231,7 +232,7 @@ class NotAWrapper:
     ],
 )
 def test_zen_wrappers_validation_during_builds(bad_wrapper):
-    with pytest.raises(TypeError):
+    with pytest.raises((TypeError, InstantiationException)):
         builds(int, zen_wrappers=bad_wrapper)
 
 
@@ -246,7 +247,7 @@ def test_zen_wrappers_validation_during_builds(bad_wrapper):
 )
 def test_zen_wrappers_validation_during_instantiation(bad_wrapper):
     conf = builds(int, zen_wrappers=bad_wrapper)
-    with pytest.raises(TypeError):
+    with pytest.raises((TypeError, InstantiationException)):
         instantiate(conf)
 
 

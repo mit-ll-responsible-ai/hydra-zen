@@ -15,6 +15,7 @@ from hydra_zen.structured_configs._implementations import (
     is_partial_builds,
 )
 from hydra_zen.typing import Builds, Just, Partial, PartialBuilds
+from hydra_zen.typing._implementations import HydraPartialBuilds
 
 
 @pytest.mark.parametrize(
@@ -22,7 +23,8 @@ from hydra_zen.typing import Builds, Just, Partial, PartialBuilds
     [
         (just, Just),
         (builds, Builds),
-        (partial(builds, zen_partial=True), PartialBuilds),
+        (partial(builds, zen_partial=True), (PartialBuilds, HydraPartialBuilds)),
+        (partial(builds, zen_partial=True, zen_meta=dict(y=1)), PartialBuilds),
     ],
 )
 def test_runtime_checkability_of_protocols(fn, protocol):
