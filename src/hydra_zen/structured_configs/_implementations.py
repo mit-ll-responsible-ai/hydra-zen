@@ -87,7 +87,7 @@ _names = [
     _POS_ARG_FIELD_NAME,
 ]
 
-if HYDRA_SUPPORTS_PARTIAL:
+if HYDRA_SUPPORTS_PARTIAL:  # pragma: no cover
     _names.append(_PARTIAL_FIELD_NAME)
 
 _HYDRA_FIELD_NAMES: FrozenSet[str] = frozenset(_names)
