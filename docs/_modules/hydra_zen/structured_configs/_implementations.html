@@ -254,14 +254,19 @@
 <span class="n">_CONVERT_FIELD_NAME</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_convert_&quot;</span>
 <span class="n">_POS_ARG_FIELD_NAME</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_args_&quot;</span>
 
-<span class="n">_HYDRA_FIELD_NAMES</span><span class="p">:</span> <span class="n">FrozenSet</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span>
-    <span class="p">(</span>
-        <span class="n">_TARGET_FIELD_NAME</span><span class="p">,</span>
-        <span class="n">_RECURSIVE_FIELD_NAME</span><span class="p">,</span>
-        <span class="n">_CONVERT_FIELD_NAME</span><span class="p">,</span>
-        <span class="n">_POS_ARG_FIELD_NAME</span><span class="p">,</span>
-    <span class="p">)</span>
-<span class="p">)</span>
+<span class="n">_names</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">_TARGET_FIELD_NAME</span><span class="p">,</span>
+    <span class="n">_RECURSIVE_FIELD_NAME</span><span class="p">,</span>
+    <span class="n">_CONVERT_FIELD_NAME</span><span class="p">,</span>
+    <span class="n">_POS_ARG_FIELD_NAME</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="k">if</span> <span class="n">HYDRA_SUPPORTS_PARTIAL</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="n">_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_PARTIAL_FIELD_NAME</span><span class="p">)</span>
+
+<span class="n">_HYDRA_FIELD_NAMES</span><span class="p">:</span> <span class="n">FrozenSet</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">_names</span><span class="p">)</span>
+
+<span class="k">del</span> <span class="n">_names</span>
 
 <span class="c1"># hydra-zen-specific fields</span>
 <span class="n">_ZEN_PROCESSING_LOCATION</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">zen_processing</span><span class="p">)</span>
@@ -1384,7 +1389,7 @@
             <span class="p">),</span>
             <span class="p">(</span>
                 <span class="n">_PARTIAL_FIELD_NAME</span><span class="p">,</span>
-                <span class="nb">str</span><span class="p">,</span>
+                <span class="nb">bool</span><span class="p">,</span>
                 <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">zen_partial</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
             <span class="p">),</span>
         <span class="p">]</span>
@@ -1875,8 +1880,12 @@
         <span class="n">dataclass_name</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">sanitized_base_fields</span><span class="p">,</span> <span class="n">bases</span><span class="o">=</span><span class="n">builds_bases</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="n">frozen</span>
     <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">zen_partial</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">_ZEN_PARTIAL_TARGET_FIELD_NAME</span><span class="p">):</span>
-        <span class="c1"># `out._partial_target_` has been inherited; this will lead to an error when</span>
+    <span class="c1"># TODO: revisit this constraint</span>
+    <span class="k">if</span> <span class="n">zen_partial</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="p">(</span>
+        <span class="nb">hasattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">_ZEN_PARTIAL_TARGET_FIELD_NAME</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="p">(</span><span class="n">HYDRA_SUPPORTS_PARTIAL</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">_PARTIAL_FIELD_NAME</span><span class="p">))</span>
+    <span class="p">):</span>
+        <span class="c1"># `out._partial_` has been inherited; this will lead to an error when</span>
         <span class="c1"># hydra-instantiation occurs, since it will be passed to target.</span>
         <span class="c1"># There is not an easy way to delete this, since it comes from a parent class</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
