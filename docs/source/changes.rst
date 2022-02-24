@@ -33,6 +33,35 @@ Improvements
 - ``hydra_zen.typing.ZenWrappers`` is now a publicly-available annotation. It reflects valid types for ``builds(..., zen_wrappers=<...>)``.
 - hydra-zen now has a pyright-verified `type completeness score <https://github.com/microsoft/pyright/blob/92b4028cd5fd483efcf3f1cdb8597b2d4edd8866/docs/typed-libraries.md#verifying-type-completeness>`_ of 100%. Our CI now requires that this score does not drop below 100%. See :pull:`226` for more details.
 
+
+Support for Upcoming Hydra Features
+-----------------------------------
+
+Hydra 1.1.2 is introducing `support for partial instantiation of targeted configs <https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#partial-instantiation>`_ via the ``_partial_`` field. ``builds(<target>, zen_partial=True)`` will now set the ``_partial_`` field on the structured config
+rather than using ``hydra_zen.funcs.zen_processing`` to facilitate partial instantiation.
+
+
++---------------------------------------------------+---------------------------------------------------+
+| .. code-block:: pycon                             | .. code-block:: pycon                             |
+|    :caption: Hydra < 1.1.2                        |    :caption: 1.1.2 <= Hydra                       |
+|                                                   |                                                   |
+|    >>> Conf = builds(dict, a=1, zen_partial=True) |    >>> Conf = builds(dict, a=1, zen_partial=True) |
+|                                                   |                                                   |
+|    >>> print(to_yaml(Conf))                       |    >>> print(to_yaml(Conf))                       |
+|    _target_: hydra_zen.funcs.zen_processing       |    _target_: builtins.dict                        |
+|    _zen_target: builtins.dict                     |    _partial_: true                                |
+|    _zen_partial: true                             |    a: 1                                           |
+|    a: 1                                           |                                                   |
+|                                                   |    >>> instantiate(Conf)                          |
+|    >>> instantiate(Conf)                          |    functools.partial(<class 'dict'>, a=1)         |
+|    functools.partial(<class 'dict'>, a=1)         |                                                   |
++---------------------------------------------------+---------------------------------------------------+
+
+
+This change will only occur when one's locally-installed version of ``hydra-core`` is 1.1.2 or higher. Structured configs and yamls that configure partial'd objects via ``hydra_zen.funcs.zen_processing`` are still valid and will instantiate in the same way as before. I.e. this is only a compatibility-breaking change for code that relied on the specific implementation details of the structured config produced by ``builds(<target>, zen_partial=True)``.
+
+(See :pull:`186` and :pull:`230` for additional details)
+
 .. _v0.5.0:
 
 ------------------
