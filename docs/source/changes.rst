@@ -11,7 +11,7 @@ chronological order. All previous releases should still be available on pip.
 .. _v0.6.0:
 
 ---------------------
-0.6.0rc1 - 2022-02-17
+0.6.0rc2 - 2022-02-17
 ---------------------
 
 This release focuses on improving hydra-zen's type-annotations; it increases the 
