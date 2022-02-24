@@ -5,6 +5,7 @@ import pytest
 
 from hydra_zen import builds, get_target, instantiate, make_custom_builds_fn
 from hydra_zen._compatibility import HYDRA_SUPPORTS_PARTIAL
+from hydra_zen.funcs import zen_processing
 from hydra_zen.structured_configs._implementations import (
     is_partial_builds,
     uses_zen_processing,
@@ -18,6 +19,14 @@ from hydra_zen.typing._implementations import HydraPartialBuilds
 class HydraPartialConf:
     _target_: str = get_obj_path(dict)
     _partial_: bool = True
+    x: int = 1
+
+
+@dataclass
+class ZenPartialConf:
+    _target_: str = get_obj_path(zen_processing)
+    _zen_target: str = get_obj_path(dict)
+    _zen_partial: bool = True
     x: int = 1
 
 
@@ -35,6 +44,14 @@ def test_HYDRA_SUPPORTS_PARTIAL_is_set_properly():
     else:
         # instantiation should product `dict(x=1, _partial_=True)`
         assert obj == {"x": 1, "_partial_": True}
+
+
+def test_partial_via_zen_processing():
+    # ensures that confs that leverage zen_processing to partial-y
+    # instantiate object always works
+    obj = instantiate(ZenPartialConf)
+    assert isinstance(obj, partial)
+    assert obj() == {"x": 1}
 
 
 def test_is_partial_builds_on_hydra_partial_config():
@@ -91,5 +108,5 @@ def test_partial_func_attr_is_always_target(zen_meta, zen_wrapper, pop_sig):
     )
 
     partial_out = instantiate(Conf)
-    assert hasattr(partial_out, "func") and partial_out.func is f  # type: ignore
+    assert hasattr(partial_out, "func") and partial_out.func is f
     assert partial_out() == (("hi",), {"x": 1})
