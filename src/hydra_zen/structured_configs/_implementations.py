@@ -96,6 +96,7 @@ del _names
 
 # hydra-zen-specific fields
 _ZEN_PROCESSING_LOCATION: Final[str] = _utils.get_obj_path(zen_processing)
+_GET_OBJ_LOCATION: Final[str] = _utils.get_obj_path(get_obj)
 _ZEN_TARGET_FIELD_NAME: Final[str] = "_zen_target"
 _ZEN_PARTIAL_TARGET_FIELD_NAME: Final[str] = "_zen_partial"
 _META_FIELD_NAME: Final[str] = "_zen_exclude"
@@ -466,7 +467,7 @@ def just(obj: Importable) -> Type[Just[Importable]]:
         (
             _TARGET_FIELD_NAME,
             str,
-            _utils.field(default=_utils.get_obj_path(get_obj), init=False),
+            _utils.field(default=_GET_OBJ_LOCATION, init=False),
         ),
         (
             "path",
