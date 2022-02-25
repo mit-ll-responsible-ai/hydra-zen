@@ -1199,6 +1199,8 @@ def builds(
 
     target_field: List[Union[Tuple[str, Type[Any]], Tuple[str, Type[Any], Any]]]
 
+    target_path: Final[str] = _utils.get_obj_path(target)
+
     if (
         HYDRA_SUPPORTS_PARTIAL
         and zen_partial
@@ -1211,7 +1213,7 @@ def builds(
             (
                 _TARGET_FIELD_NAME,
                 str,
-                _utils.field(default=_utils.get_obj_path(target), init=False),
+                _utils.field(default=target_path, init=False),
             ),
             (
                 _PARTIAL_FIELD_NAME,
@@ -1225,12 +1227,12 @@ def builds(
             (
                 _TARGET_FIELD_NAME,
                 str,
-                _utils.field(default=_utils.get_obj_path(zen_processing), init=False),
+                _utils.field(default=_ZEN_PROCESSING_LOCATION, init=False),
             ),
             (
                 _ZEN_TARGET_FIELD_NAME,
                 str,
-                _utils.field(default=_utils.get_obj_path(target), init=False),
+                _utils.field(default=target_path, init=False),
             ),
         ]
 
@@ -1286,7 +1288,7 @@ def builds(
             (
                 _TARGET_FIELD_NAME,
                 str,
-                _utils.field(default=_utils.get_obj_path(target), init=False),
+                _utils.field(default=target_path, init=False),
             )
         ]
 
@@ -1459,7 +1461,7 @@ def builds(
                 _unexpected = set(kwargs_for_target) - nameable_params_in_sig
                 raise TypeError(
                     BUILDS_ERROR_PREFIX
-                    + f"The following unexpected keyword argument(s) was specified for {_utils.get_obj_path(target)} "
+                    + f"The following unexpected keyword argument(s) was specified for {target_path} "
                     f"via `builds`: {', '.join(_unexpected)}"
                 )
             if not fields_set_by_bases <= nameable_params_in_sig and not (
@@ -1470,7 +1472,7 @@ def builds(
                 _unexpected = fields_set_by_bases - nameable_params_in_sig
                 raise TypeError(
                     BUILDS_ERROR_PREFIX
-                    + f"The following unexpected keyword argument(s) for {_utils.get_obj_path(target)} "
+                    + f"The following unexpected keyword argument(s) for {target_path} "
                     f"was specified via inheritance from a base class: "
                     f"{', '.join(_unexpected)}"
                 )
@@ -1494,7 +1496,7 @@ def builds(
                         raise TypeError(
                             BUILDS_ERROR_PREFIX
                             + f"Multiple values for argument {param.name} were specified for "
-                            f"{_utils.get_obj_path(target)} via `builds`"
+                            f"{target_path} via `builds`"
                         )
             if not sig_by_kind[
                 _VAR_POSITIONAL
@@ -1519,7 +1521,7 @@ def builds(
                 )
                 raise TypeError(
                     BUILDS_ERROR_PREFIX
-                    + f"{_utils.get_obj_path(target)} takes {_permissible} positional args, but "
+                    + f"{target_path} takes {_permissible} positional args, but "
                     f"{len(_pos_args)} were specified via `builds`"
                 )
 
@@ -1722,7 +1724,7 @@ def builds(
 
     out.__doc__ = (
         f"A structured config designed to {'partially ' if zen_partial else ''}initialize/call "
-        f"`{_utils.get_obj_path(target)}` upon instantiation by hydra."
+        f"`{target_path}` upon instantiation by hydra."
     )
     if hasattr(target, "__doc__"):
         target_doc = target.__doc__
