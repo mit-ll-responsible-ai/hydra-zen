@@ -62,7 +62,13 @@ from hydra_zen.typing._builds_overloads import (
     full_builds as _full_builds,
     partial_builds as _partial_builds,
 )
-from hydra_zen.typing._implementations import DataClass, DataClass_, Field, HasTarget
+from hydra_zen.typing._implementations import (
+    BuildsWithSig,
+    DataClass,
+    DataClass_,
+    Field,
+    HasTarget,
+)
 
 from ._value_conversion import ZEN_VALUE_CONVERSION
 
@@ -644,7 +650,7 @@ def builds(
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[()] = ...,
     frozen: bool = ...,
-) -> Callable[P, Builds[Type[R]]]:  # pragma: no cover
+) -> Type[BuildsWithSig[Type[R], P]]:  # pragma: no cover
     ...
 
 
@@ -704,7 +710,7 @@ def builds(
 ) -> Union[
     Type[Builds[Importable]],
     Type[PartialBuilds[Importable]],
-    Callable[P, Builds[Type[R]]],
+    Type[BuildsWithSig[Type[R], P]],
 ]:  # pragma: no cover
     ...
 
@@ -724,7 +730,7 @@ def builds(
 ) -> Union[
     Type[Builds[Importable]],
     Type[PartialBuilds[Importable]],
-    Callable[P, Builds[Type[R]]],
+    Type[BuildsWithSig[Type[R], P]],
 ]:
     """builds(hydra_target, /, *pos_args, zen_partial=False, zen_meta=None,
     hydra_recursive=None, populate_full_signature=False, hydra_convert=None,
@@ -1730,7 +1736,7 @@ def builds(
             out.__doc__ += (
                 f"\n\nThe docstring for {_utils.safe_name(target)} :\n\n" + target_doc
             )
-    return cast(Union[Type[Builds[Importable]], Callable[P, Builds[Type[R]]]], out)
+    return cast(Union[Type[Builds[Importable]], Type[BuildsWithSig[Type[R], P]]], out)
 
 
 # We need to check if things are Builds, Just, PartialBuilds to a higher
