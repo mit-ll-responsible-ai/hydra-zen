@@ -3,11 +3,13 @@
 
 from ._implementations import (
     Builds,
+    HydraPartialBuilds,
     Importable,
     Just,
     Partial,
     PartialBuilds,
     SupportedPrimitive,
+    ZenPartialBuilds,
     ZenWrappers,
 )
 
@@ -19,4 +21,6 @@ __all__ = [
     "PartialBuilds",
     "SupportedPrimitive",
     "ZenWrappers",
+    "ZenPartialBuilds",
+    "HydraPartialBuilds",
 ]
