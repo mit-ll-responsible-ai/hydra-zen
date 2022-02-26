@@ -11,8 +11,7 @@ from hydra_zen.structured_configs._implementations import (
     uses_zen_processing,
 )
 from hydra_zen.structured_configs._utils import get_obj_path
-from hydra_zen.typing import PartialBuilds
-from hydra_zen.typing._implementations import HydraPartialBuilds
+from hydra_zen.typing import HydraPartialBuilds, ZenPartialBuilds
 
 
 @dataclass
@@ -32,7 +31,7 @@ class ZenPartialConf:
 
 def test_HydraPartialBuilds_protocol():
     assert isinstance(HydraPartialConf(), HydraPartialBuilds)
-    assert not isinstance(HydraPartialConf(), PartialBuilds)
+    assert not isinstance(HydraPartialConf(), ZenPartialBuilds)
 
 
 def test_HYDRA_SUPPORTS_PARTIAL_is_set_properly():
