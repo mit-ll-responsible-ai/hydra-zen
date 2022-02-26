@@ -733,9 +733,7 @@ def builds(
     Type[PartialBuilds[Importable]],
     Type[BuildsWithSig[Type[R], P]],
 ]:
-    """builds(hydra_target, /, *pos_args, zen_partial=False, zen_meta=None,
-    hydra_recursive=None, populate_full_signature=False, hydra_convert=None,
-    frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
+    """builds(hydra_target, /, *pos_args, zen_partial=False, zen_wrappers=(),zen_meta=None, populate_full_signature=False, hydra_recursive=None, hydra_convert=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
 
     Returns a structured config, which describes how to instantiate/call
     ``<hydra_target>`` with both user-specified and auto-populated parameter values.
@@ -1208,13 +1206,18 @@ def builds(
 
     target_path: Final[str] = _utils.get_obj_path(target)
 
-    if (
-        HYDRA_SUPPORTS_PARTIAL
-        and zen_partial
-        # check that no other zen-processing is needed
-        and not zen_meta
-        and not validated_wrappers
-    ):  # pragma: no cover
+    bases_use_zen_processing: Final[bool] = any(
+        uses_zen_processing(b) for b in builds_bases
+    )
+
+    requires_zen_processing: Final[bool] = (
+        bool(zen_meta)
+        or bool(validated_wrappers)
+        or bases_use_zen_processing
+        or (zen_partial and not HYDRA_SUPPORTS_PARTIAL)
+    )
+
+    if not requires_zen_processing and zen_partial:  # pragma: no cover
         # TODO: require test-coverage once Hydra publishes nightly builds
         target_field = [
             (
@@ -1228,7 +1231,7 @@ def builds(
                 _utils.field(default=zen_partial, init=False),
             ),
         ]
-    elif zen_partial or zen_meta or validated_wrappers:
+    elif requires_zen_processing:
         # target is `hydra_zen.funcs.zen_processing`
         target_field = [
             (
@@ -1715,18 +1718,25 @@ def builds(
         dataclass_name, fields=sanitized_base_fields, bases=builds_bases, frozen=frozen
     )
 
-    # TODO: revisit this constraint
+    _hydra_partial_attr = getattr(out, _PARTIAL_FIELD_NAME, False)
+
     if zen_partial is False and (
-        hasattr(out, _ZEN_PARTIAL_TARGET_FIELD_NAME)
-        or (HYDRA_SUPPORTS_PARTIAL and hasattr(out, _PARTIAL_FIELD_NAME))
+        getattr(out, _ZEN_PARTIAL_TARGET_FIELD_NAME, False) or _hydra_partial_attr
     ):
-        # `out._partial_` has been inherited; this will lead to an error when
-        # hydra-instantiation occurs, since it will be passed to target.
-        # There is not an easy way to delete this, since it comes from a parent class
+        # `out._partial_=True` or `out._zen_partial=True` has been inherited; there
+        # is no way for users to override this, thus they must explicitly specify
+        # `zen_partial=True` in order to "opt-in" to this behavior.
         raise TypeError(
             BUILDS_ERROR_PREFIX
             + "`builds(..., zen_partial=False, builds_bases=(...))` does not "
             "permit `builds_bases` where a partial target has been specified."
+        )
+
+    if requires_zen_processing and _hydra_partial_attr:
+        raise TypeError(
+            BUILDS_ERROR_PREFIX
+            + "`builds(..., builds_bases=(...))` cannot use zen-processing features "
+            "while inheriting the field `_partial_: bool = True`"
         )
 
     out.__doc__ = (
