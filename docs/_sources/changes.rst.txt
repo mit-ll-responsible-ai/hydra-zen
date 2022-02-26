@@ -28,7 +28,7 @@ IDEs (e.g. using Pylance in VSCode) for the best experience.
 Bug Fixes
 ---------
 
-``builds(<target>, builds_bases=(...))`` now properly supports the case where a parent config introduces zen-processing features via inheritance. See pull:`236` for more details.
+``builds(<target>, builds_bases=(...))`` now properly supports the case where a parent config introduces zen-processing features via inheritance. See :pull:`236` for more details.
 
 
 Improvements
