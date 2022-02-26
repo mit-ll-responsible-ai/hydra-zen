@@ -1,8 +1,11 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
+from typing import Any
+
 import hypothesis.strategies as st
 
+from hydra_zen import to_yaml
 from hydra_zen.structured_configs._utils import is_classmethod
 
 valid_hydra_literals = st.sampled_from(
@@ -23,3 +26,7 @@ def check_identity(new, original):
         return new is original
     # objects like classmethods do not satisfy `x is x`
     return new == original
+
+
+def sorted_yaml(conf: Any):
+    return "\n".join(sorted(to_yaml(conf).splitlines()))

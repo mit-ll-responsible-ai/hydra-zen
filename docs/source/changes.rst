@@ -11,7 +11,7 @@ chronological order. All previous releases should still be available on pip.
 .. _v0.6.0:
 
 ---------------------
-0.6.0rc2 - 2022-02-17
+0.6.0rc3 - 2022-02-26
 ---------------------
 
 This release focuses on improving hydra-zen's type-annotations; it increases the 
@@ -24,6 +24,11 @@ annotations are validated by `pyright <https://github.com/microsoft/pyright>`_. 
 IDEs (e.g. using Pylance in VSCode) for the best experience.
 
 (A note to VSCode users: make sure to set `Type Checking Mode` to `basic` in your IDE -- it is disabled by default!)
+
+Bug Fixes
+---------
+
+``builds(<target>, builds_bases=(...))`` now properly supports the case where a parent config introduces zen-processing features via inheritance. See pull:`236` for more details.
 
 
 Improvements
