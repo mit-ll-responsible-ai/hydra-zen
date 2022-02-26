@@ -104,7 +104,7 @@ class Builds(DataClass, Protocol[T]):  # pragma: no cover
     _target_: ClassVar[str]
 
 
-class BuildsWithSig(Builds[T], Protocol[P]):  # pragma: no cover
+class BuildsWithSig(Builds[T], Protocol[T, P]):  # pragma: no cover
     def __init__(self, *args: P.args, **kwds: P.kwargs):  # pragma: no cover
         ...
 
