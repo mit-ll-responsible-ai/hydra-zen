@@ -65,7 +65,7 @@ rather than using ``hydra_zen.funcs.zen_processing`` to facilitate partial insta
 
 This change will only occur when one's locally-installed version of ``hydra-core`` is 1.1.2 or higher. Structured configs and yamls that configure partial'd objects via ``hydra_zen.funcs.zen_processing`` are still valid and will instantiate in the same way as before. I.e. this is only a compatibility-breaking change for code that relied on the specific implementation details of the structured config produced by ``builds(<target>, zen_partial=True)``.
 
-In accordance with this change, the definition of ``hydra_zen.typing.PartialBuilds`` has been changed; it now reflects a union of protocols: ``ZenPartialBuilds[T] | HydraPartialBuilds[T]]``, both are which are now part of the public API of ``hydra_zen.typing``.
+In accordance with this change, the definition of ``hydra_zen.typing.PartialBuilds`` has been changed; it now reflects a union of protocols: ``ZenPartialBuilds[T] | HydraPartialBuilds[T]``, both are which are now part of the public API of ``hydra_zen.typing``.
 
 (See :pull:`186` and :pull:`230` for additional details)
 
