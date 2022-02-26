@@ -111,10 +111,15 @@
 <nav id="bd-toc-nav">
 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry">
-<a class="reference internal nav-link" href="#rc2-2022-02-17">
-   0.6.0rc2 - 2022-02-17
+<a class="reference internal nav-link" href="#rc3-2022-02-26">
+   0.6.0rc3 - 2022-02-26
   </a>
 <ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry">
+<a class="reference internal nav-link" href="#bug-fixes">
+     Bug Fixes
+    </a>
+</li>
 <li class="toc-h3 nav-item toc-entry">
 <a class="reference internal nav-link" href="#improvements">
      Improvements
@@ -180,7 +185,7 @@
     </a>
 </li>
 <li class="toc-h3 nav-item toc-entry">
-<a class="reference internal nav-link" href="#bug-fixes">
+<a class="reference internal nav-link" href="#id8">
      Bug Fixes
     </a>
 </li>
@@ -202,7 +207,7 @@
   </a>
 <ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry">
-<a class="reference internal nav-link" href="#id10">
+<a class="reference internal nav-link" href="#id11">
      New Features
     </a>
 </li>
@@ -240,8 +245,8 @@
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
 <p>This is a record of all past hydra-zen releases and what went into them, in reverse
 chronological order. All previous releases should still be available on pip.</p>
-<div class="section" id="rc2-2022-02-17">
-<span id="v0-6-0"></span><h2>0.6.0rc2 - 2022-02-17<a class="headerlink" href="#rc2-2022-02-17" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="rc3-2022-02-26">
+<span id="v0-6-0"></span><h2>0.6.0rc3 - 2022-02-26<a class="headerlink" href="#rc3-2022-02-26" title="Permalink to this headline">¶</a></h2>
 <p>This release focuses on improving hydra-zen’s type-annotations; it increases the
 degree to which IDEs and static-analysis tools can infer information about common
 hydra-zen code patterns.</p>
@@ -250,6 +255,10 @@ types) and that some type-checkers do not support these features yet. hydra-zen�
 annotations are validated by <a class="reference external" href="https://github.com/microsoft/pyright">pyright</a>. Thus we recommend that users leverage pyright and pyright-based language servers in their
 IDEs (e.g. using Pylance in VSCode) for the best experience.</p>
 <p>(A note to VSCode users: make sure to set <code class="xref py py-obj docutils literal notranslate"><span class="pre">Type</span> <span class="pre">Checking</span> <span class="pre">Mode</span></code> to <code class="xref py py-obj docutils literal notranslate"><span class="pre">basic</span></code> in your IDE – it is disabled by default!)</p>
+<div class="section" id="bug-fixes">
+<h3>Bug Fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">builds(&lt;target&gt;,</span> <span class="pre">builds_bases=(...))</span></code> now properly supports the case where a parent config introduces zen-processing features via inheritance. See pull:<code class="xref py py-obj docutils literal notranslate"><span class="pre">236</span></code> for more details.</p>
+</div>
 <div class="section" id="improvements">
 <h3>Improvements<a class="headerlink" href="#improvements" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
@@ -269,8 +278,8 @@ rather than using <code class="docutils literal notranslate"><span class="pre">h
 <col style="width: 50%"/>
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><div class="literal-block-wrapper docutils container" id="id15">
-<div class="code-block-caption"><span class="caption-text">Hydra &lt; 1.1.2</span><a class="headerlink" href="#id15" title="Permalink to this code">¶</a></div>
+<tr class="row-odd"><td><div class="literal-block-wrapper docutils container" id="id16">
+<div class="code-block-caption"><span class="caption-text">Hydra &lt; 1.1.2</span><a class="headerlink" href="#id16" title="Permalink to this code">¶</a></div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">Conf</span><span class="p">))</span>
@@ -285,8 +294,8 @@ rather than using <code class="docutils literal notranslate"><span class="pre">h
 </div>
 </div>
 </td>
-<td><div class="literal-block-wrapper docutils container" id="id16">
-<div class="code-block-caption"><span class="caption-text">1.1.2 &lt;= Hydra</span><a class="headerlink" href="#id16" title="Permalink to this code">¶</a></div>
+<td><div class="literal-block-wrapper docutils container" id="id17">
+<div class="code-block-caption"><span class="caption-text">1.1.2 &lt;= Hydra</span><a class="headerlink" href="#id17" title="Permalink to this code">¶</a></div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">Conf</span><span class="p">))</span>
@@ -317,8 +326,8 @@ Code that used <code class="docutils literal notranslate"><span class="pre">Part
 <col style="width: 59%"/>
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><div class="literal-block-wrapper docutils container" id="id17">
-<div class="code-block-caption"><span class="caption-text">hydra-zen &lt; 0.6.0</span><a class="headerlink" href="#id17" title="Permalink to this code">¶</a></div>
+<tr class="row-odd"><td><div class="literal-block-wrapper docutils container" id="id18">
+<div class="code-block-caption"><span class="caption-text">hydra-zen &lt; 0.6.0</span><a class="headerlink" href="#id18" title="Permalink to this code">¶</a></div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">PartialBuilds</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -328,8 +337,8 @@ Code that used <code class="docutils literal notranslate"><span class="pre">Part
 </div>
 </div>
 </td>
-<td><div class="literal-block-wrapper docutils container" id="id18">
-<div class="code-block-caption"><span class="caption-text">0.6.0 &lt;= hydra-zen</span><a class="headerlink" href="#id18" title="Permalink to this code">¶</a></div>
+<td><div class="literal-block-wrapper docutils container" id="id19">
+<div class="code-block-caption"><span class="caption-text">0.6.0 &lt;= hydra-zen</span><a class="headerlink" href="#id19" title="Permalink to this code">¶</a></div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">HydraPartialBuilds</span><span class="p">,</span> <span class="n">ZenPartialBuilds</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -452,8 +461,8 @@ would be auto-populated. However, this behavior is unintuitive as
 manually-specifies the arguments from a target’s signature. Thus we have changed the
 behavior accordingly. Please read more about it in <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/174">pull request #174</a>.</p>
 </div>
-<div class="section" id="bug-fixes">
-<h3>Bug Fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id8">
+<h3>Bug Fixes<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <p>The following bug was discovered in <code class="docutils literal notranslate"><span class="pre">omegaconf</span> <span class="pre">&lt;=</span> <span class="pre">2.1.1</span></code>: a config that specifies a
 mutable default value for a field, but inherits from a parent that provides a
 non-mutable value for that field, will instantiate with the parent’s field. Please read more about this issue, and our downstream fix for it, at <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/172">pull request #172</a>.</p>
@@ -467,14 +476,14 @@ specialized support (e.g., NumPy).</p>
 </div>
 </div>
 <div class="section" id="v0-3-1">
-<span id="id8"></span><h2>0.3.1 - 2021-11-13<a class="headerlink" href="#v0-3-1" title="Permalink to this headline">¶</a></h2>
+<span id="id9"></span><h2>0.3.1 - 2021-11-13<a class="headerlink" href="#v0-3-1" title="Permalink to this headline">¶</a></h2>
 <p>This release fixes a bug that was reported in <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/issues/161">issue #161</a>. Prior to this patch,
 there was a bug in <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> where specifying <code class="docutils literal notranslate"><span class="pre">populate_full_sig=True</span></code>
 for a target that did not have <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code> caused all user-specified zen-meta fields
 to be excluded from the resulting config.</p>
 </div>
 <div class="section" id="v0-3-0">
-<span id="id9"></span><h2>0.3.0 - 2021-10-27<a class="headerlink" href="#v0-3-0" title="Permalink to this headline">¶</a></h2>
+<span id="id10"></span><h2>0.3.0 - 2021-10-27<a class="headerlink" href="#v0-3-0" title="Permalink to this headline">¶</a></h2>
 <p>This release adds many new features to hydra-zen, and is a big step towards <code class="docutils literal notranslate"><span class="pre">v1.0.0</span></code>. It also introduces some significant API changes, meaning that there are notable deprecations of expressions that were valid in <code class="docutils literal notranslate"><span class="pre">v0.2.0</span></code>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -484,8 +493,8 @@ to be excluded from the resulting config.</p>
 <p class="admonition-title">Join the Discussion 💬</p>
 <p>The hydra-zen project <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/discussions">now has a discussion board</a>. Stop by and say “hi”!</p>
 </div>
-<div class="section" id="id10">
-<h3>New Features<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id11">
+<h3>New Features<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
 <ul>
 <li><p>The introduction of <code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">zen_wrappers=&lt;&gt;)</span></code>.</p>
 <blockquote>
@@ -541,7 +550,7 @@ utilized. See <a class="reference external" href="https://github.com/mit-ll-resp
 </div>
 </div>
 <div class="section" id="v0-2-0">
-<span id="id13"></span><h2>0.2.0 - 2021-08-12<a class="headerlink" href="#v0-2-0" title="Permalink to this headline">¶</a></h2>
+<span id="id14"></span><h2>0.2.0 - 2021-08-12<a class="headerlink" href="#v0-2-0" title="Permalink to this headline">¶</a></h2>
 <p>This release:</p>
 <ul class="simple">
 <li><p>Improves hydra-zen’s <a class="reference external" href="https://mit-ll-responsible-ai.github.io/hydra-zen/structured_configs.html#automatic-type-refinement">automatic type refinement</a>. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/84">pull request #84</a> for details</p></li>
@@ -553,7 +562,7 @@ utilized. See <a class="reference external" href="https://github.com/mit-ll-resp
 </ul>
 </div>
 <div class="section" id="v0-1-0">
-<span id="id14"></span><h2>0.1.0 - 2021-08-04<a class="headerlink" href="#v0-1-0" title="Permalink to this headline">¶</a></h2>
+<span id="id15"></span><h2>0.1.0 - 2021-08-04<a class="headerlink" href="#v0-1-0" title="Permalink to this headline">¶</a></h2>
 <p>This is hydra-zen’s first stable release on PyPI!
 Although we have not yet released version <code class="xref py py-obj docutils literal notranslate"><span class="pre">v1.0.0</span></code>, it should be noted that hydra-zen’s codebase is thoroughly tested.
 Its test suite makes keen use of the property-based testing library <a class="reference external" href="https://hypothesis.readthedocs.io/en/latest/">Hypothesis</a>.

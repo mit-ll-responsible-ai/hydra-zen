@@ -907,9 +907,7 @@
     <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
     <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]],</span>
 <span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;builds(hydra_target, /, *pos_args, zen_partial=False, zen_meta=None,</span>
-<span class="sd">    hydra_recursive=None, populate_full_signature=False, hydra_convert=None,</span>
-<span class="sd">    frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)</span>
+    <span class="sd">&quot;&quot;&quot;builds(hydra_target, /, *pos_args, zen_partial=False, zen_wrappers=(), zen_meta=None, populate_full_signature=False, hydra_recursive=None, hydra_convert=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)</span>
 
 <span class="sd">    Returns a structured config, which describes how to instantiate/call</span>
 <span class="sd">    ``&lt;hydra_target&gt;`` with both user-specified and auto-populated parameter values.</span>
@@ -1382,13 +1380,14 @@
 
     <span class="n">target_path</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="p">(</span>
-        <span class="n">HYDRA_SUPPORTS_PARTIAL</span>
-        <span class="ow">and</span> <span class="n">zen_partial</span>
-        <span class="c1"># check that no other zen-processing is needed</span>
-        <span class="ow">and</span> <span class="ow">not</span> <span class="n">zen_meta</span>
-        <span class="ow">and</span> <span class="ow">not</span> <span class="n">validated_wrappers</span>
-    <span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+    <span class="n">requires_zen_processing</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="nb">bool</span><span class="p">(</span><span class="n">zen_meta</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="nb">bool</span><span class="p">(</span><span class="n">validated_wrappers</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span><span class="n">uses_zen_processing</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">builds_bases</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="p">(</span><span class="n">zen_partial</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">HYDRA_SUPPORTS_PARTIAL</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">requires_zen_processing</span> <span class="ow">and</span> <span class="n">zen_partial</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
         <span class="c1"># TODO: require test-coverage once Hydra publishes nightly builds</span>
         <span class="n">target_field</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">(</span>
@@ -1402,7 +1401,7 @@
                 <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">zen_partial</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
             <span class="p">),</span>
         <span class="p">]</span>
-    <span class="k">elif</span> <span class="n">zen_partial</span> <span class="ow">or</span> <span class="n">zen_meta</span> <span class="ow">or</span> <span class="n">validated_wrappers</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">requires_zen_processing</span><span class="p">:</span>
         <span class="c1"># target is `hydra_zen.funcs.zen_processing`</span>
         <span class="n">target_field</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">(</span>
@@ -1889,18 +1888,24 @@
         <span class="n">dataclass_name</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">sanitized_base_fields</span><span class="p">,</span> <span class="n">bases</span><span class="o">=</span><span class="n">builds_bases</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="n">frozen</span>
     <span class="p">)</span>
 
-    <span class="c1"># TODO: revisit this constraint</span>
     <span class="k">if</span> <span class="n">zen_partial</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="p">(</span>
-        <span class="nb">hasattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">_ZEN_PARTIAL_TARGET_FIELD_NAME</span><span class="p">)</span>
-        <span class="ow">or</span> <span class="p">(</span><span class="n">HYDRA_SUPPORTS_PARTIAL</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">_PARTIAL_FIELD_NAME</span><span class="p">))</span>
+        <span class="nb">getattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">_ZEN_PARTIAL_TARGET_FIELD_NAME</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">_PARTIAL_FIELD_NAME</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
     <span class="p">):</span>
-        <span class="c1"># `out._partial_` has been inherited; this will lead to an error when</span>
-        <span class="c1"># hydra-instantiation occurs, since it will be passed to target.</span>
-        <span class="c1"># There is not an easy way to delete this, since it comes from a parent class</span>
+        <span class="c1"># `out._partial_=True` or `out._zen_partial=True` has been inherited; there</span>
+        <span class="c1"># is no way for users to override this, thus they must explicitly specify</span>
+        <span class="c1"># `zen_partial=True` in order to &quot;opt-in&quot; to this behavior.</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
             <span class="n">BUILDS_ERROR_PREFIX</span>
             <span class="o">+</span> <span class="s2">&quot;`builds(..., zen_partial=False, builds_bases=(...))` does not &quot;</span>
             <span class="s2">&quot;permit `builds_bases` where a partial target has been specified.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">requires_zen_processing</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">_PARTIAL_FIELD_NAME</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="n">BUILDS_ERROR_PREFIX</span>
+            <span class="o">+</span> <span class="s2">&quot;`builds(..., builds_bases=(...))` cannot use zen-processing features &quot;</span>
+            <span class="s2">&quot;while inheriting the field `_partial_: bool = ...`&quot;</span>
         <span class="p">)</span>
 
     <span class="n">out</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="p">(</span>
@@ -1913,6 +1918,9 @@
             <span class="n">out</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">The docstring for </span><span class="si">{</span><span class="n">_utils</span><span class="o">.</span><span class="n">safe_name</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2"> :</span><span class="se">\n\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">target_doc</span>
             <span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">requires_zen_processing</span> <span class="ow">is</span> <span class="n">uses_zen_processing</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]]],</span> <span class="n">out</span><span class="p">)</span></div>
 
 
