@@ -1716,7 +1716,7 @@ def builds(
 
     if zen_partial is False and (
         getattr(out, _ZEN_PARTIAL_TARGET_FIELD_NAME, False)
-        or any(uses_zen_processing(b) for b in builds_bases)
+        or getattr(out, _PARTIAL_FIELD_NAME, False)
     ):
         # `out._partial_=True` or `out._zen_partial=True` has been inherited; there
         # is no way for users to override this, thus they must explicitly specify
