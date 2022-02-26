@@ -19,6 +19,7 @@ from typing_extensions import Literal, ParamSpec
 
 from ._implementations import (
     Builds,
+    BuildsWithSig,
     DataClass_,
     Importable,
     PartialBuilds,
@@ -46,7 +47,7 @@ def full_builds(
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[()] = ...,
     frozen: bool = ...,
-) -> Callable[P, Builds[Type[R]]]:  # pragma: no cover
+) -> Type[BuildsWithSig[Type[R], P]]:  # pragma: no cover
     ...
 
 
@@ -121,7 +122,7 @@ def full_builds(
 ) -> Union[
     Type[Builds[Importable]],
     Type[PartialBuilds[Importable]],
-    Callable[P, Builds[Type[R]]],
+    Type[BuildsWithSig[Type[R], P]],
 ]:  # pragma: no cover
     ...
 
@@ -141,7 +142,7 @@ def full_builds(
 ) -> Union[
     Type[Builds[Importable]],
     Type[PartialBuilds[Importable]],
-    Callable[P, Builds[Type[R]]],
+    Type[BuildsWithSig[Type[R], P]],
 ]:  # pragma: no cover
     raise NotImplementedError()
 
@@ -180,7 +181,7 @@ def partial_builds(
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[()] = ...,
     frozen: bool = ...,
-) -> Callable[P, Builds[Type[R]]]:  # pragma: no cover
+) -> Type[BuildsWithSig[Type[R], P]]:  # pragma: no cover
     ...
 
 
@@ -237,7 +238,7 @@ def partial_builds(
 ) -> Union[
     Type[Builds[Importable]],
     Type[PartialBuilds[Importable]],
-    Callable[P, Builds[Type[R]]],
+    Type[BuildsWithSig[Type[R], P]],
 ]:  # pragma: no cover
     ...
 
@@ -257,6 +258,6 @@ def partial_builds(
 ) -> Union[
     Type[Builds[Importable]],
     Type[PartialBuilds[Importable]],
-    Callable[P, Builds[Type[R]]],
+    Type[BuildsWithSig[Type[R], P]],
 ]:  # pragma: no cover
     raise NotImplementedError()

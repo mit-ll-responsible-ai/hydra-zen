@@ -23,7 +23,7 @@ from typing import (
 )
 
 from omegaconf import DictConfig, ListConfig
-from typing_extensions import Literal, Protocol, TypedDict, runtime_checkable
+from typing_extensions import Literal, ParamSpec, Protocol, TypedDict, runtime_checkable
 
 __all__ = [
     "Just",
@@ -34,6 +34,9 @@ __all__ = [
     "SupportedPrimitive",
     "ZenWrappers",
 ]
+
+P = ParamSpec("P")
+R = TypeVar("R")
 
 
 class EmptyDict(TypedDict):
@@ -99,6 +102,11 @@ class DataClass(DataClass_, Protocol):  # pragma: no cover
 @runtime_checkable
 class Builds(DataClass, Protocol[T]):  # pragma: no cover
     _target_: ClassVar[str]
+
+
+class BuildsWithSig(Builds[T], Protocol[T, P]):  # pragma: no cover
+    def __init__(self, *args: P.args, **kwds: P.kwargs):  # pragma: no cover
+        ...
 
 
 @runtime_checkable

@@ -32,7 +32,7 @@ from hydra_zen import (
     make_custom_builds_fn,
     mutable_value,
 )
-from hydra_zen.typing import Builds, Partial
+from hydra_zen.typing import Builds, Partial, PartialBuilds
 from hydra_zen.typing._builds_overloads import full_builds, partial_builds
 from hydra_zen.typing._implementations import HydraPartialBuilds
 
@@ -372,9 +372,16 @@ def check_base_annotations():
     class P3:
         pass
 
-    reveal_type(make_config(x=1, bases=(P1, P2, P3)), expected_text="Type[DataClass]")
+    def f(x: int):
+        pass
+
+    P4 = builds(f, populate_full_signature=True)
+
     reveal_type(
-        builds(int, bases=(P1, P2, P3)), expected_text="Type[Builds[Type[int]]]"
+        make_config(x=1, bases=(P1, P2, P3, P4)), expected_text="Type[DataClass]"
+    )
+    reveal_type(
+        builds(int, bases=(P1, P2, P3, P4)), expected_text="Type[Builds[Type[int]]]"
     )
 
     # should fail
@@ -477,10 +484,22 @@ def check_populate_full_sig():
     Conf_f(x=1, y="a string", z="not a bool")  # type: ignore
 
     # The following should be ok
-    reveal_type(Conf_f(1, "hi"), expected_text="Builds[Type[C]]")
-    reveal_type(Conf_f(1, "hi", True), expected_text="Builds[Type[C]]")
-    reveal_type(Conf_f(1, y="hi"), expected_text="Builds[Type[C]]")
-    reveal_type(Conf_f(x=1, y="hi", z=False), expected_text="Builds[Type[C]]")
+    reveal_type(
+        Conf_f(1, "hi"),
+        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = ...)]",
+    )
+    reveal_type(
+        Conf_f(1, "hi", True),
+        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = ...)]",
+    )
+    reveal_type(
+        Conf_f(1, y="hi"),
+        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = ...)]",
+    )
+    reveal_type(
+        Conf_f(x=1, y="hi", z=False),
+        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = ...)]",
+    )
 
     # check instantiation
     reveal_type(instantiate(Conf_f), expected_text="C")
@@ -613,7 +632,7 @@ def check_make_custom_builds_pop_sig():
 
     reveal_type(
         Conf,
-        expected_text="(x: int, y: str, z: bool = ...) -> Builds[Type[int]]",
+        expected_text="Type[BuildsWithSig[Type[int], (x: int, y: str, z: bool = ...)]]",
     )
 
 
@@ -653,3 +672,26 @@ def check_make_custom_builds_partial():
         Conf3,
         expected_text="Type[PartialBuilds[(x: int, y: str, z: bool = False) -> int]]",
     )
+
+
+def check_protocol_compatibility():
+    def f_builds(x: Type[Builds]):
+        pass
+
+    def f_partial(x: Type[PartialBuilds]):
+        pass
+
+    def f(x: int):
+        pass
+
+    b = builds(int)
+    pb = builds(int, zen_partial=True)
+    bs = builds(f, populate_full_signature=True)
+
+    f_builds(b)
+    f_builds(pb)
+    f_builds(bs)
+
+    f_partial(b)  # type: ignore
+    f_partial(pb)
+    f_partial(bs)  # type: ignore
