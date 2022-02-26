@@ -1749,6 +1749,9 @@ def builds(
             out.__doc__ += (
                 f"\n\nThe docstring for {_utils.safe_name(target)} :\n\n" + target_doc
             )
+
+    assert requires_zen_processing is uses_zen_processing(out)
+
     return cast(Union[Type[Builds[Importable]], Type[BuildsWithSig[Type[R], P]]], out)
 
 
