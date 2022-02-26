@@ -8,6 +8,7 @@ from hypothesis import given
 from hydra_zen import builds, instantiate, to_yaml
 from hydra_zen._compatibility import HYDRA_SUPPORTS_PARTIAL
 from hydra_zen.structured_configs._implementations import (
+    _PARTIAL_FIELD_NAME,
     _ZEN_PROCESSING_LOCATION,
     uses_zen_processing,
 )
@@ -66,8 +67,9 @@ def test_partial_with_inherited_zen_processing(args, meta, wrappers):
 
     child = Child()
 
-    # ensure meta fields are retained by child
-    assert yaml_lines(parent) <= yaml_lines(child)
+    if HYDRA_SUPPORTS_PARTIAL or uses_zen_processing(parent):
+        # ensure meta fields are retained by child
+        assert yaml_lines(parent) <= yaml_lines(child)
 
     if uses_zen_processing(parent) or not HYDRA_SUPPORTS_PARTIAL:
         assert uses_zen_processing(child)
@@ -138,7 +140,16 @@ def test_zen_partial_false_raises_for_partiald_parents(Parent):
     "Parent", [ZenPartialFalse, HydraPartialFalse, ZenPartialTrue, HydraPartialTrue]
 )
 def test_zen_partial_true_holds_for_all_inheritance(Parent):
-    Conf = builds(dict, b=2, zen_partial=True, builds_bases=(Parent,))
+    def make_conf():
+        return builds(dict, b=2, zen_partial=True, builds_bases=(Parent,))
+
+    if not HYDRA_SUPPORTS_PARTIAL and hasattr(Parent, _PARTIAL_FIELD_NAME):
+        with pytest.raises(TypeError):
+            make_conf()
+        return
+
+    Conf = make_conf()
+
     out = instantiate(Conf)
     assert isinstance(out, partial)
     assert out() == {"a": 1, "b": 2}

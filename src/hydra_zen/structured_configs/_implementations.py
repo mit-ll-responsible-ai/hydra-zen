@@ -1732,11 +1732,11 @@ def builds(
             "permit `builds_bases` where a partial target has been specified."
         )
 
-    if requires_zen_processing and _hydra_partial_attr:
+    if requires_zen_processing and hasattr(out, _PARTIAL_FIELD_NAME):
         raise TypeError(
             BUILDS_ERROR_PREFIX
             + "`builds(..., builds_bases=(...))` cannot use zen-processing features "
-            "while inheriting the field `_partial_: bool = True`"
+            "while inheriting the field `_partial_: bool = ...`"
         )
 
     out.__doc__ = (
