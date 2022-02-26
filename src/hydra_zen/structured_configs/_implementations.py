@@ -1206,14 +1206,10 @@ def builds(
 
     target_path: Final[str] = _utils.get_obj_path(target)
 
-    bases_use_zen_processing: Final[bool] = any(
-        uses_zen_processing(b) for b in builds_bases
-    )
-
     requires_zen_processing: Final[bool] = (
         bool(zen_meta)
         or bool(validated_wrappers)
-        or bases_use_zen_processing
+        or any(uses_zen_processing(b) for b in builds_bases)
         or (zen_partial and not HYDRA_SUPPORTS_PARTIAL)
     )
 
@@ -1718,10 +1714,9 @@ def builds(
         dataclass_name, fields=sanitized_base_fields, bases=builds_bases, frozen=frozen
     )
 
-    _hydra_partial_attr = getattr(out, _PARTIAL_FIELD_NAME, False)
-
     if zen_partial is False and (
-        getattr(out, _ZEN_PARTIAL_TARGET_FIELD_NAME, False) or _hydra_partial_attr
+        getattr(out, _ZEN_PARTIAL_TARGET_FIELD_NAME, False)
+        or any(uses_zen_processing(b) for b in builds_bases)
     ):
         # `out._partial_=True` or `out._zen_partial=True` has been inherited; there
         # is no way for users to override this, thus they must explicitly specify
