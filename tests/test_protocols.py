@@ -14,7 +14,7 @@ from hydra_zen.structured_configs._implementations import (
     is_just,
     is_partial_builds,
 )
-from hydra_zen.typing import Builds, Just, Partial, PartialBuilds
+from hydra_zen.typing import Builds, Just, Partial, ZenPartialBuilds
 from hydra_zen.typing._implementations import HydraPartialBuilds
 
 
@@ -23,8 +23,8 @@ from hydra_zen.typing._implementations import HydraPartialBuilds
     [
         (just, Just),
         (builds, Builds),
-        (partial(builds, zen_partial=True), (PartialBuilds, HydraPartialBuilds)),
-        (partial(builds, zen_partial=True, zen_meta=dict(y=1)), PartialBuilds),
+        (partial(builds, zen_partial=True), (ZenPartialBuilds, HydraPartialBuilds)),
+        (partial(builds, zen_partial=True, zen_meta=dict(y=1)), ZenPartialBuilds),
     ],
 )
 def test_runtime_checkability_of_protocols(fn, protocol):
@@ -37,7 +37,7 @@ def test_runtime_checkability_of_protocols(fn, protocol):
 
 def test_Builds_is_not_ZenPartialBuilds():
     Conf = builds(dict)
-    assert not isinstance(Conf, PartialBuilds)
+    assert not isinstance(Conf, ZenPartialBuilds)
 
     PConf = builds(dict, zen_partial=True)
     assert isinstance(PConf, Builds)
@@ -64,7 +64,7 @@ def test_targeted_dataclass_is_Builds():
         (just, Just),
         (
             make_custom_builds_fn(zen_partial=True, zen_meta=dict(_y=None)),
-            PartialBuilds,
+            ZenPartialBuilds,
         ),
     ],
 )

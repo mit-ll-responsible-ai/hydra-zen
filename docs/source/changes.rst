@@ -37,7 +37,7 @@ Improvements
 Support for Upcoming Hydra Features
 -----------------------------------
 
-Hydra 1.1.2 is introducing `support for partial instantiation of targeted configs <https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#partial-instantiation>`_ via the ``_partial_`` field. ``builds(<target>, zen_partial=True)`` will now set the ``_partial_`` field on the structured config
+Hydra 1.1.2 will introduce `support for partial instantiation of targeted configs <https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#partial-instantiation>`_ via the ``_partial_`` field. ``builds(<target>, zen_partial=True)`` will now set the ``_partial_`` field on the structured config
 rather than using ``hydra_zen.funcs.zen_processing`` to facilitate partial instantiation.
 
 
@@ -60,7 +60,28 @@ rather than using ``hydra_zen.funcs.zen_processing`` to facilitate partial insta
 
 This change will only occur when one's locally-installed version of ``hydra-core`` is 1.1.2 or higher. Structured configs and yamls that configure partial'd objects via ``hydra_zen.funcs.zen_processing`` are still valid and will instantiate in the same way as before. I.e. this is only a compatibility-breaking change for code that relied on the specific implementation details of the structured config produced by ``builds(<target>, zen_partial=True)``.
 
+In accordance with this change, the definition of ``hydra_zen.typing.PartialBuilds`` has been changed; it now reflects a union of protocols: ``ZenPartialBuilds[T] | HydraPartialBuilds[T]]``, both are which are now part of the public API of ``hydra_zen.typing``.
+
 (See :pull:`186` and :pull:`230` for additional details)
+
+Compatibility-Breaking Changes
+------------------------------
+
+``hydra_zen.typing.PartialBuilds`` is no longer a runtime-checkable protocol.
+Code that used ``PartialBuilds`` in this way can be updated as follows:
+
+
++---------------------------------------------------+--------------------------------------------------------------------------+
+|                                                   |                                                                          |
+| .. code-block:: pycon                             | .. code-block:: pycon                                                    |
+|    :caption: hydra-zen < 0.6.0                    |    :caption: 0.6.0 <= hydra-zen                                          |
+|                                                   |                                                                          |
+|    >>> from hydra_zen.typing import PartialBuilds |    >>> from hydra_zen.typing import HydraPartialBuilds, ZenPartialBuilds |
+|                                                   |                                                                          |
+|    >>> Conf = builds(int, zen_partial=True)       |    >>> Conf = builds(int, zen_partial=True)                              |
+|    >>> isinstance(Conf, PartialBuilds)            |    >>> isinstance(Conf, (HydraPartialBuilds, ZenPartialBuilds))          |
+|    True                                           |    True                                                                  |
++---------------------------------------------------+--------------------------------------------------------------------------+
 
 .. _v0.5.0:
 

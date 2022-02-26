@@ -33,6 +33,8 @@ __all__ = [
     "Importable",
     "SupportedPrimitive",
     "ZenWrappers",
+    "ZenPartialBuilds",
+    "HydraPartialBuilds",
 ]
 
 P = ParamSpec("P")
@@ -116,7 +118,7 @@ class Just(Builds[T], Protocol[T]):  # pragma: no cover
 
 
 @runtime_checkable
-class PartialBuilds(Builds[T], Protocol[T]):  # pragma: no cover
+class ZenPartialBuilds(Builds[T], Protocol[T]):  # pragma: no cover
     _target_: ClassVar[
         Literal["hydra_zen.funcs.zen_processing"]
     ] = "hydra_zen.funcs.zen_processing"
@@ -127,6 +129,9 @@ class PartialBuilds(Builds[T], Protocol[T]):  # pragma: no cover
 @runtime_checkable
 class HydraPartialBuilds(Builds[T], Protocol[T]):  # pragma: no cover
     _partial_: ClassVar[Literal[True]] = True
+
+
+PartialBuilds = Union[ZenPartialBuilds[T], HydraPartialBuilds[T]]
 
 
 @runtime_checkable

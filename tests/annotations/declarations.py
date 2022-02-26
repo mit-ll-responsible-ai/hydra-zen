@@ -32,7 +32,13 @@ from hydra_zen import (
     make_custom_builds_fn,
     mutable_value,
 )
-from hydra_zen.typing import Builds, Partial, PartialBuilds
+from hydra_zen.typing import (
+    Builds,
+    HydraPartialBuilds,
+    Partial,
+    PartialBuilds,
+    ZenPartialBuilds,
+)
 from hydra_zen.typing._builds_overloads import full_builds, partial_builds
 from hydra_zen.typing._implementations import HydraPartialBuilds
 
@@ -53,9 +59,10 @@ def requires_A(x: int):
 
 
 # test type behaviors
-def f1():
+def check_partial_builds_on_class():
     reveal_type(
-        builds(A, zen_partial=True), expected_text="Type[PartialBuilds[Type[A]]]"
+        builds(A, zen_partial=True),
+        expected_text="Type[ZenPartialBuilds[Type[A]]] | Type[HydraPartialBuilds[Type[A]]]",
     )
     conf_a_partial = builds(A, zen_partial=True)
     reveal_type(instantiate(conf_a_partial), expected_text="Partial[A]")
@@ -65,15 +72,18 @@ def f1():
 f_sig = Callable[[int], int]
 
 
-def f2():
+def check_partial_builds_on_function():
     reveal_type(
         builds(f, zen_partial=True),
-        expected_text="Type[PartialBuilds[(x: int) -> int]]",
+        expected_text="Type[ZenPartialBuilds[(x: int) -> int]] | Type[HydraPartialBuilds[(x: int) -> int]]",
     )
 
     conf_f_partial = builds(f, zen_partial=True)
 
-    reveal_type(conf_f_partial(), expected_text="PartialBuilds[(x: int) -> int]")
+    reveal_type(
+        conf_f_partial(),
+        expected_text="ZenPartialBuilds[(x: int) -> int] | HydraPartialBuilds[(x: int) -> int]",
+    )
 
     conf_f_partial_instance = conf_f_partial()
     reveal_type(instantiate(conf_f_partial), expected_text="Partial[int]")
@@ -181,27 +191,27 @@ def zen_wrappers():
 
     reveal_type(
         builds(str, zen_partial=True, zen_wrappers=f),
-        expected_text="Type[PartialBuilds[Type[str]]]",
+        expected_text="Type[ZenPartialBuilds[Type[str]]] | Type[HydraPartialBuilds[Type[str]]]",
     )
     reveal_type(
         builds(str, zen_partial=True, zen_wrappers=J),
-        expected_text="Type[PartialBuilds[Type[str]]]",
+        expected_text="Type[ZenPartialBuilds[Type[str]]] | Type[HydraPartialBuilds[Type[str]]]",
     )
     reveal_type(
         builds(str, zen_partial=True, zen_wrappers=B),
-        expected_text="Type[PartialBuilds[Type[str]]]",
+        expected_text="Type[ZenPartialBuilds[Type[str]]] | Type[HydraPartialBuilds[Type[str]]]",
     )
     reveal_type(
         builds(str, zen_partial=True, zen_wrappers=PB),
-        expected_text="Type[PartialBuilds[Type[str]]]",
+        expected_text="Type[ZenPartialBuilds[Type[str]]] | Type[HydraPartialBuilds[Type[str]]]",
     )
     reveal_type(
         builds(str, zen_partial=True, zen_wrappers=(None,)),
-        expected_text="Type[PartialBuilds[Type[str]]]",
+        expected_text="Type[ZenPartialBuilds[Type[str]]] | Type[HydraPartialBuilds[Type[str]]]",
     )
     reveal_type(
         builds(str, zen_partial=True, zen_wrappers=(f, J, B, PB, None)),
-        expected_text="Type[PartialBuilds[Type[str]]]",
+        expected_text="Type[ZenPartialBuilds[Type[str]]] | Type[HydraPartialBuilds[Type[str]]]",
     )
 
     # should fail
@@ -214,7 +224,8 @@ def custom_builds_fn():
 
     reveal_type(_builds(int), expected_text="Type[Builds[Type[int]]]")
     reveal_type(
-        _builds(int, zen_partial=True), expected_text="Type[PartialBuilds[Type[int]]]"
+        _builds(int, zen_partial=True),
+        expected_text="Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]]",
     )
 
 
@@ -295,7 +306,7 @@ def supported_primitives():
             e=f,
             zen_partial=True,
         ),
-        expected_text="Type[PartialBuilds[Type[dict[Unknown, Unknown]]]]",
+        expected_text="Type[ZenPartialBuilds[Type[dict[Unknown, Unknown]]]] | Type[HydraPartialBuilds[Type[dict[Unknown, Unknown]]]]",
     )
 
     # check lists
@@ -414,7 +425,7 @@ def check_partiald_target():
     reveal_type(builds(partial(int)), expected_text="Type[Builds[partial[int]]]")
     reveal_type(
         builds(partial(int), zen_partial=True),
-        expected_text="Type[PartialBuilds[partial[int]]]",
+        expected_text="Type[ZenPartialBuilds[partial[int]]] | Type[HydraPartialBuilds[partial[int]]]",
     )
     a = builds(partial(int))
     reveal_type(instantiate(a), expected_text="int")
@@ -435,10 +446,17 @@ def check_target_annotation():
 
 
 def check_protocols():
+    def f() -> Type[ZenPartialBuilds[Type[int]]]:
+        ...
+
+    def g() -> Type[HydraPartialBuilds[Type[int]]]:
+        ...
+
     reveal_type(builds(int)._target_, expected_text="str")
     reveal_type(builds(int)()._target_, expected_text="str")
 
-    PBuilds = builds(int, zen_partial=True)
+    PBuilds = f()
+
     reveal_type(
         PBuilds._target_, expected_text="Literal['hydra_zen.funcs.zen_processing']"
     )
@@ -451,6 +469,10 @@ def check_protocols():
 
     reveal_type(PBuilds._zen_partial, expected_text="Literal[True]")
     reveal_type(PBuilds()._zen_partial, expected_text="Literal[True]")
+
+    HPBuilds = g()
+    reveal_type(HPBuilds._partial_, expected_text="Literal[True]")
+    reveal_type(HPBuilds()._partial_, expected_text="Literal[True]")
 
     Just = just(int)
     reveal_type(Just._target_, expected_text="Literal['hydra_zen.funcs.get_obj']")
@@ -519,7 +541,8 @@ def check_populate_full_sig():
     Conf_f_partial = builds(f, populate_full_signature=True, zen_partial=True)
     conf2 = Conf_f_partial(not_a_valid_arg=1)  # should be ok
     reveal_type(
-        conf2, expected_text="PartialBuilds[(x: int, y: str, z: bool = False) -> C]"
+        conf2,
+        expected_text="ZenPartialBuilds[(x: int, y: str, z: bool = False) -> C] | HydraPartialBuilds[(x: int, y: str, z: bool = False) -> C]",
     )
 
     # specifying `populate_full_signature=False` should disable sig-reflection
@@ -565,7 +588,7 @@ def check_full_builds():
     Conf_f3 = full_builds(f, zen_partial=True)
     reveal_type(
         Conf_f3,
-        expected_text="Type[PartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]]",
+        expected_text="Type[ZenPartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]] | Type[HydraPartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]]",
     )
     Conf_f3()
 
@@ -578,14 +601,14 @@ def check_partial_builds():
     Conf_f = partial_builds(f)
     reveal_type(
         Conf_f,
-        expected_text="Type[PartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]]",
+        expected_text="Type[ZenPartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]] | Type[HydraPartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]]",
     )
 
     # type-checker should see default: `populate_full_signature=True`
     Conf_f2 = partial_builds(f, zen_partial=True)
     reveal_type(
         Conf_f2,
-        expected_text="Type[PartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]]",
+        expected_text="Type[ZenPartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]] | Type[HydraPartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]]",
     )
 
     # signature should be required
@@ -646,7 +669,7 @@ def check_make_custom_builds_partial():
 
     reveal_type(
         Conf,
-        expected_text="Type[PartialBuilds[(x: int, y: str, z: bool = False) -> int]]",
+        expected_text="Type[ZenPartialBuilds[(x: int, y: str, z: bool = False) -> int]] | Type[HydraPartialBuilds[(x: int, y: str, z: bool = False) -> int]]",
     )
 
     partial_builds2 = make_custom_builds_fn(
@@ -657,7 +680,7 @@ def check_make_custom_builds_partial():
 
     reveal_type(
         Conf2,
-        expected_text="Type[PartialBuilds[(x: int, y: str, z: bool = False) -> int]]",
+        expected_text="Type[ZenPartialBuilds[(x: int, y: str, z: bool = False) -> int]] | Type[HydraPartialBuilds[(x: int, y: str, z: bool = False) -> int]]",
     )
 
     Parent = make_config(x=1)
@@ -670,7 +693,7 @@ def check_make_custom_builds_partial():
 
     reveal_type(
         Conf3,
-        expected_text="Type[PartialBuilds[(x: int, y: str, z: bool = False) -> int]]",
+        expected_text="Type[ZenPartialBuilds[(x: int, y: str, z: bool = False) -> int]] | Type[HydraPartialBuilds[(x: int, y: str, z: bool = False) -> int]]",
     )
 
 
@@ -678,7 +701,7 @@ def check_protocol_compatibility():
     def f_builds(x: Type[Builds]):
         pass
 
-    def f_partial(x: Type[PartialBuilds]):
+    def f_partial(x: Type[PartialBuilds[Any]]):
         pass
 
     def f(x: int):
