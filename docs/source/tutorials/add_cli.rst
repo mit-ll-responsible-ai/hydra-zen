@@ -71,8 +71,30 @@ With the above modifications to ``my_app.py`` complete, we can launch our applic
 from the command line. The following will launch a job with ``mario`` and ``luigi`` as 
 the names for player 1 and player 2, respectively.
 
-Open your terminal in the same directory as ``my_app.py`` and execute the following 
-command.
+Open your terminal in the same directory as ``my_app.py``.
+We can view the configurable aspects of our application using the ``--help`` command; run the following:
+
+.. code-block:: console
+   :caption: Checking the configurable components of our app. (We will add configuration groups in a later lesson.)
+
+   $ python my_app.py --help
+   my_app is powered by Hydra.
+   
+   == Configuration groups ==
+   Compose your configuration from those groups (group=option)
+   
+   
+   
+   == Config ==
+   Override anything in the config (foo.bar=value)
+   
+   player1: ???
+   player2: ???
+
+
+See that our app requires that we configure two fields: ``player1`` and ``player2``.
+Let's configure these fields with the string values ``"mario"`` and ``"luigi"``, respectively.
+In your console execute the following command:
 
 .. code-block:: console
    :caption: Launching our application from the command line
@@ -83,7 +105,7 @@ command.
    You can `add tab-completion <https://hydra.cc/docs/tutorials/basic/running_your_app/tab_completion/>`_ to your application's command line interface. This is helpful 
    once you start writing applications that have many configurable components.
 
-To inspect the log written by our application, let's open a Python terminal in the same 
+To inspect the log written by our application, open a Python terminal in the same 
 directory as ``my_app.py`` and define the following function for reading files
 
 .. code-block:: pycon
@@ -101,8 +123,8 @@ Getting the directory containing the output of this job:
    >>> latest_job  # changes based  on reader's date, time, and OS
    WindowsPath('C:/outputs/2021-10-21/12-58-13')
 
-Let's verify that our application still operates as-expected; ``player_log.txt`` should 
-read as follows:
+Print the contents of ``player_log.txt`` and verify that it matches with how we ran our
+program:
 
 .. code-block:: pycon
    
@@ -112,7 +134,7 @@ read as follows:
    Player 2: luigi
 
 
-Voilà! As demonstrated, our application can now be configured and launched from the 
+Voilà! As demonstrated, our simple application can now be configured and launched from the 
 command line. It should be noted that we can still launch our app from a Python 
 console, using :func:`~hydra_zen.launch`, as we did :ref:`in the previous tutorial <launch-basic-app>`.
 
