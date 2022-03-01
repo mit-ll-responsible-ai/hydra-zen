@@ -6,17 +6,17 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Design a Hierarchical Interface for an Application — hydra-zen  documentation</title>
-<link href="../_static/css/theme.css" rel="stylesheet"/>
-<link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet"/>
+<link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet"/>
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet"/>
 <link href="../_static/vendor/fontawesome/5.13.0/css/all.min.css" rel="stylesheet"/>
 <link as="font" crossorigin="" href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2" rel="preload" type="font/woff2"/>
 <link as="font" crossorigin="" href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2" rel="preload" type="font/woff2"/>
 <link href="../_static/pygments.css" rel="stylesheet" type="text/css">
-<link href="../_static/css/blank.css" rel="stylesheet" type="text/css">
+<link href="../_static/styles/pydata-sphinx-theme.css" rel="stylesheet" type="text/css">
 <link href="../_static/copybutton.css" rel="stylesheet" type="text/css">
 <link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css">
 <link href="../_static/tabs.css" rel="stylesheet" type="text/css">
-<link as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js" rel="preload"/>
+<link as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf" rel="preload"/>
 <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
 <script src="../_static/jquery.js"></script>
 <script src="../_static/underscore.js"></script>
@@ -82,10 +82,8 @@
 <div class="navbar-end-item">
 <ul aria-label="Icon Links" class="navbar-nav" id="navbar-icon-links">
 <li class="nav-item">
-<a class="nav-link" href="https://github.com/mit-ll-responsible-ai/hydra-zen" rel="noopener" target="_blank" title="GitHub">
-<span><i class="fab fa-github-square"></i></span>
-<label class="sr-only">GitHub</label>
-</a>
+<a class="nav-link" href="https://github.com/mit-ll-responsible-ai/hydra-zen" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+<label class="sr-only">GitHub</label></a>
 </li>
 </ul>
 </div>
@@ -96,7 +94,8 @@
 <div class="container-xl">
 <div class="row">
 <!-- Only show if we have sidebars configured, else just a small margin  -->
-<div class="col-12 col-md-3 bd-sidebar"><form action="../search.html" class="bd-search d-flex align-items-center" method="get">
+<div class="col-12 col-md-3 bd-sidebar">
+<div class="sidebar-start-items"><form action="../search.html" class="bd-search d-flex align-items-center" method="get">
 <i class="icon fas fa-search"></i>
 <input aria-label="Search the docs ..." autocomplete="off" class="form-control" id="search-input" name="q" placeholder="Search the docs ..." type="search"/>
 </form><nav aria-label="Main navigation" class="bd-links" id="bd-docs-nav">
@@ -135,6 +134,9 @@
 </ul>
 </div>
 </nav>
+</div>
+<div class="sidebar-end-items">
+</div>
 </div>
 <div class="d-none d-xl-block col-xl-2 bd-toc">
 <div class="toc-item">
@@ -181,6 +183,11 @@
     </a>
 </li>
 </ul>
+</li>
+<li class="toc-h2 nav-item toc-entry">
+<a class="reference internal nav-link" href="#reference-documentation">
+   Reference Documentation
+  </a>
 </li>
 </ul>
 </nav>
@@ -281,22 +288,43 @@ to generate configs that reflect these interfaces.</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">game_library</span> <span class="kn">import</span> <span class="n">Character</span>
 
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">print_yaml</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
 <span class="gp">&gt;&gt;&gt; </span><span class="n">CharConf</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">(</span><span class="n">Character</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">(</span><span class="n">CharConf</span><span class="p">))</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">print_yaml</span><span class="p">(</span><span class="n">CharConf</span><span class="p">)</span>
 <span class="go">_target_: game_library.Character</span>
 <span class="go">name: ???</span>
 <span class="go">level: 1</span>
 <span class="go">inventory: null</span>
 
-<span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">(</span><span class="n">CharConf</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"celeste"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">print_yaml</span><span class="p">(</span><span class="n">CharConf</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"celeste"</span><span class="p">))</span>
+<span class="go">_target_: game_library.Character</span>
+<span class="go">name: celeste</span>
+<span class="go">level: 1</span>
+<span class="go">inventory: null</span>
+</pre></div>
+</div>
+</div>
+<p>The <a class="reference internal" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><code class="xref py py-func docutils literal notranslate"><span class="pre">instantiate()</span></code></a> function is used to actually “build” the object described by our config</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Getting a feel for  <a class="reference internal" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><code class="xref py py-func docutils literal notranslate"><span class="pre">instantiate()</span></code></a>.</span><a class="headerlink" href="#id4" title="Permalink to this code">¶</a></div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">char</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">(</span><span class="n">CharConf</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"celeste"</span><span class="p">))</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">char</span>
 <span class="go">celeste, lvl: 1, has: None</span>
+
+<span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#isinstance" title="isinstance"><span class="nb">isinstance</span></a><span class="p">(</span><span class="n">char</span><span class="p">,</span> <span class="n">Character</span><span class="p">)</span>
+<span class="go">True</span>
 </pre></div>
 </div>
 </div>
 <p>Let’s create a configuration for a character with basic “starter gear” for their
 inventory. We will use the following code in <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code>.</p>
-<div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text">Dynamically generating configs based on <code class="docutils literal notranslate"><span class="pre">game_library</span></code></span><a class="headerlink" href="#id4" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">Dynamically generating configs based on <code class="docutils literal notranslate"><span class="pre">game_library</span></code></span><a class="headerlink" href="#id5" title="Permalink to this code">¶</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><span class="n">make_custom_builds_fn</span></a>
 
 <span class="kn">from</span> <span class="nn">game_library</span> <span class="kn">import</span> <span class="n">inventory</span><span class="p">,</span> <span class="n">Character</span>
@@ -315,8 +343,8 @@ inventory. We will use the following code in <code class="docutils literal notra
 </div>
 <p>Finally, the top-level config for our application will simply specify that <code class="docutils literal notranslate"><span class="pre">player</span></code>
 is described by this character config:</p>
-<div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-text">The top-level config for our application</span><a class="headerlink" href="#id5" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">The top-level config for our application</span><a class="headerlink" href="#id6" title="Permalink to this code">¶</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a>
 
 <span class="n">Config</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">(</span><span class="n">player</span><span class="o">=</span><span class="n">CharConf</span><span class="p">)</span>
@@ -326,15 +354,25 @@ is described by this character config:</p>
 </div>
 <div class="section" id="updating-the-task-function">
 <h3>Updating the Task Function<a class="headerlink" href="#updating-the-task-function" title="Permalink to this headline">¶</a></h3>
-<p>We’ll make some trivial modifications to our task function. We’re only dealing with one
-player now, not two, so we adjust accordingly. Let’s also print the
-<code class="docutils literal notranslate"><span class="pre">Character</span></code>-instance for <code class="docutils literal notranslate"><span class="pre">player</span></code> so that we get instant feedback as we prototype our application.</p>
-<div class="literal-block-wrapper docutils container" id="id6">
-<div class="code-block-caption"><span class="caption-text">A revised task function (single-player only)</span><a class="headerlink" href="#id6" title="Permalink to this code">¶</a></div>
+<p>We’ll make some modifications to our task function.</p>
+<ul class="simple">
+<li><p>We’re only dealing with one player now, not two, so we adjust accordingly.</p></li>
+<li><p>We need to make use of the <a class="reference internal" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><code class="xref py py-func docutils literal notranslate"><span class="pre">instantiate()</span></code></a> function to create the <code class="docutils literal notranslate"><span class="pre">Character</span></code>-instance based on our config.</p></li>
+<li><p>Let’s print <code class="docutils literal notranslate"><span class="pre">Character</span></code>-instance for <code class="docutils literal notranslate"><span class="pre">player</span></code> so that we get instant feedback when we run our application from the CLI.</p></li>
+</ul>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">A revised task function (single-player only)</span><a class="headerlink" href="#id7" title="Permalink to this code">¶</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Config</span><span class="p">):</span>
-    <span class="n">obj</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
-
-    <span class="n">player</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">player</span>
+    <span class="c1"># `instantiate(cfg.player)` calls:</span>
+    <span class="c1">#</span>
+    <span class="c1"># Character(</span>
+    <span class="c1">#    name=cfg.player.name,</span>
+    <span class="c1">#    level=cfg.player.level,</span>
+    <span class="c1">#    inventory=inventory(gold=cfg.player.inventory.gold,</span>
+    <span class="c1">#                        weapon=cfg.player.inventory.weapon,</span>
+    <span class="c1">#                        costume=cfg.player.inventory.costume</span>
+    <span class="c1"># )</span>
+    <span class="n">player</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">player</span><span class="p">)</span> <span class="c1"># an instance of `Character`</span>
     <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">player</span><span class="p">)</span>
 
     <span class="k">with</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#open" title="open"><span class="nb">open</span></a><span class="p">(</span><span class="s2">"player_log.txt"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -351,8 +389,8 @@ player now, not two, so we adjust accordingly. Let’s also print the
 <p>Combining these configs and task function together - along with the boilerplate code
 needed to <a class="reference internal" href="add_cli.html#cli-app"><span class="std std-ref">create a command line interface</span></a> - our updated <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code>
 script is as follows.</p>
-<div class="literal-block-wrapper docutils container" id="id7">
-<div class="code-block-caption"><span class="caption-text">Contents of my_app.py:</span><a class="headerlink" href="#id7" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id8">
+<div class="code-block-caption"><span class="caption-text">Contents of my_app.py:</span><a class="headerlink" href="#id8" title="Permalink to this code">¶</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hydra</span>
 <span class="kn">from</span> <span class="nn">hydra.core.config_store</span> <span class="kn">import</span> <span class="n">ConfigStore</span>
 
@@ -377,9 +415,9 @@ script is as follows.</p>
 
 <span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_name</span><span class="o">=</span><span class="s2">"my_app"</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Config</span><span class="p">):</span>
-    <span class="n">obj</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
 
-    <span class="n">player</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">player</span>
+    <span class="n">player</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">player</span><span class="p">)</span> <span class="c1"># an instance of `Character`</span>
+
     <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">player</span><span class="p">)</span>
 
     <span class="k">with</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#open" title="open"><span class="nb">open</span></a><span class="p">(</span><span class="s2">"player_log.txt"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -398,26 +436,55 @@ script is as follows.</p>
 <div class="section" id="running-our-application">
 <h2>Running Our Application<a class="headerlink" href="#running-our-application" title="Permalink to this headline">¶</a></h2>
 <p>We can now configure any aspect of the player when launching our application; let’s try
-a few examples in order to get a feel for the syntax.</p>
-<p>Open your terminal in the directory shared by both <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code> and
+a few examples in order to get a feel for the syntax.
+Open your terminal in the directory shared by both <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code> and
 <code class="docutils literal notranslate"><span class="pre">game_library.py</span></code> and run the following commands. Verify that you can reproduce the
 behavior shown below.</p>
-<div class="literal-block-wrapper docutils container" id="id8">
-<div class="code-block-caption"><span class="caption-text">Configuring: name</span><a class="headerlink" href="#id8" title="Permalink to this code">¶</a></div>
+<p>Checking the <code class="docutils literal notranslate"><span class="pre">--help</span></code> option of our application reveals the hierarchical structure of
+its configurable interface. See that the only required value is <code class="docutils literal notranslate"><span class="pre">player.name</span></code>,  and
+that we can override any of the other default configured values.</p>
+<div class="literal-block-wrapper docutils container" id="id9">
+<div class="code-block-caption"><span class="caption-text">Checking the configurable components of our app. (We will add configuration groups in a later lesson.)</span><a class="headerlink" href="#id9" title="Permalink to this code">¶</a></div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python my_app.py --help
+<span class="go">my_app is powered by Hydra.</span>
+
+<span class="go">== Configuration groups ==</span>
+<span class="go">Compose your configuration from those groups (group=option)</span>
+
+
+
+<span class="go">== Config ==</span>
+<span class="go">Override anything in the config (foo.bar=value)</span>
+
+<span class="go">player:</span>
+<span class="go">  _target_: game_library.Character</span>
+<span class="go">  name: ???</span>
+<span class="go">  level: 1</span>
+<span class="go">  inventory:</span>
+<span class="go">    _target_: game_library.inventory</span>
+<span class="go">    gold: 10</span>
+<span class="go">    weapon: stick</span>
+<span class="go">    costume: tunic</span>
+</pre></div>
+</div>
+</div>
+<p>Now let’s run our application with various configurations.</p>
+<div class="literal-block-wrapper docutils container" id="id10">
+<div class="code-block-caption"><span class="caption-text">Configuring: name</span><a class="headerlink" href="#id10" title="Permalink to this code">¶</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python my_app.py player.name<span class="o">=</span>frodo
 <span class="go">frodo, lvl: 1, has: {'gold': 10, 'weapon': 'stick', 'costume': 'tunic'}</span>
 </pre></div>
 </div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id9">
-<div class="code-block-caption"><span class="caption-text">Configuring: name and level</span><a class="headerlink" href="#id9" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id11">
+<div class="code-block-caption"><span class="caption-text">Configuring: name and level</span><a class="headerlink" href="#id11" title="Permalink to this code">¶</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python my_app.py player.name<span class="o">=</span>frodo player.level<span class="o">=</span><span class="m">5</span>
 <span class="go">frodo, lvl: 5, has: {'gold': 10, 'weapon': 'stick', 'costume': 'tunic'}</span>
 </pre></div>
 </div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id10">
-<div class="code-block-caption"><span class="caption-text">Configuring: name, level, and costume</span><a class="headerlink" href="#id10" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id12">
+<div class="code-block-caption"><span class="caption-text">Configuring: name, level, and costume</span><a class="headerlink" href="#id12" title="Permalink to this code">¶</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python my_app.py player.name<span class="o">=</span>frodo player.level<span class="o">=</span><span class="m">2</span> player.inventory.costume<span class="o">=</span>robe
 <span class="go">frodo, lvl: 2, has: {'gold': 10, 'weapon': 'stick', 'costume': 'robe'}</span>
 </pre></div>
@@ -432,8 +499,8 @@ application’s CLI. The following command line expression</p>
 </pre></div>
 </div>
 <p>can be replicated from a Python console via:</p>
-<div class="literal-block-wrapper docutils container" id="id11">
-<div class="code-block-caption"><span class="caption-text">A Python console, opened in the same directory as <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code></span><a class="headerlink" href="#id11" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id13">
+<div class="code-block-caption"><span class="caption-text">A Python console, opened in the same directory as <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code></span><a class="headerlink" href="#id13" title="Permalink to this code">¶</a></div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><span class="n">launch</span></a>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">my_app</span> <span class="kn">import</span> <span class="n">Config</span><span class="p">,</span> <span class="n">task_function</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">job</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><span class="n">launch</span></a><span class="p">(</span>
@@ -497,21 +564,25 @@ reflects - dynamically - the library code that we are ultimately instantiating. 
 see the power of Hydra’s ability to configure nested fields within our config.</p>
 <p>In the next tutorial, we will define swappable config groups so that we can load
 specific player profiles and inventory load-outs from our application’s interface.</p>
-<div class="admonition-references admonition">
-<p class="admonition-title">References</p>
+</div>
+</div>
+<div class="section" id="reference-documentation">
+<h2>Reference Documentation<a class="headerlink" href="#reference-documentation" title="Permalink to this headline">¶</a></h2>
+<p>Want a deeper understanding of how hydra-zen and Hydra work?
+The following reference materials are especially relevant to this
+tutorial section.</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="../generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_custom_builds_fn</span></code></a></p></li>
+<li><p><a class="reference internal" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">instantiate</span></code></a></p></li>
 <li><p><a class="reference internal" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a></p></li>
+<li><p><a class="reference internal" href="../generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_custom_builds_fn</span></code></a></p></li>
 <li><p><a class="reference external" href="https://hydra.cc/docs/tutorials/structured_config/config_store">Hydra’s Config Store API</a></p></li>
 <li><p><a class="reference external" href="https://hydra.cc/docs/advanced/override_grammar/basic">Hydra’s command line override syntax</a></p></li>
 </ul>
-</div>
 <div class="admonition attention">
 <p class="admonition-title">Attention</p>
 <p><strong>Cleaning Up</strong>:
 To clean up after this tutorial, delete the <code class="docutils literal notranslate"><span class="pre">outputs</span></code> directory that Hydra created
 upon launching our application.</p>
-</div>
 </div>
 </div>
 </div>
@@ -536,7 +607,7 @@ upon launching our application.</p>
 </main>
 </div>
 </div>
-<script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
 <div class="container">
 <div class="footer-item">

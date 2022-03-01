@@ -185,9 +185,8 @@ over. Modify your ``my_app.py`` script to match the following code.
    
    @hydra.main(config_path=None, config_name="my_app")
    def task_function(cfg: Config):
-       obj = instantiate(cfg)
-   
-       player = obj.player
+
+       player = instantiate(cfg.player)
        print(player)
    
        with open("player_log.txt", "w") as f:
@@ -215,8 +214,38 @@ Running Our Application
 In addition to configuring any aspect of the player manually, we can now also reference particular config-group items by-name when we launch our application.
 
 Open your terminal in the directory shared by both ``my_app.py`` and 
-``game_library.py`` and run the following commands. Verify that you can reproduce the 
-behavior shown below.
+``game_library.py`` and run the following commands.
+The ``--help`` flag will list our application's configurable groups and hierarchical
+parameters:
+
+.. code-block:: console
+   :caption: Viewing the ``--help`` info for our application.
+
+   $ python my_app.py --help
+   my_app is powered by Hydra.
+   
+   == Configuration groups ==
+   Compose your configuration from those groups (group=option)
+   
+   player: base, brinda, rakesh
+   player/inventory: advanced, hard_mode, starter
+   
+   
+   == Config ==
+   Override anything in the config (foo.bar=value)
+   
+   player:
+     _target_: game_library.Character
+     name: ???
+     level: 1
+     inventory:
+       _target_: game_library.inventory
+       gold: 10
+       weapon: stick
+       costume: tunic
+
+
+Verify that you can reproduce the behavior shown below.
 
 .. code-block:: console
    :caption: Default inventory.
@@ -255,14 +284,19 @@ of our app's config. This is an elegant way to change, en-masse, pieces of funct
 In the final section of this tutorial, we will use hydra-zen to "inject" novel 
 functionality into our code without having to modify our library's source code nor our task function.
 
-.. admonition:: References
-   
-   - :hydra:`Hydra's default list <tutorials/structured_config/defaults>`
-   - :hydra:`Hydra's default list (technical reference) <advanced/defaults_list>`
-   - :hydra:`Hydra's Config Store API <tutorials/structured_config/config_store>`
-   - :hydra:`Hydra's command line override syntax <advanced/override_grammar/basic>`
-   - `~hydra_zen.make_custom_builds_fn`
-   - `~hydra_zen.builds`
+Reference Documentation
+=======================
+Want a deeper understanding of how hydra-zen and Hydra work?
+The following reference materials are especially relevant to this
+tutorial section.
+
+- :hydra:`Hydra's default list <tutorials/structured_config/defaults>`
+- :hydra:`Hydra's default list (technical reference) <advanced/defaults_list>`
+- :hydra:`Hydra's Config Store API <tutorials/structured_config/config_store>`
+- :hydra:`Hydra's command line override syntax <advanced/override_grammar/basic>`
+- `~hydra_zen.make_custom_builds_fn`
+- `~hydra_zen.builds`
+- `~hydra_zen.instantiate`
 
 .. attention:: **Cleaning Up**:
    To clean up after this tutorial, delete the ``outputs`` directory that Hydra created 

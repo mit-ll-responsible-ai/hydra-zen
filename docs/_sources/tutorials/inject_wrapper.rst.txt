@@ -152,7 +152,7 @@ over. Modify your ``my_app.py`` script to match the following code.
    cs.store(group="player/inventory", name="hard_mode", node=hard_mode_gear)
    
    # 2. Included the wrapper in our config for `Character`
-   CharConf = builds(Character, inventory=starter_gear, zen_wrappers=halloween_update)  # type: ignore
+   CharConf = builds(Character, inventory=starter_gear, zen_wrappers=halloween_update)
    
    brinda_conf = CharConf(
        name="brinda",
@@ -178,9 +178,8 @@ over. Modify your ``my_app.py`` script to match the following code.
    
    @hydra.main(config_path=None, config_name="my_app")
    def task_function(cfg: Config):
-       obj = instantiate(cfg)
-   
-       player = obj.player
+
+       player = instantiate(cfg.player)
        print(player)
    
        with open("player_log.txt", "w") as f:
@@ -263,10 +262,14 @@ pre-processing, post-processing, and transformations into the config-instantiati
 process. For example, hydra-zen provides enhanced :ref:`data-validation capabilities <data-val>` via zen-wrappers. Based on this tutorial, we hope that you feel emboldened 
 to design and use zen-wrappers in your workflow!
 
-.. admonition:: References
+Reference Documentation
+=======================
+Want a deeper understanding of how hydra-zen and Hydra work?
+The following reference materials are especially relevant to this
+tutorial section.
    
-   - `~hydra_zen.builds`
-   - `Real Python's tutorial on wrappers (a.k.a decorators) <https://realpython.com/primer-on-python-decorators/#simple-decorators>`_
+- `~hydra_zen.builds`
+- `Real Python's tutorial on wrappers (a.k.a decorators) <https://realpython.com/primer-on-python-decorators/#simple-decorators>`_
 
 .. attention:: **Cleaning Up**:
    To clean up after this tutorial, delete the ``outputs`` directory that Hydra created 
