@@ -255,14 +255,19 @@ of our app's config. This is an elegant way to change, en-masse, pieces of funct
 In the final section of this tutorial, we will use hydra-zen to "inject" novel 
 functionality into our code without having to modify our library's source code nor our task function.
 
-.. admonition:: References
-   
-   - :hydra:`Hydra's default list <tutorials/structured_config/defaults>`
-   - :hydra:`Hydra's default list (technical reference) <advanced/defaults_list>`
-   - :hydra:`Hydra's Config Store API <tutorials/structured_config/config_store>`
-   - :hydra:`Hydra's command line override syntax <advanced/override_grammar/basic>`
-   - `~hydra_zen.make_custom_builds_fn`
-   - `~hydra_zen.builds`
+Reference Documentation
+=======================
+Want a deeper understanding of how hydra-zen and Hydra work?
+The following reference materials are especially relevant to this
+tutorial section.
+
+- :hydra:`Hydra's default list <tutorials/structured_config/defaults>`
+- :hydra:`Hydra's default list (technical reference) <advanced/defaults_list>`
+- :hydra:`Hydra's Config Store API <tutorials/structured_config/config_store>`
+- :hydra:`Hydra's command line override syntax <advanced/override_grammar/basic>`
+- `~hydra_zen.make_custom_builds_fn`
+- `~hydra_zen.builds`
+- `~hydra_zen.instantiate`
 
 .. attention:: **Cleaning Up**:
    To clean up after this tutorial, delete the ``outputs`` directory that Hydra created 

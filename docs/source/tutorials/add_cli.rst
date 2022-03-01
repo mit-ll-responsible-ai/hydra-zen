@@ -138,10 +138,15 @@ Voilà! As demonstrated, our simple application can now be configured and launch
 command line. It should be noted that we can still launch our app from a Python 
 console, using :func:`~hydra_zen.launch`, as we did :ref:`in the previous tutorial <launch-basic-app>`.
 
-.. admonition:: References
+Reference Documentation
+=======================
+Want a deeper understanding of how hydra-zen and Hydra work?
+The following reference materials are especially relevant to this
+tutorial section.
 
-   - :hydra:`Hydra's Config Store API <tutorials/structured_config/config_store>`
-   - :hydra:`Hydra's command line override syntax <advanced/override_grammar/basic>`
+- `~hydra_zen.make_config`
+- :hydra:`Hydra's Config Store API <tutorials/structured_config/config_store>`
+- :hydra:`Hydra's command line override syntax <advanced/override_grammar/basic>`
 
 
 .. attention:: **Cleaning Up**:
