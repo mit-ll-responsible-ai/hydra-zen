@@ -100,12 +100,12 @@ To see :func:`~hydra_zen.builds` in action, open a Python console (or Jupyter no
 
 .. code-block:: pycon
    :caption: Getting a feel for :func:`~hydra_zen.builds`
-
+   
    >>> from hydra_zen import builds, instantiate, to_yaml
    >>> from game_library import Character
    
    >>> def print_yaml(x): print(to_yaml(x))
-
+   
    >>> CharConf = builds(Character, populate_full_signature=True)
    
    >>> print_yaml(CharConf)
@@ -113,8 +113,8 @@ To see :func:`~hydra_zen.builds` in action, open a Python console (or Jupyter no
    name: ???
    level: 1
    inventory: null
-
-   >>> print_yaml(CharConf(name="celeste")
+   
+   >>> print_yaml(CharConf(name="celeste"))
    _target_: game_library.Character
    name: celeste
    level: 1
