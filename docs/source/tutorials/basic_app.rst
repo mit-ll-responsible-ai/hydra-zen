@@ -223,11 +223,15 @@ we can inspect ``config.yaml``.
 We successfully designed, configured, and launched an application using hydra-zen and 
 Hydra! In the next tutorial, we will add a command line interface to this app.
 
-.. admonition:: References
 
-   - :func:`~hydra_zen.make_config`
-   - :func:`~hydra_zen.instantiate`
-   - :func:`~hydra_zen.launch`
+Reference Documentation
+=======================
+Want a deeper understanding of how hydra-zen and Hydra work?
+The following reference materials are especially relevant to this
+tutorial section.
+
+- :func:`~hydra_zen.make_config`
+- :func:`~hydra_zen.launch`
 
 
 .. attention:: **Cleaning Up**:

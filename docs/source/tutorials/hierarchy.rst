@@ -100,19 +100,40 @@ To see :func:`~hydra_zen.builds` in action, open a Python console (or Jupyter no
 
 .. code-block:: pycon
    :caption: Getting a feel for :func:`~hydra_zen.builds`
-
+   
    >>> from hydra_zen import builds, instantiate, to_yaml
    >>> from game_library import Character
    
+   >>> def print_yaml(x): print(to_yaml(x))
+   
    >>> CharConf = builds(Character, populate_full_signature=True)
-   >>> print(to_yaml(CharConf))
+   
+   >>> print_yaml(CharConf)
    _target_: game_library.Character
    name: ???
    level: 1
    inventory: null
    
-   >>> instantiate(CharConf, name="celeste")
+   >>> print_yaml(CharConf(name="celeste"))
+   _target_: game_library.Character
+   name: celeste
+   level: 1
+   inventory: null
+
+The :func:`~hydra_zen.instantiate` function is used to actually "build" the object described by our config
+
+.. code-block:: pycon
+   :caption: Getting a feel for  :func:`~hydra_zen.instantiate`.
+
+   >>> from hydra_zen import instantiate
+   
+   >>> char = instantiate(CharConf(name="celeste"))
+   
+   >>> char
    celeste, lvl: 1, has: None
+
+   >>> isinstance(char, Character)
+   True
 
 Let's create a configuration for a character with basic "starter gear" for their 
 inventory. We will use the following code in ``my_app.py``.
@@ -148,17 +169,26 @@ is described by this character config:
 Updating the Task Function
 --------------------------
 
-We'll make some trivial modifications to our task function. We're only dealing with one 
-player now, not two, so we adjust accordingly. Let's also print the 
-``Character``-instance for ``player`` so that we get instant feedback as we prototype our application.
+We'll make some modifications to our task function.
+
+- We're only dealing with one player now, not two, so we adjust accordingly.
+- We need to make use of the :func:`~hydra_zen.instantiate` function to create the ``Character``-instance based on our config. 
+- Let's print ``Character``-instance for ``player`` so that we get instant feedback when we run our application from the CLI.
 
 .. code-block:: python
    :caption: A revised task function (single-player only)
 
-   def task_function(cfg: Config):
-       obj = instantiate(cfg)
-       
-       player = obj.player
+   def task_function(cfg: Config):      
+       # `instantiate(cfg.player)` calls:
+       #
+       # Character(
+       #    name=cfg.player.name,
+       #    level=cfg.player.level,
+       #    inventory=inventory(gold=cfg.player.inventory.gold,
+       #                        weapon=cfg.player.inventory.weapon,
+       #                        costume=cfg.player.inventory.costume                        
+       # )
+       player = instantiate(cfg.player) # an instance of `Character`
        print(player)
 
        with open("player_log.txt", "w") as f:
@@ -202,9 +232,9 @@ script is as follows.
     
     @hydra.main(config_path=None, config_name="my_app")
     def task_function(cfg: Config):
-        obj = instantiate(cfg)
-        
-        player = obj.player
+
+        player = instantiate(cfg.player) # an instance of `Character`
+
         print(player)
         
         with open("player_log.txt", "w") as f:
@@ -222,10 +252,40 @@ Running Our Application
 
 We can now configure any aspect of the player when launching our application; let's try 
 a few examples in order to get a feel for the syntax. 
-
 Open your terminal in the directory shared by both ``my_app.py`` and 
 ``game_library.py`` and run the following commands. Verify that you can reproduce the 
 behavior shown below.
+
+Checking the ``--help`` option of our application reveals the hierarchical structure of 
+its configurable interface. See that the only required value is ``player.name``,  and
+that we can override any of the other default configured values.
+
+.. code-block:: console
+   :caption: Checking the configurable components of our app. (We will add configuration groups in a later lesson.)
+
+   $ python my_app.py --help
+   my_app is powered by Hydra.
+   
+   == Configuration groups ==
+   Compose your configuration from those groups (group=option)
+   
+   
+   
+   == Config ==
+   Override anything in the config (foo.bar=value)
+   
+   player:
+     _target_: game_library.Character
+     name: ???
+     level: 1
+     inventory:
+       _target_: game_library.inventory
+       gold: 10
+       weapon: stick
+       costume: tunic
+
+
+Now let's run our application with various configurations.
 
 .. code-block:: console
    :caption: Configuring: name
@@ -336,12 +396,17 @@ see the power of Hydra's ability to configure nested fields within our config.
 In the next tutorial, we will define swappable config groups so that we can load 
 specific player profiles and inventory load-outs from our application's interface.
 
-.. admonition:: References
+Reference Documentation
+=======================
+Want a deeper understanding of how hydra-zen and Hydra work?
+The following reference materials are especially relevant to this
+tutorial section.
 
-   - `~hydra_zen.make_custom_builds_fn`
-   - `~hydra_zen.builds`
-   - :hydra:`Hydra's Config Store API <tutorials/structured_config/config_store>`
-   - :hydra:`Hydra's command line override syntax <advanced/override_grammar/basic>`
+- `~hydra_zen.instantiate`
+- `~hydra_zen.builds`
+- `~hydra_zen.make_custom_builds_fn`
+- :hydra:`Hydra's Config Store API <tutorials/structured_config/config_store>`
+- :hydra:`Hydra's command line override syntax <advanced/override_grammar/basic>`
 
 .. attention:: **Cleaning Up**:
    To clean up after this tutorial, delete the ``outputs`` directory that Hydra created 
