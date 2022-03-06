@@ -1,7 +1,6 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
-from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import (
