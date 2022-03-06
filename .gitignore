@@ -140,3 +140,9 @@ docs/builds
 node_modules/
 
 scratch/
+
+# npm
+package-lock.json
+
+# vscode
+settings.json
