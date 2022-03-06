@@ -136,8 +136,8 @@ class SomeDataClass:
 def f6():
     some_dataclass = SomeDataClass()
 
-    out1 = instantiate(SomeDataClass)
-    out2 = instantiate(some_dataclass)
+    reveal_type(instantiate(SomeDataClass), expected_text="Any")
+    reveal_type(instantiate(some_dataclass), expected_text="Any")
 
 
 def f7():
@@ -167,6 +167,8 @@ def f8():
     @dataclass
     class A:
         x: List[int] = mutable_value([1, 2])
+
+    reveal_type(A().x, expected_text="List[int]")
 
 
 def zen_wrappers():
@@ -718,3 +720,13 @@ def check_protocol_compatibility():
     f_partial(b)  # type: ignore
     f_partial(pb)
     f_partial(bs)  # type: ignore
+
+
+def check_targeted_dataclass():
+    @dataclass
+    class OptimizerConf:
+        _target_: str
+        _partial_: bool = True
+
+    optimizer_conf = OptimizerConf(_target_="torch.optim.SGD")
+    reveal_type(instantiate(optimizer_conf), expected_text="Any")
