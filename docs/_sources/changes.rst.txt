@@ -37,7 +37,8 @@ Improvements
 - Type-information is now dispatched by :func:`~hydra_zen.make_custom_builds_fn` for the common use-cases of ``populate_full_signature=True`` and ``zen_partial=True``, respectively. See :pull:`224` for examples and details.
 - ``hydra_zen.typing.ZenWrappers`` is now a publicly-available annotation. It reflects valid types for ``builds(..., zen_wrappers=<...>)``.
 - hydra-zen now has a pyright-verified `type completeness score <https://github.com/microsoft/pyright/blob/92b4028cd5fd483efcf3f1cdb8597b2d4edd8866/docs/typed-libraries.md#verifying-type-completeness>`_ of 100%. Our CI now requires that this score does not drop below 100%. See :pull:`226` for more details.
-
+- Improved compatibility with mypy (:pull:`243`)
+ 
 
 Support for Upcoming Hydra Features
 -----------------------------------
