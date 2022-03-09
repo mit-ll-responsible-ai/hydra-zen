@@ -113,8 +113,8 @@
 <nav id="bd-toc-nav">
 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry">
-<a class="reference internal nav-link" href="#rc3-2022-02-26">
-   0.6.0rc3 - 2022-02-26
+<a class="reference internal nav-link" href="#v0-6-0">
+   0.6.0 - 2022-03-09
   </a>
 <ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry">
@@ -150,12 +150,12 @@
     </a>
 </li>
 <li class="toc-h3 nav-item toc-entry">
-<a class="reference internal nav-link" href="#id2">
+<a class="reference internal nav-link" href="#id3">
      Improvements
     </a>
 </li>
 <li class="toc-h3 nav-item toc-entry">
-<a class="reference internal nav-link" href="#id3">
+<a class="reference internal nav-link" href="#id4">
      Compatibility-Breaking Changes
     </a>
 </li>
@@ -177,17 +177,17 @@
   </a>
 <ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry">
-<a class="reference internal nav-link" href="#id6">
+<a class="reference internal nav-link" href="#id7">
      New Features
     </a>
 </li>
 <li class="toc-h3 nav-item toc-entry">
-<a class="reference internal nav-link" href="#id7">
+<a class="reference internal nav-link" href="#id8">
      Compatibility-Breaking Changes
     </a>
 </li>
 <li class="toc-h3 nav-item toc-entry">
-<a class="reference internal nav-link" href="#id8">
+<a class="reference internal nav-link" href="#id9">
      Bug Fixes
     </a>
 </li>
@@ -209,7 +209,7 @@
   </a>
 <ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry">
-<a class="reference internal nav-link" href="#id11">
+<a class="reference internal nav-link" href="#id12">
      New Features
     </a>
 </li>
@@ -247,8 +247,8 @@
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
 <p>This is a record of all past hydra-zen releases and what went into them, in reverse
 chronological order. All previous releases should still be available on pip.</p>
-<div class="section" id="rc3-2022-02-26">
-<span id="v0-6-0"></span><h2>0.6.0rc3 - 2022-02-26<a class="headerlink" href="#rc3-2022-02-26" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="v0-6-0">
+<span id="id1"></span><h2>0.6.0 - 2022-03-09<a class="headerlink" href="#v0-6-0" title="Permalink to this headline">¶</a></h2>
 <p>This release focuses on improving hydra-zen’s type-annotations; it increases the
 degree to which IDEs and static-analysis tools can infer information about common
 hydra-zen code patterns.</p>
@@ -281,8 +281,8 @@ rather than using <code class="docutils literal notranslate"><span class="pre">h
 <col style="width: 50%"/>
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><div class="literal-block-wrapper docutils container" id="id16">
-<div class="code-block-caption"><span class="caption-text">Hydra &lt; 1.1.2</span><a class="headerlink" href="#id16" title="Permalink to this code">¶</a></div>
+<tr class="row-odd"><td><div class="literal-block-wrapper docutils container" id="id17">
+<div class="code-block-caption"><span class="caption-text">Hydra &lt; 1.1.2</span><a class="headerlink" href="#id17" title="Permalink to this code">¶</a></div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">Conf</span><span class="p">))</span>
@@ -297,8 +297,8 @@ rather than using <code class="docutils literal notranslate"><span class="pre">h
 </div>
 </div>
 </td>
-<td><div class="literal-block-wrapper docutils container" id="id17">
-<div class="code-block-caption"><span class="caption-text">1.1.2 &lt;= Hydra</span><a class="headerlink" href="#id17" title="Permalink to this code">¶</a></div>
+<td><div class="literal-block-wrapper docutils container" id="id18">
+<div class="code-block-caption"><span class="caption-text">1.1.2 &lt;= Hydra</span><a class="headerlink" href="#id18" title="Permalink to this code">¶</a></div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">Conf</span><span class="p">))</span>
@@ -329,8 +329,8 @@ Code that used <code class="docutils literal notranslate"><span class="pre">Part
 <col style="width: 59%"/>
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><div class="literal-block-wrapper docutils container" id="id18">
-<div class="code-block-caption"><span class="caption-text">hydra-zen &lt; 0.6.0</span><a class="headerlink" href="#id18" title="Permalink to this code">¶</a></div>
+<tr class="row-odd"><td><div class="literal-block-wrapper docutils container" id="id19">
+<div class="code-block-caption"><span class="caption-text">hydra-zen &lt; 0.6.0</span><a class="headerlink" href="#id19" title="Permalink to this code">¶</a></div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">PartialBuilds</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -340,8 +340,8 @@ Code that used <code class="docutils literal notranslate"><span class="pre">Part
 </div>
 </div>
 </td>
-<td><div class="literal-block-wrapper docutils container" id="id19">
-<div class="code-block-caption"><span class="caption-text">0.6.0 &lt;= hydra-zen</span><a class="headerlink" href="#id19" title="Permalink to this code">¶</a></div>
+<td><div class="literal-block-wrapper docutils container" id="id20">
+<div class="code-block-caption"><span class="caption-text">0.6.0 &lt;= hydra-zen</span><a class="headerlink" href="#id20" title="Permalink to this code">¶</a></div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">HydraPartialBuilds</span><span class="p">,</span> <span class="n">ZenPartialBuilds</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -357,7 +357,7 @@ Code that used <code class="docutils literal notranslate"><span class="pre">Part
 </div>
 </div>
 <div class="section" id="v0-5-0">
-<span id="id1"></span><h2>0.5.0 - 2022-01-27<a class="headerlink" href="#v0-5-0" title="Permalink to this headline">¶</a></h2>
+<span id="id2"></span><h2>0.5.0 - 2022-01-27<a class="headerlink" href="#v0-5-0" title="Permalink to this headline">¶</a></h2>
 <p>This release primarily improves the ability of <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> to inspect and
 the signatures of its targets; thus its ability to both auto-generate and validate
 configs is improved. This includes automatic support for specifying “partial’d” objects
@@ -370,8 +370,8 @@ the target of <a class="reference internal" href="generated/hydra_zen.builds.htm
 <li><p>An object produced by <a class="reference external" href="https://docs.python.org/3/library/functools.html#functools.partial" title="(in Python v3.10)"><code class="xref py py-func docutils literal notranslate"><span class="pre">functools.partial()</span></code></a> can now be specified as the target of <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a>; <code class="docutils literal notranslate"><span class="pre">builds</span></code> will automatically “unpack” this partial’d object and incorporate its arguments into the config. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/199">pull request #199</a> for examples.</p></li>
 </ul>
 </div>
-<div class="section" id="id2">
-<h3>Improvements<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h3>Improvements<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Fixed an edge case <a class="reference external" href="https://bugs.python.org/issue40897">caused by an upstream bug in inspect.signature</a>, which prevented <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> from accessing the appropriate signature for some target classes. This affected a couple of popular PyTorch classes, such as <code class="docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code> and <code class="docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code>. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/189">pull request #189</a> for examples.</p></li>
 <li><p>When appropriate, <code class="docutils literal notranslate"><span class="pre">builds(&lt;target&gt;,</span> <span class="pre">...)</span></code> will now consult <code class="docutils literal notranslate"><span class="pre">&lt;target&gt;.__new__</span></code> to acquire the type-hints of the target’s signature. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/189">pull request #189</a> for examples.</p></li>
@@ -380,8 +380,8 @@ the target of <a class="reference internal" href="generated/hydra_zen.builds.htm
 <li><p>Fixed incomplete annotations for <code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">zen_wrappers=&lt;..&gt;)</span></code>. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/180">pull request #180</a></p></li>
 </ul>
 </div>
-<div class="section" id="id3">
-<h3>Compatibility-Breaking Changes<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id4">
+<h3>Compatibility-Breaking Changes<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <p>The deprecations <a class="reference internal" href="#p3p0-deprecations"><span class="std std-ref">introduced in v0.3.0</span></a> are now errors. Refer to those notes for details and for solutions for fixing stale code.</p>
 </div>
 <div class="section" id="notes">
@@ -425,11 +425,11 @@ following difference in behavior:</p>
 </div>
 </div>
 <div class="section" id="v0-4-1">
-<span id="id4"></span><h2>0.4.1 - 2021-12-06<a class="headerlink" href="#v0-4-1" title="Permalink to this headline">¶</a></h2>
+<span id="id5"></span><h2>0.4.1 - 2021-12-06<a class="headerlink" href="#v0-4-1" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="#v0-4-0"><span class="std std-ref">0.4.0 - 2021-12-05</span></a> introduced an undocumented, compatibility-breaking change to how hydra-zen treats <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a> values. This patch reverts that change.</p>
 </div>
 <div class="section" id="v0-4-0">
-<span id="id5"></span><h2>0.4.0 - 2021-12-05<a class="headerlink" href="#v0-4-0" title="Permalink to this headline">¶</a></h2>
+<span id="id6"></span><h2>0.4.0 - 2021-12-05<a class="headerlink" href="#v0-4-0" title="Permalink to this headline">¶</a></h2>
 <p>This release makes improvements to the validation performed by hydra-zen’s
 <a class="reference internal" href="api_reference.html#create-config"><span class="std std-ref">config-creation functions</span></a>. It also adds specialized support for
 types that are not natively supported by Hydra.</p>
@@ -438,8 +438,8 @@ fix for an upstream bug in
 <a class="reference external" href="https://omegaconf.readthedocs.io/en/2.1_branch/">omegaconf</a> (a library on which
 Hydra intimately depends). Thus it is highly recommended that users prioritize
 upgrading to hydra-zen v0.4.0.</p>
-<div class="section" id="id6">
-<h3>New Features<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id7">
+<h3>New Features<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <ul>
 <li><p>Strict runtime <em>and</em> static validation of configuration types. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/163">pull request #163</a> for detailed descriptions and examples.</p>
 <blockquote>
@@ -453,8 +453,8 @@ upgrading to hydra-zen v0.4.0.</p>
 </li>
 </ul>
 </div>
-<div class="section" id="id7">
-<h3>Compatibility-Breaking Changes<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id8">
+<h3>Compatibility-Breaking Changes<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <p>We changed the behavior of <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> when
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">populate_full_signature=True</span></code> and one or more base-classes are specified for
 inheritance.</p>
@@ -464,8 +464,8 @@ would be auto-populated. However, this behavior is unintuitive as
 manually-specifies the arguments from a target’s signature. Thus we have changed the
 behavior accordingly. Please read more about it in <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/174">pull request #174</a>.</p>
 </div>
-<div class="section" id="id8">
-<h3>Bug Fixes<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id9">
+<h3>Bug Fixes<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <p>The following bug was discovered in <code class="docutils literal notranslate"><span class="pre">omegaconf</span> <span class="pre">&lt;=</span> <span class="pre">2.1.1</span></code>: a config that specifies a
 mutable default value for a field, but inherits from a parent that provides a
 non-mutable value for that field, will instantiate with the parent’s field. Please read more about this issue, and our downstream fix for it, at <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/172">pull request #172</a>.</p>
@@ -479,14 +479,14 @@ specialized support (e.g., NumPy).</p>
 </div>
 </div>
 <div class="section" id="v0-3-1">
-<span id="id9"></span><h2>0.3.1 - 2021-11-13<a class="headerlink" href="#v0-3-1" title="Permalink to this headline">¶</a></h2>
+<span id="id10"></span><h2>0.3.1 - 2021-11-13<a class="headerlink" href="#v0-3-1" title="Permalink to this headline">¶</a></h2>
 <p>This release fixes a bug that was reported in <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/issues/161">issue #161</a>. Prior to this patch,
 there was a bug in <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> where specifying <code class="docutils literal notranslate"><span class="pre">populate_full_sig=True</span></code>
 for a target that did not have <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code> caused all user-specified zen-meta fields
 to be excluded from the resulting config.</p>
 </div>
 <div class="section" id="v0-3-0">
-<span id="id10"></span><h2>0.3.0 - 2021-10-27<a class="headerlink" href="#v0-3-0" title="Permalink to this headline">¶</a></h2>
+<span id="id11"></span><h2>0.3.0 - 2021-10-27<a class="headerlink" href="#v0-3-0" title="Permalink to this headline">¶</a></h2>
 <p>This release adds many new features to hydra-zen, and is a big step towards <code class="docutils literal notranslate"><span class="pre">v1.0.0</span></code>. It also introduces some significant API changes, meaning that there are notable deprecations of expressions that were valid in <code class="docutils literal notranslate"><span class="pre">v0.2.0</span></code>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -496,8 +496,8 @@ to be excluded from the resulting config.</p>
 <p class="admonition-title">Join the Discussion 💬</p>
 <p>The hydra-zen project <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/discussions">now has a discussion board</a>. Stop by and say “hi”!</p>
 </div>
-<div class="section" id="id11">
-<h3>New Features<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id12">
+<h3>New Features<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
 <ul>
 <li><p>The introduction of <code class="docutils literal notranslate"><span class="pre">builds(...,</span> <span class="pre">zen_wrappers=&lt;&gt;)</span></code>.</p>
 <blockquote>
@@ -553,7 +553,7 @@ utilized. See <a class="reference external" href="https://github.com/mit-ll-resp
 </div>
 </div>
 <div class="section" id="v0-2-0">
-<span id="id14"></span><h2>0.2.0 - 2021-08-12<a class="headerlink" href="#v0-2-0" title="Permalink to this headline">¶</a></h2>
+<span id="id15"></span><h2>0.2.0 - 2021-08-12<a class="headerlink" href="#v0-2-0" title="Permalink to this headline">¶</a></h2>
 <p>This release:</p>
 <ul class="simple">
 <li><p>Improves hydra-zen’s <a class="reference external" href="https://mit-ll-responsible-ai.github.io/hydra-zen/structured_configs.html#automatic-type-refinement">automatic type refinement</a>. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/84">pull request #84</a> for details</p></li>
@@ -565,7 +565,7 @@ utilized. See <a class="reference external" href="https://github.com/mit-ll-resp
 </ul>
 </div>
 <div class="section" id="v0-1-0">
-<span id="id15"></span><h2>0.1.0 - 2021-08-04<a class="headerlink" href="#v0-1-0" title="Permalink to this headline">¶</a></h2>
+<span id="id16"></span><h2>0.1.0 - 2021-08-04<a class="headerlink" href="#v0-1-0" title="Permalink to this headline">¶</a></h2>
 <p>This is hydra-zen’s first stable release on PyPI!
 Although we have not yet released version <code class="xref py py-obj docutils literal notranslate"><span class="pre">v1.0.0</span></code>, it should be noted that hydra-zen’s codebase is thoroughly tested.
 Its test suite makes keen use of the property-based testing library <a class="reference external" href="https://hypothesis.readthedocs.io/en/latest/">Hypothesis</a>.
