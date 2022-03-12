@@ -18,9 +18,10 @@ from dataclasses import dataclass
 from enum import Enum
 from functools import partial
 from pathlib import Path
-from typing import Any, Callable, List, Tuple, Type, TypeVar, Union
+from typing import Any, Callable, List, Mapping, Optional, Tuple, Type, TypeVar, Union
 
 from omegaconf import MISSING, DictConfig, ListConfig
+from typing_extensions import Literal
 
 from hydra_zen import (
     ZenField,
@@ -37,10 +38,12 @@ from hydra_zen.typing import (
     HydraPartialBuilds,
     Partial,
     PartialBuilds,
+    SupportedPrimitive,
     ZenPartialBuilds,
+    ZenWrappers,
 )
 from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds
-from hydra_zen.typing._implementations import HydraPartialBuilds
+from hydra_zen.typing._implementations import DataClass_, HydraPartialBuilds
 
 T = TypeVar("T")
 
@@ -761,3 +764,78 @@ def check_targeted_dataclass():
 
     optimizer_conf = OptimizerConf(_target_="torch.optim.SGD")
     reveal_type(instantiate(optimizer_conf), expected_text="Any")
+
+
+def check_overloads_arent_too_restrictive():
+    def caller(
+        zen_partial: bool,
+        zen_wrappers: ZenWrappers[Callable[..., Any]],
+        zen_meta: Optional[Mapping[str, SupportedPrimitive]],
+        populate_full_signature: bool,
+        hydra_recursive: Optional[bool],
+        hydra_convert: Optional[Literal["none", "partial", "all"]],
+        frozen: bool,
+        builds_bases: Tuple[Type[DataClass_], ...],
+        dataclass_name: Optional[str],
+        fbuilds: FullBuilds = ...,
+        pbuilds: PBuilds = ...,
+        **kwargs_for_target: SupportedPrimitive
+    ):
+        bout = builds(
+            int,
+            zen_partial=zen_partial,
+            zen_wrappers=zen_wrappers,
+            zen_meta=zen_meta,
+            populate_full_signature=populate_full_signature,
+            hydra_recursive=hydra_recursive,
+            hydra_convert=hydra_convert,
+            frozen=frozen,
+            builds_bases=builds_bases,
+            dataclass_name=dataclass_name,
+            **kwargs_for_target
+        )
+
+        reveal_type(
+            bout,
+            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Type[R@builds], P@builds]]",
+        )
+
+        fout = fbuilds(
+            int,
+            zen_partial=zen_partial,
+            zen_wrappers=zen_wrappers,
+            zen_meta=zen_meta,
+            populate_full_signature=populate_full_signature,
+            hydra_recursive=hydra_recursive,
+            hydra_convert=hydra_convert,
+            frozen=frozen,
+            builds_bases=builds_bases,
+            dataclass_name=dataclass_name,
+            **kwargs_for_target
+        )
+
+        reveal_type(
+            fout,
+            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Type[R@__call__], P@__call__]]",
+        )
+
+        pout = pbuilds(
+            int,
+            zen_partial=zen_partial,
+            zen_wrappers=zen_wrappers,
+            zen_meta=zen_meta,
+            populate_full_signature=populate_full_signature,
+            hydra_recursive=hydra_recursive,
+            hydra_convert=hydra_convert,
+            frozen=frozen,
+            builds_bases=builds_bases,
+            dataclass_name=dataclass_name,
+            **kwargs_for_target
+        )
+
+        reveal_type(
+            pout,
+            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Type[R@__call__], P@__call__]]",
+        )
+
+    assert caller
