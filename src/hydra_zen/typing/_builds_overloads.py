@@ -107,6 +107,27 @@ class FullBuilds(Protocol):  # pragma: no cover
     ) -> Type[PartialBuilds[Importable]]:
         ...
 
+    @overload
+    def __call__(
+        self,
+        *pos_args: Union[Importable, Callable[P, R], SupportedPrimitive],
+        zen_partial: bool,
+        zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
+        zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+        populate_full_signature: bool,
+        hydra_recursive: Optional[bool] = ...,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+        frozen: bool = ...,
+        builds_bases: Tuple[Type[DataClass_], ...] = (),
+        dataclass_name: Optional[str] = ...,
+        **kwargs_for_target: SupportedPrimitive,
+    ) -> Union[
+        Type[Builds[Importable]],
+        Type[PartialBuilds[Importable]],
+        Type[BuildsWithSig[Type[R], P]],
+    ]:
+        ...
+
     def __call__(
         self,
         *pos_args: Union[Importable, Callable[P, R], SupportedPrimitive],
@@ -202,6 +223,27 @@ class PBuilds(Protocol):  # pragma: no cover
     ) -> Type[Builds[Importable]]:
         ...
 
+    @overload
+    def __call__(
+        self,
+        *pos_args: Union[Importable, Callable[P, R], SupportedPrimitive],
+        zen_partial: bool,
+        zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
+        zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+        populate_full_signature: bool = ...,
+        hydra_recursive: Optional[bool] = ...,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+        frozen: bool = ...,
+        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        dataclass_name: Optional[str] = ...,
+        **kwargs_for_target: SupportedPrimitive,
+    ) -> Union[
+        Type[Builds[Importable]],
+        Type[PartialBuilds[Importable]],
+        Type[BuildsWithSig[Type[R], P]],
+    ]:
+        ...
+
     def __call__(
         self,
         *pos_args: Union[Importable, Callable[P, R], SupportedPrimitive],
@@ -221,3 +263,7 @@ class PBuilds(Protocol):  # pragma: no cover
         Type[BuildsWithSig[Type[R], P]],
     ]:
         ...
+
+
+def f(x: PBuilds, y: bool, pop: bool):
+    x(int, zen_partial=y, populate_full_signature=pop)
