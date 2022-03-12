@@ -172,7 +172,7 @@ def f8():
 
 
 def zen_wrappers():
-    def f(obj):
+    def f(obj: Any):
         return obj
 
     J = just(f)
@@ -235,7 +235,7 @@ def supported_primitives():
     class M:
         pass
 
-    def f(*args):
+    def f(*args: Any):
         pass
 
     @dataclass
@@ -256,10 +256,10 @@ def supported_primitives():
                 "hi",
                 2.0,
                 1j,
-                set(),
+                {1, 2},
                 M,
                 ADataclass,
-                builds(dict),
+                builds(int),
                 Path.cwd(),
                 olist,
                 odict,
@@ -289,7 +289,7 @@ def supported_primitives():
     reveal_type(
         builds(
             dict,
-            a=(1, "hi", 2.0, 1j, set(), M, ADataclass, builds(dict), Path.cwd()),
+            a=(1, "hi", 2.0, 1j, set(), M, ADataclass, builds(int), Path.cwd()),
             b={M},
             c={1: M},
             d=[2.0 + 1j],
@@ -301,7 +301,7 @@ def supported_primitives():
     reveal_type(
         builds(
             dict,
-            a=(1, "hi", 2.0, 1j, set(), M, ADataclass, builds(dict), Path.cwd()),
+            a=(1, "hi", 2.0, 1j, set(), M, ADataclass, builds(int), Path.cwd()),
             b={M},
             c={1: M},
             d=[2.0 + 1j],
@@ -312,14 +312,14 @@ def supported_primitives():
     )
 
     # check lists
-    a5 = make_config(a=[], b=[1], c=[[1]], d=[[[M]]])
+    make_config(a=[], b=[1], c=[[1]], d=[[[M]]])
 
     # check dicts
-    a6 = make_config(
+    make_config(
         a={}, b={1: 1}, c=[{1: 1}], d={1: {"a": "a"}}, e={"a": 1j}, f={"a": [1j]}
     )
 
-    a7 = builds(
+    builds(
         f,
         None,
         MISSING,
@@ -334,10 +334,10 @@ def supported_primitives():
         set(),
         frozenset(),
         {1, 1j, Path.cwd()},
-        deque(),
+        deque([1, 2]),
         Counter(),
-        [deque(), Counter(), 1j],
-        (deque(), Counter(), 1j),
+        [deque([1, 2]), Counter({1: 1}), 1j],
+        (deque([1, 2]), Counter(), 1j),
         range(1, 10, 2),
         odict,
         olist,
@@ -349,7 +349,7 @@ def supported_primitives():
 
     # make sure we don't hit this issue again
     # https://github.com/microsoft/pyright/issues/2659
-    a8 = make_config(x=a_list, y=a_dict, z=a_set)
+    make_config(x=a_list, y=a_dict, z=a_set)
 
     # The following should be marked as "bad by type-checkers
     make_config(a=M())  # type: ignore
@@ -421,6 +421,7 @@ def check_partial_protocol():
     x: Partial[int]
     x = partial(int)
     x = partial(str)  # type: ignore
+    assert x
 
 
 def check_partiald_target():
@@ -730,7 +731,7 @@ def check_make_custom_builds_partial():
 
 
 def check_protocol_compatibility():
-    def f_builds(x: Type[Builds]):
+    def f_builds(x: Type[Builds[Any]]):
         pass
 
     def f_partial(x: Type[PartialBuilds[Any]]):
