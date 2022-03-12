@@ -68,17 +68,25 @@ else:
 
 
 @runtime_checkable
-class Partial(Protocol[T2]):
-    func: Callable[..., T2]
-    args: Tuple[Any, ...]
-    keywords: Dict[str, Any]
+class Partial(Protocol[T2]):  # pragma: no cover
+    @property
+    def func(self) -> Callable[..., T2]:
+        ...
+
+    @property
+    def args(self) -> Tuple[Any, ...]:
+        ...
+
+    @property
+    def keywords(self) -> Dict[str, Any]:
+        ...
 
     def __new__(
         cls: Type[T3], func: Callable[..., T2], *args: Any, **kwargs: Any
-    ) -> T3:  # pragma: no cover
+    ) -> T3:
         ...
 
-    def __call__(self, *args: Any, **kwargs: Any) -> T2:  # pragma: no cover
+    def __call__(self, *args: Any, **kwargs: Any) -> T2:
         ...
 
 
