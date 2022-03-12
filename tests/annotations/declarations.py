@@ -594,6 +594,36 @@ def check_full_builds(full_builds: FullBuilds):
     )
     Conf_f3()
 
+    class C:
+        def __init__(self) -> None:
+            pass
+
+    def g(x: int, y: str, z: bool = False):
+        return C()
+
+    # specifying `populate_full_signature=False` should disable sig-reflection
+    Conf_f_not_full = full_builds(g, populate_full_signature=False)
+    conf3 = Conf_f_not_full(not_a_valid_arg=1)  # should be ok
+    reveal_type(conf3, expected_text="Builds[(x: int, y: str, z: bool = False) -> C]")
+
+    # Providing any *args directly in `builds` should distable sig-reflection
+    Conf_f_with_args = full_builds(g, 1, populate_full_signature=True)
+    conf5 = Conf_f_with_args()  # should be ok
+    reveal_type(conf5, expected_text="Builds[(x: int, y: str, z: bool = False) -> C]")
+
+    # Providing any **kwargs directly in `builds` should distable sig-reflection
+    Conf_f_with_kwargs = full_builds(g, x=1, populate_full_signature=True)
+    conf6 = Conf_f_with_kwargs()  # should be ok
+    reveal_type(conf6, expected_text="Builds[(x: int, y: str, z: bool = False) -> C]")
+
+    # Providing any bases in `builds` should distable sig-reflection
+    Parent = make_config(x=1)
+    Conf_f_with_base = full_builds(
+        g, populate_full_signature=True, builds_bases=(Parent,)
+    )
+    conf7 = Conf_f_with_base()  # should be ok
+    reveal_type(conf7, expected_text="Builds[(x: int, y: str, z: bool = False) -> C]")
+
 
 def check_partial_builds(partial_builds: PBuilds):
     def f(x: int, y: str, z: bool = False):
