@@ -614,25 +614,6 @@ def sanitized_field(
     )
 
 
-# `builds(<t>, [*args], [**kwargs], zen_partial=False, populate_full_signature=False)`
-@overload
-def builds(
-    hydra_target: Importable,
-    *pos_args: SupportedPrimitive,
-    zen_partial: Literal[False] = ...,
-    zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
-    zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
-    populate_full_signature: Literal[False] = ...,
-    hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
-    dataclass_name: Optional[str] = ...,
-    builds_bases: Tuple[Type[DataClass_], ...] = ...,
-    frozen: bool = ...,
-    **kwargs_for_target: SupportedPrimitive,
-) -> Type[Builds[Importable]]:  # pragma: no cover
-    ...
-
-
 # `builds(<t>, zen_partial=False, populate_full_signature=True)`
 # -- without any user-specified args/kwargs or bases for the target
 @overload
@@ -690,12 +671,10 @@ def builds(
     ...
 
 
-# broadest annotation
 @overload
 def builds(
-    hydra_target: Union[Importable, Callable[P, R]],
-    *pos_args: SupportedPrimitive,
-    zen_partial: bool = ...,
+    *pos_args: Union[Importable, Callable[P, R], SupportedPrimitive],
+    zen_partial: bool,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
     populate_full_signature: bool = ...,
@@ -1807,18 +1786,6 @@ def is_partial_builds(x: Any) -> TypeGuard[PartialBuilds[Any]]:
         uses_zen_processing(x)
         and (getattr(x, _ZEN_PARTIAL_TARGET_FIELD_NAME, False) is True)
     )
-
-
-@overload
-def get_target(
-    obj: Union[PartialBuilds[_T], Type[PartialBuilds[_T]]]
-) -> _T:  # pragma: no cover
-    ...
-
-
-@overload
-def get_target(obj: Union[Just[_T], Type[Just[_T]]]) -> _T:  # pragma: no cover
-    ...
 
 
 @overload
