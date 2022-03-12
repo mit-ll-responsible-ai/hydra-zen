@@ -39,7 +39,7 @@ class FullBuilds(Protocol):  # pragma: no cover
     @overload
     def __call__(
         self,
-        hydra_target: Callable[P, R],
+        __hydra_target: Callable[P, R],
         *,
         zen_partial: Literal[False] = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -56,7 +56,7 @@ class FullBuilds(Protocol):  # pragma: no cover
     @overload
     def __call__(
         self,
-        hydra_target: Importable,
+        __hydra_target: Importable,
         *pos_args: SupportedPrimitive,
         zen_partial: Literal[False] = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -74,7 +74,7 @@ class FullBuilds(Protocol):  # pragma: no cover
     @overload
     def __call__(
         self,
-        hydra_target: Importable,
+        __hydra_target: Importable,
         *pos_args: SupportedPrimitive,
         zen_partial: Literal[False] = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -92,7 +92,7 @@ class FullBuilds(Protocol):  # pragma: no cover
     @overload
     def __call__(
         self,
-        hydra_target: Importable,
+        __hydra_target: Importable,
         *pos_args: SupportedPrimitive,
         zen_partial: Literal[True] = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -110,7 +110,8 @@ class FullBuilds(Protocol):  # pragma: no cover
     @overload
     def __call__(
         self,
-        *pos_args: Union[Importable, Callable[P, R], SupportedPrimitive],
+        __hydra_target: Union[Importable, Callable[P, R]],
+        *pos_args: SupportedPrimitive,
         zen_partial: bool,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
         zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
@@ -130,7 +131,8 @@ class FullBuilds(Protocol):  # pragma: no cover
 
     def __call__(
         self,
-        *pos_args: Union[Importable, Callable[P, R], SupportedPrimitive],
+        __hydra_target: Union[Importable, Callable[P, R]],
+        *pos_args: SupportedPrimitive,
         zen_partial: bool = False,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
         zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
@@ -155,7 +157,7 @@ class PBuilds(Protocol):  # pragma: no cover
     @overload
     def __call__(
         self,
-        hydra_target: Importable,
+        __hydra_target: Importable,
         *pos_args: SupportedPrimitive,
         zen_partial: Literal[True] = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -173,7 +175,7 @@ class PBuilds(Protocol):  # pragma: no cover
     @overload
     def __call__(
         self,
-        hydra_target: Callable[P, R],
+        __hydra_target: Callable[P, R],
         *,
         zen_partial: Literal[False] = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -190,7 +192,7 @@ class PBuilds(Protocol):  # pragma: no cover
     @overload
     def __call__(
         self,
-        hydra_target: Importable,
+        __hydra_target: Importable,
         *pos_args: SupportedPrimitive,
         zen_partial: Literal[False] = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -208,7 +210,7 @@ class PBuilds(Protocol):  # pragma: no cover
     @overload
     def __call__(
         self,
-        hydra_target: Importable,
+        __hydra_target: Importable,
         *pos_args: SupportedPrimitive,
         zen_partial: Literal[False] = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -226,7 +228,8 @@ class PBuilds(Protocol):  # pragma: no cover
     @overload
     def __call__(
         self,
-        *pos_args: Union[Importable, Callable[P, R], SupportedPrimitive],
+        __hydra_target: Union[Importable, Callable[P, R]],
+        *pos_args: SupportedPrimitive,
         zen_partial: bool,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
         zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
@@ -246,7 +249,8 @@ class PBuilds(Protocol):  # pragma: no cover
 
     def __call__(
         self,
-        *pos_args: Union[Importable, Callable[P, R], SupportedPrimitive],
+        __hydra_target: Union[Importable, Callable[P, R]],
+        *pos_args: SupportedPrimitive,
         zen_partial: bool = True,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
         zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
@@ -263,7 +267,3 @@ class PBuilds(Protocol):  # pragma: no cover
         Type[BuildsWithSig[Type[R], P]],
     ]:
         ...
-
-
-def f(x: PBuilds, y: bool, pop: bool):
-    x(int, zen_partial=y, populate_full_signature=pop)

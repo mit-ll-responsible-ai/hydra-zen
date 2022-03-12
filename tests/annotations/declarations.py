@@ -582,6 +582,9 @@ def check_full_builds(full_builds: FullBuilds):
     def f(x: int, y: str, z: bool = False):
         return 1
 
+    full_builds(hydra_target=int)  # type: ignore
+    full_builds(__hydra_target=int)  # type: ignore
+
     # type-checker should see default: `populate_full_signature=True`
     Conf_f = full_builds(f)
     Conf_f()  # type: ignore
@@ -632,6 +635,9 @@ def check_full_builds(full_builds: FullBuilds):
 def check_partial_builds(partial_builds: PBuilds):
     def f(x: int, y: str, z: bool = False):
         return 1
+
+    partial_builds(hydra_target=int)  # type: ignore
+    partial_builds(__hydra_target=int)  # type: ignore
 
     # type-checker should see default: `populate_full_signature=True`
     Conf_f = partial_builds(f)
@@ -839,3 +845,8 @@ def check_overloads_arent_too_restrictive():
         )
 
     assert caller
+
+
+def check_hydra_target_pos_only():
+    builds(hydra_target=int)  # type: ignore
+    builds(__hydra_target=int)  # type: ignore

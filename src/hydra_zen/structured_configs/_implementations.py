@@ -618,7 +618,7 @@ def sanitized_field(
 # -- without any user-specified args/kwargs or bases for the target
 @overload
 def builds(
-    hydra_target: Callable[P, R],
+    __hydra_target: Callable[P, R],
     *,
     zen_partial: Literal[False] = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -636,7 +636,7 @@ def builds(
 # `builds(<t>, *args, **kwargs, zen_partial=False, populate_full_signature=True)`
 @overload
 def builds(
-    hydra_target: Importable,
+    __hydra_target: Importable,
     *pos_args: SupportedPrimitive,
     zen_partial: Literal[False] = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -655,7 +655,7 @@ def builds(
 # `builds(<t>, [*args], [**kwargs], zen_partial=True)`
 @overload
 def builds(
-    hydra_target: Importable,
+    __hydra_target: Importable,
     *pos_args: SupportedPrimitive,
     zen_partial: Literal[True] = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -673,7 +673,8 @@ def builds(
 
 @overload
 def builds(
-    *pos_args: Union[Importable, Callable[P, R], SupportedPrimitive],
+    __hydra_target: Union[Importable, Callable[P, R]],
+    *pos_args: SupportedPrimitive,
     zen_partial: bool,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
