@@ -39,7 +39,7 @@ from hydra_zen.typing import (
     PartialBuilds,
     ZenPartialBuilds,
 )
-from hydra_zen.typing._builds_overloads import full_builds, partial_builds
+from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds
 from hydra_zen.typing._implementations import HydraPartialBuilds
 
 T = TypeVar("T")
@@ -574,7 +574,7 @@ def check_populate_full_sig():
     reveal_type(conf7, expected_text="Builds[(x: int, y: str, z: bool = False) -> C]")
 
 
-def check_full_builds():
+def check_full_builds(full_builds: FullBuilds):
     def f(x: int, y: str, z: bool = False):
         return 1
 
@@ -595,7 +595,7 @@ def check_full_builds():
     Conf_f3()
 
 
-def check_partial_builds():
+def check_partial_builds(partial_builds: PBuilds):
     def f(x: int, y: str, z: bool = False):
         return 1
 

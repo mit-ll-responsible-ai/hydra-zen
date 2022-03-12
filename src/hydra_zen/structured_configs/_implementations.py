@@ -58,10 +58,7 @@ from hydra_zen.typing import (
     SupportedPrimitive,
     ZenWrappers,
 )
-from hydra_zen.typing._builds_overloads import (
-    full_builds as _full_builds,
-    partial_builds as _partial_builds,
-)
+from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds
 from hydra_zen.typing._implementations import (
     BuildsWithSig,
     DataClass,
@@ -1955,8 +1952,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     builds_bases: Tuple[()] = ...,
-    __b: _T2 = _full_builds,
-) -> _T2:  # pragma: no cover
+) -> FullBuilds:  # pragma: no cover
     ...
 
 
@@ -1987,8 +1983,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
-    __b: _T2 = _partial_builds,
-) -> _T2:  # pragma: no cover
+) -> PBuilds:  # pragma: no cover
     ...
 
 
