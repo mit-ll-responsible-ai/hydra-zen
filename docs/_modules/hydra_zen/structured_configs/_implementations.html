@@ -234,10 +234,6 @@
     <span class="n">SupportedPrimitive</span><span class="p">,</span>
     <span class="n">ZenWrappers</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing._builds_overloads</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">full_builds</span> <span class="k">as</span> <span class="n">_full_builds</span><span class="p">,</span>
-    <span class="n">partial_builds</span> <span class="k">as</span> <span class="n">_partial_builds</span><span class="p">,</span>
-<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">BuildsWithSig</span><span class="p">,</span>
     <span class="n">DataClass</span><span class="p">,</span>
@@ -249,7 +245,6 @@
 <span class="kn">from</span> <span class="nn">._value_conversion</span> <span class="kn">import</span> <span class="n">ZEN_VALUE_CONVERSION</span>
 
 <span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T&quot;</span><span class="p">)</span>
-<span class="n">_T2</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T2&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
 
 <span class="n">P</span> <span class="o">=</span> <span class="n">ParamSpec</span><span class="p">(</span><span class="s2">&quot;P&quot;</span><span class="p">)</span>
 <span class="n">R</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;R&quot;</span><span class="p">)</span>
@@ -793,30 +788,10 @@
     <span class="p">)</span>
 
 
-<span class="c1"># `builds(&lt;t&gt;, [*args], [**kwargs], zen_partial=False, populate_full_signature=False)`</span>
+<span class="c1"># partial=False, pop-sig=True; no *args, **kwargs, nor builds_bases</span>
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-    <span class="n">hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
-    <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
-    <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SupportedPrimitive</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">populate_full_signature</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span>  <span class="c1"># pragma: no cover</span>
-    <span class="o">...</span>
-
-
-<span class="c1"># `builds(&lt;t&gt;, zen_partial=False, populate_full_signature=True)`</span>
-<span class="c1"># -- without any user-specified args/kwargs or bases for the target</span>
-<span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-    <span class="n">hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span>
+    <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -831,10 +806,10 @@
     <span class="o">...</span>
 
 
-<span class="c1"># `builds(&lt;t&gt;, *args, **kwargs, zen_partial=False, populate_full_signature=True)`</span>
+<span class="c1"># partial=False, pop-sig=bool</span>
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-    <span class="n">hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
+    <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
     <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -850,10 +825,10 @@
     <span class="o">...</span>
 
 
-<span class="c1"># `builds(&lt;t&gt;, [*args], [**kwargs], zen_partial=True)`</span>
+<span class="c1"># partial=True, pop-sig=bool</span>
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-    <span class="n">hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
+    <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
     <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -869,18 +844,18 @@
     <span class="o">...</span>
 
 
-<span class="c1"># broadest annotation</span>
+<span class="c1"># partial=bool, pop-sig=bool</span>
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-    <span class="n">hydra_target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Importable</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]],</span>
+    <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Importable</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]],</span>
     <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
-    <span class="n">zen_partial</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">zen_partial</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SupportedPrimitive</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
@@ -1989,18 +1964,6 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span>
-    <span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">_T</span><span class="p">]]]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-    <span class="o">...</span>
-
-
-<span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="n">Type</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">_T</span><span class="p">]]])</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-    <span class="o">...</span>
-
-
-<span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">_T</span><span class="p">]]])</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="o">...</span>
 
@@ -2093,212 +2056,6 @@
         <span class="k">pass</span>  <span class="c1"># makes sure we cover this branch in tests</span>
 
     <span class="k">return</span> <span class="n">target</span></div>
-
-
-<span class="n">_builds_sig</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">builds</span><span class="p">)</span>
-<span class="n">__BUILDS_DEFAULTS</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">name</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">default</span>
-    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">_builds_sig</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">kind</span> <span class="ow">is</span> <span class="n">p</span><span class="o">.</span><span class="n">KEYWORD_ONLY</span>
-<span class="p">}</span>
-<span class="k">del</span> <span class="n">_builds_sig</span>
-
-
-<span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">make_custom_builds_fn</span><span class="p">(</span>
-    <span class="o">*</span><span class="p">,</span>
-    <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">populate_full_signature</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">__b</span><span class="p">:</span> <span class="n">_T2</span> <span class="o">=</span> <span class="n">builds</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T2</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-    <span class="o">...</span>
-
-
-<span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">make_custom_builds_fn</span><span class="p">(</span>
-    <span class="o">*</span><span class="p">,</span>
-    <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">populate_full_signature</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>  <span class="c1"># &lt;- special case</span>
-    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[()]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">__b</span><span class="p">:</span> <span class="n">_T2</span> <span class="o">=</span> <span class="n">_full_builds</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T2</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-    <span class="o">...</span>
-
-
-<span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">make_custom_builds_fn</span><span class="p">(</span>
-    <span class="o">*</span><span class="p">,</span>
-    <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">populate_full_signature</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">__b</span><span class="p">:</span> <span class="n">_T2</span> <span class="o">=</span> <span class="n">builds</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T2</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-    <span class="o">...</span>
-
-
-<span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">make_custom_builds_fn</span><span class="p">(</span>
-    <span class="o">*</span><span class="p">,</span>
-    <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>  <span class="c1"># &lt;- special case</span>
-    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">__b</span><span class="p">:</span> <span class="n">_T2</span> <span class="o">=</span> <span class="n">_partial_builds</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T2</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-    <span class="o">...</span>
-
-
-<div class="viewcode-block" id="make_custom_builds_fn"><a class="viewcode-back" href="../../../generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn">[docs]</a><span class="k">def</span> <span class="nf">make_custom_builds_fn</span><span class="p">(</span>
-    <span class="o">*</span><span class="p">,</span>
-    <span class="n">zen_partial</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(),</span>
-    <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
-    <span class="c1"># This is the easiest way to get static tooling to see the output</span>
-    <span class="c1"># as `builds`.</span>
-    <span class="n">__b</span><span class="p">:</span> <span class="n">_T2</span> <span class="o">=</span> <span class="n">builds</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T2</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Returns the `builds` function, but with customized default values.</span>
-
-<span class="sd">    E.g. ``make_custom_builds_fn(hydra_convert=&#39;all&#39;)`` will return a version</span>
-<span class="sd">    of the `builds` function where the default value for ``hydra_convert``</span>
-<span class="sd">    is ``&#39;all&#39;`` instead of ``None``.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    zen_partial : bool, optional (default=False)</span>
-<span class="sd">        Specifies a new the default value for ``builds(..., zen_partial=&lt;..&gt;)``</span>
-
-<span class="sd">    zen_wrappers : None | Callable | Builds | InterpStr | Sequence[None | Callable | Builds | InterpStr]</span>
-<span class="sd">        Specifies a new the default value for ``builds(..., zen_wrappers=&lt;..&gt;)``</span>
-
-<span class="sd">    zen_meta : Optional[Mapping[str, Any]]</span>
-<span class="sd">        Specifies a new the default value for ``builds(..., zen_meta=&lt;..&gt;)``</span>
-
-<span class="sd">    populate_full_signature : bool, optional (default=False)</span>
-<span class="sd">        Specifies a new the default value for ``builds(..., populate_full_signature=&lt;..&gt;)``</span>
-
-<span class="sd">    hydra_recursive : Optional[bool], optional (default=True)</span>
-<span class="sd">        Specifies a new the default value for ``builds(..., hydra_recursive=&lt;..&gt;)``</span>
-
-<span class="sd">    hydra_convert : Optional[Literal[&quot;none&quot;, &quot;partial&quot;, &quot;all&quot;]], optional (default=&quot;none&quot;)</span>
-<span class="sd">        Specifies a new the default value for ``builds(..., hydra_convert=&lt;..&gt;)``</span>
-
-<span class="sd">    frozen : bool, optional (default=False)</span>
-<span class="sd">        Specifies a new the default value for ``builds(..., frozen=&lt;..&gt;)``</span>
-
-<span class="sd">    builds_bases : Tuple[DataClass, ...]</span>
-<span class="sd">        Specifies a new the default value for ``builds(..., builds_bases=&lt;..&gt;)``</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    custom_builds</span>
-<span class="sd">        The function `builds`, but with customized default values.</span>
-
-<span class="sd">    See Also</span>
-<span class="sd">    --------</span>
-<span class="sd">    builds : Create a targeted structured config designed to &quot;build&quot; a particular object.</span>
-
-<span class="sd">    Examples</span>
-<span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; from hydra_zen import builds, make_custom_builds_fn, instantiate</span>
-
-<span class="sd">    **Basic usage**</span>
-
-<span class="sd">    The following will create a `builds` function whose default value</span>
-<span class="sd">    for ``zen_partial`` has been set to ``True``.</span>
-
-<span class="sd">    &gt;&gt;&gt; pbuilds = make_custom_builds_fn(zen_partial=True)</span>
-
-<span class="sd">    I.e. using ``pbuilds(...)`` is equivalent to using</span>
-<span class="sd">    ``builds(..., zen_partial=True)``.</span>
-
-<span class="sd">    &gt;&gt;&gt; instantiate(pbuilds(int))  # calls `functools.partial(int)`</span>
-<span class="sd">    functools.partial(&lt;class &#39;int&#39;&gt;)</span>
-
-<span class="sd">    You can still specify ``zen_partial`` on a per-case basis with ``pbuilds``.</span>
-
-<span class="sd">    &gt;&gt;&gt; instantiate(pbuilds(int, zen_partial=False))  # calls `int()`</span>
-<span class="sd">    0</span>
-
-<span class="sd">    **Adding data validation to configs**</span>
-
-<span class="sd">    Suppose that we want to enable runtime type-checking - using beartype -</span>
-<span class="sd">    whenever our configs are being instantiated; then the following settings</span>
-<span class="sd">    for `builds` would be handy.</span>
-
-<span class="sd">    &gt;&gt;&gt; # Note: beartype must be installed to use this feature</span>
-<span class="sd">    &gt;&gt;&gt; from hydra_zen.third_party.beartype import validates_with_beartype</span>
-<span class="sd">    &gt;&gt;&gt; build_a_bear = make_custom_builds_fn(</span>
-<span class="sd">    ...     populate_full_signature=True,</span>
-<span class="sd">    ...     hydra_convert=&quot;all&quot;,</span>
-<span class="sd">    ...     zen_wrappers=validates_with_beartype,</span>
-<span class="sd">    ... )</span>
-
-<span class="sd">    Now all configs produced via ``build_a_bear`` will include type-checking</span>
-<span class="sd">    during instantiation.</span>
-
-<span class="sd">    &gt;&gt;&gt; from typing_extensions import Literal</span>
-<span class="sd">    &gt;&gt;&gt; def f(x: Literal[&quot;a&quot;, &quot;b&quot;]): return x</span>
-
-<span class="sd">    &gt;&gt;&gt; Conf = build_a_bear(f)  # a conf that includes `validates_with_beartype`</span>
-
-<span class="sd">    &gt;&gt;&gt; instantiate(Conf, x=&quot;a&quot;)  # satisfies annotation: Literal[&quot;a&quot;, &quot;b&quot;]</span>
-<span class="sd">    &quot;a&quot;</span>
-
-<span class="sd">    &gt;&gt;&gt; instantiate(conf, x=&quot;c&quot;)  # violates annotation: Literal[&quot;a&quot;, &quot;b&quot;]</span>
-<span class="sd">    &lt;Validation error: &quot;c&quot; is not &quot;a&quot; or &quot;b&quot;&gt;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">__b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">builds</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;make_custom_builds_fn() got an unexpected argument: &#39;__b&#39;&quot;</span><span class="p">)</span>
-    <span class="k">del</span> <span class="n">__b</span>
-
-    <span class="n">excluded_fields</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;dataclass_name&quot;</span><span class="p">}</span>
-    <span class="n">LOCALS</span> <span class="o">=</span> <span class="nb">locals</span><span class="p">()</span>
-
-    <span class="c1"># Ensures that new defaults added to `builds` must be reflected</span>
-    <span class="c1"># in the signature of `make_custom_builds_fn`.</span>
-    <span class="k">assert</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">__BUILDS_DEFAULTS</span><span class="p">)</span> <span class="o">-</span> <span class="n">excluded_fields</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">LOCALS</span><span class="p">)</span>
-
-    <span class="n">_new_defaults</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">name</span><span class="p">:</span> <span class="n">LOCALS</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">__BUILDS_DEFAULTS</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">excluded_fields</span>
-    <span class="p">}</span>
-
-    <span class="c1"># let `builds` validate the new defaults!</span>
-    <span class="n">builds</span><span class="p">(</span><span class="n">builds</span><span class="p">,</span> <span class="o">**</span><span class="n">_new_defaults</span><span class="p">)</span>
-
-    <span class="nd">@wraps</span><span class="p">(</span><span class="n">builds</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
-        <span class="n">merged_kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">merged_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_new_defaults</span><span class="p">)</span>
-        <span class="n">merged_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">builds</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">merged_kwargs</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">_T2</span><span class="p">,</span> <span class="n">wrapped</span><span class="p">)</span></div>
 
 
 <span class="k">class</span> <span class="nc">NOTHING</span><span class="p">:</span>
