@@ -614,8 +614,7 @@ def sanitized_field(
     )
 
 
-# `builds(<t>, zen_partial=False, populate_full_signature=True)`
-# -- without any user-specified args/kwargs or bases for the target
+# partial=False, pop-sig=True; no *args, **kwargs, nor builds_bases
 @overload
 def builds(
     __hydra_target: Callable[P, R],
@@ -633,7 +632,7 @@ def builds(
     ...
 
 
-# `builds(<t>, *args, **kwargs, zen_partial=False, populate_full_signature=True)`
+# partial=False, pop-sig=bool
 @overload
 def builds(
     __hydra_target: Importable,
@@ -652,7 +651,7 @@ def builds(
     ...
 
 
-# `builds(<t>, [*args], [**kwargs], zen_partial=True)`
+# partial=True, pop-sig=bool
 @overload
 def builds(
     __hydra_target: Importable,
@@ -671,6 +670,7 @@ def builds(
     ...
 
 
+# partial=bool, pop-sig=bool
 @overload
 def builds(
     __hydra_target: Union[Importable, Callable[P, R]],
@@ -681,7 +681,7 @@ def builds(
     populate_full_signature: bool = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
-    dataclass_name: Optional[str] = ...,
+    dataclass_name: Optional[str],
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
     **kwargs_for_target: SupportedPrimitive,
