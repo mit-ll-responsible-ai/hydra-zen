@@ -60,6 +60,10 @@ T3 = TypeVar("T3")
 
 T4 = TypeVar("T4", bound=Callable[..., Any])
 
+
+InstOrType: TypeAlias = Union[T, Type[T]]
+
+
 if TYPE_CHECKING:  # pragma: no cover
     from dataclasses import Field  # provided by typestub but not generic at runtime
 else:

@@ -27,7 +27,7 @@ from hydra.utils import instantiate as hydra_instantiate
 from omegaconf import MISSING, DictConfig, ListConfig, OmegaConf
 
 from .typing import Builds, Just, Partial
-from .typing._implementations import DataClass_, HasTarget, IsPartial
+from .typing._implementations import DataClass_, HasTarget, InstOrType, IsPartial
 
 __all__ = ["instantiate", "to_yaml", "save_as_yaml", "load_from_yaml", "MISSING"]
 
@@ -37,25 +37,21 @@ T = TypeVar("T")
 
 @overload
 def instantiate(
-    config: Union[Just[T], Type[Just[T]]], *args: Any, **kwargs: Any
+    config: InstOrType[Just[T]], *args: Any, **kwargs: Any
 ) -> T:  # pragma: no cover
     ...
 
 
 @overload
 def instantiate(
-    config: Union[IsPartial[Callable[..., T]], Type[IsPartial[Callable[..., T]]]],
-    *args: Any,
-    **kwargs: Any
+    config: InstOrType[IsPartial[Callable[..., T]]], *args: Any, **kwargs: Any
 ) -> Partial[T]:  # pragma: no cover
     ...
 
 
 @overload
 def instantiate(
-    config: Union[Builds[Callable[..., T]], Type[Builds[Callable[..., T]]]],
-    *args: Any,
-    **kwargs: Any
+    config: InstOrType[Builds[Callable[..., T]]], *args: Any, **kwargs: Any
 ) -> T:  # pragma: no cover
     ...
 
