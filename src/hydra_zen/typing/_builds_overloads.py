@@ -117,7 +117,8 @@ class StdBuilds(Protocol):  # pragma: no cover
 
     def __call__(
         self,
-        *pos_args: Union[Importable, Callable[P, R], SupportedPrimitive],
+        __hydra_target: Union[Importable, Callable[P, R]],
+        *pos_args: SupportedPrimitive,
         zen_partial: bool = False,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
         zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
