@@ -141,6 +141,7 @@ class FullBuilds(Protocol):  # pragma: no cover
 class PBuilds(Protocol):  # pragma: no cover
     # partial_builds -> zen_partial=True (new default value)
 
+    # partial=True, pop-sig=bool
     @overload
     def __call__(
         self,
@@ -159,6 +160,7 @@ class PBuilds(Protocol):  # pragma: no cover
     ) -> Type[PartialBuilds[Importable]]:
         ...
 
+    # partial=False, pop-sig=True; no *args, **kwargs, nor builds_bases
     @overload
     def __call__(
         self,
@@ -176,6 +178,7 @@ class PBuilds(Protocol):  # pragma: no cover
     ) -> Type[BuildsWithSig[Type[R], P]]:
         ...
 
+    # partial=False, pop-sig=bool
     @overload
     def __call__(
         self,
@@ -184,7 +187,7 @@ class PBuilds(Protocol):  # pragma: no cover
         zen_partial: Literal[False] = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
         zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
-        populate_full_signature: Literal[False] = ...,
+        populate_full_signature: bool = ...,
         hydra_recursive: Optional[bool] = ...,
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         dataclass_name: Optional[str] = ...,
@@ -194,24 +197,7 @@ class PBuilds(Protocol):  # pragma: no cover
     ) -> Type[Builds[Importable]]:
         ...
 
-    @overload
-    def __call__(
-        self,
-        __hydra_target: Importable,
-        *pos_args: SupportedPrimitive,
-        zen_partial: Literal[False] = ...,
-        zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
-        zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
-        populate_full_signature: Literal[True] = ...,
-        hydra_recursive: Optional[bool] = ...,
-        hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
-        dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
-        frozen: bool = ...,
-        **kwargs_for_target: SupportedPrimitive,
-    ) -> Type[Builds[Importable]]:
-        ...
-
+    # partial=bool, pop-sig=bool
     @overload
     def __call__(
         self,
@@ -220,7 +206,7 @@ class PBuilds(Protocol):  # pragma: no cover
         zen_partial: bool,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
         zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
-        populate_full_signature: bool = ...,
+        populate_full_signature: bool,
         hydra_recursive: Optional[bool] = ...,
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         frozen: bool = ...,
