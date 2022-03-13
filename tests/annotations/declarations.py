@@ -18,9 +18,10 @@ from dataclasses import dataclass
 from enum import Enum
 from functools import partial
 from pathlib import Path
-from typing import Any, Callable, List, Tuple, Type, TypeVar, Union
+from typing import Any, Callable, List, Mapping, Optional, Tuple, Type, TypeVar, Union
 
 from omegaconf import MISSING, DictConfig, ListConfig
+from typing_extensions import Literal
 
 from hydra_zen import (
     ZenField,
@@ -37,10 +38,12 @@ from hydra_zen.typing import (
     HydraPartialBuilds,
     Partial,
     PartialBuilds,
+    SupportedPrimitive,
     ZenPartialBuilds,
+    ZenWrappers,
 )
-from hydra_zen.typing._builds_overloads import full_builds, partial_builds
-from hydra_zen.typing._implementations import HydraPartialBuilds
+from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds
+from hydra_zen.typing._implementations import DataClass_, HydraPartialBuilds
 
 T = TypeVar("T")
 
@@ -172,7 +175,7 @@ def f8():
 
 
 def zen_wrappers():
-    def f(obj):
+    def f(obj: Any):
         return obj
 
     J = just(f)
@@ -235,7 +238,7 @@ def supported_primitives():
     class M:
         pass
 
-    def f(*args):
+    def f(*args: Any):
         pass
 
     @dataclass
@@ -256,10 +259,10 @@ def supported_primitives():
                 "hi",
                 2.0,
                 1j,
-                set(),
+                {1, 2},
                 M,
                 ADataclass,
-                builds(dict),
+                builds(int),
                 Path.cwd(),
                 olist,
                 odict,
@@ -289,7 +292,7 @@ def supported_primitives():
     reveal_type(
         builds(
             dict,
-            a=(1, "hi", 2.0, 1j, set(), M, ADataclass, builds(dict), Path.cwd()),
+            a=(1, "hi", 2.0, 1j, set(), M, ADataclass, builds(int), Path.cwd()),
             b={M},
             c={1: M},
             d=[2.0 + 1j],
@@ -301,7 +304,7 @@ def supported_primitives():
     reveal_type(
         builds(
             dict,
-            a=(1, "hi", 2.0, 1j, set(), M, ADataclass, builds(dict), Path.cwd()),
+            a=(1, "hi", 2.0, 1j, set(), M, ADataclass, builds(int), Path.cwd()),
             b={M},
             c={1: M},
             d=[2.0 + 1j],
@@ -312,14 +315,14 @@ def supported_primitives():
     )
 
     # check lists
-    a5 = make_config(a=[], b=[1], c=[[1]], d=[[[M]]])
+    make_config(a=[], b=[1], c=[[1]], d=[[[M]]])
 
     # check dicts
-    a6 = make_config(
+    make_config(
         a={}, b={1: 1}, c=[{1: 1}], d={1: {"a": "a"}}, e={"a": 1j}, f={"a": [1j]}
     )
 
-    a7 = builds(
+    builds(
         f,
         None,
         MISSING,
@@ -334,10 +337,10 @@ def supported_primitives():
         set(),
         frozenset(),
         {1, 1j, Path.cwd()},
-        deque(),
+        deque([1, 2]),
         Counter(),
-        [deque(), Counter(), 1j],
-        (deque(), Counter(), 1j),
+        [deque([1, 2]), Counter({1: 1}), 1j],
+        (deque([1, 2]), Counter(), 1j),
         range(1, 10, 2),
         odict,
         olist,
@@ -349,7 +352,7 @@ def supported_primitives():
 
     # make sure we don't hit this issue again
     # https://github.com/microsoft/pyright/issues/2659
-    a8 = make_config(x=a_list, y=a_dict, z=a_set)
+    make_config(x=a_list, y=a_dict, z=a_set)
 
     # The following should be marked as "bad by type-checkers
     make_config(a=M())  # type: ignore
@@ -421,6 +424,7 @@ def check_partial_protocol():
     x: Partial[int]
     x = partial(int)
     x = partial(str)  # type: ignore
+    assert x
 
 
 def check_partiald_target():
@@ -574,7 +578,7 @@ def check_populate_full_sig():
     reveal_type(conf7, expected_text="Builds[(x: int, y: str, z: bool = False) -> C]")
 
 
-def check_full_builds():
+def check_full_builds(full_builds: FullBuilds):
     def f(x: int, y: str, z: bool = False):
         return 1
 
@@ -594,8 +598,38 @@ def check_full_builds():
     )
     Conf_f3()
 
+    class C:
+        def __init__(self) -> None:
+            pass
 
-def check_partial_builds():
+    def g(x: int, y: str, z: bool = False):
+        return C()
+
+    # specifying `populate_full_signature=False` should disable sig-reflection
+    Conf_f_not_full = full_builds(g, populate_full_signature=False)
+    conf3 = Conf_f_not_full(not_a_valid_arg=1)  # should be ok
+    reveal_type(conf3, expected_text="Builds[(x: int, y: str, z: bool = False) -> C]")
+
+    # Providing any *args directly in `builds` should distable sig-reflection
+    Conf_f_with_args = full_builds(g, 1, populate_full_signature=True)
+    conf5 = Conf_f_with_args()  # should be ok
+    reveal_type(conf5, expected_text="Builds[(x: int, y: str, z: bool = False) -> C]")
+
+    # Providing any **kwargs directly in `builds` should distable sig-reflection
+    Conf_f_with_kwargs = full_builds(g, x=1, populate_full_signature=True)
+    conf6 = Conf_f_with_kwargs()  # should be ok
+    reveal_type(conf6, expected_text="Builds[(x: int, y: str, z: bool = False) -> C]")
+
+    # Providing any bases in `builds` should distable sig-reflection
+    Parent = make_config(x=1)
+    Conf_f_with_base = full_builds(
+        g, populate_full_signature=True, builds_bases=(Parent,)
+    )
+    conf7 = Conf_f_with_base()  # should be ok
+    reveal_type(conf7, expected_text="Builds[(x: int, y: str, z: bool = False) -> C]")
+
+
+def check_partial_builds(partial_builds: PBuilds):
     def f(x: int, y: str, z: bool = False):
         return 1
 
@@ -700,7 +734,7 @@ def check_make_custom_builds_partial():
 
 
 def check_protocol_compatibility():
-    def f_builds(x: Type[Builds]):
+    def f_builds(x: Type[Builds[Any]]):
         pass
 
     def f_partial(x: Type[PartialBuilds[Any]]):
@@ -730,3 +764,89 @@ def check_targeted_dataclass():
 
     optimizer_conf = OptimizerConf(_target_="torch.optim.SGD")
     reveal_type(instantiate(optimizer_conf), expected_text="Any")
+
+
+def check_overloads_arent_too_restrictive():
+    def caller(
+        zen_partial: bool,
+        zen_wrappers: ZenWrappers[Callable[..., Any]],
+        zen_meta: Optional[Mapping[str, SupportedPrimitive]],
+        populate_full_signature: bool,
+        hydra_recursive: Optional[bool],
+        hydra_convert: Optional[Literal["none", "partial", "all"]],
+        frozen: bool,
+        builds_bases: Tuple[Type[DataClass_], ...],
+        dataclass_name: Optional[str],
+        fbuilds: FullBuilds = ...,
+        pbuilds: PBuilds = ...,
+        **kwargs_for_target: SupportedPrimitive
+    ):
+        bout = builds(
+            int,
+            zen_partial=zen_partial,
+            zen_wrappers=zen_wrappers,
+            zen_meta=zen_meta,
+            populate_full_signature=populate_full_signature,
+            hydra_recursive=hydra_recursive,
+            hydra_convert=hydra_convert,
+            frozen=frozen,
+            builds_bases=builds_bases,
+            dataclass_name=dataclass_name,
+            **kwargs_for_target
+        )
+
+        reveal_type(
+            bout,
+            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Type[R@builds], P@builds]]",
+        )
+
+        fout = fbuilds(
+            int,
+            zen_partial=zen_partial,
+            zen_wrappers=zen_wrappers,
+            zen_meta=zen_meta,
+            populate_full_signature=populate_full_signature,
+            hydra_recursive=hydra_recursive,
+            hydra_convert=hydra_convert,
+            frozen=frozen,
+            builds_bases=builds_bases,
+            dataclass_name=dataclass_name,
+            **kwargs_for_target
+        )
+
+        reveal_type(
+            fout,
+            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Type[R@__call__], P@__call__]]",
+        )
+
+        pout = pbuilds(
+            int,
+            zen_partial=zen_partial,
+            zen_wrappers=zen_wrappers,
+            zen_meta=zen_meta,
+            populate_full_signature=populate_full_signature,
+            hydra_recursive=hydra_recursive,
+            hydra_convert=hydra_convert,
+            frozen=frozen,
+            builds_bases=builds_bases,
+            dataclass_name=dataclass_name,
+            **kwargs_for_target
+        )
+
+        reveal_type(
+            pout,
+            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Type[R@__call__], P@__call__]]",
+        )
+
+    assert caller
+
+
+def check_hydra_target_pos_only(partial_builds: PBuilds, full_builds: FullBuilds):
+    builds(hydra_target=int)  # type: ignore
+    builds(__hydra_target=int)  # type: ignore
+
+    partial_builds(hydra_target=int)  # type: ignore
+    partial_builds(__hydra_target=int)  # type: ignore
+
+    full_builds(hydra_target=int)  # type: ignore
+    full_builds(__hydra_target=int)  # type: ignore

@@ -1,6 +1,8 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
+# pyright: strict
+
 from enum import Enum
 from pathlib import Path
 from typing import (
@@ -23,7 +25,14 @@ from typing import (
 )
 
 from omegaconf import DictConfig, ListConfig
-from typing_extensions import Literal, ParamSpec, Protocol, TypedDict, runtime_checkable
+from typing_extensions import (
+    Literal,
+    ParamSpec,
+    Protocol,
+    TypeAlias,
+    TypedDict,
+    runtime_checkable,
+)
 
 __all__ = [
     "Just",
@@ -51,6 +60,10 @@ T3 = TypeVar("T3")
 
 T4 = TypeVar("T4", bound=Callable[..., Any])
 
+
+InstOrType: TypeAlias = Union[T, Type[T]]
+
+
 if TYPE_CHECKING:  # pragma: no cover
     from dataclasses import Field  # provided by typestub but not generic at runtime
 else:
@@ -68,17 +81,25 @@ else:
 
 
 @runtime_checkable
-class Partial(Protocol[T2]):
-    func: Callable[..., T2]
-    args: Tuple[Any, ...]
-    keywords: Dict[str, Any]
+class Partial(Protocol[T2]):  # pragma: no cover
+    @property
+    def func(self) -> Callable[..., T2]:
+        ...
+
+    @property
+    def args(self) -> Tuple[Any, ...]:
+        ...
+
+    @property
+    def keywords(self) -> Dict[str, Any]:
+        ...
 
     def __new__(
         cls: Type[T3], func: Callable[..., T2], *args: Any, **kwargs: Any
-    ) -> T3:  # pragma: no cover
+    ) -> T3:
         ...
 
-    def __call__(self, *args: Any, **kwargs: Any) -> T2:  # pragma: no cover
+    def __call__(self, *args: Any, **kwargs: Any) -> T2:
         ...
 
 
@@ -117,21 +138,34 @@ class Just(Builds[T], Protocol[T]):  # pragma: no cover
     _target_: ClassVar[Literal["hydra_zen.funcs.get_obj"]] = "hydra_zen.funcs.get_obj"
 
 
-@runtime_checkable
-class ZenPartialBuilds(Builds[T], Protocol[T]):  # pragma: no cover
-    _target_: ClassVar[
-        Literal["hydra_zen.funcs.zen_processing"]
-    ] = "hydra_zen.funcs.zen_processing"
+class ZenPartialMixin(Protocol[T]):  # pragma: no cover
     _zen_target: ClassVar[str]
     _zen_partial: ClassVar[Literal[True]] = True
 
 
-@runtime_checkable
-class HydraPartialBuilds(Builds[T], Protocol[T]):  # pragma: no cover
+class HydraPartialMixin(Protocol[T]):  # pragma: no cover
     _partial_: ClassVar[Literal[True]] = True
 
 
-PartialBuilds = Union[ZenPartialBuilds[T], HydraPartialBuilds[T]]
+@runtime_checkable
+class ZenPartialBuilds(Builds[T], ZenPartialMixin[T], Protocol[T]):  # pragma: no cover
+    _target_: ClassVar[
+        Literal["hydra_zen.funcs.zen_processing"]
+    ] = "hydra_zen.funcs.zen_processing"
+
+
+@runtime_checkable
+class HydraPartialBuilds(
+    Builds[T], HydraPartialMixin[T], Protocol[T]
+):  # pragma: no cover
+    ...
+
+
+# Necessary, but not sufficient, check for PartialBuilds; useful for creating
+# non-overlapping overloads
+IsPartial: TypeAlias = Union[ZenPartialMixin[T], HydraPartialMixin[T]]
+
+PartialBuilds: TypeAlias = Union[ZenPartialBuilds[T], HydraPartialBuilds[T]]
 
 
 @runtime_checkable
@@ -141,7 +175,7 @@ class HasTarget(Protocol):  # pragma: no cover
 
 Importable = TypeVar("Importable", bound=Callable[..., Any])
 
-_HydraPrimitive = Union[
+_HydraPrimitive: TypeAlias = Union[
     bool,
     None,
     int,
@@ -149,7 +183,8 @@ _HydraPrimitive = Union[
     str,
 ]
 
-_SupportedPrimitive = Union[
+
+_SupportedPrimitive: TypeAlias = Union[
     _HydraPrimitive,
     ListConfig,
     DictConfig,
@@ -165,7 +200,7 @@ _SupportedPrimitive = Union[
 ]
 
 if TYPE_CHECKING:  # pragma: no cover
-    SupportedPrimitive = Union[
+    SupportedPrimitive: TypeAlias = Union[
         _SupportedPrimitive,
         FrozenSet["SupportedPrimitive"],
         # Even thought this is redundant with Sequence, it seems to
@@ -184,7 +219,7 @@ else:
     SupportedPrimitive = TypeVar("SupportedPrimitive")
 
 
-ZenWrapper = Union[
+ZenWrapper: TypeAlias = Union[
     None,
     Builds[Callable[[T4], T4]],
     PartialBuilds[Callable[[T4], T4]],
@@ -196,7 +231,7 @@ ZenWrapper = Union[
     str,
 ]
 if TYPE_CHECKING:  # pragma: no cover
-    ZenWrappers = Union[ZenWrapper[T4], Sequence[ZenWrapper[T4]]]
+    ZenWrappers: TypeAlias = Union[ZenWrapper[T4], Sequence[ZenWrapper[T4]]]
 else:
     # cleans up annotations for REPLs
     class ZenWrappers(Generic[T2]):  # pragma: no cover

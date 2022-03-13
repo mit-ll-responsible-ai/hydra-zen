@@ -58,10 +58,6 @@ from hydra_zen.typing import (
     SupportedPrimitive,
     ZenWrappers,
 )
-from hydra_zen.typing._builds_overloads import (
-    full_builds as _full_builds,
-    partial_builds as _partial_builds,
-)
 from hydra_zen.typing._implementations import (
     BuildsWithSig,
     DataClass,
@@ -73,7 +69,6 @@ from hydra_zen.typing._implementations import (
 from ._value_conversion import ZEN_VALUE_CONVERSION
 
 _T = TypeVar("_T")
-_T2 = TypeVar("_T2", bound=Callable[..., Any])
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -617,30 +612,10 @@ def sanitized_field(
     )
 
 
-# `builds(<t>, [*args], [**kwargs], zen_partial=False, populate_full_signature=False)`
+# partial=False, pop-sig=True; no *args, **kwargs, nor builds_bases
 @overload
 def builds(
-    hydra_target: Importable,
-    *pos_args: SupportedPrimitive,
-    zen_partial: Literal[False] = ...,
-    zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
-    zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
-    populate_full_signature: Literal[False] = ...,
-    hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
-    dataclass_name: Optional[str] = ...,
-    builds_bases: Tuple[Type[DataClass_], ...] = ...,
-    frozen: bool = ...,
-    **kwargs_for_target: SupportedPrimitive,
-) -> Type[Builds[Importable]]:  # pragma: no cover
-    ...
-
-
-# `builds(<t>, zen_partial=False, populate_full_signature=True)`
-# -- without any user-specified args/kwargs or bases for the target
-@overload
-def builds(
-    hydra_target: Callable[P, R],
+    __hydra_target: Callable[P, R],
     *,
     zen_partial: Literal[False] = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -655,10 +630,10 @@ def builds(
     ...
 
 
-# `builds(<t>, *args, **kwargs, zen_partial=False, populate_full_signature=True)`
+# partial=False, pop-sig=bool
 @overload
 def builds(
-    hydra_target: Importable,
+    __hydra_target: Importable,
     *pos_args: SupportedPrimitive,
     zen_partial: Literal[False] = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -674,10 +649,10 @@ def builds(
     ...
 
 
-# `builds(<t>, [*args], [**kwargs], zen_partial=True)`
+# partial=True, pop-sig=bool
 @overload
 def builds(
-    hydra_target: Importable,
+    __hydra_target: Importable,
     *pos_args: SupportedPrimitive,
     zen_partial: Literal[True] = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -693,18 +668,18 @@ def builds(
     ...
 
 
-# broadest annotation
+# partial=bool, pop-sig=bool
 @overload
 def builds(
-    hydra_target: Union[Importable, Callable[P, R]],
+    __hydra_target: Union[Importable, Callable[P, R]],
     *pos_args: SupportedPrimitive,
-    zen_partial: bool = ...,
+    zen_partial: bool,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
     populate_full_signature: bool = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
-    dataclass_name: Optional[str] = ...,
+    dataclass_name: Optional[str],
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
     **kwargs_for_target: SupportedPrimitive,
@@ -1813,18 +1788,6 @@ def is_partial_builds(x: Any) -> TypeGuard[PartialBuilds[Any]]:
 
 
 @overload
-def get_target(
-    obj: Union[PartialBuilds[_T], Type[PartialBuilds[_T]]]
-) -> _T:  # pragma: no cover
-    ...
-
-
-@overload
-def get_target(obj: Union[Just[_T], Type[Just[_T]]]) -> _T:  # pragma: no cover
-    ...
-
-
-@overload
 def get_target(obj: Union[Builds[_T], Type[Builds[_T]]]) -> _T:  # pragma: no cover
     ...
 
@@ -1917,212 +1880,6 @@ def get_target(obj: HasTarget) -> Any:
         pass  # makes sure we cover this branch in tests
 
     return target
-
-
-_builds_sig = inspect.signature(builds)
-__BUILDS_DEFAULTS: Final[Dict[str, Any]] = {
-    name: p.default
-    for name, p in _builds_sig.parameters.items()
-    if p.kind is p.KEYWORD_ONLY
-}
-del _builds_sig
-
-
-@overload
-def make_custom_builds_fn(
-    *,
-    zen_partial: Literal[False] = ...,
-    zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
-    zen_meta: Optional[Mapping[str, Any]] = ...,
-    populate_full_signature: Literal[False] = ...,
-    hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
-    frozen: bool = ...,
-    builds_bases: Tuple[Type[DataClass_], ...] = ...,
-    __b: _T2 = builds,
-) -> _T2:  # pragma: no cover
-    ...
-
-
-@overload
-def make_custom_builds_fn(
-    *,
-    zen_partial: Literal[False] = ...,
-    zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
-    zen_meta: Optional[Mapping[str, Any]] = ...,
-    populate_full_signature: Literal[True] = ...,  # <- special case
-    hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
-    frozen: bool = ...,
-    builds_bases: Tuple[()] = ...,
-    __b: _T2 = _full_builds,
-) -> _T2:  # pragma: no cover
-    ...
-
-
-@overload
-def make_custom_builds_fn(
-    *,
-    zen_partial: Literal[False] = ...,
-    zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
-    zen_meta: Optional[Mapping[str, Any]] = ...,
-    populate_full_signature: Literal[True] = ...,
-    hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
-    frozen: bool = ...,
-    builds_bases: Tuple[Type[DataClass_], ...] = ...,
-    __b: _T2 = builds,
-) -> _T2:  # pragma: no cover
-    ...
-
-
-@overload
-def make_custom_builds_fn(
-    *,
-    zen_partial: Literal[True] = ...,  # <- special case
-    zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
-    zen_meta: Optional[Mapping[str, Any]] = ...,
-    populate_full_signature: bool = ...,
-    hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
-    frozen: bool = ...,
-    builds_bases: Tuple[Type[DataClass_], ...] = ...,
-    __b: _T2 = _partial_builds,
-) -> _T2:  # pragma: no cover
-    ...
-
-
-def make_custom_builds_fn(
-    *,
-    zen_partial: bool = False,
-    zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
-    zen_meta: Optional[Mapping[str, Any]] = None,
-    populate_full_signature: bool = False,
-    hydra_recursive: Optional[bool] = None,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
-    frozen: bool = False,
-    builds_bases: Tuple[Type[DataClass_], ...] = (),
-    # This is the easiest way to get static tooling to see the output
-    # as `builds`.
-    __b: _T2 = builds,
-) -> _T2:
-    """Returns the `builds` function, but with customized default values.
-
-    E.g. ``make_custom_builds_fn(hydra_convert='all')`` will return a version
-    of the `builds` function where the default value for ``hydra_convert``
-    is ``'all'`` instead of ``None``.
-
-    Parameters
-    ----------
-    zen_partial : bool, optional (default=False)
-        Specifies a new the default value for ``builds(..., zen_partial=<..>)``
-
-    zen_wrappers : None | Callable | Builds | InterpStr | Sequence[None | Callable | Builds | InterpStr]
-        Specifies a new the default value for ``builds(..., zen_wrappers=<..>)``
-
-    zen_meta : Optional[Mapping[str, Any]]
-        Specifies a new the default value for ``builds(..., zen_meta=<..>)``
-
-    populate_full_signature : bool, optional (default=False)
-        Specifies a new the default value for ``builds(..., populate_full_signature=<..>)``
-
-    hydra_recursive : Optional[bool], optional (default=True)
-        Specifies a new the default value for ``builds(..., hydra_recursive=<..>)``
-
-    hydra_convert : Optional[Literal["none", "partial", "all"]], optional (default="none")
-        Specifies a new the default value for ``builds(..., hydra_convert=<..>)``
-
-    frozen : bool, optional (default=False)
-        Specifies a new the default value for ``builds(..., frozen=<..>)``
-
-    builds_bases : Tuple[DataClass, ...]
-        Specifies a new the default value for ``builds(..., builds_bases=<..>)``
-
-    Returns
-    -------
-    custom_builds
-        The function `builds`, but with customized default values.
-
-    See Also
-    --------
-    builds : Create a targeted structured config designed to "build" a particular object.
-
-    Examples
-    --------
-    >>> from hydra_zen import builds, make_custom_builds_fn, instantiate
-
-    **Basic usage**
-
-    The following will create a `builds` function whose default value
-    for ``zen_partial`` has been set to ``True``.
-
-    >>> pbuilds = make_custom_builds_fn(zen_partial=True)
-
-    I.e. using ``pbuilds(...)`` is equivalent to using
-    ``builds(..., zen_partial=True)``.
-
-    >>> instantiate(pbuilds(int))  # calls `functools.partial(int)`
-    functools.partial(<class 'int'>)
-
-    You can still specify ``zen_partial`` on a per-case basis with ``pbuilds``.
-
-    >>> instantiate(pbuilds(int, zen_partial=False))  # calls `int()`
-    0
-
-    **Adding data validation to configs**
-
-    Suppose that we want to enable runtime type-checking - using beartype -
-    whenever our configs are being instantiated; then the following settings
-    for `builds` would be handy.
-
-    >>> # Note: beartype must be installed to use this feature
-    >>> from hydra_zen.third_party.beartype import validates_with_beartype
-    >>> build_a_bear = make_custom_builds_fn(
-    ...     populate_full_signature=True,
-    ...     hydra_convert="all",
-    ...     zen_wrappers=validates_with_beartype,
-    ... )
-
-    Now all configs produced via ``build_a_bear`` will include type-checking
-    during instantiation.
-
-    >>> from typing_extensions import Literal
-    >>> def f(x: Literal["a", "b"]): return x
-
-    >>> Conf = build_a_bear(f)  # a conf that includes `validates_with_beartype`
-
-    >>> instantiate(Conf, x="a")  # satisfies annotation: Literal["a", "b"]
-    "a"
-
-    >>> instantiate(conf, x="c")  # violates annotation: Literal["a", "b"]
-    <Validation error: "c" is not "a" or "b">
-    """
-    if __b is not builds:
-        raise TypeError("make_custom_builds_fn() got an unexpected argument: '__b'")
-    del __b
-
-    excluded_fields = {"dataclass_name"}
-    LOCALS = locals()
-
-    # Ensures that new defaults added to `builds` must be reflected
-    # in the signature of `make_custom_builds_fn`.
-    assert (set(__BUILDS_DEFAULTS) - excluded_fields) <= set(LOCALS)
-
-    _new_defaults = {
-        name: LOCALS[name] for name in __BUILDS_DEFAULTS if name not in excluded_fields
-    }
-
-    # let `builds` validate the new defaults!
-    builds(builds, **_new_defaults)
-
-    @wraps(builds)
-    def wrapped(*args: Any, **kwargs: Any):
-        merged_kwargs: Dict[str, Any] = {}
-        merged_kwargs.update(_new_defaults)
-        merged_kwargs.update(kwargs)
-        return builds(*args, **merged_kwargs)
-
-    return cast(_T2, wrapped)
 
 
 class NOTHING:

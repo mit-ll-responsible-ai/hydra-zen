@@ -1,6 +1,5 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-
 """
 Provides annotation overloads for various hydra functions, using the types defined in `hydra_zen.typing`.
 This enables tools like IDEs to be more incisive during static analysis and to provide users with additional
@@ -19,14 +18,16 @@ E.g.
 
 """
 
+# pyright: strict
+
 import pathlib
 from typing import IO, Any, Callable, Type, TypeVar, Union, overload
 
 from hydra.utils import instantiate as hydra_instantiate
 from omegaconf import MISSING, DictConfig, ListConfig, OmegaConf
 
-from .typing import Builds, Just, Partial, PartialBuilds
-from .typing._implementations import DataClass_, HasTarget, HydraPartialBuilds
+from .typing import Builds, Just, Partial
+from .typing._implementations import DataClass_, HasTarget, InstOrType, IsPartial
 
 __all__ = ["instantiate", "to_yaml", "save_as_yaml", "load_from_yaml", "MISSING"]
 
@@ -36,70 +37,21 @@ T = TypeVar("T")
 
 @overload
 def instantiate(
-    config: Union[Just[T], Type[Just[T]]], *args: Any, **kwargs: Any
+    config: InstOrType[Just[T]], *args: Any, **kwargs: Any
 ) -> T:  # pragma: no cover
     ...
 
 
 @overload
 def instantiate(
-    config: Union[
-        HydraPartialBuilds[Callable[..., T]], Type[HydraPartialBuilds[Callable[..., T]]]
-    ],
-    *args: Any,
-    **kwargs: Any
+    config: InstOrType[IsPartial[Callable[..., T]]], *args: Any, **kwargs: Any
 ) -> Partial[T]:  # pragma: no cover
     ...
 
 
 @overload
 def instantiate(
-    config: Union[HydraPartialBuilds[Type[T]], Type[HydraPartialBuilds[Type[T]]]],
-    *args: Any,
-    **kwargs: Any
-) -> Partial[T]:  # pragma: no cover
-    ...
-
-
-@overload
-def instantiate(
-    config: Union[
-        PartialBuilds[Callable[..., T]], Type[PartialBuilds[Callable[..., T]]]
-    ],
-    *args: Any,
-    **kwargs: Any
-) -> Partial[T]:  # pragma: no cover
-    ...
-
-
-@overload
-def instantiate(
-    config: Union[PartialBuilds[Type[T]], Type[PartialBuilds[Type[T]]]],
-    *args: Any,
-    **kwargs: Any
-) -> Partial[T]:  # pragma: no cover
-    ...
-
-
-@overload
-def instantiate(
-    config: Union[Builds[Callable[..., T]], Type[Builds[Callable[..., T]]]],
-    *args: Any,
-    **kwargs: Any
-) -> T:  # pragma: no cover
-    ...
-
-
-@overload
-def instantiate(
-    config: Callable[..., Builds[Type[T]]], *args: Any, **kwargs: Any
-) -> T:  # pragma: no cover
-    ...
-
-
-@overload
-def instantiate(
-    config: Union[Builds[Type[T]], Type[Builds[Type[T]]]], *args: Any, **kwargs: Any
+    config: InstOrType[Builds[Callable[..., T]]], *args: Any, **kwargs: Any
 ) -> T:  # pragma: no cover
     ...
 
