@@ -7,9 +7,9 @@ from ._implementations import (
     hydrated_dataclass,
     just,
     make_config,
-    make_custom_builds_fn,
     mutable_value,
 )
+from ._make_custom_builds import make_custom_builds_fn
 
 __all__ = [
     "builds",

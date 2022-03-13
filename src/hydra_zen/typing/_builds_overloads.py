@@ -31,7 +31,109 @@ from ._implementations import (
 R = TypeVar("R")
 P = ParamSpec("P")
 
-__all__ = ["FullBuilds", "PBuilds"]
+__all__ = ["FullBuilds", "PBuilds", "StdBuilds"]
+
+
+class StdBuilds(Protocol):  # pragma: no cover
+
+    # partial=False, pop-sig=True; no *args, **kwargs, nor builds_bases
+    @overload
+    def __call__(
+        self,
+        __hydra_target: Callable[P, R],
+        *,
+        zen_partial: Literal[False] = ...,
+        zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
+        zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+        populate_full_signature: Literal[True],
+        hydra_recursive: Optional[bool] = ...,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+        dataclass_name: Optional[str] = ...,
+        builds_bases: Tuple[()] = ...,
+        frozen: bool = ...,
+    ) -> Type[BuildsWithSig[Type[R], P]]:  # pragma: no cover
+        ...
+
+    # partial=False, pop-sig=bool
+    @overload
+    def __call__(
+        self,
+        __hydra_target: Importable,
+        *pos_args: SupportedPrimitive,
+        zen_partial: Literal[False] = ...,
+        zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
+        zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+        populate_full_signature: bool = ...,
+        hydra_recursive: Optional[bool] = ...,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+        dataclass_name: Optional[str] = ...,
+        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        frozen: bool = ...,
+        **kwargs_for_target: SupportedPrimitive,
+    ) -> Type[Builds[Importable]]:  # pragma: no cover
+        ...
+
+    # partial=True, pop-sig=bool
+    @overload
+    def __call__(
+        self,
+        __hydra_target: Importable,
+        *pos_args: SupportedPrimitive,
+        zen_partial: Literal[True] = ...,
+        zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
+        zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+        populate_full_signature: bool = ...,
+        hydra_recursive: Optional[bool] = ...,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+        dataclass_name: Optional[str] = ...,
+        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        frozen: bool = ...,
+        **kwargs_for_target: SupportedPrimitive,
+    ) -> Type[PartialBuilds[Importable]]:  # pragma: no cover
+        ...
+
+    # partial=bool, pop-sig=bool
+    @overload
+    def __call__(
+        self,
+        __hydra_target: Union[Importable, Callable[P, R]],
+        *pos_args: SupportedPrimitive,
+        zen_partial: bool,
+        zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
+        zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+        populate_full_signature: bool = ...,
+        hydra_recursive: Optional[bool] = ...,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+        dataclass_name: Optional[str],
+        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        frozen: bool = ...,
+        **kwargs_for_target: SupportedPrimitive,
+    ) -> Union[
+        Type[Builds[Importable]],
+        Type[PartialBuilds[Importable]],
+        Type[BuildsWithSig[Type[R], P]],
+    ]:  # pragma: no cover
+        ...
+
+    def __call__(
+        self,
+        *pos_args: Union[Importable, Callable[P, R], SupportedPrimitive],
+        zen_partial: bool = False,
+        zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
+        zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
+        populate_full_signature: bool = False,
+        hydra_recursive: Optional[bool] = None,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+        frozen: bool = False,
+        builds_bases: Tuple[Type[DataClass_], ...] = (),
+        dataclass_name: Optional[str] = None,
+        **kwargs_for_target: SupportedPrimitive,
+    ) -> Union[
+        Type[Builds[Importable]],
+        Type[PartialBuilds[Importable]],
+        Type[BuildsWithSig[Type[R], P]],
+    ]:
+        ...
 
 
 class FullBuilds(Protocol):  # pragma: no cover
