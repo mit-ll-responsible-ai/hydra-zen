@@ -14,7 +14,7 @@ from omegaconf import OmegaConf
 from omegaconf.errors import OmegaConfBaseException, ValidationError
 
 from hydra_zen import ZenField, builds, instantiate, make_config, to_yaml
-from hydra_zen.structured_configs._implementations import NOTHING
+from hydra_zen.structured_configs._make_config import NOTHING
 from tests import everything_except
 from tests.custom_strategies import partitions
 
