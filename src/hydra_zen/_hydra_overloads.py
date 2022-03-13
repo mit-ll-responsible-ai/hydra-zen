@@ -18,14 +18,16 @@ E.g.
 
 """
 
+# pyright: strict
+
 import pathlib
 from typing import IO, Any, Callable, Type, TypeVar, Union, overload
 
 from hydra.utils import instantiate as hydra_instantiate
 from omegaconf import MISSING, DictConfig, ListConfig, OmegaConf
 
-from .typing import Builds, Just, Partial, PartialBuilds
-from .typing._implementations import DataClass_, HasTarget
+from .typing import Builds, Just, Partial
+from .typing._implementations import DataClass_, HasTarget, IsPartial
 
 __all__ = ["instantiate", "to_yaml", "save_as_yaml", "load_from_yaml", "MISSING"]
 
@@ -42,18 +44,7 @@ def instantiate(
 
 @overload
 def instantiate(
-    config: Union[
-        PartialBuilds[Callable[..., T]], Type[PartialBuilds[Callable[..., T]]]
-    ],
-    *args: Any,
-    **kwargs: Any
-) -> Partial[T]:  # pragma: no cover
-    ...
-
-
-@overload
-def instantiate(
-    config: Union[PartialBuilds[Type[T]], Type[PartialBuilds[Type[T]]]],
+    config: Union[IsPartial[Callable[..., T]], Type[IsPartial[Callable[..., T]]]],
     *args: Any,
     **kwargs: Any
 ) -> Partial[T]:  # pragma: no cover
@@ -65,20 +56,6 @@ def instantiate(
     config: Union[Builds[Callable[..., T]], Type[Builds[Callable[..., T]]]],
     *args: Any,
     **kwargs: Any
-) -> T:  # pragma: no cover
-    ...
-
-
-@overload
-def instantiate(
-    config: Callable[..., Builds[Type[T]]], *args: Any, **kwargs: Any
-) -> T:  # pragma: no cover
-    ...
-
-
-@overload
-def instantiate(
-    config: Union[Builds[Type[T]], Type[Builds[Type[T]]]], *args: Any, **kwargs: Any
 ) -> T:  # pragma: no cover
     ...
 

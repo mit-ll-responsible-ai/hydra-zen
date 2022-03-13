@@ -134,19 +134,32 @@ class Just(Builds[T], Protocol[T]):  # pragma: no cover
     _target_: ClassVar[Literal["hydra_zen.funcs.get_obj"]] = "hydra_zen.funcs.get_obj"
 
 
-@runtime_checkable
-class ZenPartialBuilds(Builds[T], Protocol[T]):  # pragma: no cover
-    _target_: ClassVar[
-        Literal["hydra_zen.funcs.zen_processing"]
-    ] = "hydra_zen.funcs.zen_processing"
+class ZenPartialMixin(Protocol[T]):  # pragma: no cover
     _zen_target: ClassVar[str]
     _zen_partial: ClassVar[Literal[True]] = True
 
 
-@runtime_checkable
-class HydraPartialBuilds(Builds[T], Protocol[T]):  # pragma: no cover
+class HydraPartialMixin(Protocol[T]):  # pragma: no cover
     _partial_: ClassVar[Literal[True]] = True
 
+
+@runtime_checkable
+class ZenPartialBuilds(Builds[T], ZenPartialMixin[T], Protocol[T]):  # pragma: no cover
+    _target_: ClassVar[
+        Literal["hydra_zen.funcs.zen_processing"]
+    ] = "hydra_zen.funcs.zen_processing"
+
+
+@runtime_checkable
+class HydraPartialBuilds(
+    Builds[T], HydraPartialMixin[T], Protocol[T]
+):  # pragma: no cover
+    ...
+
+
+# Necessary, but not sufficient, check for PartialBuilds; useful for creating
+# non-overlapping overloads
+IsPartial: TypeAlias = Union[ZenPartialMixin[T], HydraPartialMixin[T]]
 
 PartialBuilds: TypeAlias = Union[ZenPartialBuilds[T], HydraPartialBuilds[T]]
 
