@@ -36,6 +36,8 @@ __all__ = ["FullBuilds", "PBuilds"]
 
 class FullBuilds(Protocol):  # pragma: no cover
     # full_builds -> populate_full_signature=True  (new default value)
+
+    # partial=False, pop_sig=True; no *args, **kwargs, nor builds_bases`
     @overload
     def __call__(
         self,
@@ -53,6 +55,7 @@ class FullBuilds(Protocol):  # pragma: no cover
     ) -> Type[BuildsWithSig[Type[R], P]]:
         ...
 
+    # partial=False, pop_sig=bool; has *args, **kwargs, and/or `builds_bases`
     @overload
     def __call__(
         self,
@@ -61,7 +64,7 @@ class FullBuilds(Protocol):  # pragma: no cover
         zen_partial: Literal[False] = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
         zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
-        populate_full_signature: Literal[False] = ...,
+        populate_full_signature: bool = ...,
         hydra_recursive: Optional[bool] = ...,
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         dataclass_name: Optional[str] = ...,
@@ -71,24 +74,7 @@ class FullBuilds(Protocol):  # pragma: no cover
     ) -> Type[Builds[Importable]]:
         ...
 
-    @overload
-    def __call__(
-        self,
-        __hydra_target: Importable,
-        *pos_args: SupportedPrimitive,
-        zen_partial: Literal[False] = ...,
-        zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
-        zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
-        populate_full_signature: Literal[True] = ...,
-        hydra_recursive: Optional[bool] = ...,
-        hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
-        dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
-        frozen: bool = ...,
-        **kwargs_for_target: SupportedPrimitive,
-    ) -> Type[Builds[Importable]]:
-        ...
-
+    # partial=True, pop-sig=bool
     @overload
     def __call__(
         self,
@@ -107,6 +93,7 @@ class FullBuilds(Protocol):  # pragma: no cover
     ) -> Type[PartialBuilds[Importable]]:
         ...
 
+    # partial=bool, pop-sig=bool
     @overload
     def __call__(
         self,
@@ -119,7 +106,7 @@ class FullBuilds(Protocol):  # pragma: no cover
         hydra_recursive: Optional[bool] = ...,
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         frozen: bool = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = (),
+        builds_bases: Tuple[Type[DataClass_], ...] = ...,
         dataclass_name: Optional[str] = ...,
         **kwargs_for_target: SupportedPrimitive,
     ) -> Union[
