@@ -1,3 +1,6 @@
+# Copyright (c) 2022 Massachusetts Institute of Technology
+# SPDX-License-Identifier: MIT
+# pyright: strict
 import inspect
 from functools import wraps
 from typing import (
@@ -23,7 +26,6 @@ from ._implementations import builds
 
 __all__ = ["make_custom_builds_fn"]
 
-# pyright: strict
 
 _builds_sig = inspect.signature(builds)
 __BUILDS_DEFAULTS: Final[Dict[str, Any]] = {
