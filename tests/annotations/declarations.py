@@ -42,7 +42,7 @@ from hydra_zen.typing import (
     ZenPartialBuilds,
     ZenWrappers,
 )
-from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds
+from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds, StdBuilds
 from hydra_zen.typing._implementations import DataClass_, HydraPartialBuilds
 
 T = TypeVar("T")
@@ -857,3 +857,29 @@ def check_hydra_target_pos_only(partial_builds: PBuilds, full_builds: FullBuilds
 
     full_builds(hydra_target=int)  # type: ignore
     full_builds(__hydra_target=int)  # type: ignore
+
+
+def check_partial_narrowing_builds(x: bool):
+    def f(x: int):
+        1
+
+    maybe_full_sig = builds(f, zen_partial=x)
+    # could have full-sig; should raise
+    maybe_full_sig()  # type: ignore
+
+    not_full_sig = builds(f, zen_partial=x, populate_full_signature=False)
+    # can't have full sig,
+    not_full_sig()
+
+
+def check_partial_narrowing_std(builds_fn: StdBuilds, x: bool):
+    def f(x: int):
+        1
+
+    maybe_full_sig = builds_fn(f, zen_partial=x)
+    # could have full-sig; should raise
+    maybe_full_sig()  # type: ignore
+
+    not_full_sig = builds_fn(f, zen_partial=x, populate_full_signature=False)
+    # can't have full sig,
+    not_full_sig()
