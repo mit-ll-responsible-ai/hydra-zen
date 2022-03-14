@@ -102,7 +102,7 @@ def test_value_supported_via_config_maker_functions(
         if (
             not isinstance(value, range)
             and hasattr(value, "__iter__")
-            and any(v != v for v in value)
+            and any(v != v for v in value)  # type: ignore
         ):  # avoid nans in collections
             pass
         else:
@@ -166,7 +166,8 @@ def test_functools_partial_gets_validated():
     make_config(x=partial(f3, z=2))  # OK
 
     with pytest.raises(TypeError):
-        make_config(x=partial(f3, y=2))  # no param named `y`
+        # no param named `y`
+        make_config(x=partial(f3, y=2))  # type: ignore
 
 
 def f4(a, b=1, c="2"):

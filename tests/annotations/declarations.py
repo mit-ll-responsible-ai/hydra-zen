@@ -42,7 +42,7 @@ from hydra_zen.typing import (
     ZenPartialBuilds,
     ZenWrappers,
 )
-from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds
+from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds, StdBuilds
 from hydra_zen.typing._implementations import DataClass_, HydraPartialBuilds
 
 T = TypeVar("T")
@@ -781,12 +781,6 @@ def check_overloads_arent_too_restrictive():
         pbuilds: PBuilds = ...,
         **kwargs_for_target: SupportedPrimitive
     ):
-        regression_check = builds(int, zen_partial=zen_partial)
-
-        reveal_type(
-            regression_check,
-            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Type[R@builds], P@builds]]",
-        )
 
         bout = builds(
             int,
@@ -857,3 +851,59 @@ def check_hydra_target_pos_only(partial_builds: PBuilds, full_builds: FullBuilds
 
     full_builds(hydra_target=int)  # type: ignore
     full_builds(__hydra_target=int)  # type: ignore
+
+
+# the following tests caught regressions in builds' overloads
+
+
+def check_partial_narrowing_builds(x: bool):
+    def f(x: int):
+        1
+
+    maybe_full_sig = builds(f, zen_partial=x, populate_full_signature=x)
+    # could have full-sig; should raise
+    maybe_full_sig()  # type: ignore
+
+    not_full_sig = builds(f, zen_partial=x, populate_full_signature=False)
+    # can't have full sig,
+    not_full_sig()
+
+    not_full_sig2 = builds(f, zen_partial=x)
+    # can't have full-sig
+    not_full_sig2()
+
+
+def check_partial_narrowing_std_and_partial(
+    builds_fn: Union[StdBuilds, PBuilds], x: bool
+):
+    def f(x: int):
+        1
+
+    maybe_full_sig = builds_fn(f, zen_partial=x, populate_full_signature=x)
+    # could have full-sig; should raise
+    maybe_full_sig()  # type: ignore
+
+    not_full_sig = builds_fn(f, zen_partial=x, populate_full_signature=False)
+    # can't have full sig,
+    not_full_sig()
+
+    not_full_sig2 = builds_fn(f, zen_partial=x)
+    # can't have full-sig
+    not_full_sig2()
+
+
+def check_partial_narrowing_full(builds_fn: FullBuilds, x: bool):
+    def f(x: int):
+        1
+
+    maybe_full_sig = builds_fn(f, zen_partial=x, populate_full_signature=x)
+    # could have full-sig; should raise
+    maybe_full_sig()  # type: ignore
+
+    not_full_sig = builds_fn(f, zen_partial=x, populate_full_signature=False)
+    # can't have full sig,
+    not_full_sig()
+
+    yes_full_sig = builds_fn(f, zen_partial=x)
+    # can't have full-sig
+    yes_full_sig()  # type: ignore

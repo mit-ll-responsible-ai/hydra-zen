@@ -47,8 +47,8 @@ def test_builds_sets_hydra_params(
         **kwargs,
     )
 
-    assert out._convert_ == convert
-    assert out._recursive_ == recursive
+    assert out._convert_ == convert  # type: ignore
+    assert out._recursive_ == recursive  # type: ignore
     if name is not None:
         assert out.__name__ == name
     else:
@@ -184,7 +184,7 @@ def g2(x: List[C]):
 
 
 def test_type_checking():
-    conf = builds(f, populate_full_signature=True)(x=("hi",))
+    conf = builds(f, populate_full_signature=True)(x=("hi",))  # type: ignore
     with pytest.raises(ValidationError):
         instantiate(conf)
 

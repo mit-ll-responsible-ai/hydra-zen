@@ -296,6 +296,6 @@ def test_bad_relative_interp_warns(wrappers, expected_match):
     ["${s}", "${.s}", ["${.s}"], ["${..s}", "${..s}"], ["${..s}", "${..s}", "${..s}"]],
 )
 def test_interp_doesnt_warn(wrappers):
-    with pytest.warns(None) as record:
+    with pytest.warns(None) as record:  # type: ignore
         builds(dict, zen_wrappers=wrappers, zen_meta=dict(s=1))
     assert not record

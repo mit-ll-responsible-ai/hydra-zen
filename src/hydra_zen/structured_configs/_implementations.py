@@ -646,6 +646,28 @@ def builds(
     ...
 
 
+# partial=bool, pop-sig=False
+@overload
+def builds(
+    __hydra_target: Importable,
+    *pos_args: SupportedPrimitive,
+    zen_partial: bool = ...,
+    zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
+    zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+    populate_full_signature: Literal[False] = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    dataclass_name: Optional[str] = ...,
+    builds_bases: Tuple[Type[DataClass_], ...] = ...,
+    frozen: bool = ...,
+    **kwargs_for_target: SupportedPrimitive,
+) -> Union[
+    Type[Builds[Importable]],
+    Type[PartialBuilds[Importable]],
+]:  # pragma: no cover
+    ...
+
+
 # partial=bool, pop-sig=bool
 @overload
 def builds(
