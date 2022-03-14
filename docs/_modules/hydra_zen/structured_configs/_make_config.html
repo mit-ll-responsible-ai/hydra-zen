@@ -193,13 +193,8 @@
 <span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">SupportedPrimitive</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass</span><span class="p">,</span> <span class="n">DataClass_</span><span class="p">,</span> <span class="n">Field</span>
 
-<span class="kn">from</span> <span class="nn">._implementations</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">_CONVERT_FIELD_NAME</span><span class="p">,</span>
-    <span class="n">_RECURSIVE_FIELD_NAME</span><span class="p">,</span>
-    <span class="n">_retain_type_info</span><span class="p">,</span>
-    <span class="n">builds</span><span class="p">,</span>
-    <span class="n">sanitized_field</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">._globals</span> <span class="kn">import</span> <span class="n">CONVERT_FIELD_NAME</span><span class="p">,</span> <span class="n">RECURSIVE_FIELD_NAME</span>
+<span class="kn">from</span> <span class="nn">._implementations</span> <span class="kn">import</span> <span class="n">_retain_type_info</span><span class="p">,</span> <span class="n">builds</span><span class="p">,</span> <span class="n">sanitized_field</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ZenField&quot;</span><span class="p">,</span> <span class="s2">&quot;make_config&quot;</span><span class="p">]</span>
 
@@ -600,7 +595,7 @@
     <span class="k">if</span> <span class="n">hydra_recursive</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">config_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="p">(</span>
-                <span class="n">_RECURSIVE_FIELD_NAME</span><span class="p">,</span>
+                <span class="n">RECURSIVE_FIELD_NAME</span><span class="p">,</span>
                 <span class="nb">bool</span><span class="p">,</span>
                 <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">hydra_recursive</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
             <span class="p">)</span>
@@ -608,7 +603,7 @@
 
     <span class="k">if</span> <span class="n">hydra_convert</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">config_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="p">(</span><span class="n">_CONVERT_FIELD_NAME</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">hydra_convert</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+            <span class="p">(</span><span class="n">CONVERT_FIELD_NAME</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">hydra_convert</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
