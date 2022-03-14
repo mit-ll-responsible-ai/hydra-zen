@@ -853,11 +853,14 @@ def check_hydra_target_pos_only(partial_builds: PBuilds, full_builds: FullBuilds
     full_builds(__hydra_target=int)  # type: ignore
 
 
+# the following tests caught regressions in builds' overloads
+
+
 def check_partial_narrowing_builds(x: bool):
     def f(x: int):
         1
 
-    maybe_full_sig = builds(f, zen_partial=x, populate_full_signature=True)
+    maybe_full_sig = builds(f, zen_partial=x, populate_full_signature=x)
     # could have full-sig; should raise
     maybe_full_sig()  # type: ignore
 
@@ -870,11 +873,13 @@ def check_partial_narrowing_builds(x: bool):
     not_full_sig2()
 
 
-def check_partial_narrowing_std(builds_fn: StdBuilds, x: bool):
+def check_partial_narrowing_std_and_partial(
+    builds_fn: Union[StdBuilds, PBuilds], x: bool
+):
     def f(x: int):
         1
 
-    maybe_full_sig = builds_fn(f, zen_partial=x, populate_full_signature=True)
+    maybe_full_sig = builds_fn(f, zen_partial=x, populate_full_signature=x)
     # could have full-sig; should raise
     maybe_full_sig()  # type: ignore
 
@@ -887,7 +892,7 @@ def check_partial_narrowing_std(builds_fn: StdBuilds, x: bool):
     not_full_sig2()
 
 
-def check_partial_narrowing_p(builds_fn: PBuilds, x: bool):
+def check_partial_narrowing_full(builds_fn: FullBuilds, x: bool):
     def f(x: int):
         1
 
@@ -899,15 +904,6 @@ def check_partial_narrowing_p(builds_fn: PBuilds, x: bool):
     # can't have full sig,
     not_full_sig()
 
-
-def check_partial_narrowing_f(builds_fn: FullBuilds, x: bool):
-    def f(x: int):
-        1
-
-    maybe_full_sig = builds_fn(f, zen_partial=x, populate_full_signature=x)
-    # could have full-sig; should raise
-    maybe_full_sig()  # type: ignore
-
-    not_full_sig = builds_fn(f, zen_partial=x, populate_full_signature=False)
-    # can't have full sig,
-    not_full_sig()
+    yes_full_sig = builds_fn(f, zen_partial=x)
+    # can't have full-sig
+    yes_full_sig()  # type: ignore
