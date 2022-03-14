@@ -13,10 +13,9 @@ from hypothesis import assume, given, settings
 from omegaconf import OmegaConf
 
 from hydra_zen import builds, get_target, hydrated_dataclass, instantiate, just, to_yaml
-from hydra_zen.errors import HydraZenDeprecationWarning
-from hydra_zen.structured_configs._implementations import (
-    _HYDRA_FIELD_NAMES,
-    _ZEN_TARGET_FIELD_NAME,
+from hydra_zen.structured_configs._globals import (
+    HYDRA_FIELD_NAMES,
+    ZEN_TARGET_FIELD_NAME,
 )
 from tests import everything_except
 
@@ -369,8 +368,8 @@ def test_get_target_on_non_builds():
         get_target(1)  # type: ignore
 
 
-RESERVED_FIELD_NAMES = sorted(_HYDRA_FIELD_NAMES) + [
-    _ZEN_TARGET_FIELD_NAME,
+RESERVED_FIELD_NAMES = sorted(HYDRA_FIELD_NAMES) + [
+    ZEN_TARGET_FIELD_NAME,
     "_zen_some_new_feature",
     "hydra_some_new_feature",
     "zen_some_new_feature",
