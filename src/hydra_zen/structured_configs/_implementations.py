@@ -60,6 +60,7 @@ from hydra_zen.typing._implementations import (
     DataClass_,
     Field,
     HasTarget,
+    InstOrType,
 )
 
 from ._globals import (
@@ -1703,7 +1704,7 @@ def builds(
 
 
 @overload
-def get_target(obj: Union[Builds[_T], Type[Builds[_T]]]) -> _T:  # pragma: no cover
+def get_target(obj: InstOrType[Builds[_T]]) -> _T:  # pragma: no cover
     ...
 
 
