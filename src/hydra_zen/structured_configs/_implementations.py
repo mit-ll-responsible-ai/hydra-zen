@@ -657,7 +657,7 @@ def builds(
     populate_full_signature: bool = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
-    dataclass_name: Optional[str],
+    dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
     **kwargs_for_target: SupportedPrimitive,
