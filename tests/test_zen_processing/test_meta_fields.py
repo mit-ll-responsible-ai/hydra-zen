@@ -104,7 +104,7 @@ def test_basic_zen_meta_behavior_vs_concrete_sig(
         populate_full_signature=pop_sig,
     )
 
-    conf = Conf()
+    conf = Conf()  # type: ignore
 
     # ensure all meta-fields are present
     for meta_name, meta_val in zen_meta.items():
@@ -125,7 +125,7 @@ def test_zen_meta_via_hydrated_dataclass():
         b: int = 2
 
     conf = Conf()
-    assert conf.a == 1
+    assert conf.a == 1  # type: ignore
     assert conf.b == 2
     assert instantiate(conf) == dict(b=2)
 
