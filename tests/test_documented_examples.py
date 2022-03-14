@@ -40,7 +40,9 @@ def f():
 
 
 class C:
-    pass
+    @classmethod
+    def f(cls, x):
+        return x
 
 
 def func(a_class, a_list=[1, 2], a_func=f, a_builtin_func=len):
@@ -73,12 +75,6 @@ def test_nested_configs_pos_args():
     assert x == dict(w=1)
     assert y is f
     assert z is f
-
-
-class C:
-    @classmethod
-    def f(cls, x):
-        return x
 
 
 def test_builds_classmethod():

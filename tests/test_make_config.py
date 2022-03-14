@@ -45,7 +45,7 @@ def test_zen_field_args_positional_ordering():
     field = ZenField(int, 1, "name")
     assert field.name == "name"
     assert field.hint is int
-    assert field.default.default == 1
+    assert field.default.default == 1  # type: ignore
 
 
 @settings(max_examples=20, suppress_health_check=[HealthCheck(3)])
