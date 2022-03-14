@@ -654,7 +654,7 @@ def builds(
     zen_partial: bool = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
-    populate_full_signature: Literal[False],
+    populate_full_signature: Literal[False] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     dataclass_name: Optional[str] = ...,

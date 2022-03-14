@@ -781,12 +781,6 @@ def check_overloads_arent_too_restrictive():
         pbuilds: PBuilds = ...,
         **kwargs_for_target: SupportedPrimitive
     ):
-        regression_check = builds(int, zen_partial=zen_partial)
-
-        reveal_type(
-            regression_check,
-            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Type[R@builds], P@builds]]",
-        )
 
         bout = builds(
             int,
@@ -863,7 +857,7 @@ def check_partial_narrowing_builds(x: bool):
     def f(x: int):
         1
 
-    maybe_full_sig = builds(f, zen_partial=x)
+    maybe_full_sig = builds(f, zen_partial=x, populate_full_signature=True)
     # could have full-sig; should raise
     maybe_full_sig()  # type: ignore
 
@@ -871,12 +865,46 @@ def check_partial_narrowing_builds(x: bool):
     # can't have full sig,
     not_full_sig()
 
+    not_full_sig2 = builds(f, zen_partial=x)
+    # can't have full-sig
+    not_full_sig2()
+
 
 def check_partial_narrowing_std(builds_fn: StdBuilds, x: bool):
     def f(x: int):
         1
 
-    maybe_full_sig = builds_fn(f, zen_partial=x)
+    maybe_full_sig = builds_fn(f, zen_partial=x, populate_full_signature=True)
+    # could have full-sig; should raise
+    maybe_full_sig()  # type: ignore
+
+    not_full_sig = builds_fn(f, zen_partial=x, populate_full_signature=False)
+    # can't have full sig,
+    not_full_sig()
+
+    not_full_sig2 = builds_fn(f, zen_partial=x)
+    # can't have full-sig
+    not_full_sig2()
+
+
+def check_partial_narrowing_p(builds_fn: PBuilds, x: bool):
+    def f(x: int):
+        1
+
+    maybe_full_sig = builds_fn(f, zen_partial=x, populate_full_signature=x)
+    # could have full-sig; should raise
+    maybe_full_sig()  # type: ignore
+
+    not_full_sig = builds_fn(f, zen_partial=x, populate_full_signature=False)
+    # can't have full sig,
+    not_full_sig()
+
+
+def check_partial_narrowing_f(builds_fn: FullBuilds, x: bool):
+    def f(x: int):
+        1
+
+    maybe_full_sig = builds_fn(f, zen_partial=x, populate_full_signature=x)
     # could have full-sig; should raise
     maybe_full_sig()  # type: ignore
 
