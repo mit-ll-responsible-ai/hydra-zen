@@ -8,7 +8,7 @@ import pytest
 from hypothesis import given
 
 from hydra_zen import builds, hydrated_dataclass, instantiate
-from hydra_zen.structured_configs._implementations import is_partial_builds
+from hydra_zen.structured_configs._type_guards import is_partial_builds
 
 
 def f(*args, **kwargs):

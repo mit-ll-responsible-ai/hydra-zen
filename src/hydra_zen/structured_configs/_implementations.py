@@ -35,7 +35,7 @@ from typing import (
 )
 
 from omegaconf import DictConfig, ListConfig
-from typing_extensions import Final, Literal, ParamSpec, TypeGuard
+from typing_extensions import Final, Literal, ParamSpec
 
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVES,
@@ -44,7 +44,7 @@ from hydra_zen._compatibility import (
     ZEN_SUPPORTED_PRIMITIVES,
 )
 from hydra_zen.errors import HydraZenUnsupportedPrimitiveError, HydraZenValidationError
-from hydra_zen.funcs import get_obj, partial, zen_processing
+from hydra_zen.funcs import get_obj
 from hydra_zen.structured_configs import _utils
 from hydra_zen.typing import (
     Builds,
@@ -77,6 +77,7 @@ from ._globals import (
     ZEN_TARGET_FIELD_NAME,
     ZEN_WRAPPERS_FIELD_NAME,
 )
+from ._type_guards import is_builds, is_just, is_old_partial_builds, uses_zen_processing
 from ._value_conversion import ZEN_VALUE_CONVERSION
 
 _T = TypeVar("_T")
@@ -93,10 +94,6 @@ _POSITIONAL_OR_KEYWORD: Final = inspect.Parameter.POSITIONAL_OR_KEYWORD
 _VAR_POSITIONAL: Final = inspect.Parameter.VAR_POSITIONAL
 _KEYWORD_ONLY: Final = inspect.Parameter.KEYWORD_ONLY
 _VAR_KEYWORD: Final = inspect.Parameter.VAR_KEYWORD
-
-
-def _get_target(x: Any):
-    return getattr(x, TARGET_FIELD_NAME)
 
 
 def _retain_type_info(type_: type, value: Any, hydra_recursive: Optional[bool]):
@@ -1705,68 +1702,6 @@ def builds(
     return cast(Union[Type[Builds[Importable]], Type[BuildsWithSig[Type[R], P]]], out)
 
 
-# We need to check if things are Builds, Just, PartialBuilds to a higher
-# fidelity than is provided by `isinstance(..., <Protocol>)`. I.e. we want to
-# check that the desired attributes *and* that their values match those of the
-# protocols. Failing to heed this would, for example, lead to any `Builds` that
-# happens to have a `path` attribute to be treated as `Just` in `get_target`.
-#
-# The following functions perform these desired checks. Note that they do not
-# require that the provided object be a dataclass; this enables compatibility
-# with omegaconf containers.
-#
-# These are not part of the public API for now, but they may be in the future.
-def is_builds(x: Any) -> TypeGuard[Builds[Any]]:
-    return hasattr(x, TARGET_FIELD_NAME)
-
-
-def is_just(x: Any) -> TypeGuard[Just[Any]]:
-    if is_builds(x) and hasattr(x, JUST_FIELD_NAME):
-        attr = _get_target(x)
-        if attr == _get_target(Just) or attr is get_obj:
-            return True
-        else:
-            # ensures we conver this branch in tests
-            return False
-    return False
-
-
-def _is_old_partial_builds(x: Any) -> bool:  # pragma: no cover
-    # We don't care about coverage here.
-    # This will only be used in `get_target` and we'll be sure to cover that branch
-    if is_builds(x) and hasattr(x, "_partial_target_"):
-        attr = _get_target(x)
-        if (attr == "hydra_zen.funcs.partial" or attr is partial) and is_just(
-            getattr(x, "_partial_target_")
-        ):
-            return True
-        else:
-            # ensures we cover this branch in tests
-            return False
-    return False
-
-
-def uses_zen_processing(x: Any) -> TypeGuard[Builds[Any]]:
-    if not is_builds(x) or not hasattr(x, ZEN_TARGET_FIELD_NAME):
-        return False
-    attr = _get_target(x)
-    if attr != ZEN_PROCESSING_LOCATION and attr is not zen_processing:
-        return False
-    return True
-
-
-def is_partial_builds(x: Any) -> TypeGuard[PartialBuilds[Any]]:
-    return (
-        # check if partial'd config via Hydra
-        HYDRA_SUPPORTS_PARTIAL
-        and getattr(x, PARTIAL_FIELD_NAME, False) is True
-    ) or (
-        # check if partial'd config via `zen_processing`
-        uses_zen_processing(x)
-        and (getattr(x, ZEN_PARTIAL_TARGET_FIELD_NAME, False) is True)
-    )
-
-
 @overload
 def get_target(obj: Union[Builds[_T], Type[Builds[_T]]]) -> _T:  # pragma: no cover
     ...
@@ -1835,7 +1770,7 @@ def get_target(obj: HasTarget) -> Any:
     >>> get_target(loaded_conf)
     __main__.B
     """
-    if _is_old_partial_builds(obj):
+    if is_old_partial_builds(obj):
         # obj._partial_target_ is `Just[obj]`
         return get_target(getattr(obj, "_partial_target_"))
     elif uses_zen_processing(obj):

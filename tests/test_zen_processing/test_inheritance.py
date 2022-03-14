@@ -11,7 +11,7 @@ from hydra_zen.structured_configs._globals import (
     PARTIAL_FIELD_NAME,
     ZEN_PROCESSING_LOCATION,
 )
-from hydra_zen.structured_configs._implementations import uses_zen_processing
+from hydra_zen.structured_configs._type_guards import uses_zen_processing
 from hydra_zen.typing import HydraPartialBuilds, ZenPartialBuilds
 from tests import sorted_yaml
 
