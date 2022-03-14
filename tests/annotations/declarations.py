@@ -781,6 +781,13 @@ def check_overloads_arent_too_restrictive():
         pbuilds: PBuilds = ...,
         **kwargs_for_target: SupportedPrimitive
     ):
+        regression_check = builds(int, zen_partial=zen_partial)
+
+        reveal_type(
+            regression_check,
+            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Type[R@builds], P@builds]]",
+        )
+
         bout = builds(
             int,
             zen_partial=zen_partial,

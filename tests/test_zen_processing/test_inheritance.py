@@ -7,11 +7,11 @@ from hypothesis import given
 
 from hydra_zen import builds, instantiate, to_yaml
 from hydra_zen._compatibility import HYDRA_SUPPORTS_PARTIAL
-from hydra_zen.structured_configs._implementations import (
-    _PARTIAL_FIELD_NAME,
-    _ZEN_PROCESSING_LOCATION,
-    uses_zen_processing,
+from hydra_zen.structured_configs._globals import (
+    PARTIAL_FIELD_NAME,
+    ZEN_PROCESSING_LOCATION,
 )
+from hydra_zen.structured_configs._type_guards import uses_zen_processing
 from hydra_zen.typing import HydraPartialBuilds, ZenPartialBuilds
 from tests import sorted_yaml
 
@@ -86,7 +86,7 @@ def test_partial_with_inherited_zen_processing(args, meta, wrappers):
 
 @dataclass
 class ZenPartialFalse:
-    _target_: str = _ZEN_PROCESSING_LOCATION
+    _target_: str = ZEN_PROCESSING_LOCATION
     _zen_target: str = "builtins.dict"
     _zen_partial: bool = False
     a: int = 1
@@ -94,7 +94,7 @@ class ZenPartialFalse:
 
 @dataclass
 class ZenPartialTrue:
-    _target_: str = _ZEN_PROCESSING_LOCATION
+    _target_: str = ZEN_PROCESSING_LOCATION
     _zen_target: str = "builtins.dict"
     _zen_partial: bool = True
     a: int = 1
@@ -143,7 +143,7 @@ def test_zen_partial_true_holds_for_all_inheritance(Parent):
     def make_conf():
         return builds(dict, b=2, zen_partial=True, builds_bases=(Parent,))
 
-    if not HYDRA_SUPPORTS_PARTIAL and hasattr(Parent, _PARTIAL_FIELD_NAME):
+    if not HYDRA_SUPPORTS_PARTIAL and hasattr(Parent, PARTIAL_FIELD_NAME):
         with pytest.raises(TypeError):
             make_conf()
         return

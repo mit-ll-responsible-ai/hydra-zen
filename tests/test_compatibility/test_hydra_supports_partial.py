@@ -6,7 +6,7 @@ import pytest
 from hydra_zen import builds, get_target, instantiate, make_custom_builds_fn
 from hydra_zen._compatibility import HYDRA_SUPPORTS_PARTIAL
 from hydra_zen.funcs import zen_processing
-from hydra_zen.structured_configs._implementations import (
+from hydra_zen.structured_configs._type_guards import (
     is_partial_builds,
     uses_zen_processing,
 )

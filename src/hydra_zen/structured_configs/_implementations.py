@@ -20,7 +20,6 @@ from typing import (
     Any,
     Callable,
     Dict,
-    FrozenSet,
     List,
     Mapping,
     Optional,
@@ -36,7 +35,7 @@ from typing import (
 )
 
 from omegaconf import DictConfig, ListConfig
-from typing_extensions import Final, Literal, ParamSpec, TypeGuard
+from typing_extensions import Final, Literal, ParamSpec
 
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVES,
@@ -45,7 +44,7 @@ from hydra_zen._compatibility import (
     ZEN_SUPPORTED_PRIMITIVES,
 )
 from hydra_zen.errors import HydraZenUnsupportedPrimitiveError, HydraZenValidationError
-from hydra_zen.funcs import get_obj, partial, zen_processing
+from hydra_zen.funcs import get_obj
 from hydra_zen.structured_configs import _utils
 from hydra_zen.typing import (
     Builds,
@@ -61,8 +60,25 @@ from hydra_zen.typing._implementations import (
     DataClass_,
     Field,
     HasTarget,
+    InstOrType,
 )
 
+from ._globals import (
+    CONVERT_FIELD_NAME,
+    GET_OBJ_LOCATION,
+    HYDRA_FIELD_NAMES,
+    JUST_FIELD_NAME,
+    META_FIELD_NAME,
+    PARTIAL_FIELD_NAME,
+    POS_ARG_FIELD_NAME,
+    RECURSIVE_FIELD_NAME,
+    TARGET_FIELD_NAME,
+    ZEN_PARTIAL_TARGET_FIELD_NAME,
+    ZEN_PROCESSING_LOCATION,
+    ZEN_TARGET_FIELD_NAME,
+    ZEN_WRAPPERS_FIELD_NAME,
+)
+from ._type_guards import is_builds, is_just, is_old_partial_builds, uses_zen_processing
 from ._value_conversion import ZEN_VALUE_CONVERSION
 
 _T = TypeVar("_T")
@@ -71,36 +87,7 @@ P = ParamSpec("P")
 R = TypeVar("R")
 
 
-# Hydra-specific fields
-_TARGET_FIELD_NAME: Final[str] = "_target_"
-_PARTIAL_FIELD_NAME: Final[str] = "_partial_"
-_RECURSIVE_FIELD_NAME: Final[str] = "_recursive_"
-_CONVERT_FIELD_NAME: Final[str] = "_convert_"
-_POS_ARG_FIELD_NAME: Final[str] = "_args_"
-
-_names = [
-    _TARGET_FIELD_NAME,
-    _RECURSIVE_FIELD_NAME,
-    _CONVERT_FIELD_NAME,
-    _POS_ARG_FIELD_NAME,
-]
-
-if HYDRA_SUPPORTS_PARTIAL:  # pragma: no cover
-    _names.append(_PARTIAL_FIELD_NAME)
-
-_HYDRA_FIELD_NAMES: FrozenSet[str] = frozenset(_names)
-
-del _names
-
-# hydra-zen-specific fields
-_ZEN_PROCESSING_LOCATION: Final[str] = _utils.get_obj_path(zen_processing)
-_GET_OBJ_LOCATION: Final[str] = _utils.get_obj_path(get_obj)
-_ZEN_TARGET_FIELD_NAME: Final[str] = "_zen_target"
-_ZEN_PARTIAL_TARGET_FIELD_NAME: Final[str] = "_zen_partial"
-_META_FIELD_NAME: Final[str] = "_zen_exclude"
-_ZEN_WRAPPERS_FIELD_NAME: Final[str] = "_zen_wrappers"
-_JUST_FIELD_NAME: Final[str] = "path"
-# TODO: add _JUST_Target
+_builtin_function_or_method_type = type(len)
 
 # signature param-types
 _POSITIONAL_ONLY: Final = inspect.Parameter.POSITIONAL_ONLY
@@ -108,12 +95,6 @@ _POSITIONAL_OR_KEYWORD: Final = inspect.Parameter.POSITIONAL_OR_KEYWORD
 _VAR_POSITIONAL: Final = inspect.Parameter.VAR_POSITIONAL
 _KEYWORD_ONLY: Final = inspect.Parameter.KEYWORD_ONLY
 _VAR_KEYWORD: Final = inspect.Parameter.VAR_KEYWORD
-
-_builtin_function_or_method_type = type(len)
-
-
-def _get_target(x: Any):
-    return getattr(x, _TARGET_FIELD_NAME)
 
 
 def _retain_type_info(type_: type, value: Any, hydra_recursive: Optional[bool]):
@@ -369,7 +350,7 @@ def hydrated_dataclass(
                 f.name: f.default if f.default is not MISSING else f.default_factory()  # type: ignore
                 for f in fields(decorated_obj)
                 if not (f.default is MISSING and f.default_factory is MISSING)
-                and f.name not in _HYDRA_FIELD_NAMES
+                and f.name not in HYDRA_FIELD_NAMES
                 and not f.name.startswith("_zen_")
             }
         else:
@@ -463,12 +444,12 @@ def just(obj: Importable) -> Type[Just[Importable]]:
 
     entry: List[Tuple[Any, Any, Field[Any]]] = [
         (
-            _TARGET_FIELD_NAME,
+            TARGET_FIELD_NAME,
             str,
-            _utils.field(default=_GET_OBJ_LOCATION, init=False),
+            _utils.field(default=GET_OBJ_LOCATION, init=False),
         ),
         (
-            "path",
+            JUST_FIELD_NAME,
             str,
             _utils.field(
                 default=obj_path,
@@ -676,7 +657,7 @@ def builds(
     populate_full_signature: bool = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
-    dataclass_name: Optional[str],
+    dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
     **kwargs_for_target: SupportedPrimitive,
@@ -1128,7 +1109,7 @@ def builds(
                     # `zen_wrappers` handles importing string; we can
                     # elimintate the indirection of Just and "flatten" this
                     # config
-                    validated_wrappers.append(getattr(wrapper, _JUST_FIELD_NAME))
+                    validated_wrappers.append(getattr(wrapper, JUST_FIELD_NAME))
                 else:
                     if hydra_recursive is False:
                         warnings.warn(
@@ -1159,9 +1140,9 @@ def builds(
 
     # Check for reserved names
     for _name in chain(kwargs_for_target, zen_meta):
-        if _name in _HYDRA_FIELD_NAMES:
+        if _name in HYDRA_FIELD_NAMES:
             err_msg = f"The field-name specified via `builds(..., {_name}=<...>)` is reserved by Hydra."
-            if _name != _TARGET_FIELD_NAME:
+            if _name != TARGET_FIELD_NAME:
                 raise ValueError(
                     err_msg
                     + f" You can set this parameter via `builds(..., hydra_{_name[1:-1]}=<...>)`"
@@ -1189,12 +1170,12 @@ def builds(
         # TODO: require test-coverage once Hydra publishes nightly builds
         target_field = [
             (
-                _TARGET_FIELD_NAME,
+                TARGET_FIELD_NAME,
                 str,
                 _utils.field(default=target_path, init=False),
             ),
             (
-                _PARTIAL_FIELD_NAME,
+                PARTIAL_FIELD_NAME,
                 bool,
                 _utils.field(default=zen_partial, init=False),
             ),
@@ -1203,12 +1184,12 @@ def builds(
         # target is `hydra_zen.funcs.zen_processing`
         target_field = [
             (
-                _TARGET_FIELD_NAME,
+                TARGET_FIELD_NAME,
                 str,
-                _utils.field(default=_ZEN_PROCESSING_LOCATION, init=False),
+                _utils.field(default=ZEN_PROCESSING_LOCATION, init=False),
             ),
             (
-                _ZEN_TARGET_FIELD_NAME,
+                ZEN_TARGET_FIELD_NAME,
                 str,
                 _utils.field(default=target_path, init=False),
             ),
@@ -1217,7 +1198,7 @@ def builds(
         if zen_partial:
             target_field.append(
                 (
-                    _ZEN_PARTIAL_TARGET_FIELD_NAME,
+                    ZEN_PARTIAL_TARGET_FIELD_NAME,
                     bool,
                     _utils.field(default=True, init=False),
                 ),
@@ -1226,7 +1207,7 @@ def builds(
         if zen_meta:
             target_field.append(
                 (
-                    _META_FIELD_NAME,
+                    META_FIELD_NAME,
                     Tuple[str, ...],
                     _utils.field(default=tuple(zen_meta), init=False),
                 ),
@@ -1244,7 +1225,7 @@ def builds(
                 # we flatten the config to avoid unnecessary list
                 target_field.append(
                     (
-                        _ZEN_WRAPPERS_FIELD_NAME,
+                        ZEN_WRAPPERS_FIELD_NAME,
                         Union[
                             Union[str, Builds[Any]], Tuple[Union[str, Builds[Any]], ...]
                         ],
@@ -1254,7 +1235,7 @@ def builds(
             else:
                 target_field.append(
                     (
-                        _ZEN_WRAPPERS_FIELD_NAME,
+                        ZEN_WRAPPERS_FIELD_NAME,
                         Union[
                             Union[str, Builds[Any]], Tuple[Union[str, Builds[Any]], ...]
                         ],
@@ -1264,7 +1245,7 @@ def builds(
     else:
         target_field = [
             (
-                _TARGET_FIELD_NAME,
+                TARGET_FIELD_NAME,
                 str,
                 _utils.field(default=target_path, init=False),
             )
@@ -1275,7 +1256,7 @@ def builds(
     if hydra_recursive is not None:
         base_fields.append(
             (
-                _RECURSIVE_FIELD_NAME,
+                RECURSIVE_FIELD_NAME,
                 bool,
                 _utils.field(default=hydra_recursive, init=False),
             )
@@ -1283,13 +1264,13 @@ def builds(
 
     if hydra_convert is not None:
         base_fields.append(
-            (_CONVERT_FIELD_NAME, str, _utils.field(default=hydra_convert, init=False))
+            (CONVERT_FIELD_NAME, str, _utils.field(default=hydra_convert, init=False))
         )
 
     if _pos_args:
         base_fields.append(
             (
-                _POS_ARG_FIELD_NAME,
+                POS_ARG_FIELD_NAME,
                 Tuple[Any, ...],
                 _utils.field(
                     default=tuple(
@@ -1405,7 +1386,7 @@ def builds(
     if not _pos_args and builds_bases:
         # pos_args is potentially inherited
         for _base in builds_bases:
-            _pos_args = getattr(_base, _POS_ARG_FIELD_NAME, ())
+            _pos_args = getattr(_base, POS_ARG_FIELD_NAME, ())
 
             # validates
             _pos_args = tuple(
@@ -1419,7 +1400,7 @@ def builds(
         _field.name
         for _base in builds_bases
         for _field in fields(_base)
-        if _field.name not in _HYDRA_FIELD_NAMES and not _field.name.startswith("_zen_")
+        if _field.name not in HYDRA_FIELD_NAMES and not _field.name.startswith("_zen_")
     }
 
     # Validate that user-specified arguments satisfy target's signature.
@@ -1687,8 +1668,8 @@ def builds(
     )
 
     if zen_partial is False and (
-        getattr(out, _ZEN_PARTIAL_TARGET_FIELD_NAME, False)
-        or getattr(out, _PARTIAL_FIELD_NAME, False)
+        getattr(out, ZEN_PARTIAL_TARGET_FIELD_NAME, False)
+        or getattr(out, PARTIAL_FIELD_NAME, False)
     ):
         # `out._partial_=True` or `out._zen_partial=True` has been inherited; there
         # is no way for users to override this, thus they must explicitly specify
@@ -1699,7 +1680,7 @@ def builds(
             "permit `builds_bases` where a partial target has been specified."
         )
 
-    if requires_zen_processing and hasattr(out, _PARTIAL_FIELD_NAME):
+    if requires_zen_processing and hasattr(out, PARTIAL_FIELD_NAME):
         raise TypeError(
             BUILDS_ERROR_PREFIX
             + "`builds(..., builds_bases=(...))` cannot use zen-processing features "
@@ -1722,70 +1703,8 @@ def builds(
     return cast(Union[Type[Builds[Importable]], Type[BuildsWithSig[Type[R], P]]], out)
 
 
-# We need to check if things are Builds, Just, PartialBuilds to a higher
-# fidelity than is provided by `isinstance(..., <Protocol>)`. I.e. we want to
-# check that the desired attributes *and* that their values match those of the
-# protocols. Failing to heed this would, for example, lead to any `Builds` that
-# happens to have a `path` attribute to be treated as `Just` in `get_target`.
-#
-# The following functions perform these desired checks. Note that they do not
-# require that the provided object be a dataclass; this enables compatibility
-# with omegaconf containers.
-#
-# These are not part of the public API for now, but they may be in the future.
-def is_builds(x: Any) -> TypeGuard[Builds[Any]]:
-    return hasattr(x, _TARGET_FIELD_NAME)
-
-
-def is_just(x: Any) -> TypeGuard[Just[Any]]:
-    if is_builds(x) and hasattr(x, _JUST_FIELD_NAME):
-        attr = _get_target(x)
-        if attr == _get_target(Just) or attr is get_obj:
-            return True
-        else:
-            # ensures we conver this branch in tests
-            return False
-    return False
-
-
-def _is_old_partial_builds(x: Any) -> bool:  # pragma: no cover
-    # We don't care about coverage here.
-    # This will only be used in `get_target` and we'll be sure to cover that branch
-    if is_builds(x) and hasattr(x, "_partial_target_"):
-        attr = _get_target(x)
-        if (attr == "hydra_zen.funcs.partial" or attr is partial) and is_just(
-            getattr(x, "_partial_target_")
-        ):
-            return True
-        else:
-            # ensures we cover this branch in tests
-            return False
-    return False
-
-
-def uses_zen_processing(x: Any) -> TypeGuard[Builds[Any]]:
-    if not is_builds(x) or not hasattr(x, _ZEN_TARGET_FIELD_NAME):
-        return False
-    attr = _get_target(x)
-    if attr != _ZEN_PROCESSING_LOCATION and attr is not zen_processing:
-        return False
-    return True
-
-
-def is_partial_builds(x: Any) -> TypeGuard[PartialBuilds[Any]]:
-    return (
-        # check if partial'd config via Hydra
-        HYDRA_SUPPORTS_PARTIAL
-        and getattr(x, _PARTIAL_FIELD_NAME, False) is True
-    ) or (
-        # check if partial'd config via `zen_processing`
-        uses_zen_processing(x)
-        and (getattr(x, _ZEN_PARTIAL_TARGET_FIELD_NAME, False) is True)
-    )
-
-
 @overload
-def get_target(obj: Union[Builds[_T], Type[Builds[_T]]]) -> _T:  # pragma: no cover
+def get_target(obj: InstOrType[Builds[_T]]) -> _T:  # pragma: no cover
     ...
 
 
@@ -1852,19 +1771,19 @@ def get_target(obj: HasTarget) -> Any:
     >>> get_target(loaded_conf)
     __main__.B
     """
-    if _is_old_partial_builds(obj):
+    if is_old_partial_builds(obj):
         # obj._partial_target_ is `Just[obj]`
         return get_target(getattr(obj, "_partial_target_"))
     elif uses_zen_processing(obj):
-        field_name = _ZEN_TARGET_FIELD_NAME
+        field_name = ZEN_TARGET_FIELD_NAME
     elif is_just(obj):
-        field_name = _JUST_FIELD_NAME
+        field_name = JUST_FIELD_NAME
     elif is_builds(obj):
-        field_name = _TARGET_FIELD_NAME
+        field_name = TARGET_FIELD_NAME
     else:
         raise TypeError(
             f"`obj` must specify a target; i.e. it must have an attribute named"
-            f" {_TARGET_FIELD_NAME} or named {_ZEN_PARTIAL_TARGET_FIELD_NAME} that"
+            f" {TARGET_FIELD_NAME} or named {ZEN_PARTIAL_TARGET_FIELD_NAME} that"
             f" points to a target-object or target-string"
         )
     target = getattr(obj, field_name)

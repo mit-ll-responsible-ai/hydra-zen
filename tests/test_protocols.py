@@ -9,7 +9,7 @@ import pytest
 
 from hydra_zen import builds, instantiate, just, make_custom_builds_fn
 from hydra_zen.funcs import get_obj, zen_processing
-from hydra_zen.structured_configs._implementations import (
+from hydra_zen.structured_configs._type_guards import (
     is_builds,
     is_just,
     is_partial_builds,

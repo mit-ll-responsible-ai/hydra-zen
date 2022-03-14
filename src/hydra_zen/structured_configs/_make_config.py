@@ -17,13 +17,8 @@ from hydra_zen.structured_configs import _utils
 from hydra_zen.typing import SupportedPrimitive
 from hydra_zen.typing._implementations import DataClass, DataClass_, Field
 
-from ._implementations import (
-    _CONVERT_FIELD_NAME,
-    _RECURSIVE_FIELD_NAME,
-    _retain_type_info,
-    builds,
-    sanitized_field,
-)
+from ._globals import CONVERT_FIELD_NAME, RECURSIVE_FIELD_NAME
+from ._implementations import _retain_type_info, builds, sanitized_field
 
 __all__ = ["ZenField", "make_config"]
 
@@ -424,7 +419,7 @@ def make_config(
     if hydra_recursive is not None:
         config_fields.append(
             (
-                _RECURSIVE_FIELD_NAME,
+                RECURSIVE_FIELD_NAME,
                 bool,
                 _utils.field(default=hydra_recursive, init=False),
             )
@@ -432,7 +427,7 @@ def make_config(
 
     if hydra_convert is not None:
         config_fields.append(
-            (_CONVERT_FIELD_NAME, str, _utils.field(default=hydra_convert, init=False))
+            (CONVERT_FIELD_NAME, str, _utils.field(default=hydra_convert, init=False))
         )
 
     return cast(
