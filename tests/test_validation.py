@@ -27,7 +27,7 @@ def test_builds_no_args_raises():
 
 def test_builds_no_positional_target_raises():
     with pytest.raises(TypeError):
-        builds(hydra_target=dict)
+        builds(hydra_target=dict)  # type: ignore
 
 
 def test_target_as_kwarg_is_an_error():
@@ -62,7 +62,7 @@ def test_specifying_hydra_partial_and_zen_partial_raises_in_hydrated(
 ):
     with pytest.raises(TypeError):
 
-        @hydrated_dataclass(int, hydra_partial=hydra_partial, zen_partial=zen_partial)
+        @hydrated_dataclass(int, hydra_partial=hydra_partial, zen_partial=zen_partial)  # type: ignore
         class A:
             pass
 
@@ -70,7 +70,7 @@ def test_specifying_hydra_partial_and_zen_partial_raises_in_hydrated(
 def test_deprecation_shim_for_hydrated_dataclass_doesnt_permit_new_kwargs():
     with pytest.raises(TypeError):
 
-        @hydrated_dataclass(int, some_arg=1)
+        @hydrated_dataclass(int, some_arg=1)  # type: ignore
         class A:
             pass
 
@@ -332,7 +332,7 @@ def test_builds_input_validation(param_name: str, value):
 
 def test_just_raises_with_legible_message():
     with pytest.raises(AttributeError) as exec_info:
-        just(1)
+        just(1)  # type: ignore
     assert "just(1)" in str(exec_info.value)
 
 
