@@ -170,7 +170,7 @@ def test_builds_with_full_sig_mirrors_target_sig(
         assert conf.x == "-100"
     else:
         # x should be excluded when partial=True and full-sig is populated
-        conf = Conf()
+        conf = Conf()  # type: ignore
 
     assert conf.y == 0
     assert conf.z == [2]
