@@ -36,7 +36,7 @@ __BUILDS_DEFAULTS: Final[Dict[str, Any]] = {
 del _builds_sig
 
 
-# partial=False, pop-sig=True; no builds-bases
+# partial=False, pop-sig=True; no parents
 @overload
 def make_custom_builds_fn(
     *,
@@ -68,33 +68,98 @@ def make_custom_builds_fn(
     ...
 
 
-# partial=False, pop-sig=bool
+# partial=False, pop-sig=False, no parents
 @overload
 def make_custom_builds_fn(
     *,
     zen_partial: Literal[False] = ...,
+    populate_full_signature: Literal[False] = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
-    populate_full_signature: bool = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
-    builds_bases: Tuple[Type[DataClass_], ...] = ...,
+    builds_bases: Tuple[()] = ...,
 ) -> StdBuilds:  # pragma: no cover
     ...
 
 
+# partial=False, pop-sig=bool, no parents
+@overload
+def make_custom_builds_fn(
+    *,
+    zen_partial: Literal[False] = ...,
+    populate_full_signature: bool,
+    zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
+    zen_meta: Optional[Mapping[str, Any]] = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    frozen: bool = ...,
+    builds_bases: Tuple[()] = ...,
+) -> Union[FullBuilds, StdBuilds]:  # pragma: no cover
+    ...
+
+
+# partial=False, pop-sig=bool, with parents
+@overload
+def make_custom_builds_fn(
+    *,
+    zen_partial: Literal[False] = ...,
+    populate_full_signature: bool = ...,
+    zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
+    zen_meta: Optional[Mapping[str, Any]] = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    frozen: bool = ...,
+    builds_bases: Tuple[Type[DataClass_], ...],
+) -> StdBuilds:  # pragma: no cover
+    ...
+
+
+# partial=bool, pop-sig=False
 @overload
 def make_custom_builds_fn(
     *,
     zen_partial: bool,
+    populate_full_signature: Literal[False] = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
-    populate_full_signature: bool,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
+) -> Union[PBuilds, StdBuilds]:  # pragma: no cover
+    ...
+
+
+# partial=bool, pop-sig=bool, with parents
+@overload
+def make_custom_builds_fn(
+    *,
+    zen_partial: bool,
+    populate_full_signature: bool,
+    zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
+    zen_meta: Optional[Mapping[str, Any]] = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    frozen: bool = ...,
+    builds_bases: Tuple[Type[DataClass_], ...],
+) -> Union[PBuilds, StdBuilds]:  # pragma: no cover
+    ...
+
+
+# partial=bool, pop-sig=bool, no parents
+@overload
+def make_custom_builds_fn(
+    *,
+    zen_partial: bool,
+    populate_full_signature: bool,
+    zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
+    zen_meta: Optional[Mapping[str, Any]] = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    frozen: bool = ...,
+    builds_bases: Tuple[()] = ...,
 ) -> Union[FullBuilds, PBuilds, StdBuilds]:  # pragma: no cover
     ...
 
@@ -102,9 +167,9 @@ def make_custom_builds_fn(
 def make_custom_builds_fn(
     *,
     zen_partial: bool = False,
+    populate_full_signature: bool = False,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
     zen_meta: Optional[Mapping[str, Any]] = None,
-    populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     frozen: bool = False,
