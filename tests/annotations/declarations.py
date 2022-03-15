@@ -907,3 +907,66 @@ def check_partial_narrowing_full(builds_fn: FullBuilds, x: bool):
     yes_full_sig = builds_fn(f, zen_partial=x)
     # can't have full-sig
     yes_full_sig()  # type: ignore
+
+
+def check_make_custom_builds_overloads(boolean: bool):
+    # partial = True
+    reveal_type(
+        make_custom_builds_fn(zen_partial=True, populate_full_signature=boolean),
+        expected_text="PBuilds",
+    )
+    reveal_type(make_custom_builds_fn(zen_partial=True), expected_text="PBuilds")
+    reveal_type(
+        make_custom_builds_fn(zen_partial=True, populate_full_signature=False),
+        expected_text="PBuilds",
+    )
+
+    # partial = False, pop-sig = False
+    reveal_type(make_custom_builds_fn(zen_partial=False), expected_text="StdBuilds")
+
+    reveal_type(
+        make_custom_builds_fn(zen_partial=False, populate_full_signature=False),
+        expected_text="StdBuilds",
+    )
+
+    reveal_type(
+        make_custom_builds_fn(zen_partial=False, populate_full_signature=boolean),
+        expected_text="FullBuilds | StdBuilds",
+    )
+
+    # partial = bool
+    reveal_type(
+        make_custom_builds_fn(zen_partial=boolean),
+        expected_text="PBuilds | StdBuilds",
+    )
+
+    reveal_type(
+        make_custom_builds_fn(populate_full_signature=False, zen_partial=boolean),
+        expected_text="PBuilds | StdBuilds",
+    )
+
+    Parent = builds(int)
+
+    reveal_type(
+        make_custom_builds_fn(populate_full_signature=True, zen_partial=boolean),
+        expected_text="FullBuilds | PBuilds | StdBuilds",
+    )
+
+    reveal_type(
+        make_custom_builds_fn(populate_full_signature=boolean, zen_partial=boolean),
+        expected_text="FullBuilds | PBuilds | StdBuilds",
+    )
+
+    reveal_type(
+        make_custom_builds_fn(
+            populate_full_signature=True, zen_partial=boolean, builds_bases=(Parent,)
+        ),
+        expected_text="PBuilds | StdBuilds",
+    )
+
+    reveal_type(
+        make_custom_builds_fn(
+            populate_full_signature=boolean, zen_partial=boolean, builds_bases=(Parent,)
+        ),
+        expected_text="PBuilds | StdBuilds",
+    )
