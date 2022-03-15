@@ -105,7 +105,7 @@ def make_custom_builds_fn(
 def make_custom_builds_fn(
     *,
     zen_partial: Literal[False] = ...,
-    populate_full_signature: bool,
+    populate_full_signature: bool = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
     hydra_recursive: Optional[bool] = ...,
