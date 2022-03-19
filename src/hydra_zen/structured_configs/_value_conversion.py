@@ -1,9 +1,9 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path, PosixPath, WindowsPath
-from typing import Any, Callable, Dict, Type, cast
+from typing import Any, Callable, Dict, Tuple, Type, cast
 
 from hydra_zen.typing import Builds
 
@@ -17,7 +17,7 @@ ZEN_VALUE_CONVERSION: Dict[type, Callable[[Any], Any]] = {}
 class ConfigComplex:
     real: Any
     imag: Any
-    _target_: str = get_obj_path(complex)
+    _target_: str = field(default=get_obj_path(complex), init=False)
 
 
 def convert_complex(value: complex) -> Builds[Type[complex]]:
@@ -29,8 +29,8 @@ ZEN_VALUE_CONVERSION[complex] = convert_complex
 
 @dataclass
 class ConfigPath:
-    _args_: Any
-    _target_: str = get_obj_path(Path)
+    _args_: Tuple[str]
+    _target_: str = field(default=get_obj_path(Path), init=False)
 
 
 def convert_path(value: Path) -> Builds[Type[Path]]:

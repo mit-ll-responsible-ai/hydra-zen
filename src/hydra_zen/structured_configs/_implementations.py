@@ -374,67 +374,7 @@ def hydrated_dataclass(
     return wrapper
 
 
-def just(obj: Importable) -> Type[Just[Importable]]:
-    """Returns a config that, when instantiated by Hydra, "just" returns the un-instantiated target-object.
-
-    Parameters
-    ----------
-    obj : Importable
-        The object that will be instantiated from this config.
-
-    Returns
-    -------
-    config : Type[Just[Importable]]
-
-    See Also
-    --------
-    builds : Create a targeted structured config designed to "build" a particular object.
-    make_config: Creates a general config with customized field names, default values, and annotations.
-
-    Notes
-    -----
-    The configs produced by `just` introduce an explicit dependency on hydra-zen. I.e.
-    hydra-zen must be installed in order to instantiate any config that used `just`.
-
-    Examples
-    --------
-    **Basic usage**
-
-    >>> from hydra_zen import just, instantiate, to_yaml
-
-    >>> Conf = just(range)
-    >>> instantiate(Conf) is range
-    True
-
-    The config produced by `just` describes how to import the target,
-    not how to instantiate/call the object.
-
-    >>> print(to_yaml(Conf))
-    _target_: hydra_zen.funcs.get_obj
-    path: builtins.range
-
-    **Auto-Application of just**
-
-    Both `builds` and `make_config` will automatically apply `just` to default values
-    that are function-objects or class objects. E.g. in the following example `just`
-    will be applied to ``sum``.
-
-    >>> from hydra_zen import make_config
-    >>> Conf2 = make_config(data=[1, 2, 3], reduction_fn=sum)
-
-    >>> print(to_yaml(Conf2))
-    data:
-    - 1
-    - 2
-    - 3
-    reduction_fn:
-      _target_: hydra_zen.funcs.get_obj
-      path: builtins.sum
-
-    >>> conf = instantiate(Conf2)
-    >>> conf.reduction_fn(conf.data)
-    6
-    """
+def _just(obj: Importable) -> Type[Just[Importable]]:
     try:
         obj_path = _utils.get_obj_path(obj)
     except AttributeError:
@@ -479,6 +419,19 @@ def _is_ufunc(value: Any) -> bool:
     return isinstance(value, numpy.ufunc)
 
 
+@functools.lru_cache
+def _throwaway():
+    pass
+
+
+_lru_cache_type = type(_throwaway)
+
+_builtin_types = (_builtin_function_or_method_type, _lru_cache_type)
+
+del _throwaway
+del _lru_cache_type
+
+
 def sanitized_default_value(
     value: Any,
     allow_zen_conversion: bool = True,
@@ -495,11 +448,12 @@ def sanitized_default_value(
         and (
             inspect.isfunction(value)
             or (not is_dataclass(value) and inspect.isclass(value))
-            or isinstance(value, _builtin_function_or_method_type)
+            or inspect.ismethod(value)
+            or isinstance(value, _builtin_types)
             or _is_ufunc(value)
         )
     ):
-        return just(value)
+        return _just(value)
     resolved_value = value
     type_of_value = type(resolved_value)
 
@@ -532,8 +486,10 @@ def sanitized_default_value(
     )
 
     if structured_conf_permitted:
-        err_msg += f"\n\nConsider using `hydra_zen.builds({type(value)}, ...)` to "
-        "create a config for this particular value."
+        err_msg += (
+            f"\n\nConsider using `hydra_zen.builds({type(value)}, ...)` create "
+            "a config for this particular value."
+        )
 
     raise HydraZenUnsupportedPrimitiveError(err_msg)
 
@@ -1821,16 +1777,16 @@ def get_target(obj: HasTarget) -> Any:
 
 
 # registering value-conversions that depend on `builds`
-def _cast_via_tuple(dest_type: Type[_T]) -> Callable[[_T], Type[Builds[Type[_T]]]]:
+def _cast_via_tuple(dest_type: Type[_T]) -> Callable[[_T], Builds[Type[_T]]]:
     def converter(value):
-        return builds(dest_type, tuple(value))
+        return builds(dest_type, tuple(value))()
 
     return converter
 
 
-def _unpack_partial(value: Partial[_T]) -> Type[PartialBuilds[Type[_T]]]:
+def _unpack_partial(value: Partial[_T]) -> PartialBuilds[Type[_T]]:
     target = cast(Type[_T], value.func)
-    return builds(target, *value.args, **value.keywords, zen_partial=True)
+    return builds(target, *value.args, **value.keywords, zen_partial=True)()
 
 
 ZEN_VALUE_CONVERSION[set] = _cast_via_tuple(set)
@@ -1840,6 +1796,6 @@ ZEN_VALUE_CONVERSION[bytes] = _cast_via_tuple(bytes)
 ZEN_VALUE_CONVERSION[bytearray] = _cast_via_tuple(bytearray)
 ZEN_VALUE_CONVERSION[range] = lambda value: builds(
     range, value.start, value.stop, value.step
-)
-ZEN_VALUE_CONVERSION[Counter] = lambda counter: builds(Counter, dict(counter))
+)()
+ZEN_VALUE_CONVERSION[Counter] = lambda counter: builds(Counter, dict(counter))()
 ZEN_VALUE_CONVERSION[functools.partial] = _unpack_partial
