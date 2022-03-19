@@ -35,14 +35,14 @@ torch_objects = [
     tr.autograd.functional.jacobian,
     tr.cuda.current_device,
     tr.cuda.device_count,
-    tr.backends.cuda.is_built,
-    tr.distributed.is_available,
+    tr.backends.cuda.is_built,  # type: ignore
+    tr.distributed.is_available,  # type: ignore
     tr.distributions.bernoulli.Bernoulli,
     tr.fft.fft,
-    tr.jit.script,
+    tr.jit.script,  # type: ignore
     tr.linalg.cholesky,
-    tr.overrides.get_ignored_functions,
-    tr.profiler.profile,
+    tr.overrides.get_ignored_functions,  # type: ignore
+    tr.profiler.profile,  # type: ignore
     DataLoader,
 ]
 
