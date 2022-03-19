@@ -2,10 +2,8 @@ from pathlib import Path
 from typing import Any, FrozenSet, Type, TypeVar, Union, overload
 
 from hydra_zen.typing import Builds, Importable, Just
-from hydra_zen.typing._implementations import (  # type: ignore
-    _HydraPrimitive,
-    _SupportedViaBuilds,
-)
+from hydra_zen.typing._implementations import _HydraPrimitive  # type: ignore
+from hydra_zen.typing._implementations import _SupportedViaBuilds  # type: ignore
 
 from ._implementations import sanitized_default_value
 from ._value_conversion import ConfigComplex, ConfigPath
