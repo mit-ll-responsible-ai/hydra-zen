@@ -44,13 +44,11 @@ def just(obj: Importable) -> Type[Just[Importable]]:
 def just(obj: Any) -> Any:
     """Returns a structured config that "just" describes the specified value.
 
-    ``obj`` must have a type either supported natively by Hydra, in which case
-    it will be return unchanged, or a type that hydra-zen provides extended
-    support for. See "Notes" for a list of supported types.
-
     Parameters
     ----------
-    obj : HydraSupportedPrimitive | ZenSupportedPrimitive
+    obj : Type | Callable[..., Any] HydraSupportedPrimitive | ZenSupportedPrimitive
+        A type (e.g. a class-object), function-object, or a value of a type that is
+        supported by either  hydra-zen or Hydra.
 
     Returns
     -------
