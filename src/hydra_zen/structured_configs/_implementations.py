@@ -420,7 +420,7 @@ def _is_ufunc(value: Any) -> bool:
 
 
 @functools.lru_cache
-def _throwaway():
+def _throwaway():  # pragma: no cover
     pass
 
 

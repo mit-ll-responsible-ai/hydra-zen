@@ -37,7 +37,7 @@ def just(obj: TB) -> Builds[Type[TB]]:  # pragma: no cover
 
 
 @overload
-def just(obj: Importable) -> Type[Just[Importable]]:
+def just(obj: Importable) -> Type[Just[Importable]]:  # pragma: no cover
     ...
 
 
