@@ -419,7 +419,7 @@ def _is_ufunc(value: Any) -> bool:
     return isinstance(value, numpy.ufunc)
 
 
-@functools.lru_cache
+@functools.lru_cache(maxsize=128)
 def _throwaway():  # pragma: no cover
     pass
 
