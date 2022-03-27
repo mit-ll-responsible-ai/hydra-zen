@@ -4,18 +4,19 @@
 <html>
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="Docutils 0.17.1: http://docutils.sourceforge.net/" name="generator"/>
 <title>hydra-zen’s Automatic Type Refinement Behavior — hydra-zen  documentation</title>
+<!-- Loaded before other Sphinx assets -->
 <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet"/>
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet"/>
 <link href="../_static/vendor/fontawesome/5.13.0/css/all.min.css" rel="stylesheet"/>
 <link as="font" crossorigin="" href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2" rel="preload" type="font/woff2"/>
 <link as="font" crossorigin="" href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2" rel="preload" type="font/woff2"/>
 <link href="../_static/pygments.css" rel="stylesheet" type="text/css">
-<link href="../_static/styles/pydata-sphinx-theme.css" rel="stylesheet" type="text/css">
 <link href="../_static/copybutton.css" rel="stylesheet" type="text/css">
 <link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css">
 <link href="../_static/tabs.css" rel="stylesheet" type="text/css">
+<!-- Pre-loaded scripts that we'll load fully later -->
 <link as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf" rel="preload"/>
 <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
 <script src="../_static/jquery.js"></script>
@@ -23,10 +24,10 @@
 <script src="../_static/doctools.js"></script>
 <script src="../_static/clipboard.min.js"></script>
 <script src="../_static/copybutton.js"></script>
-<script loading_method="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
+<script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
 <script src="../_static/gtag.js"></script>
 <link href="../genindex.html" rel="index" title="Index">
-<link href="../search.html" rel="search" title="Search"/>
+<link href="../search.html" rel="search" title="Search">
 <link href="dont_repeat_yourself.html" rel="next" title="Don’t Repeat Yourself: Keeping DRY with Dynamically-Generated Configs 🌞"/>
 <link href="../explanation.html" rel="prev" title="Explanation"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
@@ -35,7 +36,7 @@
 <link href="../_static/hydra_zen_favicon_64x64.png" rel="icon" sizes="64x64"/>
 <!-- Google Analytics -->
 </link></link></link></link></link></link></head>
-<body data-offset="80" data-spy="scroll" data-target="#bd-toc-nav">
+<body data-offset="60" data-spy="scroll" data-target="#bd-toc-nav">
 <div class="container-fluid" id="banner"></div>
 <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 <div id="navbar-start">
@@ -100,7 +101,7 @@
 <input aria-label="Search the docs ..." autocomplete="off" class="form-control" id="search-input" name="q" placeholder="Search the docs ..." type="search"/>
 </form><nav aria-label="Main navigation" class="bd-links" id="bd-docs-nav">
 <div class="bd-toc-item active">
-<p class="caption">
+<p aria-level="2" class="caption" role="heading">
 <span class="caption-text">
   Contents:
  </span>
@@ -130,7 +131,7 @@
 </div>
 <div class="d-none d-xl-block col-xl-2 bd-toc">
 <div class="toc-item">
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
 <i class="fas fa-list"></i> On this page
 </div>
 <nav id="bd-toc-nav">
@@ -158,16 +159,16 @@
 </div>
 <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
 <div>
-<div class="section" id="hydra-zen-s-automatic-type-refinement-behavior">
-<span id="type-support"></span><h1>hydra-zen’s Automatic Type Refinement Behavior<a class="headerlink" href="#hydra-zen-s-automatic-type-refinement-behavior" title="Permalink to this headline">¶</a></h1>
+<section id="hydra-zen-s-automatic-type-refinement-behavior">
+<span id="type-support"></span><h1>hydra-zen’s Automatic Type Refinement Behavior<a class="headerlink" href="#hydra-zen-s-automatic-type-refinement-behavior" title="Permalink to this headline">#</a></h1>
 <p>hydra-zen’s <a class="reference internal" href="../api_reference.html#create-config"><span class="std std-ref">config-creation functions</span></a> will automatically
 refine user-supplied type annotations so that they are made compatible with Hydra’s
 limited type support. This eliminates a friction that will otherwise force users to
 modify their code’s type annotations. Furthermore, hydra-zen preserves
 type information such that third-party type checkers can be used to provide more
 robust support for more general type annotations.</p>
-<div class="section" id="hydra-s-limited-type-support">
-<h2>Hydra’s Limited Type Support<a class="headerlink" href="#hydra-s-limited-type-support" title="Permalink to this headline">¶</a></h2>
+<section id="hydra-s-limited-type-support">
+<h2>Hydra’s Limited Type Support<a class="headerlink" href="#hydra-s-limited-type-support" title="Permalink to this headline">#</a></h2>
 <p>Hydra permits only <a class="reference external" href="https://hydra.cc/docs/next/tutorials/structured_config/intro#structured-configs-supports">a narrow subset of type annotations</a> to be present in a
 config:</p>
 <blockquote>
@@ -198,9 +199,9 @@ unsupported type-annotation (<code class="docutils literal notranslate"><span cl
 </div>
 <p>This behavior can be highly undesirable as it requires users to modify their code and
 use less-accurate type-annotations.</p>
-</div>
-<div class="section" id="leveraging-automatic-type-refinement-without-having-to-think-about-it">
-<h2>Leveraging Automatic Type-Refinement (without having to think about it)<a class="headerlink" href="#leveraging-automatic-type-refinement-without-having-to-think-about-it" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="leveraging-automatic-type-refinement-without-having-to-think-about-it">
+<h2>Leveraging Automatic Type-Refinement (without having to think about it)<a class="headerlink" href="#leveraging-automatic-type-refinement-without-having-to-think-about-it" title="Permalink to this headline">#</a></h2>
 <p>To eliminate the friction that occurs here, hydra-zen’s <a class="reference internal" href="../api_reference.html#create-config"><span class="std std-ref">config-creation functions</span></a> will automatically-broaden the type annotations on the configs that they produce. This means that users will not need to change their
 type-annotations for the sake of Hydra.</p>
 <p>For example, to address the incompatibility seen in the previous example, we can use
@@ -240,9 +241,9 @@ configure the following function:</p>
 </div>
 <p>In general, hydra-zen will broaden types as-needed so that dynamically-generated configs will never include annotations that would cause Hydra to raise an error due
 to lack of support for that type.</p>
-</div>
-<div class="section" id="using-third-party-runtime-type-checkers">
-<span id="pydantic-support"></span><h2>Using Third-Party Runtime Type-Checkers<a class="headerlink" href="#using-third-party-runtime-type-checkers" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="using-third-party-runtime-type-checkers">
+<span id="pydantic-support"></span><h2>Using Third-Party Runtime Type-Checkers<a class="headerlink" href="#using-third-party-runtime-type-checkers" title="Permalink to this headline">#</a></h2>
 <p>Although hydra-zen will broaden the types that get exposed to Hydra, the original
 type-information of a target that is provided to <a class="reference internal" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> is still
 preserved. This means that third-party type checkers like
@@ -276,8 +277,8 @@ will perform general, runtime type-checking for us.</p>
 <p>hydra-zen also provides support for leveraging these third-party type-checkers
 directly, via the <code class="docutils literal notranslate"><span class="pre">zen_wrappers</span></code> feature of <a class="reference internal" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a>. See
 <a class="reference internal" href="../api_reference.html#data-val"><span class="std std-ref">Runtime Data Validation</span></a> for more details.</p>
-</div>
-</div>
+</section>
+</section>
 </div>
 <!-- Previous / next buttons -->
 <div class="prev-next-area">
@@ -299,6 +300,7 @@ directly, via the <code class="docutils literal notranslate"><span class="pre">z
 </main>
 </div>
 </div>
+<!-- Scripts loaded after <body> so the DOM is not blocked -->
 <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
 <div class="container">
@@ -309,7 +311,7 @@ directly, via the <code class="docutils literal notranslate"><span class="pre">z
 </div>
 <div class="footer-item">
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br/>
 </p>
 </div>
 </div>

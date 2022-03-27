@@ -4,18 +4,19 @@
 <html>
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>load_from_yaml — hydra-zen  documentation</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="Docutils 0.17.1: http://docutils.sourceforge.net/" name="generator"/>
+<title>hydra_zen.load_from_yaml — hydra-zen  documentation</title>
+<!-- Loaded before other Sphinx assets -->
 <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet"/>
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet"/>
 <link href="../_static/vendor/fontawesome/5.13.0/css/all.min.css" rel="stylesheet"/>
 <link as="font" crossorigin="" href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2" rel="preload" type="font/woff2"/>
 <link as="font" crossorigin="" href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2" rel="preload" type="font/woff2"/>
 <link href="../_static/pygments.css" rel="stylesheet" type="text/css">
-<link href="../_static/styles/pydata-sphinx-theme.css" rel="stylesheet" type="text/css">
 <link href="../_static/copybutton.css" rel="stylesheet" type="text/css">
 <link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css">
 <link href="../_static/tabs.css" rel="stylesheet" type="text/css">
+<!-- Pre-loaded scripts that we'll load fully later -->
 <link as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf" rel="preload"/>
 <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
 <script src="../_static/jquery.js"></script>
@@ -23,19 +24,19 @@
 <script src="../_static/doctools.js"></script>
 <script src="../_static/clipboard.min.js"></script>
 <script src="../_static/copybutton.js"></script>
-<script loading_method="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
+<script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
 <script src="../_static/gtag.js"></script>
 <link href="../genindex.html" rel="index" title="Index">
-<link href="../search.html" rel="search" title="Search"/>
-<link href="hydra_zen.third_party.beartype.validates_with_beartype.html" rel="next" title="validates_with_beartype"/>
-<link href="hydra_zen.save_as_yaml.html" rel="prev" title="save_as_yaml"/>
+<link href="../search.html" rel="search" title="Search">
+<link href="hydra_zen.third_party.beartype.validates_with_beartype.html" rel="next" title="hydra_zen.third_party.beartype.validates_with_beartype"/>
+<link href="hydra_zen.save_as_yaml.html" rel="prev" title="hydra_zen.save_as_yaml"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <meta content="None" name="docsearch:language"/>
 <link href="../_static/hydra_zen_favicon_32x32.png" rel="icon" sizes="32x32"/>
 <link href="../_static/hydra_zen_favicon_64x64.png" rel="icon" sizes="64x64"/>
 <!-- Google Analytics -->
 </link></link></link></link></link></link></head>
-<body data-offset="80" data-spy="scroll" data-target="#bd-toc-nav">
+<body data-offset="60" data-spy="scroll" data-target="#bd-toc-nav">
 <div class="container-fluid" id="banner"></div>
 <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 <div id="navbar-start">
@@ -103,82 +104,82 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1">
 <a class="reference internal" href="hydra_zen.launch.html">
-   launch
+   hydra_zen.launch
   </a>
 </li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1">
 <a class="reference internal" href="hydra_zen.make_config.html">
-   make_config
+   hydra_zen.make_config
   </a>
 </li>
 <li class="toctree-l1">
 <a class="reference internal" href="hydra_zen.builds.html">
-   builds
+   hydra_zen.builds
   </a>
 </li>
 <li class="toctree-l1">
 <a class="reference internal" href="hydra_zen.just.html">
-   just
+   hydra_zen.just
   </a>
 </li>
 <li class="toctree-l1">
 <a class="reference internal" href="hydra_zen.hydrated_dataclass.html">
-   hydrated_dataclass
+   hydra_zen.hydrated_dataclass
   </a>
 </li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1">
 <a class="reference internal" href="hydra_zen.instantiate.html">
-   instantiate
+   hydra_zen.instantiate
   </a>
 </li>
 <li class="toctree-l1">
 <a class="reference internal" href="hydra_zen.get_target.html">
-   get_target
+   hydra_zen.get_target
   </a>
 </li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1">
 <a class="reference internal" href="hydra_zen.make_custom_builds_fn.html">
-   make_custom_builds_fn
+   hydra_zen.make_custom_builds_fn
   </a>
 </li>
 <li class="toctree-l1">
 <a class="reference internal" href="hydra_zen.ZenField.html">
-   ZenField
+   hydra_zen.ZenField
   </a>
 </li>
 </ul>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1">
 <a class="reference internal" href="hydra_zen.to_yaml.html">
-   to_yaml
+   hydra_zen.to_yaml
   </a>
 </li>
 <li class="toctree-l1">
 <a class="reference internal" href="hydra_zen.save_as_yaml.html">
-   save_as_yaml
+   hydra_zen.save_as_yaml
   </a>
 </li>
 <li class="toctree-l1 current active">
 <a class="current reference internal" href="#">
-   load_from_yaml
+   hydra_zen.load_from_yaml
   </a>
 </li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1">
 <a class="reference internal" href="hydra_zen.third_party.beartype.validates_with_beartype.html">
-   validates_with_beartype
+   hydra_zen.third_party.beartype.validates_with_beartype
   </a>
 </li>
 <li class="toctree-l1">
 <a class="reference internal" href="hydra_zen.third_party.pydantic.validates_with_pydantic.html">
-   validates_with_pydantic
+   hydra_zen.third_party.pydantic.validates_with_pydantic
   </a>
 </li>
 </ul>
@@ -198,11 +199,11 @@
 </div>
 <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
 <div>
-<div class="section" id="load-from-yaml">
-<h1>load_from_yaml<a class="headerlink" href="#load-from-yaml" title="Permalink to this headline">¶</a></h1>
+<section id="hydra-zen-load-from-yaml">
+<h1>hydra_zen.load_from_yaml<a class="headerlink" href="#hydra-zen-load-from-yaml" title="Permalink to this headline">#</a></h1>
 <dl class="py function">
-<dt id="hydra_zen.load_from_yaml">
-<code class="sig-prename descclassname"><span class="pre">hydra_zen.</span></code><code class="sig-name descname"><span class="pre">load_from_yaml</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/_hydra_overloads.html#load_from_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.load_from_yaml" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="hydra_zen.load_from_yaml">
+<span class="sig-prename descclassname"><span class="pre">hydra_zen.</span></span><span class="sig-name descname"><span class="pre">load_from_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/_hydra_overloads.html#load_from_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.load_from_yaml" title="Permalink to this definition">#</a></dt>
 <dd><p>Load a config from a yaml-format file</p>
 <p>This is an alias of <code class="docutils literal notranslate"><span class="pre">omegaconf.OmegaConf.load</span></code>.</p>
 <dl class="field-list simple">
@@ -246,7 +247,7 @@ will be loaded from.</p>
 </pre></div>
 </div>
 </dd></dl>
-</div>
+</section>
 </div>
 <!-- Previous / next buttons -->
 <div class="prev-next-area">
@@ -254,13 +255,13 @@ will be loaded from.</p>
 <i class="fas fa-angle-left"></i>
 <div class="prev-next-info">
 <p class="prev-next-subtitle">previous</p>
-<p class="prev-next-title">save_as_yaml</p>
+<p class="prev-next-title">hydra_zen.save_as_yaml</p>
 </div>
 </a>
 <a class="right-next" href="hydra_zen.third_party.beartype.validates_with_beartype.html" id="next-link" title="next page">
 <div class="prev-next-info">
 <p class="prev-next-subtitle">next</p>
-<p class="prev-next-title">validates_with_beartype</p>
+<p class="prev-next-title">hydra_zen.third_party.beartype.validates_with_beartype</p>
 </div>
 <i class="fas fa-angle-right"></i>
 </a>
@@ -268,6 +269,7 @@ will be loaded from.</p>
 </main>
 </div>
 </div>
+<!-- Scripts loaded after <body> so the DOM is not blocked -->
 <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
 <div class="container">
@@ -278,7 +280,7 @@ will be loaded from.</p>
 </div>
 <div class="footer-item">
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br/>
 </p>
 </div>
 </div>

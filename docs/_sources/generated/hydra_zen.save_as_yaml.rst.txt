@@ -1,5 +1,5 @@
-save_as_yaml
-============
+﻿hydra\_zen.save\_as\_yaml
+=========================
 
 .. currentmodule:: hydra_zen
 

@@ -4,18 +4,20 @@
 <html>
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="hydra-zen eliminates the repetitive patterns involved in designing a Hydra-based project by providing users with functions for dynamically generating configurations for their project." name="description"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="Docutils 0.17.1: http://docutils.sourceforge.net/" name="generator"/>
+<meta content="hydra-zen eliminates the repetitive patterns involved in designing a Hydra-based project by providing users with functions for dynamically generating configurations for their project." name="description"/>
 <title>Don’t Repeat Yourself: Keeping DRY with Dynamically-Generated Configs 🌞 — hydra-zen  documentation</title>
+<!-- Loaded before other Sphinx assets -->
 <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet"/>
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet"/>
 <link href="../_static/vendor/fontawesome/5.13.0/css/all.min.css" rel="stylesheet"/>
 <link as="font" crossorigin="" href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2" rel="preload" type="font/woff2"/>
 <link as="font" crossorigin="" href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2" rel="preload" type="font/woff2"/>
 <link href="../_static/pygments.css" rel="stylesheet" type="text/css">
-<link href="../_static/styles/pydata-sphinx-theme.css" rel="stylesheet" type="text/css">
 <link href="../_static/copybutton.css" rel="stylesheet" type="text/css">
 <link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css">
 <link href="../_static/tabs.css" rel="stylesheet" type="text/css">
+<!-- Pre-loaded scripts that we'll load fully later -->
 <link as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf" rel="preload"/>
 <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
 <script src="../_static/jquery.js"></script>
@@ -23,11 +25,11 @@
 <script src="../_static/doctools.js"></script>
 <script src="../_static/clipboard.min.js"></script>
 <script src="../_static/copybutton.js"></script>
-<script loading_method="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
+<script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
 <script src="../_static/gtag.js"></script>
 <script src="../_static/tabs.js"></script>
 <link href="../genindex.html" rel="index" title="Index">
-<link href="../search.html" rel="search" title="Search"/>
+<link href="../search.html" rel="search" title="Search">
 <link href="hydrated_dataclass.html" rel="next" title="Combining Statically-Defined and Dynamically-Generated Configurations"/>
 <link href="type_refinement.html" rel="prev" title="hydra-zen’s Automatic Type Refinement Behavior"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
@@ -36,7 +38,7 @@
 <link href="../_static/hydra_zen_favicon_64x64.png" rel="icon" sizes="64x64"/>
 <!-- Google Analytics -->
 </link></link></link></link></link></link></head>
-<body data-offset="80" data-spy="scroll" data-target="#bd-toc-nav">
+<body data-offset="60" data-spy="scroll" data-target="#bd-toc-nav">
 <div class="container-fluid" id="banner"></div>
 <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 <div id="navbar-start">
@@ -101,7 +103,7 @@
 <input aria-label="Search the docs ..." autocomplete="off" class="form-control" id="search-input" name="q" placeholder="Search the docs ..." type="search"/>
 </form><nav aria-label="Main navigation" class="bd-links" id="bd-docs-nav">
 <div class="bd-toc-item active">
-<p class="caption">
+<p aria-level="2" class="caption" role="heading">
 <span class="caption-text">
   Contents:
  </span>
@@ -131,7 +133,7 @@
 </div>
 <div class="d-none d-xl-block col-xl-2 bd-toc">
 <div class="toc-item">
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
 <i class="fas fa-list"></i> On this page
 </div>
 <nav id="bd-toc-nav">
@@ -160,8 +162,8 @@
 </div>
 <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
 <div>
-<div class="section" id="don-t-repeat-yourself-keeping-dry-with-dynamically-generated-configs">
-<span id="dry"></span><h1>Don’t Repeat Yourself: Keeping DRY with Dynamically-Generated Configs 🌞<a class="headerlink" href="#don-t-repeat-yourself-keeping-dry-with-dynamically-generated-configs" title="Permalink to this headline">¶</a></h1>
+<section id="don-t-repeat-yourself-keeping-dry-with-dynamically-generated-configs">
+<span id="dry"></span><h1>Don’t Repeat Yourself: Keeping DRY with Dynamically-Generated Configs 🌞<a class="headerlink" href="#don-t-repeat-yourself-keeping-dry-with-dynamically-generated-configs" title="Permalink to this headline">#</a></h1>
 <p><strong>DRY – Don’t Repeat Yourself</strong> – is a <a class="reference external" href="https://en.wikipedia.org/wiki/Don%27t_repeat_yourself">principle of software development</a> that cautions against repetitive software
 patterns and workflows. One of the major benefits of using hydra-zen’s
 <a class="reference internal" href="../api_reference.html#create-config"><span class="std std-ref">config-creation functions</span></a> is that they help us abide by the DRY
@@ -169,7 +171,7 @@ principle. On the other hand, manually writing configs for  your code will often
 you soaking <strong>WET (Writing Everything Twice)</strong>.</p>
 <p>To develop an intuition for these claims, let’s suppose that we want to configure the following class.</p>
 <div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">Contents of <code class="docutils literal notranslate"><span class="pre">vision/model.py</span></code></span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text">Contents of <code class="docutils literal notranslate"><span class="pre">vision/model.py</span></code></span><a class="headerlink" href="#id1" title="Permalink to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#module-typing" title="typing"><span class="nn">typing</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="typing.Tuple"><span class="n">Tuple</span></a>
 
 <span class="c1"># This is a class that we want to configure</span>
@@ -186,12 +188,12 @@ you soaking <strong>WET (Writing Everything Twice)</strong>.</p>
 </div>
 </div>
 <p>We’ll compare the processes of configuring <code class="xref py py-class docutils literal notranslate"><span class="pre">DNN</span></code> using a YAML-file, using a hand-written dataclass, and using <a class="reference internal" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.builds()</span></code></a>.</p>
-<div class="section" id="statically-defined-configs-are-wet">
-<h2>Statically-Defined Configs are WET<a class="headerlink" href="#statically-defined-configs-are-wet" title="Permalink to this headline">¶</a></h2>
+<section id="statically-defined-configs-are-wet">
+<h2>Statically-Defined Configs are WET<a class="headerlink" href="#statically-defined-configs-are-wet" title="Permalink to this headline">#</a></h2>
 <p>Manually writing a structured config for <code class="docutils literal notranslate"><span class="pre">DNN</span></code> entails hard-coding its current import-path as a string as wll as explicitly mirroring its signature:</p>
 <div class="sphinx-tabs docutils container">
 <div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">dataclass-based config</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">yaml-based config</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">Manually configuring <code class="docutils literal notranslate"><span class="pre">DNN</span></code> with a dataclass</span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text">Manually configuring <code class="docutils literal notranslate"><span class="pre">DNN</span></code> with a dataclass</span><a class="headerlink" href="#id2" title="Permalink to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a>
 
 <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="nd">@dataclass</span></a>
@@ -205,7 +207,7 @@ you soaking <strong>WET (Writing Everything Twice)</strong>.</p>
 </div>
 </div>
 </div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">Manually configuring <code class="docutils literal notranslate"><span class="pre">DNN</span></code> with a YAML file</span><a class="headerlink" href="#id3" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text">Manually configuring <code class="docutils literal notranslate"><span class="pre">DNN</span></code> with a YAML file</span><a class="headerlink" href="#id3" title="Permalink to this code">#</a></div>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">vision.model.DNN</span><span class="w"></span>
 <span class="nt">input_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">???</span><span class="w"></span>
 <span class="nt">output_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">???</span><span class="w"></span>
@@ -228,12 +230,12 @@ you soaking <strong>WET (Writing Everything Twice)</strong>.</p>
 brought your towel, because things are getting WET 🌊.</p>
 <p>Having to manually sync our configs with our code is not only tedious but it also
 creates a hot-spot for mistakes and bugs.</p>
-</div>
-<div class="section" id="generating-configs-with-builds-keeps-us-dry">
-<h2>Generating Configs with <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code> Keeps Us DRY<a class="headerlink" href="#generating-configs-with-builds-keeps-us-dry" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="generating-configs-with-builds-keeps-us-dry">
+<h2>Generating Configs with <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code> Keeps Us DRY<a class="headerlink" href="#generating-configs-with-builds-keeps-us-dry" title="Permalink to this headline">#</a></h2>
 <p>We can stay nice and DRY by dynamically generating our configurations with <a class="reference internal" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a>.</p>
 <div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text">Configuring <code class="docutils literal notranslate"><span class="pre">DNN</span></code> using <a class="reference internal" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a></span><a class="headerlink" href="#id4" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text">Configuring <code class="docutils literal notranslate"><span class="pre">DNN</span></code> using <a class="reference internal" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a></span><a class="headerlink" href="#id4" title="Permalink to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a>
 <span class="kn">from</span> <span class="nn">vision.model</span> <span class="kn">import</span> <span class="n">DNN</span>
 
@@ -247,8 +249,8 @@ sync with our code: the config (complete with type annotations and default value
 <p>Additionally, any configured parameters that we do manually specify via
 <a class="reference internal" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> will be <a class="reference internal" href="../generated/hydra_zen.builds.html#builds-validation"><span class="std std-ref">validated against the signature of</span></a> <code class="xref py py-class docutils literal notranslate"><span class="pre">DNN</span></code> as the config is being created. Thus typos and
 mistakes will be caught fast and early - before we even launch our app.</p>
-</div>
-</div>
+</section>
+</section>
 </div>
 <!-- Previous / next buttons -->
 <div class="prev-next-area">
@@ -270,6 +272,7 @@ mistakes will be caught fast and early - before we even launch our app.</p>
 </main>
 </div>
 </div>
+<!-- Scripts loaded after <body> so the DOM is not blocked -->
 <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
 <div class="container">
@@ -280,7 +283,7 @@ mistakes will be caught fast and early - before we even launch our app.</p>
 </div>
 <div class="footer-item">
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br/>
 </p>
 </div>
 </div>

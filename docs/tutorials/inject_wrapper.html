@@ -4,18 +4,20 @@
 <html>
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="A tutorial that demonstrates hydra-zen's function-injection mechanisms for instantiating structured configurations." name="description"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="Docutils 0.17.1: http://docutils.sourceforge.net/" name="generator"/>
+<meta content="A tutorial that demonstrates hydra-zen's function-injection mechanisms for instantiating structured configurations." name="description"/>
 <title>Inject Novel Functionality via the Application’s Configurable Interface — hydra-zen  documentation</title>
+<!-- Loaded before other Sphinx assets -->
 <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet"/>
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet"/>
 <link href="../_static/vendor/fontawesome/5.13.0/css/all.min.css" rel="stylesheet"/>
 <link as="font" crossorigin="" href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2" rel="preload" type="font/woff2"/>
 <link as="font" crossorigin="" href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2" rel="preload" type="font/woff2"/>
 <link href="../_static/pygments.css" rel="stylesheet" type="text/css">
-<link href="../_static/styles/pydata-sphinx-theme.css" rel="stylesheet" type="text/css">
 <link href="../_static/copybutton.css" rel="stylesheet" type="text/css">
 <link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css">
 <link href="../_static/tabs.css" rel="stylesheet" type="text/css">
+<!-- Pre-loaded scripts that we'll load fully later -->
 <link as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf" rel="preload"/>
 <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
 <script src="../_static/jquery.js"></script>
@@ -23,10 +25,10 @@
 <script src="../_static/doctools.js"></script>
 <script src="../_static/clipboard.min.js"></script>
 <script src="../_static/copybutton.js"></script>
-<script loading_method="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
+<script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
 <script src="../_static/gtag.js"></script>
 <link href="../genindex.html" rel="index" title="Index">
-<link href="../search.html" rel="search" title="Search"/>
+<link href="../search.html" rel="search" title="Search">
 <link href="../how_tos.html" rel="next" title="How-To Guides"/>
 <link href="config_groups.html" rel="prev" title="Provide Swappable Configuration Groups"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
@@ -35,7 +37,7 @@
 <link href="../_static/hydra_zen_favicon_64x64.png" rel="icon" sizes="64x64"/>
 <!-- Google Analytics -->
 </link></link></link></link></link></link></head>
-<body data-offset="80" data-spy="scroll" data-target="#bd-toc-nav">
+<body data-offset="60" data-spy="scroll" data-target="#bd-toc-nav">
 <div class="container-fluid" id="banner"></div>
 <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 <div id="navbar-start">
@@ -100,7 +102,7 @@
 <input aria-label="Search the docs ..." autocomplete="off" class="form-control" id="search-input" name="q" placeholder="Search the docs ..." type="search"/>
 </form><nav aria-label="Main navigation" class="bd-links" id="bd-docs-nav">
 <div class="bd-toc-item active">
-<p class="caption">
+<p aria-level="2" class="caption" role="heading">
 <span class="caption-text">
   Contents:
  </span>
@@ -140,7 +142,7 @@
 </div>
 <div class="d-none d-xl-block col-xl-2 bd-toc">
 <div class="toc-item">
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
 <i class="fas fa-list"></i> On this page
 </div>
 <nav id="bd-toc-nav">
@@ -196,8 +198,8 @@
 <p class="admonition-title">Prerequisites</p>
 <p>This tutorial is a direct follow-on to: <a class="reference internal" href="config_groups.html#config-groups-tutorial"><span class="std std-ref">Provide Swappable Configuration Groups</span></a>.</p>
 </div>
-<div class="section" id="inject-novel-functionality-via-the-application-s-configurable-interface">
-<h1>Inject Novel Functionality via the Application’s Configurable Interface<a class="headerlink" href="#inject-novel-functionality-via-the-application-s-configurable-interface" title="Permalink to this headline">¶</a></h1>
+<section id="inject-novel-functionality-via-the-application-s-configurable-interface">
+<h1>Inject Novel Functionality via the Application’s Configurable Interface<a class="headerlink" href="#inject-novel-functionality-via-the-application-s-configurable-interface" title="Permalink to this headline">#</a></h1>
 <p>In this tutorial we will add new functionality into our application without modifying
 either our library’s code or our task function.</p>
 <p>Let’s suppose that the Halloween holiday is
@@ -205,20 +207,20 @@ approaching, and we want to surprise our players with a treat: all of their cost
 will display as “spooky” renditions during this season 🎃. We can use the
 “zen-wrappers” feature of <a class="reference internal" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> to “inject” these updated costumes into
 the game, simply by modifying our application’s config.</p>
-<div class="section" id="modifying-our-application">
-<h2>Modifying Our Application<a class="headerlink" href="#modifying-our-application" title="Permalink to this headline">¶</a></h2>
+<section id="modifying-our-application">
+<h2>Modifying Our Application<a class="headerlink" href="#modifying-our-application" title="Permalink to this headline">#</a></h2>
 <p>We will need to make two modifications to our code in <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code>:</p>
 <ol class="arabic simple">
 <li><p>Define a wrapper that will modify the player’s costume so that it is a “spooky” version of itself.</p></li>
 <li><p>Include the wrapper in the player’s config.</p></li>
 </ol>
-<div class="section" id="creating-the-functionality-injecting-wrapper">
-<h3>Creating the Functionality-Injecting Wrapper<a class="headerlink" href="#creating-the-functionality-injecting-wrapper" title="Permalink to this headline">¶</a></h3>
+<section id="creating-the-functionality-injecting-wrapper">
+<h3>Creating the Functionality-Injecting Wrapper<a class="headerlink" href="#creating-the-functionality-injecting-wrapper" title="Permalink to this headline">#</a></h3>
 <p>Let’s create a <a class="reference external" href="https://realpython.com/primer-on-python-decorators/#simple-decorators">wrapper</a> that will take in our <code class="xref py py-class docutils literal notranslate"><span class="pre">game_library.Character</span></code> object,
 instantiate it, and then update its costume.</p>
 <p>We will incorporate the following code in <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code>.</p>
 <div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">Defining the wrapper</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text">Defining the wrapper</span><a class="headerlink" href="#id1" title="Permalink to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">halloween_update</span><span class="p">(</span><span class="n">CharClass</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># instantiate the Character</span>
@@ -241,7 +243,7 @@ directory as <code class="docutils literal notranslate"><span class="pre">game_l
 tutorial-readers, created ourselves. See <a class="reference internal" href="hierarchy.html#game-library"><span class="std std-ref">Creating (Fake) Library Code</span></a> for details.</p>
 </div>
 <div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">Testing out the wrapper</span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text">Testing out the wrapper</span><a class="headerlink" href="#id2" title="Permalink to this code">#</a></div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">game_library</span> <span class="kn">import</span> <span class="n">Character</span><span class="p">,</span> <span class="n">inventory</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">halloween_update</span><span class="p">(</span><span class="n">CharClass</span><span class="p">):</span>
@@ -269,9 +271,9 @@ its costume updated for the holiday. Verify that you see the following behaviors
 <span class="go">ness, lvl: 1, has: {'gold': 1, 'weapon': 'none', 'costume': 'shirt'}</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="including-the-wrapper-in-our-config">
-<h3>Including the Wrapper in Our Config<a class="headerlink" href="#including-the-wrapper-in-our-config" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="including-the-wrapper-in-our-config">
+<h3>Including the Wrapper in Our Config<a class="headerlink" href="#including-the-wrapper-in-our-config" title="Permalink to this headline">#</a></h3>
 <p>Incorporating this wrapper into our application simply involves specifying it as a
 “zen-wrapper” in our config for <code class="xref py py-class docutils literal notranslate"><span class="pre">game_library.Character</span></code>. I.e. we will update:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">CharConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">Character</span><span class="p">,</span> <span class="n">inventory</span><span class="o">=</span><span class="n">starter_gear</span><span class="p">)</span>
@@ -281,13 +283,13 @@ its costume updated for the holiday. Verify that you see the following behaviors
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">CharConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">Character</span><span class="p">,</span> <span class="n">inventory</span><span class="o">=</span><span class="n">starter_gear</span><span class="p">,</span> <span class="n">zen_wrappers</span><span class="o">=</span><span class="n">halloween_update</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="putting-it-all-together">
-<h3>Putting It All Together<a class="headerlink" href="#putting-it-all-together" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="putting-it-all-together">
+<h3>Putting It All Together<a class="headerlink" href="#putting-it-all-together" title="Permalink to this headline">#</a></h3>
 <p>Let’s update the contents of <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code> to reflect the changes that we just went
 over. Modify your <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code> script to match the following code.</p>
 <div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">Contents of <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code></span><a class="headerlink" href="#id3" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text">Contents of <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code></span><a class="headerlink" href="#id3" title="Permalink to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hydra</span>
 <span class="kn">from</span> <span class="nn">hydra.core.config_store</span> <span class="kn">import</span> <span class="n">ConfigStore</span>
 
@@ -366,38 +368,38 @@ over. Modify your <code class="docutils literal notranslate"><span class="pre">m
 </pre></div>
 </div>
 </div>
-</div>
-</div>
-<div class="section" id="running-our-application">
-<h2>Running Our Application<a class="headerlink" href="#running-our-application" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="running-our-application">
+<h2>Running Our Application<a class="headerlink" href="#running-our-application" title="Permalink to this headline">#</a></h2>
 <p>We can configure and launch our application exactly as we had before, but now all of
 the player’s costumes will automatically become 👻 spooky 👻.</p>
 <p>Open your terminal in the directory shared by both <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code> and
 <code class="docutils literal notranslate"><span class="pre">game_library.py</span></code> and run the following commands. Verify that you can reproduce the
 behavior shown below.</p>
 <div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text">Base character.</span><a class="headerlink" href="#id4" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text">Base character.</span><a class="headerlink" href="#id4" title="Permalink to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python my_app.py player.name<span class="o">=</span>ivy
 <span class="go">ivy, lvl: 1, has: {'gold': 10, 'weapon': 'stick', 'costume': 'spooky tunic'}</span>
 </pre></div>
 </div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-text">Manually-specified costume.</span><a class="headerlink" href="#id5" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text">Manually-specified costume.</span><a class="headerlink" href="#id5" title="Permalink to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python my_app.py player.name<span class="o">=</span>ivy player.inventory.costume<span class="o">=</span>crown
 <span class="go">ivy, lvl: 1, has: {'gold': 10, 'weapon': 'stick', 'costume': 'spooky crown'}</span>
 </pre></div>
 </div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id6">
-<div class="code-block-caption"><span class="caption-text">Load Rakesh’s player-profile</span><a class="headerlink" href="#id6" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text">Load Rakesh’s player-profile</span><a class="headerlink" href="#id6" title="Permalink to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python my_app.py <span class="nv">player</span><span class="o">=</span>rakesh
 <span class="go">rakesh, lvl: 300, has: {'gold': 41, 'weapon': 'pillow', 'costume': 'spooky PJs'}</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="inspecting-the-results">
-<h3>Inspecting the Results<a class="headerlink" href="#inspecting-the-results" title="Permalink to this headline">¶</a></h3>
+<section id="inspecting-the-results">
+<h3>Inspecting the Results<a class="headerlink" href="#inspecting-the-results" title="Permalink to this headline">#</a></h3>
 <p>Hydra will document our use of <code class="xref py py-func docutils literal notranslate"><span class="pre">halloween_update()</span></code> in the <code class="docutils literal notranslate"><span class="pre">config.yaml</span></code> for our
 job. To inspect the config for our most-recent job, let’s open a Python terminal in the same directory as <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code> and run the following code</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pathlib.html#module-pathlib" title="pathlib"><span class="nn">pathlib</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path"><span class="n">Path</span></a>
@@ -432,10 +434,10 @@ example, it should be emphasized that zen-wrappers can be used to inject arbitra
 pre-processing, post-processing, and transformations into the config-instantiation
 process. For example, hydra-zen provides enhanced <a class="reference internal" href="../api_reference.html#data-val"><span class="std std-ref">data-validation capabilities</span></a> via zen-wrappers. Based on this tutorial, we hope that you feel emboldened
 to design and use zen-wrappers in your workflow!</p>
-</div>
-</div>
-<div class="section" id="reference-documentation">
-<h2>Reference Documentation<a class="headerlink" href="#reference-documentation" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="reference-documentation">
+<h2>Reference Documentation<a class="headerlink" href="#reference-documentation" title="Permalink to this headline">#</a></h2>
 <p>Want a deeper understanding of how hydra-zen and Hydra work?
 The following reference materials are especially relevant to this
 tutorial section.</p>
@@ -449,8 +451,8 @@ tutorial section.</p>
 To clean up after this tutorial, delete the <code class="docutils literal notranslate"><span class="pre">outputs</span></code> directory that Hydra created
 upon launching our application.</p>
 </div>
-</div>
-</div>
+</section>
+</section>
 </div>
 <!-- Previous / next buttons -->
 <div class="prev-next-area">
@@ -472,6 +474,7 @@ upon launching our application.</p>
 </main>
 </div>
 </div>
+<!-- Scripts loaded after <body> so the DOM is not blocked -->
 <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 <footer class="footer mt-5 mt-md-0">
 <div class="container">
@@ -482,7 +485,7 @@ upon launching our application.</p>
 </div>
 <div class="footer-item">
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br/>
 </p>
 </div>
 </div>
