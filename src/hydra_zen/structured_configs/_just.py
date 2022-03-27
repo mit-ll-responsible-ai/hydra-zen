@@ -134,7 +134,7 @@ def just(obj: Any) -> Any:
     ``just`` operates recursively within sequences and mappings.
 
     >>> just({'a': [3-4j, 1+2j]})
-    a': [ConfigComplex(real=3.0, imag=-4.0, _target_='builtins.complex'),
+    'a': [ConfigComplex(real=3.0, imag=-4.0, _target_='builtins.complex'),
          ConfigComplex(real=1.0, imag=2.0, _target_='builtins.complex')]}
 
     **Auto-Application of just**
