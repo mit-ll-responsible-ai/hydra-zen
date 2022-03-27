@@ -26,7 +26,7 @@ KEYWORDS = (
 )
 INSTALL_REQUIRES = [
     "hydra-core >= 1.1.0",
-    "typing-extensions >= 4.0.0",
+    "typing-extensions >= 4.0.1",
 ]
 TESTS_REQUIRE = [
     "pytest >= 3.8",
