@@ -131,34 +131,36 @@ def just(obj: Any) -> Any:
     >>> instantiate(just({1, 2, 3})
     {1, 2, 3}
 
-    The config produced by `just` describes how to import the target,
-    not how to instantiate/call the object.
+    ``just`` operates recursively within sequences and mappings.
 
-    >>> print(to_yaml(Conf))
-    _target_: hydra_zen.funcs.get_obj
-    path: builtins.range
+    >>> just({'a':[3-4j, 1+2j]})
+    a': [ConfigComplex(real=3.0, imag=-4.0, _target_='builtins.complex'),
+         ConfigComplex(real=1.0, imag=2.0, _target_='builtins.complex')]}
 
     **Auto-Application of just**
 
-    Both `builds` and `make_config` will automatically apply `just` to default values
-    that are function-objects or class objects. E.g. in the following example `just`
-    will be applied to ``sum``.
+    Both ``builds`` and ``make_config`` will automatically (and recursively) apply
+    ``just`` to all configured values. E.g. in the following example `just` will be
+    applied to both  the complex-valued the list and to ``sum``.
 
     >>> from hydra_zen import make_config
-    >>> Conf2 = make_config(data=[1, 2, 3], reduction_fn=sum)
+    >>> Conf2 = make_config(data=[1+2j, 2+3j], reduction_fn=sum)
 
     >>> print(to_yaml(Conf2))
     data:
-    - 1
-    - 2
-    - 3
+    - real: 1.0
+      imag: 2.0
+      _target_: builtins.complex
+    - real: 2.0
+      imag: 3.0
+      _target_: builtins.complex
     reduction_fn:
       _target_: hydra_zen.funcs.get_obj
       path: builtins.sum
 
     >>> conf = instantiate(Conf2)
     >>> conf.reduction_fn(conf.data)
-    6
+    (3+5j)
     """
     return sanitized_default_value(
         obj,
