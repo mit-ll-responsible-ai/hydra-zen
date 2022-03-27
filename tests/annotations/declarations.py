@@ -858,7 +858,7 @@ def check_hydra_target_pos_only(partial_builds: PBuilds, full_builds: FullBuilds
 
 def check_partial_narrowing_builds(x: bool):
     def f(x: int):
-        1
+        return 1
 
     maybe_full_sig = builds(f, zen_partial=x, populate_full_signature=x)
     # could have full-sig; should raise
@@ -877,7 +877,7 @@ def check_partial_narrowing_std_and_partial(
     builds_fn: Union[StdBuilds, PBuilds], x: bool
 ):
     def f(x: int):
-        1
+        return 1
 
     maybe_full_sig = builds_fn(f, zen_partial=x, populate_full_signature=x)
     # could have full-sig; should raise
@@ -894,7 +894,7 @@ def check_partial_narrowing_std_and_partial(
 
 def check_partial_narrowing_full(builds_fn: FullBuilds, x: bool):
     def f(x: int):
-        1
+        return 1
 
     maybe_full_sig = builds_fn(f, zen_partial=x, populate_full_signature=x)
     # could have full-sig; should raise
