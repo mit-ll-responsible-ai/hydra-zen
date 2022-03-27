@@ -43,6 +43,11 @@ def just(obj: Importable) -> Type[Just[Importable]]:  # pragma: no cover
     ...
 
 
+@overload
+def just(obj: Any) -> Any:  # pragma: no cover
+    ...
+
+
 def just(obj: Any) -> Any:
     """Returns a structured config that "just" describes the specified value.
 

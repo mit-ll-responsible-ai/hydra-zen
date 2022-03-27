@@ -197,3 +197,8 @@ class A:
 
 def test_get_target_with_non_string_target():
     assert get_target(A) is int
+
+
+def test_recursive_just():
+    x = {"a": [3 - 4j, 1 + 2j]}
+    assert instantiate(just(x)) == x

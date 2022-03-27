@@ -129,8 +129,6 @@ def check_just():
     class A:
         ...
 
-    just(A())  # type: ignore
-
     # test just(...)
     reveal_type(just(f), expected_text="Type[Just[(x: int) -> int]]")
     reveal_type(just(A), expected_text="Type[Just[Type[A]]]")
