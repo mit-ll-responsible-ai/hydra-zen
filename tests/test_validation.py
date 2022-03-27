@@ -18,6 +18,7 @@ from hydra_zen.structured_configs._globals import (
     HYDRA_FIELD_NAMES,
     ZEN_TARGET_FIELD_NAME,
 )
+from hydra_zen.structured_configs._utils import get_obj_path
 from tests import everything_except
 
 
@@ -435,3 +436,8 @@ def test_meta_fields_colliding_with_user_provided_kwargs_raises(
             builds(dict, x=1, y=2, zen_meta=meta_fields, zen_partial=partial)
     else:
         builds(dict, x=1, y=2, zen_meta=meta_fields, zen_partial=partial)
+
+
+def test_get_obj_path_raises_for_unknown_name():
+    with pytest.raises(AttributeError):
+        get_obj_path(1)

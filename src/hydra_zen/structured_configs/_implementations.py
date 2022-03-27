@@ -375,12 +375,7 @@ def hydrated_dataclass(
 
 
 def _just(obj: Importable) -> Type[Just[Importable]]:
-    try:
-        obj_path = _utils.get_obj_path(obj)
-    except AttributeError:
-        raise AttributeError(
-            f"`just({obj})`: `obj` is not importable; it is missing the attributes `__module__` and/or `__qualname__`"
-        )
+    obj_path = _utils.get_obj_path(obj)
 
     entry: List[Tuple[Any, Any, Field[Any]]] = [
         (
