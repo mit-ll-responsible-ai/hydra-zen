@@ -414,13 +414,12 @@ def _is_ufunc(value: Any) -> bool:
     return isinstance(value, numpy.ufunc)
 
 
-def _is_jax_compiled_func(value: Any) -> bool:
-    # checks without importing jaxlic
+def _is_jax_compiled_func(value: Any) -> bool:  # pragma: no cover
+    # we don't require jax to be installed for our coverage metrics
 
+    # checks without importing jaxlib
     jaxlib_xla_extension = sys.modules.get("jaxlib.xla_extension")
-    if jaxlib_xla_extension is None:  # pragma: no cover
-        # we do actually cover this branch some runs of our CI,
-        # but our coverage job installs numpy
+    if jaxlib_xla_extension is None:
         return False
     try:
         CompiledFunction = getattr(jaxlib_xla_extension, "CompiledFunction")
