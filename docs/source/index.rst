@@ -34,24 +34,33 @@ launching Hydra jobs.
 
   If you are already use Hydra, let's cut to the chase: **the most important benefit of using hydra-zen is that it automatically and dynamically generates structured configs for you**.
   
-  
-  +----------------------------------------------------------------+-----------------------------------------------------------------------+
-  | .. code-block:: python                                         | .. code-block:: python                                                |
-  |    :caption: Creating a structured config using vanilla Hydra  |    :caption: Creating an equivalent structured config using hydra-zen |
-  |                                                                |                                                                       |
-  |    from dataclasses import dataclass, field                    |    from hydra_zen import builds                                       |
-  |                                                                |                                                                       |
-  |    def foo(bar: int, baz: list[str], qux: float = 1.23):       |    def foo(bar: int, baz: list[str], qux: float = 1.23):              |
-  |        ...                                                     |        ...                                                            |
-  |                                                                |                                                                       |
-  |    @dataclass                                                  |    FooConf = builds(foo, bar=2, baz=["abc"],                          |
-  |    class FooConf:                                              |                     populate_full_signature=True)                     |
-  |        _target_: str = "__main__.foo"                          |                                                                       |
-  |        bar: int = 2                                            |                                                                       |
-  |        baz: list[str] = field(default_factory=lambda: ["abc"]) |                                                                       |
-  |        qux: float = 1.23                                       |                                                                       |
-  +----------------------------------------------------------------+-----------------------------------------------------------------------+
-  
+
+  .. code-block:: python
+     :caption: Creating a structured config *without hydra-zen*
+     
+     from dataclasses import dataclass, field
+     
+     def foo(bar: int, baz: list[str], qux: float = 1.23):
+         ...
+     
+     @dataclass
+     class FooConf:
+         _target_: str = "__main__.foo"
+         bar: int = 2
+         baz: list[str] = field(default_factory=lambda: ["abc"])
+         qux: float = 1.23
+
+
+  .. code-block:: python
+     :caption: Creating an equivalent structured config *with hydra-zen*
+
+     from hydra_zen import builds
+
+     def foo(bar: int, baz: list[str], qux: float = 1.23):
+         ...
+
+     FooConf = builds(foo, bar=2, baz=["abc"], populate_full_signature=True)
+
   This means that it is much **easier and safer** to write and maintain the configs for your Hydra applications:
   
   - Write all of your configs in Python. No more yaml files!

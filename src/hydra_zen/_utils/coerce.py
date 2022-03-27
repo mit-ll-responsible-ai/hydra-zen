@@ -158,7 +158,6 @@ def coerce_sequences(obj: _T) -> _T:
         if (
             inspect.isclass(caster)
             and issubclass(caster, Sequence)
-            # and not inspect.isabstract(caster)  # E.g. caster = Sequence
             and not issubclass(caster, str)  # strings don't need to be cast
             and caster is not list  # annotation is list to begin with
         ):
@@ -167,7 +166,7 @@ def coerce_sequences(obj: _T) -> _T:
             elif _is_namedtuple_type(annotation):
 
                 def _unpack(x):
-                    return annotation(*x)  # type: ignore
+                    return annotation(*x)
 
                 caster = _unpack
             else:  # pragma: no cover

@@ -3,6 +3,8 @@
 
 # pyright: strict
 
+import sys
+import types
 from enum import Enum
 from pathlib import Path
 from typing import (
@@ -30,6 +32,7 @@ from typing_extensions import (
     Literal,
     ParamSpec,
     Protocol,
+    Self,
     TypeAlias,
     TypedDict,
     runtime_checkable,
@@ -96,12 +99,17 @@ class Partial(Protocol[T2]):  # pragma: no cover
         ...
 
     def __new__(
-        cls: Type[T3], func: Callable[..., T2], *args: Any, **kwargs: Any
-    ) -> T3:
+        cls: Type[Self], __func: Callable[..., T2], *args: Any, **kwargs: Any
+    ) -> Self:
         ...
 
     def __call__(self, *args: Any, **kwargs: Any) -> T2:
         ...
+
+    if sys.version_info >= (3, 9):  # pragma: no cover
+
+        def __class_getitem__(cls, item: Any) -> types.GenericAlias:
+            ...
 
 
 InterpStr = NewType("InterpStr", str)
