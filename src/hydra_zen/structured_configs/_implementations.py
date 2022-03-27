@@ -419,6 +419,21 @@ def _is_ufunc(value: Any) -> bool:
     return isinstance(value, numpy.ufunc)
 
 
+def _is_jax_compiled_func(value: Any) -> bool:
+    # checks without importing jaxlic
+
+    jaxlib_xla_extension = sys.modules.get("jaxlib.xla_extension")
+    if jaxlib_xla_extension is None:  # pragma: no cover
+        # we do actually cover this branch some runs of our CI,
+        # but our coverage job installs numpy
+        return False
+    try:
+        CompiledFunction = getattr(jaxlib_xla_extension, "CompiledFunction")
+        return isinstance(value, CompiledFunction)
+    except AttributeError:
+        return False
+
+
 @functools.lru_cache(maxsize=128)
 def _throwaway():  # pragma: no cover
     pass
@@ -451,6 +466,7 @@ def sanitized_default_value(
             or inspect.ismethod(value)
             or isinstance(value, _builtin_types)
             or _is_ufunc(value)
+            or _is_jax_compiled_func(value)
         )
     ):
         return _just(value)
