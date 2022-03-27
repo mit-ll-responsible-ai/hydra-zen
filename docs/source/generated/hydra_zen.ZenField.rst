@@ -1,6 +1,28 @@
-ZenField
-========
+﻿hydra\_zen.ZenField
+===================
 
 .. currentmodule:: hydra_zen
 
-.. autofunction:: ZenField
+.. autoclass:: ZenField
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ZenField.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ZenField.hint
+   
+   

@@ -1,5 +1,5 @@
-hydrated_dataclass
-==================
+﻿hydra\_zen.hydrated\_dataclass
+==============================
 
 .. currentmodule:: hydra_zen
 

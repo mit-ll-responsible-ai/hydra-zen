@@ -1,5 +1,5 @@
-builds
-======
+﻿hydra\_zen.builds
+=================
 
 .. currentmodule:: hydra_zen
 
