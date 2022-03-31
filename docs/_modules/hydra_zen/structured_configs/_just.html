@@ -1,0 +1,385 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hydra_zen.structured_configs._just &#8212; hydra-zen  documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-codeautolink.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/tabs.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
+    <script src="../../../_static/gtag.js"></script>
+    <script src="../../../_static/tabs.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+      
+      <link rel="icon" sizes="32x32" href="../../../_static/hydra_zen_favicon_32x32.png">
+      
+    
+      
+      <link rel="icon" sizes="64x64" href="../../../_static/hydra_zen_favicon_64x64.png">
+      
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="../../../index.html">
+  <img src="../../../_static/Hydra-Zen_logo_full_filled_bkgrnd_smaller.png" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../tutorials.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../how_tos.html">
+  How-To Guides
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../explanation.html">
+  Explanation
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../api_reference.html">
+  Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../changes.html">
+  Changelog
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/mit-ll-responsible-ai/hydra-zen" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for hydra_zen.structured_configs._just</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2022 Massachusetts Institute of Technology</span>
+<span class="c1"># SPDX-License-Identifier: MIT</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">FrozenSet</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">overload</span>
+
+<span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">Builds</span><span class="p">,</span> <span class="n">Importable</span><span class="p">,</span> <span class="n">Just</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">_HydraPrimitive</span>  <span class="c1"># type: ignore</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">_SupportedViaBuilds</span>  <span class="c1"># type: ignore</span>
+
+<span class="kn">from</span> <span class="nn">._implementations</span> <span class="kn">import</span> <span class="n">sanitized_default_value</span>
+<span class="kn">from</span> <span class="nn">._value_conversion</span> <span class="kn">import</span> <span class="n">ConfigComplex</span><span class="p">,</span> <span class="n">ConfigPath</span>
+
+<span class="c1"># pyright: strict</span>
+
+<span class="n">TP</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TP&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">_HydraPrimitive</span><span class="p">)</span>
+<span class="n">TB</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TB&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Union</span><span class="p">[</span><span class="n">_SupportedViaBuilds</span><span class="p">,</span> <span class="n">FrozenSet</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;just&quot;</span><span class="p">]</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">just</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">TP</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TP</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">just</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="nb">complex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigComplex</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">just</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigPath</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">just</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">TB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">TB</span><span class="p">]]:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">just</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Importable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">just</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="o">...</span>
+
+
+<div class="viewcode-block" id="just"><a class="viewcode-back" href="../../../generated/hydra_zen.just.html#hydra_zen.just">[docs]</a><span class="k">def</span> <span class="nf">just</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns a structured config that &quot;just&quot; describes the specified value.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    obj : Type | Callable[..., Any] HydraSupportedPrimitive | ZenSupportedPrimitive</span>
+<span class="sd">        A type (e.g. a class-object), function-object, or a value of a type that is</span>
+<span class="sd">        supported by either  hydra-zen or Hydra.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    config : HydraSupportedPrimitive | Builds</span>
+<span class="sd">        A structured config that describes ``obj``.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    hydra_zen.errors.HydraZenUnsupportedPrimitiveError</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    builds : Create a targeted structured config designed to &quot;build&quot; a particular object.</span>
+<span class="sd">    make_config: Creates a general config with customized field names, default values, and annotations.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The configs produced by ``just(&lt;type_or_func&gt;)`` introduce an explicit dependency</span>
+<span class="sd">    on hydra-zen. I.e. hydra-zen must be installed in order to instantiate any config</span>
+<span class="sd">    that used `just`.</span>
+
+<span class="sd">    hydra-zen provides specialized support for values of the following types:</span>
+
+<span class="sd">    - :py:class:`bytes`</span>
+<span class="sd">    - :py:class:`bytearray`</span>
+<span class="sd">    - :py:class:`complex`</span>
+<span class="sd">    - :py:class:`collections.Counter`</span>
+<span class="sd">    - :py:class:`collections.deque`</span>
+<span class="sd">    - :py:func:`functools.partial`</span>
+<span class="sd">    - :py:class:`pathlib.Path`</span>
+<span class="sd">    - :py:class:`pathlib.PosixPath`</span>
+<span class="sd">    - :py:class:`pathlib.WindowsPath`</span>
+<span class="sd">    - :py:class:`range`</span>
+<span class="sd">    - :py:class:`set`</span>
+<span class="sd">    - :py:class:`frozenset`</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    **Basic usage**</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydra_zen import just, instantiate, to_yaml</span>
+
+<span class="sd">    Calling ``just`` on a type or function object will create a structured config</span>
+<span class="sd">    that, when instantiated, returns that object.</span>
+
+<span class="sd">    &gt;&gt;&gt; class A: pass</span>
+<span class="sd">    &gt;&gt;&gt; Conf_A = just(A)  # returns a dataclass-type</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(Conf_A) is A</span>
+<span class="sd">    True</span>
+
+<span class="sd">    &gt;&gt;&gt; def my_func(x: int): pass</span>
+<span class="sd">    &gt;&gt;&gt; Conf_func = just(my_func)  # returns a dataclass-type</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(Conf_func) is my_funct</span>
+<span class="sd">    True</span>
+
+
+<span class="sd">    Calling ``just`` on a value of a type that is natively supported by Hydra</span>
+<span class="sd">    will reurn that value unchanged</span>
+
+<span class="sd">    &gt;&gt;&gt; just(1)</span>
+<span class="sd">    1</span>
+<span class="sd">    &gt;&gt;&gt; just(False)</span>
+<span class="sd">    False</span>
+
+<span class="sd">    Calling ``just`` on a value of a type that has special support from hydra-zen</span>
+<span class="sd">    will return a structured config instance that, when instantiated, returns that</span>
+<span class="sd">    value</span>
+
+<span class="sd">    &gt;&gt;&gt; just(1+2j)</span>
+<span class="sd">    ConfigComplex(real=1.0, imag=2.0, _target_=&#39;builtins.complex&#39;)</span>
+
+<span class="sd">    &gt;&gt;&gt; instantiate(just(1+2j))</span>
+<span class="sd">    (1+2j)</span>
+
+<span class="sd">    &gt;&gt;&gt; just({1, 2, 3})</span>
+<span class="sd">    Builds_set(_target_=&#39;builtins.set&#39;, _args_=((1, 2, 3),))</span>
+
+<span class="sd">    &gt;&gt;&gt; instantiate(just({1, 2, 3})</span>
+<span class="sd">    {1, 2, 3}</span>
+
+<span class="sd">    ``just`` operates recursively within sequences and mappings.</span>
+
+<span class="sd">    &gt;&gt;&gt; just({&#39;a&#39;: [3-4j, 1+2j]})</span>
+<span class="sd">    &#39;a&#39;: [ConfigComplex(real=3.0, imag=-4.0, _target_=&#39;builtins.complex&#39;),</span>
+<span class="sd">         ConfigComplex(real=1.0, imag=2.0, _target_=&#39;builtins.complex&#39;)]}</span>
+
+<span class="sd">    **Auto-Application of just**</span>
+
+<span class="sd">    Both ``builds`` and ``make_config`` will automatically (and recursively) apply</span>
+<span class="sd">    ``just`` to all configured values. E.g. in the following example `just` will be</span>
+<span class="sd">    applied to both  the complex-valued the list and to ``sum``.</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydra_zen import make_config</span>
+<span class="sd">    &gt;&gt;&gt; Conf2 = make_config(data=[1+2j, 2+3j], reduction_fn=sum)</span>
+
+<span class="sd">    &gt;&gt;&gt; print(to_yaml(Conf2))</span>
+<span class="sd">    data:</span>
+<span class="sd">    - real: 1.0</span>
+<span class="sd">      imag: 2.0</span>
+<span class="sd">      _target_: builtins.complex</span>
+<span class="sd">    - real: 2.0</span>
+<span class="sd">      imag: 3.0</span>
+<span class="sd">      _target_: builtins.complex</span>
+<span class="sd">    reduction_fn:</span>
+<span class="sd">      _target_: hydra_zen.funcs.get_obj</span>
+<span class="sd">      path: builtins.sum</span>
+
+<span class="sd">    &gt;&gt;&gt; conf = instantiate(Conf2)</span>
+<span class="sd">    &gt;&gt;&gt; conf.reduction_fn(conf.data)</span>
+<span class="sd">    (3+5j)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">sanitized_default_value</span><span class="p">(</span>
+        <span class="n">obj</span><span class="p">,</span>
+        <span class="n">allow_zen_conversion</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">structured_conf_permitted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">field_name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">error_prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+</pre></div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022 Massachusetts Institute of Technology.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

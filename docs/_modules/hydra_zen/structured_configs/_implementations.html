@@ -547,73 +547,8 @@
     <span class="k">return</span> <span class="n">wrapper</span></div>
 
 
-<div class="viewcode-block" id="just"><a class="viewcode-back" href="../../../generated/hydra_zen.just.html#hydra_zen.just">[docs]</a><span class="k">def</span> <span class="nf">just</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Importable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span>
-    <span class="sd">&quot;&quot;&quot;Returns a config that, when instantiated by Hydra, &quot;just&quot; returns the un-instantiated target-object.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    obj : Importable</span>
-<span class="sd">        The object that will be instantiated from this config.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    config : Type[Just[Importable]]</span>
-
-<span class="sd">    See Also</span>
-<span class="sd">    --------</span>
-<span class="sd">    builds : Create a targeted structured config designed to &quot;build&quot; a particular object.</span>
-<span class="sd">    make_config: Creates a general config with customized field names, default values, and annotations.</span>
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    The configs produced by `just` introduce an explicit dependency on hydra-zen. I.e.</span>
-<span class="sd">    hydra-zen must be installed in order to instantiate any config that used `just`.</span>
-
-<span class="sd">    Examples</span>
-<span class="sd">    --------</span>
-<span class="sd">    **Basic usage**</span>
-
-<span class="sd">    &gt;&gt;&gt; from hydra_zen import just, instantiate, to_yaml</span>
-
-<span class="sd">    &gt;&gt;&gt; Conf = just(range)</span>
-<span class="sd">    &gt;&gt;&gt; instantiate(Conf) is range</span>
-<span class="sd">    True</span>
-
-<span class="sd">    The config produced by `just` describes how to import the target,</span>
-<span class="sd">    not how to instantiate/call the object.</span>
-
-<span class="sd">    &gt;&gt;&gt; print(to_yaml(Conf))</span>
-<span class="sd">    _target_: hydra_zen.funcs.get_obj</span>
-<span class="sd">    path: builtins.range</span>
-
-<span class="sd">    **Auto-Application of just**</span>
-
-<span class="sd">    Both `builds` and `make_config` will automatically apply `just` to default values</span>
-<span class="sd">    that are function-objects or class objects. E.g. in the following example `just`</span>
-<span class="sd">    will be applied to ``sum``.</span>
-
-<span class="sd">    &gt;&gt;&gt; from hydra_zen import make_config</span>
-<span class="sd">    &gt;&gt;&gt; Conf2 = make_config(data=[1, 2, 3], reduction_fn=sum)</span>
-
-<span class="sd">    &gt;&gt;&gt; print(to_yaml(Conf2))</span>
-<span class="sd">    data:</span>
-<span class="sd">    - 1</span>
-<span class="sd">    - 2</span>
-<span class="sd">    - 3</span>
-<span class="sd">    reduction_fn:</span>
-<span class="sd">      _target_: hydra_zen.funcs.get_obj</span>
-<span class="sd">      path: builtins.sum</span>
-
-<span class="sd">    &gt;&gt;&gt; conf = instantiate(Conf2)</span>
-<span class="sd">    &gt;&gt;&gt; conf.reduction_fn(conf.data)</span>
-<span class="sd">    6</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">obj_path</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;`just(</span><span class="si">{</span><span class="n">obj</span><span class="si">}</span><span class="s2">)`: `obj` is not importable; it is missing the attributes `__module__` and/or `__qualname__`&quot;</span>
-        <span class="p">)</span>
+<span class="k">def</span> <span class="nf">_just</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Importable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span>
+    <span class="n">obj_path</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
 
     <span class="n">entry</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Field</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">(</span>
@@ -636,7 +571,7 @@
         <span class="sa">f</span><span class="s2">&quot;A structured config designed to return </span><span class="si">{</span><span class="n">obj</span><span class="si">}</span><span class="s2"> when it is instantiated by hydra&quot;</span>
     <span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Type</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">out_class</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Type</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">out_class</span><span class="p">)</span>
 
 
 <span class="n">_KEY_ERROR_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;Configuring dictionary key:&quot;</span>
@@ -650,6 +585,33 @@
         <span class="c1"># but our coverage job installs numpy</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ufunc</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_is_jax_compiled_func</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="c1"># we don&#39;t require jax to be installed for our coverage metrics</span>
+
+    <span class="c1"># checks without importing jaxlib</span>
+    <span class="n">jaxlib_xla_extension</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;jaxlib.xla_extension&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">jaxlib_xla_extension</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">CompiledFunction</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">jaxlib_xla_extension</span><span class="p">,</span> <span class="s2">&quot;CompiledFunction&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">CompiledFunction</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_throwaway</span><span class="p">():</span>  <span class="c1"># pragma: no cover</span>
+    <span class="k">pass</span>
+
+
+<span class="n">_lru_cache_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">_throwaway</span><span class="p">)</span>
+
+<span class="n">_builtin_types</span> <span class="o">=</span> <span class="p">(</span><span class="n">_builtin_function_or_method_type</span><span class="p">,</span> <span class="n">_lru_cache_type</span><span class="p">)</span>
+
+<span class="k">del</span> <span class="n">_throwaway</span>
+<span class="k">del</span> <span class="n">_lru_cache_type</span>
 
 
 <span class="k">def</span> <span class="nf">sanitized_default_value</span><span class="p">(</span>
@@ -668,11 +630,13 @@
         <span class="ow">and</span> <span class="p">(</span>
             <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
             <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">and</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
-            <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">_builtin_function_or_method_type</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">_builtin_types</span><span class="p">)</span>
             <span class="ow">or</span> <span class="n">_is_ufunc</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="n">_is_jax_compiled_func</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="p">)</span>
     <span class="p">):</span>
-        <span class="k">return</span> <span class="n">just</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_just</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
     <span class="n">resolved_value</span> <span class="o">=</span> <span class="n">value</span>
     <span class="n">type_of_value</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">resolved_value</span><span class="p">)</span>
 
@@ -705,8 +669,10 @@
     <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">structured_conf_permitted</span><span class="p">:</span>
-        <span class="n">err_msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Consider using `hydra_zen.builds(</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2">, ...)` to &quot;</span>
-        <span class="s2">&quot;create a config for this particular value.&quot;</span>
+        <span class="n">err_msg</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Consider using `hydra_zen.builds(</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2">, ...)` create &quot;</span>
+            <span class="s2">&quot;a config for this particular value.&quot;</span>
+        <span class="p">)</span>
 
     <span class="k">raise</span> <span class="n">HydraZenUnsupportedPrimitiveError</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
 
@@ -1994,16 +1960,16 @@
 
 
 <span class="c1"># registering value-conversions that depend on `builds`</span>
-<span class="k">def</span> <span class="nf">_cast_via_tuple</span><span class="p">(</span><span class="n">dest_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_T</span><span class="p">],</span> <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">]]]]:</span>
+<span class="k">def</span> <span class="nf">_cast_via_tuple</span><span class="p">(</span><span class="n">dest_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_T</span><span class="p">],</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">]]]:</span>
     <span class="k">def</span> <span class="nf">converter</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">builds</span><span class="p">(</span><span class="n">dest_type</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">builds</span><span class="p">(</span><span class="n">dest_type</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">value</span><span class="p">))()</span>
 
     <span class="k">return</span> <span class="n">converter</span>
 
 
-<span class="k">def</span> <span class="nf">_unpack_partial</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Partial</span><span class="p">[</span><span class="n">_T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">]]]:</span>
+<span class="k">def</span> <span class="nf">_unpack_partial</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Partial</span><span class="p">[</span><span class="n">_T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">]]:</span>
     <span class="n">target</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="n">value</span><span class="o">.</span><span class="n">func</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">builds</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="o">*</span><span class="n">value</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">value</span><span class="o">.</span><span class="n">keywords</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">builds</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="o">*</span><span class="n">value</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">value</span><span class="o">.</span><span class="n">keywords</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)()</span>
 
 
 <span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="nb">set</span><span class="p">]</span> <span class="o">=</span> <span class="n">_cast_via_tuple</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
@@ -2013,8 +1979,8 @@
 <span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="nb">bytearray</span><span class="p">]</span> <span class="o">=</span> <span class="n">_cast_via_tuple</span><span class="p">(</span><span class="nb">bytearray</span><span class="p">)</span>
 <span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="nb">range</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">value</span><span class="p">:</span> <span class="n">builds</span><span class="p">(</span>
     <span class="nb">range</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">step</span>
-<span class="p">)</span>
-<span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="n">Counter</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">counter</span><span class="p">:</span> <span class="n">builds</span><span class="p">(</span><span class="n">Counter</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">counter</span><span class="p">))</span>
+<span class="p">)()</span>
+<span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="n">Counter</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">counter</span><span class="p">:</span> <span class="n">builds</span><span class="p">(</span><span class="n">Counter</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">counter</span><span class="p">))()</span>
 <span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">]</span> <span class="o">=</span> <span class="n">_unpack_partial</span>
 </pre></div>
 
