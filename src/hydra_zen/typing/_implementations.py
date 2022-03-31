@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
+    ByteString,
     Callable,
     ClassVar,
     Dict,
@@ -191,6 +192,12 @@ _HydraPrimitive: TypeAlias = Union[
     str,
 ]
 
+_SupportedViaBuilds = Union[
+    Partial[Any],
+    range,
+    Set[Any],
+    ByteString,
+]
 
 _SupportedPrimitive: TypeAlias = Union[
     _HydraPrimitive,
@@ -201,10 +208,8 @@ _SupportedPrimitive: TypeAlias = Union[
     DataClass_,
     complex,
     Path,
-    Partial[Any],
-    range,
-    Set[Any],
-    EmptyDict,  # not covered by Mapping[..., ...]
+    _SupportedViaBuilds,
+    EmptyDict,  # not covered by Mapping[..., ...]]
 ]
 
 if TYPE_CHECKING:  # pragma: no cover

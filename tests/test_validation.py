@@ -13,10 +13,12 @@ from hypothesis import assume, given, settings
 from omegaconf import OmegaConf
 
 from hydra_zen import builds, get_target, hydrated_dataclass, instantiate, just, to_yaml
+from hydra_zen.errors import HydraZenUnsupportedPrimitiveError
 from hydra_zen.structured_configs._globals import (
     HYDRA_FIELD_NAMES,
     ZEN_TARGET_FIELD_NAME,
 )
+from hydra_zen.structured_configs._utils import get_obj_path
 from tests import everything_except
 
 
@@ -331,9 +333,8 @@ def test_builds_input_validation(param_name: str, value):
 
 
 def test_just_raises_with_legible_message():
-    with pytest.raises(AttributeError) as exec_info:
-        just(1)  # type: ignore
-    assert "just(1)" in str(exec_info.value)
+    with pytest.raises(HydraZenUnsupportedPrimitiveError):
+        just(Class())  # type: ignore
 
 
 def test_hydrated_dataclass_from_instance_raise():
@@ -435,3 +436,8 @@ def test_meta_fields_colliding_with_user_provided_kwargs_raises(
             builds(dict, x=1, y=2, zen_meta=meta_fields, zen_partial=partial)
     else:
         builds(dict, x=1, y=2, zen_meta=meta_fields, zen_partial=partial)
+
+
+def test_get_obj_path_raises_for_unknown_name():
+    with pytest.raises(AttributeError):
+        get_obj_path(1)

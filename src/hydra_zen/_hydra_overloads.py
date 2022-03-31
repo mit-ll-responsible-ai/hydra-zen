@@ -26,6 +26,7 @@ from typing import IO, Any, Callable, Type, TypeVar, Union, overload
 from hydra.utils import instantiate as hydra_instantiate
 from omegaconf import MISSING, DictConfig, ListConfig, OmegaConf
 
+from .structured_configs._value_conversion import ConfigComplex, ConfigPath
 from .typing import Builds, Just, Partial
 from .typing._implementations import DataClass_, HasTarget, InstOrType, IsPartial
 
@@ -33,6 +34,20 @@ __all__ = ["instantiate", "to_yaml", "save_as_yaml", "load_from_yaml", "MISSING"
 
 
 T = TypeVar("T")
+
+
+@overload
+def instantiate(
+    config: InstOrType[ConfigPath], *args: Any, **kwargs: Any
+) -> pathlib.Path:  # pragma: no cover
+    ...
+
+
+@overload
+def instantiate(
+    config: InstOrType[ConfigComplex], *args: Any, **kwargs: Any
+) -> complex:  # pragma: no cover
+    ...
 
 
 @overload

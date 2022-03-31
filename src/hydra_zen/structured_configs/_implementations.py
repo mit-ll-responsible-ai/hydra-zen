@@ -374,73 +374,8 @@ def hydrated_dataclass(
     return wrapper
 
 
-def just(obj: Importable) -> Type[Just[Importable]]:
-    """Returns a config that, when instantiated by Hydra, "just" returns the un-instantiated target-object.
-
-    Parameters
-    ----------
-    obj : Importable
-        The object that will be instantiated from this config.
-
-    Returns
-    -------
-    config : Type[Just[Importable]]
-
-    See Also
-    --------
-    builds : Create a targeted structured config designed to "build" a particular object.
-    make_config: Creates a general config with customized field names, default values, and annotations.
-
-    Notes
-    -----
-    The configs produced by `just` introduce an explicit dependency on hydra-zen. I.e.
-    hydra-zen must be installed in order to instantiate any config that used `just`.
-
-    Examples
-    --------
-    **Basic usage**
-
-    >>> from hydra_zen import just, instantiate, to_yaml
-
-    >>> Conf = just(range)
-    >>> instantiate(Conf) is range
-    True
-
-    The config produced by `just` describes how to import the target,
-    not how to instantiate/call the object.
-
-    >>> print(to_yaml(Conf))
-    _target_: hydra_zen.funcs.get_obj
-    path: builtins.range
-
-    **Auto-Application of just**
-
-    Both `builds` and `make_config` will automatically apply `just` to default values
-    that are function-objects or class objects. E.g. in the following example `just`
-    will be applied to ``sum``.
-
-    >>> from hydra_zen import make_config
-    >>> Conf2 = make_config(data=[1, 2, 3], reduction_fn=sum)
-
-    >>> print(to_yaml(Conf2))
-    data:
-    - 1
-    - 2
-    - 3
-    reduction_fn:
-      _target_: hydra_zen.funcs.get_obj
-      path: builtins.sum
-
-    >>> conf = instantiate(Conf2)
-    >>> conf.reduction_fn(conf.data)
-    6
-    """
-    try:
-        obj_path = _utils.get_obj_path(obj)
-    except AttributeError:
-        raise AttributeError(
-            f"`just({obj})`: `obj` is not importable; it is missing the attributes `__module__` and/or `__qualname__`"
-        )
+def _just(obj: Importable) -> Type[Just[Importable]]:
+    obj_path = _utils.get_obj_path(obj)
 
     entry: List[Tuple[Any, Any, Field[Any]]] = [
         (
@@ -479,6 +414,33 @@ def _is_ufunc(value: Any) -> bool:
     return isinstance(value, numpy.ufunc)
 
 
+def _is_jax_compiled_func(value: Any) -> bool:  # pragma: no cover
+    # we don't require jax to be installed for our coverage metrics
+
+    # checks without importing jaxlib
+    jaxlib_xla_extension = sys.modules.get("jaxlib.xla_extension")
+    if jaxlib_xla_extension is None:
+        return False
+    try:
+        CompiledFunction = getattr(jaxlib_xla_extension, "CompiledFunction")
+        return isinstance(value, CompiledFunction)
+    except AttributeError:
+        return False
+
+
+@functools.lru_cache(maxsize=128)
+def _throwaway():  # pragma: no cover
+    pass
+
+
+_lru_cache_type = type(_throwaway)
+
+_builtin_types = (_builtin_function_or_method_type, _lru_cache_type)
+
+del _throwaway
+del _lru_cache_type
+
+
 def sanitized_default_value(
     value: Any,
     allow_zen_conversion: bool = True,
@@ -495,11 +457,13 @@ def sanitized_default_value(
         and (
             inspect.isfunction(value)
             or (not is_dataclass(value) and inspect.isclass(value))
-            or isinstance(value, _builtin_function_or_method_type)
+            or inspect.ismethod(value)
+            or isinstance(value, _builtin_types)
             or _is_ufunc(value)
+            or _is_jax_compiled_func(value)
         )
     ):
-        return just(value)
+        return _just(value)
     resolved_value = value
     type_of_value = type(resolved_value)
 
@@ -532,8 +496,10 @@ def sanitized_default_value(
     )
 
     if structured_conf_permitted:
-        err_msg += f"\n\nConsider using `hydra_zen.builds({type(value)}, ...)` to "
-        "create a config for this particular value."
+        err_msg += (
+            f"\n\nConsider using `hydra_zen.builds({type(value)}, ...)` create "
+            "a config for this particular value."
+        )
 
     raise HydraZenUnsupportedPrimitiveError(err_msg)
 
@@ -1821,16 +1787,16 @@ def get_target(obj: HasTarget) -> Any:
 
 
 # registering value-conversions that depend on `builds`
-def _cast_via_tuple(dest_type: Type[_T]) -> Callable[[_T], Type[Builds[Type[_T]]]]:
+def _cast_via_tuple(dest_type: Type[_T]) -> Callable[[_T], Builds[Type[_T]]]:
     def converter(value):
-        return builds(dest_type, tuple(value))
+        return builds(dest_type, tuple(value))()
 
     return converter
 
 
-def _unpack_partial(value: Partial[_T]) -> Type[PartialBuilds[Type[_T]]]:
+def _unpack_partial(value: Partial[_T]) -> PartialBuilds[Type[_T]]:
     target = cast(Type[_T], value.func)
-    return builds(target, *value.args, **value.keywords, zen_partial=True)
+    return builds(target, *value.args, **value.keywords, zen_partial=True)()
 
 
 ZEN_VALUE_CONVERSION[set] = _cast_via_tuple(set)
@@ -1840,6 +1806,6 @@ ZEN_VALUE_CONVERSION[bytes] = _cast_via_tuple(bytes)
 ZEN_VALUE_CONVERSION[bytearray] = _cast_via_tuple(bytearray)
 ZEN_VALUE_CONVERSION[range] = lambda value: builds(
     range, value.start, value.stop, value.step
-)
-ZEN_VALUE_CONVERSION[Counter] = lambda counter: builds(Counter, dict(counter))
+)()
+ZEN_VALUE_CONVERSION[Counter] = lambda counter: builds(Counter, dict(counter))()
 ZEN_VALUE_CONVERSION[functools.partial] = _unpack_partial

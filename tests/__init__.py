@@ -1,6 +1,7 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
+import functools
 from typing import Any
 
 import hypothesis.strategies as st
@@ -21,7 +22,15 @@ def everything_except(*excluded_types: type):
     )
 
 
-def check_identity(new, original):
+def is_same(new, original):
+    if isinstance(original, functools.partial):
+        if not isinstance(new, functools.partial):
+            return False
+        return (
+            new.args == original.args
+            and new.keywords == original.keywords
+            and new.func is original.func
+        )
     if not is_classmethod(original):
         return new is original
     # objects like classmethods do not satisfy `x is x`

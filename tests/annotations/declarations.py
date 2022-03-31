@@ -122,13 +122,32 @@ def f4():
     reveal_type(instantiate(conf_f_2), expected_text="int")
 
 
-def f5():
+def check_just():
+    def f(x: int) -> int:
+        return x
+
+    class A:
+        ...
+
     # test just(...)
     reveal_type(just(f), expected_text="Type[Just[(x: int) -> int]]")
     reveal_type(just(A), expected_text="Type[Just[Type[A]]]")
     reveal_type(instantiate(just(f)), expected_text="(x: int) -> int")
     reveal_type(instantiate(just(A)), expected_text="Type[A]")
     reveal_type(instantiate(just(A)()), expected_text="Type[A]")  # instance of Just
+
+    reveal_type(just(1), expected_text="int")
+    reveal_type(just("hi"), expected_text="str")
+    reveal_type(just(1 + 2j), expected_text="ConfigComplex")
+    reveal_type(just(Path.home()), expected_text="ConfigPath")
+    reveal_type(just(partial(f, 1)), expected_text="Type[Just[partial[int]]]")
+    reveal_type(just(set([1, 2, 3])), expected_text="Builds[Type[set[int]]]")
+    reveal_type(just(b"1234"), expected_text="Builds[Type[bytes]]")
+    reveal_type(just(range(10)), expected_text="Builds[Type[range]]")
+
+    partiald_f = instantiate(just(partial(f, 1)))
+    reveal_type(partiald_f, expected_text="partial[int]")
+    reveal_type(partiald_f(), expected_text="int")
 
 
 @dataclass
