@@ -220,7 +220,7 @@ def to_yaml(cfg: Any, *, resolve: bool = False, sort_keys: bool = False) -> str:
     Parameters
     ----------
     cfg : Any
-        A valid configuration object (e.g. DictConfig, ListConfig, dataclass).
+        A valid configuration object, supported either by Hydra or hydra-zen
 
     resolve : bool, optional (default=False)
         If `True`, interpolated fields in `cfg` will be resolved in the yaml.
@@ -257,6 +257,13 @@ def to_yaml(cfg: Any, *, resolve: bool = False, sort_keys: bool = False) -> str:
     >>> print(to_yaml(c2))
     _target_: builtins.dict
     'y': 10
+
+    hydra-zen's additional supported types can be specified as well
+
+    >>> print(to_yaml(1+2j))
+    real: 1.0
+    imag: 2.0
+    _target_: builtins.complex
 
     **Specifying resolve**
 
