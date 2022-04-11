@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from hydra_zen import instantiate, just
+from hydra_zen import instantiate, just, make_config
 from tests import is_same
 
 
@@ -44,3 +44,8 @@ def test_just_roundtrip(obj):
         assert is_same(out, obj)
     else:
         assert out == obj
+
+
+def test_just_of_structured_config_is_identity():
+    cfg = make_config(x=1)
+    assert just(cfg) is cfg
