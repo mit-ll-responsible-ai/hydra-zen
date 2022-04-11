@@ -21,11 +21,14 @@ E.g.
 # pyright: strict
 
 import pathlib
-from typing import IO, Any, Callable, Type, TypeVar, Union, overload
+from dataclasses import is_dataclass
+from functools import wraps
+from typing import IO, Any, Callable, Type, TypeVar, Union, cast, overload
 
 from hydra.utils import instantiate as hydra_instantiate
 from omegaconf import MISSING, DictConfig, ListConfig, OmegaConf
 
+from .structured_configs._just import just
 from .structured_configs._value_conversion import ConfigComplex, ConfigPath
 from .typing import Builds, Just, Partial
 from .typing._implementations import DataClass_, HasTarget, InstOrType, IsPartial
@@ -34,6 +37,7 @@ __all__ = ["instantiate", "to_yaml", "save_as_yaml", "load_from_yaml", "MISSING"
 
 
 T = TypeVar("T")
+F = TypeVar("F", bound=Callable[..., Any])
 
 
 @overload
@@ -196,6 +200,17 @@ def instantiate(config: Any, *args: Any, **kwargs: Any) -> Any:
     return hydra_instantiate(config, *args, **kwargs)
 
 
+def apply_just(fn: F) -> F:
+    @wraps(fn)
+    def wrapper(cfg: Any, *args: Any, **kwargs: Any):
+        if not is_dataclass(cfg):
+            cfg = just(cfg)
+        return fn(cfg, *args, **kwargs)
+
+    return cast(F, wrapper)
+
+
+@apply_just
 def to_yaml(cfg: Any, *, resolve: bool = False, sort_keys: bool = False) -> str:
     """
     Serialize a config as a yaml-formatted string.
@@ -274,9 +289,11 @@ def to_yaml(cfg: Any, *, resolve: bool = False, sort_keys: bool = False) -> str:
     a: ???
     b: ???
     """
+
     return OmegaConf.to_yaml(cfg=cfg, resolve=resolve, sort_keys=sort_keys)
 
 
+@apply_just
 def save_as_yaml(
     config: Any, f: Union[str, pathlib.Path, IO[Any]], resolve: bool = False
 ) -> None:

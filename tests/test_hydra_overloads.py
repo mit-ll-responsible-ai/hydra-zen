@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import string
+from pathlib import Path
 
 import hypothesis.strategies as st
 import pytest
@@ -12,6 +13,7 @@ from hydra_zen import (
     MISSING as zen_MISSING,
     builds,
     instantiate,
+    just,
     load_from_yaml,
     save_as_yaml,
     to_yaml,
@@ -45,3 +47,15 @@ def test_yaml_io_roundtrip(fname, value):
     loaded_conf = load_from_yaml(fname)
 
     assert instantiate(conf) == instantiate(loaded_conf)
+
+
+def test_to_yaml_applies_just():
+    data = [1 + 2j, Path.cwd(), "hi"]
+    assert to_yaml(just(data)) == to_yaml(data)
+
+
+def test_save_yaml_applies_just(tmp_path):
+    data = {"a": [1 + 2j, "hi", 3j]}
+    save_as_yaml(data, tmp_path / "cfg.yml")
+    out = dict(instantiate(load_from_yaml(tmp_path / "cfg.yml")))
+    assert out == data
