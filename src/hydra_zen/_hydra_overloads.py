@@ -200,7 +200,7 @@ def instantiate(config: Any, *args: Any, **kwargs: Any) -> Any:
     return hydra_instantiate(config, *args, **kwargs)
 
 
-def apply_just(fn: F) -> F:
+def _apply_just(fn: F) -> F:
     @wraps(fn)
     def wrapper(cfg: Any, *args: Any, **kwargs: Any):
         if not is_dataclass(cfg):
@@ -210,7 +210,7 @@ def apply_just(fn: F) -> F:
     return cast(F, wrapper)
 
 
-@apply_just
+@_apply_just
 def to_yaml(cfg: Any, *, resolve: bool = False, sort_keys: bool = False) -> str:
     """
     Serialize a config as a yaml-formatted string.
@@ -300,7 +300,7 @@ def to_yaml(cfg: Any, *, resolve: bool = False, sort_keys: bool = False) -> str:
     return OmegaConf.to_yaml(cfg=cfg, resolve=resolve, sort_keys=sort_keys)
 
 
-@apply_just
+@_apply_just
 def save_as_yaml(
     config: Any, f: Union[str, pathlib.Path, IO[Any]], resolve: bool = False
 ) -> None:
