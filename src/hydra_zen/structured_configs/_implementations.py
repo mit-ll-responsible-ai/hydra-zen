@@ -637,7 +637,7 @@ def builds(
 # partial=bool, pop-sig=bool
 @overload
 def builds(
-    __hydra_target: Union[Importable, Callable[P, R]],
+    __hydra_target: Union[Callable[P, R], Importable],
     *pos_args: SupportedPrimitive,
     zen_partial: bool,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
