@@ -98,8 +98,8 @@ def just(obj: Any) -> Any:
 
     >>> from hydra_zen import just, instantiate, to_yaml
 
-    Calling ``just`` on a type or function object will create a structured config
-    that, when instantiated, returns that object.
+    Using ``just`` to create a config that returns an object – without calling it –
+    upon instantiation.
 
     >>> class A: pass
     >>> Conf_A = just(A)  # returns a dataclass-type
@@ -108,7 +108,7 @@ def just(obj: Any) -> Any:
 
     >>> def my_func(x: int): pass
     >>> Conf_func = just(my_func)  # returns a dataclass-type
-    >>> instantiate(Conf_func) is my_funct
+    >>> instantiate(Conf_func) is my_func
     True
 
 
