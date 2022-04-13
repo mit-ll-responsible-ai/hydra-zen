@@ -23,11 +23,11 @@ values will automatically be converted to structured configs.
 .. code-block:: pycon
 
    >>> from functools import partial
-   >>> from hydra_zen import to_yamlm just
+   >>> from hydra_zen import to_yaml, just
 
    >>> def f(x: int): returns x**2
    
-   >>> just(partial(f, x=2))
+   >>> just(partial(f, x=2))  # returns a dataclass instance
    PartialBuilds_f(_target_='__main__.f', _partial_=True, x=2)
 
    >>> print(to_yaml(partial(f, x=2)))
