@@ -258,8 +258,8 @@ that used <a class="reference internal" href="#hydra_zen.just" title="hydra_zen.
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><span class="n">just</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a>
 </pre></div>
 </div>
-<p>Calling <code class="docutils literal notranslate"><span class="pre">just</span></code> on a type or function object will create a structured config
-that, when instantiated, returns that object.</p>
+<p>Using <code class="docutils literal notranslate"><span class="pre">just</span></code> to create a config that returns an object – without calling it –
+upon instantiation.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">A</span><span class="p">:</span> <span class="k">pass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Conf_A</span> <span class="o">=</span> <span class="n">just</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>  <span class="c1"># returns a dataclass-type</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf_A</span><span class="p">)</span> <span class="ow">is</span> <span class="n">A</span>
@@ -268,7 +268,7 @@ that, when instantiated, returns that object.</p>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">my_func</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">):</span> <span class="k">pass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Conf_func</span> <span class="o">=</span> <span class="n">just</span><span class="p">(</span><span class="n">my_func</span><span class="p">)</span>  <span class="c1"># returns a dataclass-type</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf_func</span><span class="p">)</span> <span class="ow">is</span> <span class="n">my_funct</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf_func</span><span class="p">)</span> <span class="ow">is</span> <span class="n">my_func</span>
 <span class="go">True</span>
 </pre></div>
 </div>

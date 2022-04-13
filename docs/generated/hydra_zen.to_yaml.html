@@ -209,7 +209,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>cfg</strong><span class="classifier">Any</span></dt><dd><p>A valid configuration object (e.g. DictConfig, ListConfig, dataclass).</p>
+<dt><strong>cfg</strong><span class="classifier">Any</span></dt><dd><p>A valid configuration object, supported either by Hydra or hydra-zen</p>
 </dd>
 <dt><strong>resolve</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>, interpolated fields in <code class="xref py py-obj docutils literal notranslate"><span class="pre">cfg</span></code> will be resolved in the yaml.</p>
 </dd>
@@ -250,6 +250,13 @@ and a configured field:</p>
 <span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">c2</span><span class="p">))</span>
 <span class="go">_target_: builtins.dict</span>
 <span class="go">'y': 10</span>
+</pre></div>
+</div>
+<p>hydra-zen’s additional supported types can be specified as well</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="n">j</span><span class="p">))</span>
+<span class="go">real: 1.0</span>
+<span class="go">imag: 2.0</span>
+<span class="go">_target_: builtins.complex</span>
 </pre></div>
 </div>
 <p><strong>Specifying resolve</strong></p>

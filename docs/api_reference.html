@@ -395,11 +395,8 @@ of common types via its <a class="reference internal" href="#create-config"><spa
 </section>
 <section id="additional-types-supported-via-hydra-zen">
 <span id="additional-types"></span><h3>Additional Types, Supported via hydra-zen<a class="headerlink" href="#additional-types-supported-via-hydra-zen" title="Permalink to this headline">#</a></h3>
-<blockquote>
-<div><p>This feature was introduced in hydra-zen <code class="docutils literal notranslate"><span class="pre">v0.4.0</span></code></p>
-</div></blockquote>
 <p>Values of additional types can be specified directly via hydra-zen’s
-<a class="reference internal" href="#create-config"><span class="std std-ref">config-creation functions</span></a>, and hydra-zen will automatically
+<a class="reference internal" href="#create-config"><span class="std std-ref">config-creation functions</span></a> (and other utility functions like <code class="docutils literal notranslate"><span class="pre">to_yaml</span></code>), and hydra-zen will automatically
 create targeted configs to represent those values in a way that is compatible
 with Hydra. For example, a <a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">complex</span></code></a> value can be specified directly via <a class="reference internal" href="generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_config()</span></code></a>, and a targeted config will be created for that value.</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a>
@@ -409,6 +406,13 @@ with Hydra. For example, a <a class="reference external" href="https://docs.pyth
 <span class="go">  real: 2.0</span>
 <span class="go">  imag: 3.0</span>
 <span class="go">  _target_: builtins.complex</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functools.html#module-functools" title="functools"><span class="nn">functools</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functools.html#functools.partial" title="functools.partial"><span class="n">partial</span></a>
+<span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functools.html#functools.partial" title="functools.partial"><span class="n">partial</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="mi">3</span><span class="p">)))</span>
+<span class="go">_target_: builtins.int</span>
+<span class="go">_partial_: true</span>
+<span class="go">_args_:</span>
+<span class="go">- 3</span>
 </pre></div>
 </div>
 <p>hydra-zen provides specialized support for values of the following types:</p>

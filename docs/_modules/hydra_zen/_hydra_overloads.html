@@ -194,11 +194,14 @@
 <span class="c1"># pyright: strict</span>
 
 <span class="kn">import</span> <span class="nn">pathlib</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">IO</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">overload</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">is_dataclass</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">IO</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span><span class="p">,</span> <span class="n">overload</span>
 
 <span class="kn">from</span> <span class="nn">hydra.utils</span> <span class="kn">import</span> <span class="n">instantiate</span> <span class="k">as</span> <span class="n">hydra_instantiate</span>
 <span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">MISSING</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">,</span> <span class="n">OmegaConf</span>
 
+<span class="kn">from</span> <span class="nn">.structured_configs._just</span> <span class="kn">import</span> <span class="n">just</span>
 <span class="kn">from</span> <span class="nn">.structured_configs._value_conversion</span> <span class="kn">import</span> <span class="n">ConfigComplex</span><span class="p">,</span> <span class="n">ConfigPath</span>
 <span class="kn">from</span> <span class="nn">.typing</span> <span class="kn">import</span> <span class="n">Builds</span><span class="p">,</span> <span class="n">Just</span><span class="p">,</span> <span class="n">Partial</span>
 <span class="kn">from</span> <span class="nn">.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass_</span><span class="p">,</span> <span class="n">HasTarget</span><span class="p">,</span> <span class="n">InstOrType</span><span class="p">,</span> <span class="n">IsPartial</span>
@@ -207,6 +210,7 @@
 
 
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;F&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
 
 
 <span class="nd">@overload</span>
@@ -369,7 +373,18 @@
     <span class="k">return</span> <span class="n">hydra_instantiate</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="to_yaml"><a class="viewcode-back" href="../../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml">[docs]</a><span class="k">def</span> <span class="nf">to_yaml</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">resolve</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">sort_keys</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_apply_just</span><span class="p">(</span><span class="n">fn</span><span class="p">:</span> <span class="n">F</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">F</span><span class="p">:</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+            <span class="n">cfg</span> <span class="o">=</span> <span class="n">just</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">wrapper</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="to_yaml"><a class="viewcode-back" href="../../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml">[docs]</a><span class="nd">@_apply_just</span>
+<span class="k">def</span> <span class="nf">to_yaml</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">resolve</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">sort_keys</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Serialize a config as a yaml-formatted string.</span>
 
@@ -378,7 +393,7 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    cfg : Any</span>
-<span class="sd">        A valid configuration object (e.g. DictConfig, ListConfig, dataclass).</span>
+<span class="sd">        A valid configuration object, supported either by Hydra or hydra-zen</span>
 
 <span class="sd">    resolve : bool, optional (default=False)</span>
 <span class="sd">        If `True`, interpolated fields in `cfg` will be resolved in the yaml.</span>
@@ -416,6 +431,13 @@
 <span class="sd">    _target_: builtins.dict</span>
 <span class="sd">    &#39;y&#39;: 10</span>
 
+<span class="sd">    hydra-zen&#39;s additional supported types can be specified as well</span>
+
+<span class="sd">    &gt;&gt;&gt; print(to_yaml(1+2j))</span>
+<span class="sd">    real: 1.0</span>
+<span class="sd">    imag: 2.0</span>
+<span class="sd">    _target_: builtins.complex</span>
+
 <span class="sd">    **Specifying resolve**</span>
 
 <span class="sd">    The following is a config with interpolated fields.</span>
@@ -447,10 +469,12 @@
 <span class="sd">    a: ???</span>
 <span class="sd">    b: ???</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">return</span> <span class="n">OmegaConf</span><span class="o">.</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">cfg</span><span class="o">=</span><span class="n">cfg</span><span class="p">,</span> <span class="n">resolve</span><span class="o">=</span><span class="n">resolve</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="n">sort_keys</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="save_as_yaml"><a class="viewcode-back" href="../../generated/hydra_zen.save_as_yaml.html#hydra_zen.save_as_yaml">[docs]</a><span class="k">def</span> <span class="nf">save_as_yaml</span><span class="p">(</span>
+<div class="viewcode-block" id="save_as_yaml"><a class="viewcode-back" href="../../generated/hydra_zen.save_as_yaml.html#hydra_zen.save_as_yaml">[docs]</a><span class="nd">@_apply_just</span>
+<span class="k">def</span> <span class="nf">save_as_yaml</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="n">IO</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">resolve</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>

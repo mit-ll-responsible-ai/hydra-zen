@@ -8,6 +8,33 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse 
 chronological order. All previous releases should still be available on pip.
 
+.. _v0.7.0:
+
+------------------
+0.7.0 - 2022-XX-XX
+------------------
+
+New Features
+------------
+:func:`~hydra_zen.just`, :func:`~hydra_zen.to_yaml`, and :func:`~hydra_zen.save_as_yaml` can directly 
+operate on values of :ref:`types with specialized support from hydra-zen <additional-types>`; these 
+values will automatically be converted to structured configs. 
+
+.. code-block:: pycon
+
+   >>> from functools import partial
+   >>> from hydra_zen import to_yamlm just
+
+   >>> def f(x: int): returns x**2
+   
+   >>> just(partial(f, x=2))
+   PartialBuilds_f(_target_='__main__.f', _partial_=True, x=2)
+
+   >>> print(to_yaml(partial(f, x=2)))
+   _target_: __main__.f
+   _partial_: true
+   x: 2
+
 .. _v0.6.0:
 
 ------------------

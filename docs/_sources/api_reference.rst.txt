@@ -123,10 +123,8 @@ Values of the following types can be specified directly in configs:
 Additional Types, Supported via hydra-zen
 *****************************************
 
-    This feature was introduced in hydra-zen ``v0.4.0``
-
 Values of additional types can be specified directly via hydra-zen's 
-:ref:`config-creation functions <create-config>`, and hydra-zen will automatically 
+:ref:`config-creation functions <create-config>` (and other utility functions like ``to_yaml``), and hydra-zen will automatically 
 create targeted configs to represent those values in a way that is compatible 
 with Hydra. For example, a :py:class:`complex` value can be specified directly via :func:`~hydra_zen.make_config`, and a targeted config will be created for that value.
 
@@ -139,6 +137,13 @@ with Hydra. For example, a :py:class:`complex` value can be specified directly v
      real: 2.0
      imag: 3.0
      _target_: builtins.complex
+   
+   >>> from functools import partial
+   >>> print(to_yaml(partial(int, 3)))
+   _target_: builtins.int
+   _partial_: true
+   _args_:
+   - 3
 
 hydra-zen provides specialized support for values of the following types:
 

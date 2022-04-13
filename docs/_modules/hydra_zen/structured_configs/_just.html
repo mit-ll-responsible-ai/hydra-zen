@@ -271,8 +271,8 @@
 
 <span class="sd">    &gt;&gt;&gt; from hydra_zen import just, instantiate, to_yaml</span>
 
-<span class="sd">    Calling ``just`` on a type or function object will create a structured config</span>
-<span class="sd">    that, when instantiated, returns that object.</span>
+<span class="sd">    Using ``just`` to create a config that returns an object – without calling it –</span>
+<span class="sd">    upon instantiation.</span>
 
 <span class="sd">    &gt;&gt;&gt; class A: pass</span>
 <span class="sd">    &gt;&gt;&gt; Conf_A = just(A)  # returns a dataclass-type</span>
@@ -281,7 +281,7 @@
 
 <span class="sd">    &gt;&gt;&gt; def my_func(x: int): pass</span>
 <span class="sd">    &gt;&gt;&gt; Conf_func = just(my_func)  # returns a dataclass-type</span>
-<span class="sd">    &gt;&gt;&gt; instantiate(Conf_func) is my_funct</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(Conf_func) is my_func</span>
 <span class="sd">    True</span>
 
 
