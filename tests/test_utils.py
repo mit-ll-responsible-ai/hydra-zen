@@ -21,7 +21,11 @@ from omegaconf.errors import (
 from typing_extensions import Final, Literal
 
 from hydra_zen import builds, instantiate, mutable_value
-from hydra_zen._compatibility import Version, _get_version
+from hydra_zen._compatibility import (
+    HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES,
+    Version,
+    _get_version,
+)
 from hydra_zen.structured_configs._utils import (
     field,
     is_interpolated_string,
@@ -139,22 +143,48 @@ NoneType = type(None)
         (Union[NoneType, int], Optional[int]),  # supported Optional
         (Optional[Color], Optional[Color]),
         (Optional[List[Color]], Optional[List[Color]]),
-        (Optional[List[List[int]]], Optional[List[Any]]),
+        (
+            Optional[List[List[int]]],
+            Optional[List[Any]]
+            if not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES
+            else Optional[List[List[int]]],
+        ),
         (List[int], List[int]),  # supported containers
         (List[frozenset], List[Any]),
-        (List[List[int]], List[Any]),
+        (
+            List[List[int]],
+            List[Any] if not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES else List[List[int]],
+        ),
         (List[T], List[Any]),
         (Dict[str, float], Dict[str, float]),
         (Dict[C, int], Dict[Any, int]),
         (Dict[str, C], Dict[str, Any]),
         (Dict[C, C], Dict[Any, Any]),
-        (Dict[str, List[int]], Dict[str, Any]),
+        (
+            Dict[str, List[int]],
+            Dict[str, Any]
+            if not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES
+            else Dict[str, List[int]],
+        ),
         (Tuple[str], Tuple[str]),
         (Tuple[str, ...], Tuple[str, ...]),
         (Tuple[str, str, str], Tuple[str, str, str]),
-        (Tuple[List[int]], Tuple[Any]),
+        (
+            Tuple[List[int]],
+            (
+                Tuple[Any]
+                if not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES
+                else Tuple[List[int]]
+            ),
+        ),
         (Union[NoneType, Tuple[int, int]], Optional[Tuple[int, int]]),
         (Union[Tuple[int, int], NoneType], Optional[Tuple[int, int]]),
+        (
+            List[Dict[str, List[int]]],
+            List[Any]
+            if not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES
+            else List[Dict[str, List[int]]],
+        ),
     ],
 )
 def test_sanitized_type_expected_behavior(in_type, expected_type):

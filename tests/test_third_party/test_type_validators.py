@@ -18,7 +18,7 @@ from typing import (
 import hypothesis.strategies as st
 import pytest
 from hypothesis import assume, given, settings
-from omegaconf import OmegaConf
+from omegaconf import OmegaConf, ValidationError
 from typing_extensions import Annotated, Final, Literal, TypedDict
 
 from hydra_zen import builds, instantiate, to_yaml
@@ -325,7 +325,13 @@ def test_signature_parsing(args, kwargs, should_pass, validator, target, as_yaml
             hydra_convert="all",
         )
         if as_yaml:
-            conf_with_val = OmegaConf.create(to_yaml(conf_with_val))
+
+            try:
+                # omegaconf >= 2.2.0 no longer casts lists to strings
+                conf_with_val = OmegaConf.create(to_yaml(conf_with_val))
+            except ValidationError:
+                assume(False)
+
         if not should_pass:
             with pytest.raises(Exception):
                 instantiate(conf_with_val)
