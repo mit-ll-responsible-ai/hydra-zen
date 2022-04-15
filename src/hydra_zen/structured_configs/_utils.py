@@ -28,6 +28,7 @@ from typing_extensions import Final, TypeGuard
 
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVE_TYPES,
+    HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES,
     PATCH_OMEGACONF_830,
 )
 from hydra_zen.typing._implementations import DataClass_, Field, InterpStr
@@ -294,6 +295,7 @@ def sanitized_type(
     # Warning: mutating `type_` will mutate the signature being inspected
     # Even calling deepcopy(`type_`) silently fails to prevent this.
     origin = get_origin(type_)
+    no_nested_container = not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES
 
     if origin is not None:
         if primitive_only:
@@ -319,13 +321,13 @@ def sanitized_type(
             return Union[optional_type, NoneType]  # type: ignore
 
         if origin is list or origin is List:
-            return List[sanitized_type(args[0], primitive_only=True)] if args else type_  # type: ignore
+            return List[sanitized_type(args[0], primitive_only=no_nested_container)] if args else type_  # type: ignore
 
         if origin is dict or origin is Dict:
             return (
                 Dict[
                     sanitized_type(args[0], primitive_only=True),  # type: ignore
-                    sanitized_type(args[1], primitive_only=True),  # type: ignore
+                    sanitized_type(args[1], primitive_only=no_nested_container),  # type: ignore
                 ]
                 if args
                 else type_
@@ -345,7 +347,7 @@ def sanitized_type(
             has_ellipses = Ellipsis in unique_args
 
             _unique_type = (
-                sanitized_type(args[0], primitive_only=True)
+                sanitized_type(args[0], primitive_only=no_nested_container)
                 if len(unique_args) == 1 or (len(unique_args) == 2 and has_ellipses)
                 else Any
             )

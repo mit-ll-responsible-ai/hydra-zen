@@ -4,7 +4,7 @@ from collections import Counter, deque
 from enum import Enum
 from functools import partial
 from pathlib import Path, PosixPath, WindowsPath
-from typing import NamedTuple, Optional, Set
+from typing import NamedTuple, Set
 
 import hydra
 import omegaconf
@@ -49,10 +49,9 @@ PATCH_OMEGACONF_830: Final = True  # OMEGACONF_VERSION < Version(2, 1, 1)
 # Hydra's instantiate API now supports partial-instantiation, indicated
 # by a `_partial_ = True` attribute.
 # https://github.com/facebookresearch/hydra/pull/1905
-#
-# Uncomment dynamice setting of `HYDRA_SUPPORTS_PARTIAL` once we can
-# begin testing against nightly builds of Hydra
 HYDRA_SUPPORTS_PARTIAL: Final = Version(1, 1, 1) < HYDRA_VERSION
+
+HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES: Final = OMEGACONF_VERSION >= Version(2, 2, 0)
 
 # Indicates primitive types permitted in type-hints of structured configs
 HYDRA_SUPPORTED_PRIMITIVE_TYPES: Final = {int, float, bool, str, Enum}
