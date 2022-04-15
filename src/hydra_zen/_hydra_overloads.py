@@ -40,6 +40,17 @@ T = TypeVar("T")
 F = TypeVar("F", bound=Callable[..., Any])
 
 
+class _TightBind:  # pragma: no cover
+    ...
+
+
+@overload
+def instantiate(
+    config: _TightBind, *args: Any, **kwargs: Any
+) -> Any:  # pragma: no cover
+    ...
+
+
 @overload
 def instantiate(
     config: InstOrType[ConfigPath], *args: Any, **kwargs: Any

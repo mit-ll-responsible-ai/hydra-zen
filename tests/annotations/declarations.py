@@ -33,6 +33,7 @@ from hydra_zen import (
     make_custom_builds_fn,
     mutable_value,
 )
+from hydra_zen.structured_configs._value_conversion import ConfigComplex, ConfigPath
 from hydra_zen.typing import (
     Builds,
     HydraPartialBuilds,
@@ -1012,3 +1013,12 @@ def check_make_custom_builds_overloads(boolean: bool):
         make_custom_builds_fn(populate_full_signature=boolean, zen_partial=boolean),
         expected_text="FullBuilds | PBuilds | StdBuilds",
     )
+
+
+def check_instantiate_overrides(
+    any_: Any, complex_: ConfigComplex, path_: ConfigPath, dataclass_: DataClass_
+):
+    reveal_type(instantiate(any_), expected_text="Any")
+    reveal_type(instantiate(complex_), expected_text="complex")
+    reveal_type(instantiate(path_), expected_text="Path")
+    reveal_type(instantiate(dataclass_), expected_text="Any")
