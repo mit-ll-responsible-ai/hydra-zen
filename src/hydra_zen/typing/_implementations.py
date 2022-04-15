@@ -190,13 +190,13 @@ _HydraPrimitive: TypeAlias = Union[
     int,
     float,
     str,
+    ByteString,
 ]
 
 _SupportedViaBuilds = Union[
     Partial[Any],
     range,
     Set[Any],
-    ByteString,
 ]
 
 _SupportedPrimitive: TypeAlias = Union[

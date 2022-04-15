@@ -116,7 +116,7 @@ Values of the following types can be specified directly in configs:
 - :py:class:`list`
 - :py:class:`dict`
 - :py:class:`enum.Enum`
-
+- :py:class:`bytes`  (*support added in OmegaConf 2.2.0*)
 
 .. _additional-types:
 
@@ -147,12 +147,12 @@ with Hydra. For example, a :py:class:`complex` value can be specified directly v
 
 hydra-zen provides specialized support for values of the following types:
 
-- :py:class:`bytes`
+- :py:class:`bytes` (*support provided for OmegaConf < 2.2.0*)
 - :py:class:`bytearray`
 - :py:class:`complex`
 - :py:class:`collections.Counter`
 - :py:class:`collections.deque`
-- :py:func:`functools.partial`  (*added in v0.5.0*)
+- :py:func:`functools.partial`
 - :py:class:`pathlib.Path`
 - :py:class:`pathlib.PosixPath`
 - :py:class:`pathlib.WindowsPath`
