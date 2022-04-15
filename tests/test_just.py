@@ -1,3 +1,6 @@
+# Copyright (c) 2022 Massachusetts Institute of Technology
+# SPDX-License-Identifier: MIT
+
 import functools
 from pathlib import Path
 
@@ -26,7 +29,6 @@ def func_with_cache(x: int):
 @pytest.mark.parametrize(
     "obj",
     [
-        b"123",
         bytearray([1, 2, 3]),
         1 + 2j,
         Path.cwd(),

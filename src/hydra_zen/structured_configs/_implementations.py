@@ -1802,7 +1802,10 @@ def _unpack_partial(value: Partial[_T]) -> PartialBuilds[Type[_T]]:
 ZEN_VALUE_CONVERSION[set] = _cast_via_tuple(set)
 ZEN_VALUE_CONVERSION[frozenset] = _cast_via_tuple(frozenset)
 ZEN_VALUE_CONVERSION[deque] = _cast_via_tuple(deque)
-ZEN_VALUE_CONVERSION[bytes] = _cast_via_tuple(bytes)
+
+if bytes in ZEN_SUPPORTED_PRIMITIVES:  # pragma: no cover
+    ZEN_VALUE_CONVERSION[bytes] = _cast_via_tuple(bytes)
+
 ZEN_VALUE_CONVERSION[bytearray] = _cast_via_tuple(bytearray)
 ZEN_VALUE_CONVERSION[range] = lambda value: builds(
     range, value.start, value.stop, value.step

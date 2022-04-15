@@ -22,6 +22,7 @@ from typing_extensions import Final, Literal
 
 from hydra_zen import builds, instantiate, mutable_value
 from hydra_zen._compatibility import (
+    HYDRA_SUPPORTS_BYTES,
     HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES,
     Version,
     _get_version,
@@ -115,6 +116,7 @@ NoneType = type(None)
         (float, float),
         (str, str),
         (bool, bool),
+        (bytes, bytes if HYDRA_SUPPORTS_BYTES else Any),
         (Color, Color),
         (C, Any),  # unsupported primitives
         (type(None), Any),
