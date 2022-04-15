@@ -185,6 +185,10 @@ NoneType = type(None)
             if not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES
             else List[Dict[str, List[int]]],
         ),
+        (
+            List[List[Type[int]]],
+            List[Any] if not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES else List[List[Any]],
+        ),
     ],
 )
 def test_sanitized_type_expected_behavior(in_type, expected_type):
@@ -210,7 +214,8 @@ def test_sanitized_type_expected_behavior(in_type, expected_type):
                 ConfigValueError,
             )
         ):
-            OmegaConf.create(Bad)
+            Conf = OmegaConf.create(Bad)
+            Conf.x = [[int]]  # special case: validate
 
     @dataclass
     class Tmp:
