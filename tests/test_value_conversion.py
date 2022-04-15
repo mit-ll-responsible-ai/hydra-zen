@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 import string
 from collections import Counter, deque
+from dataclasses import dataclass
 from enum import Enum
 from functools import partial
 from pathlib import Path
@@ -10,9 +11,16 @@ from typing import Dict, FrozenSet, List, Set, Union
 import hypothesis.strategies as st
 import pytest
 from hypothesis import HealthCheck, assume, given, settings
-from omegaconf import DictConfig, ListConfig, OmegaConf
+from omegaconf import DictConfig, ListConfig, OmegaConf, ValidationError
 
-from hydra_zen import builds, get_target, instantiate, make_config, to_yaml
+from hydra_zen import (
+    builds,
+    get_target,
+    instantiate,
+    make_config,
+    mutable_value,
+    to_yaml,
+)
 from hydra_zen._compatibility import ZEN_SUPPORTED_PRIMITIVES
 from hydra_zen.structured_configs._value_conversion import ZEN_VALUE_CONVERSION
 
@@ -213,3 +221,20 @@ def test_builds_handles_recursive_partial():
     assert get_target(Conf) is f1
     assert instantiate(Conf) == partiald_obj()
     assert partiald_obj() == (("a", "b"), dict(a=1, b=2))
+
+
+@given(type_=st.sampled_from(list(ZEN_SUPPORTED_PRIMITIVES)), data=st.data())
+def test_zen_supported_primitives_arent_supported_by_hydra(type_, data: st.DataObject):
+    try:
+        value = data.draw(st.from_type(type_))
+    except (TypeError, NotImplementedError):
+        assume(False)
+        return
+
+    @dataclass
+    class C:
+        x: type_ = mutable_value(value) if isinstance(value, (set, dict)) else value
+
+    with pytest.raises((ValidationError, AssertionError)):
+        Conf = OmegaConf.create(C)
+        assert isinstance(Conf.x, type_)
