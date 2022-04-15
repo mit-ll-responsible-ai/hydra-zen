@@ -213,6 +213,17 @@
 <span class="n">F</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;F&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
 
 
+<span class="k">class</span> <span class="nc">_TightBind</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">instantiate</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">_TightBind</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="o">...</span>
+
+
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">instantiate</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">ConfigPath</span><span class="p">],</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
