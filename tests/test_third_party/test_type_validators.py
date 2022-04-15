@@ -207,7 +207,6 @@ class UserIdentity(TypedDict):
     "annotation, fools_hydra",
     [
         (Tuple[str, int, bool], (True, "hi", 2)),
-        (xf.add(Dict[str, int], BEAR), dict(a="hi")),
         (Literal["a", "b"], "c"),
         (Union[List[str], str], dict(a=1)),
         (MyNamedTuple, (1.0, 2.0)),
