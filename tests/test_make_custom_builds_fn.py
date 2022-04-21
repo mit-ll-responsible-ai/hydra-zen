@@ -6,6 +6,7 @@ import pytest
 from hypothesis import assume, example, given
 
 from hydra_zen import builds, make_custom_builds_fn, to_yaml
+from hydra_zen.errors import HydraZenDeprecationWarning
 from tests.custom_strategies import partitions, valid_builds_args
 
 _builds_sig = inspect.signature(builds)
@@ -83,3 +84,8 @@ def test_make_builds_fn_produces_builds_with_expected_defaults_and_behaviors(
     # this should be the same as passing all of these args directly to vanilla builds
     via_builds = builds(target, **kwargs_passed_through, **kwargs_as_defaults)
     assert to_yaml(via_custom) == to_yaml(via_builds)
+
+
+def test_builds_bases_deprecation():
+    with pytest.warns(HydraZenDeprecationWarning):
+        make_custom_builds_fn(builds_bases=((builds(int),)))
