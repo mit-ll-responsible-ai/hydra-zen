@@ -767,7 +767,7 @@ def builds(
 
     hydra_defaults : List['_self_' | Dict[str, str]] | None, optional (default = None)
         A list in an input config that instructs Hydra how to build the output config
-        [7][8]. Each input config can have a Defaults List as a top level element. The
+        [7]_ [8]_. Each input config can have a Defaults List as a top level element. The
         Defaults List itself is not a part of output config.
 
     frozen : bool, optional (default=False)
