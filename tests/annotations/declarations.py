@@ -1032,11 +1032,13 @@ def check_hydra_defaults(
     partial_builds(int, hydra_defaults=["_self_", {"a": "b"}])
     full_builds(int, hydra_defaults=["_self_", {"a": "b"}])
     std_builds(int, hydra_defaults=["_self_", {"a": "b"}])
+    make_config(hydra_defaults=["_self_", {"a": "b"}])
 
     builds(int, hydra_defaults=1)  # type: ignore
     partial_builds(int, hydra_defaults=1)  # type: ignore
     full_builds(int, hydra_defaults=1)  # type: ignore
     std_builds(int, hydra_defaults=1)  # type: ignore
+    make_config(hydra_defaults=1)  # type: ignore
 
     builds(int, hydra_defaults=["_self_", {"a": "b"}, {1: 1}])  # type: ignore
     builds(int, hydra_defaults={"a": "b"})  # type: ignore

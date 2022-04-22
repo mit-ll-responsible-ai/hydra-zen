@@ -10,7 +10,14 @@ from hypothesis import given
 from omegaconf import DictConfig, ListConfig
 from omegaconf.errors import ValidationError
 
-from hydra_zen import builds, hydrated_dataclass, instantiate, launch, mutable_value
+from hydra_zen import (
+    builds,
+    hydrated_dataclass,
+    instantiate,
+    launch,
+    make_config,
+    mutable_value,
+)
 from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.structured_configs._utils import get_obj_path
 
@@ -205,9 +212,18 @@ def test_type_checking():
     instantiate(builds(g2, x=[conf_C, conf_C]))
 
 
-def test_hydra_defaults_work(config_store):
+def test_hydra_defaults_work_builds(config_store):
     config_store.store(group="x", name="a", node=builds(int, 10))
     Conf = builds(dict, x=None, y="hi", hydra_defaults=["_self_", {"x": "a"}])
+    job = launch(Conf, instantiate)
+    assert job.return_value == {"x": 10, "y": "hi"}
+
+
+def test_hydra_defaults_work_make_config(config_store):
+    config_store.store(group="x", name="a", node=builds(int, 10))
+    Conf = make_config(
+        x=None, y="hi", hydra_defaults=["_self_", {"x": "a"}], hydra_convert="all"
+    )
     job = launch(Conf, instantiate)
     assert job.return_value == {"x": 10, "y": "hi"}
 
@@ -238,6 +254,9 @@ def test_hydra_defaults_validation(invalids: Any, valids: list, include_self):
     with pytest.raises(HydraZenValidationError):
         builds(dict, hydra_defaults=defaults)
 
+    with pytest.raises(HydraZenValidationError):
+        make_config(hydra_defaults=defaults)
+
 
 @given(
     selfs=st.lists(st.just("_self_"), min_size=2, max_size=5),
@@ -250,7 +269,13 @@ def test_hydra_defaults_raises_multiple_self(selfs: list, others: list):
     with pytest.raises(HydraZenValidationError):
         builds(dict, hydra_defaults=defaults)
 
+    with pytest.raises(HydraZenValidationError):
+        make_config(hydra_defaults=defaults)
+
 
 def test_no_self_in_defaults_warns():
     with pytest.warns(UserWarning):
         builds(dict, hydra_defaults=[{"a": "b"}])
+
+    with pytest.warns(UserWarning):
+        make_config(hydra_defaults=[{"a": "b"}])

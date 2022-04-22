@@ -1263,21 +1263,6 @@ def builds(
             (CONVERT_FIELD_NAME, str, _utils.field(default=hydra_convert, init=False))
         )
 
-    if _pos_args:
-        base_fields.append(
-            (
-                POS_ARG_FIELD_NAME,
-                Tuple[Any, ...],
-                _utils.field(
-                    default=tuple(
-                        sanitized_default_value(x, error_prefix=BUILDS_ERROR_PREFIX)
-                        for x in _pos_args
-                    ),
-                    init=False,
-                ),
-            )
-        )
-
     if hydra_defaults is not None:
         if not _utils.valid_defaults_list(hydra_defaults):
             raise HydraZenValidationError(
@@ -1291,6 +1276,21 @@ def builds(
                 List[Any],
                 _utils.field(
                     default_factory=lambda: list(hydra_defaults),
+                    init=False,
+                ),
+            )
+        )
+
+    if _pos_args:
+        base_fields.append(
+            (
+                POS_ARG_FIELD_NAME,
+                Tuple[Any, ...],
+                _utils.field(
+                    default=tuple(
+                        sanitized_default_value(x, error_prefix=BUILDS_ERROR_PREFIX)
+                        for x in _pos_args
+                    ),
                     init=False,
                 ),
             )

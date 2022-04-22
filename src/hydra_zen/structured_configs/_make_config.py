@@ -14,10 +14,11 @@ from typing_extensions import Literal
 
 from hydra_zen._compatibility import PATCH_OMEGACONF_830
 from hydra_zen.structured_configs import _utils
+from hydra_zen.structured_configs._implementations import sanitize_collection
 from hydra_zen.typing import SupportedPrimitive
-from hydra_zen.typing._implementations import DataClass, DataClass_, Field
+from hydra_zen.typing._implementations import DataClass, DataClass_, DefaultsList, Field
 
-from ._globals import CONVERT_FIELD_NAME, RECURSIVE_FIELD_NAME
+from ._globals import CONVERT_FIELD_NAME, DEFAULTS_LIST_FIELD_NAME, RECURSIVE_FIELD_NAME
 from ._implementations import _retain_type_info, builds, sanitized_field
 
 __all__ = ["ZenField", "make_config"]
@@ -105,6 +106,7 @@ def make_config(
     *fields_as_args: Union[str, ZenField],
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_defaults: Optional[DefaultsList] = None,
     config_name: str = "Config",
     frozen: bool = False,
     bases: Tuple[Type[DataClass_], ...] = (),
@@ -358,6 +360,7 @@ def make_config(
         dict,
         hydra_convert=hydra_convert,
         hydra_recursive=hydra_recursive,
+        hydra_defaults=hydra_defaults,
         **fields_as_kwargs,
     )
 
@@ -428,6 +431,16 @@ def make_config(
     if hydra_convert is not None:
         config_fields.append(
             (CONVERT_FIELD_NAME, str, _utils.field(default=hydra_convert, init=False))
+        )
+
+    if hydra_defaults is not None:
+        hydra_defaults = sanitize_collection(hydra_defaults)
+        config_fields.append(
+            (
+                DEFAULTS_LIST_FIELD_NAME,
+                List[Any],
+                _utils.field(default_factory=lambda: list(hydra_defaults), init=False),
+            )
         )
 
     return cast(
