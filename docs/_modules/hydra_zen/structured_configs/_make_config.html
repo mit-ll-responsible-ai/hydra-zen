@@ -187,10 +187,11 @@
 
 <span class="kn">from</span> <span class="nn">hydra_zen._compatibility</span> <span class="kn">import</span> <span class="n">PATCH_OMEGACONF_830</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.structured_configs</span> <span class="kn">import</span> <span class="n">_utils</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.structured_configs._implementations</span> <span class="kn">import</span> <span class="n">sanitize_collection</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">SupportedPrimitive</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass</span><span class="p">,</span> <span class="n">DataClass_</span><span class="p">,</span> <span class="n">Field</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass</span><span class="p">,</span> <span class="n">DataClass_</span><span class="p">,</span> <span class="n">DefaultsList</span><span class="p">,</span> <span class="n">Field</span>
 
-<span class="kn">from</span> <span class="nn">._globals</span> <span class="kn">import</span> <span class="n">CONVERT_FIELD_NAME</span><span class="p">,</span> <span class="n">RECURSIVE_FIELD_NAME</span>
+<span class="kn">from</span> <span class="nn">._globals</span> <span class="kn">import</span> <span class="n">CONVERT_FIELD_NAME</span><span class="p">,</span> <span class="n">DEFAULTS_LIST_FIELD_NAME</span><span class="p">,</span> <span class="n">RECURSIVE_FIELD_NAME</span>
 <span class="kn">from</span> <span class="nn">._implementations</span> <span class="kn">import</span> <span class="n">_retain_type_info</span><span class="p">,</span> <span class="n">builds</span><span class="p">,</span> <span class="n">sanitized_field</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ZenField&quot;</span><span class="p">,</span> <span class="s2">&quot;make_config&quot;</span><span class="p">]</span>
@@ -278,6 +279,7 @@
     <span class="o">*</span><span class="n">fields_as_args</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">],</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">hydra_defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DefaultsList</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Config&quot;</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
@@ -318,6 +320,13 @@
 <span class="sd">        - ``&quot;all&quot;``: Passed objects are dicts, lists and primitives without a trace of OmegaConf containers</span>
 
 <span class="sd">        If ``None``, the ``_convert_`` attribute is not set on the resulting config.</span>
+
+
+<span class="sd">    hydra_defaults : List[&#39;_self_&#39; | Dict[str, str]] | None, optional (default = None)</span>
+<span class="sd">        A list in an input config that instructs Hydra how to build the output config</span>
+<span class="sd">        [7][8]. Each input config can have a Defaults List as a top level element. The</span>
+<span class="sd">        Defaults List itself is not a part of output config.</span>
+
 
 <span class="sd">    bases : Tuple[Type[DataClass], ...], optional (default=())</span>
 <span class="sd">        Base classes that the resulting config class will inherit from.</span>
@@ -376,6 +385,8 @@
 <span class="sd">    .. [4] https://docs.python.org/3/library/dataclasses.html</span>
 <span class="sd">    .. [5] https://hydra.cc/docs/next/tutorials/structured_config/intro/#structured-configs-supports</span>
 <span class="sd">    .. [6] https://docs.python.org/3/library/dataclasses.html#default-factory-functions</span>
+<span class="sd">    .. [7] https://hydra.cc/docs/next/tutorials/structured_config/defaults/</span>
+<span class="sd">    .. [8] https://hydra.cc/docs/next/advanced/defaults_list/</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -525,12 +536,23 @@
                 <span class="p">)</span>
         <span class="k">del</span> <span class="n">all_names</span>
 
+    <span class="k">if</span> <span class="s2">&quot;defaults&quot;</span> <span class="ow">in</span> <span class="n">fields_as_kwargs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">hydra_defaults</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;`defaults` and `hydra_defaults` cannot be specified simultaneously&quot;</span>
+            <span class="p">)</span>
+        <span class="n">_defaults</span> <span class="o">=</span> <span class="n">fields_as_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;defaults&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_defaults</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">):</span>
+            <span class="n">hydra_defaults</span> <span class="o">=</span> <span class="n">_defaults</span>  <span class="c1"># type: ignore</span>
+
     <span class="c1"># validate hydra-args via `builds`</span>
     <span class="c1"># also check for use of reserved names</span>
     <span class="n">builds</span><span class="p">(</span>
         <span class="nb">dict</span><span class="p">,</span>
         <span class="n">hydra_convert</span><span class="o">=</span><span class="n">hydra_convert</span><span class="p">,</span>
         <span class="n">hydra_recursive</span><span class="o">=</span><span class="n">hydra_recursive</span><span class="p">,</span>
+        <span class="n">hydra_defaults</span><span class="o">=</span><span class="n">hydra_defaults</span><span class="p">,</span>
         <span class="o">**</span><span class="n">fields_as_kwargs</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -601,6 +623,16 @@
     <span class="k">if</span> <span class="n">hydra_convert</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">config_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="p">(</span><span class="n">CONVERT_FIELD_NAME</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">hydra_convert</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">hydra_defaults</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">hydra_defaults</span> <span class="o">=</span> <span class="n">sanitize_collection</span><span class="p">(</span><span class="n">hydra_defaults</span><span class="p">)</span>
+        <span class="n">config_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">DEFAULTS_LIST_FIELD_NAME</span><span class="p">,</span>
+                <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+                <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">hydra_defaults</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+            <span class="p">)</span>
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
