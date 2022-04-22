@@ -260,7 +260,12 @@ def get_obj_path(obj: Any) -> str:
     if not is_classmethod(obj):
         return f"{module}.{name}"
     else:
-        return f"{module}.{qualname}"
+        # __qualname__ reflects name of class that originaly defines classmethod.
+        # Does not point to child in case of inheritance.
+        #
+        # obj.__self__ -> parent object
+        # obj.__name__ -> name of classmethod
+        return f"{get_obj_path(obj.__self__)}.{obj.__name__}"
 
 
 NoneType = type(None)
