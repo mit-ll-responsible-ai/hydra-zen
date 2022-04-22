@@ -1274,7 +1274,7 @@ def builds(
         if not _utils.valid_defaults_list(hydra_defaults):
             raise HydraZenValidationError(
                 f"`hydra_defaults` must be type `list[str | dict[str, str | list[str]]`"
-                f", Got: {hydra_defaults}"
+                f", Got: {repr(hydra_defaults)}"
             )
         hydra_defaults = sanitize_collection(hydra_defaults)
         base_fields.append(
