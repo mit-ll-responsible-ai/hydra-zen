@@ -600,7 +600,14 @@ class B265(A265):
         return 1
 
 
-def test_builds_of_inherited_classmethod():
+class C265(B265):
+    @classmethod
+    def bar(cls):
+        return "hello"
+
+
+@pytest.mark.parametrize("Cls", [B265, C265])
+def test_builds_of_inherited_classmethod(Cls):
     # https://github.com/mit-ll-responsible-ai/hydra-zen/issues/265
 
-    assert instantiate(builds(B265.foo)) == B265.foo()
+    assert instantiate(builds(Cls.foo)) == Cls.foo()
