@@ -354,6 +354,16 @@ def make_config(
                 )
         del all_names
 
+    if "defaults" in fields_as_kwargs:
+        if hydra_defaults is not None:
+            raise TypeError(
+                "`defaults` and `hydra_defaults` cannot be specified simultaneously"
+            )
+        _defaults = fields_as_kwargs.pop("defaults")
+
+        if not isinstance(_defaults, ZenField):
+            hydra_defaults = _defaults  # type: ignore
+
     # validate hydra-args via `builds`
     # also check for use of reserved names
     builds(

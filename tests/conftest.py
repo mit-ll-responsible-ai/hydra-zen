@@ -62,9 +62,14 @@ def config_store() -> Iterable[ConfigStore]:
     cs = ConfigStore.instance()
     saved = cs.repo
     cs.repo = deepcopy(cs.repo)
+
     try:
         yield cs
     finally:
+        # restore repo but re-add fields that were initialized
+        for name in ("sweeper", "launcher"):
+            if name not in saved["hydra"]:
+                saved["hydra"][name] = cs.repo["hydra"][name]
         cs.repo = saved
 
 

@@ -279,3 +279,7 @@ def test_no_self_in_defaults_warns():
 
     with pytest.warns(UserWarning):
         make_config(hydra_defaults=[{"a": "b"}])
+
+
+def test_redundant_defaults_in_make_config_raises():
+    pass
