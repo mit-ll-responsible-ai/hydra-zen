@@ -5,10 +5,13 @@ import logging
 import os
 import sys
 import tempfile
+from copy import deepcopy
+from typing import Iterable
 
 import hypothesis.strategies as st
 import pkg_resources
 import pytest
+from hydra.core.config_store import ConfigStore
 from omegaconf import DictConfig, ListConfig
 
 # Skip collection of tests that don't work on the current version of Python.
@@ -43,7 +46,7 @@ if sys.version_info < (3, 7):
 
 
 @pytest.fixture()
-def cleandir():
+def cleandir() -> Iterable[str]:
     """Run function in a temporary directory."""
     with tempfile.TemporaryDirectory() as tmpdirname:
         old_dir = os.getcwd()  # get current working directory (cwd)
@@ -51,6 +54,18 @@ def cleandir():
         yield tmpdirname  # yields control to the test to be run
         os.chdir(old_dir)
         logging.shutdown()
+
+
+@pytest.fixture()
+def config_store() -> Iterable[ConfigStore]:
+    """Yields a Hydra config store whose state is restricted to the test."""
+    cs = ConfigStore.instance()
+    saved = cs.repo
+    cs.repo = deepcopy(cs.repo)
+    try:
+        yield cs
+    finally:
+        cs.repo = saved
 
 
 pytest_plugins = "pytester"

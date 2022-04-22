@@ -16,6 +16,7 @@ from typing import (
     Dict,
     FrozenSet,
     Generic,
+    List,
     Mapping,
     NewType,
     Optional,
@@ -249,3 +250,6 @@ else:
     # cleans up annotations for REPLs
     class ZenWrappers(Generic[T2]):  # pragma: no cover
         pass
+
+
+DefaultsList = List[Union[str, Mapping[str, Union[str, List[str]]]]]

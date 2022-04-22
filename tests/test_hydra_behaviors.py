@@ -10,7 +10,7 @@ from hypothesis import given
 from omegaconf import DictConfig, ListConfig
 from omegaconf.errors import ValidationError
 
-from hydra_zen import builds, hydrated_dataclass, instantiate, mutable_value
+from hydra_zen import builds, hydrated_dataclass, instantiate, launch, mutable_value
 from hydra_zen.structured_configs._utils import get_obj_path
 
 
@@ -202,3 +202,10 @@ def test_type_checking():
 
     # should be ok
     instantiate(builds(g2, x=[conf_C, conf_C]))
+
+
+def test_hydra_defaults_work(config_store):
+    config_store.store(group="x", name="a", node=builds(int, 10))
+    Conf = builds(dict, x=None, y="hi", hydra_defaults=["_self_", {"x": "a"}])
+    job = launch(Conf, instantiate)
+    assert job.return_value == {"x": 10, "y": "hi"}

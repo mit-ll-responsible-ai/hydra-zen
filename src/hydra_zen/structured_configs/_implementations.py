@@ -58,6 +58,7 @@ from hydra_zen.typing import (
 from hydra_zen.typing._implementations import (
     BuildsWithSig,
     DataClass_,
+    DefaultsList,
     Field,
     HasTarget,
     InstOrType,
@@ -65,6 +66,7 @@ from hydra_zen.typing._implementations import (
 
 from ._globals import (
     CONVERT_FIELD_NAME,
+    DEFAULTS_LIST_FIELD_NAME,
     GET_OBJ_LOCATION,
     HYDRA_FIELD_NAMES,
     JUST_FIELD_NAME,
@@ -567,6 +569,7 @@ def builds(
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_defaults: Optional[DefaultsList] = ...,
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[()] = ...,
     frozen: bool = ...,
@@ -585,6 +588,7 @@ def builds(
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_defaults: Optional[DefaultsList] = ...,
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
@@ -604,6 +608,7 @@ def builds(
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_defaults: Optional[DefaultsList] = ...,
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
@@ -623,6 +628,7 @@ def builds(
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_defaults: Optional[DefaultsList] = ...,
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
@@ -645,6 +651,7 @@ def builds(
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_defaults: Optional[DefaultsList] = ...,
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
@@ -665,6 +672,7 @@ def builds(
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_defaults: Optional[DefaultsList] = None,
     frozen: bool = False,
     builds_bases: Tuple[Type[DataClass_], ...] = (),
     dataclass_name: Optional[str] = None,
@@ -674,7 +682,7 @@ def builds(
     Type[PartialBuilds[Importable]],
     Type[BuildsWithSig[Type[R], P]],
 ]:
-    """builds(hydra_target, /, *pos_args, zen_partial=False, zen_wrappers=(), zen_meta=None, populate_full_signature=False, hydra_recursive=None, hydra_convert=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
+    """builds(hydra_target, /, *pos_args, zen_partial=False, zen_wrappers=(), zen_meta=None, populate_full_signature=False, hydra_recursive=None, hydra_convert=None, hydra_defaults=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
 
     Returns a structured config, which describes how to instantiate/call
     ``<hydra_target>`` with both user-specified and auto-populated parameter values.
@@ -1265,6 +1273,24 @@ def builds(
                         sanitized_default_value(x, error_prefix=BUILDS_ERROR_PREFIX)
                         for x in _pos_args
                     ),
+                    init=False,
+                ),
+            )
+        )
+
+    if hydra_defaults is not None:
+        if not _utils.valid_defaults_list(hydra_defaults):
+            raise HydraZenValidationError(
+                f"`hydra_defaults` must be type `list[str | dict[str, str | list[str]]`"
+                f", Got: {hydra_defaults}"
+            )
+        hydra_defaults = sanitize_collection(hydra_defaults)
+        base_fields.append(
+            (
+                DEFAULTS_LIST_FIELD_NAME,
+                List[Any],
+                _utils.field(
+                    default_factory=lambda: list(hydra_defaults),
                     init=False,
                 ),
             )
