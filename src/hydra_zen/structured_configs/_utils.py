@@ -452,7 +452,7 @@ def valid_defaults_list(hydra_defaults: Any) -> bool:
                 "`hydra_defaults` cannot have more than one '_self_' entry"
             )
 
-        if not isinstance(item, (dict, str, Sequence)):
+        if not isinstance(item, (dict, str)):
             return False
 
         if isinstance(item, dict) and any(
