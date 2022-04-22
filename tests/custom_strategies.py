@@ -53,8 +53,8 @@ def _compat_frozen(conf: Dict[str, Any]):
 def valid_builds_args(*required: str, excluded: Sequence[str] = ()):
     """Generates valid inputs for all nameable args in `builds`, except `dataclass_name`."""
     assert len(required) == len(set(required))
-    _required = set(required)  # type: ignore
-    _excluded = set(excluded)  # type: ignore
+    _required = set(required)
+    _excluded = set(excluded)
     assert _required.isdisjoint(_excluded)
 
     assert _required <= set(_valid_builds_strats), _required - set(_valid_builds_strats)

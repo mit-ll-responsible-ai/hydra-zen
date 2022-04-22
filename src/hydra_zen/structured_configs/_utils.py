@@ -31,6 +31,7 @@ from hydra_zen._compatibility import (
     HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES,
     PATCH_OMEGACONF_830,
 )
+from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.typing._implementations import DataClass_, Field, InterpStr
 
 try:
@@ -429,4 +430,40 @@ def mutable_default_permitted(bases: Iterable[DataClass_], field_name: str) -> b
         ):
             # see https://github.com/omry/omegaconf/issues/830
             return False
+    return True
+
+
+def valid_defaults_list(hydra_defaults: Any) -> bool:
+    """
+    Raises
+    ------
+    HydraZenValidationError: Duplicate _self_ entries"""
+    if not isinstance(hydra_defaults, list):
+        return False
+
+    has_self = False
+    for item in hydra_defaults:
+
+        if item == "_self_":
+            if not has_self:
+                has_self = True
+                continue
+            raise HydraZenValidationError(
+                "`hydra_defaults` cannot have more than one '_self_' entry"
+            )
+
+        if not isinstance(item, (dict, str)):
+            return False
+
+        if isinstance(item, dict) and any(
+            not isinstance(k, str) or not isinstance(v, (str, list))
+            for k, v in item.items()
+        ):
+            return False
+
+    if not has_self:
+        warnings.warn(
+            "Defaults list is missing `_self_`. See https://hydra.cc/docs/upgrades/1.0_to_1.1/default_composition_order for more information",
+            category=UserWarning,
+        )
     return True

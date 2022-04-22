@@ -269,7 +269,7 @@ def make_custom_builds_fn(
     <Validation error: "c" is not "a" or "b">
     """
 
-    excluded_fields = {"dataclass_name"}
+    excluded_fields = {"dataclass_name", "hydra_defaults"}
     LOCALS = locals()
 
     # Ensures that new defaults added to `builds` must be reflected

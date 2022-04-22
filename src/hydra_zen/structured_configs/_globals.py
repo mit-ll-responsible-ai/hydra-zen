@@ -15,6 +15,7 @@ PARTIAL_FIELD_NAME: Final[str] = "_partial_"
 RECURSIVE_FIELD_NAME: Final[str] = "_recursive_"
 CONVERT_FIELD_NAME: Final[str] = "_convert_"
 POS_ARG_FIELD_NAME: Final[str] = "_args_"
+DEFAULTS_LIST_FIELD_NAME: Final[str] = "defaults"
 
 _names = [
     TARGET_FIELD_NAME,

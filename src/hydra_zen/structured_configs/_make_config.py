@@ -14,10 +14,11 @@ from typing_extensions import Literal
 
 from hydra_zen._compatibility import PATCH_OMEGACONF_830
 from hydra_zen.structured_configs import _utils
+from hydra_zen.structured_configs._implementations import sanitize_collection
 from hydra_zen.typing import SupportedPrimitive
-from hydra_zen.typing._implementations import DataClass, DataClass_, Field
+from hydra_zen.typing._implementations import DataClass, DataClass_, DefaultsList, Field
 
-from ._globals import CONVERT_FIELD_NAME, RECURSIVE_FIELD_NAME
+from ._globals import CONVERT_FIELD_NAME, DEFAULTS_LIST_FIELD_NAME, RECURSIVE_FIELD_NAME
 from ._implementations import _retain_type_info, builds, sanitized_field
 
 __all__ = ["ZenField", "make_config"]
@@ -105,6 +106,7 @@ def make_config(
     *fields_as_args: Union[str, ZenField],
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_defaults: Optional[DefaultsList] = None,
     config_name: str = "Config",
     frozen: bool = False,
     bases: Tuple[Type[DataClass_], ...] = (),
@@ -145,6 +147,13 @@ def make_config(
         - ``"all"``: Passed objects are dicts, lists and primitives without a trace of OmegaConf containers
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting config.
+
+
+    hydra_defaults : List['_self_' | Dict[str, str]] | None, optional (default = None)
+        A list in an input config that instructs Hydra how to build the output config
+        [7][8]. Each input config can have a Defaults List as a top level element. The
+        Defaults List itself is not a part of output config.
+
 
     bases : Tuple[Type[DataClass], ...], optional (default=())
         Base classes that the resulting config class will inherit from.
@@ -203,6 +212,8 @@ def make_config(
     .. [4] https://docs.python.org/3/library/dataclasses.html
     .. [5] https://hydra.cc/docs/next/tutorials/structured_config/intro/#structured-configs-supports
     .. [6] https://docs.python.org/3/library/dataclasses.html#default-factory-functions
+    .. [7] https://hydra.cc/docs/next/tutorials/structured_config/defaults/
+    .. [8] https://hydra.cc/docs/next/advanced/defaults_list/
 
     Examples
     --------
@@ -352,12 +363,23 @@ def make_config(
                 )
         del all_names
 
+    if "defaults" in fields_as_kwargs:
+        if hydra_defaults is not None:
+            raise TypeError(
+                "`defaults` and `hydra_defaults` cannot be specified simultaneously"
+            )
+        _defaults = fields_as_kwargs.pop("defaults")
+
+        if not isinstance(_defaults, ZenField):
+            hydra_defaults = _defaults  # type: ignore
+
     # validate hydra-args via `builds`
     # also check for use of reserved names
     builds(
         dict,
         hydra_convert=hydra_convert,
         hydra_recursive=hydra_recursive,
+        hydra_defaults=hydra_defaults,
         **fields_as_kwargs,
     )
 
@@ -428,6 +450,16 @@ def make_config(
     if hydra_convert is not None:
         config_fields.append(
             (CONVERT_FIELD_NAME, str, _utils.field(default=hydra_convert, init=False))
+        )
+
+    if hydra_defaults is not None:
+        hydra_defaults = sanitize_collection(hydra_defaults)
+        config_fields.append(
+            (
+                DEFAULTS_LIST_FIELD_NAME,
+                List[Any],
+                _utils.field(default_factory=lambda: list(hydra_defaults), init=False),
+            )
         )
 
     return cast(

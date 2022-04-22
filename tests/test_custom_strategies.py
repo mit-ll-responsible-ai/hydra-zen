@@ -26,7 +26,9 @@ def test_valid_build_strats_are_exhaustive():
         for n, p in inspect.signature(builds).parameters.items()
         if p.kind is p.KEYWORD_ONLY
     )
-    assert nameable_builds_args - {"dataclass_name"} == set(_valid_builds_strats)
+    assert nameable_builds_args - {"dataclass_name", "hydra_defaults"} == set(
+        _valid_builds_strats
+    )
 
 
 @given(req_excl=partitions(tuple(_valid_builds_strats), ordered=False), data=st.data())

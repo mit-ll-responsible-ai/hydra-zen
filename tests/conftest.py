@@ -1,10 +1,12 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
+
 import logging
 import os
 import sys
 import tempfile
+from typing import Iterable
 
 import hypothesis.strategies as st
 import pkg_resources
@@ -43,7 +45,7 @@ if sys.version_info < (3, 7):
 
 
 @pytest.fixture()
-def cleandir():
+def cleandir() -> Iterable[str]:
     """Run function in a temporary directory."""
     with tempfile.TemporaryDirectory() as tmpdirname:
         old_dir = os.getcwd()  # get current working directory (cwd)
