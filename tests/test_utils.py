@@ -191,6 +191,8 @@ NoneType = type(None)
             List[List[Type[int]]],
             List[Any] if not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES else List[List[Any]],
         ),
+        (Tuple[Tuple[int, ...], ...], Tuple[Any, ...]),
+        (Optional[Tuple[Tuple[int, ...], ...]], Optional[Tuple[Any, ...]]),
     ],
 )
 def test_sanitized_type_expected_behavior(in_type, expected_type):
