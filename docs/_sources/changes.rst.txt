@@ -64,10 +64,14 @@ installed. (See :pull:`261`)
 
 Deprecations
 ------------
-:pull:`263` deprecates the ``builds_bases`` argument in ``make_custom_builds``. It will 
+:pull:`263` deprecates the ``builds_bases`` argument in :func:`~hydra_zen.make_custom_builds`. It will 
 be removed in hydra-zen v0.8.0. Users will need to specify ``builds_bases`` on a 
 per-config basis via ``builds``.
 
+
+Bug Fixes
+---------
+- ``hydra_zen.builds(<Child.class-method>)`` would create a config with the wrong target if ``<class-method>`` was defined on a parent of ``Child``. See :issue:`265`.
 
 Improvements
 ------------
