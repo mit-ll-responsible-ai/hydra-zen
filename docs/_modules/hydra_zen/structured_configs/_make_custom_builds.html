@@ -175,6 +175,7 @@
 <span class="c1"># SPDX-License-Identifier: MIT</span>
 <span class="c1"># pyright: strict</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Any</span><span class="p">,</span>
@@ -191,6 +192,7 @@
 
 <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Final</span><span class="p">,</span> <span class="n">Literal</span>
 
+<span class="kn">from</span> <span class="nn">hydra_zen.errors</span> <span class="kn">import</span> <span class="n">HydraZenDeprecationWarning</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">ZenWrappers</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._builds_overloads</span> <span class="kn">import</span> <span class="n">FullBuilds</span><span class="p">,</span> <span class="n">PBuilds</span><span class="p">,</span> <span class="n">StdBuilds</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass_</span>
@@ -453,6 +455,16 @@
 
     <span class="c1"># let `builds` validate the new defaults!</span>
     <span class="n">builds</span><span class="p">(</span><span class="n">builds</span><span class="p">,</span> <span class="o">**</span><span class="n">_new_defaults</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">_new_defaults</span><span class="p">[</span><span class="s2">&quot;builds_bases&quot;</span><span class="p">]:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="n">HydraZenDeprecationWarning</span><span class="p">(</span>
+                <span class="s2">&quot;Specifying `make_custom_builds_fn(builds_bases=&lt;...&gt;)` is deprecated &quot;</span>
+                <span class="s2">&quot;as of hydra-zen 0.7.0. It will be an error in hydra-zen 0.8.0. &quot;</span>
+                <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">`builds_bases` must be specified via `builds` manually.&quot;</span>
+            <span class="p">),</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="nd">@wraps</span><span class="p">(</span><span class="n">builds</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
