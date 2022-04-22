@@ -582,3 +582,25 @@ def test_inheritance_populates_init_field():
 
     # x is 'filled' via inheritance
     Conf2()
+
+
+class A265:
+    @classmethod
+    def foo(cls):
+        return cls.bar()
+
+    @classmethod
+    def bar(cls):
+        raise NotImplementedError()
+
+
+class B265(A265):
+    @classmethod
+    def bar(cls):
+        return 1
+
+
+def test_builds_of_inherited_classmethod():
+    # https://github.com/mit-ll-responsible-ai/hydra-zen/issues/265
+
+    assert instantiate(builds(B265.foo)) == B265.foo()
