@@ -438,7 +438,7 @@ def valid_defaults_list(hydra_defaults: Any) -> bool:
     Raises
     ------
     HydraZenValidationError: Duplicate _self_ entries"""
-    if not isinstance(hydra_defaults, Sequence):
+    if not isinstance(hydra_defaults, list):
         return False
 
     has_self = False

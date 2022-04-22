@@ -1,17 +1,16 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
+
 import logging
 import os
 import sys
 import tempfile
-from copy import deepcopy
 from typing import Iterable
 
 import hypothesis.strategies as st
 import pkg_resources
 import pytest
-from hydra.core.config_store import ConfigStore
 from omegaconf import DictConfig, ListConfig
 
 # Skip collection of tests that don't work on the current version of Python.
@@ -54,23 +53,6 @@ def cleandir() -> Iterable[str]:
         yield tmpdirname  # yields control to the test to be run
         os.chdir(old_dir)
         logging.shutdown()
-
-
-@pytest.fixture()
-def config_store() -> Iterable[ConfigStore]:
-    """Yields a Hydra config store whose state is restricted to the test."""
-    cs = ConfigStore.instance()
-    saved = cs.repo
-    cs.repo = deepcopy(cs.repo)
-
-    try:
-        yield cs
-    finally:
-        # restore repo but re-add fields that were initialized
-        for name in ("sweeper", "launcher"):
-            if name not in saved["hydra"]:
-                saved["hydra"][name] = cs.repo["hydra"][name]
-        cs.repo = saved
 
 
 pytest_plugins = "pytester"

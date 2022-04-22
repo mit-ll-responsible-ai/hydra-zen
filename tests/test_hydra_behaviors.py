@@ -14,7 +14,6 @@ from hydra_zen import (
     builds,
     hydrated_dataclass,
     instantiate,
-    launch,
     make_config,
     mutable_value,
 )
@@ -210,22 +209,6 @@ def test_type_checking():
 
     # should be ok
     instantiate(builds(g2, x=[conf_C, conf_C]))
-
-
-def test_hydra_defaults_work_builds(config_store):
-    config_store.store(group="x", name="a", node=builds(int, 10))
-    Conf = builds(dict, x=None, y="hi", hydra_defaults=["_self_", {"x": "a"}])
-    job = launch(Conf, instantiate)
-    assert job.return_value == {"x": 10, "y": "hi"}
-
-
-def test_hydra_defaults_work_make_config(config_store):
-    config_store.store(group="x", name="a", node=builds(int, 10))
-    Conf = make_config(
-        x=None, y="hi", hydra_defaults=["_self_", {"x": "a"}], hydra_convert="all"
-    )
-    job = launch(Conf, instantiate)
-    assert job.return_value == {"x": 10, "y": "hi"}
 
 
 invalid_defaults = st.sampled_from(
