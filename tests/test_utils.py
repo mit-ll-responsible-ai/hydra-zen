@@ -157,6 +157,7 @@ NoneType = type(None)
             List[List[int]],
             List[Any] if not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES else List[List[int]],
         ),
+        (List[Tuple[int, int]], List[Any]),
         (List[T], List[Any]),
         (Dict[str, float], Dict[str, float]),
         (Dict[C, int], Dict[Any, int]),
