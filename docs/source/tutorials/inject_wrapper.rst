@@ -171,7 +171,7 @@ over. Modify your ``my_app.py`` script to match the following code.
    cs.store(group="player", name="rakesh", node=rakesh_conf)
    
    
-   Config = make_config("player", defaults=["_self_", {"player": "base"}])
+   Config = make_config("player", hydra_defaults=["_self_", {"player": "base"}])
    
    cs.store(name="my_app", node=Config)
    

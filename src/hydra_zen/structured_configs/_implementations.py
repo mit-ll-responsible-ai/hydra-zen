@@ -765,6 +765,11 @@ def builds(
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting config.
 
+    hydra_defaults : List['_self_' | Dict[str, str]] | None, optional (default = None)
+        A list in an input config that instructs Hydra how to build the output config
+        [7][8]. Each input config can have a Defaults List as a top level element. The
+        Defaults List itself is not a part of output config.
+
     frozen : bool, optional (default=False)
         If ``True``, the resulting config will create frozen (i.e. immutable) instances.
         I.e. setting/deleting an attribute of an instance will raise
@@ -817,6 +822,8 @@ def builds(
     .. [4] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
     .. [5] https://docs.python.org/3/library/dataclasses.html
     .. [6] https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation
+    .. [7] https://hydra.cc/docs/next/tutorials/structured_config/defaults/
+    .. [8] https://hydra.cc/docs/next/advanced/defaults_list/
 
     See Also
     --------
