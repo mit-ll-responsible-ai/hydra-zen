@@ -16,6 +16,14 @@ chronological order. All previous releases should still be available on pip.
 
 New Features
 ------------
+
+**Support for defaults lists**
+
+A `defaults list <https://hydra.cc/docs/advanced/defaults_list/>`_ can be passed to :func:`~hydra_zen.builds` and :func:`~hydra_zen.make_config` via the new ``hydra_defaults`` argument. Basic runtime and static type-checking are performed on this field. See :pull:`264` for more details and examples.
+
+
+**Improved functionality for types with Specialized hydra-zen support**
+
 :func:`~hydra_zen.just`, :func:`~hydra_zen.to_yaml`, and :func:`~hydra_zen.save_as_yaml` can directly 
 operate on values of :ref:`types with specialized support from hydra-zen <additional-types>`; these 
 values will automatically be converted to structured configs. 
@@ -34,6 +42,39 @@ values will automatically be converted to structured configs.
    _target_: __main__.f
    _partial_: true
    x: 2
+
+See :pull:`250` and :pull:`259` for more details and examples.
+
+Support for Upcoming Hydra/OmegaConf Features
+---------------------------------------------
+OmegaConf ``v2.2.0`` is adding native support for the following types:
+
+- :py:class:`bytes`
+- :py:class:`pathlib.Path`
+
+hydra-zen :ref:`already provides support for these <additional-types>`, but this version will defer to OmegaConf's native support when possible. (See :pull:`262`)
+
+OmegaConf ``v2.2.0`` improves its type-checking, with added support for nested 
+containers. Accordingly, hydra-zen's :ref:`automatic type refinement <type-support>` 
+will no longer auto-broaden nested container types when ``OmegaConf v2.2.0+`` is 
+installed. (See :pull:`261`)
+
+
+.. _0p7p0-deprecations:
+
+Deprecations
+------------
+:pull:`263` deprecates the ``builds_bases`` argument in ``make_custom_builds``. It will 
+be removed in hydra-zen v0.8.0. Users will need to specify ``builds_bases`` on a 
+per-config basis via ``builds``.
+
+
+Improvements
+------------
+- Fixed internal protocol of ``partial`` to be compatible with latest type-shed annotations.
+- Add missing annotation overloads for :func:`~hydra_zen.builds` and :func:`~hydra_zen.make_custom_builds`
+- Substantial source code reorganization
+- Improved pyright tests
 
 .. _v0.6.0:
 

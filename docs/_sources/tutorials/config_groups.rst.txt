@@ -119,11 +119,11 @@ default config for that group. Let's specify the ``CharConf`` config, which we n
 
 .. note:: 
 
-   The ``defaults`` field in our top-level config has special meaning in the context of 
-   Hydra; it specifies a list that instructs Hydra how to build the resulting config, 
-   and the list itself is not included in the config. You can read about the 
-   ``defaults`` list in :hydra:`this tutorial <tutorials/structured_config/defaults>` 
-   and in this :hydra:`technical reference <advanced/defaults_list>`.
+   The ``hydra-defaults`` field in our top-level config has special meaning in the 
+   context of Hydra: it specifies a list that instructs Hydra how to build the 
+   resulting config, and the list itself is not included in the config. You can read 
+   about the Defaults List in :hydra:`this tutorial <tutorials/structured_config/
+   defaults>` and in this :hydra:`technical reference <advanced/defaults_list>`.
 
 
 Putting It All Together

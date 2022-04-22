@@ -22,6 +22,7 @@ config:
    - Nesting of Structured Configs
    - Containers (List and Dict) containing primitives or Structured Configs
    - Optional fields
+   - Nested containers (*added in OmegaConf v2.2.0*)
 
 Annotations that fall outside of this subset will cause Hydra to raise an error. 
 This means that the following config:
