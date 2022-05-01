@@ -431,7 +431,7 @@ def check_base_annotations():
     make_custom_builds_fn(builds_bases=(A,))  # type: ignore
 
 
-def make_hydra_partial(x: T) -> HydraPartialBuilds[Type[T]]:
+def make_hydra_partial(x: T) -> HydraPartialBuilds[T]:
     ...
 
 
