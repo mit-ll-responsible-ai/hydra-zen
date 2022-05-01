@@ -260,14 +260,23 @@ def get_obj_path(obj: Any) -> str:
     if not is_classmethod(obj):
         return f"{module}.{name}"
     else:
-        return f"{module}.{qualname}"
+        # __qualname__ reflects name of class that originaly defines classmethod.
+        # Does not point to child in case of inheritance.
+        #
+        # obj.__self__ -> parent object
+        # obj.__name__ -> name of classmethod
+        return f"{get_obj_path(obj.__self__)}.{obj.__name__}"
 
 
 NoneType = type(None)
 
 
 def sanitized_type(
-    type_: Any, *, primitive_only: bool = False, wrap_optional: bool = False
+    type_: Any,
+    *,
+    primitive_only: bool = False,
+    wrap_optional: bool = False,
+    nested: bool = False,
 ) -> type:
     """Returns ``type_`` unchanged if it is supported as an annotation by hydra,
     otherwise returns ``Any``.
@@ -322,19 +331,19 @@ def sanitized_type(
             return Union[optional_type, NoneType]  # type: ignore
 
         if origin is list or origin is List:
-            return List[sanitized_type(args[0], primitive_only=no_nested_container)] if args else type_  # type: ignore
+            return List[sanitized_type(args[0], primitive_only=no_nested_container, nested=True)] if args else type_  # type: ignore
 
         if origin is dict or origin is Dict:
             return (
                 Dict[
-                    sanitized_type(args[0], primitive_only=True),  # type: ignore
-                    sanitized_type(args[1], primitive_only=no_nested_container),  # type: ignore
+                    sanitized_type(args[0], primitive_only=True, nested=True),  # type: ignore
+                    sanitized_type(args[1], primitive_only=no_nested_container, nested=True),  # type: ignore
                 ]
                 if args
                 else type_
             )
 
-        if origin is tuple or origin is Tuple:
+        if (origin is tuple or origin is Tuple) and not nested:
             # hydra silently supports tuples of homogenous types
             # It has some weird behavior. It treats `Tuple[t1, t2, ...]` as `List[t1]`
             # It isn't clear that we want to perpetrate this on our end..
@@ -348,7 +357,7 @@ def sanitized_type(
             has_ellipses = Ellipsis in unique_args
 
             _unique_type = (
-                sanitized_type(args[0], primitive_only=no_nested_container)
+                sanitized_type(args[0], primitive_only=no_nested_container, nested=True)
                 if len(unique_args) == 1 or (len(unique_args) == 2 and has_ellipses)
                 else Any
             )

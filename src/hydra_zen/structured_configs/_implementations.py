@@ -451,7 +451,11 @@ def sanitized_default_value(
     field_name: str = "",
     structured_conf_permitted: bool = True,
 ) -> Any:
-    value = sanitize_collection(value)
+    if value is None or type(value) in {str, int, bool, float}:
+        return value
+
+    if hasattr(value, "__iter__"):
+        value = sanitize_collection(value)
 
     if (
         structured_conf_permitted
