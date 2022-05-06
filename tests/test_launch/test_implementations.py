@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: MIT
 
 from pathlib import Path
-from typing import Final
 
 import pytest
 from hydra.core.config_store import ConfigStore
