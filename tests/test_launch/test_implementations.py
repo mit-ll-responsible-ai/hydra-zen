@@ -210,9 +210,17 @@ def test_version_base(version_base: Optional[str]):
 
     expected_dir = Path().cwd() if version_base != "1.1" else (Path().cwd() / "outputs")
 
-    glob_pattern = "foo.txt" if version_base != "1.1" else "**/foo.txt"
+    glob_pattern = "foo.txt" if version_base != "1.1" else "./**/foo.txt"
 
     assert len(list(expected_dir.glob(glob_pattern))) == 0
 
     launch(make_config(), task, version_base=version_base)
     assert len(list(expected_dir.glob(glob_pattern))) == 1, list(expected_dir.glob("*"))
+
+    # ensure the file isn't found in the opposite location
+    not_found = (
+        Path().cwd().glob("foo.txt")
+        if version_base == "1.1"
+        else (Path().cwd() / "outputs").glob("**/foo.txt")
+    )
+    assert len(list(not_found)) == 0
