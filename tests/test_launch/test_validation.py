@@ -95,7 +95,7 @@ def test_launch_with_multirun_with_hydra_in_config(
 
     if version_base:
         overrides.append("hydra.job.chdir=True")
-    assert version_base
+
     # override works and user value is set
     job = launch(
         task_cfg,

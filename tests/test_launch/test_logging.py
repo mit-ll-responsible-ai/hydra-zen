@@ -8,6 +8,7 @@ import pytest
 from hydra.core.utils import JobReturn
 
 from hydra_zen import builds, instantiate, launch
+from hydra_zen._compatibility import HYDRA_VERSION
 
 log = logging.getLogger(__name__)
 
@@ -19,16 +20,20 @@ def task(cfg):
 
 @pytest.mark.usefixtures("cleandir")
 def test_consecutive_logs(version_base):
+    overrides = ["hydra.run.dir=test"]
+    if HYDRA_VERSION >= (1, 2, 0):
+        overrides.append("hydra.job.chdir=True")
+
     job1 = launch(
         builds(dict, message="1"),
         task_function=task,
-        overrides=["hydra.run.dir=test", "hydra.job.chdir=True"],
+        overrides=overrides,
         **version_base,
     )
     job2 = launch(
         builds(dict, message="2"),
         task_function=task,
-        overrides=["hydra.run.dir=test", "hydra.job.chdir=True"],
+        overrides=overrides,
         **version_base,
     )
 
@@ -45,16 +50,18 @@ def test_consecutive_logs(version_base):
 
 @pytest.mark.usefixtures("cleandir")
 def test_seperate_logs(version_base):
+    extra_overrides = ["hydra.job.chdir=True"] if HYDRA_VERSION >= (1, 2, 0) else []
+
     job1 = launch(
         builds(dict, message="1"),
         task_function=task,
-        overrides=["hydra.run.dir=test1", "hydra.job.chdir=True"],
+        overrides=["hydra.run.dir=test1"] + extra_overrides,
         **version_base,
     )
     job2 = launch(
         builds(dict, message="2"),
         task_function=task,
-        overrides=["hydra.run.dir=test2", "hydra.job.chdir=True"],
+        overrides=["hydra.run.dir=test2"] + extra_overrides,
         **version_base,
     )
 
