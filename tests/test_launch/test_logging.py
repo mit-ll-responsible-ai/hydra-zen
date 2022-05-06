@@ -18,12 +18,18 @@ def task(cfg):
 
 
 @pytest.mark.usefixtures("cleandir")
-def test_consecutive_logs():
+def test_consecutive_logs(version_base):
     job1 = launch(
-        builds(dict, message="1"), task_function=task, overrides=["hydra.run.dir=test"]
+        builds(dict, message="1"),
+        task_function=task,
+        overrides=["hydra.run.dir=test", "hydra.job.chdir=True"],
+        **version_base,
     )
     job2 = launch(
-        builds(dict, message="2"), task_function=task, overrides=["hydra.run.dir=test"]
+        builds(dict, message="2"),
+        task_function=task,
+        overrides=["hydra.run.dir=test", "hydra.job.chdir=True"],
+        **version_base,
     )
 
     assert isinstance(job1, JobReturn) and job1.working_dir is not None
@@ -38,12 +44,18 @@ def test_consecutive_logs():
 
 
 @pytest.mark.usefixtures("cleandir")
-def test_seperate_logs():
+def test_seperate_logs(version_base):
     job1 = launch(
-        builds(dict, message="1"), task_function=task, overrides=["hydra.run.dir=test1"]
+        builds(dict, message="1"),
+        task_function=task,
+        overrides=["hydra.run.dir=test1", "hydra.job.chdir=True"],
+        **version_base,
     )
     job2 = launch(
-        builds(dict, message="2"), task_function=task, overrides=["hydra.run.dir=test2"]
+        builds(dict, message="2"),
+        task_function=task,
+        overrides=["hydra.run.dir=test2", "hydra.job.chdir=True"],
+        **version_base,
     )
 
     assert isinstance(job1, JobReturn) and job1.working_dir is not None

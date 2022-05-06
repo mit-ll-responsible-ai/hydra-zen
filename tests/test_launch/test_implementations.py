@@ -51,8 +51,8 @@ def test_store_config(cfg):
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize("cfg", CONFIG_TYPE_EXAMPLES)
 @pytest.mark.parametrize("multirun", [False, True])
-def test_launch_config_type(cfg, multirun):
-    job = launch(cfg, task_function=instantiate, multirun=multirun)
+def test_launch_config_type(cfg, multirun, version_base):
+    job = launch(cfg, task_function=instantiate, multirun=multirun, **version_base)
     if isinstance(job, list):
         job = job[0][0]
 
@@ -66,13 +66,13 @@ def test_launch_config_type(cfg, multirun):
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize("cfg", DATACLASS_CONFIG_TYPE_EXAMPLES)
 @pytest.mark.parametrize("to_dictconfig", [True, False])
-def test_launch_to_dictconfig(cfg, to_dictconfig):
+def test_launch_to_dictconfig(cfg, to_dictconfig, version_base):
     pre_num_fields = len(dataclasses.fields(cfg))
 
     def task_fn(cfg):
         _ = cloudpickle.loads(cloudpickle.dumps(cfg))
 
-    launch(cfg, task_function=task_fn, to_dictconfig=to_dictconfig)
+    launch(cfg, task_function=task_fn, to_dictconfig=to_dictconfig, **version_base)
 
     if pre_num_fields > 0:
         if not to_dictconfig:
@@ -81,7 +81,7 @@ def test_launch_to_dictconfig(cfg, to_dictconfig):
             assert len(dataclasses.fields(cfg)) > 0
     else:
         # run again with no error
-        launch(cfg, task_function=task_fn, to_dictconfig=to_dictconfig)
+        launch(cfg, task_function=task_fn, to_dictconfig=to_dictconfig, **version_base)
 
 
 @pytest.mark.usefixtures("cleandir")
@@ -89,10 +89,7 @@ def test_launch_to_dictconfig(cfg, to_dictconfig):
     "overrides", [None, [], ["hydra.run.dir=test_hydra_overrided"]]
 )
 @pytest.mark.parametrize("with_log_configuration", [False, True])
-def test_launch_job(
-    overrides,
-    with_log_configuration,
-):
+def test_launch_job(overrides, with_log_configuration, version_base):
     cfg = dict(a=1, b=1)
     override_exists = overrides and len(overrides) > 1
 
@@ -101,6 +98,7 @@ def test_launch_job(
         task_function=instantiate,
         overrides=overrides,
         with_log_configuration=with_log_configuration,
+        **version_base,
     )
     assert job.return_value == {"a": 1, "b": 1}
 
@@ -115,9 +113,7 @@ def test_launch_job(
 @pytest.mark.parametrize("multirun_overrides", [None, ["a=1,2"]])
 @pytest.mark.parametrize("with_log_configuration", [False, True])
 def test_launch_multirun(
-    overrides,
-    multirun_overrides,
-    with_log_configuration,
+    overrides, multirun_overrides, with_log_configuration, version_base
 ):
     cfg = dict(a=1, b=1)
     override_exists = overrides and len(overrides) > 1
@@ -136,6 +132,7 @@ def test_launch_multirun(
         overrides=_overrides,
         with_log_configuration=with_log_configuration,
         multirun=True,
+        **version_base,
     )
     assert isinstance(job, list) and len(job) == 1
     for i, j in enumerate(job[0]):
@@ -146,11 +143,11 @@ def test_launch_multirun(
 
 
 @pytest.mark.usefixtures("cleandir")
-def test_launch_with_multirun_overrides():
+def test_launch_with_multirun_overrides(version_base):
     cfg = builds(dict, a=1, b=1)
     multirun_overrides = ["hydra/sweeper=basic", "a=1,2"]
     with pytest.raises(ConfigCompositionException):
-        launch(cfg, instantiate, overrides=multirun_overrides)
+        launch(cfg, instantiate, overrides=multirun_overrides, **version_base)
 
 
 ###############################################
@@ -193,10 +190,12 @@ cs.store(group="hydra/sweeper", name="local_test", node=builds(LocalBasicSweeper
     "plugin",
     [["hydra/sweeper=basic"], ["hydra/sweeper=local_test"]],
 )
-def test_launch_with_multirun_plugin(plugin):
+def test_launch_with_multirun_plugin(plugin, version_base):
     cfg = builds(dict, a=1, b=1)
     multirun_overrides = plugin + ["a=1,2"]
-    job = launch(cfg, instantiate, overrides=multirun_overrides, multirun=True)
+    job = launch(
+        cfg, instantiate, overrides=multirun_overrides, multirun=True, **version_base
+    )
     assert isinstance(job, list) and len(job) == 1 and len(job[0]) == 2
     for i, j in enumerate(job[0]):
         assert j.return_value == {"a": i + 1, "b": 1}

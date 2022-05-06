@@ -13,19 +13,19 @@ from hydra_zen import builds, instantiate, launch, make_config
 from hydra_zen.errors import HydraZenValidationError
 
 
-def test_hydra_defaults_work_builds():
+def test_hydra_defaults_work_builds(version_base):
     config_store = ConfigStore.instance()
     config_store.store(group="x", name="a", node=builds(int, 10))
     Conf = builds(dict, x=None, y="hi", hydra_defaults=["_self_", {"x": "a"}])
-    job = launch(Conf, instantiate)
+    job = launch(Conf, instantiate, **version_base)
     assert job.return_value == {"x": 10, "y": "hi"}
 
 
-def test_hydra_defaults_work_make_config():
+def test_hydra_defaults_work_make_config(version_base):
     config_store = ConfigStore.instance()
     config_store.store(group="x", name="a", node=builds(int, 10))
     Conf = make_config(x=None, y="hi", hydra_defaults=["_self_", {"x": "a"}])
-    job = launch(Conf, instantiate)
+    job = launch(Conf, instantiate, **version_base)
     assert job.return_value == {"x": 10, "y": "hi"}
 
 
