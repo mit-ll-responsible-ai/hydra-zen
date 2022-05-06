@@ -1,7 +1,6 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
-import warnings
 from pathlib import Path
 
 import pytest
@@ -80,15 +79,7 @@ def test_launch_to_dictconfig(cfg, to_dictconfig):
             assert len(dataclasses.fields(cfg)) > 0
 
         if not to_dictconfig:
-            with pytest.warns(
-                warnings.warn(
-                    "There may ben an issue with your dataclass.  If you just executed with a "
-                    + "`hydra/launcher` that utilizes cloudpickle (e.g., hydra-submitit-launcher), there is a known "
-                    + "issue with dataclasses (see: https://github.com/cloudpipe/cloudpickle/issues/386). You will have "
-                    + "to restart your interactive environment ro run `launch` again.  To avoid this issue you can use the option "
-                    + "`to_dictconfig=True`."
-                )
-            ):
+            with pytest.warns(UserWarning):
                 launch(cfg, task_function=task_fn, to_dictconfig=to_dictconfig)
     else:
         # run again with no error
