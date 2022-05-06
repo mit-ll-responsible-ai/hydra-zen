@@ -58,6 +58,9 @@ def test_launch_config_type(cfg, multirun):
     assert job.return_value == instantiate(cfg)
 
 
+@pytest.mark.filterwarnings(
+    "ignore:Your dataclass-based config was mutated by this run"
+)
 @pytest.mark.skipif(not CLOUDPICKLE_AVAIL, reason="cloudpickle not available")
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize("cfg", DATACLASS_CONFIG_TYPE_EXAMPLES)
