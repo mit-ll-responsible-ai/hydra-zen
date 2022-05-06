@@ -213,8 +213,9 @@ def launch(
     # store config in ConfigStore
     if to_dictconfig and is_dataclass(config):
         # convert Dataclass to a DictConfig
-        cfg = OmegaConf.structured(config)
-        dictconfig = OmegaConf.create(OmegaConf.to_container(cfg))
+        dictconfig = OmegaConf.create(
+            OmegaConf.to_container(OmegaConf.structured(config))
+        )
         config_name = _store_config(dictconfig, config_name)
     else:
         config_name = _store_config(config, config_name)
