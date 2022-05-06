@@ -282,11 +282,11 @@ def launch(
             and _num_dataclass_fields_after < _num_dataclass_fields
         ):
             warnings.warn(
-                "There may ben an issue with your dataclass.  If you just executed with a "
+                "Your dataclass-based config was mutated by this run. If you just executed with a "
                 "`hydra/launcher` that utilizes cloudpickle (e.g., hydra-submitit-launcher), there is a known "
                 "issue with dataclasses (see: https://github.com/cloudpipe/cloudpickle/issues/386). You will have "
-                "to restart your interactive environment ro run `launch` again.  To avoid this issue you can use the option "
-                "`to_dictconfig=True`."
+                "to restart your interactive environment ro run `launch` again. To avoid this issue you can use the "
+                "`launch` option: `to_dictconfig=True`."
             )
 
     return job
