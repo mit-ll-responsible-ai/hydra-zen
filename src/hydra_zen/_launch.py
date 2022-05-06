@@ -211,7 +211,7 @@ def launch(
         _num_dataclass_fields = len(fields(config))
 
     # store config in ConfigStore
-    if is_dataclass(config) and to_dictconfig:
+    if to_dictconfig and is_dataclass(config):
         # convert Dataclass to a DictConfig
         cfg = OmegaConf.structured(config)
         dictconfig = OmegaConf.create(OmegaConf.to_container(cfg))
@@ -235,15 +235,17 @@ def launch(
             with_log_configuration=with_log_configuration,
         )
 
+        callbacks = Callbacks(cfg)
+        run_start = (
+            callbacks.on_run_start if not multirun else callbacks.on_multirun_start
+        )
+        run_start(config=cfg, config_name=config_name)
+
+        hydra_context = HydraContext(
+            config_loader=gh.config_loader(), callbacks=callbacks
+        )
+
         if not multirun:
-            # taken from Hydra.run without compose config
-            callbacks = Callbacks(cfg)
-            callbacks.on_run_start(config=cfg, config_name=config_name)
-
-            hydra_context = HydraContext(
-                config_loader=gh.config_loader(), callbacks=callbacks
-            )
-
             job = run_job(
                 hydra_context=hydra_context,
                 task_function=task_function,
@@ -257,14 +259,6 @@ def launch(
             # access the result to trigger an exception in case the job failed.
             _ = job.return_value
         else:
-            # taken from Hydra.multirun without compose_config
-            callbacks = Callbacks(cfg)
-            callbacks.on_multirun_start(config=cfg, config_name=config_name)
-
-            hydra_context = HydraContext(
-                config_loader=gh.config_loader(), callbacks=callbacks
-            )
-
             # Instantiate sweeper without using Hydra's Plugin discovery (Zen!)
             sweeper = instantiate(cfg.hydra.sweeper)
             assert isinstance(sweeper, Sweeper)
