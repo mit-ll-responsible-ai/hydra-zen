@@ -1,24 +1,24 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-from pathlib import Path
+import warnings
+from dataclasses import fields, is_dataclass
 from typing import Any, Callable, List, Mapping, Optional, Type, Union
 
+from hydra import initialize
 from hydra._internal.callbacks import Callbacks
-from hydra._internal.hydra import Hydra
-from hydra._internal.utils import create_config_search_path
 from hydra.core.config_store import ConfigStore
 from hydra.core.global_hydra import GlobalHydra
-from hydra.core.utils import JobReturn
+from hydra.core.utils import JobReturn, run_job
 from hydra.plugins.sweeper import Sweeper
 from hydra.types import HydraContext, RunMode
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig, ListConfig, OmegaConf
 
 from hydra_zen._hydra_overloads import instantiate
 from hydra_zen.typing._implementations import DataClass
 
 
 def _store_config(
-    cfg: Union[DataClass, Type[DataClass], DictConfig, Mapping[Any, Any]],
+    cfg: Union[DataClass, Type[DataClass], DictConfig, ListConfig, Mapping[Any, Any]],
     config_name: str = "hydra_launch",
 ) -> str:
     """Stores configuration object in Hydra's ConfigStore.
@@ -54,11 +54,11 @@ def launch(
     config: Union[DataClass, Type[DataClass], Mapping[str, Any]],
     task_function: Callable[[DictConfig], Any],
     overrides: Optional[List[str]] = None,
-    config_dir: Optional[Union[str, Path]] = None,
     config_name: str = "zen_launch",
     job_name: str = "zen_launch",
     with_log_configuration: bool = True,
     multirun: bool = False,
+    to_dictconfig: bool = False,
 ) -> Union[JobReturn, Any]:
     r"""Launch a Hydra job using a Python-based interface.
 
@@ -84,9 +84,6 @@ def launch(
         If provided, sets/overrides values in ``config``. See [1]_ and [2]_
         for a detailed discussion of the "grammar" supported by ``overrides``.
 
-    config_dir : Optional[Union[str, Path]]
-        The config path: a directory where Hydra will search for configs.
-
     config_name : str (default: "zen_launch")
         Name of the stored configuration in Hydra's ConfigStore API.
 
@@ -97,6 +94,10 @@ def launch(
 
     multirun : bool (default: False)
         Launch a Hydra multi-run ([3]_).
+
+    to_dictconfig: bool (default: False)
+        If ``True``, convert a ``dataclasses.dataclass`` to a ``omegaconf.DictConfig``. Note, this
+        will remove Hydra's cabability for validation with structured configurations.
 
     Returns
     -------
@@ -203,46 +204,68 @@ def launch(
     'multirun/2021-10-19/17-50-07\\1',
     'multirun/2021-10-19/17-50-07\\2']
     """
-    config_name = _store_config(config, config_name)
 
-    if config_dir is not None:
-        config_dir = str(Path(config_dir).absolute())
-    search_path = create_config_search_path(config_dir)
+    # used for check below
+    _num_dataclass_fields = 0
+    if is_dataclass(config):
+        _num_dataclass_fields = len(fields(config))
 
-    hydra = Hydra.create_main_hydra2(task_name=job_name, config_search_path=search_path)
-    try:
+    # store config in ConfigStore
+    if to_dictconfig and is_dataclass(config):
+        # convert Dataclass to a DictConfig
+        dictconfig = OmegaConf.create(
+            OmegaConf.to_container(OmegaConf.structured(config))
+        )
+        config_name = _store_config(dictconfig, config_name)
+    else:
+        config_name = _store_config(config, config_name)
+
+    # Initializes Hydra and add the config_path to the config search path
+    with initialize(config_path=None, job_name=job_name):
+
+        # taken from hydra.compose with support for MULTIRUN
+        gh = GlobalHydra.instance()
+        assert gh.hydra is not None
+
+        # Load configuration
+        cfg = gh.hydra.compose_config(
+            config_name=config_name,
+            overrides=overrides if overrides is not None else [],
+            run_mode=RunMode.RUN if not multirun else RunMode.MULTIRUN,
+            from_shell=False,
+            with_log_configuration=with_log_configuration,
+        )
+
+        callbacks = Callbacks(cfg)
+        run_start = (
+            callbacks.on_run_start if not multirun else callbacks.on_multirun_start
+        )
+        run_start(config=cfg, config_name=config_name)
+
+        hydra_context = HydraContext(
+            config_loader=gh.config_loader(), callbacks=callbacks
+        )
+
         if not multirun:
-            # Here we can use Hydra's `run` method
-            job = hydra.run(
-                config_name=config_name,
+            job = run_job(
+                hydra_context=hydra_context,
                 task_function=task_function,
-                overrides=overrides if overrides is not None else [],
-                with_log_configuration=with_log_configuration,
+                config=cfg,
+                job_dir_key="hydra.run.dir",
+                job_subdir_key=None,
+                configure_logging=with_log_configuration,
             )
+            callbacks.on_run_end(config=cfg, config_name=config_name, job_return=job)
 
+            # access the result to trigger an exception in case the job failed.
+            _ = job.return_value
         else:
-            # Instead of running Hydra's `multirun` method we instantiate
-            # and run the sweeper method.  This allows us to run local
-            # sweepers and launchers without installing them in `hydra_plugins`
-            # package directory.
-            cfg = hydra.compose_config(
-                config_name=config_name,
-                overrides=overrides if overrides is not None else [],
-                with_log_configuration=with_log_configuration,
-                run_mode=RunMode.MULTIRUN,
-            )
-
-            callbacks = Callbacks(cfg)
-            callbacks.on_multirun_start(config=cfg, config_name=config_name)
-
             # Instantiate sweeper without using Hydra's Plugin discovery (Zen!)
             sweeper = instantiate(cfg.hydra.sweeper)
             assert isinstance(sweeper, Sweeper)
             sweeper.setup(
                 config=cfg,
-                hydra_context=HydraContext(
-                    config_loader=hydra.config_loader, callbacks=callbacks
-                ),
+                hydra_context=hydra_context,
                 task_function=task_function,
             )
 
@@ -250,10 +273,21 @@ def launch(
                 cfg.hydra.overrides.task, resolve=False
             )
             assert isinstance(task_overrides, list)
-
             job = sweeper.sweep(arguments=task_overrides)
             callbacks.on_multirun_end(config=cfg, config_name=config_name)
 
-    finally:
-        GlobalHydra.instance().clear()
+    if is_dataclass(config):
+        _num_dataclass_fields_after = len(fields(config))
+        if (
+            _num_dataclass_fields_after == 0
+            and _num_dataclass_fields_after < _num_dataclass_fields
+        ):
+            warnings.warn(
+                "Your dataclass-based config was mutated by this run. If you just executed with a "
+                "`hydra/launcher` that utilizes cloudpickle (e.g., hydra-submitit-launcher), there is a known "
+                "issue with dataclasses (see: https://github.com/cloudpipe/cloudpickle/issues/386). You will have "
+                "to restart your interactive environment ro run `launch` again. To avoid this issue you can use the "
+                "`launch` option: `to_dictconfig=True`."
+            )
+
     return job

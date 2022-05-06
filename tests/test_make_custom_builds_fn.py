@@ -64,6 +64,7 @@ def f2(x, y: str):
     return
 
 
+@pytest.mark.filterwarnings("ignore:Specifying")  # deprecated builds_bases
 @pytest.mark.filterwarnings(
     "ignore:A structured config was supplied for `zen_wrappers`"
 )

@@ -4,28 +4,41 @@
 from pathlib import Path
 
 import pytest
-from hydra import compose, initialize
 from hydra.core.config_store import ConfigStore
 from hydra.core.override_parser.overrides_parser import OverridesParser
 from hydra.errors import ConfigCompositionException
 from hydra.plugins.sweeper import Sweeper
 from omegaconf.omegaconf import OmegaConf
 
-from hydra_zen import builds, instantiate, launch
+from hydra_zen import builds, instantiate, launch, make_config
 from hydra_zen._launch import _store_config
 
+try:
+    import dataclasses
 
-@pytest.mark.parametrize("as_dataclass", [True, False])
-@pytest.mark.parametrize("as_dictconfig", [True, False])
-def test_store_config(as_dataclass, as_dictconfig):
-    cfg = builds(dict, a=1, b=1)
+    import cloudpickle
 
-    if not as_dataclass:
-        cfg = dict(f=cfg)
+    CLOUDPICKLE_AVAIL = True
+except ImportError:
+    CLOUDPICKLE_AVAIL = False
 
-    if as_dictconfig:
-        cfg = OmegaConf.create(cfg)
+CONFIG_TYPE_EXAMPLES = [
+    make_config(),
+    builds(dict, a=1, b=1),
+    dict(a=1),
+    dict(f=builds(dict, a=1, b=1)),
+    OmegaConf.create(dict(a=1)),
+    OmegaConf.create(dict(f=builds(dict, a=1, b=1))),
+]
 
+DATACLASS_CONFIG_TYPE_EXAMPLES = [
+    make_config(),
+    builds(dict, a=1, b=1),
+]
+
+
+@pytest.mark.parametrize("cfg", CONFIG_TYPE_EXAMPLES)
+def test_store_config(cfg):
     cn = _store_config(cfg)
     cs = ConfigStore.instance()
     key = cn + ".yaml"
@@ -34,46 +47,48 @@ def test_store_config(as_dataclass, as_dictconfig):
 
 
 @pytest.mark.usefixtures("cleandir")
+@pytest.mark.parametrize("cfg", CONFIG_TYPE_EXAMPLES)
 @pytest.mark.parametrize("multirun", [False, True])
-@pytest.mark.parametrize("as_dataclass", [True, False])
-@pytest.mark.parametrize(
-    "as_dictconfig, with_hydra", [(True, True), (True, False), (False, False)]
-)
-def test_launch_config_type(
-    multirun,
-    as_dataclass,
-    as_dictconfig,
-    with_hydra,
-):
-    if not as_dataclass:
-        cfg = dict(a=1, b=1)
-    else:
-        cfg = builds(dict, a=1, b=1)
-
-    if as_dictconfig:
-        if not with_hydra:
-            cfg = OmegaConf.create(cfg)
-        else:
-            cn = _store_config(cfg)
-            with initialize(config_path=None):
-                cfg = compose(config_name=cn)
-
+def test_launch_config_type(cfg, multirun):
     job = launch(cfg, task_function=instantiate, multirun=multirun)
     if isinstance(job, list):
         job = job[0][0]
 
-    assert job.return_value == {"a": 1, "b": 1}
+    assert job.return_value == instantiate(cfg)
+
+
+@pytest.mark.filterwarnings(
+    "ignore:Your dataclass-based config was mutated by this run"
+)
+@pytest.mark.skipif(not CLOUDPICKLE_AVAIL, reason="cloudpickle not available")
+@pytest.mark.usefixtures("cleandir")
+@pytest.mark.parametrize("cfg", DATACLASS_CONFIG_TYPE_EXAMPLES)
+@pytest.mark.parametrize("to_dictconfig", [True, False])
+def test_launch_to_dictconfig(cfg, to_dictconfig):
+    pre_num_fields = len(dataclasses.fields(cfg))
+
+    def task_fn(cfg):
+        _ = cloudpickle.loads(cloudpickle.dumps(cfg))
+
+    launch(cfg, task_function=task_fn, to_dictconfig=to_dictconfig)
+
+    if pre_num_fields > 0:
+        if not to_dictconfig:
+            assert len(dataclasses.fields(cfg)) == 0
+        else:
+            assert len(dataclasses.fields(cfg)) > 0
+    else:
+        # run again with no error
+        launch(cfg, task_function=task_fn, to_dictconfig=to_dictconfig)
 
 
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize(
     "overrides", [None, [], ["hydra.run.dir=test_hydra_overrided"]]
 )
-@pytest.mark.parametrize("config_dir", [Path.cwd(), None])
 @pytest.mark.parametrize("with_log_configuration", [False, True])
 def test_launch_job(
     overrides,
-    config_dir,
     with_log_configuration,
 ):
     cfg = dict(a=1, b=1)
@@ -83,7 +98,6 @@ def test_launch_job(
         cfg,
         task_function=instantiate,
         overrides=overrides,
-        config_dir=config_dir,
         with_log_configuration=with_log_configuration,
     )
     assert job.return_value == {"a": 1, "b": 1}
@@ -97,12 +111,10 @@ def test_launch_job(
     "overrides", [None, [], ["hydra.sweep.dir=test_hydra_overrided"]]
 )
 @pytest.mark.parametrize("multirun_overrides", [None, ["a=1,2"]])
-@pytest.mark.parametrize("config_dir", [Path.cwd(), None])
 @pytest.mark.parametrize("with_log_configuration", [False, True])
 def test_launch_multirun(
     overrides,
     multirun_overrides,
-    config_dir,
     with_log_configuration,
 ):
     cfg = dict(a=1, b=1)
@@ -120,7 +132,6 @@ def test_launch_multirun(
         cfg,
         task_function=instantiate,
         overrides=_overrides,
-        config_dir=config_dir,
         with_log_configuration=with_log_configuration,
         multirun=True,
     )
