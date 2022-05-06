@@ -1,5 +1,6 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+import warnings
 from dataclasses import fields, is_dataclass
 from typing import Any, Callable, List, Mapping, Optional, Type, Union
 
@@ -206,22 +207,19 @@ def launch(
     'multirun/2021-10-19/17-50-07\\2']
     """
 
+    # used for check below
+    _num_dataclass_fields = 0
     if is_dataclass(config):
-        if to_dictconfig:
-            # convert Dataclass to a DictConfig
-            cfg = OmegaConf.structured(config)
-            config = OmegaConf.create(OmegaConf.to_container(cfg))
-        else:
-            if len(fields(config)) == 0:
-                raise ValueError(
-                    """There is an issue with your dataclass.  If you previously executed with a
-                `hydra/launcher` that utilizes cloudpickle (e.g., hydra-submitit-launcher), there is a known
-                issue with dataclasses (see: https://github.com/cloudpipe/cloudpickle/issues/386). You will have
-                to restart your interactive environment.  To avoid this issue you can use the option `to_dictconfig=True`."""
-                )
+        _num_dataclass_fields = len(fields(config))
 
     # store config in ConfigStore
-    config_name = _store_config(config, config_name)
+    if is_dataclass(config) and to_dictconfig:
+        # convert Dataclass to a DictConfig
+        cfg = OmegaConf.structured(config)
+        dictconfig = OmegaConf.create(OmegaConf.to_container(cfg))
+        config_name = _store_config(dictconfig, config_name)
+    else:
+        config_name = _store_config(config, config_name)
 
     # Initializes Hydra and add the config_path to the config search path
     with initialize(config_path=None, job_name=job_name):
@@ -285,4 +283,18 @@ def launch(
             job = sweeper.sweep(arguments=task_overrides)
             callbacks.on_multirun_end(config=cfg, config_name=config_name)
 
-        return job
+    if is_dataclass(config):
+        _num_dataclass_fields_after = len(fields(config))
+        if (
+            _num_dataclass_fields_after == 0
+            and _num_dataclass_fields_after < _num_dataclass_fields
+        ):
+            warnings.warn(
+                "There may ben an issue with your dataclass.  If you just executed with a "
+                + "`hydra/launcher` that utilizes cloudpickle (e.g., hydra-submitit-launcher), there is a known "
+                + "issue with dataclasses (see: https://github.com/cloudpipe/cloudpickle/issues/386). You will have "
+                + "to restart your interactive environment ro run `launch` again.  To avoid this issue you can use the option "
+                + "`to_dictconfig=True`."
+            )
+
+    return job

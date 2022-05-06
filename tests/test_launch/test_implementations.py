@@ -1,6 +1,7 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
+import warnings
 from pathlib import Path
 
 import pytest
@@ -10,28 +11,35 @@ from hydra.errors import ConfigCompositionException
 from hydra.plugins.sweeper import Sweeper
 from omegaconf.omegaconf import OmegaConf
 
-from hydra_zen import builds, instantiate, launch
+from hydra_zen import builds, instantiate, launch, make_config
 from hydra_zen._launch import _store_config
 
 try:
-    import cloudpickle
     import dataclasses
+
+    import cloudpickle
+
     CLOUDPICKLE_AVAIL = True
 except ImportError:
     CLOUDPICKLE_AVAIL = False
 
+CONFIG_TYPE_EXAMPLES = [
+    make_config(),
+    builds(dict, a=1, b=1),
+    dict(a=1),
+    dict(f=builds(dict, a=1, b=1)),
+    OmegaConf.create(dict(a=1)),
+    OmegaConf.create(dict(f=builds(dict, a=1, b=1))),
+]
 
-@pytest.mark.parametrize("as_dataclass", [True, False])
-@pytest.mark.parametrize("as_dictconfig", [True, False])
-def test_store_config(as_dataclass, as_dictconfig):
-    cfg = builds(dict, a=1, b=1)
+DATACLASS_CONFIG_TYPE_EXAMPLES = [
+    make_config(),
+    builds(dict, a=1, b=1),
+]
 
-    if not as_dataclass:
-        cfg = dict(f=cfg)
 
-    if as_dictconfig:
-        cfg = OmegaConf.create(cfg)
-
+@pytest.mark.parametrize("cfg", CONFIG_TYPE_EXAMPLES)
+def test_store_config(cfg):
     cn = _store_config(cfg)
     cs = ConfigStore.instance()
     key = cn + ".yaml"
@@ -40,43 +48,48 @@ def test_store_config(as_dataclass, as_dictconfig):
 
 
 @pytest.mark.usefixtures("cleandir")
+@pytest.mark.parametrize("cfg", CONFIG_TYPE_EXAMPLES)
 @pytest.mark.parametrize("multirun", [False, True])
-@pytest.mark.parametrize("as_dataclass", [True, False])
-@pytest.mark.parametrize("as_dictconfig", [True, False])
-def test_launch_config_type(multirun, as_dataclass, as_dictconfig):
-    if not as_dataclass:
-        cfg = dict(a=1, b=1)
-    else:
-        cfg = builds(dict, a=1, b=1)
-
-    if as_dictconfig:
-        cfg = OmegaConf.create(cfg)
-
+def test_launch_config_type(cfg, multirun):
     job = launch(cfg, task_function=instantiate, multirun=multirun)
     if isinstance(job, list):
         job = job[0][0]
 
-    assert job.return_value == {"a": 1, "b": 1}
+    assert job.return_value == instantiate(cfg)
+
 
 @pytest.mark.skipif(not CLOUDPICKLE_AVAIL, reason="cloudpickle not available")
 @pytest.mark.usefixtures("cleandir")
+@pytest.mark.parametrize("cfg", DATACLASS_CONFIG_TYPE_EXAMPLES)
 @pytest.mark.parametrize("to_dictconfig", [True, False])
-def test_launch_to_dictconfig(to_dictconfig):
-    cfg = builds(dict, a=1, b=1)
+def test_launch_to_dictconfig(cfg, to_dictconfig):
+    pre_num_fields = len(dataclasses.fields(cfg))
 
     def task_fn(cfg):
         _ = cloudpickle.loads(cloudpickle.dumps(cfg))
 
     launch(cfg, task_function=task_fn, to_dictconfig=to_dictconfig)
 
-    if not to_dictconfig:
-        assert len(dataclasses.fields(cfg)) == 0
-    else:
-        assert len(dataclasses.fields(cfg)) > 0
+    if pre_num_fields > 0:
+        if not to_dictconfig:
+            assert len(dataclasses.fields(cfg)) == 0
+        else:
+            assert len(dataclasses.fields(cfg)) > 0
 
-    if not to_dictconfig:
-        with pytest.raises(ValueError):
-            launch(cfg, task_function=task_fn, to_dictconfig=to_dictconfig)
+        if not to_dictconfig:
+            with pytest.warns(
+                warnings.warn(
+                    "There may ben an issue with your dataclass.  If you just executed with a "
+                    + "`hydra/launcher` that utilizes cloudpickle (e.g., hydra-submitit-launcher), there is a known "
+                    + "issue with dataclasses (see: https://github.com/cloudpipe/cloudpickle/issues/386). You will have "
+                    + "to restart your interactive environment ro run `launch` again.  To avoid this issue you can use the option "
+                    + "`to_dictconfig=True`."
+                )
+            ):
+                launch(cfg, task_function=task_fn, to_dictconfig=to_dictconfig)
+    else:
+        # run again with no error
+        launch(cfg, task_function=task_fn, to_dictconfig=to_dictconfig)
 
 
 @pytest.mark.usefixtures("cleandir")
