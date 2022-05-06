@@ -77,10 +77,6 @@ def test_launch_to_dictconfig(cfg, to_dictconfig):
             assert len(dataclasses.fields(cfg)) == 0
         else:
             assert len(dataclasses.fields(cfg)) > 0
-
-        if not to_dictconfig:
-            with pytest.warns(UserWarning):
-                launch(cfg, task_function=task_fn, to_dictconfig=to_dictconfig)
     else:
         # run again with no error
         launch(cfg, task_function=task_fn, to_dictconfig=to_dictconfig)
