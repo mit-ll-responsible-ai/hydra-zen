@@ -6,21 +6,19 @@ from typing import Any, Callable, List, Mapping, Optional, Type, Union
 
 from hydra import initialize
 from hydra._internal.callbacks import Callbacks
-from hydra._internal.hydra import Hydra
-from hydra._internal.utils import create_config_search_path
 from hydra.core.config_store import ConfigStore
 from hydra.core.global_hydra import GlobalHydra
 from hydra.core.utils import JobReturn, run_job
 from hydra.plugins.sweeper import Sweeper
 from hydra.types import HydraContext, RunMode
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig, ListConfig, OmegaConf
 
 from hydra_zen._hydra_overloads import instantiate
 from hydra_zen.typing._implementations import DataClass
 
 
 def _store_config(
-    cfg: Union[DataClass, Type[DataClass], DictConfig, Mapping[Any, Any]],
+    cfg: Union[DataClass, Type[DataClass], DictConfig, ListConfig, Mapping[Any, Any]],
     config_name: str = "hydra_launch",
 ) -> str:
     """Stores configuration object in Hydra's ConfigStore.
