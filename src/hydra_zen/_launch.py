@@ -17,6 +17,10 @@ from hydra_zen._hydra_overloads import instantiate
 from hydra_zen.typing._implementations import DataClass
 
 
+class _NotSet:  # pragma: no cover
+    pass
+
+
 def _store_config(
     cfg: Union[DataClass, Type[DataClass], DictConfig, ListConfig, Mapping[Any, Any]],
     config_name: str = "hydra_launch",
@@ -54,11 +58,12 @@ def launch(
     config: Union[DataClass, Type[DataClass], Mapping[str, Any]],
     task_function: Callable[[DictConfig], Any],
     overrides: Optional[List[str]] = None,
+    multirun: bool = False,
+    version_base: Optional[Union[str, Type[_NotSet]]] = _NotSet,
+    to_dictconfig: bool = False,
     config_name: str = "zen_launch",
     job_name: str = "zen_launch",
     with_log_configuration: bool = True,
-    multirun: bool = False,
-    to_dictconfig: bool = False,
 ) -> Union[JobReturn, Any]:
     r"""Launch a Hydra job using a Python-based interface.
 
@@ -84,6 +89,19 @@ def launch(
         If provided, sets/overrides values in ``config``. See [1]_ and [2]_
         for a detailed discussion of the "grammar" supported by ``overrides``.
 
+    multirun : bool (default: False)
+        Launch a Hydra multi-run ([3]_).
+
+    version_base : Optional[str], optional (default=_NotSet)
+        Available starting with Hydra 1.2.0.
+        - If the `version_base parameter` is not specified, Hydra 1.x will use defaults compatible with version 1.1. Also in this case, a warning is issued to indicate an explicit version_base is preferred.
+        - If the `version_base parameter` is `None`, then the defaults are chosen for the current minor Hydra version. For example for Hydra 1.2, then would imply `config_path=None` and `hydra.job.chdir=False`.
+        - If the `version_base` parameter is an explicit version string like "1.1", then the defaults appropriate to that version are used.
+
+    to_dictconfig: bool (default: False)
+        If ``True``, convert a ``dataclasses.dataclass`` to a ``omegaconf.DictConfig``. Note, this
+        will remove Hydra's cabability for validation with structured configurations.
+
     config_name : str (default: "zen_launch")
         Name of the stored configuration in Hydra's ConfigStore API.
 
@@ -91,13 +109,6 @@ def launch(
 
     with_log_configuration : bool (default: True)
         If ``True``, enables the configuration of the logging subsystem from the loaded config.
-
-    multirun : bool (default: False)
-        Launch a Hydra multi-run ([3]_).
-
-    to_dictconfig: bool (default: False)
-        If ``True``, convert a ``dataclasses.dataclass`` to a ``omegaconf.DictConfig``. Note, this
-        will remove Hydra's cabability for validation with structured configurations.
 
     Returns
     -------
@@ -221,7 +232,11 @@ def launch(
         config_name = _store_config(config, config_name)
 
     # Initializes Hydra and add the config_path to the config search path
-    with initialize(config_path=None, job_name=job_name):
+    with initialize(
+        config_path=None,
+        job_name=job_name,
+        **({} if version_base is _NotSet else {"version_base": version_base})
+    ):
 
         # taken from hydra.compose with support for MULTIRUN
         gh = GlobalHydra.instance()

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from pathlib import Path
+from typing import Optional
 
 import pytest
 from hydra.core.config_store import ConfigStore
@@ -11,6 +12,7 @@ from hydra.plugins.sweeper import Sweeper
 from omegaconf.omegaconf import OmegaConf
 
 from hydra_zen import builds, instantiate, launch, make_config
+from hydra_zen._compatibility import HYDRA_VERSION
 from hydra_zen._launch import _store_config
 
 try:
@@ -198,3 +200,20 @@ def test_launch_with_multirun_plugin(plugin):
     assert isinstance(job, list) and len(job) == 1 and len(job[0]) == 2
     for i, j in enumerate(job[0]):
         assert j.return_value == {"a": i + 1, "b": 1}
+
+
+@pytest.mark.skipif(HYDRA_VERSION < (1, 2, 0), reason="version_base not supported")
+@pytest.mark.parametrize("version_base", ["1.1", "1.2", None])
+@pytest.mark.usefixtures("cleandir")
+def test_version_base(version_base: Optional[str]):
+    def task(cfg):
+        (Path().cwd() / "foo.txt").touch()
+
+    expected_dir = Path().cwd() if version_base != "1.1" else (Path().cwd() / "outputs")
+
+    glob_pattern = "foo.txt" if version_base != "1.1" else "**/foo.txt"
+
+    assert len(list(expected_dir.glob(glob_pattern))) == 0
+
+    launch(make_config(), task, version_base=version_base)
+    assert len(list(expected_dir.glob(glob_pattern))) == 1, list(expected_dir.glob("*"))
