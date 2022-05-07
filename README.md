@@ -68,6 +68,19 @@ For further details refer to [these docs](https://github.com/mit-ll-responsible-
 Share ideas, ask questions, and chat with us over at [hydra-zen's discussion board](https://github.com/mit-ll-responsible-ai/hydra-zen/discussions).
 
 
+## Citation
+
+Using `hydra-zen` for your research? Please cite the following publication:
+
+```
+@article{soklaski2022tools,
+  title={Tools and Practices for Responsible AI Engineering},
+  author={Soklaski, Ryan and Goodwin, Justin and Brown, Olivia and Yee, Michael and Matterer, Jason},
+  journal={arXiv preprint arXiv:2201.05647},
+  year={2022}
+}
+```
+
 ## Disclaimer
 
 DISTRIBUTION STATEMENT A. Approved for public release: distribution unlimited.
