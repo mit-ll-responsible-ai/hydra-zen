@@ -1,17 +1,18 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
-
 import logging
 import os
 import sys
 import tempfile
-from typing import Iterable
+from typing import Dict, Iterable, Optional
 
 import hypothesis.strategies as st
 import pkg_resources
 import pytest
 from omegaconf import DictConfig, ListConfig
+
+from hydra_zen._compatibility import HYDRA_VERSION
 
 # Skip collection of tests that don't work on the current version of Python.
 collect_ignore_glob = []
@@ -53,6 +54,17 @@ def cleandir() -> Iterable[str]:
         yield tmpdirname  # yields control to the test to be run
         os.chdir(old_dir)
         logging.shutdown()
+
+
+@pytest.fixture()
+def version_base() -> Dict[str, Optional[str]]:
+    """Return version_base according to local version, or empty dict for versions
+    preceding version_base"""
+    return (
+        {"version_base": ".".join(str(i) for i in HYDRA_VERSION)}
+        if HYDRA_VERSION >= (1, 2, 0)
+        else {}
+    )
 
 
 pytest_plugins = "pytester"

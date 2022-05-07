@@ -73,7 +73,7 @@ def tracker(x=CustomCallback):
 
 @pytest.mark.usefixtures("cleandir")
 @pytest.mark.parametrize("multirun", [False, True])
-def test_hydra_run_with_callback(multirun):
+def test_hydra_run_with_callback(multirun, version_base: dict):
     # Tests that callback methods are called during appropriate
     # stages
     try:
@@ -86,6 +86,7 @@ def test_hydra_run_with_callback(multirun):
             task_function=instantiate,
             overrides=["hydra/callbacks=test_callback"],
             multirun=multirun,
+            **version_base,
         )
 
         if multirun:
