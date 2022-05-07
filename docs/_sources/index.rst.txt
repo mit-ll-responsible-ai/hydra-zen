@@ -11,7 +11,7 @@
 
 .. tip::
 
-   🎓 Using hydra-zen for your research project? `Cite us <https://zenodo.org/record/5584711>`_!
+   🎓 Using hydra-zen for your research project? `Cite us <https://arxiv.org/abs/2201.05647>`_!
 
 
 =====================================
