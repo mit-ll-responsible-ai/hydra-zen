@@ -60,6 +60,10 @@ will no longer auto-broaden nested container types when ``OmegaConf v2.2.0+`` is
 installed. (See :pull:`261`)
 
 
+Hydra ``v1.2.0`` is introducing a ``version_base`` parameter that can control default behaviors in ``hydra.run`` and ``hydra.initialize``.
+Correspondingly, ``version_base`` is now exposed via `~hydra_zen.launch`. See :pull:`273` for more details.
+
+
 .. _0p7p0-deprecations:
 
 Deprecations

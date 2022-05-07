@@ -189,6 +189,10 @@
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass</span>
 
 
+<span class="k">class</span> <span class="nc">_NotSet</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="k">pass</span>
+
+
 <span class="k">def</span> <span class="nf">_store_config</span><span class="p">(</span>
     <span class="n">cfg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataClass</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataClass</span><span class="p">],</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
     <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;hydra_launch&quot;</span><span class="p">,</span>
@@ -226,11 +230,12 @@
     <span class="n">config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataClass</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataClass</span><span class="p">],</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
     <span class="n">task_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">DictConfig</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
     <span class="n">overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">multirun</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">version_base</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">_NotSet</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">_NotSet</span><span class="p">,</span>
+    <span class="n">to_dictconfig</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;zen_launch&quot;</span><span class="p">,</span>
     <span class="n">job_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;zen_launch&quot;</span><span class="p">,</span>
     <span class="n">with_log_configuration</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">multirun</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">to_dictconfig</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">JobReturn</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Launch a Hydra job using a Python-based interface.</span>
 
@@ -256,6 +261,19 @@
 <span class="sd">        If provided, sets/overrides values in ``config``. See [1]_ and [2]_</span>
 <span class="sd">        for a detailed discussion of the &quot;grammar&quot; supported by ``overrides``.</span>
 
+<span class="sd">    multirun : bool (default: False)</span>
+<span class="sd">        Launch a Hydra multi-run ([3]_).</span>
+
+<span class="sd">    version_base : Optional[str], optional (default=_NotSet)</span>
+<span class="sd">        Available starting with Hydra 1.2.0.</span>
+<span class="sd">        - If the `version_base parameter` is not specified, Hydra 1.x will use defaults compatible with version 1.1. Also in this case, a warning is issued to indicate an explicit version_base is preferred.</span>
+<span class="sd">        - If the `version_base parameter` is `None`, then the defaults are chosen for the current minor Hydra version. For example for Hydra 1.2, then would imply `config_path=None` and `hydra.job.chdir=False`.</span>
+<span class="sd">        - If the `version_base` parameter is an explicit version string like &quot;1.1&quot;, then the defaults appropriate to that version are used.</span>
+
+<span class="sd">    to_dictconfig: bool (default: False)</span>
+<span class="sd">        If ``True``, convert a ``dataclasses.dataclass`` to a ``omegaconf.DictConfig``. Note, this</span>
+<span class="sd">        will remove Hydra&#39;s cabability for validation with structured configurations.</span>
+
 <span class="sd">    config_name : str (default: &quot;zen_launch&quot;)</span>
 <span class="sd">        Name of the stored configuration in Hydra&#39;s ConfigStore API.</span>
 
@@ -263,13 +281,6 @@
 
 <span class="sd">    with_log_configuration : bool (default: True)</span>
 <span class="sd">        If ``True``, enables the configuration of the logging subsystem from the loaded config.</span>
-
-<span class="sd">    multirun : bool (default: False)</span>
-<span class="sd">        Launch a Hydra multi-run ([3]_).</span>
-
-<span class="sd">    to_dictconfig: bool (default: False)</span>
-<span class="sd">        If ``True``, convert a ``dataclasses.dataclass`` to a ``omegaconf.DictConfig``. Note, this</span>
-<span class="sd">        will remove Hydra&#39;s cabability for validation with structured configurations.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -393,7 +404,11 @@
         <span class="n">config_name</span> <span class="o">=</span> <span class="n">_store_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">config_name</span><span class="p">)</span>
 
     <span class="c1"># Initializes Hydra and add the config_path to the config search path</span>
-    <span class="k">with</span> <span class="n">initialize</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">job_name</span><span class="o">=</span><span class="n">job_name</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">initialize</span><span class="p">(</span>
+        <span class="n">config_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">job_name</span><span class="o">=</span><span class="n">job_name</span><span class="p">,</span>
+        <span class="o">**</span><span class="p">({}</span> <span class="k">if</span> <span class="n">version_base</span> <span class="ow">is</span> <span class="n">_NotSet</span> <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;version_base&quot;</span><span class="p">:</span> <span class="n">version_base</span><span class="p">})</span>
+    <span class="p">):</span>
 
         <span class="c1"># taken from hydra.compose with support for MULTIRUN</span>
         <span class="n">gh</span> <span class="o">=</span> <span class="n">GlobalHydra</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
