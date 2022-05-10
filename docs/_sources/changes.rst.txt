@@ -11,7 +11,7 @@ chronological order. All previous releases should still be available on pip.
 .. _v0.7.0:
 
 ------------------
-0.7.0 - 2022-XX-XX
+0.7.0 - 2022-05-10
 ------------------
 
 New Features
@@ -19,7 +19,7 @@ New Features
 
 **Support for defaults lists**
 
-A `defaults list <https://hydra.cc/docs/advanced/defaults_list/>`_ can be passed to :func:`~hydra_zen.builds` and :func:`~hydra_zen.make_config` via the new ``hydra_defaults`` argument. Basic runtime and static type-checking are performed on this field. See :pull:`264` for more details and examples.
+Hydra's `defaults list <https://hydra.cc/docs/advanced/defaults_list/>`_ field can be passed to :func:`~hydra_zen.builds` and :func:`~hydra_zen.make_config` via the new ``hydra_defaults`` argument. Basic runtime and static type-checking are performed on this field. See :pull:`264` for more details and examples.
 
 
 **Improved functionality for types with Specialized hydra-zen support**
@@ -33,12 +33,13 @@ values will automatically be converted to structured configs.
    >>> from functools import partial
    >>> from hydra_zen import to_yaml, just
 
-   >>> def f(x: int): returns x**2
-   
-   >>> just(partial(f, x=2))  # returns a dataclass instance
+   >>> def f(x): returns x**2
+   >>> partiald_f = partial(f, x=2))
+
+   >>> just(partiald_f)  # convert to structured config
    PartialBuilds_f(_target_='__main__.f', _partial_=True, x=2)
 
-   >>> print(to_yaml(partial(f, x=2)))
+   >>> print(to_yaml(partiald_f))  # convert to yaml
    _target_: __main__.f
    _partial_: true
    x: 2
