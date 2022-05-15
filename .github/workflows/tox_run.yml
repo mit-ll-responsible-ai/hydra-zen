@@ -155,7 +155,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-node-
     - name: Install pyright
-      run: sudo npm install -g pyright@">1.1.232"
+      run: sudo npm install -g pyright@">1.1.247"
     - uses: actions/checkout@v3
     - name: Set up Python
       uses: actions/setup-python@v3
