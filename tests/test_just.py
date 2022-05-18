@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: MIT
 
 import functools
-from pathlib import Path
 
 import pytest
 
@@ -31,7 +30,6 @@ def func_with_cache(x: int):
     [
         bytearray([1, 2, 3]),
         1 + 2j,
-        Path.cwd(),
         A,
         f,
         func_with_cache,

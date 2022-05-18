@@ -5,6 +5,7 @@ import sys
 import warnings
 from dataclasses import MISSING, field as _field, is_dataclass
 from enum import Enum
+from pathlib import Path
 from typing import (
     Any,
     Callable,
@@ -29,6 +30,7 @@ from typing_extensions import Final, TypeGuard
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVE_TYPES,
     HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES,
+    HYDRA_SUPPORTS_PARTIAL,
     PATCH_OMEGACONF_830,
 )
 from hydra_zen.errors import HydraZenValidationError
@@ -308,7 +310,7 @@ def sanitized_type(
     no_nested_container = not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES
 
     if origin is not None:
-        if primitive_only:
+        if primitive_only:  # pragma: no cover
             return Any
 
         args = get_args(type_)
@@ -368,19 +370,23 @@ def sanitized_type(
 
         return Any
 
+    if HYDRA_SUPPORTS_PARTIAL and isinstance(type_, type) and issubclass(type_, Path):
+        type_ = Path
+
     if (
         type_ is Any
         or type_ in HYDRA_SUPPORTED_PRIMITIVE_TYPES
         or is_dataclass(type_)
         or (isinstance(type_, type) and issubclass(type_, Enum))
     ):
+
         if wrap_optional and type_ is not Any:  # pragma: no cover
             # normally get_type_hints automatically resolves Optional[...]
             # when None is set as the default, but this has been flaky
             # for some pytorch-lightning classes. So we just do it ourselves...
             # It might be worth removing this later since none of our standard tests
             # cover it.
-            type_ = Optional[type_]
+            type_ = Optional[type_]  # type: ignore
         return type_
 
     # Needed to cover python 3.6 where __origin__ doesn't normalize to type
@@ -429,17 +435,17 @@ def check_suspicious_interpolations(
 
 
 def mutable_default_permitted(bases: Iterable[DataClass_], field_name: str) -> bool:
-    if not PATCH_OMEGACONF_830:  # pragma: no cover
+    if not PATCH_OMEGACONF_830:
         return True
-
-    for base in bases:
-        if (
-            field_name in base.__dataclass_fields__
-            and base.__dataclass_fields__[field_name].default is not MISSING
-        ):
-            # see https://github.com/omry/omegaconf/issues/830
-            return False
-    return True
+    else:  # pragma: no cover
+        for base in bases:
+            if (
+                field_name in base.__dataclass_fields__
+                and base.__dataclass_fields__[field_name].default is not MISSING
+            ):
+                # see https://github.com/omry/omegaconf/issues/830
+                return False
+        return True
 
 
 def valid_defaults_list(hydra_defaults: Any) -> bool:

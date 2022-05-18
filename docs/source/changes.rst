@@ -8,6 +8,24 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse 
 chronological order. All previous releases should still be available on pip.
 
+.. _v0.8.0:
+
+------------------
+0.8.0 - 2022-XX-XX
+------------------
+
+.. note:: This is documentation for an unreleased version of hydra-zen
+
+
+Support for New Hydra/OmegaConf Features
+----------------------------------------
+OmegaConf ``v2.2.1`` is added native support for the following types:
+
+- :py:class:`pathlib.Path`
+
+hydra-zen :ref:`already provides support for these <additional-types>`, but this version will defer to OmegaConf's native support when possible. (See :pull:`276`)
+
+
 .. _v0.7.0:
 
 ------------------
@@ -33,8 +51,8 @@ values will automatically be converted to structured configs.
    >>> from functools import partial
    >>> from hydra_zen import to_yaml, just
 
-   >>> def f(x): returns x**2
-   >>> partiald_f = partial(f, x=2))
+   >>> def f(x): return x**2
+   >>> partiald_f = partial(f, x=2)
 
    >>> just(partiald_f)  # convert to structured config
    PartialBuilds_f(_target_='__main__.f', _partial_=True, x=2)
@@ -51,7 +69,6 @@ Support for Upcoming Hydra/OmegaConf Features
 OmegaConf ``v2.2.0`` is adding native support for the following types:
 
 - :py:class:`bytes`
-- :py:class:`pathlib.Path`
 
 hydra-zen :ref:`already provides support for these <additional-types>`, but this version will defer to OmegaConf's native support when possible. (See :pull:`262`)
 

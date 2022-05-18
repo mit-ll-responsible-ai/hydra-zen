@@ -117,6 +117,7 @@ Values of the following types can be specified directly in configs:
 - :py:class:`dict`
 - :py:class:`enum.Enum`
 - :py:class:`bytes`  (*support added in OmegaConf 2.2.0*)
+- :py:class:`pathlib.Path`  (*support added in OmegaConf 2.2.1*)
 
 .. _additional-types:
 
@@ -153,7 +154,7 @@ hydra-zen provides specialized support for values of the following types:
 - :py:class:`collections.Counter`
 - :py:class:`collections.deque`
 - :py:func:`functools.partial`
-- :py:class:`pathlib.Path`
+- :py:class:`pathlib.Path` (*support provided for OmegaConf < 2.2.1*)
 - :py:class:`pathlib.PosixPath`
 - :py:class:`pathlib.WindowsPath`
 - :py:class:`range`

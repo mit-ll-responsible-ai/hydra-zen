@@ -6,6 +6,7 @@ import random
 import string
 import sys
 from dataclasses import dataclass, field as dataclass_field
+from pathlib import Path, PosixPath, WindowsPath
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Type, TypeVar, Union
 
 import hypothesis.strategies as st
@@ -24,6 +25,7 @@ from hydra_zen import builds, instantiate, mutable_value
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTS_BYTES,
     HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES,
+    HYDRA_SUPPORTS_Path,
     Version,
     _get_version,
 )
@@ -117,6 +119,9 @@ NoneType = type(None)
         (str, str),
         (bool, bool),
         (bytes, bytes if HYDRA_SUPPORTS_BYTES else Any),
+        (Path, Path if HYDRA_SUPPORTS_Path else Any),
+        (PosixPath, Path if HYDRA_SUPPORTS_Path else Any),
+        (WindowsPath, Path if HYDRA_SUPPORTS_Path else Any),
         (Color, Color),
         (C, Any),  # unsupported primitives
         (type(None), Any),
@@ -219,7 +224,7 @@ def test_sanitized_type_expected_behavior(in_type, expected_type):
                 ConfigValueError,
             )
         ):
-            Conf = OmegaConf.create(Bad)
+            Conf = OmegaConf.create(Bad)  # type: ignore
             Conf.x = [[int]]  # special case: validate
 
     @dataclass

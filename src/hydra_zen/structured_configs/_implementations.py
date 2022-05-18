@@ -325,24 +325,20 @@ def hydrated_dataclass(
         decorated_obj = cast(Any, decorated_obj)
         decorated_obj = dataclass(frozen=frozen)(decorated_obj)
 
-        if PATCH_OMEGACONF_830 and 2 < len(decorated_obj.__mro__):
+        if PATCH_OMEGACONF_830 and 2 < len(decorated_obj.__mro__):  # pragma: no cover
             parents = decorated_obj.__mro__[1:-1]
             # this class inherits from a parent
             for field_ in fields(decorated_obj):
                 if field_.default_factory is not MISSING and any(
                     hasattr(p, field_.name) for p in parents
                 ):
-                    # TODO: update error message with fixed omegaconf version
-                    _value = field_.default_factory()
                     raise HydraZenValidationError(
                         "This config will not instantiate properly.\nThis is due to a "
                         "known bug in omegaconf: The config specifies a "
                         f"default-factory for field {field_.name}, and inherits from a "
                         "parent that specifies the same field with a non-factory value "
                         "-- the parent's value will take precedence.\nTo circumvent "
-                        f"this, specify {field_.name} using: "
-                        f"`builds({type(_value).__name__}, {_value})`\n\nFor more "
-                        "information, see: https://github.com/omry/omegaconf/issues/830"
+                        f"this upgrade to omegaconf 2.2.1 or higher."
                     )
 
         if populate_full_signature:
@@ -548,8 +544,8 @@ def sanitized_field(
     ):
         if _mutable_default_permitted:
             return cast(Field[Any], mutable_value(value))
-
-        value = builds(type(value), value)
+        else:  # pragma: no cover
+            value = builds(type(value), value)
 
     return _utils.field(
         default=sanitized_default_value(
@@ -1656,7 +1652,7 @@ def builds(
                 PATCH_OMEGACONF_830
                 and builds_bases
                 and value.default_factory is not MISSING
-            ):
+            ):  # pragma: no cover
 
                 # Addresses omegaconf #830 https://github.com/omry/omegaconf/issues/830
                 #
