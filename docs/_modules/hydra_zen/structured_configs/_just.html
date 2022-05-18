@@ -172,7 +172,6 @@
   <h1>Source code for hydra_zen.structured_configs._just</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) 2022 Massachusetts Institute of Technology</span>
 <span class="c1"># SPDX-License-Identifier: MIT</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">FrozenSet</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">overload</span>
 
 <span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">Builds</span><span class="p">,</span> <span class="n">Importable</span><span class="p">,</span> <span class="n">Just</span>
@@ -180,7 +179,7 @@
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">_SupportedViaBuilds</span>  <span class="c1"># type: ignore</span>
 
 <span class="kn">from</span> <span class="nn">._implementations</span> <span class="kn">import</span> <span class="n">sanitized_default_value</span>
-<span class="kn">from</span> <span class="nn">._value_conversion</span> <span class="kn">import</span> <span class="n">ConfigComplex</span><span class="p">,</span> <span class="n">ConfigPath</span>
+<span class="kn">from</span> <span class="nn">._value_conversion</span> <span class="kn">import</span> <span class="n">ConfigComplex</span>
 
 <span class="c1"># pyright: strict</span>
 
@@ -197,11 +196,6 @@
 
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">just</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="nb">complex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigComplex</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-    <span class="o">...</span>
-
-
-<span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">just</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigPath</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="o">...</span>
 
 
