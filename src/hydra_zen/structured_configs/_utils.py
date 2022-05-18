@@ -310,7 +310,7 @@ def sanitized_type(
     no_nested_container = not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES
 
     if origin is not None:
-        if primitive_only:
+        if primitive_only:  # pragma: no cover
             return Any
 
         args = get_args(type_)
@@ -435,17 +435,17 @@ def check_suspicious_interpolations(
 
 
 def mutable_default_permitted(bases: Iterable[DataClass_], field_name: str) -> bool:
-    if not PATCH_OMEGACONF_830:  # pragma: no cover
+    if not PATCH_OMEGACONF_830:
         return True
-
-    for base in bases:
-        if (
-            field_name in base.__dataclass_fields__
-            and base.__dataclass_fields__[field_name].default is not MISSING
-        ):
-            # see https://github.com/omry/omegaconf/issues/830
-            return False
-    return True
+    else:  # pragma: no cover
+        for base in bases:
+            if (
+                field_name in base.__dataclass_fields__
+                and base.__dataclass_fields__[field_name].default is not MISSING
+            ):
+                # see https://github.com/omry/omegaconf/issues/830
+                return False
+        return True
 
 
 def valid_defaults_list(hydra_defaults: Any) -> bool:
