@@ -44,7 +44,7 @@ HYDRA_VERSION: Final = _get_version(hydra.__version__)
 #
 # Uncomment dynamic setting once OmegaConf merges fix:
 # https://github.com/omry/omegaconf/pull/832
-PATCH_OMEGACONF_830: Final = True  # OMEGACONF_VERSION < Version(2, 1, 1)
+PATCH_OMEGACONF_830: Final = OMEGACONF_VERSION < Version(2, 2, 1)
 
 # Hydra's instantiate API now supports partial-instantiation, indicated
 # by a `_partial_ = True` attribute.
