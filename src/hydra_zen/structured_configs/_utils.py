@@ -386,7 +386,7 @@ def sanitized_type(
             # for some pytorch-lightning classes. So we just do it ourselves...
             # It might be worth removing this later since none of our standard tests
             # cover it.
-            type_ = Optional[type_]
+            type_ = Optional[type_]  # type: ignore
         return type_
 
     # Needed to cover python 3.6 where __origin__ doesn't normalize to type

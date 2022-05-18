@@ -1,6 +1,5 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-from pathlib import Path
 from typing import Any, FrozenSet, Type, TypeVar, Union, overload
 
 from hydra_zen.typing import Builds, Importable, Just
@@ -8,7 +7,7 @@ from hydra_zen.typing._implementations import _HydraPrimitive  # type: ignore
 from hydra_zen.typing._implementations import _SupportedViaBuilds  # type: ignore
 
 from ._implementations import sanitized_default_value
-from ._value_conversion import ConfigComplex, ConfigPath
+from ._value_conversion import ConfigComplex
 
 # pyright: strict
 
@@ -25,11 +24,6 @@ def just(obj: TP) -> TP:  # pragma: no cover
 
 @overload
 def just(obj: complex) -> ConfigComplex:  # pragma: no cover
-    ...
-
-
-@overload
-def just(obj: Path) -> ConfigPath:  # pragma: no cover
     ...
 
 
