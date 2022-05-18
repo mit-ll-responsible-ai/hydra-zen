@@ -5,11 +5,13 @@ from dataclasses import dataclass, field
 from pathlib import Path, PosixPath, WindowsPath
 from typing import Any, Callable, Dict, Tuple, Type, cast
 
+from hydra_zen._compatibility import ZEN_SUPPORTED_PRIMITIVES
 from hydra_zen.typing import Builds
 
 from ._utils import get_obj_path
 
 # Some primitive support implemented in _implementations.py
+
 ZEN_VALUE_CONVERSION: Dict[type, Callable[[Any], Any]] = {}
 
 
@@ -33,10 +35,11 @@ class ConfigPath:
     _target_: str = field(default=get_obj_path(Path), init=False)
 
 
-def convert_path(value: Path) -> Builds[Type[Path]]:
-    return cast(Builds[Type[Path]], ConfigPath(_args_=(str(value),)))
+if Path in ZEN_SUPPORTED_PRIMITIVES:  # pragma no cover
 
+    def convert_path(value: Path) -> Builds[Type[Path]]:
+        return cast(Builds[Type[Path]], ConfigPath(_args_=(str(value),)))
 
-ZEN_VALUE_CONVERSION[Path] = convert_path
-ZEN_VALUE_CONVERSION[PosixPath] = convert_path
-ZEN_VALUE_CONVERSION[WindowsPath] = convert_path
+    ZEN_VALUE_CONVERSION[Path] = convert_path
+    ZEN_VALUE_CONVERSION[PosixPath] = convert_path
+    ZEN_VALUE_CONVERSION[WindowsPath] = convert_path

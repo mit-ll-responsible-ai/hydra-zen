@@ -5,6 +5,7 @@ import sys
 import warnings
 from dataclasses import MISSING, field as _field, is_dataclass
 from enum import Enum
+from pathlib import Path
 from typing import (
     Any,
     Callable,
@@ -29,6 +30,7 @@ from typing_extensions import Final, TypeGuard
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVE_TYPES,
     HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES,
+    HYDRA_SUPPORTS_PARTIAL,
     PATCH_OMEGACONF_830,
 )
 from hydra_zen.errors import HydraZenValidationError
@@ -368,12 +370,16 @@ def sanitized_type(
 
         return Any
 
+    if HYDRA_SUPPORTS_PARTIAL and isinstance(type_, type) and issubclass(type_, Path):
+        type_ = Path
+
     if (
         type_ is Any
         or type_ in HYDRA_SUPPORTED_PRIMITIVE_TYPES
         or is_dataclass(type_)
         or (isinstance(type_, type) and issubclass(type_, Enum))
     ):
+
         if wrap_optional and type_ is not Any:  # pragma: no cover
             # normally get_type_hints automatically resolves Optional[...]
             # when None is set as the default, but this has been flaky

@@ -141,7 +141,7 @@ def check_just():
     reveal_type(just("hi"), expected_text="str")
     reveal_type(just(b"1234"), expected_text="bytes")
     reveal_type(just(1 + 2j), expected_text="ConfigComplex")
-    reveal_type(just(Path.home()), expected_text="ConfigPath")
+    reveal_type(just(Path.home()), expected_text="Path")
     reveal_type(just(partial(f, 1)), expected_text="Type[Just[partial[int]]]")
     reveal_type(just(set([1, 2, 3])), expected_text="Builds[Type[set[int]]]")
     reveal_type(just(range(10)), expected_text="Builds[Type[range]]")

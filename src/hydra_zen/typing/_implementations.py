@@ -6,7 +6,7 @@
 import sys
 import types
 from enum import Enum
-from pathlib import Path
+from pathlib import Path, PosixPath, WindowsPath
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -186,12 +186,7 @@ class HasTarget(Protocol):  # pragma: no cover
 Importable = TypeVar("Importable", bound=Callable[..., Any])
 
 _HydraPrimitive: TypeAlias = Union[
-    bool,
-    None,
-    int,
-    float,
-    str,
-    ByteString,
+    bool, None, int, float, str, ByteString, Path, WindowsPath, PosixPath
 ]
 
 _SupportedViaBuilds = Union[
@@ -208,7 +203,6 @@ _SupportedPrimitive: TypeAlias = Union[
     Enum,
     DataClass_,
     complex,
-    Path,
     _SupportedViaBuilds,
     EmptyDict,  # not covered by Mapping[..., ...]]
 ]
