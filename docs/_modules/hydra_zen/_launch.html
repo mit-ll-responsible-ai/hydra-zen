@@ -185,6 +185,7 @@
 <span class="kn">from</span> <span class="nn">hydra.types</span> <span class="kn">import</span> <span class="n">HydraContext</span><span class="p">,</span> <span class="n">RunMode</span>
 <span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">,</span> <span class="n">OmegaConf</span>
 
+<span class="kn">from</span> <span class="nn">hydra_zen._compatibility</span> <span class="kn">import</span> <span class="n">HYDRA_VERSION</span>
 <span class="kn">from</span> <span class="nn">hydra_zen._hydra_overloads</span> <span class="kn">import</span> <span class="n">instantiate</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass</span>
 
@@ -407,7 +408,11 @@
     <span class="k">with</span> <span class="n">initialize</span><span class="p">(</span>
         <span class="n">config_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">job_name</span><span class="o">=</span><span class="n">job_name</span><span class="p">,</span>
-        <span class="o">**</span><span class="p">({}</span> <span class="k">if</span> <span class="n">version_base</span> <span class="ow">is</span> <span class="n">_NotSet</span> <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;version_base&quot;</span><span class="p">:</span> <span class="n">version_base</span><span class="p">})</span>
+        <span class="o">**</span><span class="p">(</span>
+            <span class="p">{}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">HYDRA_VERSION</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">version_base</span> <span class="ow">is</span> <span class="n">_NotSet</span><span class="p">)</span>
+            <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;version_base&quot;</span><span class="p">:</span> <span class="n">version_base</span><span class="p">}</span>
+        <span class="p">)</span>
     <span class="p">):</span>
 
         <span class="c1"># taken from hydra.compose with support for MULTIRUN</span>
