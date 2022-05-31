@@ -28,7 +28,7 @@ from typing import (
     Union,
 )
 
-from omegaconf import DictConfig, ListConfig
+from omegaconf import Container
 from typing_extensions import (
     Literal,
     ParamSpec,
@@ -197,8 +197,7 @@ _SupportedViaBuilds = Union[
 
 _SupportedPrimitive: TypeAlias = Union[
     _HydraPrimitive,
-    ListConfig,
-    DictConfig,
+    Container,
     Callable[..., Any],
     Enum,
     DataClass_,

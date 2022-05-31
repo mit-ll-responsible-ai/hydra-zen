@@ -11,7 +11,7 @@ from hydra.core.global_hydra import GlobalHydra
 from hydra.core.utils import JobReturn, run_job
 from hydra.plugins.sweeper import Sweeper
 from hydra.types import HydraContext, RunMode
-from omegaconf import DictConfig, ListConfig, OmegaConf
+from omegaconf import Container, DictConfig, OmegaConf
 
 from hydra_zen._compatibility import HYDRA_VERSION
 from hydra_zen._hydra_overloads import instantiate
@@ -23,14 +23,14 @@ class _NotSet:  # pragma: no cover
 
 
 def _store_config(
-    cfg: Union[DataClass, Type[DataClass], DictConfig, ListConfig, Mapping[Any, Any]],
+    cfg: Union[DataClass, Type[DataClass], Container, Mapping[Any, Any]],
     config_name: str = "hydra_launch",
 ) -> str:
     """Stores configuration object in Hydra's ConfigStore.
 
     Parameters
     ----------
-    cfg : Union[DataClass, DictConfig, Mapping]
+    cfg : DataClass | ListConfig | DictConfig | Mapping[Any, Any]
         A configuration as a dataclass, configuration object, or a dictionary.
 
     config_name : str (default: hydra_launch)

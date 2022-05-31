@@ -26,7 +26,7 @@ from functools import wraps
 from typing import IO, Any, Callable, Type, TypeVar, Union, cast, overload
 
 from hydra.utils import instantiate as hydra_instantiate
-from omegaconf import MISSING, DictConfig, ListConfig, OmegaConf
+from omegaconf import MISSING, Container, OmegaConf
 
 from .structured_configs._just import just
 from .structured_configs._value_conversion import ConfigComplex, ConfigPath
@@ -88,7 +88,7 @@ def instantiate(
 
 @overload
 def instantiate(
-    config: Union[HasTarget, ListConfig, DictConfig, DataClass_, Type[DataClass_]],
+    config: Union[HasTarget, Container, DataClass_, Type[DataClass_]],
     *args: Any,
     **kwargs: Any
 ) -> Any:  # pragma: no cover
@@ -356,9 +356,7 @@ def save_as_yaml(
     return OmegaConf.save(config=config, f=f, resolve=resolve)
 
 
-def load_from_yaml(
-    file_: Union[str, pathlib.Path, IO[Any]]
-) -> Union[DictConfig, ListConfig]:
+def load_from_yaml(file_: Union[str, pathlib.Path, IO[Any]]) -> Container:
     """
     Load a config from a yaml-format file
 
