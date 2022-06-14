@@ -42,12 +42,12 @@ except ImportError:  # pragma: no cover
     # remove at Python 3.7 end-of-life
     from collections.abc import Callable as _Callable
 
-    def get_origin(obj: Any) -> Union[None, type]:
+    def get_origin(tp: Any) -> Union[None, type]:
         """Get the unsubscripted version of a type.
 
         Parameters
         ----------
-        obj : Any
+        tp : Any
 
         Returns
         -------
@@ -67,14 +67,14 @@ except ImportError:  # pragma: no cover
         >>> assert get_origin(Union[T, int]) is Union
         >>> assert get_origin(List[Tuple[T, T]][int]) == list
         """
-        return getattr(obj, "__origin__", None)
+        return getattr(tp, "__origin__", None)
 
-    def get_args(obj: Any) -> Union[Tuple[type, ...], Tuple[List[type], type]]:
+    def get_args(tp: Any) -> Union[Tuple[type, ...], Tuple[List[type], type]]:
         """Get type arguments with all substitutions performed.
 
         Parameters
         ----------
-        obj : Any
+        tp : Any
 
         Returns
         -------
@@ -89,9 +89,9 @@ except ImportError:  # pragma: no cover
         >>> assert get_args(Union[int, Tuple[T, int]][str]) == (int, Tuple[str, int])
         >>> assert get_args(Callable[[], T][int]) == ([], int)
         """
-        if hasattr(obj, "__origin__") and hasattr(obj, "__args__"):
-            args = obj.__args__
-            if get_origin(obj) is _Callable and args and args[0] is not Ellipsis:
+        if hasattr(tp, "__origin__") and hasattr(tp, "__args__"):
+            args = tp.__args__
+            if get_origin(tp) is _Callable and args and args[0] is not Ellipsis:
                 args = (list(args[:-1]), args[-1])
             return args
         return ()
