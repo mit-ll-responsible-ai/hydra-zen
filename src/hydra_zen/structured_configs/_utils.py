@@ -25,7 +25,14 @@ from typing import (
 )
 
 from omegaconf import II
-from typing_extensions import Final, TypeGuard
+from typing_extensions import (
+    Final,
+    ParamSpecArgs,
+    ParamSpecKwargs,
+    TypeGuard,
+    Unpack,
+    _AnnotatedAlias,
+)
 
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVE_TYPES,
@@ -303,6 +310,14 @@ def sanitized_type(
     >>> sanitized_type(Dict[str, frozenset])
     Dict[str, Any]
     """
+    if hasattr(type_, "__supertype__"):
+        # is NewType
+        return sanitized_type(
+            type_.__supertype__,
+            primitive_only=primitive_only,
+            wrap_optional=wrap_optional,
+            nested=nested,
+        )
 
     # Warning: mutating `type_` will mutate the signature being inspected
     # Even calling deepcopy(`type_`) silently fails to prevent this.
@@ -310,6 +325,15 @@ def sanitized_type(
     no_nested_container = not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES
 
     if origin is not None:
+
+        if isinstance(type_, _AnnotatedAlias):
+            return sanitized_type(
+                origin,
+                primitive_only=primitive_only,
+                wrap_optional=wrap_optional,
+                nested=nested,
+            )
+
         if primitive_only:  # pragma: no cover
             return Any
 
@@ -357,13 +381,28 @@ def sanitized_type(
             args = cast(Tuple[type, ...], args)
             unique_args = set(args)
             has_ellipses = Ellipsis in unique_args
+            has_variadic_unpack = any(get_origin(tp) is Unpack for tp in unique_args)
 
-            _unique_type = (
-                sanitized_type(args[0], primitive_only=no_nested_container, nested=True)
-                if len(unique_args) == 1 or (len(unique_args) == 2 and has_ellipses)
-                else Any
-            )
-            if has_ellipses:
+            if len(unique_args) == 1 or (len(unique_args) == 2 and has_ellipses):
+                # E.g. Tuple[int, int, int] or Tuple[int, ...]
+                _unique_type = sanitized_type(
+                    args[0], primitive_only=no_nested_container, nested=True
+                )
+            elif len(unique_args) == 2 and has_variadic_unpack:
+                # E.g. Tuple[int, *Ts]
+                _a = Any
+                for item in args:
+                    if get_origin(item) is not Unpack:
+                        _a = item
+                        break
+                _unique_type = sanitized_type(
+                    _a, primitive_only=no_nested_container, nested=True
+                )
+                del _a
+            else:
+                _unique_type = Any
+
+            if has_ellipses or has_variadic_unpack:
                 return Tuple[_unique_type, ...]  # type: ignore
             else:
                 return Tuple[(_unique_type,) * len(args)]  # type: ignore
@@ -372,6 +411,10 @@ def sanitized_type(
 
     if HYDRA_SUPPORTS_PARTIAL and isinstance(type_, type) and issubclass(type_, Path):
         type_ = Path
+
+    if isinstance(type_, (ParamSpecArgs, ParamSpecKwargs)):
+        # these aren't hashable -- can't check for membership in set
+        return Any
 
     if (
         type_ is Any
