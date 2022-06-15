@@ -167,6 +167,7 @@ NoneType: TypeAlias = None
         (P.args, Any),  # type: ignore
         (P.kwargs, Any),  # type: ignore
         (Ts, Any),
+        (Tuple[Unpack[Ts]], Tuple[Any, ...]),
         (Tuple[Unpack[Ts], int], Tuple[int, ...]),
         (Tuple[str, Unpack[Ts]], Tuple[str, ...]),
         (Tuple[str, Unpack[Ts], int], Tuple[Any, ...]),
