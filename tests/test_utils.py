@@ -167,10 +167,34 @@ NoneType: TypeAlias = None
         (P.args, Any),  # type: ignore
         (P.kwargs, Any),  # type: ignore
         (Ts, Any),
-        (Tuple[Unpack[Ts]], Tuple[Any, ...]),
-        (Tuple[Unpack[Ts], int], Tuple[int, ...]),
-        (Tuple[str, Unpack[Ts]], Tuple[str, ...]),
-        (Tuple[str, Unpack[Ts], int], Tuple[Any, ...]),
+        pytest.param(
+            Tuple[Unpack[Ts]],
+            Tuple[Any, ...],
+            marks=pytest.mark.skipif(
+                sys.version_info <= (3, 7), reason="Python 3.6 doesn't support Unpack"
+            ),
+        ),
+        pytest.param(
+            Tuple[Unpack[Ts], int],
+            Tuple[int, ...],
+            marks=pytest.mark.skipif(
+                sys.version_info < (3, 7), reason="Python 3.6 doesn't support Unpack"
+            ),
+        ),
+        pytest.param(
+            Tuple[str, Unpack[Ts]],
+            Tuple[str, ...],
+            marks=pytest.mark.skipif(
+                sys.version_info < (3, 7), reason="Python 3.6 doesn't support Unpack"
+            ),
+        ),
+        pytest.param(
+            Tuple[str, Unpack[Ts], int],
+            Tuple[Any, ...],
+            marks=pytest.mark.skipif(
+                sys.version_info < (3, 7), reason="Python 3.6 doesn't support Unpack"
+            ),
+        ),
         (Annotated[int, int], int),
         (Annotated[Tuple[str, str], int], Tuple[str, str]),
         (Annotated[Builds, int], Any),
@@ -267,6 +291,7 @@ def test_sanitized_type_expected_behavior(in_type, expected_type):
                 KeyValidationError,
                 ConfigIndexError,
                 ConfigValueError,
+                AttributeError,
             )
         ):
             Conf = OmegaConf.create(Bad)  # type: ignore
