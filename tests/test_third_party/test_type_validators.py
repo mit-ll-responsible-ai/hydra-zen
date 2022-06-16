@@ -211,7 +211,6 @@ class UserIdentity(TypedDict):
         (Union[List[str], str], dict(a=1)),
         (MyNamedTuple, (1.0, 2.0)),
         (xf.add(UserIdentity, BEAR), dict(first="bruce", last="lee")),
-        (Annotated[int, "special"], "hello"),
     ],
 )
 @pytest.mark.parametrize("validator", all_validators)
