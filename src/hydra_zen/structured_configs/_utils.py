@@ -26,6 +26,7 @@ from typing import (
 
 from omegaconf import II
 from typing_extensions import (
+    Annotated,
     Final,
     ParamSpecArgs,
     ParamSpecKwargs,
@@ -326,9 +327,25 @@ def sanitized_type(
 
     if origin is not None:
 
+        # Support for Annotated[x, y]
+
         if isinstance(type_, _AnnotatedAlias):
+            # Python 3.7-3.8
+            # type_: Annotated[x, y]; origin -> x
             return sanitized_type(
                 origin,
+                primitive_only=primitive_only,
+                wrap_optional=wrap_optional,
+                nested=nested,
+            )
+
+        if origin is Annotated:
+            # Python 3.9+
+            # # type_: Annotated[x, y]; origin -> Annotated; args -> (x, y)
+            tp, _ = get_args(origin)
+
+            return sanitized_type(
+                tp,
                 primitive_only=primitive_only,
                 wrap_optional=wrap_optional,
                 nested=nested,
