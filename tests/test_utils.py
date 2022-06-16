@@ -176,14 +176,14 @@ NoneType: TypeAlias = None
         ),
         pytest.param(
             Tuple[Unpack[Ts], int],
-            Tuple[int, ...],
+            Tuple[Any, ...],
             marks=pytest.mark.skipif(
                 sys.version_info < (3, 7), reason="Python 3.6 doesn't support Unpack"
             ),
         ),
         pytest.param(
             Tuple[str, Unpack[Ts]],
-            Tuple[str, ...],
+            Tuple[Any, ...],
             marks=pytest.mark.skipif(
                 sys.version_info < (3, 7), reason="Python 3.6 doesn't support Unpack"
             ),

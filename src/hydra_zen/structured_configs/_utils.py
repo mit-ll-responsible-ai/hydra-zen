@@ -412,17 +412,6 @@ def sanitized_type(
                 _unique_type = sanitized_type(
                     args[0], primitive_only=no_nested_container, nested=True
                 )
-            elif len(unique_args) == 2 and has_variadic_unpack:
-                # E.g. Tuple[int, *Ts]
-                _a = Any
-                for item in args:
-                    if get_origin(item) is not Unpack:
-                        _a = item
-                        break
-                _unique_type = sanitized_type(
-                    _a, primitive_only=no_nested_container, nested=True
-                )
-                del _a
             else:
                 _unique_type = Any
 
