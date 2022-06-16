@@ -47,6 +47,7 @@ from hydra_zen import builds, instantiate, mutable_value
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTS_BYTES,
     HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES,
+    HYDRA_VERSION,
     HYDRA_SUPPORTS_Path,
     Version,
     _get_version,
@@ -184,16 +185,30 @@ NoneType: TypeAlias = None
         pytest.param(
             Tuple[str, Unpack[Ts]],
             Tuple[Any, ...],
-            marks=pytest.mark.skipif(
-                sys.version_info < (3, 7), reason="Python 3.6 doesn't support Unpack"
-            ),
+            marks=[
+                pytest.mark.skipif(
+                    sys.version_info < (3, 7),
+                    reason="Python 3.6 doesn't support Unpack",
+                ),
+                pytest.mark.xfail(
+                    HYDRA_VERSION < Version(1, 2, 0),
+                    reason="Hydra 1.1.2 doesn't parse tuples deeply.",
+                ),
+            ],
         ),
         pytest.param(
             Tuple[str, Unpack[Ts], int],
             Tuple[Any, ...],
-            marks=pytest.mark.skipif(
-                sys.version_info < (3, 7), reason="Python 3.6 doesn't support Unpack"
-            ),
+            marks=[
+                pytest.mark.skipif(
+                    sys.version_info < (3, 7),
+                    reason="Python 3.6 doesn't support Unpack",
+                ),
+                pytest.mark.xfail(
+                    HYDRA_VERSION < Version(1, 2, 0),
+                    reason="Hydra 1.1.2 doesn't parse tuples deeply.",
+                ),
+            ],
         ),
         (Annotated[int, int], int),
         (Annotated[Tuple[str, str], int], Tuple[str, str]),
