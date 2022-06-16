@@ -335,14 +335,11 @@ def sanitized_type(
     if origin is not None:
 
         # Support for Annotated[x, y]
-
         # Python 3.9+
         # # type_: Annotated[x, y]; origin -> Annotated; args -> (x, y)
         if origin is Annotated:  # pragma: no cover
-            tp, _ = get_args(type_)
-
             return sanitized_type(
-                tp,
+                get_args(type_)[0],
                 primitive_only=primitive_only,
                 wrap_optional=wrap_optional,
                 nested=nested,
@@ -404,18 +401,21 @@ def sanitized_type(
                 return Any  # bare Tuple not supported by hydra
             args = cast(Tuple[type, ...], args)
             unique_args = set(args)
+
+            if any(get_origin(tp) is Unpack for tp in unique_args):
+                # E.g. Tuple[*Ts]
+                return Tuple[Any, ...]
+
             has_ellipses = Ellipsis in unique_args
-            has_variadic_unpack = any(get_origin(tp) is Unpack for tp in unique_args)
 
-            if len(unique_args) == 1 or (len(unique_args) == 2 and has_ellipses):
-                # E.g. Tuple[int, int, int] or Tuple[int, ...]
-                _unique_type = sanitized_type(
-                    args[0], primitive_only=no_nested_container, nested=True
-                )
-            else:
-                _unique_type = Any
+            # E.g. Tuple[int, int, int] or Tuple[int, ...]
+            _unique_type = (
+                sanitized_type(args[0], primitive_only=no_nested_container, nested=True)
+                if len(unique_args) == 1 or (len(unique_args) == 2 and has_ellipses)
+                else Any
+            )
 
-            if has_ellipses or has_variadic_unpack:
+            if has_ellipses:
                 return Tuple[_unique_type, ...]  # type: ignore
             else:
                 return Tuple[(_unique_type,) * len(args)]  # type: ignore
