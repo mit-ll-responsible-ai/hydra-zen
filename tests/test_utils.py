@@ -168,6 +168,7 @@ NoneType: TypeAlias = None
         (P.args, Any),  # type: ignore
         (P.kwargs, Any),  # type: ignore
         (Ts, Any),
+        (SomeProtocol[T], Any),
         pytest.param(
             Tuple[Unpack[Ts]],
             Tuple[Any, ...],
@@ -192,7 +193,7 @@ NoneType: TypeAlias = None
                 ),
                 pytest.mark.xfail(
                     HYDRA_VERSION < Version(1, 2, 0),
-                    reason="Hydra 1.1.2 doesn't parse tuples deeply.",
+                    reason="Hydra 1.1.2 doesn't parse tuples beyond first element.",
                 ),
             ],
         ),
@@ -206,7 +207,7 @@ NoneType: TypeAlias = None
                 ),
                 pytest.mark.xfail(
                     HYDRA_VERSION < Version(1, 2, 0),
-                    reason="Hydra 1.1.2 doesn't parse tuples deeply.",
+                    reason="Hydra 1.1.2 doesn't parse tuples beyond first element.",
                 ),
             ],
         ),
