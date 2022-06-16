@@ -26,6 +26,16 @@ OmegaConf ``v2.2.1`` is added native support for the following types:
 hydra-zen :ref:`already provides support for these <additional-types>`, but this version will defer to OmegaConf's native support when possible. (See :pull:`276`)
 
 
+Improvements
+------------
+- The :ref:`automatic type refinement <type-support>` performed by :func:`~hydra_zen.builds` now has enhanced support for ``typing.Annotated``, ``typing.NewType``, and ``typing.TypeVarTuple``. (See :pull:`283`)
+
+
+Bug Fixes
+---------
+- :func:`~hydra_zen.builds` would raise a ``TypeError`` if it encountered a target whose signature contained the annotations ``ParamSpecArgs`` or  ``ParamSpecKwargs``. It can now sanitize these annotations properly. (See :pull:`283`)
+
+
 .. _v0.7.0:
 
 ------------------
