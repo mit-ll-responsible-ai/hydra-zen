@@ -32,8 +32,15 @@ from typing_extensions import (
     ParamSpecKwargs,
     TypeGuard,
     Unpack,
-    _AnnotatedAlias,
 )
+
+try:
+    from typing_extensions import _AnnotatedAlias
+except ImportError:  # pragma: no cover
+    # Python 3.6
+    class _AnnotatedAlias:
+        ...
+
 
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVE_TYPES,
@@ -329,9 +336,9 @@ def sanitized_type(
 
         # Support for Annotated[x, y]
 
-        if origin is Annotated:
-            # Python 3.9+
-            # # type_: Annotated[x, y]; origin -> Annotated; args -> (x, y)
+        # Python 3.9+
+        # # type_: Annotated[x, y]; origin -> Annotated; args -> (x, y)
+        if origin is Annotated:  # pragma: no cover
             tp, _ = get_args(type_)
 
             return sanitized_type(
@@ -341,9 +348,9 @@ def sanitized_type(
                 nested=nested,
             )
 
+        # Python 3.7-3.8
+        # type_: Annotated[x, y]; origin -> x
         if isinstance(type_, _AnnotatedAlias):
-            # Python 3.7-3.8
-            # type_: Annotated[x, y]; origin -> x
             return sanitized_type(
                 origin,
                 primitive_only=primitive_only,
