@@ -329,23 +329,23 @@ def sanitized_type(
 
         # Support for Annotated[x, y]
 
-        if isinstance(type_, _AnnotatedAlias):
-            # Python 3.7-3.8
-            # type_: Annotated[x, y]; origin -> x
+        if origin is Annotated:
+            # Python 3.9+
+            # # type_: Annotated[x, y]; origin -> Annotated; args -> (x, y)
+            tp, _ = get_args(type_)
+
             return sanitized_type(
-                origin,
+                tp,
                 primitive_only=primitive_only,
                 wrap_optional=wrap_optional,
                 nested=nested,
             )
 
-        if origin is Annotated:
-            # Python 3.9+
-            # # type_: Annotated[x, y]; origin -> Annotated; args -> (x, y)
-            tp, _ = get_args(origin)
-
+        if isinstance(type_, _AnnotatedAlias):
+            # Python 3.7-3.8
+            # type_: Annotated[x, y]; origin -> x
             return sanitized_type(
-                tp,
+                origin,
                 primitive_only=primitive_only,
                 wrap_optional=wrap_optional,
                 nested=nested,
