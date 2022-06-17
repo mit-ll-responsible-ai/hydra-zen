@@ -19,6 +19,7 @@ CLASSIFIERS = [
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
     "Topic :: Scientific/Engineering",
 ]
 KEYWORDS = (
@@ -26,7 +27,7 @@ KEYWORDS = (
 )
 INSTALL_REQUIRES = [
     "hydra-core >= 1.1.0",
-    "typing-extensions >= 4.0.1",
+    "typing-extensions >= 4.1.0",
 ]
 TESTS_REQUIRE = [
     "pytest >= 3.8",

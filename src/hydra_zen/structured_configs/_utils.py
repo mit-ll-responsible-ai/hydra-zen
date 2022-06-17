@@ -5,6 +5,7 @@ import sys
 import warnings
 from dataclasses import MISSING, field as _field, is_dataclass
 from enum import Enum
+from pathlib import Path
 from typing import (
     Any,
     Callable,
@@ -24,11 +25,27 @@ from typing import (
 )
 
 from omegaconf import II, MISSING, DictConfig, ListConfig
-from typing_extensions import Final, TypeGuard
+from typing_extensions import (
+    Annotated,
+    Final,
+    ParamSpecArgs,
+    ParamSpecKwargs,
+    TypeGuard,
+    Unpack,
+)
+
+try:
+    from typing_extensions import _AnnotatedAlias
+except ImportError:  # pragma: no cover
+    # Python 3.6
+    class _AnnotatedAlias:
+        ...
+
 
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVE_TYPES,
     HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES,
+    HYDRA_SUPPORTS_PARTIAL,
     PATCH_OMEGACONF_830,
 )
 from hydra_zen.errors import HydraZenValidationError
@@ -40,12 +57,12 @@ except ImportError:  # pragma: no cover
     # remove at Python 3.7 end-of-life
     from collections.abc import Callable as _Callable
 
-    def get_origin(obj: Any) -> Union[None, type]:
+    def get_origin(tp: Any) -> Union[None, type]:
         """Get the unsubscripted version of a type.
 
         Parameters
         ----------
-        obj : Any
+        tp : Any
 
         Returns
         -------
@@ -65,14 +82,14 @@ except ImportError:  # pragma: no cover
         >>> assert get_origin(Union[T, int]) is Union
         >>> assert get_origin(List[Tuple[T, T]][int]) == list
         """
-        return getattr(obj, "__origin__", None)
+        return getattr(tp, "__origin__", None)
 
-    def get_args(obj: Any) -> Union[Tuple[type, ...], Tuple[List[type], type]]:
+    def get_args(tp: Any) -> Union[Tuple[type, ...], Tuple[List[type], type]]:
         """Get type arguments with all substitutions performed.
 
         Parameters
         ----------
-        obj : Any
+        tp : Any
 
         Returns
         -------
@@ -87,9 +104,9 @@ except ImportError:  # pragma: no cover
         >>> assert get_args(Union[int, Tuple[T, int]][str]) == (int, Tuple[str, int])
         >>> assert get_args(Callable[[], T][int]) == ([], int)
         """
-        if hasattr(obj, "__origin__") and hasattr(obj, "__args__"):
-            args = obj.__args__
-            if get_origin(obj) is _Callable and args and args[0] is not Ellipsis:
+        if hasattr(tp, "__origin__") and hasattr(tp, "__args__"):
+            args = tp.__args__
+            if get_origin(tp) is _Callable and args and args[0] is not Ellipsis:
                 args = (list(args[:-1]), args[-1])
             return args
         return ()
@@ -301,6 +318,14 @@ def sanitized_type(
     >>> sanitized_type(Dict[str, frozenset])
     Dict[str, Any]
     """
+    if hasattr(type_, "__supertype__"):
+        # is NewType
+        return sanitized_type(
+            type_.__supertype__,
+            primitive_only=primitive_only,
+            wrap_optional=wrap_optional,
+            nested=nested,
+        )
 
     # Warning: mutating `type_` will mutate the signature being inspected
     # Even calling deepcopy(`type_`) silently fails to prevent this.
@@ -308,7 +333,29 @@ def sanitized_type(
     no_nested_container = not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES
 
     if origin is not None:
-        if primitive_only:
+
+        # Support for Annotated[x, y]
+        # Python 3.9+
+        # # type_: Annotated[x, y]; origin -> Annotated; args -> (x, y)
+        if origin is Annotated:  # pragma: no cover
+            return sanitized_type(
+                get_args(type_)[0],
+                primitive_only=primitive_only,
+                wrap_optional=wrap_optional,
+                nested=nested,
+            )
+
+        # Python 3.7-3.8
+        # type_: Annotated[x, y]; origin -> x
+        if isinstance(type_, _AnnotatedAlias):
+            return sanitized_type(
+                origin,
+                primitive_only=primitive_only,
+                wrap_optional=wrap_optional,
+                nested=nested,
+            )
+
+        if primitive_only:  # pragma: no cover
             return Any
 
         args = get_args(type_)
@@ -354,18 +401,32 @@ def sanitized_type(
                 return Any  # bare Tuple not supported by hydra
             args = cast(Tuple[type, ...], args)
             unique_args = set(args)
+
+            if any(get_origin(tp) is Unpack for tp in unique_args):
+                # E.g. Tuple[*Ts]
+                return Tuple[Any, ...]
+
             has_ellipses = Ellipsis in unique_args
 
+            # E.g. Tuple[int, int, int] or Tuple[int, ...]
             _unique_type = (
                 sanitized_type(args[0], primitive_only=no_nested_container, nested=True)
                 if len(unique_args) == 1 or (len(unique_args) == 2 and has_ellipses)
                 else Any
             )
+
             if has_ellipses:
                 return Tuple[_unique_type, ...]  # type: ignore
             else:
                 return Tuple[(_unique_type,) * len(args)]  # type: ignore
 
+        return Any
+
+    if HYDRA_SUPPORTS_PARTIAL and isinstance(type_, type) and issubclass(type_, Path):
+        type_ = Path
+
+    if isinstance(type_, (ParamSpecArgs, ParamSpecKwargs)):
+        # these aren't hashable -- can't check for membership in set
         return Any
 
     if (
@@ -374,13 +435,14 @@ def sanitized_type(
         or is_dataclass(type_)
         or (isinstance(type_, type) and issubclass(type_, Enum))
     ):
+
         if wrap_optional and type_ is not Any:  # pragma: no cover
             # normally get_type_hints automatically resolves Optional[...]
             # when None is set as the default, but this has been flaky
             # for some pytorch-lightning classes. So we just do it ourselves...
             # It might be worth removing this later since none of our standard tests
             # cover it.
-            type_ = Optional[type_]
+            type_ = Optional[type_]  # type: ignore
         return type_
 
     # Needed to cover python 3.6 where __origin__ doesn't normalize to type
@@ -429,17 +491,17 @@ def check_suspicious_interpolations(
 
 
 def mutable_default_permitted(bases: Iterable[DataClass_], field_name: str) -> bool:
-    if not PATCH_OMEGACONF_830:  # pragma: no cover
+    if not PATCH_OMEGACONF_830:
         return True
-
-    for base in bases:
-        if (
-            field_name in base.__dataclass_fields__
-            and base.__dataclass_fields__[field_name].default is not MISSING
-        ):
-            # see https://github.com/omry/omegaconf/issues/830
-            return False
-    return True
+    else:  # pragma: no cover
+        for base in bases:
+            if (
+                field_name in base.__dataclass_fields__
+                and base.__dataclass_fields__[field_name].default is not MISSING
+            ):
+                # see https://github.com/omry/omegaconf/issues/830
+                return False
+        return True
 
 
 def valid_defaults_list(hydra_defaults: Any) -> bool:

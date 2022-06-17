@@ -92,7 +92,7 @@ def _repack_zenfield(value: ZenField, name: str, bases: Tuple[DataClass_, ...]):
         and not _utils.mutable_default_permitted(bases, field_name=name)
         and isinstance(default, _Field)
         and default.default_factory is not MISSING
-    ):
+    ):  # pragma: no cover
         return ZenField(
             hint=value.hint,
             default=default.default_factory(),

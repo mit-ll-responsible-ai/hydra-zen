@@ -141,7 +141,7 @@ def check_just():
     reveal_type(just("hi"), expected_text="str")
     reveal_type(just(b"1234"), expected_text="bytes")
     reveal_type(just(1 + 2j), expected_text="ConfigComplex")
-    reveal_type(just(Path.home()), expected_text="ConfigPath")
+    reveal_type(just(Path.home()), expected_text="Path")
     reveal_type(just(partial(f, 1)), expected_text="Type[Just[partial[int]]]")
     reveal_type(just(set([1, 2, 3])), expected_text="Builds[Type[set[int]]]")
     reveal_type(just(range(10)), expected_text="Builds[Type[range]]")
@@ -818,7 +818,7 @@ def check_overloads_arent_too_restrictive():
 
         reveal_type(
             bout,
-            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Type[R@builds], P@builds]]",
+            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Unknown, (*args: Unknown, **kwargs: Unknown)]]",
         )
 
         fout = fbuilds(
@@ -837,7 +837,7 @@ def check_overloads_arent_too_restrictive():
 
         reveal_type(
             fout,
-            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Type[R@__call__], P@__call__]]",
+            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Unknown, (*args: Unknown, **kwargs: Unknown)]]",
         )
 
         pout = pbuilds(
@@ -856,7 +856,7 @@ def check_overloads_arent_too_restrictive():
 
         reveal_type(
             pout,
-            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Type[R@__call__], P@__call__]]",
+            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Unknown, (*args: Unknown, **kwargs: Unknown)]]",
         )
 
     assert caller

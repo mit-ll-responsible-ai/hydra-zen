@@ -13,6 +13,7 @@ from hydra.plugins.sweeper import Sweeper
 from hydra.types import HydraContext, RunMode
 from omegaconf import DictConfig, ListConfig, OmegaConf
 
+from hydra_zen._compatibility import HYDRA_VERSION
 from hydra_zen._hydra_overloads import instantiate
 from hydra_zen.typing._implementations import DataClass
 
@@ -235,7 +236,11 @@ def launch(
     with initialize(
         config_path=None,
         job_name=job_name,
-        **({} if version_base is _NotSet else {"version_base": version_base})
+        **(
+            {}
+            if (HYDRA_VERSION < (1, 2, 0) or version_base is _NotSet)
+            else {"version_base": version_base}
+        )
     ):
 
         # taken from hydra.compose with support for MULTIRUN

@@ -6,7 +6,20 @@ import random
 import string
 import sys
 from dataclasses import dataclass, field as dataclass_field
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Type, TypeVar, Union
+from pathlib import Path, PosixPath, WindowsPath
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    List,
+    NewType,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
 
 import hypothesis.strategies as st
 import pytest
@@ -18,12 +31,24 @@ from omegaconf.errors import (
     ConfigValueError,
     KeyValidationError,
 )
-from typing_extensions import Final, Literal
+from typing_extensions import (
+    Annotated,
+    Final,
+    Literal,
+    ParamSpec,
+    Protocol,
+    Self,
+    TypeAlias,
+    TypeVarTuple,
+    Unpack,
+)
 
 from hydra_zen import builds, instantiate, mutable_value
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTS_BYTES,
     HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES,
+    HYDRA_VERSION,
+    HYDRA_SUPPORTS_Path,
     Version,
     _get_version,
 )
@@ -37,6 +62,8 @@ from hydra_zen.typing import Builds
 from tests import everything_except
 
 T = TypeVar("T")
+P = ParamSpec("P")
+Ts = TypeVarTuple("Ts")
 
 current_module: str = sys.modules[__name__].__name__
 
@@ -106,7 +133,11 @@ class Color(enum.Enum):
     pass
 
 
-NoneType = type(None)
+class SomeProtocol(Protocol[T]):
+    ...
+
+
+NoneType: TypeAlias = None
 
 
 @pytest.mark.parametrize(
@@ -117,6 +148,9 @@ NoneType = type(None)
         (str, str),
         (bool, bool),
         (bytes, bytes if HYDRA_SUPPORTS_BYTES else Any),
+        (Path, Path if HYDRA_SUPPORTS_Path else Any),
+        (PosixPath, Path if HYDRA_SUPPORTS_Path else Any),
+        (WindowsPath, Path if HYDRA_SUPPORTS_Path else Any),
         (Color, Color),
         (C, Any),  # unsupported primitives
         (type(None), Any),
@@ -127,6 +161,62 @@ NoneType = type(None)
         (callable, Any),
         (frozenset, Any),
         (T, Any),
+        (List[T], List[Any]),
+        (Tuple[T, T], Tuple[Any, Any]),
+        (Callable[P, int], Any),
+        (P, Any),
+        (P.args, Any),  # type: ignore
+        (P.kwargs, Any),  # type: ignore
+        (Ts, Any),
+        (SomeProtocol[T], Any),
+        pytest.param(
+            Tuple[Unpack[Ts]],
+            Tuple[Any, ...],
+            marks=pytest.mark.skipif(
+                sys.version_info <= (3, 7), reason="Python 3.6 doesn't support Unpack"
+            ),
+        ),
+        pytest.param(
+            Tuple[Unpack[Ts], int],
+            Tuple[Any, ...],
+            marks=pytest.mark.skipif(
+                sys.version_info < (3, 7), reason="Python 3.6 doesn't support Unpack"
+            ),
+        ),
+        pytest.param(
+            Tuple[str, Unpack[Ts]],
+            Tuple[Any, ...],
+            marks=[
+                pytest.mark.skipif(
+                    sys.version_info < (3, 7),
+                    reason="Python 3.6 doesn't support Unpack",
+                ),
+                pytest.mark.xfail(
+                    HYDRA_VERSION < Version(1, 2, 0),
+                    reason="Hydra 1.1.2 doesn't parse tuples beyond first element.",
+                ),
+            ],
+        ),
+        pytest.param(
+            Tuple[str, Unpack[Ts], int],
+            Tuple[Any, ...],
+            marks=[
+                pytest.mark.skipif(
+                    sys.version_info < (3, 7),
+                    reason="Python 3.6 doesn't support Unpack",
+                ),
+                pytest.mark.xfail(
+                    HYDRA_VERSION < Version(1, 2, 0),
+                    reason="Hydra 1.1.2 doesn't parse tuples beyond first element.",
+                ),
+            ],
+        ),
+        (Annotated[int, int], int),
+        (Annotated[Tuple[str, str], int], Tuple[str, str]),
+        (Annotated[Builds, int], Any),
+        (NewType("I", int), int),
+        (NewType("S", Tuple[str, str]), Tuple[str, str]),
+        (Self, Any),  # type: ignore
         (Literal[1, 2], Any),  # unsupported generics
         (Type[int], Any),
         (Builds, Any),
@@ -217,16 +307,18 @@ def test_sanitized_type_expected_behavior(in_type, expected_type):
                 KeyValidationError,
                 ConfigIndexError,
                 ConfigValueError,
+                AttributeError,
             )
         ):
-            Conf = OmegaConf.create(Bad)
+            Conf = OmegaConf.create(Bad)  # type: ignore
             Conf.x = [[int]]  # special case: validate
 
     @dataclass
     class Tmp:
         x: expected_type
 
-    OmegaConf.create(Tmp)  # shouldn't raise on `expected_type`
+    # shouldn't raise on `expected_type`
+    OmegaConf.create(Tmp)  # type: ignore
 
 
 def test_tuple_annotation_normalization():
