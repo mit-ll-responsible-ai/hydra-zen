@@ -1041,5 +1041,21 @@ def check_hydra_defaults(
     make_config(hydra_defaults=1)  # type: ignore
 
     builds(int, hydra_defaults=["_self_", {"a": "b"}, {1: 1}])  # type: ignore
+    builds(int, hydra_defaults=["_self_", ["a"]])  # type: ignore
+    builds(int, hydra_defaults=["_self_", {("a",): "b"}])  # type: ignore
     builds(int, hydra_defaults={"a": "b"})  # type: ignore
     builds(int, hydra_defaults="_self_")  # type: ignore
+
+    builds(
+        int,
+        hydra_defaults=[
+            "_self_",
+            {"a": "b"},
+            {"a": None},
+            {"a": MISSING},
+            {"a": ["b"]},
+            DictConfig({"a": "b"}),
+            {"a": ListConfig(["a"])},
+            make_config(a="a"),
+        ],
+    )
