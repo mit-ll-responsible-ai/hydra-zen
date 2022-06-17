@@ -252,4 +252,6 @@ else:
         pass
 
 
-DefaultsList = List[Union[str, Mapping[str, Union[str, List[str]]]]]
+DefaultsList = List[
+    Union[str, DataClass_, Mapping[str, Union[None, str, Sequence[str]]]]
+]
