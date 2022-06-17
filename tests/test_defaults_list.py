@@ -88,3 +88,15 @@ def test_no_self_in_defaults_warns():
 def test_redundant_defaults_in_make_config_raises():
     with pytest.raises(TypeError):
         make_config(defaults=["_self_"], hydra_defaults=["_self_"])
+
+
+def test_regression_284():
+    # https://github.com/mit-ll-responsible-ai/hydra-zen/issues/284
+    make_config(
+        hydra_defaults=[
+            "_self_",
+            {"model": "resnet"},
+            {"decorators_model": None},
+            {"test_transform": "test_transformation_6ch"},
+        ]
+    )
