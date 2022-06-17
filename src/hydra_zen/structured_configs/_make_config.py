@@ -149,11 +149,10 @@ def make_config(
         If ``None``, the ``_convert_`` attribute is not set on the resulting config.
 
 
-    hydra_defaults : List['_self_' | Dict[str, str]] | None, optional (default = None)
+    hydra_defaults : None | list[str | dict[str, str | list[str] | None ]], optional (default = None)
         A list in an input config that instructs Hydra how to build the output config
-        [7]_ [8]_. Each input config can have a Defaults List as a top level element. The
-        Defaults List itself is not a part of output config.
-
+        [7]_ [8]_. Each input config can have a Defaults List as a top level element.
+        The Defaults List itself is not a part of output config.
 
     bases : Tuple[Type[DataClass], ...], optional (default=())
         Base classes that the resulting config class will inherit from.
