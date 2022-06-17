@@ -300,7 +300,7 @@ hydra-config objects nested within this dataclass <a class="reference internal" 
 </ul>
 <p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_convert_</span></code> attribute is not set on the resulting config.</p>
 </dd>
-<dt><strong>hydra_defaults</strong><span class="classifier">List[‘_self_’ | Dict[str, str]] | None, optional (default = None)</span></dt><dd><p>A list in an input config that instructs Hydra how to build the output config
+<dt><strong>hydra_defaults</strong><span class="classifier">None | list[str | dict[str, str | list[str] | None ]], optional (default = None)</span></dt><dd><p>A list in an input config that instructs Hydra how to build the output config
 <a class="reference internal" href="#r9f8e996c6560-7" id="id4">[7]</a> <a class="reference internal" href="#r9f8e996c6560-8" id="id5">[8]</a>. Each input config can have a Defaults List as a top level element. The
 Defaults List itself is not a part of output config.</p>
 </dd>

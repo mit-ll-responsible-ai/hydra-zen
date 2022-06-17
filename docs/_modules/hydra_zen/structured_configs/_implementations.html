@@ -937,7 +937,7 @@
 
 <span class="sd">        If ``None``, the ``_convert_`` attribute is not set on the resulting config.</span>
 
-<span class="sd">    hydra_defaults : List[&#39;_self_&#39; | Dict[str, str]] | None, optional (default = None)</span>
+<span class="sd">    hydra_defaults : None | list[str | dict[str, str | list[str] | None ]], optional (default = None)</span>
 <span class="sd">        A list in an input config that instructs Hydra how to build the output config</span>
 <span class="sd">        [7]_ [8]_. Each input config can have a Defaults List as a top level element. The</span>
 <span class="sd">        Defaults List itself is not a part of output config.</span>
@@ -1445,7 +1445,7 @@
     <span class="k">if</span> <span class="n">hydra_defaults</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_utils</span><span class="o">.</span><span class="n">valid_defaults_list</span><span class="p">(</span><span class="n">hydra_defaults</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">HydraZenValidationError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;`hydra_defaults` must be type `list[str | dict[str, str | list[str]]`&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;`hydra_defaults` must be type `None | list[str | dict[str, str | list[str] | None ]]`&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;, Got: </span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="n">hydra_defaults</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
         <span class="n">hydra_defaults</span> <span class="o">=</span> <span class="n">sanitize_collection</span><span class="p">(</span><span class="n">hydra_defaults</span><span class="p">)</span>
