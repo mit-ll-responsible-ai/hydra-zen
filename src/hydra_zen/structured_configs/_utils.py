@@ -24,7 +24,8 @@ from typing import (
     overload,
 )
 
-from omegaconf import II
+
+from omegaconf import II, DictConfig, ListConfig
 from typing_extensions import (
     Annotated,
     Final,
@@ -509,7 +510,7 @@ def valid_defaults_list(hydra_defaults: Any) -> bool:
     Raises
     ------
     HydraZenValidationError: Duplicate _self_ entries"""
-    if not isinstance(hydra_defaults, list):
+    if not isinstance(hydra_defaults, (list, ListConfig)):
         return False
 
     has_self = False
@@ -523,13 +524,23 @@ def valid_defaults_list(hydra_defaults: Any) -> bool:
                 "`hydra_defaults` cannot have more than one '_self_' entry"
             )
 
-        if not isinstance(item, (dict, str)):
-            return False
+        if isinstance(item, (dict, DictConfig)):
+            for k, v in item.items():
+                if not isinstance(k, str):
+                    return False
 
-        if isinstance(item, dict) and any(
-            not isinstance(k, str) or not isinstance(v, (str, list))
-            for k, v in item.items()
-        ):
+                if (
+                    not isinstance(v, (str, list, ListConfig))
+                    and v is not None
+                    and v != MISSING
+                ):
+                    return False
+        elif isinstance(item, str):
+            continue
+        elif is_dataclass(item):
+            # no validation here
+            continue
+        else:
             return False
 
     if not has_self:
