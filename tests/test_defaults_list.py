@@ -2,30 +2,40 @@
 # SPDX-License-Identifier: MIT
 
 import random
-from typing import Any
+from functools import partial
+from typing import Any, Callable, List
 
 import hypothesis.strategies as st
 import pytest
 from hydra.core.config_store import ConfigStore
 from hypothesis import given
+from omegaconf import DictConfig, ListConfig
 
 from hydra_zen import MISSING, builds, instantiate, launch, make_config
 from hydra_zen.errors import HydraZenValidationError
 
 
-def test_hydra_defaults_work_builds(version_base):
+@pytest.mark.usefixtures("cleandir")
+@pytest.mark.parametrize("fn", [partial(builds, dict), make_config])
+@pytest.mark.parametrize(
+    "default,overrides",
+    [
+        ({"x": "a"}, []),
+        (DictConfig({"x": "a"}), []),
+        (make_config(x="a"), []),
+        ({"x": ["a"]}, []),
+        ({"x": ListConfig(["a"])}, []),
+        ({"x": None}, ["x=a"]),
+        ({"x": MISSING}, ["x=a"]),
+    ],
+)
+def test_hydra_defaults_work_as_expected(
+    fn: Callable, default: Any, overrides: List[str], version_base
+):
     config_store = ConfigStore.instance()
     config_store.store(group="x", name="a", node=builds(int, 10))
-    Conf = builds(dict, x=None, y="hi", hydra_defaults=["_self_", {"x": "a"}])
-    job = launch(Conf, instantiate, **version_base)
-    assert job.return_value == {"x": 10, "y": "hi"}
-
-
-def test_hydra_defaults_work_make_config(version_base):
-    config_store = ConfigStore.instance()
-    config_store.store(group="x", name="a", node=builds(int, 10))
-    Conf = make_config(x=None, y="hi", hydra_defaults=["_self_", {"x": "a"}])
-    job = launch(Conf, instantiate, **version_base)
+    Conf = fn(x=None, y="hi", hydra_defaults=["_self_", default])
+    job = launch(Conf, instantiate, **version_base, overrides=overrides)
     assert job.return_value == {"x": 10, "y": "hi"}
 
 
@@ -52,6 +62,7 @@ def test_hydra_defaults_validation_passes_on_good_values(defaults: Any, include_
     make_config(hydra_defaults=defaults)
 
 
+@pytest.mark.usefixtures("cleandir")
 @pytest.mark.filterwarnings("ignore::UserWarning")
 @given(
     invalids=invalid_defaults | st.lists(invalid_defaults, min_size=1),
