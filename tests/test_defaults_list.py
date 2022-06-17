@@ -2,52 +2,82 @@
 # SPDX-License-Identifier: MIT
 
 import random
-from typing import Any
+from functools import partial
+from typing import Any, Callable, List
 
 import hypothesis.strategies as st
 import pytest
 from hydra.core.config_store import ConfigStore
 from hypothesis import given
+from omegaconf import DictConfig, ListConfig
 
-from hydra_zen import builds, instantiate, launch, make_config
+from hydra_zen import MISSING, builds, instantiate, launch, make_config
 from hydra_zen.errors import HydraZenValidationError
 
 
-def test_hydra_defaults_work_builds(version_base):
+@pytest.mark.usefixtures("cleandir")
+@pytest.mark.parametrize("fn", [partial(builds, dict), make_config])
+@pytest.mark.parametrize(
+    "default,overrides",
+    [
+        ({"x": "a"}, []),
+        (DictConfig({"x": "a"}), []),
+        (make_config(x="a"), []),
+        ({"x": ["a"]}, []),
+        ({"x": ListConfig(["a"])}, []),
+        ({"x": None}, ["x=a"]),
+        ({"x": MISSING}, ["x=a"]),
+    ],
+)
+def test_hydra_defaults_work_as_expected(
+    fn: Callable, default: Any, overrides: List[str], version_base
+):
     config_store = ConfigStore.instance()
     config_store.store(group="x", name="a", node=builds(int, 10))
-    Conf = builds(dict, x=None, y="hi", hydra_defaults=["_self_", {"x": "a"}])
-    job = launch(Conf, instantiate, **version_base)
-    assert job.return_value == {"x": 10, "y": "hi"}
-
-
-def test_hydra_defaults_work_make_config(version_base):
-    config_store = ConfigStore.instance()
-    config_store.store(group="x", name="a", node=builds(int, 10))
-    Conf = make_config(x=None, y="hi", hydra_defaults=["_self_", {"x": "a"}])
-    job = launch(Conf, instantiate, **version_base)
+    Conf = fn(x=None, y="hi", hydra_defaults=["_self_", default])
+    job = launch(Conf, instantiate, **version_base, overrides=overrides)
     assert job.return_value == {"x": 10, "y": "hi"}
 
 
 invalid_defaults = st.sampled_from(
     [1, [1], [{"a": 1}], {"a": 1}, {1: "a"}, {1: 1}, False, True]
 )
-valid_defaults = st.sampled_from(["a", {"a": "b"}, {"a": ["a", "b"]}])
+valid_defaults = st.sampled_from(
+    ["a", {"a": "b"}, {"a": None}, {"a": MISSING}, {"a": ["a", "b"]}]
+)
 
 
+@pytest.mark.filterwarnings("ignore::UserWarning")
+@given(
+    defaults=st.lists(valid_defaults, min_size=0),
+    include_self=st.sampled_from([None, "pre", "post"]),
+)
+def test_hydra_defaults_validation_passes_on_good_values(defaults: Any, include_self):
+    if include_self == "pre":
+        defaults = ["_self_"] + defaults
+    elif include_self == "post":
+        defaults.append("_self_")
+
+    builds(dict, hydra_defaults=defaults)
+    make_config(hydra_defaults=defaults)
+
+
+@pytest.mark.usefixtures("cleandir")
 @pytest.mark.filterwarnings("ignore::UserWarning")
 @given(
     invalids=invalid_defaults | st.lists(invalid_defaults, min_size=1),
     valids=st.lists(valid_defaults, min_size=0),
     include_self=st.sampled_from([None, "pre", "post"]),
 )
-def test_hydra_defaults_validation(invalids: Any, valids: list, include_self):
+def test_hydra_defaults_validation_catches_bad_values(
+    invalids: Any, valids: list, include_self
+):
     if isinstance(invalids, list):
         defaults = invalids + valids
         random.shuffle(defaults)
         if include_self == "pre":
             defaults = ["_self_"] + defaults
-        elif include_self == "pose":
+        elif include_self == "post":
             defaults.append("_self_")
     else:
         defaults = invalids
@@ -88,3 +118,16 @@ def test_no_self_in_defaults_warns():
 def test_redundant_defaults_in_make_config_raises():
     with pytest.raises(TypeError):
         make_config(defaults=["_self_"], hydra_defaults=["_self_"])
+
+
+def test_regression_284():
+    # https://github.com/mit-ll-responsible-ai/hydra-zen/issues/284
+    make_config(
+        hydra_defaults=[
+            "_self_",
+            {"model": "resnet"},
+            {"decorators_model": None},
+            {"decorators_model2": MISSING},
+            {"test_transform": "test_transformation_6ch"},
+        ]
+    )

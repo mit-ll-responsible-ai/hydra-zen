@@ -36,6 +36,20 @@ Bug Fixes
 - :func:`~hydra_zen.builds` would raise a ``TypeError`` if it encountered a target whose signature contained the annotations ``ParamSpecArgs`` or  ``ParamSpecKwargs``. It can now sanitize these annotations properly. (See :pull:`283`)
 
 
+.. _v0.7.1:
+
+---------------------
+0.7.1rc1 - 2022-05-10
+---------------------
+
+Bug Fixes
+---------
+
+The validation that hydra-zen performs on ``hydra_defaults`` was overly restrictive. E.g. it would flag ``[{"some_group": None}]`` as invalid, even though null is permitted in `Hydra's default list syntax <https://hydra.cc/docs/advanced/defaults_list/>`_.
+This patch fixes this validation and updates the docs & annotations for ``hydra_defaults`` in :func:`~hydra_zen.builds` and :func:`~hydra_zen.make_config`.
+See :pull:`287` for more details.
+
+
 .. _v0.7.0:
 
 ------------------
