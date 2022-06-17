@@ -9,7 +9,7 @@ import pytest
 from hydra.core.config_store import ConfigStore
 from hypothesis import given
 
-from hydra_zen import builds, instantiate, launch, make_config
+from hydra_zen import MISSING, builds, instantiate, launch, make_config
 from hydra_zen.errors import HydraZenValidationError
 
 
@@ -32,7 +32,24 @@ def test_hydra_defaults_work_make_config(version_base):
 invalid_defaults = st.sampled_from(
     [1, [1], [{"a": 1}], {"a": 1}, {1: "a"}, {1: 1}, False, True]
 )
-valid_defaults = st.sampled_from(["a", {"a": "b"}, {"a": ["a", "b"]}])
+valid_defaults = st.sampled_from(
+    ["a", {"a": "b"}, {"a": None}, {"a": MISSING}, {"a": ["a", "b"]}]
+)
+
+
+@pytest.mark.filterwarnings("ignore::UserWarning")
+@given(
+    defaults=st.lists(valid_defaults, min_size=0),
+    include_self=st.sampled_from([None, "pre", "post"]),
+)
+def test_hydra_defaults_validation_passes_on_good_values(defaults: Any, include_self):
+    if include_self == "pre":
+        defaults = ["_self_"] + defaults
+    elif include_self == "post":
+        defaults.append("_self_")
+
+    builds(dict, hydra_defaults=defaults)
+    make_config(hydra_defaults=defaults)
 
 
 @pytest.mark.filterwarnings("ignore::UserWarning")
@@ -41,13 +58,15 @@ valid_defaults = st.sampled_from(["a", {"a": "b"}, {"a": ["a", "b"]}])
     valids=st.lists(valid_defaults, min_size=0),
     include_self=st.sampled_from([None, "pre", "post"]),
 )
-def test_hydra_defaults_validation(invalids: Any, valids: list, include_self):
+def test_hydra_defaults_validation_catches_bad_values(
+    invalids: Any, valids: list, include_self
+):
     if isinstance(invalids, list):
         defaults = invalids + valids
         random.shuffle(defaults)
         if include_self == "pre":
             defaults = ["_self_"] + defaults
-        elif include_self == "pose":
+        elif include_self == "post":
             defaults.append("_self_")
     else:
         defaults = invalids
@@ -97,6 +116,7 @@ def test_regression_284():
             "_self_",
             {"model": "resnet"},
             {"decorators_model": None},
+            {"decorators_model2": MISSING},
             {"test_transform": "test_transformation_6ch"},
         ]
     )
