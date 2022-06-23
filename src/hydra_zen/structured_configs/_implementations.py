@@ -185,7 +185,7 @@ def __dataclass_transform__(
 def hydrated_dataclass(
     target: Callable[..., Any],
     *pos_args: SupportedPrimitive,
-    zen_partial: bool = False,
+    zen_partial: Optional[bool] = None,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
@@ -211,7 +211,7 @@ def hydrated_dataclass(
         Arguments specified positionally are not included in the dataclass' signature and
         are stored as a tuple bound to in the ``_args_`` field.
 
-    zen_partial : bool, optional (default=False)
+    zen_partial : Optional[bool]
         If ``True``, then the resulting config will instantiate as
         ``functools.partial(hydra_target, *pos_args, **kwargs_for_target)`` rather than
         ``hydra_target(*pos_args, **kwargs_for_target)``. Thus this enables the
@@ -563,7 +563,7 @@ def sanitized_field(
 def builds(
     __hydra_target: Callable[P, R],
     *,
-    zen_partial: Literal[False] = ...,
+    zen_partial: Literal[False, None] = ...,
     populate_full_signature: Literal[True],
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
@@ -582,7 +582,7 @@ def builds(
 def builds(
     __hydra_target: Importable,
     *pos_args: SupportedPrimitive,
-    zen_partial: Literal[False] = ...,
+    zen_partial: Literal[False, None] = ...,
     populate_full_signature: bool = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
@@ -622,7 +622,7 @@ def builds(
 def builds(
     __hydra_target: Importable,
     *pos_args: SupportedPrimitive,
-    zen_partial: bool = ...,
+    zen_partial: Optional[bool] = ...,
     populate_full_signature: Literal[False] = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
@@ -645,7 +645,7 @@ def builds(
 def builds(
     __hydra_target: Union[Callable[P, R], Importable],
     *pos_args: SupportedPrimitive,
-    zen_partial: bool,
+    zen_partial: Optional[bool],
     populate_full_signature: bool = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
@@ -666,7 +666,7 @@ def builds(
 
 def builds(
     *pos_args: Union[Importable, Callable[P, R], SupportedPrimitive],
-    zen_partial: bool = False,
+    zen_partial: Optional[bool] = None,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
     populate_full_signature: bool = False,
@@ -682,7 +682,7 @@ def builds(
     Type[PartialBuilds[Importable]],
     Type[BuildsWithSig[Type[R], P]],
 ]:
-    """builds(hydra_target, /, *pos_args, zen_partial=False, zen_wrappers=(), zen_meta=None, populate_full_signature=False, hydra_recursive=None, hydra_convert=None, hydra_defaults=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
+    """builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, hydra_recursive=None, hydra_convert=None, hydra_defaults=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
 
     Returns a structured config, which describes how to instantiate/call
     ``<hydra_target>`` with both user-specified and auto-populated parameter values.
@@ -714,7 +714,7 @@ def builds(
         ``_zen_`` are reserved to ensure future-compatibility, and thus cannot be
         specified by the user.
 
-    zen_partial : bool, optional (default=False)
+    zen_partial : Optional[bool]
         If ``True``, then the resulting config will instantiate as
         ``functools.partial(<hydra_target>, *pos_args, **kwargs_for_target)``. Thus
         this enables the partial-configuration of objects.
@@ -1061,7 +1061,7 @@ def builds(
             f"`hydra_recursive` must be a boolean type, got {hydra_recursive}"
         )
 
-    if not isinstance(zen_partial, bool):
+    if zen_partial is not None and not isinstance(zen_partial, bool):
         raise TypeError(f"`zen_partial` must be a boolean type, got: {zen_partial}")
 
     if hydra_convert is not None and hydra_convert not in {"none", "partial", "all"}:
@@ -1166,7 +1166,7 @@ def builds(
         bool(zen_meta)
         or bool(validated_wrappers)
         or any(uses_zen_processing(b) for b in builds_bases)
-        or (zen_partial and not HYDRA_SUPPORTS_PARTIAL)
+        or (bool(zen_partial) and not HYDRA_SUPPORTS_PARTIAL)
     )
 
     if not requires_zen_processing and zen_partial:  # pragma: no cover
