@@ -42,7 +42,7 @@ del _builds_sig
 @overload
 def make_custom_builds_fn(
     *,
-    zen_partial: Literal[False] = ...,
+    zen_partial: Literal[False, None] = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
     populate_full_signature: Literal[True],
@@ -74,7 +74,7 @@ def make_custom_builds_fn(
 @overload
 def make_custom_builds_fn(
     *,
-    zen_partial: Literal[False] = ...,
+    zen_partial: Literal[False, None] = ...,
     populate_full_signature: Literal[False] = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
@@ -90,7 +90,7 @@ def make_custom_builds_fn(
 @overload
 def make_custom_builds_fn(
     *,
-    zen_partial: Literal[False] = ...,
+    zen_partial: Literal[False, None] = ...,
     populate_full_signature: bool,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
@@ -106,7 +106,7 @@ def make_custom_builds_fn(
 @overload
 def make_custom_builds_fn(
     *,
-    zen_partial: Literal[False] = ...,
+    zen_partial: Literal[False, None] = ...,
     populate_full_signature: bool = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
@@ -122,7 +122,7 @@ def make_custom_builds_fn(
 @overload
 def make_custom_builds_fn(
     *,
-    zen_partial: bool,
+    zen_partial: Union[bool, None],
     populate_full_signature: Literal[False] = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
@@ -138,7 +138,7 @@ def make_custom_builds_fn(
 @overload
 def make_custom_builds_fn(
     *,
-    zen_partial: bool,
+    zen_partial: Union[bool, None],
     populate_full_signature: bool,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
@@ -154,7 +154,7 @@ def make_custom_builds_fn(
 @overload
 def make_custom_builds_fn(
     *,
-    zen_partial: bool,
+    zen_partial: Union[bool, None],
     populate_full_signature: bool,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
@@ -168,7 +168,7 @@ def make_custom_builds_fn(
 
 def make_custom_builds_fn(
     *,
-    zen_partial: bool = False,
+    zen_partial: Optional[bool] = None,
     populate_full_signature: bool = False,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
     zen_meta: Optional[Mapping[str, Any]] = None,
