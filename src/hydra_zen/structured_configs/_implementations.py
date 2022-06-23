@@ -75,7 +75,7 @@ from ._globals import (
     POS_ARG_FIELD_NAME,
     RECURSIVE_FIELD_NAME,
     TARGET_FIELD_NAME,
-    ZEN_PARTIAL_TARGET_FIELD_NAME,
+    ZEN_PARTIAL_FIELD_NAME,
     ZEN_PROCESSING_LOCATION,
     ZEN_TARGET_FIELD_NAME,
     ZEN_WRAPPERS_FIELD_NAME,
@@ -1162,14 +1162,51 @@ def builds(
 
     target_path: Final[str] = _utils.get_obj_path(target)
 
+    # Determine if _partial_=True and/or _zen_partial=True is propagated by parents
+    base_hydra_partial: Optional[bool] = None  # state of closest parent with _partial_
+    base_zen_partial: Optional[bool] = None  # state of closest parent with _zen_partial
+
+    # reflects state of closest parent that has partial field specified
+    parent_partial: Optional[bool] = None
+
+    for base in builds_bases:
+        _set_this_iteration = False
+        if HYDRA_SUPPORTS_PARTIAL and base_hydra_partial is None:
+            base_hydra_partial = getattr(base, PARTIAL_FIELD_NAME, None)
+            if parent_partial is None:
+                parent_partial = base_hydra_partial
+                _set_this_iteration = True
+
+        if base_zen_partial is None:
+            base_zen_partial = getattr(base, ZEN_PARTIAL_FIELD_NAME, None)
+            if parent_partial is None or (
+                _set_this_iteration and base_zen_partial is not None
+            ):
+                parent_partial = parent_partial or base_zen_partial
+
+        del _set_this_iteration
+
+    if zen_partial is None:
+        # zen_partial is inherited
+        zen_partial = parent_partial
+
+    del parent_partial
+
+    requires_partial_field = zen_partial is not None
+
     requires_zen_processing: Final[bool] = (
         bool(zen_meta)
         or bool(validated_wrappers)
         or any(uses_zen_processing(b) for b in builds_bases)
-        or (bool(zen_partial) and not HYDRA_SUPPORTS_PARTIAL)
+        or (bool(requires_partial_field) and not HYDRA_SUPPORTS_PARTIAL)
     )
 
-    if not requires_zen_processing and zen_partial:  # pragma: no cover
+    if base_zen_partial:
+        assert requires_zen_processing
+
+    del base_zen_partial
+
+    if not requires_zen_processing and requires_partial_field:  # pragma: no cover
         # TODO: require test-coverage once Hydra publishes nightly builds
         target_field = [
             (
@@ -1180,7 +1217,7 @@ def builds(
             (
                 PARTIAL_FIELD_NAME,
                 bool,
-                _utils.field(default=zen_partial, init=False),
+                _utils.field(default=bool(zen_partial), init=False),
             ),
         ]
     elif requires_zen_processing:
@@ -1198,14 +1235,23 @@ def builds(
             ),
         ]
 
-        if zen_partial:
+        if requires_partial_field:
             target_field.append(
                 (
-                    ZEN_PARTIAL_TARGET_FIELD_NAME,
+                    ZEN_PARTIAL_FIELD_NAME,
                     bool,
-                    _utils.field(default=True, init=False),
+                    _utils.field(default=bool(zen_partial), init=False),
                 ),
             )
+            if HYDRA_SUPPORTS_PARTIAL and base_hydra_partial:
+                # Must explicitly set _partial_=False to prevent inheritance
+                target_field.append(
+                    (
+                        PARTIAL_FIELD_NAME,
+                        bool,
+                        _utils.field(default=False, init=False),
+                    ),
+                )
 
         if zen_meta:
             target_field.append(
@@ -1253,6 +1299,9 @@ def builds(
                 _utils.field(default=target_path, init=False),
             )
         ]
+
+    del base_hydra_partial
+    del requires_partial_field
 
     base_fields = target_field
 
@@ -1688,25 +1737,25 @@ def builds(
         dataclass_name, fields=sanitized_base_fields, bases=builds_bases, frozen=frozen
     )
 
-    if zen_partial is False and (
-        getattr(out, ZEN_PARTIAL_TARGET_FIELD_NAME, False)
-        or getattr(out, PARTIAL_FIELD_NAME, False)
-    ):
-        # `out._partial_=True` or `out._zen_partial=True` has been inherited; there
-        # is no way for users to override this, thus they must explicitly specify
-        # `zen_partial=True` in order to "opt-in" to this behavior.
-        raise TypeError(
-            BUILDS_ERROR_PREFIX
-            + "`builds(..., zen_partial=False, builds_bases=(...))` does not "
-            "permit `builds_bases` where a partial target has been specified."
-        )
+    # if zen_partial is False and (
+    #     getattr(out, ZEN_PARTIAL_TARGET_FIELD_NAME, False)
+    #     or getattr(out, PARTIAL_FIELD_NAME, False)
+    # ):
+    #     # `out._partial_=True` or `out._zen_partial=True` has been inherited; there
+    #     # is no way for users to override this, thus they must explicitly specify
+    #     # `zen_partial=True` in order to "opt-in" to this behavior.
+    #     raise TypeError(
+    #         BUILDS_ERROR_PREFIX
+    #         + "`builds(..., zen_partial=False, builds_bases=(...))` does not "
+    #         "permit `builds_bases` where a partial target has been specified."
+    #     )
 
-    if requires_zen_processing and hasattr(out, PARTIAL_FIELD_NAME):
-        raise TypeError(
-            BUILDS_ERROR_PREFIX
-            + "`builds(..., builds_bases=(...))` cannot use zen-processing features "
-            "while inheriting the field `_partial_: bool = ...`"
-        )
+    # if requires_zen_processing and hasattr(out, PARTIAL_FIELD_NAME):
+    #     raise TypeError(
+    #         BUILDS_ERROR_PREFIX
+    #         + "`builds(..., builds_bases=(...))` cannot use zen-processing features "
+    #         "while inheriting the field `_partial_: bool = ...`"
+    #     )
 
     out.__doc__ = (
         f"A structured config designed to {'partially ' if zen_partial else ''}initialize/call "
@@ -1720,6 +1769,11 @@ def builds(
             )
 
     assert requires_zen_processing is uses_zen_processing(out)
+
+    # _partial_=True should never be relied on when zen-processing is being used.
+    assert not HYDRA_SUPPORTS_PARTIAL or (
+        not (requires_zen_processing and getattr(out, PARTIAL_FIELD_NAME, False))
+    )
 
     return cast(Union[Type[Builds[Importable]], Type[BuildsWithSig[Type[R], P]]], out)
 
@@ -1804,7 +1858,7 @@ def get_target(obj: HasTarget) -> Any:
     else:
         raise TypeError(
             f"`obj` must specify a target; i.e. it must have an attribute named"
-            f" {TARGET_FIELD_NAME} or named {ZEN_PARTIAL_TARGET_FIELD_NAME} that"
+            f" {TARGET_FIELD_NAME} or named {ZEN_PARTIAL_FIELD_NAME} that"
             f" points to a target-object or target-string"
         )
     target = getattr(obj, field_name)
