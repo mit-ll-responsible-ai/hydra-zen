@@ -1162,7 +1162,17 @@ def builds(
 
     target_path: Final[str] = _utils.get_obj_path(target)
 
-    # Determine if _partial_=True and/or _zen_partial=True is propagated by parents
+    # zen_partial behavior:
+    #
+    # If zen_partial is not None: zen_partial dictates if output is PartialBuilds
+    #
+    # If zen_parial is None: closest parent with partial-flag specified determines
+    # if output isPartialBuilds
+    #
+    # If _partial_=True is inherited but zen-processing is used
+    #    then set _partial_=False, _zen_partial=zen_partial
+    #
+
     base_hydra_partial: Optional[bool] = None  # state of closest parent with _partial_
     base_zen_partial: Optional[bool] = None  # state of closest parent with _zen_partial
 
@@ -1737,26 +1747,6 @@ def builds(
         dataclass_name, fields=sanitized_base_fields, bases=builds_bases, frozen=frozen
     )
 
-    # if zen_partial is False and (
-    #     getattr(out, ZEN_PARTIAL_TARGET_FIELD_NAME, False)
-    #     or getattr(out, PARTIAL_FIELD_NAME, False)
-    # ):
-    #     # `out._partial_=True` or `out._zen_partial=True` has been inherited; there
-    #     # is no way for users to override this, thus they must explicitly specify
-    #     # `zen_partial=True` in order to "opt-in" to this behavior.
-    #     raise TypeError(
-    #         BUILDS_ERROR_PREFIX
-    #         + "`builds(..., zen_partial=False, builds_bases=(...))` does not "
-    #         "permit `builds_bases` where a partial target has been specified."
-    #     )
-
-    # if requires_zen_processing and hasattr(out, PARTIAL_FIELD_NAME):
-    #     raise TypeError(
-    #         BUILDS_ERROR_PREFIX
-    #         + "`builds(..., builds_bases=(...))` cannot use zen-processing features "
-    #         "while inheriting the field `_partial_: bool = ...`"
-    #     )
-
     out.__doc__ = (
         f"A structured config designed to {'partially ' if zen_partial else ''}initialize/call "
         f"`{target_path}` upon instantiation by hydra."
@@ -1771,8 +1761,10 @@ def builds(
     assert requires_zen_processing is uses_zen_processing(out)
 
     # _partial_=True should never be relied on when zen-processing is being used.
-    assert not HYDRA_SUPPORTS_PARTIAL or (
-        not (requires_zen_processing and getattr(out, PARTIAL_FIELD_NAME, False))
+    assert not (
+        HYDRA_SUPPORTS_PARTIAL
+        and requires_zen_processing
+        and getattr(out, PARTIAL_FIELD_NAME, False)
     )
 
     return cast(Union[Type[Builds[Importable]], Type[BuildsWithSig[Type[R], P]]], out)

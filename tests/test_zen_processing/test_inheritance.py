@@ -307,10 +307,13 @@ def test_partial_field_set_only_when_necessary(
         ((ZenPartialFalse, HydraPartialTrue), False),
     ],
 )
+@pytest.mark.parametrize("meta", [{}, dict(meta=True)])
 def test_partial_via_inheritance_explicit_cases(
-    parents: Tuple[Type[DataClass_], ...], expected_partial: bool
+    parents: Tuple[Type[DataClass_], ...],
+    expected_partial: bool,
+    meta,
 ):
-    Conf = builds(int, builds_bases=parents)
+    Conf = builds(int, zen_meta=meta, builds_bases=parents)
     assert is_partial_builds(Conf) is expected_partial
 
 
@@ -321,30 +324,3 @@ def test_inherited_partial_false_fields(Parent):
 
     Conf = builds(dict, builds_bases=(Parent,))  # should be OK
     assert instantiate(Conf) == instantiate(Parent)
-
-
-# def test_inherit_hydra_partial_with_zen_processing_raises():
-#     with pytest.raises(TypeError):
-#         builds(
-#             dict, zen_meta=dict(a=1), zen_partial=True, builds_bases=(HydraPartialTrue,)
-#         )
-
-
-# @pytest.mark.parametrize("Parent", [ZenPartialTrue, HydraPartialTrue])
-# def test_zen_partial_false_raises_for_partiald_parents(Parent):
-#     with pytest.raises(TypeError):
-#         builds(dict, zen_partial=False, builds_bases=(Parent,))
-
-
-# @pytest.mark.parametrize(
-#     "Parent", [ZenPartialFalse, HydraPartialFalse, ZenPartialTrue, HydraPartialTrue]
-# )
-# def test_zen_partial_true_holds_for_all_inheritance(Parent):
-#     def make_conf():
-#         return builds(dict, b=2, zen_partial=True, builds_bases=(Parent,))
-
-#     Conf = make_conf()
-
-#     out = instantiate(Conf)
-#     assert isinstance(out, partial)
-#     assert out() == {"a": 1, "b": 2}
