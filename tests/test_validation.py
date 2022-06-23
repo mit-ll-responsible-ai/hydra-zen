@@ -50,7 +50,7 @@ def test_hydra_partial_via_hydrated_dataclass_is_error():
             pass
 
 
-@given(hydra_partial=st.booleans(), zen_partial=st.booleans())
+@given(hydra_partial=st.booleans(), zen_partial=st.none() | st.booleans())
 def test_specifying_hydra_partial_and_zen_partial_raises(
     hydra_partial: bool, zen_partial: bool
 ):
@@ -153,7 +153,7 @@ def passthrough(*args, **kwargs):
         ),
     ],
 )
-@given(partial=st.booleans(), full_sig=st.booleans())
+@given(partial=st.none() | st.booleans(), full_sig=st.booleans())
 def test_builds_raises_when_user_specified_args_violate_sig(
     func, args, kwargs, full_sig, partial
 ):
@@ -211,7 +211,7 @@ def f(y):
     return y
 
 
-@given(partial=st.booleans(), full_sig=st.booleans())
+@given(partial=st.none() | st.booleans(), full_sig=st.booleans())
 def test_builds_raises_when_base_has_invalid_arg(full_sig, partial):
 
     with pytest.raises(TypeError):
@@ -280,7 +280,7 @@ class Class:
 
 
 @pytest.mark.parametrize("not_callable", [1, "a", None, [1, 2], Class()])
-@given(partial=st.booleans(), full_sig=st.booleans())
+@given(partial=st.none() | st.booleans(), full_sig=st.booleans())
 def test_builds_raises_on_non_callable_target(not_callable, partial, full_sig):
     with pytest.raises(TypeError):
         builds(not_callable, populate_full_signature=full_sig, zen_partial=partial)
@@ -323,7 +323,7 @@ def test_hydrated_dataclass_from_instance_raise():
         hydrated_dataclass(dict)(instance_of_a)  # type: ignore
 
 
-@given(partial=st.booleans(), full_sig=st.booleans())
+@given(partial=st.none() | st.booleans(), full_sig=st.booleans())
 def test_builds_raises_for_unimportable_target(partial, full_sig):
     def unreachable():
         pass
@@ -376,7 +376,7 @@ def f_meta_sig(x, *args, y, **kwargs):
         st.sampled_from(["x", "y", "args", "kwargs", "z"]), st.integers()
     ),
     pop_sig=st.booleans(),
-    partial=st.booleans(),
+    partial=st.none() | st.booleans(),
 )
 def test_meta_fields_colliding_with_sig_raises(
     meta_fields, pop_sig: bool, partial: bool
@@ -402,7 +402,7 @@ def test_meta_fields_colliding_with_sig_raises(
     meta_fields=st.dictionaries(
         st.sampled_from(["x", "y", "args", "kwargs", "z"]), st.integers()
     ),
-    partial=st.booleans(),
+    partial=st.none() | st.booleans(),
 )
 def test_meta_fields_colliding_with_user_provided_kwargs_raises(
     meta_fields, partial: bool

@@ -19,7 +19,7 @@ def f(x, y, z: int = 3):
     return x, y, z
 
 
-@given(full_sig=st.booleans(), partial=st.booleans())
+@given(full_sig=st.booleans(), partial=st.none() | st.booleans())
 def test_builds_produces_dataclass(full_sig: bool, partial: bool):
 
     if full_sig and not partial:
@@ -42,7 +42,7 @@ def f_2(x, y, z):
 
 
 @pytest.mark.parametrize("full_sig", [True, False])
-@pytest.mark.parametrize("partial", [True, False])
+@pytest.mark.parametrize("partial", [True, False, None])
 def test_chain_builds_of_targets_with_common_interfaces(full_sig, partial):
 
     # Note that conf_1 and conf_2 target `f` whereas conf_3 targets `f_three_vars`,
@@ -68,7 +68,7 @@ def test_chain_builds_of_targets_with_common_interfaces(full_sig, partial):
 
 
 @pytest.mark.parametrize("full_sig", [True, False])
-@pytest.mark.parametrize("partial", [True, False])
+@pytest.mark.parametrize("partial", [True, False, None])
 def test_pos_args_with_inheritance(full_sig, partial):
 
     conf_1 = builds(f_three_vars, 1, 2)
