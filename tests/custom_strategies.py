@@ -26,7 +26,7 @@ wrapper_strat = single_wrapper_strat | st.lists(single_wrapper_strat)
 
 
 _valid_builds_strats = dict(
-    zen_partial=st.booleans(),
+    zen_partial=st.none() | st.booleans(),
     zen_wrappers=wrapper_strat,
     zen_meta=st.dictionaries(
         st.text(string.ascii_lowercase, min_size=1, max_size=2).map(lambda x: "_" + x),
