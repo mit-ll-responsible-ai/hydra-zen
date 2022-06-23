@@ -1166,13 +1166,14 @@ def builds(
     #
     # If zen_partial is not None: zen_partial dictates if output is PartialBuilds
     #
-    # If zen_parial is None: closest parent with partial-flag specified determines
-    # if output isPartialBuilds
+    # If zen_partial is None:
+    #   - closest parent with partial-flag specified determines
+    #     if output is PartialBuilds
+    #   - if no parent, output is Builds
     #
     # If _partial_=True is inherited but zen-processing is used
     #    then set _partial_=False, _zen_partial=zen_partial
     #
-
     base_hydra_partial: Optional[bool] = None  # state of closest parent with _partial_
     base_zen_partial: Optional[bool] = None  # state of closest parent with _zen_partial
 
