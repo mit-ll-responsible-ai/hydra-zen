@@ -263,30 +263,6 @@ def f2():
     pass
 
 
-@given(partial=st.booleans(), full_sig=st.booleans())
-def test_builds_raises_when_base_with_partial_target_is_specified(
-    partial: bool, full_sig: bool
-):
-
-    partiald_conf = builds(f2, zen_partial=True)
-
-    if not partial:
-        with pytest.raises(TypeError):
-            builds(
-                f2,
-                populate_full_signature=full_sig,
-                zen_partial=partial,
-                builds_bases=(partiald_conf,),
-            )
-    else:
-        builds(
-            f2,
-            populate_full_signature=full_sig,
-            zen_partial=partial,
-            builds_bases=(partiald_conf,),
-        )
-
-
 def func_with_var_kwargs(**x):
     return x
 
@@ -334,7 +310,7 @@ def test_builds_input_validation(param_name: str, value):
 
 def test_just_raises_with_legible_message():
     with pytest.raises(HydraZenUnsupportedPrimitiveError):
-        just(Class())  # type: ignore
+        just(Class())
 
 
 def test_hydrated_dataclass_from_instance_raise():
