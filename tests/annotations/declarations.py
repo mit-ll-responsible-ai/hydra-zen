@@ -818,7 +818,7 @@ def check_overloads_arent_too_restrictive():
 
         reveal_type(
             bout,
-            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Unknown, (*args: Unknown, **kwargs: Unknown)]]",
+            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Unknown, (...)]]",
         )
 
         fout = fbuilds(
@@ -837,7 +837,7 @@ def check_overloads_arent_too_restrictive():
 
         reveal_type(
             fout,
-            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Unknown, (*args: Unknown, **kwargs: Unknown)]]",
+            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Unknown, (...)]]",
         )
 
         pout = pbuilds(
@@ -856,7 +856,7 @@ def check_overloads_arent_too_restrictive():
 
         reveal_type(
             pout,
-            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Unknown, (*args: Unknown, **kwargs: Unknown)]]",
+            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Unknown, (...)]]",
         )
 
     assert caller
