@@ -14,7 +14,7 @@ from ._globals import (
     JUST_FIELD_NAME,
     PARTIAL_FIELD_NAME,
     TARGET_FIELD_NAME,
-    ZEN_PARTIAL_TARGET_FIELD_NAME,
+    ZEN_PARTIAL_FIELD_NAME,
     ZEN_PROCESSING_LOCATION,
     ZEN_TARGET_FIELD_NAME,
 )
@@ -84,6 +84,6 @@ def is_partial_builds(x: Any) -> TypeGuard[PartialBuilds[Any]]:
         ) or (
             # check if partial'd config via `zen_processing`
             uses_zen_processing(x)
-            and (getattr(x, ZEN_PARTIAL_TARGET_FIELD_NAME, False) is True)
+            and (getattr(x, ZEN_PARTIAL_FIELD_NAME, False) is True)
         )
     return False

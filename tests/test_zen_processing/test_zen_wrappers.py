@@ -126,7 +126,7 @@ a_tracked_wrapper = st.sampled_from(tracked_funcs)
     kwargs=st.dictionaries(
         st.text(string.ascii_lowercase, min_size=1, max_size=1), st.integers()
     ),
-    zen_partial=st.booleans(),
+    zen_partial=st.none() | st.booleans(),
     zen_meta=st.dictionaries(
         st.text(string.ascii_lowercase, min_size=1, max_size=1).map(lambda x: "_" + x),
         st.integers(),
@@ -165,7 +165,7 @@ def test_zen_wrappers_expected_behavior(
     if hasattr(target, "num_decorated"):
         del target.num_decorated
 
-    wrappers, zen_meta = _coordinate_meta_fields_for_interpolation(wrappers, zen_meta)  # type: ignore
+    wrappers, zen_meta = _coordinate_meta_fields_for_interpolation(wrappers, zen_meta)
 
     args = tuple(args)  # type: ignore
     conf = builds(

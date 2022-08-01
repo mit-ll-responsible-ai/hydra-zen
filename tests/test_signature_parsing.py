@@ -145,9 +145,9 @@ def f3(x: str, *args, y: int = 22, z=[2], **kwargs):
 
 
 @pytest.mark.parametrize("include_extra_param", [False, True])
-@pytest.mark.parametrize("partial", [False, True])
+@pytest.mark.parametrize("partial", [None, False, True])
 def test_builds_with_full_sig_mirrors_target_sig(
-    include_extra_param: bool, partial: bool
+    include_extra_param: bool, partial: Optional[bool]
 ):
 
     kwargs = dict(named_param=2) if include_extra_param else {}

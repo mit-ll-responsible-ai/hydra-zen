@@ -21,7 +21,7 @@ def xy_are_pos_only(x, y, /):
 
 
 @pytest.mark.parametrize("func", [x_is_pos_only])
-@given(partial=st.booleans(), full_sig=st.booleans())
+@given(partial=st.none() | st.booleans(), full_sig=st.booleans())
 def test_builds_runtime_validation_pos_only_not_nameable(func, full_sig, partial):
     with pytest.raises(TypeError):
         builds(func, x=10, zen_partial=partial, populate_full_signature=full_sig)
@@ -30,7 +30,7 @@ def test_builds_runtime_validation_pos_only_not_nameable(func, full_sig, partial
 @given(
     x=valid_hydra_literals,
     full_sig=st.booleans(),
-    partial=st.booleans(),
+    partial=st.none() | st.booleans(),
 )
 def test_roundtrip_pos_only(x, full_sig: bool, partial: bool):
     cfg = builds(

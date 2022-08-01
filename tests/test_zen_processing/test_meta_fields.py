@@ -27,7 +27,7 @@ def f(*args, **kwargs):
         ),
         st.integers(),
     ),
-    zen_partial=st.booleans(),
+    zen_partial=st.none() | st.booleans(),
     pop_sig=st.booleans(),
 )
 def test_basic_zen_meta_behavior(
@@ -77,7 +77,7 @@ def f_concrete_sig(a, b):
         ),
         st.integers(),
     ),
-    zen_partial=st.booleans(),
+    zen_partial=st.none() | st.booleans(),
     pop_sig=st.booleans(),
 )
 def test_basic_zen_meta_behavior_vs_concrete_sig(

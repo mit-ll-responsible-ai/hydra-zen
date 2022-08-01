@@ -25,7 +25,7 @@ def wrapper(obj):
     convert=st.sampled_from(["none", "all", "partial"]),
     recursive=st.booleans(),
     sig=st.booleans(),
-    partial=st.booleans(),
+    partial=st.none() | st.booleans(),
     meta=st.none() | st.just(dict(meta=1)),
     wrappers=st.none() | st.just(wrapper) | st.lists(st.just(wrapper)),
     kwargs=st.dictionaries(keys=st.sampled_from(["x", "y", "z"]), values=st.floats()),
