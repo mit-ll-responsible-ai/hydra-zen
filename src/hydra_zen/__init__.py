@@ -20,6 +20,7 @@ from .structured_configs import (
     mutable_value,
 )
 from .structured_configs._implementations import get_target
+from .structured_configs._type_guards import is_partial_builds, uses_zen_processing
 
 __all__ = [
     "builds",
@@ -36,6 +37,8 @@ __all__ = [
     "ZenField",
     "make_custom_builds_fn",
     "launch",
+    "is_partial_builds",
+    "uses_zen_processing",
 ]
 
 __version__ = get_versions()["version"]
