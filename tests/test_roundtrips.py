@@ -1,6 +1,5 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-
 import datetime
 import math
 import operator
@@ -11,7 +10,7 @@ import statistics
 import string
 from collections import Counter, defaultdict, deque
 from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import hypothesis.strategies as st
 import pytest
@@ -95,10 +94,10 @@ def f(x, y=dict(a=2)):
 
 
 @pytest.mark.parametrize("full_sig", [True, False])
-@pytest.mark.parametrize("partial", [True, False])
+@pytest.mark.parametrize("partial", [True, False, None])
 @pytest.mark.parametrize("named_arg", [True, False])
 def test_builds_roundtrips_with_mutable_values(
-    full_sig: bool, partial: bool, named_arg: bool
+    full_sig: bool, partial: Optional[bool], named_arg: bool
 ):
     # tests mutable user-specified value and default value
     if named_arg:

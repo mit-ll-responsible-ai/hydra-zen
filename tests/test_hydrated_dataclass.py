@@ -6,6 +6,11 @@ from dataclasses import is_dataclass
 import pytest
 
 from hydra_zen import hydrated_dataclass, instantiate
+from hydra_zen._compatibility import HYDRA_SUPPORTS_PARTIAL
+from hydra_zen.structured_configs._globals import (
+    PARTIAL_FIELD_NAME,
+    ZEN_PARTIAL_FIELD_NAME,
+)
 
 
 def f1(x, y):
@@ -47,3 +52,24 @@ def test_pos_args():
         z: int = 3
 
     assert instantiate(Conf) == (1, 2, 3)
+
+
+@pytest.mark.parametrize("zen_partial", [None, False, True])
+def test_partial(zen_partial):
+    kw = {}
+    if zen_partial is not None:
+        kw["zen_partial"] = zen_partial
+
+    @hydrated_dataclass(f2, 1, 2, **kw)
+    class Conf:
+        z: int = 3
+
+    if zen_partial is None:
+        assert not hasattr(Conf, PARTIAL_FIELD_NAME) and not hasattr(
+            Conf, ZEN_PARTIAL_FIELD_NAME
+        )
+    else:
+        if HYDRA_SUPPORTS_PARTIAL:
+            assert getattr(Conf, PARTIAL_FIELD_NAME) is zen_partial
+        else:
+            assert getattr(Conf, ZEN_PARTIAL_FIELD_NAME) is zen_partial

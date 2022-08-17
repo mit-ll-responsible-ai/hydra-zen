@@ -788,7 +788,7 @@ def check_targeted_dataclass():
 
 def check_overloads_arent_too_restrictive():
     def caller(
-        zen_partial: bool,
+        zen_partial: Optional[bool],
         zen_wrappers: ZenWrappers[Callable[..., Any]],
         zen_meta: Optional[Mapping[str, SupportedPrimitive]],
         populate_full_signature: bool,
@@ -876,60 +876,62 @@ def check_hydra_target_pos_only(partial_builds: PBuilds, full_builds: FullBuilds
 # the following tests caught regressions in builds' overloads
 
 
-def check_partial_narrowing_builds(x: bool):
+def check_partial_narrowing_builds(x: bool, partial_: Optional[bool]):
     def f(x: int):
         return 1
 
-    maybe_full_sig = builds(f, zen_partial=x, populate_full_signature=x)
+    maybe_full_sig = builds(f, zen_partial=partial_, populate_full_signature=x)
     # could have full-sig; should raise
     maybe_full_sig()  # type: ignore
 
-    not_full_sig = builds(f, zen_partial=x, populate_full_signature=False)
+    not_full_sig = builds(f, zen_partial=partial_, populate_full_signature=False)
     # can't have full sig,
     not_full_sig()
 
-    not_full_sig2 = builds(f, zen_partial=x)
+    not_full_sig2 = builds(f, zen_partial=partial_)
     # can't have full-sig
     not_full_sig2()
 
 
 def check_partial_narrowing_std_and_partial(
-    builds_fn: Union[StdBuilds, PBuilds], x: bool
+    builds_fn: Union[StdBuilds, PBuilds], x: bool, partial_: Optional[bool]
 ):
     def f(x: int):
         return 1
 
-    maybe_full_sig = builds_fn(f, zen_partial=x, populate_full_signature=x)
+    maybe_full_sig = builds_fn(f, zen_partial=partial_, populate_full_signature=x)
     # could have full-sig; should raise
     maybe_full_sig()  # type: ignore
 
-    not_full_sig = builds_fn(f, zen_partial=x, populate_full_signature=False)
+    not_full_sig = builds_fn(f, zen_partial=partial_, populate_full_signature=False)
     # can't have full sig,
     not_full_sig()
 
-    not_full_sig2 = builds_fn(f, zen_partial=x)
+    not_full_sig2 = builds_fn(f, zen_partial=partial_)
     # can't have full-sig
     not_full_sig2()
 
 
-def check_partial_narrowing_full(builds_fn: FullBuilds, x: bool):
+def check_partial_narrowing_full(
+    builds_fn: FullBuilds, x: bool, partial_: Optional[bool]
+):
     def f(x: int):
         return 1
 
-    maybe_full_sig = builds_fn(f, zen_partial=x, populate_full_signature=x)
+    maybe_full_sig = builds_fn(f, zen_partial=partial_, populate_full_signature=x)
     # could have full-sig; should raise
     maybe_full_sig()  # type: ignore
 
-    not_full_sig = builds_fn(f, zen_partial=x, populate_full_signature=False)
+    not_full_sig = builds_fn(f, zen_partial=partial_, populate_full_signature=False)
     # can't have full sig,
     not_full_sig()
 
-    yes_full_sig = builds_fn(f, zen_partial=x)
+    yes_full_sig = builds_fn(f, zen_partial=partial_)
     # can't have full-sig
     yes_full_sig()  # type: ignore
 
 
-def check_make_custom_builds_overloads(boolean: bool):
+def check_make_custom_builds_overloads(boolean: bool, optional_boolean: Optional[bool]):
     Parent = builds(int)
 
     # Returns `StdBuilds`
@@ -976,41 +978,51 @@ def check_make_custom_builds_overloads(boolean: bool):
     )
 
     reveal_type(
-        make_custom_builds_fn(zen_partial=boolean),
+        make_custom_builds_fn(zen_partial=optional_boolean),
         expected_text="PBuilds | StdBuilds",
     )
 
     reveal_type(
-        make_custom_builds_fn(populate_full_signature=False, zen_partial=boolean),
+        make_custom_builds_fn(
+            populate_full_signature=False, zen_partial=optional_boolean
+        ),
         expected_text="PBuilds | StdBuilds",
     )
     reveal_type(
         make_custom_builds_fn(
-            populate_full_signature=True, zen_partial=boolean, builds_bases=(Parent,)
+            populate_full_signature=True,
+            zen_partial=optional_boolean,
+            builds_bases=(Parent,),
         ),
         expected_text="PBuilds | StdBuilds",
     )
 
     reveal_type(
         make_custom_builds_fn(
-            populate_full_signature=boolean, zen_partial=boolean, builds_bases=(Parent,)
+            populate_full_signature=boolean,
+            zen_partial=optional_boolean,
+            builds_bases=(Parent,),
         ),
         expected_text="PBuilds | StdBuilds",
     )
 
     reveal_type(
-        make_custom_builds_fn(zen_partial=boolean, builds_bases=(Parent,)),
+        make_custom_builds_fn(zen_partial=optional_boolean, builds_bases=(Parent,)),
         expected_text="PBuilds | StdBuilds",
     )
 
     # Returns `FullBuilds | PBuilds | StdBuilds`
     reveal_type(
-        make_custom_builds_fn(populate_full_signature=True, zen_partial=boolean),
+        make_custom_builds_fn(
+            populate_full_signature=True, zen_partial=optional_boolean
+        ),
         expected_text="FullBuilds | PBuilds | StdBuilds",
     )
 
     reveal_type(
-        make_custom_builds_fn(populate_full_signature=boolean, zen_partial=boolean),
+        make_custom_builds_fn(
+            populate_full_signature=boolean, zen_partial=optional_boolean
+        ),
         expected_text="FullBuilds | PBuilds | StdBuilds",
     )
 

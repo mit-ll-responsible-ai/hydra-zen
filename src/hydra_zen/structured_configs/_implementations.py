@@ -75,7 +75,7 @@ from ._globals import (
     POS_ARG_FIELD_NAME,
     RECURSIVE_FIELD_NAME,
     TARGET_FIELD_NAME,
-    ZEN_PARTIAL_TARGET_FIELD_NAME,
+    ZEN_PARTIAL_FIELD_NAME,
     ZEN_PROCESSING_LOCATION,
     ZEN_TARGET_FIELD_NAME,
     ZEN_WRAPPERS_FIELD_NAME,
@@ -185,7 +185,7 @@ def __dataclass_transform__(
 def hydrated_dataclass(
     target: Callable[..., Any],
     *pos_args: SupportedPrimitive,
-    zen_partial: bool = False,
+    zen_partial: Optional[bool] = None,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
@@ -211,7 +211,7 @@ def hydrated_dataclass(
         Arguments specified positionally are not included in the dataclass' signature and
         are stored as a tuple bound to in the ``_args_`` field.
 
-    zen_partial : bool, optional (default=False)
+    zen_partial : Optional[bool]
         If ``True``, then the resulting config will instantiate as
         ``functools.partial(hydra_target, *pos_args, **kwargs_for_target)`` rather than
         ``hydra_target(*pos_args, **kwargs_for_target)``. Thus this enables the
@@ -563,7 +563,7 @@ def sanitized_field(
 def builds(
     __hydra_target: Callable[P, R],
     *,
-    zen_partial: Literal[False] = ...,
+    zen_partial: Literal[False, None] = ...,
     populate_full_signature: Literal[True],
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
@@ -582,7 +582,7 @@ def builds(
 def builds(
     __hydra_target: Importable,
     *pos_args: SupportedPrimitive,
-    zen_partial: Literal[False] = ...,
+    zen_partial: Literal[False, None] = ...,
     populate_full_signature: bool = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
@@ -622,7 +622,7 @@ def builds(
 def builds(
     __hydra_target: Importable,
     *pos_args: SupportedPrimitive,
-    zen_partial: bool = ...,
+    zen_partial: Optional[bool] = ...,
     populate_full_signature: Literal[False] = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
@@ -645,7 +645,7 @@ def builds(
 def builds(
     __hydra_target: Union[Callable[P, R], Importable],
     *pos_args: SupportedPrimitive,
-    zen_partial: bool,
+    zen_partial: Optional[bool],
     populate_full_signature: bool = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
@@ -666,7 +666,7 @@ def builds(
 
 def builds(
     *pos_args: Union[Importable, Callable[P, R], SupportedPrimitive],
-    zen_partial: bool = False,
+    zen_partial: Optional[bool] = None,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
     populate_full_signature: bool = False,
@@ -682,7 +682,7 @@ def builds(
     Type[PartialBuilds[Importable]],
     Type[BuildsWithSig[Type[R], P]],
 ]:
-    """builds(hydra_target, /, *pos_args, zen_partial=False, zen_wrappers=(), zen_meta=None, populate_full_signature=False, hydra_recursive=None, hydra_convert=None, hydra_defaults=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
+    """builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, hydra_recursive=None, hydra_convert=None, hydra_defaults=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
 
     Returns a structured config, which describes how to instantiate/call
     ``<hydra_target>`` with both user-specified and auto-populated parameter values.
@@ -714,7 +714,7 @@ def builds(
         ``_zen_`` are reserved to ensure future-compatibility, and thus cannot be
         specified by the user.
 
-    zen_partial : bool, optional (default=False)
+    zen_partial : Optional[bool]
         If ``True``, then the resulting config will instantiate as
         ``functools.partial(<hydra_target>, *pos_args, **kwargs_for_target)``. Thus
         this enables the partial-configuration of objects.
@@ -1061,7 +1061,7 @@ def builds(
             f"`hydra_recursive` must be a boolean type, got {hydra_recursive}"
         )
 
-    if not isinstance(zen_partial, bool):
+    if zen_partial is not None and not isinstance(zen_partial, bool):
         raise TypeError(f"`zen_partial` must be a boolean type, got: {zen_partial}")
 
     if hydra_convert is not None and hydra_convert not in {"none", "partial", "all"}:
@@ -1162,14 +1162,62 @@ def builds(
 
     target_path: Final[str] = _utils.get_obj_path(target)
 
+    # zen_partial behavior:
+    #
+    # If zen_partial is not None: zen_partial dictates if output is PartialBuilds
+    #
+    # If zen_partial is None:
+    #   - closest parent with partial-flag specified determines
+    #     if output is PartialBuilds
+    #   - if no parent, output is Builds
+    #
+    # If _partial_=True is inherited but zen-processing is used
+    #    then set _partial_=False, _zen_partial=zen_partial
+    #
+    base_hydra_partial: Optional[bool] = None  # state of closest parent with _partial_
+    base_zen_partial: Optional[bool] = None  # state of closest parent with _zen_partial
+
+    # reflects state of closest parent that has partial field specified
+    parent_partial: Optional[bool] = None
+
+    for base in builds_bases:
+        _set_this_iteration = False
+        if HYDRA_SUPPORTS_PARTIAL and base_hydra_partial is None:
+            base_hydra_partial = getattr(base, PARTIAL_FIELD_NAME, None)
+            if parent_partial is None:
+                parent_partial = base_hydra_partial
+                _set_this_iteration = True
+
+        if base_zen_partial is None:
+            base_zen_partial = getattr(base, ZEN_PARTIAL_FIELD_NAME, None)
+            if parent_partial is None or (
+                _set_this_iteration and base_zen_partial is not None
+            ):
+                parent_partial = parent_partial or base_zen_partial
+
+        del _set_this_iteration
+
+    if zen_partial is None:
+        # zen_partial is inherited
+        zen_partial = parent_partial
+
+    del parent_partial
+
+    requires_partial_field = zen_partial is not None
+
     requires_zen_processing: Final[bool] = (
         bool(zen_meta)
         or bool(validated_wrappers)
         or any(uses_zen_processing(b) for b in builds_bases)
-        or (zen_partial and not HYDRA_SUPPORTS_PARTIAL)
+        or (bool(requires_partial_field) and not HYDRA_SUPPORTS_PARTIAL)
     )
 
-    if not requires_zen_processing and zen_partial:  # pragma: no cover
+    if base_zen_partial:
+        assert requires_zen_processing
+
+    del base_zen_partial
+
+    if not requires_zen_processing and requires_partial_field:  # pragma: no cover
         # TODO: require test-coverage once Hydra publishes nightly builds
         target_field = [
             (
@@ -1180,7 +1228,7 @@ def builds(
             (
                 PARTIAL_FIELD_NAME,
                 bool,
-                _utils.field(default=zen_partial, init=False),
+                _utils.field(default=bool(zen_partial), init=False),
             ),
         ]
     elif requires_zen_processing:
@@ -1198,14 +1246,23 @@ def builds(
             ),
         ]
 
-        if zen_partial:
+        if requires_partial_field:
             target_field.append(
                 (
-                    ZEN_PARTIAL_TARGET_FIELD_NAME,
+                    ZEN_PARTIAL_FIELD_NAME,
                     bool,
-                    _utils.field(default=True, init=False),
+                    _utils.field(default=bool(zen_partial), init=False),
                 ),
             )
+            if HYDRA_SUPPORTS_PARTIAL and base_hydra_partial:
+                # Must explicitly set _partial_=False to prevent inheritance
+                target_field.append(
+                    (
+                        PARTIAL_FIELD_NAME,
+                        bool,
+                        _utils.field(default=False, init=False),
+                    ),
+                )
 
         if zen_meta:
             target_field.append(
@@ -1253,6 +1310,9 @@ def builds(
                 _utils.field(default=target_path, init=False),
             )
         ]
+
+    del base_hydra_partial
+    del requires_partial_field
 
     base_fields = target_field
 
@@ -1606,7 +1666,7 @@ def builds(
         base_fields.extend((name, Any, value) for name, value in zen_meta.items())
 
     if dataclass_name is None:
-        if zen_partial is False:
+        if zen_partial is not True:
             dataclass_name = f"Builds_{_utils.safe_name(target)}"
         else:
             dataclass_name = f"PartialBuilds_{_utils.safe_name(target)}"
@@ -1688,26 +1748,6 @@ def builds(
         dataclass_name, fields=sanitized_base_fields, bases=builds_bases, frozen=frozen
     )
 
-    if zen_partial is False and (
-        getattr(out, ZEN_PARTIAL_TARGET_FIELD_NAME, False)
-        or getattr(out, PARTIAL_FIELD_NAME, False)
-    ):
-        # `out._partial_=True` or `out._zen_partial=True` has been inherited; there
-        # is no way for users to override this, thus they must explicitly specify
-        # `zen_partial=True` in order to "opt-in" to this behavior.
-        raise TypeError(
-            BUILDS_ERROR_PREFIX
-            + "`builds(..., zen_partial=False, builds_bases=(...))` does not "
-            "permit `builds_bases` where a partial target has been specified."
-        )
-
-    if requires_zen_processing and hasattr(out, PARTIAL_FIELD_NAME):
-        raise TypeError(
-            BUILDS_ERROR_PREFIX
-            + "`builds(..., builds_bases=(...))` cannot use zen-processing features "
-            "while inheriting the field `_partial_: bool = ...`"
-        )
-
     out.__doc__ = (
         f"A structured config designed to {'partially ' if zen_partial else ''}initialize/call "
         f"`{target_path}` upon instantiation by hydra."
@@ -1720,6 +1760,13 @@ def builds(
             )
 
     assert requires_zen_processing is uses_zen_processing(out)
+
+    # _partial_=True should never be relied on when zen-processing is being used.
+    assert not (
+        HYDRA_SUPPORTS_PARTIAL
+        and requires_zen_processing
+        and getattr(out, PARTIAL_FIELD_NAME, False)
+    )
 
     return cast(Union[Type[Builds[Importable]], Type[BuildsWithSig[Type[R], P]]], out)
 
@@ -1804,7 +1851,7 @@ def get_target(obj: HasTarget) -> Any:
     else:
         raise TypeError(
             f"`obj` must specify a target; i.e. it must have an attribute named"
-            f" {TARGET_FIELD_NAME} or named {ZEN_PARTIAL_TARGET_FIELD_NAME} that"
+            f" {TARGET_FIELD_NAME} or named {ZEN_PARTIAL_FIELD_NAME} that"
             f" points to a target-object or target-string"
         )
     target = getattr(obj, field_name)

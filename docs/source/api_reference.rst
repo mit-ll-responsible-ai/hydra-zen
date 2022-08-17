@@ -74,6 +74,8 @@ Utilities
 
 
    make_custom_builds_fn
+   is_partial_builds
+   uses_zen_processing
    ZenField
 
 

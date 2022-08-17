@@ -18,8 +18,17 @@ from hydra_zen.structured_configs._implementations import sanitize_collection
 from hydra_zen.typing import SupportedPrimitive
 from hydra_zen.typing._implementations import DataClass, DataClass_, DefaultsList, Field
 
-from ._globals import CONVERT_FIELD_NAME, DEFAULTS_LIST_FIELD_NAME, RECURSIVE_FIELD_NAME
+from .._compatibility import HYDRA_SUPPORTS_PARTIAL
+from ._globals import (
+    CONVERT_FIELD_NAME,
+    DEFAULTS_LIST_FIELD_NAME,
+    PARTIAL_FIELD_NAME,
+    RECURSIVE_FIELD_NAME,
+    ZEN_PARTIAL_FIELD_NAME,
+    ZEN_TARGET_FIELD_NAME,
+)
 from ._implementations import _retain_type_info, builds, sanitized_field
+from ._type_guards import uses_zen_processing
 
 __all__ = ["ZenField", "make_config"]
 
@@ -462,9 +471,25 @@ def make_config(
             )
         )
 
-    return cast(
-        Type[DataClass],
-        make_dataclass(
-            cls_name=config_name, fields=config_fields, frozen=frozen, bases=bases
-        ),
+    out = make_dataclass(
+        cls_name=config_name, fields=config_fields, frozen=frozen, bases=bases
     )
+    if hasattr(out, ZEN_TARGET_FIELD_NAME) and not uses_zen_processing(out):
+        raise ValueError(
+            f"{out.__name__} inherits from base classes that overwrite some fields "
+            f"associated with zen-processing features. As a result, this config will "
+            f"not instantiate correctly."
+        )
+    if (
+        HYDRA_SUPPORTS_PARTIAL
+        and getattr(out, PARTIAL_FIELD_NAME, False)
+        and uses_zen_processing(out)
+    ):
+        raise ValueError(
+            f"{out.__name__} specifies both `{PARTIAL_FIELD_NAME}=True` and `"
+            f"{ZEN_PARTIAL_FIELD_NAME}=True`. This config will not instantiate "
+            f"correctly. This is typically caused by inheriting from multiple, "
+            f"conflicting configs."
+        )
+
+    return cast(Type[DataClass], out)

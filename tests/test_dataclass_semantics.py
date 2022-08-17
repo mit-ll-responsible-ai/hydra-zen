@@ -19,7 +19,7 @@ def f(x, y, z: int = 3):
     return x, y, z
 
 
-@given(full_sig=st.booleans(), partial=st.booleans())
+@given(full_sig=st.booleans(), partial=st.none() | st.booleans())
 def test_builds_produces_dataclass(full_sig: bool, partial: bool):
 
     if full_sig and not partial:
@@ -42,7 +42,7 @@ def f_2(x, y, z):
 
 
 @pytest.mark.parametrize("full_sig", [True, False])
-@pytest.mark.parametrize("partial", [True, False])
+@pytest.mark.parametrize("partial", [True, False, None])
 def test_chain_builds_of_targets_with_common_interfaces(full_sig, partial):
 
     # Note that conf_1 and conf_2 target `f` whereas conf_3 targets `f_three_vars`,
@@ -68,7 +68,7 @@ def test_chain_builds_of_targets_with_common_interfaces(full_sig, partial):
 
 
 @pytest.mark.parametrize("full_sig", [True, False])
-@pytest.mark.parametrize("partial", [True, False])
+@pytest.mark.parametrize("partial", [True, False, None])
 def test_pos_args_with_inheritance(full_sig, partial):
 
     conf_1 = builds(f_three_vars, 1, 2)
@@ -178,3 +178,20 @@ def test_hydra_settings_can_be_inherited(recursive, convert, via_builds):
         assert Child._convert_ is Base._convert_
     else:
         assert not hasattr(Child, "_convert_")
+
+
+@given(
+    target=st.sampled_from([int, str]),
+    zen_partial=st.none() | st.booleans(),
+    name=st.none() | st.just("CustomName"),
+)
+def test_dataclass_name(target, zen_partial, name):
+    Conf = builds(target, zen_partial=zen_partial, dataclass_name=name)
+    if name is not None:
+        assert Conf.__name__ == "CustomName"
+        return
+    target_name = "str" if target is str else "int"
+    if zen_partial is True:
+        assert Conf.__name__ == f"PartialBuilds_{target_name}"
+    else:
+        assert Conf.__name__ == f"Builds_{target_name}"

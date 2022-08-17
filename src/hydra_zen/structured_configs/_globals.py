@@ -35,7 +35,7 @@ del _names
 ZEN_PROCESSING_LOCATION: Final[str] = _utils.get_obj_path(zen_processing)
 GET_OBJ_LOCATION: Final[str] = _utils.get_obj_path(get_obj)
 ZEN_TARGET_FIELD_NAME: Final[str] = "_zen_target"
-ZEN_PARTIAL_TARGET_FIELD_NAME: Final[str] = "_zen_partial"
+ZEN_PARTIAL_FIELD_NAME: Final[str] = "_zen_partial"
 META_FIELD_NAME: Final[str] = "_zen_exclude"
 ZEN_WRAPPERS_FIELD_NAME: Final[str] = "_zen_wrappers"
 JUST_FIELD_NAME: Final[str] = "path"
