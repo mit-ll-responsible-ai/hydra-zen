@@ -327,7 +327,11 @@ def test_inherited_partial_false_fields(Parent):
 
 
 def test_make_config_catches_multiple_inheritance_conflicting_with_zen_processing():
-    A = builds(int, zen_partial=True)
+    @dataclass
+    class A:
+        _target_: str = "builtins.str"
+        _partial_: bool = True
+
     B = builds(int, zen_partial=True, zen_meta=dict(a=1))
 
     with pytest.raises(ValueError):
@@ -335,6 +339,7 @@ def test_make_config_catches_multiple_inheritance_conflicting_with_zen_processin
         # leading to "corrupt" state
         _ = make_config(bases=(A, B))
 
-    with pytest.raises(ValueError):
-        # Specifies _partial_=True and _zen_partial=True
-        _ = make_config(bases=(B, A))
+    if HYDRA_SUPPORTS_PARTIAL:
+        with pytest.raises(ValueError):
+            # Specifies _partial_=True and _zen_partial=True
+            _ = make_config(bases=(B, A))
