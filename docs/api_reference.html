@@ -196,6 +196,16 @@
   </a>
  </li>
  <li class="toctree-l1">
+  <a class="reference internal" href="generated/hydra_zen.is_partial_builds.html">
+   hydra_zen.is_partial_builds
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="generated/hydra_zen.uses_zen_processing.html">
+   hydra_zen.uses_zen_processing
+  </a>
+ </li>
+ <li class="toctree-l1">
   <a class="reference internal" href="generated/hydra_zen.ZenField.html">
    hydra_zen.ZenField
   </a>
@@ -412,6 +422,12 @@ the data and class-instances that we need for our application.</p>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_custom_builds_fn</span></code></a>(*[, zen_partial, ...])</p></td>
 <td><p>Returns the <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> function, but with customized default values.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.is_partial_builds.html#hydra_zen.is_partial_builds" title="hydra_zen.is_partial_builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_partial_builds</span></code></a>(x)</p></td>
+<td><p>Returns <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> if the input is a targeted structured config that entails partial instantiation, either via <code class="xref py py-obj docutils literal notranslate"><span class="pre">_partial_=True</span></code> <a class="reference internal" href="generated/hydra_zen.is_partial_builds.html#r01589f11ee6f-1" id="id2"><span>[R01589f11ee6f-1]</span></a> or via <code class="xref py py-obj docutils literal notranslate"><span class="pre">_zen_partial=True</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.uses_zen_processing.html#hydra_zen.uses_zen_processing" title="hydra_zen.uses_zen_processing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uses_zen_processing</span></code></a>(x)</p></td>
+<td><p>Returns <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> if the input is a targeted structured config that relies on zen-processing features during its instantiation process.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.ZenField.html#hydra_zen.ZenField" title="hydra_zen.ZenField"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenField</span></code></a>([hint, default, name])</p></td>
 <td><p>Specifies a field's name and/or type-annotation and/or default value.</p></td>

@@ -190,8 +190,17 @@
 <span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">SupportedPrimitive</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass</span><span class="p">,</span> <span class="n">DataClass_</span><span class="p">,</span> <span class="n">DefaultsList</span><span class="p">,</span> <span class="n">Field</span>
 
-<span class="kn">from</span> <span class="nn">._globals</span> <span class="kn">import</span> <span class="n">CONVERT_FIELD_NAME</span><span class="p">,</span> <span class="n">DEFAULTS_LIST_FIELD_NAME</span><span class="p">,</span> <span class="n">RECURSIVE_FIELD_NAME</span>
+<span class="kn">from</span> <span class="nn">.._compatibility</span> <span class="kn">import</span> <span class="n">HYDRA_SUPPORTS_PARTIAL</span>
+<span class="kn">from</span> <span class="nn">._globals</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CONVERT_FIELD_NAME</span><span class="p">,</span>
+    <span class="n">DEFAULTS_LIST_FIELD_NAME</span><span class="p">,</span>
+    <span class="n">PARTIAL_FIELD_NAME</span><span class="p">,</span>
+    <span class="n">RECURSIVE_FIELD_NAME</span><span class="p">,</span>
+    <span class="n">ZEN_PARTIAL_FIELD_NAME</span><span class="p">,</span>
+    <span class="n">ZEN_TARGET_FIELD_NAME</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">._implementations</span> <span class="kn">import</span> <span class="n">_retain_type_info</span><span class="p">,</span> <span class="n">builds</span><span class="p">,</span> <span class="n">sanitized_field</span>
+<span class="kn">from</span> <span class="nn">._type_guards</span> <span class="kn">import</span> <span class="n">uses_zen_processing</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ZenField&quot;</span><span class="p">,</span> <span class="s2">&quot;make_config&quot;</span><span class="p">]</span>
 
@@ -634,12 +643,28 @@
             <span class="p">)</span>
         <span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
-        <span class="n">Type</span><span class="p">[</span><span class="n">DataClass</span><span class="p">],</span>
-        <span class="n">make_dataclass</span><span class="p">(</span>
-            <span class="n">cls_name</span><span class="o">=</span><span class="n">config_name</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">config_fields</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="n">frozen</span><span class="p">,</span> <span class="n">bases</span><span class="o">=</span><span class="n">bases</span>
-        <span class="p">),</span>
-    <span class="p">)</span></div>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">make_dataclass</span><span class="p">(</span>
+        <span class="n">cls_name</span><span class="o">=</span><span class="n">config_name</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">config_fields</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="n">frozen</span><span class="p">,</span> <span class="n">bases</span><span class="o">=</span><span class="n">bases</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">ZEN_TARGET_FIELD_NAME</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">uses_zen_processing</span><span class="p">(</span><span class="n">out</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">out</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> inherits from base classes that overwrite some fields &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;associated with zen-processing features. As a result, this config will &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;not instantiate correctly.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">HYDRA_SUPPORTS_PARTIAL</span>
+        <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">PARTIAL_FIELD_NAME</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="n">uses_zen_processing</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">out</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> specifies both `</span><span class="si">{</span><span class="n">PARTIAL_FIELD_NAME</span><span class="si">}</span><span class="s2">=True` and `&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ZEN_PARTIAL_FIELD_NAME</span><span class="si">}</span><span class="s2">=True`. This config will not instantiate &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;correctly. This is typically caused by inheriting from multiple, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;conflicting configs.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass</span><span class="p">],</span> <span class="n">out</span><span class="p">)</span></div>
 </pre></div>
 
               </div>
