@@ -6,7 +6,7 @@ import hypothesis.strategies as st
 import pytest
 from hypothesis import given
 
-from hydra_zen import builds, instantiate, to_yaml
+from hydra_zen import builds, instantiate, make_config, to_yaml
 from hydra_zen._compatibility import HYDRA_SUPPORTS_PARTIAL
 from hydra_zen.structured_configs._globals import (
     PARTIAL_FIELD_NAME,
@@ -324,3 +324,17 @@ def test_inherited_partial_false_fields(Parent):
 
     Conf = builds(dict, builds_bases=(Parent,))  # should be OK
     assert instantiate(Conf) == instantiate(Parent)
+
+
+def test_make_config_catches_multiple_inheritance_conflicting_with_zen_processing():
+    A = builds(int, zen_partial=True)
+    B = builds(int, zen_partial=True, zen_meta=dict(a=1))
+
+    with pytest.raises(ValueError):
+        # Overwrites _target_=hydra_zen.funcs.zen_processing
+        # leading to "corrupt" state
+        _ = make_config(bases=(A, B))
+
+    with pytest.raises(ValueError):
+        # Specifies _partial_=True and _zen_partial=True
+        _ = make_config(bases=(B, A))
