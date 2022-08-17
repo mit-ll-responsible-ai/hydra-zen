@@ -1666,7 +1666,7 @@ def builds(
         base_fields.extend((name, Any, value) for name, value in zen_meta.items())
 
     if dataclass_name is None:
-        if zen_partial is False:
+        if zen_partial is not True:
             dataclass_name = f"Builds_{_utils.safe_name(target)}"
         else:
             dataclass_name = f"PartialBuilds_{_utils.safe_name(target)}"

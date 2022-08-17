@@ -178,3 +178,20 @@ def test_hydra_settings_can_be_inherited(recursive, convert, via_builds):
         assert Child._convert_ is Base._convert_
     else:
         assert not hasattr(Child, "_convert_")
+
+
+@given(
+    target=st.sampled_from([int, str]),
+    zen_partial=st.none() | st.booleans(),
+    name=st.none() | st.just("CustomName"),
+)
+def test_dataclass_name(target, zen_partial, name):
+    Conf = builds(target, zen_partial=zen_partial, dataclass_name=name)
+    if name is not None:
+        assert Conf.__name__ == "CustomName"
+        return
+    target_name = "str" if target is str else "int"
+    if zen_partial is True:
+        assert Conf.__name__ == f"PartialBuilds_{target_name}"
+    else:
+        assert Conf.__name__ == f"Builds_{target_name}"
