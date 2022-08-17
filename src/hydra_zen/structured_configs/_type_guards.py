@@ -128,7 +128,7 @@ def uses_zen_processing(x: Any) -> TypeGuard[Builds[Any]]:
 
 def is_partial_builds(x: Any) -> TypeGuard[PartialBuilds[Any]]:
     """
-    Returns `True` if the input is a targeted structured config that uses partial
+    Returns `True` if the input is a targeted structured config that entails partial
     instantiation, either via `_partial_=True` [1]_ or via `_zen_partial=True`.
 
     Parameters
