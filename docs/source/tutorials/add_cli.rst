@@ -49,7 +49,8 @@ Modify your script to match this:
    #    The name specified here - 'config' - must match the
    #    name that we provided to `cs.store(name=<...>, node=Config)`
    @hydra.main(config_path=None, config_name="my_app")
-   def task_function(cfg: Config):
+   def task_function(cfg):
+       # cfg: Config
        obj = instantiate(cfg)
        p1 = obj.player1
        p2 = obj.player2
