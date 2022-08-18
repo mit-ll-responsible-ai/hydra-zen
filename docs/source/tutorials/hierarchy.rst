@@ -178,7 +178,7 @@ We'll make some modifications to our task function.
 .. code-block:: python
    :caption: A revised task function (single-player only)
 
-   def task_function(cfg: Config):      
+   def task_function(cfg):      
        # `instantiate(cfg.player)` calls:
        #
        # Character(

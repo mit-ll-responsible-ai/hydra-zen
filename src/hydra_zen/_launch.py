@@ -15,7 +15,7 @@ from omegaconf import DictConfig, ListConfig, OmegaConf
 
 from hydra_zen._compatibility import HYDRA_VERSION
 from hydra_zen._hydra_overloads import instantiate
-from hydra_zen.typing._implementations import DataClass
+from hydra_zen.typing._implementations import DataClass, InstOrType
 
 
 class _NotSet:  # pragma: no cover
@@ -56,8 +56,8 @@ def _store_config(
 
 
 def launch(
-    config: Union[DataClass, Type[DataClass], Mapping[str, Any]],
-    task_function: Callable[[DictConfig], Any],
+    config: Union[InstOrType[DataClass], Mapping[str, Any]],
+    task_function: Callable[[Any], Any],
     overrides: Optional[List[str]] = None,
     multirun: bool = False,
     version_base: Optional[Union[str, Type[_NotSet]]] = _NotSet,

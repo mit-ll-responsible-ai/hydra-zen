@@ -184,8 +184,8 @@ over. Modify your ``my_app.py`` script to match the following code.
    
    
    @hydra.main(config_path=None, config_name="my_app")
-   def task_function(cfg: Config):
-
+   def task_function(cfg):
+       # cfg: Config
        player = instantiate(cfg.player)
        print(player)
    

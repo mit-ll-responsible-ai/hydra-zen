@@ -87,7 +87,8 @@ this file.
     
     Config = make_config("player1", "player2")
     
-    def task_function(cfg: Config):
+    def task_function(cfg):
+        # cfg: Config
         obj = instantiate(cfg)
         
         # access the player names from the config
