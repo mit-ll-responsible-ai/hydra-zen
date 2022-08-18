@@ -1071,3 +1071,16 @@ def check_hydra_defaults(
             make_config(a="a"),
         ],
     )
+
+
+def check_launch():
+    from hydra_zen import launch
+    from hydra_zen.typing._implementations import DataClass, InstOrType
+
+    Xonf = make_config()
+
+    def f(x: InstOrType[DataClass]):
+        pass
+
+    f(Xonf)
+    launch(Xonf, f)
