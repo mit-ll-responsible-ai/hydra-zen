@@ -14,7 +14,7 @@ chronological order. All previous releases should still be available on pip.
 0.8.0 - 2022-XX-XX
 ------------------
 
-.. note:: This is documentation for an unreleased version of hydra-zen
+.. note:: This is documentation for an unreleased version of hydra-zen. You can try out this version pre-release version using `pip install --pre hydra-zen`
 
 
 Support for New Hydra/OmegaConf Features
