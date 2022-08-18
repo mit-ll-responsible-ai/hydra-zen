@@ -427,8 +427,8 @@ over. Modify your <code class="docutils literal notranslate"><span class="pre">m
 
 
 <span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_name</span><span class="o">=</span><span class="s2">&quot;my_app&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Config</span><span class="p">):</span>
-
+<span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+    <span class="c1"># cfg: Config</span>
     <span class="n">player</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">player</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">player</span><span class="p">)</span>
 

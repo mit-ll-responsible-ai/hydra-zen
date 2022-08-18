@@ -397,7 +397,8 @@ and trainer. We’ll also define the task function that trains and tests our mod
 <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">ExperimentConfig</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+    <span class="c1"># cfg: ExperimentConfig</span>
     <span class="n">pl</span><span class="o">.</span><span class="n">seed_everything</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
 
     <span class="n">obj</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>

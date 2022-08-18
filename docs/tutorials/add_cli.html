@@ -278,7 +278,8 @@ from a command line interface, using Hydra.</p>
 <span class="c1">#    The name specified here - &#39;config&#39; - must match the</span>
 <span class="c1">#    name that we provided to `cs.store(name=&lt;...&gt;, node=Config)`</span>
 <span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_name</span><span class="o">=</span><span class="s2">&quot;my_app&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Config</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+    <span class="c1"># cfg: Config</span>
     <span class="n">obj</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
     <span class="n">p1</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">player1</span>
     <span class="n">p2</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">player2</span>

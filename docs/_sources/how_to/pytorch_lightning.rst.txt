@@ -161,7 +161,8 @@ and trainer. We'll also define the task function that trains and tests our model
    )
    
    
-   def task_function(cfg: ExperimentConfig):
+   def task_function(cfg):
+       # cfg: ExperimentConfig
        pl.seed_everything(cfg.seed)
    
        obj = instantiate(cfg)

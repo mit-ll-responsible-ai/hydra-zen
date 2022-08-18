@@ -332,7 +332,8 @@ this file.</p>
 
 <span class="n">Config</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span><span class="s2">&quot;player1&quot;</span><span class="p">,</span> <span class="s2">&quot;player2&quot;</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Config</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+    <span class="c1"># cfg: Config</span>
     <span class="n">obj</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
 
     <span class="c1"># access the player names from the config</span>

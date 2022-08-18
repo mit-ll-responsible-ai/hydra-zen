@@ -187,7 +187,7 @@
 
 <span class="kn">from</span> <span class="nn">hydra_zen._compatibility</span> <span class="kn">import</span> <span class="n">HYDRA_VERSION</span>
 <span class="kn">from</span> <span class="nn">hydra_zen._hydra_overloads</span> <span class="kn">import</span> <span class="n">instantiate</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass</span><span class="p">,</span> <span class="n">InstOrType</span>
 
 
 <span class="k">class</span> <span class="nc">_NotSet</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
@@ -228,8 +228,8 @@
 
 
 <div class="viewcode-block" id="launch"><a class="viewcode-back" href="../../generated/hydra_zen.launch.html#hydra_zen.launch">[docs]</a><span class="k">def</span> <span class="nf">launch</span><span class="p">(</span>
-    <span class="n">config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataClass</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataClass</span><span class="p">],</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
-    <span class="n">task_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">DictConfig</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">InstOrType</span><span class="p">[</span><span class="n">DataClass</span><span class="p">],</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+    <span class="n">task_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
     <span class="n">overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">multirun</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">version_base</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">_NotSet</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">_NotSet</span><span class="p">,</span>
