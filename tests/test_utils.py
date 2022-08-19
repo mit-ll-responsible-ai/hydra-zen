@@ -66,8 +66,6 @@ T = TypeVar("T")
 P = ParamSpec("P")
 Ts = TypeVarTuple("Ts")
 
-IS_PY37 = (3, 6) < sys.version_info < (3, 8)
-
 
 def pass_through(*args):
     return args
@@ -134,14 +132,14 @@ class Color(enum.Enum):
     pass
 
 
-class SomeProtocol(Protocol[T]):
+class SomeProtocol(Protocol[T]):  # type: ignore
     ...
 
 
 NoneType: TypeAlias = None
 
-vList = List if sys.version_info > (3, 7) else List[Any]
-vDict = Dict if sys.version_info > (3, 7) else Dict[Any, Any]
+vList = List[Any] if sys.version_info < (3, 8) else List
+vDict = Dict[Any, Any] if sys.version_info < (3, 8) else Dict
 
 
 @pytest.mark.parametrize(
@@ -164,7 +162,7 @@ vDict = Dict if sys.version_info > (3, 7) else Dict[Any, Any]
         (dict, (vDict if OMEGACONF_VERSION < Version(2, 2, 3) else dict)),
         (callable, Any),
         (frozenset, Any),
-        (List, vList),
+        (vList, vList),
         (Tuple, (Any if OMEGACONF_VERSION < Version(2, 2, 3) else Tuple)),
         (Dict, vDict),
         (T, Any),
@@ -297,9 +295,7 @@ def test_sanitized_type_expected_behavior(in_type, expected_type):
 
     assert sanitized_type(in_type) == expected_type, in_type
 
-    if in_type != expected_type and not (
-        sys.version_info < (3, 8) and in_type in (List, Dict)
-    ):
+    if in_type != expected_type:
         # In cases where we change the type, it should be because omegaconf
         # doesn't support that annotation.
         # This check will help catch cases where omegaconf/hydra has added support for
