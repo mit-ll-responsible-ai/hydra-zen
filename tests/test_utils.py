@@ -48,6 +48,7 @@ from hydra_zen._compatibility import (
     HYDRA_SUPPORTS_BYTES,
     HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES,
     HYDRA_VERSION,
+    OMEGACONF_VERSION,
     HYDRA_SUPPORTS_Path,
     Version,
     _get_version,
@@ -64,8 +65,6 @@ from tests import everything_except
 T = TypeVar("T")
 P = ParamSpec("P")
 Ts = TypeVarTuple("Ts")
-
-current_module: str = sys.modules[__name__].__name__
 
 
 def pass_through(*args):
@@ -133,11 +132,14 @@ class Color(enum.Enum):
     pass
 
 
-class SomeProtocol(Protocol[T]):
+class SomeProtocol(Protocol[T]):  # type: ignore
     ...
 
 
 NoneType: TypeAlias = None
+
+vList = List[Any] if sys.version_info < (3, 8) else List
+vDict = Dict[Any, Any] if sys.version_info < (3, 8) else Dict
 
 
 @pytest.mark.parametrize(
@@ -155,11 +157,14 @@ NoneType: TypeAlias = None
         (C, Any),  # unsupported primitives
         (type(None), Any),
         (set, Any),
-        (list, Any),
-        (tuple, Any),
-        (dict, Any),
+        (list, (vList if OMEGACONF_VERSION < Version(2, 2, 3) else list)),
+        (tuple, (Any if OMEGACONF_VERSION < Version(2, 2, 3) else tuple)),
+        (dict, (vDict if OMEGACONF_VERSION < Version(2, 2, 3) else dict)),
         (callable, Any),
         (frozenset, Any),
+        (vList, vList),
+        (Tuple, (Any if OMEGACONF_VERSION < Version(2, 2, 3) else Tuple)),
+        (Dict, vDict),
         (T, Any),
         (List[T], List[Any]),
         (Tuple[T, T], Tuple[Any, Any]),

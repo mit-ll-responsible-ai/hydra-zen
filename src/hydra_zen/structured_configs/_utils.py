@@ -24,7 +24,6 @@ from typing import (
     overload,
 )
 
-
 from omegaconf import II, DictConfig, ListConfig
 from typing_extensions import (
     Annotated,
@@ -47,7 +46,9 @@ from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVE_TYPES,
     HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES,
     HYDRA_SUPPORTS_PARTIAL,
+    OMEGACONF_VERSION,
     PATCH_OMEGACONF_830,
+    Version,
 )
 from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.typing._implementations import DataClass_, Field, InterpStr
@@ -287,6 +288,14 @@ def get_obj_path(obj: Any) -> str:
 
 
 NoneType = type(None)
+_supported_types = HYDRA_SUPPORTED_PRIMITIVE_TYPES | {
+    list,
+    dict,
+    tuple,
+    List,
+    Tuple,
+    Dict,
+}
 
 
 def sanitized_type(
@@ -328,9 +337,16 @@ def sanitized_type(
             nested=nested,
         )
 
+    if OMEGACONF_VERSION < Version(2, 2, 3):  # pragma: no cover
+        try:
+            type_ = {list: List, tuple: Tuple, dict: Dict}.get(type_, type_)
+        except TypeError:
+            pass
+
     # Warning: mutating `type_` will mutate the signature being inspected
     # Even calling deepcopy(`type_`) silently fails to prevent this.
     origin = get_origin(type_)
+
     no_nested_container = not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES
 
     if origin is not None:
@@ -379,17 +395,18 @@ def sanitized_type(
             return Union[optional_type, NoneType]  # type: ignore
 
         if origin is list or origin is List:
-            return List[sanitized_type(args[0], primitive_only=no_nested_container, nested=True)] if args else type_  # type: ignore
+            if args:
+                return List[sanitized_type(args[0], primitive_only=no_nested_container, nested=True)]  # type: ignore
+            return List
 
         if origin is dict or origin is Dict:
-            return (
-                Dict[
-                    sanitized_type(args[0], primitive_only=True, nested=True),  # type: ignore
-                    sanitized_type(args[1], primitive_only=no_nested_container, nested=True),  # type: ignore
-                ]
-                if args
-                else type_
-            )
+            if args:
+                KeyType = sanitized_type(args[0], primitive_only=True, nested=True)
+                ValueType = sanitized_type(
+                    args[1], primitive_only=no_nested_container, nested=True
+                )
+                return Dict[KeyType, ValueType]  # type: ignore
+            return Dict
 
         if (origin is tuple or origin is Tuple) and not nested:
             # hydra silently supports tuples of homogenous types
@@ -399,7 +416,8 @@ def sanitized_type(
             #
             # Otherwise we preserve the annotation as accurately as possible
             if not args:
-                return Any  # bare Tuple not supported by hydra
+                return Any if OMEGACONF_VERSION < (2, 2, 3) else Tuple
+
             args = cast(Tuple[type, ...], args)
             unique_args = set(args)
 
@@ -432,10 +450,13 @@ def sanitized_type(
 
     if (
         type_ is Any
-        or type_ in HYDRA_SUPPORTED_PRIMITIVE_TYPES
+        or type_ in _supported_types
         or is_dataclass(type_)
         or (isinstance(type_, type) and issubclass(type_, Enum))
     ):
+
+        if sys.version_info[:2] == (3, 6) and type_ is Dict:  # pragma: no cover
+            type_ = Dict[Any, Any]
 
         if wrap_optional and type_ is not Any:  # pragma: no cover
             # normally get_type_hints automatically resolves Optional[...]
@@ -447,7 +468,14 @@ def sanitized_type(
         return type_
 
     # Needed to cover python 3.6 where __origin__ doesn't normalize to type
-    if not primitive_only and type_ in {List, Tuple, Dict}:  # pragma: no cover
+    if not primitive_only and type_ in {
+        List,
+        Tuple,
+        Dict,
+        list,
+        dict,
+        tuple,
+    }:  # pragma: no cover
         if wrap_optional and type_ is not Any:
             type_ = Optional[type_]  # type: ignore
         return type_
