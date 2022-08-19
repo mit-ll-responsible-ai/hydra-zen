@@ -1,12 +1,13 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+import inspect
 import string
 from collections import Counter, deque
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from functools import partial
 from pathlib import Path
-from typing import Dict, FrozenSet, List, Set, Union
+from typing import Any, Callable, Dict, FrozenSet, Iterable, List, Set, Union
 
 import hypothesis.strategies as st
 import pytest
@@ -23,6 +24,8 @@ from hydra_zen import (
 )
 from hydra_zen._compatibility import ZEN_SUPPORTED_PRIMITIVES
 from hydra_zen.structured_configs._value_conversion import ZEN_VALUE_CONVERSION
+from hydra_zen.typing import Partial
+from tests import is_same
 
 
 def test_supported_primitives_in_sync_with_value_conversion():
@@ -238,3 +241,98 @@ def test_zen_supported_primitives_arent_supported_by_hydra(type_, data: st.DataO
     with pytest.raises((ValidationError, AssertionError)):
         Conf = OmegaConf.create(C)
         assert isinstance(Conf.x, type_)
+
+
+@dataclass
+class A_builds_populate_sig_with_default_factory:
+    z: Any
+    x_list: List[int] = field(default_factory=lambda: list([1, 0, 1, 0, 1]))
+    x_dict: Dict[str, int] = field(default_factory=lambda: dict({"K_DEFAULT": 10101}))
+    y: bool = False
+
+
+@given(
+    via_yaml=st.booleans(),
+    list_=st.none() | st.lists(st.integers()),
+    # TODO: generalize to st.dictionaries(st.sampled_from("abcd"), st.integers())
+    #       once https://github.com/facebookresearch/hydra/issues/2350 is resolved
+    dict_=st.none(),
+    kwargs_via_builds=st.booleans(),
+)
+def test_builds_populate_sig_with_default_factory(
+    via_yaml: bool, list_, dict_, kwargs_via_builds
+):
+    A = A_builds_populate_sig_with_default_factory
+    kwargs = {}
+    if list_ is not None:
+        kwargs["x_list"] = list_
+
+    if dict_ is not None:
+        kwargs["x_dict"] = dict_
+
+    Conf = (
+        builds(A, **kwargs, populate_full_signature=True)
+        if kwargs_via_builds
+        else builds(A, populate_full_signature=True)
+    )
+
+    assert inspect.signature(Conf).parameters == inspect.signature(A).parameters
+
+    if via_yaml:
+        Conf = OmegaConf.structured(to_yaml(Conf))
+    a_expected = A(z=1, **kwargs)
+
+    a = (
+        instantiate(Conf, z=1)
+        if kwargs_via_builds
+        else instantiate(Conf, **kwargs, z=1)
+    )
+
+    assert isinstance(a, A)
+    assert a.x_list == a_expected.x_list
+    assert a.x_dict == a_expected.x_dict
+    assert a.y == a_expected.y
+    assert a.z == a_expected.z
+
+
+@dataclass
+class A_auto_config_for_dataclass_fields:
+    complex_factory: Any = mutable_value(1 + 2j)
+    complex_: complex = 2 + 4j
+    list_of_stuff: List[Any] = field(
+        default_factory=lambda: list([1 + 2j, Path.home()])
+    )
+    fn_factory: Callable[[Iterable[int]], int] = field(default_factory=lambda: sum)
+    fn: Callable[[Iterable[int]], int] = sum
+    partial_factory: Partial[int] = field(default_factory=lambda: partial(sum))
+    partial_: Partial[int] = partial(sum)
+
+
+def test_auto_config_for_dataclass_fields():
+    A = A_auto_config_for_dataclass_fields
+    Conf = builds(A, populate_full_signature=True)
+    actual = instantiate(Conf)
+    expected = A()
+    assert isinstance(actual, A)
+    assert actual.complex_factory == expected.complex_factory
+    assert actual.complex_ == expected.complex_
+    assert actual.list_of_stuff == expected.list_of_stuff
+    assert is_same(actual.fn_factory, expected.fn_factory)
+    assert is_same(actual.fn, expected.fn)
+    assert is_same(actual.partial_factory, expected.partial_factory)
+    assert is_same(actual.partial_, expected.partial_)
+
+
+def identity_with_dict_default(x={"a": 1}):
+    return x
+
+
+@pytest.mark.xfail
+def test_known_failcase_hydra_2350():
+    # https://github.com/facebookresearch/hydra/issues/2350
+    # Overriding a default-value dictionary via instantiate interface results
+    # in merging of the default-dictionary with the override value
+    Conf = builds(identity_with_dict_default, populate_full_signature=True)
+    actual = instantiate(Conf, x={"b": 2})
+    expected = {"b": 2}
+    assert actual == expected, actual
