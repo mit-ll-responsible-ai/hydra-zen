@@ -455,6 +455,9 @@ def sanitized_type(
         or (isinstance(type_, type) and issubclass(type_, Enum))
     ):
 
+        if sys.version_info[:2] == (3, 6) and type_ is Dict:
+            type_ = Dict[Any, Any]
+
         if wrap_optional and type_ is not Any:  # pragma: no cover
             # normally get_type_hints automatically resolves Optional[...]
             # when None is set as the default, but this has been flaky
