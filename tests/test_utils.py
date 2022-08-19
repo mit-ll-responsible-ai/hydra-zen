@@ -140,6 +140,9 @@ class SomeProtocol(Protocol[T]):
 
 NoneType: TypeAlias = None
 
+vList = List if sys.version_info > (3, 7) else List[Any]
+vDict = Dict if sys.version_info > (3, 7) else Dict[Any, Any]
+
 
 @pytest.mark.parametrize(
     "in_type, expected_type",
@@ -156,14 +159,14 @@ NoneType: TypeAlias = None
         (C, Any),  # unsupported primitives
         (type(None), Any),
         (set, Any),
-        (list, (List if OMEGACONF_VERSION < Version(2, 2, 3) else list)),
+        (list, (vList if OMEGACONF_VERSION < Version(2, 2, 3) else list)),
         (tuple, (Any if OMEGACONF_VERSION < Version(2, 2, 3) else tuple)),
-        (dict, (Dict if OMEGACONF_VERSION < Version(2, 2, 3) else dict)),
+        (dict, (vDict if OMEGACONF_VERSION < Version(2, 2, 3) else dict)),
         (callable, Any),
         (frozenset, Any),
-        (List, List if not IS_PY37 else List[Any]),
+        (List, vList),
         (Tuple, (Any if OMEGACONF_VERSION < Version(2, 2, 3) else Tuple)),
-        (Dict, Dict if not IS_PY37 else Dict[Any, Any]),
+        (Dict, vDict),
         (T, Any),
         (List[T], List[Any]),
         (Tuple[T, T], Tuple[Any, Any]),
@@ -294,7 +297,9 @@ def test_sanitized_type_expected_behavior(in_type, expected_type):
 
     assert sanitized_type(in_type) == expected_type, in_type
 
-    if in_type != expected_type:
+    if in_type != expected_type and not (
+        sys.version_info < (3, 8) and in_type in (List, Dict)
+    ):
         # In cases where we change the type, it should be because omegaconf
         # doesn't support that annotation.
         # This check will help catch cases where omegaconf/hydra has added support for
