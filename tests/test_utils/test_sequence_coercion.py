@@ -112,7 +112,7 @@ def test_fuzz_sequence_coercion(annotation):
 @example(None)
 @example(ListConfig([1, 2]))
 # generate anything that hypothesis can generate!
-@given(st.from_type(type).flatmap(st.from_type))  # type: ignore
+@given(st.from_type(type).flatmap(st.from_type))
 def test_only_list_values_get_cast(input_val):
     try:
         assume(input_val == input_val)  # reject inputs who don't satisfy identity

@@ -337,15 +337,15 @@ def sanitized_type(
             nested=nested,
         )
 
-    # Warning: mutating `type_` will mutate the signature being inspected
-    # Even calling deepcopy(`type_`) silently fails to prevent this.
-    origin = get_origin(type_)
-
-    if OMEGACONF_VERSION < Version(2, 2, 3):
+    if OMEGACONF_VERSION < Version(2, 2, 3):  # pragma: no cover
         try:
             type_ = {list: List, tuple: Tuple, dict: Dict}.get(type_, type_)
         except TypeError:
             pass
+
+    # Warning: mutating `type_` will mutate the signature being inspected
+    # Even calling deepcopy(`type_`) silently fails to prevent this.
+    origin = get_origin(type_)
 
     no_nested_container = not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES
 
@@ -415,7 +415,8 @@ def sanitized_type(
             #
             # Otherwise we preserve the annotation as accurately as possible
             if not args:
-                return Tuple
+                return Any if OMEGACONF_VERSION < (2, 2, 3) else Tuple
+
             args = cast(Tuple[type, ...], args)
             unique_args = set(args)
 

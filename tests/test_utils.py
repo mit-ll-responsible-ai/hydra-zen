@@ -66,7 +66,7 @@ T = TypeVar("T")
 P = ParamSpec("P")
 Ts = TypeVarTuple("Ts")
 
-current_module: str = sys.modules[__name__].__name__
+IS_PY37 = (3, 6) < sys.version_info < (3, 8)
 
 
 def pass_through(*args):
@@ -161,9 +161,9 @@ NoneType: TypeAlias = None
         (dict, (Dict if OMEGACONF_VERSION < Version(2, 2, 3) else dict)),
         (callable, Any),
         (frozenset, Any),
-        (List, List),
+        (List, List if not IS_PY37 else List[Any]),
         (Tuple, Tuple),
-        (Dict, Dict),
+        (Dict, Dict if not IS_PY37 else Dict[Any, Any]),
         (T, Any),
         (List[T], List[Any]),
         (Tuple[T, T], Tuple[Any, Any]),
