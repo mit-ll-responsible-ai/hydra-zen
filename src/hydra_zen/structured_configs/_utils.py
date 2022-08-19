@@ -395,17 +395,18 @@ def sanitized_type(
             return Union[optional_type, NoneType]  # type: ignore
 
         if origin is list or origin is List:
-            return List[sanitized_type(args[0], primitive_only=no_nested_container, nested=True)] if args else type_  # type: ignore
+            if args:
+                return List[sanitized_type(args[0], primitive_only=no_nested_container, nested=True)]  # type: ignore
+            return List if sys.version_info > (3, 7) else List[Any]
 
         if origin is dict or origin is Dict:
-            return (
-                Dict[
-                    sanitized_type(args[0], primitive_only=True, nested=True),  # type: ignore
-                    sanitized_type(args[1], primitive_only=no_nested_container, nested=True),  # type: ignore
-                ]
-                if args
-                else type_
-            )
+            if args:
+                KeyType = sanitized_type(args[0], primitive_only=True, nested=True)
+                ValueType = sanitized_type(
+                    args[1], primitive_only=no_nested_container, nested=True
+                )
+                return Dict[KeyType, ValueType]  # type: ignore
+            return Dict if sys.version_info > (3, 7) else Dict[Any, Any]
 
         if (origin is tuple or origin is Tuple) and not nested:
             # hydra silently supports tuples of homogenous types
