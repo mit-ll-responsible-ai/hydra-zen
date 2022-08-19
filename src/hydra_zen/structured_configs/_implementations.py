@@ -1367,7 +1367,7 @@ def builds(
         # We want to rely on `inspect.signature` logic for raising
         # against an uninspectable sig, before we start inspecting
         # class-specific attributes below.
-        signature_params = inspect.signature(target).parameters
+        signature_params = dict(inspect.signature(target).parameters)
     except ValueError:
         if populate_full_signature:
             raise ValueError(
@@ -1375,7 +1375,7 @@ def builds(
                 + f"{target} does not have an inspectable signature. "
                 f"`builds({_utils.safe_name(target)}, populate_full_signature=True)` is not supported"
             )
-        signature_params: Mapping[str, inspect.Parameter] = {}
+        signature_params: Dict[str, inspect.Parameter] = {}
         # We will turn off signature validation for objects that didn't have
         # a valid signature. This will enable us to do things like `build(dict, a=1)`
         target_has_valid_signature: bool = False
@@ -1413,6 +1413,26 @@ def builds(
             del _params
 
         target_has_valid_signature: bool = True
+
+    if is_dataclass(target):
+        # Update `signature_params` so that any param with `default=<factory>`
+        # has its default replaced with `<factory>()`
+        # If this is a mutable value, `builds` will automatically re-pack
+        # it using a default factory
+        _fields = {f.name: f for f in fields(target)}
+        _update = {}
+        for name, param in signature_params.items():
+            f = _fields[name]
+            if f.default_factory is not MISSING:
+                _update[name] = inspect.Parameter(
+                    name,
+                    param.kind,
+                    annotation=param.annotation,
+                    default=f.default_factory(),
+                )
+        signature_params.update(_update)
+        del _update
+        del _fields
 
     # `get_type_hints` properly resolves forward references, whereas annotations from
     # `inspect.signature` do not

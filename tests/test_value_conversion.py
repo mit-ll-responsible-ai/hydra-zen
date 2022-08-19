@@ -1,12 +1,13 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+import inspect
 import string
 from collections import Counter, deque
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from functools import partial
 from pathlib import Path
-from typing import Dict, FrozenSet, List, Set, Union
+from typing import Any, Dict, FrozenSet, List, Set, Union
 
 import hypothesis.strategies as st
 import pytest
@@ -238,3 +239,29 @@ def test_zen_supported_primitives_arent_supported_by_hydra(type_, data: st.DataO
     with pytest.raises((ValidationError, AssertionError)):
         Conf = OmegaConf.create(C)
         assert isinstance(Conf.x, type_)
+
+
+@dataclass
+class A:
+    z: Any
+    x_list: List[int] = field(default_factory=lambda: [1, 2, 3])
+    x_dict: Dict[str, int] = field(default_factory=lambda: {"a": 22})
+    y: bool = False
+
+
+@given(Target=st.sampled_from([A]), via_yaml=st.booleans())
+def test_builds_populate_sig_with_default_factory(Target, via_yaml: bool):
+
+    Conf = builds(Target, populate_full_signature=True)
+
+    assert inspect.signature(Conf).parameters == inspect.signature(A).parameters
+
+    if via_yaml:
+        Conf = OmegaConf.structured(to_yaml(Conf))
+
+    a = instantiate(Conf, z=1)
+    assert isinstance(a, A)
+    assert a.x_list == A(z=1).x_list
+    assert a.x_dict == A(z=1).x_dict
+    assert a.y == A(z=1).y
+    assert a.z == A(z=1).z
