@@ -455,7 +455,7 @@ def sanitized_type(
         or (isinstance(type_, type) and issubclass(type_, Enum))
     ):
 
-        if sys.version_info[:2] == (3, 6) and type_ is Dict:
+        if sys.version_info[:2] == (3, 6) and type_ is Dict:  # pragma: no cover
             type_ = Dict[Any, Any]
 
         if wrap_optional and type_ is not Any:  # pragma: no cover
