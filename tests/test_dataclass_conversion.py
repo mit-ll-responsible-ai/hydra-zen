@@ -11,7 +11,7 @@ from hypothesis import given
 from omegaconf import OmegaConf
 from typing_extensions import TypeAlias
 
-from hydra_zen import builds, instantiate, just
+from hydra_zen import builds, instantiate, just, make_config
 from hydra_zen.errors import HydraZenUnsupportedPrimitiveError
 
 from .test_just import list_of_objects
@@ -191,3 +191,24 @@ def test_builds_with_initvar_field(dataclass_type):
     assert instantiate(
         builds(dataclass_type, populate_full_signature=True), x=1
     ) == dataclass_type(x=1)
+
+
+@pytest.mark.parametrize(
+    "dataclass_obj",
+    [
+        NoDefault(x=1),
+        HasDefault(),
+        HasDefaultFactory(),
+        HasDefaultFactory([Path.home(), 2 - 4j]),
+        HasNonInit(x=22),
+        builds(int)(),
+        NoDefault,
+        HasDefault,
+        HasDefaultFactory,
+        HasDefaultFactory,
+        HasNonInit,
+        builds(int),
+    ],
+)
+def test_make_config_doesnt_convert_dataclasses(dataclass_obj):
+    assert make_config(x=dataclass_obj).x is dataclass_obj
