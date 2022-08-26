@@ -1084,3 +1084,15 @@ def check_launch():
 
     f(Xonf)
     launch(Xonf, f)
+
+
+def check_just_support_for_dataclass():
+    from dataclasses import dataclass
+
+    @dataclass
+    class A:
+        ...
+
+    reveal_type(just(A), expected_text="Type[Builds[Type[A]]]")
+    reveal_type(just(A()), expected_text="Type[Builds[Type[A]]]")
+    reveal_type(just(A(), zen_convert={"dataclass": False}), expected_text="Any")

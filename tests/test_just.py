@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 import pytest
 
-from hydra_zen import builds, instantiate, just, to_yaml
+from hydra_zen import builds, instantiate, just, make_config, to_yaml
 from tests import is_same
 
 
@@ -73,3 +73,10 @@ def test_just_idempotence_via_yaml(obj):
 def test_just_of_targeted_config_is_identity():
     cfg = builds(dict, x=1)
     assert just(cfg) is cfg
+
+
+def test_just_no_dataclass_autoconfig():
+    Cfg = make_config()
+    instt = Cfg()
+    assert just(Cfg, zen_convert={"dataclass": False}) is Cfg
+    assert just(instt, zen_convert={"dataclass": False}) is instt

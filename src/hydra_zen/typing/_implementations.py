@@ -31,6 +31,7 @@ from typing import (
 from omegaconf import DictConfig, ListConfig
 from typing_extensions import (
     Literal,
+    NotRequired,
     ParamSpec,
     Protocol,
     Self,
@@ -249,3 +250,11 @@ else:
 DefaultsList = List[
     Union[str, DataClass_, Mapping[str, Union[None, str, Sequence[str]]]]
 ]
+
+
+class AllConvert(TypedDict):
+    dataclass: bool
+
+
+class ZenConvert(TypedDict, total=False):
+    dataclass: NotRequired[bool]

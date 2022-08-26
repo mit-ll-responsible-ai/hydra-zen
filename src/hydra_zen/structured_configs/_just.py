@@ -1,55 +1,87 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-from typing import Any, FrozenSet, Type, TypeVar, Union, overload
+from typing import Any, FrozenSet, Literal, Optional, Type, TypeVar, Union, overload
 
 from hydra_zen.typing import Builds, Importable, Just
 from hydra_zen.typing._implementations import _HydraPrimitive  # type: ignore
 from hydra_zen.typing._implementations import _SupportedViaBuilds  # type: ignore
+from hydra_zen.typing._implementations import (
+    AllConvert,
+    DataClass_,
+    InstOrType,
+    ZenConvert,
+)
 
 from ._implementations import sanitized_default_value
 from ._value_conversion import ConfigComplex
 
 # pyright: strict
-
+TD = TypeVar("TD", bound=DataClass_)
 TP = TypeVar("TP", bound=_HydraPrimitive)
 TB = TypeVar("TB", bound=Union[_SupportedViaBuilds, FrozenSet[Any]])
 
 __all__ = ["just"]
 
 
+_JUST_CONVERT_SETTINGS = AllConvert(dataclass=True)
+
+
 @overload
-def just(obj: TP) -> TP:  # pragma: no cover
+def just(obj: TP, *, zen_convert: Optional[ZenConvert] = ...) -> TP:  # pragma: no cover
     ...
 
 
 @overload
-def just(obj: complex) -> ConfigComplex:  # pragma: no cover
+def just(
+    obj: complex, *, zen_convert: Optional[ZenConvert] = ...
+) -> ConfigComplex:  # pragma: no cover
     ...
 
 
 @overload
-def just(obj: TB) -> Builds[Type[TB]]:  # pragma: no cover
+def just(
+    obj: TB, *, zen_convert: Optional[ZenConvert] = ...
+) -> Builds[Type[TB]]:  # pragma: no cover
     ...
 
 
 @overload
-def just(obj: Importable) -> Type[Just[Importable]]:  # pragma: no cover
+def just(
+    obj: InstOrType[TD], *, zen_convert: Literal[None] = ...
+) -> Type[Builds[Type[TD]]]:  # pragma: no cover
     ...
 
 
 @overload
-def just(obj: Any) -> Any:  # pragma: no cover
+def just(
+    obj: Importable, *, zen_convert: Optional[ZenConvert] = ...
+) -> Type[Just[Importable]]:  # pragma: no cover
     ...
 
 
-def just(obj: Any) -> Any:
-    """Returns a structured config that "just" describes the specified value.
+@overload
+def just(
+    obj: Any, *, zen_convert: Optional[ZenConvert] = ...
+) -> Any:  # pragma: no cover
+    ...
+
+
+def just(obj: Any, *, zen_convert: Optional[ZenConvert] = None) -> Any:
+    """`just(obj)` returns a config that "just" returns `obj` when instantiated.
+
+    `instantiate(just(obj)) == obj`
 
     Parameters
     ----------
     obj : Type | Callable[..., Any] HydraSupportedPrimitive | ZenSupportedPrimitive
-        A type (e.g. a class-object), function-object, or a value of a type that is
-        supported by either  hydra-zen or Hydra.
+        A value, type (e.g. a class-object), or function-object that is supported by
+        either  hydra-zen or Hydra.
+
+    zen_convert: Optional[ZenConvert]
+        A dict with the following optional fields:
+
+        - dataclass (bool, default=True): dataclass types and instances without
+          _target_ fields are automatically converted to targeted configs
 
     Returns
     -------
@@ -67,6 +99,9 @@ def just(obj: Any) -> Any:
 
     Notes
     -----
+    A "config" is a dynamically-generated dataclass type that is designed to be
+    compatible with Hydra.
+
     The configs produced by ``just(<type_or_func>)`` introduce an explicit dependency
     on hydra-zen. I.e. hydra-zen must be installed in order to instantiate any config
     that used `just`.
@@ -161,11 +196,17 @@ def just(obj: Any) -> Any:
     >>> conf.reduction_fn(conf.data)
     (3+5j)
     """
+    if not zen_convert:
+        zen_convert = {}
+
+    dataclass_passthrough = not zen_convert.get(
+        "dataclass", _JUST_CONVERT_SETTINGS["dataclass"]
+    )
     return sanitized_default_value(
         obj,
         allow_zen_conversion=True,
         structured_conf_permitted=True,
         field_name="",
         error_prefix="",
-        dataclass_passthrough=False,
+        dataclass_passthrough=dataclass_passthrough,
     )
