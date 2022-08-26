@@ -88,7 +88,8 @@ class ZenField:
 
         if self.default is not NOTHING:
             self.default = sanitized_field(
-                self.default, _mutable_default_permitted=_permit_default_factory
+                self.default,
+                _mutable_default_permitted=_permit_default_factory,
             )
 
 
@@ -389,7 +390,7 @@ def make_config(
         hydra_convert=hydra_convert,
         hydra_recursive=hydra_recursive,
         hydra_defaults=hydra_defaults,
-        **fields_as_kwargs,
+        **{k: None for k in fields_as_kwargs},
     )
 
     normalized_fields: Dict[str, ZenField] = {}

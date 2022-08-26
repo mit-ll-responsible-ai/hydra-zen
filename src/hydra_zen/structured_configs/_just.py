@@ -167,4 +167,5 @@ def just(obj: Any) -> Any:
         structured_conf_permitted=True,
         field_name="",
         error_prefix="",
+        dataclass_passthrough=False,
     )

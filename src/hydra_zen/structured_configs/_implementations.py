@@ -399,9 +399,6 @@ def _just(obj: Importable) -> Type[Just[Importable]]:
     return cast(Type[Just[Importable]], out_class)
 
 
-_KEY_ERROR_PREFIX = "Configuring dictionary key:"
-
-
 def _is_ufunc(value: Any) -> bool:
     # checks without importing numpy
     numpy = sys.modules.get("numpy")
@@ -446,6 +443,7 @@ def sanitized_default_value(
     error_prefix: str = "",
     field_name: str = "",
     structured_conf_permitted: bool = True,
+    dataclass_passthrough: bool = True,
 ) -> Any:
     if value is None or type(value) in {str, int, bool, float}:
         return value
@@ -455,10 +453,36 @@ def sanitized_default_value(
 
     if (
         structured_conf_permitted
+        and not dataclass_passthrough
+        and (is_dataclass(value) and not isinstance(value, type))
+        and not is_builds(value)
+    ):
+
+        # TODO: handle position-only arguments
+        converted_fields = {}
+        for _field in fields(value):
+            if _field.init and hasattr(value, _field.name):
+                _val = getattr(value, _field.name)
+                converted_fields[_field.name] = sanitized_default_value(
+                    _val,
+                    allow_zen_conversion=allow_zen_conversion,
+                    field_name=_field.name,
+                    dataclass_passthrough=False,
+                )
+        return builds(type(value), **converted_fields)
+
+    if (
+        structured_conf_permitted
         and callable(value)
         and (
             inspect.isfunction(value)
-            or (not is_dataclass(value) and inspect.isclass(value))
+            or (
+                (
+                    not is_dataclass(value)
+                    or (not dataclass_passthrough and not is_builds(value))
+                )
+                and inspect.isclass(value)
+            )
             or inspect.ismethod(value)
             or isinstance(value, _builtin_types)
             or _is_ufunc(value)
@@ -519,7 +543,7 @@ def sanitize_collection(x: _T) -> _T:
                 k,
                 allow_zen_conversion=False,
                 structured_conf_permitted=False,
-                error_prefix=_KEY_ERROR_PREFIX,
+                error_prefix="Configuring dictionary key:",
             ): sanitized_default_value(v)
             for k, v in x.items()  # type: ignore
         }
@@ -536,6 +560,7 @@ def sanitized_field(
     error_prefix: str = "",
     field_name: str = "",
     _mutable_default_permitted: bool = True,
+    dataclass_passthrough: bool = True,
 ) -> Field[Any]:
     type_value = type(value)
     if (
@@ -553,6 +578,7 @@ def sanitized_field(
             allow_zen_conversion=allow_zen_conversion,
             error_prefix=error_prefix,
             field_name=field_name,
+            dataclass_passthrough=dataclass_passthrough,
         ),
         init=init,
     )
@@ -1355,7 +1381,11 @@ def builds(
                 Tuple[Any, ...],
                 _utils.field(
                     default=tuple(
-                        sanitized_default_value(x, error_prefix=BUILDS_ERROR_PREFIX)
+                        sanitized_default_value(
+                            x,
+                            error_prefix=BUILDS_ERROR_PREFIX,
+                            dataclass_passthrough=False,
+                        )
                         for x in _pos_args
                     ),
                     init=False,
@@ -1727,6 +1757,7 @@ def builds(
                     _mutable_default_permitted=_utils.mutable_default_permitted(
                         builds_bases, name
                     ),
+                    dataclass_passthrough=False,
                 )
             elif (
                 PATCH_OMEGACONF_830
@@ -1745,6 +1776,7 @@ def builds(
                     _mutable_default_permitted=_utils.mutable_default_permitted(
                         builds_bases, name
                     ),
+                    dataclass_passthrough=False,
                 )
             else:
                 _field = value
