@@ -212,3 +212,9 @@ def test_builds_with_initvar_field(dataclass_type):
 )
 def test_make_config_doesnt_convert_dataclasses(dataclass_obj):
     assert make_config(x=dataclass_obj).x is dataclass_obj
+
+
+@pytest.mark.parametrize("obj", [make_config(), make_config()()])
+def test_just_auto_config_raises_on_dynamically_generated_types(obj):
+    with pytest.raises(HydraZenUnsupportedPrimitiveError):
+        just(obj)

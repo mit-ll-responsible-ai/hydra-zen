@@ -436,6 +436,16 @@ del _throwaway
 del _lru_cache_type
 
 
+def _check_for_dynamically_defined_dataclass_type(target_path: str, value: Any) -> None:
+    if target_path.startswith("types."):
+        raise HydraZenUnsupportedPrimitiveError(
+            f"Configuring {value}: Cannot auto-config an instance of a "
+            f"dynamically-generated dataclass type (e.g. one created from "
+            f"`hydra_zen.make_config` or `dataclasses.make_dataclass`). "
+            f"Consider disabling auto-config support for dataclasses here."
+        )
+
+
 def sanitized_default_value(
     value: Any,
     allow_zen_conversion: bool = True,
@@ -479,7 +489,12 @@ def sanitized_default_value(
                     field_name=_field.name,
                     dataclass_passthrough=False,
                 )
-        return builds(type(value), **converted_fields)
+        print("HEE")
+        out = builds(type(value), **converted_fields)
+        _check_for_dynamically_defined_dataclass_type(
+            getattr(out, TARGET_FIELD_NAME), value
+        )
+        return out
 
     if (
         structured_conf_permitted
@@ -501,7 +516,13 @@ def sanitized_default_value(
     ):
         # `value` is importable callable -- create config that will import
         # `value` upon instantiation
-        return _just(value)  # type: ignore
+        out = _just(value)  # type: ignore
+        if is_dataclass(value):
+            _check_for_dynamically_defined_dataclass_type(
+                getattr(out, JUST_FIELD_NAME), value
+            )
+        return out
+
     resolved_value = value
     type_of_value = type(resolved_value)
 
