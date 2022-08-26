@@ -457,10 +457,20 @@ def sanitized_default_value(
         and (is_dataclass(value) and not isinstance(value, type))
         and not is_builds(value)
     ):
-
+        # Auto-config dataclass instance
         # TODO: handle position-only arguments
+        _val_fields = fields(value)
+        if set(inspect.signature(type(value)).parameters) != {
+            f.name for f in _val_fields if f.init
+        }:
+            raise HydraZenUnsupportedPrimitiveError(
+                f"Configuring {value}: Cannot auto-config a dataclass instance whose "
+                f"type has an Init-only field. Consider using "
+                f"`builds({type(value).__name__}, ...)` instead."
+            )
+
         converted_fields = {}
-        for _field in fields(value):
+        for _field in _val_fields:
             if _field.init and hasattr(value, _field.name):
                 _val = getattr(value, _field.name)
                 converted_fields[_field.name] = sanitized_default_value(
@@ -489,7 +499,9 @@ def sanitized_default_value(
             or _is_jax_compiled_func(value)
         )
     ):
-        return _just(value)
+        # `value` is importable callable -- create config that will import
+        # `value` upon instantiation
+        return _just(value)  # type: ignore
     resolved_value = value
     type_of_value = type(resolved_value)
 
@@ -1452,6 +1464,9 @@ def builds(
         _fields = {f.name: f for f in fields(target)}
         _update = {}
         for name, param in signature_params.items():
+            if name not in _fields:
+                # field is InitVar
+                continue
             f = _fields[name]
             if f.default_factory is not MISSING:
                 _update[name] = inspect.Parameter(
