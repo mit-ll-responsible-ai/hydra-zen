@@ -1,9 +1,8 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-from collections.abc import Callable
 from dataclasses import InitVar, dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import hypothesis.strategies as st
 import pytest
