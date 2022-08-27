@@ -1,6 +1,8 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-from typing import Any, FrozenSet, Literal, Optional, Type, TypeVar, Union, overload
+from typing import Any, FrozenSet, Optional, Type, TypeVar, Union, overload
+
+from typing_extensions import Literal
 
 from hydra_zen.typing import Builds, Importable, Just
 from hydra_zen.typing._implementations import _HydraPrimitive  # type: ignore

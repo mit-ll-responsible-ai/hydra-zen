@@ -30,6 +30,7 @@ from typing import (
 
 from omegaconf import DictConfig, ListConfig
 from typing_extensions import (
+    Final,
     Literal,
     NotRequired,
     ParamSpec,
@@ -252,8 +253,12 @@ DefaultsList = List[
 ]
 
 
-class AllConvert(TypedDict):
+class AllConvert(TypedDict, total=True):
     dataclass: bool
+
+
+# used for runtime type-checking
+convert_types: Final = {"dataclass": bool}
 
 
 class ZenConvert(TypedDict, total=False):

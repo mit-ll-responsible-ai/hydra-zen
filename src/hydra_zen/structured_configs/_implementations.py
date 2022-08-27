@@ -56,12 +56,14 @@ from hydra_zen.typing import (
     ZenWrappers,
 )
 from hydra_zen.typing._implementations import (
+    AllConvert,
     BuildsWithSig,
     DataClass_,
     DefaultsList,
     Field,
     HasTarget,
     InstOrType,
+    ZenConvert,
 )
 
 from ._globals import (
@@ -162,6 +164,8 @@ def mutable_value(x: _T) -> _T:
 
 
 Field_Entry = Tuple[str, type, Field[Any]]
+
+_BUILDS_CONVERT_SETTINGS = AllConvert(dataclass=True)
 
 
 # Alternate form, from PEP proposal:
@@ -632,6 +636,7 @@ def builds(
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[()] = ...,
     frozen: bool = ...,
+    zen_convert: Optional[ZenConvert] = ...,
 ) -> Type[BuildsWithSig[Type[R], P]]:  # pragma: no cover
     ...
 
@@ -651,6 +656,7 @@ def builds(
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
+    zen_convert: Optional[ZenConvert] = ...,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Type[Builds[Importable]]:  # pragma: no cover
     ...
@@ -671,6 +677,7 @@ def builds(
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
+    zen_convert: Optional[ZenConvert] = ...,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Type[PartialBuilds[Importable]]:  # pragma: no cover
     ...
@@ -691,6 +698,7 @@ def builds(
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
+    zen_convert: Optional[ZenConvert] = ...,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Union[
     Type[Builds[Importable]],
@@ -714,6 +722,7 @@ def builds(
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
+    zen_convert: Optional[ZenConvert] = ...,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Union[
     Type[Builds[Importable]],
@@ -735,6 +744,7 @@ def builds(
     frozen: bool = False,
     builds_bases: Tuple[Type[DataClass_], ...] = (),
     dataclass_name: Optional[str] = None,
+    zen_convert: Optional[ZenConvert] = None,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Union[
     Type[Builds[Importable]],
@@ -1077,6 +1087,9 @@ def builds(
     >>> instantiate(Conf(a=-4))  # equivalent to calling: `partiald_dict(a=-4)`
     {'a': -4, 'b': 2}
     """
+
+    if not zen_convert:
+        zen_convert = {}
 
     if not pos_args and not kwargs_for_target:
         # `builds()`

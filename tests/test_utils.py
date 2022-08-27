@@ -56,10 +56,12 @@ from hydra_zen._compatibility import (
 from hydra_zen.structured_configs._utils import (
     field,
     is_interpolated_string,
+    merge_settings,
     safe_name,
     sanitized_type,
 )
 from hydra_zen.typing import Builds
+from hydra_zen.typing._implementations import AllConvert, ZenConvert
 from tests import everything_except
 
 T = TypeVar("T")
@@ -444,3 +446,32 @@ def test_version_comparisons():
     assert Version(1, 0, 0) < Version(1, 1, 0)
     assert Version(1, 0, 0) < Version(1, 0, 1)
     assert Version(1, 0, 1) < Version(1, 1, 0)
+
+
+@given(...)
+def test_merge_settings_idempotence(
+    user_settings: Optional[ZenConvert], default_settings: AllConvert
+):
+    merged_1 = merge_settings(user_settings, default_settings)
+    merged_2 = merge_settings(merged_1, default_settings)  # type: ignore
+    assert merged_1 == merged_2
+
+
+@given(...)
+def test_merge_settings_retains_user_settings(
+    user_settings: Optional[ZenConvert], default_settings: AllConvert
+):
+    merged = merge_settings(user_settings, default_settings)
+    assert default_settings
+    if user_settings is None:
+        user_settings = {}
+    for k, v in merged.items():
+        if k in user_settings:
+            assert user_settings[k] == v
+        else:
+            assert default_settings[k] == v
+
+    # test inputs are not mutated
+    merged["apple"] = 22  # type: ignore
+    assert "apple" not in user_settings
+    assert "apple" not in default_settings
