@@ -14,9 +14,19 @@ from typing_extensions import Literal
 
 from hydra_zen._compatibility import PATCH_OMEGACONF_830
 from hydra_zen.structured_configs import _utils
-from hydra_zen.structured_configs._implementations import sanitize_collection
+from hydra_zen.structured_configs._implementations import (
+    _BUILDS_CONVERT_SETTINGS,
+    sanitize_collection,
+)
 from hydra_zen.typing import SupportedPrimitive
-from hydra_zen.typing._implementations import DataClass, DataClass_, DefaultsList, Field
+from hydra_zen.typing._implementations import (
+    AllConvert,
+    DataClass,
+    DataClass_,
+    DefaultsList,
+    Field,
+    ZenConvert,
+)
 
 from .._compatibility import HYDRA_SUPPORTS_PARTIAL
 from ._globals import (
@@ -77,12 +87,17 @@ class ZenField:
     hint: type = Any
     default: Union[SupportedPrimitive, Field[Any]] = _utils.field(default=NOTHING)
     name: Union[str, Type[NOTHING]] = NOTHING
+    zen_convert: InitVar[Optional[ZenConvert]] = None
     _permit_default_factory: InitVar[bool] = True
 
-    def __post_init__(self, _permit_default_factory: bool) -> None:
+    def __post_init__(
+        self, zen_convert: InitVar[Optional[ZenConvert]], _permit_default_factory: bool
+    ) -> None:
         if not isinstance(self.name, str):
             if self.name is not NOTHING:
                 raise TypeError(f"`ZenField.name` expects a string, got: {self.name}")
+        convert_settings = _utils.merge_settings(zen_convert, _BUILDS_CONVERT_SETTINGS)
+        del zen_convert
 
         self.hint = _utils.sanitized_type(self.hint)
 
@@ -90,11 +105,17 @@ class ZenField:
             self.default = sanitized_field(
                 self.default,
                 _mutable_default_permitted=_permit_default_factory,
+                convert_dataclass=convert_settings["dataclass"],
             )
 
 
-def _repack_zenfield(value: ZenField, name: str, bases: Tuple[DataClass_, ...]):
-    default = value.default
+def _repack_zenfield(
+    value: ZenField,
+    name: str,
+    bases: Tuple[DataClass_, ...],
+    zen_convert: ZenConvert,
+):
+    default = (value.default,)
 
     if (
         PATCH_OMEGACONF_830
@@ -108,8 +129,12 @@ def _repack_zenfield(value: ZenField, name: str, bases: Tuple[DataClass_, ...]):
             default=default.default_factory(),
             name=value.name,
             _permit_default_factory=False,
+            zen_convert=zen_convert,
         )
     return value
+
+
+_MAKE_CONFIG_SETTINGS = AllConvert(dataclass=False)
 
 
 def make_config(
@@ -120,6 +145,7 @@ def make_config(
     config_name: str = "Config",
     frozen: bool = False,
     bases: Tuple[Type[DataClass_], ...] = (),
+    zen_convert: Optional[ZenConvert] = None,
     **fields_as_kwargs: Union[SupportedPrimitive, ZenField],
 ) -> Type[DataClass]:
     """
@@ -333,6 +359,10 @@ def make_config(
 
     See :ref:`data-val` for more general data validation capabilities via hydra-zen.
     """
+    convert_settings = _utils.merge_settings(zen_convert, _MAKE_CONFIG_SETTINGS)
+    convert_settings = cast(ZenConvert, convert_settings)
+    del zen_convert
+
     for _field in fields_as_args:
         if not isinstance(_field, (str, ZenField)):
             raise TypeError(
@@ -397,11 +427,13 @@ def make_config(
 
     for _field in fields_as_args:
         if isinstance(_field, str):
-            normalized_fields[_field] = ZenField(name=_field, hint=Any)
+            normalized_fields[_field] = ZenField(
+                name=_field, hint=Any, zen_convert=convert_settings
+            )
         else:
             assert isinstance(_field.name, str)
             normalized_fields[_field.name] = _repack_zenfield(
-                _field, _field.name, bases
+                _field, _field.name, bases, convert_settings
             )
 
     for name, value in fields_as_kwargs.items():
@@ -415,9 +447,12 @@ def make_config(
                 name=name,
                 default=value,
                 _permit_default_factory=default_factory_permitted,
+                zen_convert=convert_settings,
             )
         else:
-            normalized_fields[name] = _repack_zenfield(value, name=name, bases=bases)
+            normalized_fields[name] = _repack_zenfield(
+                value, name=name, bases=bases, zen_convert=convert_settings
+            )
 
     # fields without defaults must come first
     config_fields: List[Union[Tuple[str, type], Tuple[str, type, Any]]] = [

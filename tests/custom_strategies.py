@@ -5,6 +5,7 @@ import hypothesis.strategies as st
 
 from hydra_zen import builds
 from hydra_zen.structured_configs._utils import get_obj_path
+from hydra_zen.typing._implementations import ZenConvert
 
 __all__ = ["valid_builds_args", "partitions"]
 
@@ -39,6 +40,7 @@ _valid_builds_strats = dict(
     builds_bases=st.lists(
         st.sampled_from([builds(x) for x in (int, len, dict)]), unique=True
     ).map(tuple),
+    zen_convert=st.none() | st.from_type(ZenConvert),
 )
 
 

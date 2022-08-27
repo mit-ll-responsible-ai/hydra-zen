@@ -15,6 +15,7 @@ from hydra_zen.typing._implementations import (
 )
 
 from ._implementations import sanitized_default_value
+from ._utils import merge_settings
 from ._value_conversion import ConfigComplex
 
 # pyright: strict
@@ -198,17 +199,14 @@ def just(obj: Any, *, zen_convert: Optional[ZenConvert] = None) -> Any:
     >>> conf.reduction_fn(conf.data)
     (3+5j)
     """
-    if not zen_convert:
-        zen_convert = {}
+    convert_settings = merge_settings(zen_convert, _JUST_CONVERT_SETTINGS)
+    del zen_convert
 
-    dataclass_passthrough = not zen_convert.get(
-        "dataclass", _JUST_CONVERT_SETTINGS["dataclass"]
-    )
     return sanitized_default_value(
         obj,
         allow_zen_conversion=True,
         structured_conf_permitted=True,
         field_name="",
         error_prefix="",
-        dataclass_passthrough=dataclass_passthrough,
+        convert_dataclass=convert_settings["dataclass"],
     )

@@ -22,7 +22,7 @@ from typing_extensions import Final, Literal
 from hydra_zen.errors import HydraZenDeprecationWarning
 from hydra_zen.typing import ZenWrappers
 from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds, StdBuilds
-from hydra_zen.typing._implementations import DataClass_
+from hydra_zen.typing._implementations import DataClass_, ZenConvert
 
 from ._implementations import builds
 
@@ -50,6 +50,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     builds_bases: Tuple[()] = ...,
+    zen_convert: Optional[ZenConvert] = ...,
 ) -> FullBuilds:  # pragma: no cover
     ...
 
@@ -66,6 +67,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
+    zen_convert: Optional[ZenConvert] = ...,
 ) -> PBuilds:  # pragma: no cover
     ...
 
@@ -82,6 +84,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     builds_bases: Tuple[()] = ...,
+    zen_convert: Optional[ZenConvert] = ...,
 ) -> StdBuilds:  # pragma: no cover
     ...
 
@@ -98,6 +101,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     builds_bases: Tuple[()] = ...,
+    zen_convert: Optional[ZenConvert] = ...,
 ) -> Union[FullBuilds, StdBuilds]:  # pragma: no cover
     ...
 
@@ -114,6 +118,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     builds_bases: Tuple[Type[DataClass_], ...],
+    zen_convert: Optional[ZenConvert] = ...,
 ) -> StdBuilds:  # pragma: no cover
     ...
 
@@ -130,6 +135,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
+    zen_convert: Optional[ZenConvert] = ...,
 ) -> Union[PBuilds, StdBuilds]:  # pragma: no cover
     ...
 
@@ -146,6 +152,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     builds_bases: Tuple[Type[DataClass_], ...],
+    zen_convert: Optional[ZenConvert] = ...,
 ) -> Union[PBuilds, StdBuilds]:  # pragma: no cover
     ...
 
@@ -162,6 +169,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     builds_bases: Tuple[()] = ...,
+    zen_convert: Optional[ZenConvert] = ...,
 ) -> Union[FullBuilds, PBuilds, StdBuilds]:  # pragma: no cover
     ...
 
@@ -176,6 +184,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     frozen: bool = False,
     builds_bases: Tuple[Type[DataClass_], ...] = (),
+    zen_convert: Optional[ZenConvert] = None,
 ) -> Union[FullBuilds, PBuilds, StdBuilds]:
     """Returns the `builds` function, but with customized default values.
 

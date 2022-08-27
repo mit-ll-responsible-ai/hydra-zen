@@ -457,7 +457,7 @@ def sanitized_default_value(
     error_prefix: str = "",
     field_name: str = "",
     structured_conf_permitted: bool = True,
-    dataclass_passthrough: bool = True,
+    convert_dataclass: bool = False,
 ) -> Any:
     if value is None or type(value) in {str, int, bool, float}:
         return value
@@ -467,7 +467,7 @@ def sanitized_default_value(
 
     if (
         structured_conf_permitted
-        and not dataclass_passthrough
+        and convert_dataclass
         and (is_dataclass(value) and not isinstance(value, type))
         and not is_builds(value)
     ):
@@ -491,7 +491,7 @@ def sanitized_default_value(
                     _val,
                     allow_zen_conversion=allow_zen_conversion,
                     field_name=_field.name,
-                    dataclass_passthrough=False,
+                    convert_dataclass=convert_dataclass,
                 )
 
         out = builds(type(value), **converted_fields)
@@ -508,7 +508,7 @@ def sanitized_default_value(
             or (
                 (
                     not is_dataclass(value)
-                    or (not dataclass_passthrough and not is_builds(value))
+                    or (convert_dataclass and not is_builds(value))
                 )
                 and inspect.isclass(value)
             )
@@ -597,7 +597,7 @@ def sanitized_field(
     error_prefix: str = "",
     field_name: str = "",
     _mutable_default_permitted: bool = True,
-    dataclass_passthrough: bool = True,
+    convert_dataclass: bool = False,
 ) -> Field[Any]:
     type_value = type(value)
     if (
@@ -615,7 +615,7 @@ def sanitized_field(
             allow_zen_conversion=allow_zen_conversion,
             error_prefix=error_prefix,
             field_name=field_name,
-            dataclass_passthrough=dataclass_passthrough,
+            convert_dataclass=convert_dataclass,
         ),
         init=init,
     )
@@ -1088,8 +1088,8 @@ def builds(
     {'a': -4, 'b': 2}
     """
 
-    if not zen_convert:
-        zen_convert = {}
+    zen_convert_settings = _utils.merge_settings(zen_convert, _BUILDS_CONVERT_SETTINGS)
+    del zen_convert
 
     if not pos_args and not kwargs_for_target:
         # `builds()`
@@ -1430,7 +1430,7 @@ def builds(
                         sanitized_default_value(
                             x,
                             error_prefix=BUILDS_ERROR_PREFIX,
-                            dataclass_passthrough=False,
+                            convert_dataclass=False,
                         )
                         for x in _pos_args
                     ),
@@ -1806,7 +1806,7 @@ def builds(
                     _mutable_default_permitted=_utils.mutable_default_permitted(
                         builds_bases, name
                     ),
-                    dataclass_passthrough=False,
+                    convert_dataclass=zen_convert_settings["dataclass"],
                 )
             elif (
                 PATCH_OMEGACONF_830
@@ -1825,7 +1825,7 @@ def builds(
                     _mutable_default_permitted=_utils.mutable_default_permitted(
                         builds_bases, name
                     ),
-                    dataclass_passthrough=False,
+                    convert_dataclass=zen_convert_settings["dataclass"],
                 )
             else:
                 _field = value
