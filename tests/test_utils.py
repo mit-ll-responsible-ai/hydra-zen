@@ -475,3 +475,9 @@ def test_merge_settings_retains_user_settings(
     merged["apple"] = 22  # type: ignore
     assert "apple" not in user_settings
     assert "apple" not in default_settings
+
+
+@pytest.mark.parametrize("bad_settings", [1, {"not a field": True}, {"dataclass": 1.0}])
+def test_merge_settings_validation(bad_settings):
+    with pytest.raises((TypeError, ValueError)):
+        merge_settings(bad_settings, {"dataclass": True})
