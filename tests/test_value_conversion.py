@@ -40,15 +40,6 @@ class Shake(Enum):
     MINT = 3
 
 
-# Needed for python 3.6
-def is_ascii(x: str) -> bool:
-    try:
-        x.encode("ascii")
-        return True
-    except UnicodeEncodeError:
-        return False
-
-
 @pytest.mark.parametrize(
     "zen_supported_type",
     (

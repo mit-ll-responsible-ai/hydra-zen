@@ -32,15 +32,8 @@ from typing_extensions import (
     ParamSpecKwargs,
     TypeGuard,
     Unpack,
+    _AnnotatedAlias,
 )
-
-try:
-    from typing_extensions import _AnnotatedAlias
-except ImportError:  # pragma: no cover
-    # Python 3.6
-    class _AnnotatedAlias:
-        ...
-
 
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVE_TYPES,
@@ -472,19 +465,6 @@ def sanitized_type(
             # for some pytorch-lightning classes. So we just do it ourselves...
             # It might be worth removing this later since none of our standard tests
             # cover it.
-            type_ = Optional[type_]  # type: ignore
-        return type_
-
-    # Needed to cover python 3.6 where __origin__ doesn't normalize to type
-    if not primitive_only and type_ in {
-        List,
-        Tuple,
-        Dict,
-        list,
-        dict,
-        tuple,
-    }:  # pragma: no cover
-        if wrap_optional and type_ is not Any:
             type_ = Optional[type_]  # type: ignore
         return type_
 
