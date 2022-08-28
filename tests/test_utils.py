@@ -174,28 +174,12 @@ vDict = Dict[Any, Any] if sys.version_info < (3, 8) else Dict
         (P.kwargs, Any),  # type: ignore
         (Ts, Any),
         (SomeProtocol[T], Any),
-        pytest.param(
-            Tuple[Unpack[Ts]],
-            Tuple[Any, ...],
-            marks=pytest.mark.skipif(
-                sys.version_info <= (3, 7), reason="Python 3.6 doesn't support Unpack"
-            ),
-        ),
-        pytest.param(
-            Tuple[Unpack[Ts], int],
-            Tuple[Any, ...],
-            marks=pytest.mark.skipif(
-                sys.version_info < (3, 7), reason="Python 3.6 doesn't support Unpack"
-            ),
-        ),
+        (Tuple[Unpack[Ts]], Tuple[Any, ...]),
+        (Tuple[Unpack[Ts], int], Tuple[Any, ...]),
         pytest.param(
             Tuple[str, Unpack[Ts]],
             Tuple[Any, ...],
             marks=[
-                pytest.mark.skipif(
-                    sys.version_info < (3, 7),
-                    reason="Python 3.6 doesn't support Unpack",
-                ),
                 pytest.mark.xfail(
                     HYDRA_VERSION < Version(1, 2, 0),
                     reason="Hydra 1.1.2 doesn't parse tuples beyond first element.",
@@ -206,10 +190,6 @@ vDict = Dict[Any, Any] if sys.version_info < (3, 8) else Dict
             Tuple[str, Unpack[Ts], int],
             Tuple[Any, ...],
             marks=[
-                pytest.mark.skipif(
-                    sys.version_info < (3, 7),
-                    reason="Python 3.6 doesn't support Unpack",
-                ),
                 pytest.mark.xfail(
                     HYDRA_VERSION < Version(1, 2, 0),
                     reason="Hydra 1.1.2 doesn't parse tuples beyond first element.",
