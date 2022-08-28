@@ -10,8 +10,9 @@ from hypothesis import given
 from omegaconf import OmegaConf
 from typing_extensions import TypeAlias
 
-from hydra_zen import builds, instantiate, just, make_config
+from hydra_zen import ZenField, builds, instantiate, just, make_config
 from hydra_zen.errors import HydraZenUnsupportedPrimitiveError
+from hydra_zen.structured_configs._type_guards import is_builds
 from hydra_zen.typing._implementations import ZenConvert
 
 from .test_just import list_of_objects
@@ -193,6 +194,10 @@ def test_builds_with_initvar_field(dataclass_type):
     ) == dataclass_type(x=1)
 
 
+# def f(x): return dict(x=x)
+# lambda x: f(x)["x"]
+
+
 @pytest.mark.parametrize(
     "dataclass_obj",
     [
@@ -210,8 +215,98 @@ def test_builds_with_initvar_field(dataclass_type):
         builds(int),
     ],
 )
-def test_make_config_doesnt_convert_dataclasses(dataclass_obj):
-    assert make_config(x=dataclass_obj).x is dataclass_obj
+@pytest.mark.parametrize(
+    "config_maker",
+    [
+        lambda x: make_config(x=x).x,
+        lambda x: builds(dict, x=x, zen_convert={"dataclass": False}).x,
+        lambda x: just(x, zen_convert={"dataclass": False}),
+        lambda x: ZenField(
+            default=x, name="x", zen_convert={"dataclass": False}
+        ).default.default,
+    ],
+)
+def test_no_dataclass_conversion(config_maker, dataclass_obj):
+    assert config_maker(dataclass_obj) is dataclass_obj
+
+
+@pytest.mark.parametrize(
+    "dataclass_obj",
+    [
+        NoDefault(x=1),
+        HasDefault(),
+        HasDefaultFactory(),
+        HasDefaultFactory([Path.home(), 2 - 4j]),
+        HasNonInit(x=22),
+        NoDefault,
+        HasDefault,
+        HasDefaultFactory,
+        HasDefaultFactory,
+        HasNonInit,
+    ],
+)
+@pytest.mark.parametrize(
+    "config_maker",
+    [
+        lambda x: make_config(x=x, zen_convert={"dataclass": True}).x,
+        lambda x: builds(dict, x=x).x,
+        lambda x: just(x),
+        lambda x: ZenField(
+            default=x,
+            name="x",
+        ).default.default,
+    ],
+)
+def test_yes_dataclass_conversion(config_maker, dataclass_obj):
+    out = config_maker(dataclass_obj)
+    inst_out = instantiate(out)
+    assert out is not dataclass_obj
+    assert is_builds(out)
+    assert isinstance(inst_out, type(dataclass_obj))
+    assert inst_out == dataclass_obj
+
+
+@pytest.mark.parametrize(
+    "dataclass_obj",
+    [
+        NoDefault(x=1),
+        HasDefault(),
+        HasDefaultFactory(),
+        HasDefaultFactory([Path.home(), 2 - 4j]),
+        HasNonInit(x=22),
+        NoDefault,
+        HasDefault,
+        HasDefaultFactory,
+        HasDefaultFactory,
+        HasNonInit,
+    ],
+)
+@pytest.mark.parametrize(
+    "config_maker",
+    [
+        lambda x: make_config(x=x, zen_convert={"dataclass": True})().x,
+        lambda x: builds(dict, x=x)().x,
+        lambda x: just(x),
+        lambda x: ZenField(
+            default=x,
+            name="x",
+        ).default.default_factory(),  # type: ignore
+    ],
+)
+@pytest.mark.parametrize(
+    "as_container",
+    [
+        lambda dataclass_obj: [0, dataclass_obj],
+        lambda dataclass_obj: {1: dataclass_obj},
+    ],
+)
+def test_recursive_dataclass_conversion(config_maker, dataclass_obj, as_container):
+    out = config_maker(as_container(dataclass_obj))[1]
+    inst_out = instantiate(out)
+    assert out is not dataclass_obj
+    assert is_builds(out)
+    assert isinstance(inst_out, type(dataclass_obj))
+    assert inst_out == dataclass_obj
 
 
 @pytest.mark.parametrize("obj", [make_config(), make_config()()])

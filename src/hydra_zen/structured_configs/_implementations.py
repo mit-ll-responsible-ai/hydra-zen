@@ -127,7 +127,7 @@ def _retain_type_info(type_: type, value: Any, hydra_recursive: Optional[bool]):
     return False
 
 
-def mutable_value(x: _T, *, zen_config: Optional[ZenConvert] = None) -> _T:
+def mutable_value(x: _T, *, zen_convert: Optional[ZenConvert] = None) -> _T:
     """Used to set a mutable object as a default value for a field
     in a dataclass.
 
@@ -160,7 +160,7 @@ def mutable_value(x: _T, *, zen_config: Optional[ZenConvert] = None) -> _T:
     HasMutableDefault(a_list=[1, 2, 3])"""
     cast = type(x)  # ensure that we return a copy of the default value
     convert_dataclass = (
-        zen_config.get("dataclass", False) if zen_config is not None else False
+        zen_convert.get("dataclass", False) if zen_convert is not None else False
     )
     x = sanitize_collection(x, convert_dataclass=convert_dataclass)
     return field(default_factory=lambda: cast(x))
@@ -609,7 +609,10 @@ def sanitized_field(
         and type_value in HYDRA_SUPPORTED_PRIMITIVES
     ):
         if _mutable_default_permitted:
-            return cast(Field[Any], mutable_value(value))
+            return cast(
+                Field[Any],
+                mutable_value(value, zen_convert={"dataclass": convert_dataclass}),
+            )
         else:  # pragma: no cover
             value = builds(
                 type(value), value, zen_convert={"dataclass": convert_dataclass}
