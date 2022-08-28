@@ -115,7 +115,7 @@ def _repack_zenfield(
     bases: Tuple[DataClass_, ...],
     zen_convert: ZenConvert,
 ):
-    default = (value.default,)
+    default = value.default
 
     if (
         PATCH_OMEGACONF_830

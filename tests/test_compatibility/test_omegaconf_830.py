@@ -78,12 +78,8 @@ def mutable_if_needed(x):
     "config_maker",
     [
         lambda x, Parent: make_config(x=x, bases=(Parent,)),
-        lambda x, Parent: make_config(
-            x=ZenField(Any, x, zen_convert={"dataclass": False}), bases=(Parent,)
-        ),
-        lambda x, Parent: make_config(
-            ZenField(Any, x, "x", zen_convert={"dataclass": False}), bases=(Parent,)
-        ),
+        lambda x, Parent: make_config(x=ZenField(Any, x), bases=(Parent,)),
+        lambda x, Parent: make_config(ZenField(Any, x, "x"), bases=(Parent,)),
         lambda x, Parent: builds(A_inheritance, x=x, builds_bases=(Parent,)),
         # TODO: add case where x is populated via pop-full-sig
         # we currently support specifing fields-as-args in builds
@@ -119,7 +115,7 @@ def test_known_inheritance_issues_in_omegaconf_are_circumvented(
         and not isinstance(parent_default, (list, dict))
         and parent_field_name == "x"  # parent field overlaps
     ):
-        # ensure we only case to dataclass when necessary
+        # ensure we only cast to dataclass when necessary
         assert is_dataclass(Child.x)
     else:
         assert Child().x == child_default
