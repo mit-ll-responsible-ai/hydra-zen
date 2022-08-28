@@ -159,10 +159,9 @@ def mutable_value(x: _T, *, zen_convert: Optional[ZenConvert] = None) -> _T:
     >>> HasMutableDefault()
     HasMutableDefault(a_list=[1, 2, 3])"""
     cast = type(x)  # ensure that we return a copy of the default value
-    convert_dataclass = (
-        zen_convert.get("dataclass", False) if zen_convert is not None else False
-    )
-    x = sanitize_collection(x, convert_dataclass=convert_dataclass)
+    settings = _utils.merge_settings(zen_convert, _BUILDS_CONVERT_SETTINGS)
+    del zen_convert
+    x = sanitize_collection(x, convert_dataclass=settings["dataclass"])
     return field(default_factory=lambda: cast(x))
 
 
