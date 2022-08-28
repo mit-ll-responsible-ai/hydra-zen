@@ -16,14 +16,9 @@ chronological order. All previous releases should still be available on pip.
 
 .. note:: This is documentation for an unreleased version of hydra-zen. You can try out this version pre-release version using `pip install --pre hydra-zen`
 
-
-Support for New Hydra/OmegaConf Features
-----------------------------------------
-OmegaConf ``v2.2.1`` is added native support for the following types:
-
-- :py:class:`pathlib.Path`
-
-hydra-zen :ref:`already provides support for these <additional-types>`, but this version will defer to OmegaConf's native support when possible. (See :pull:`276`)
+Compatibility-Breaking Changes
+------------------------------
+- This release drops support for Python 3.6. If you require Python 3.6, please restrict your hydra-zen installation dependency as `hydra-zen<0.8.0`.
 
 
 Improvements
@@ -33,6 +28,16 @@ Improvements
 - Improved :ref:`automatic type refinement <type-support>` for bare sequence types, and adds conditional support for `dict`, `list`, and `tuple` as type annotations when omegaconf 2.2.3+ is installed. (See :pull:`297`)
 - Adds support for using `builds(<target>, populate_full_signature=True)` where `<target>` is a dataclass type that has a field with a default factory. (See :pull:`299`)
 - The :ref:`automatic type refinement <type-support>` performed by :func:`~hydra_zen.builds` now has enhanced support for ``typing.Annotated``, ``typing.NewType``, and ``typing.TypeVarTuple``. (See :pull:`283`)
+
+
+Support for New Hydra/OmegaConf Features
+----------------------------------------
+OmegaConf ``v2.2.1`` is added native support for the following types:
+
+- :py:class:`pathlib.Path`
+
+hydra-zen :ref:`already provides support for these <additional-types>`, but this version will defer to OmegaConf's native support when possible. (See :pull:`276`)
+
 
 Bug Fixes
 ---------
