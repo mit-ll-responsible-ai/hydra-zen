@@ -498,7 +498,7 @@ def make_config(
         )
 
     if hydra_defaults is not None:
-        hydra_defaults = sanitize_collection(hydra_defaults)
+        hydra_defaults = sanitize_collection(hydra_defaults, convert_dataclass=False)
         config_fields.append(
             (
                 DEFAULTS_LIST_FIELD_NAME,

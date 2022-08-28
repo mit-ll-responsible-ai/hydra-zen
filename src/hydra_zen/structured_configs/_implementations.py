@@ -127,7 +127,7 @@ def _retain_type_info(type_: type, value: Any, hydra_recursive: Optional[bool]):
     return False
 
 
-def mutable_value(x: _T) -> _T:
+def mutable_value(x: _T, *, zen_config: Optional[ZenConvert] = None) -> _T:
     """Used to set a mutable object as a default value for a field
     in a dataclass.
 
@@ -159,7 +159,10 @@ def mutable_value(x: _T) -> _T:
     >>> HasMutableDefault()
     HasMutableDefault(a_list=[1, 2, 3])"""
     cast = type(x)  # ensure that we return a copy of the default value
-    x = sanitize_collection(x)
+    convert_dataclass = (
+        zen_config.get("dataclass", False) if zen_config is not None else False
+    )
+    x = sanitize_collection(x, convert_dataclass=convert_dataclass)
     return field(default_factory=lambda: cast(x))
 
 
@@ -457,13 +460,13 @@ def sanitized_default_value(
     error_prefix: str = "",
     field_name: str = "",
     structured_conf_permitted: bool = True,
-    convert_dataclass: bool = False,
+    convert_dataclass: bool,
 ) -> Any:
     if value is None or type(value) in {str, int, bool, float}:
         return value
 
     if hasattr(value, "__iter__"):
-        value = sanitize_collection(value)
+        value = sanitize_collection(value, convert_dataclass=convert_dataclass)
 
     if (
         structured_conf_permitted
@@ -567,11 +570,11 @@ def sanitized_default_value(
     raise HydraZenUnsupportedPrimitiveError(err_msg)
 
 
-def sanitize_collection(x: _T) -> _T:
+def sanitize_collection(x: _T, *, convert_dataclass: bool) -> _T:
     """Pass contents of lists, tuples, or dicts through sanitized_default_values"""
     type_x = type(x)
     if type_x in {list, tuple}:
-        return type_x(sanitized_default_value(_x) for _x in x)  # type: ignore
+        return type_x(sanitized_default_value(_x, convert_dataclass=convert_dataclass) for _x in x)  # type: ignore
     elif type_x is dict:
         return {
             # Hydra doesn't permit structured configs for keys, thus we only
@@ -581,7 +584,8 @@ def sanitize_collection(x: _T) -> _T:
                 allow_zen_conversion=False,
                 structured_conf_permitted=False,
                 error_prefix="Configuring dictionary key:",
-            ): sanitized_default_value(v)
+                convert_dataclass=False,
+            ): sanitized_default_value(v, convert_dataclass=convert_dataclass)
             for k, v in x.items()  # type: ignore
         }
     else:
@@ -597,7 +601,7 @@ def sanitized_field(
     error_prefix: str = "",
     field_name: str = "",
     _mutable_default_permitted: bool = True,
-    convert_dataclass: bool = False,
+    convert_dataclass: bool,
 ) -> Field[Any]:
     type_value = type(value)
     if (
@@ -607,7 +611,9 @@ def sanitized_field(
         if _mutable_default_permitted:
             return cast(Field[Any], mutable_value(value))
         else:  # pragma: no cover
-            value = builds(type(value), value)
+            value = builds(
+                type(value), value, zen_convert={"dataclass": convert_dataclass}
+            )
 
     return _utils.field(
         default=sanitized_default_value(
@@ -1408,7 +1414,7 @@ def builds(
                 f"`hydra_defaults` must be type `None | list[str | dict[str, str | list[str] | None ]]`"
                 f", Got: {repr(hydra_defaults)}"
             )
-        hydra_defaults = sanitize_collection(hydra_defaults)
+        hydra_defaults = sanitize_collection(hydra_defaults, convert_dataclass=False)
         base_fields.append(
             (
                 DEFAULTS_LIST_FIELD_NAME,
@@ -1570,7 +1576,9 @@ def builds(
 
             # validates
             _pos_args = tuple(
-                sanitized_default_value(x, allow_zen_conversion=False)
+                sanitized_default_value(
+                    x, allow_zen_conversion=False, convert_dataclass=False
+                )
                 for x in _pos_args
             )
             if _pos_args:
@@ -1781,6 +1789,7 @@ def builds(
                     allow_zen_conversion=False,
                     error_prefix=BUILDS_ERROR_PREFIX,
                     field_name=field_.name + " (set via inheritance)",
+                    convert_dataclass=False,
                 )
             del field_
 

@@ -78,8 +78,12 @@ def mutable_if_needed(x):
     "config_maker",
     [
         lambda x, Parent: make_config(x=x, bases=(Parent,)),
-        lambda x, Parent: make_config(x=ZenField(Any, x), bases=(Parent,)),
-        lambda x, Parent: make_config(ZenField(Any, x, "x"), bases=(Parent,)),
+        lambda x, Parent: make_config(
+            x=ZenField(Any, x, zen_convert={"dataclass": False}), bases=(Parent,)
+        ),
+        lambda x, Parent: make_config(
+            ZenField(Any, x, "x", zen_convert={"dataclass": False}), bases=(Parent,)
+        ),
         lambda x, Parent: builds(A_inheritance, x=x, builds_bases=(Parent,)),
         # TODO: add case where x is populated via pop-full-sig
         # we currently support specifing fields-as-args in builds

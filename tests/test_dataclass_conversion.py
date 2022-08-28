@@ -12,6 +12,7 @@ from typing_extensions import TypeAlias
 
 from hydra_zen import builds, instantiate, just, make_config
 from hydra_zen.errors import HydraZenUnsupportedPrimitiveError
+from hydra_zen.typing._implementations import ZenConvert
 
 from .test_just import list_of_objects
 
@@ -217,3 +218,47 @@ def test_make_config_doesnt_convert_dataclasses(dataclass_obj):
 def test_just_auto_config_raises_on_dynamically_generated_types(obj):
     with pytest.raises(HydraZenUnsupportedPrimitiveError):
         just(obj)
+
+
+@dataclass
+class A:
+    y: int = 1
+
+
+A_dictconfig = instantiate(A)
+
+
+@pytest.mark.parametrize(
+    "config, expected",
+    [
+        (
+            builds(dict, x=A()),
+            dict(x=A()),
+        ),
+        (
+            builds(dict, x=A(), zen_convert=ZenConvert(dataclass=True)),
+            dict(x=A()),
+        ),
+        (
+            builds(dict, x=A(), zen_convert=ZenConvert(dataclass=False)),
+            dict(x=A_dictconfig),
+        ),
+        (
+            make_config(
+                x=A(), zen_convert=ZenConvert(dataclass=True), hydra_convert="all"
+            ),
+            dict(x=A()),
+        ),
+        (
+            make_config(
+                x=A(),
+                zen_convert=ZenConvert(dataclass=False),
+            ),
+            dict(x=A_dictconfig),
+        ),
+    ],
+)
+def test_zen_convert(config, expected):
+    actual = instantiate(config)
+    assert actual == expected
+    assert isinstance(actual["x"], type(expected["x"]))

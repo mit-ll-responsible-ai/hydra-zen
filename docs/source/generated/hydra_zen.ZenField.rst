@@ -24,5 +24,6 @@
    .. autosummary::
    
       ~ZenField.hint
+      ~ZenField.zen_convert
    
    
