@@ -15,7 +15,6 @@ CLASSIFIERS = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Intended Audience :: Science/Research",
-    "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
@@ -67,7 +66,7 @@ setup(
     url=URL,
     download_url="https://github.com/mit-ll-responsible-ai/hydra-zen/tarball/v"
     + versioneer.get_version(),
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     packages=find_packages(where="src", exclude=["tests", "tests.*"]),
     package_dir={"": "src"},
     package_data={"hydra_zen": ["py.typed"]},
