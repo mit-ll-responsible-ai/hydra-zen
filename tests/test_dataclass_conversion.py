@@ -10,7 +10,14 @@ from hypothesis import given
 from omegaconf import OmegaConf
 from typing_extensions import TypeAlias
 
-from hydra_zen import ZenField, builds, instantiate, just, make_config
+from hydra_zen import (
+    ZenField,
+    builds,
+    instantiate,
+    just,
+    make_config,
+    make_custom_builds_fn,
+)
 from hydra_zen.errors import HydraZenUnsupportedPrimitiveError
 from hydra_zen.structured_configs._type_guards import is_builds
 from hydra_zen.typing._implementations import ZenConvert
@@ -194,10 +201,6 @@ def test_builds_with_initvar_field(dataclass_type):
     ) == dataclass_type(x=1)
 
 
-# def f(x): return dict(x=x)
-# lambda x: f(x)["x"]
-
-
 @pytest.mark.parametrize(
     "dataclass_obj",
     [
@@ -218,8 +221,11 @@ def test_builds_with_initvar_field(dataclass_type):
 @pytest.mark.parametrize(
     "config_maker",
     [
-        lambda x: make_config(x=x).x,
-        lambda x: builds(dict, x=x, zen_convert={"dataclass": False}).x,
+        lambda x: make_config(x=x)().x,
+        lambda x: builds(dict, x=x, zen_convert={"dataclass": False})().x,
+        lambda x: make_custom_builds_fn(zen_convert={"dataclass": False})(
+            dict, x=x
+        )().x,
         lambda x: just(x, zen_convert={"dataclass": False}),
         lambda x: ZenField(
             default=x, name="x", zen_convert={"dataclass": False}
@@ -249,6 +255,7 @@ def test_no_dataclass_conversion(config_maker, dataclass_obj):
     "config_maker",
     [
         lambda x: make_config(x=x, zen_convert={"dataclass": True}).x,
+        lambda x: make_custom_builds_fn(zen_convert={"dataclass": True})(dict, x=x)().x,
         lambda x: builds(dict, x=x).x,
         lambda x: just(x),
         lambda x: ZenField(
@@ -286,6 +293,7 @@ def test_yes_dataclass_conversion(config_maker, dataclass_obj):
     [
         lambda x: make_config(x=x, zen_convert={"dataclass": True})().x,
         lambda x: builds(dict, x=x)().x,
+        lambda x: make_custom_builds_fn()(dict, x=x)().x,
         lambda x: just(x),
         lambda x: ZenField(
             default=x,

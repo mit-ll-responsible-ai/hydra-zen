@@ -309,4 +309,5 @@ def make_custom_builds_fn(
         merged_kwargs.update(kwargs)
         return builds(*args, **merged_kwargs)
 
+    setattr(wrapped, "_zen_convert", zen_convert)
     return cast(Union[FullBuilds, PBuilds, StdBuilds], wrapped)

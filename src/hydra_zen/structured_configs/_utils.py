@@ -570,6 +570,7 @@ def valid_defaults_list(hydra_defaults: Any) -> bool:
 def merge_settings(
     user_settings: Optional[ZenConvert], default_settings: AllConvert
 ) -> AllConvert:
+    """Merges settings as `default_settings.update(user_settings)`"""
     if user_settings is not None and not isinstance(user_settings, Mapping):
         raise TypeError(
             f"`zen_convert` is None or a Mapping (e.g. dict). Got {user_settings}"
