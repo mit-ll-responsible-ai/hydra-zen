@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 from dataclasses import InitVar, dataclass, field
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, List, Type, TypeVar
 
 import hypothesis.strategies as st
 import pytest
@@ -20,10 +20,13 @@ from hydra_zen import (
 )
 from hydra_zen.errors import HydraZenUnsupportedPrimitiveError
 from hydra_zen.structured_configs._type_guards import is_builds
-from hydra_zen.typing._implementations import ZenConvert
+from hydra_zen.typing import Builds
+from hydra_zen.typing._implementations import DataClass_, InstOrType, ZenConvert
 
 from .test_just import list_of_objects
 
+TDataClass = InstOrType[DataClass_]
+T = TypeVar("T")
 Interface1: TypeAlias = Callable[[int], int]
 Interface2: TypeAlias = Callable[[str], str]
 
@@ -229,10 +232,12 @@ def test_builds_with_initvar_field(dataclass_type):
         lambda x: just(x, zen_convert={"dataclass": False}),
         lambda x: ZenField(
             default=x, name="x", zen_convert={"dataclass": False}
-        ).default.default,
+        ).default.default,  # type: ignore
     ],
 )
-def test_no_dataclass_conversion(config_maker, dataclass_obj):
+def test_no_dataclass_conversion(
+    config_maker: Callable[[TDataClass], TDataClass], dataclass_obj: TDataClass
+):
     assert config_maker(dataclass_obj) is dataclass_obj
 
 
@@ -254,17 +259,20 @@ def test_no_dataclass_conversion(config_maker, dataclass_obj):
 @pytest.mark.parametrize(
     "config_maker",
     [
-        lambda x: make_config(x=x, zen_convert={"dataclass": True}).x,
+        lambda x: make_config(x=x, zen_convert={"dataclass": True})().x,
         lambda x: make_custom_builds_fn(zen_convert={"dataclass": True})(dict, x=x)().x,
-        lambda x: builds(dict, x=x).x,
+        lambda x: builds(dict, x=x)().x,
         lambda x: just(x),
         lambda x: ZenField(
             default=x,
             name="x",
-        ).default.default,
+        ).default.default,  # type: ignore
     ],
 )
-def test_yes_dataclass_conversion(config_maker, dataclass_obj):
+def test_yes_dataclass_conversion(
+    config_maker: Callable[[TDataClass], Builds[Type[TDataClass]]],
+    dataclass_obj: TDataClass,
+):
     out = config_maker(dataclass_obj)
     inst_out = instantiate(out)
     assert out is not dataclass_obj
@@ -308,8 +316,12 @@ def test_yes_dataclass_conversion(config_maker, dataclass_obj):
         lambda dataclass_obj: {1: dataclass_obj},
     ],
 )
-def test_recursive_dataclass_conversion(config_maker, dataclass_obj, as_container):
-    out = config_maker(as_container(dataclass_obj))[1]
+def test_recursive_dataclass_conversion(
+    config_maker: Callable[[List[TDataClass]], List[Builds[Type[TDataClass]]]],
+    dataclass_obj: TDataClass,
+    as_container: Callable[[T], List[T]],
+):
+    out = config_maker(as_container(dataclass_obj))[1]  # type: ignore
     inst_out = instantiate(out)
     assert out is not dataclass_obj
     assert is_builds(out)
