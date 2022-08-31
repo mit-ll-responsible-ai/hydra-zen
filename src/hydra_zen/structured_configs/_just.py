@@ -30,46 +30,78 @@ _JUST_CONVERT_SETTINGS = AllConvert(dataclass=True)
 
 
 @overload
-def just(obj: TP, *, zen_convert: Optional[ZenConvert] = ...) -> TP:  # pragma: no cover
+def just(
+    obj: TP,
+    *,
+    zen_convert: Optional[ZenConvert] = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+) -> TP:  # pragma: no cover
     ...
 
 
 @overload
 def just(
-    obj: complex, *, zen_convert: Optional[ZenConvert] = ...
+    obj: complex,
+    *,
+    zen_convert: Optional[ZenConvert] = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
 ) -> ConfigComplex:  # pragma: no cover
     ...
 
 
 @overload
 def just(
-    obj: TB, *, zen_convert: Optional[ZenConvert] = ...
+    obj: TB,
+    *,
+    zen_convert: Optional[ZenConvert] = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
 ) -> Builds[Type[TB]]:  # pragma: no cover
     ...
 
 
 @overload
 def just(
-    obj: InstOrType[TD], *, zen_convert: Literal[None] = ...
+    obj: InstOrType[TD],
+    *,
+    zen_convert: Literal[None] = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
 ) -> Type[Builds[Type[TD]]]:  # pragma: no cover
     ...
 
 
 @overload
 def just(
-    obj: Importable, *, zen_convert: Optional[ZenConvert] = ...
+    obj: Importable,
+    *,
+    zen_convert: Optional[ZenConvert] = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
 ) -> Type[Just[Importable]]:  # pragma: no cover
     ...
 
 
 @overload
 def just(
-    obj: Any, *, zen_convert: Optional[ZenConvert] = ...
+    obj: Any,
+    *,
+    zen_convert: Optional[ZenConvert] = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
 ) -> Any:  # pragma: no cover
     ...
 
 
-def just(obj: Any, *, zen_convert: Optional[ZenConvert] = None) -> Any:
+def just(
+    obj: Any,
+    *,
+    zen_convert: Optional[ZenConvert] = None,
+    hydra_recursive: Optional[bool] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+) -> Any:
     """`just(obj)` returns a config that "just" returns `obj` when instantiated.
 
     `instantiate(just(obj)) == obj`
@@ -209,4 +241,6 @@ def just(obj: Any, *, zen_convert: Optional[ZenConvert] = None) -> Any:
         field_name="",
         error_prefix="",
         convert_dataclass=convert_settings["dataclass"],
+        hydra_convert=hydra_convert,
+        hydra_recursive=hydra_recursive,
     )

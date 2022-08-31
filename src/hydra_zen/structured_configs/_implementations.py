@@ -198,6 +198,7 @@ def hydrated_dataclass(
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     frozen: bool = False,
+    zen_convert: Optional[ZenConvert] = None,
 ) -> Callable[[Type[_T]], Type[_T]]:
     """A decorator that uses `builds` to create a dataclass with the appropriate
     Hydra-specific fields for specifying a targeted config [1]_.
@@ -373,6 +374,7 @@ def hydrated_dataclass(
             builds_bases=(decorated_obj,),
             dataclass_name=decorated_obj.__name__,
             frozen=frozen,
+            zen_convert=zen_convert,
         )
 
     return wrapper
@@ -460,6 +462,8 @@ def sanitized_default_value(
     field_name: str = "",
     structured_conf_permitted: bool = True,
     convert_dataclass: bool,
+    hydra_recursive: Optional[bool] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
 ) -> Any:
     if value is None or type(value) in {str, int, bool, float}:
         return value
@@ -496,7 +500,12 @@ def sanitized_default_value(
                     convert_dataclass=convert_dataclass,
                 )
 
-        out = builds(type(value), **converted_fields)
+        out = builds(
+            type(value),
+            **converted_fields,
+            hydra_recursive=hydra_recursive,
+            hydra_convert=hydra_convert,
+        )
         _check_for_dynamically_defined_dataclass_type(
             getattr(out, TARGET_FIELD_NAME), value
         )
