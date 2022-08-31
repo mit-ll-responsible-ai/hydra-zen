@@ -80,3 +80,11 @@ def test_just_no_dataclass_autoconfig():
     instt = Cfg()
     assert just(Cfg, zen_convert={"dataclass": False}) is Cfg
     assert just(instt, zen_convert={"dataclass": False}) is instt
+
+
+@pytest.mark.parametrize(
+    "kwargs", [{"hydra_convert": "mall"}, {"hydra_recursive": make_config()}]
+)
+def test_validate_hydra_options(kwargs):
+    with pytest.raises((ValueError, TypeError)):
+        just(ADataclass(x=1), **kwargs)

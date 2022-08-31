@@ -1161,18 +1161,12 @@ def builds(
             f"`populate_full_signature` must be a boolean type, got: {populate_full_signature}"
         )
 
-    if hydra_recursive is not None and not isinstance(hydra_recursive, bool):
-        raise TypeError(
-            f"`hydra_recursive` must be a boolean type, got {hydra_recursive}"
-        )
-
     if zen_partial is not None and not isinstance(zen_partial, bool):
         raise TypeError(f"`zen_partial` must be a boolean type, got: {zen_partial}")
 
-    if hydra_convert is not None and hydra_convert not in {"none", "partial", "all"}:
-        raise ValueError(
-            f"`hydra_convert` must be 'none', 'partial', or 'all', got: {hydra_convert}"
-        )
+    _utils.validate_hydra_options(
+        hydra_recursive=hydra_recursive, hydra_convert=hydra_convert
+    )
 
     if not isinstance(frozen, bool):
         raise TypeError(f"frozen must be a bool, got: {frozen}")

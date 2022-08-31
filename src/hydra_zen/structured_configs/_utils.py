@@ -28,6 +28,7 @@ from omegaconf import II, DictConfig, ListConfig
 from typing_extensions import (
     Annotated,
     Final,
+    Literal,
     ParamSpecArgs,
     ParamSpecKwargs,
     TypeGuard,
@@ -588,3 +589,18 @@ def merge_settings(
                 )
             settings[k] = v
     return settings
+
+
+def validate_hydra_options(
+    hydra_recursive: Optional[bool] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+):
+    if hydra_recursive is not None and not isinstance(hydra_recursive, bool):
+        raise TypeError(
+            f"`hydra_recursive` must be a boolean type, got {hydra_recursive}"
+        )
+
+    if hydra_convert is not None and hydra_convert not in {"none", "partial", "all"}:
+        raise ValueError(
+            f"`hydra_convert` must be 'none', 'partial', or 'all', got: {hydra_convert}"
+        )
