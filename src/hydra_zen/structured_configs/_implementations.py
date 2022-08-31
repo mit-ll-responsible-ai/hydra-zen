@@ -469,7 +469,12 @@ def sanitized_default_value(
         return value
 
     if hasattr(value, "__iter__"):
-        value = sanitize_collection(value, convert_dataclass=convert_dataclass)
+        value = sanitize_collection(
+            value,
+            convert_dataclass=convert_dataclass,
+            hydra_convert=hydra_convert,
+            hydra_recursive=hydra_recursive,
+        )
 
     if (
         structured_conf_permitted
@@ -578,11 +583,17 @@ def sanitized_default_value(
     raise HydraZenUnsupportedPrimitiveError(err_msg)
 
 
-def sanitize_collection(x: _T, *, convert_dataclass: bool) -> _T:
+def sanitize_collection(
+    x: _T,
+    *,
+    convert_dataclass: bool,
+    hydra_recursive: Optional[bool] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+) -> _T:
     """Pass contents of lists, tuples, or dicts through sanitized_default_values"""
     type_x = type(x)
     if type_x in {list, tuple}:
-        return type_x(sanitized_default_value(_x, convert_dataclass=convert_dataclass) for _x in x)  # type: ignore
+        return type_x(sanitized_default_value(_x, convert_dataclass=convert_dataclass, hydra_convert=hydra_convert, hydra_recursive=hydra_recursive) for _x in x)  # type: ignore
     elif type_x is dict:
         return {
             # Hydra doesn't permit structured configs for keys, thus we only
@@ -593,7 +604,12 @@ def sanitize_collection(x: _T, *, convert_dataclass: bool) -> _T:
                 structured_conf_permitted=False,
                 error_prefix="Configuring dictionary key:",
                 convert_dataclass=False,
-            ): sanitized_default_value(v, convert_dataclass=convert_dataclass)
+            ): sanitized_default_value(
+                v,
+                convert_dataclass=convert_dataclass,
+                hydra_convert=hydra_convert,
+                hydra_recursive=hydra_recursive,
+            )
             for k, v in x.items()  # type: ignore
         }
     else:

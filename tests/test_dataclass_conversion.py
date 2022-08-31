@@ -13,6 +13,7 @@ from typing_extensions import TypeAlias
 from hydra_zen import (
     ZenField,
     builds,
+    hydrated_dataclass,
     instantiate,
     just,
     make_config,
@@ -377,3 +378,27 @@ def test_zen_convert(config, expected):
     actual = instantiate(config)
     assert actual == expected
     assert isinstance(actual["x"], type(expected["x"]))
+
+
+def f(x=HasDefault()):
+    return x
+
+
+def test_hydrated_dataclass():
+    @hydrated_dataclass(f, populate_full_signature=True)
+    class A:
+        ...
+
+    @hydrated_dataclass(
+        f, populate_full_signature=True, zen_convert={"dataclass": False}
+    )
+    class B:
+        ...
+
+    out_a = instantiate(A)
+    assert isinstance(out_a, HasDefault)
+    assert out_a == HasDefault()
+
+    out_b = instantiate(B)
+    assert not isinstance(out_b, HasDefault)
+    assert out_b == HasDefault()
