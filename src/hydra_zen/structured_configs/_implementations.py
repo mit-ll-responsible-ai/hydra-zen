@@ -488,6 +488,22 @@ def sanitized_default_value(
     ):
         return resolved_value
 
+    # check pydantic auto-config
+    pydantic = sys.modules.get("pydantic")
+    if pydantic is not None and isinstance(value, pydantic.fields.FieldInfo):
+        _val = (
+            value.default_factory()
+            if value.default_factory is not None
+            else value.default
+        )
+        return sanitized_default_value(
+            _val,
+            allow_zen_conversion=allow_zen_conversion,
+            error_prefix=error_prefix,
+            field_name=field_name,
+            structured_conf_permitted=structured_conf_permitted,
+        )
+
     if field_name:
         field_name = f", for field `{field_name}`,"
 

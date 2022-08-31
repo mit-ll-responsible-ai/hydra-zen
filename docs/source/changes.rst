@@ -23,6 +23,7 @@ Compatibility-Breaking Changes
 
 Improvements
 ------------
+- Auto-config s
 - :func:`~hydra_zen.builds` no longer has restrictions on inheritance patterns involving `PartialBuilds`-type configs. (See :pull:`290`)
 - Two new utility functions were added to the public API: :func:`~hydra_zen.is_partial_builds` and :func:`~hydra_zen.uses_zen_processing`
 - Improved :ref:`automatic type refinement <type-support>` for bare sequence types, and adds conditional support for `dict`, `list`, and `tuple` as type annotations when omegaconf 2.2.3+ is installed. (See :pull:`297`)
