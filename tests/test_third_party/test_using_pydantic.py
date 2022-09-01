@@ -1,9 +1,11 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+from typing import Any
+
 import hypothesis.strategies as st
 import pytest
 from hypothesis import given, settings
-from pydantic import AnyUrl, PositiveFloat
+from pydantic import AnyUrl, Field, PositiveFloat
 from pydantic.dataclasses import dataclass as pyd_dataclass
 from typing_extensions import Literal
 
@@ -97,3 +99,27 @@ def test_documented_example_raises(x):
         # using a broad exception here because of
         # re-raising incompatibilities with Hydra
         instantiate(HydraConf, x=x)
+
+
+@pyd_dataclass
+class HasDefault:
+    x: int = Field(default=1)
+
+
+@pyd_dataclass
+class HasDefaultFactory:
+    x: Any = Field(default_factory=lambda: [1 + 2j])
+
+
+@pytest.mark.parametrize(
+    "target,kwargs",
+    [
+        (HasDefault, {}),
+        (HasDefaultFactory, {}),
+        (HasDefault, {"x": 12}),
+        (HasDefaultFactory, {"x": [[-2j, 1 + 1j]]}),
+    ],
+)
+def test_pop_sig_with_pydantic_Field(target, kwargs):
+    Conf = builds(target, populate_full_signature=True)
+    assert instantiate(Conf(**kwargs)) == target(**kwargs)

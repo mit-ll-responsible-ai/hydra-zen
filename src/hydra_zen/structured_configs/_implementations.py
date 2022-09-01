@@ -488,6 +488,22 @@ def sanitized_default_value(
     ):
         return resolved_value
 
+    # check pydantic auto-config
+    pydantic = sys.modules.get("pydantic")
+    if pydantic is not None and isinstance(value, pydantic.fields.FieldInfo):
+        _val = (
+            value.default_factory()
+            if value.default_factory is not None
+            else value.default
+        )
+        return sanitized_default_value(
+            _val,
+            allow_zen_conversion=allow_zen_conversion,
+            error_prefix=error_prefix,
+            field_name=field_name,
+            structured_conf_permitted=structured_conf_permitted,
+        )
+
     if field_name:
         field_name = f", for field `{field_name}`,"
 
@@ -537,6 +553,14 @@ def sanitized_field(
     field_name: str = "",
     _mutable_default_permitted: bool = True,
 ) -> Field[Any]:
+
+    value = sanitized_default_value(
+        value,
+        allow_zen_conversion=allow_zen_conversion,
+        error_prefix=error_prefix,
+        field_name=field_name,
+    )
+
     type_value = type(value)
     if (
         type_value in _utils.KNOWN_MUTABLE_TYPES
@@ -547,15 +571,7 @@ def sanitized_field(
         else:  # pragma: no cover
             value = builds(type(value), value)
 
-    return _utils.field(
-        default=sanitized_default_value(
-            value,
-            allow_zen_conversion=allow_zen_conversion,
-            error_prefix=error_prefix,
-            field_name=field_name,
-        ),
-        init=init,
-    )
+    return _utils.field(default=value, init=init)
 
 
 # partial=False, pop-sig=True; no *args, **kwargs, nor builds_bases
