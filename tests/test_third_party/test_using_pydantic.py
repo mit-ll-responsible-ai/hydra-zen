@@ -5,12 +5,14 @@ from typing import Any, List, Optional
 
 import hypothesis.strategies as st
 import pytest
+from hydra.errors import InstantiationException
 from hypothesis import given, settings
+from omegaconf import OmegaConf
 from pydantic import AnyUrl, Field, PositiveFloat
 from pydantic.dataclasses import dataclass as pyd_dataclass
 from typing_extensions import Literal
 
-from hydra_zen import builds, instantiate, just
+from hydra_zen import builds, instantiate, just, to_yaml
 from hydra_zen.third_party.pydantic import validates_with_pydantic
 
 parametrize_pydantic_fields = pytest.mark.parametrize(
@@ -111,8 +113,6 @@ class User:
         default=None,
         metadata=dict(title="The age of the user", description="do not lie!"),
     )
-
-    # TODO: add support for pydantic.Field
     height: Optional[int] = Field(None, title="The height in cm", ge=50, le=300)
 
 
@@ -131,14 +131,15 @@ def test_just_on_pydantic_dataclass(config_maker):
     assert ju1 == u1 and isinstance(ju1, User)
 
 
-# def test_pydantic_runtime_type_checking():
-#     from hydra.errors import InstantiationException
-#     Conf = builds(User, populate_full_signature=True)
-#     inst_bad = Conf(id=22, height=10, age=-100)
-#     inst_good = Conf(id=22, height=10, age=25)
-#     with pytest.raises(InstantiationException):
-#         instantiate(inst_bad)
-#     assert inst_good == User(id=22, height=10, age=25) and isinstance(inst_good, User)
+def test_pydantic_runtime_type_checking():
+
+    Conf = builds(User, populate_full_signature=True, hydra_convert="all")
+    inst_bad = Conf(id=22, height=-50, age=-100)
+    with pytest.raises(InstantiationException):
+        instantiate(inst_bad)  # pydantic raises on invalid height
+
+    inst_good = instantiate(Conf(id=22, height=50, age=25))
+    assert inst_good == User(id=22, height=50, age=25) and isinstance(inst_good, User)
 
 
 @pyd_dataclass
@@ -163,3 +164,24 @@ class HasDefaultFactory:
 def test_pop_sig_with_pydantic_Field(target, kwargs):
     Conf = builds(target, populate_full_signature=True)
     assert instantiate(Conf(**kwargs)) == target(**kwargs)
+
+
+@pyd_dataclass
+class NavbarButton:
+    href: AnyUrl
+
+
+@pyd_dataclass
+class Navbar:
+    button: NavbarButton
+
+
+@given(...)
+def test_nested_dataclasses(via_yaml: bool):
+    navbar = Navbar(button=("https://example.com",))  # type: ignore
+    conf = just(navbar)
+    if via_yaml:
+        # ensure serializable
+        assert instantiate(OmegaConf.create(to_yaml(conf))) == navbar
+    else:
+        assert instantiate(conf) == navbar

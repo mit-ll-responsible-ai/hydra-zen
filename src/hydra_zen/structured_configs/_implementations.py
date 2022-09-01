@@ -584,6 +584,12 @@ def sanitized_default_value(
             hydra_recursive=hydra_recursive,
         )
 
+    if isinstance(value, str):
+        # Supports pydantic.AnyURL
+        _v = str(value)
+        if type(_v) is str:
+            return _v
+
     if field_name:
         field_name = f", for field `{field_name}`,"
 
