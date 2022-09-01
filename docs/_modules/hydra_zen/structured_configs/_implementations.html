@@ -660,6 +660,22 @@
     <span class="p">):</span>
         <span class="k">return</span> <span class="n">resolved_value</span>
 
+    <span class="c1"># check pydantic auto-config</span>
+    <span class="n">pydantic</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pydantic&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">pydantic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">FieldInfo</span><span class="p">):</span>
+        <span class="n">_val</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">value</span><span class="o">.</span><span class="n">default_factory</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">default_factory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="n">value</span><span class="o">.</span><span class="n">default</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">sanitized_default_value</span><span class="p">(</span>
+            <span class="n">_val</span><span class="p">,</span>
+            <span class="n">allow_zen_conversion</span><span class="o">=</span><span class="n">allow_zen_conversion</span><span class="p">,</span>
+            <span class="n">error_prefix</span><span class="o">=</span><span class="n">error_prefix</span><span class="p">,</span>
+            <span class="n">field_name</span><span class="o">=</span><span class="n">field_name</span><span class="p">,</span>
+            <span class="n">structured_conf_permitted</span><span class="o">=</span><span class="n">structured_conf_permitted</span><span class="p">,</span>
+        <span class="p">)</span>
+
     <span class="k">if</span> <span class="n">field_name</span><span class="p">:</span>
         <span class="n">field_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;, for field `</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">`,&quot;</span>
 
@@ -709,6 +725,14 @@
     <span class="n">field_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">_mutable_default_permitted</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+
+    <span class="n">value</span> <span class="o">=</span> <span class="n">sanitized_default_value</span><span class="p">(</span>
+        <span class="n">value</span><span class="p">,</span>
+        <span class="n">allow_zen_conversion</span><span class="o">=</span><span class="n">allow_zen_conversion</span><span class="p">,</span>
+        <span class="n">error_prefix</span><span class="o">=</span><span class="n">error_prefix</span><span class="p">,</span>
+        <span class="n">field_name</span><span class="o">=</span><span class="n">field_name</span><span class="p">,</span>
+    <span class="p">)</span>
+
     <span class="n">type_value</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="n">type_value</span> <span class="ow">in</span> <span class="n">_utils</span><span class="o">.</span><span class="n">KNOWN_MUTABLE_TYPES</span>
@@ -719,15 +743,7 @@
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="n">value</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="n">sanitized_default_value</span><span class="p">(</span>
-            <span class="n">value</span><span class="p">,</span>
-            <span class="n">allow_zen_conversion</span><span class="o">=</span><span class="n">allow_zen_conversion</span><span class="p">,</span>
-            <span class="n">error_prefix</span><span class="o">=</span><span class="n">error_prefix</span><span class="p">,</span>
-            <span class="n">field_name</span><span class="o">=</span><span class="n">field_name</span><span class="p">,</span>
-        <span class="p">),</span>
-        <span class="n">init</span><span class="o">=</span><span class="n">init</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="n">init</span><span class="p">)</span>
 
 
 <span class="c1"># partial=False, pop-sig=True; no *args, **kwargs, nor builds_bases</span>
