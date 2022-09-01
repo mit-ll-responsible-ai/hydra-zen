@@ -242,14 +242,14 @@ def make_config(
 
     References
     ----------
-    .. [1] https://hydra.cc/docs/next/tutorials/structured_config/intro/
-    .. [2] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
-    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
+    .. [1] https://hydra.cc/docs/tutorials/structured_config/intro/
+    .. [2] https://hydra.cc/docs/advanced/instantiate_objects/overview/#recursive-instantiation
+    .. [3] https://hydra.cc/docs/advanced/instantiate_objects/overview/#parameter-conversion-strategies
     .. [4] https://docs.python.org/3/library/dataclasses.html
-    .. [5] https://hydra.cc/docs/next/tutorials/structured_config/intro/#structured-configs-supports
+    .. [5] https://hydra.cc/docs/tutorials/structured_config/intro/#structured-configs-supports
     .. [6] https://docs.python.org/3/library/dataclasses.html#default-factory-functions
-    .. [7] https://hydra.cc/docs/next/tutorials/structured_config/defaults/
-    .. [8] https://hydra.cc/docs/next/advanced/defaults_list/
+    .. [7] https://hydra.cc/docs/tutorials/structured_config/defaults/
+    .. [8] https://hydra.cc/docs/advanced/defaults_list/
 
     Examples
     --------

@@ -292,10 +292,10 @@ def hydrated_dataclass(
 
     References
     ----------
-    .. [1] https://hydra.cc/docs/next/tutorials/structured_config/intro/
+    .. [1] https://hydra.cc/docs/tutorials/structured_config/intro/
     .. [2] https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation
-    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
-    .. [4] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
+    .. [3] https://hydra.cc/docs/advanced/instantiate_objects/overview/#recursive-instantiation
+    .. [4] https://hydra.cc/docs/advanced/instantiate_objects/overview/#parameter-conversion-strategies
 
     Examples
     --------
@@ -811,8 +811,8 @@ def builds(
 ]:
     """builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, hydra_recursive=None, hydra_convert=None, hydra_defaults=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
 
-    Returns a structured config, which describes how to instantiate/call
-    ``<hydra_target>`` with both user-specified and auto-populated parameter values.
+    `builds(target, *args, **kw)` returns a config that builds `target` when
+    instantiated: `instantiate(builds(target, *args, **kw)) == target(*args, **kw)`
 
     Consult the Examples section of the docstring to see the various features of
     `builds` in action.
@@ -894,7 +894,7 @@ def builds(
 
     hydra_defaults : None | list[str | dict[str, str | list[str] | None ]], optional (default = None)
         A list in an input config that instructs Hydra how to build the output config
-        [7]_ [8]_. Each input config can have a Defaults List as a top level element. The
+        [6]_ [7]_. Each input config can have a Defaults List as a top level element. The
         Defaults List itself is not a part of output config.
 
     frozen : bool, optional (default=False)
@@ -924,7 +924,7 @@ def builds(
     Notes
     -----
     The resulting "config" is a dataclass-object [5]_ with Hydra-specific attributes
-    attached to it [1]_.
+    attached to it [1]_. It posseses a `_target_` attribute is a
 
     Using any of the ``zen_xx`` features will result in a config that depends
     explicitly on hydra-zen. I.e. hydra-zen must be installed in order to
@@ -943,14 +943,13 @@ def builds(
 
     References
     ----------
-    .. [1] https://hydra.cc/docs/next/tutorials/structured_config/intro/
+    .. [1] https://hydra.cc/docs/tutorials/structured_config/intro/
     .. [2] https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation
-    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
-    .. [4] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
+    .. [3] https://hydra.cc/docs/advanced/instantiate_objects/overview/#recursive-instantiation
+    .. [4] https://hydra.cc/docs/advanced/instantiate_objects/overview/#parameter-conversion-strategies
     .. [5] https://docs.python.org/3/library/dataclasses.html
-    .. [6] https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation
-    .. [7] https://hydra.cc/docs/next/tutorials/structured_config/defaults/
-    .. [8] https://hydra.cc/docs/next/advanced/defaults_list/
+    .. [6] https://hydra.cc/docs/tutorials/structured_config/defaults/
+    .. [7] https://hydra.cc/docs/advanced/defaults_list/
 
     See Also
     --------
@@ -1085,7 +1084,7 @@ def builds(
     instantiation process. Thus arbitrary metadata can be attached to a config.
 
     Let's create a config whose fields reference a meta-field via
-    relative-interpolation [6]_.
+    relative-interpolation [2]_.
 
     >>> Conf = builds(dict, a="${.s}", b="${.s}", zen_meta=dict(s=-10))
     >>> instantiate(Conf)

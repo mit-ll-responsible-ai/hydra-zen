@@ -103,9 +103,7 @@ def just(
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
 ) -> Any:
-    """`just(obj)` returns a config that "just" returns `obj` when instantiated.
-
-    `instantiate(just(obj)) == obj`
+    """`just(obj)` returns a config that just returns `obj` when instantiated: `instantiate(just(obj)) == obj`
 
     Parameters
     ----------
