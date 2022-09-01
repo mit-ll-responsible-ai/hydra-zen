@@ -1482,7 +1482,7 @@ def builds(
                         sanitized_default_value(
                             x,
                             error_prefix=BUILDS_ERROR_PREFIX,
-                            convert_dataclass=False,
+                            convert_dataclass=zen_convert_settings["dataclass"],
                         )
                         for x in _pos_args
                     ),

@@ -282,6 +282,32 @@ def test_yes_dataclass_conversion(
     assert inst_out == dataclass_obj
 
 
+def identity(x):
+    return x
+
+
+def test_builds_with_positional_arg():
+    out1 = instantiate(
+        builds(
+            identity,
+            HasDefault(),
+            hydra_convert="all",
+            zen_convert={"dataclass": True},
+        )
+    )
+    assert isinstance(out1, HasDefault) and out1 == HasDefault()
+
+    out2 = instantiate(
+        builds(
+            identity,
+            HasDefault(),
+            hydra_convert="all",
+            zen_convert={"dataclass": False},
+        )
+    )
+    assert not isinstance(out2, HasDefault)
+
+
 @pytest.mark.parametrize(
     "dataclass_obj",
     [
