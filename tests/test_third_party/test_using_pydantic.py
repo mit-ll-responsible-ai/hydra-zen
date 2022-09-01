@@ -1,7 +1,7 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import dataclasses
-from typing import List, Optional
+from typing import Any, List, Optional
 
 import hypothesis.strategies as st
 import pytest
@@ -139,3 +139,27 @@ def test_just_on_pydantic_dataclass(config_maker):
 #     with pytest.raises(InstantiationException):
 #         instantiate(inst_bad)
 #     assert inst_good == User(id=22, height=10, age=25) and isinstance(inst_good, User)
+
+
+@pyd_dataclass
+class HasDefault:
+    x: int = Field(default=1)
+
+
+@pyd_dataclass
+class HasDefaultFactory:
+    x: Any = Field(default_factory=lambda: [1 + 2j])
+
+
+@pytest.mark.parametrize(
+    "target,kwargs",
+    [
+        (HasDefault, {}),
+        (HasDefaultFactory, {}),
+        (HasDefault, {"x": 12}),
+        (HasDefaultFactory, {"x": [[-2j, 1 + 1j]]}),
+    ],
+)
+def test_pop_sig_with_pydantic_Field(target, kwargs):
+    Conf = builds(target, populate_full_signature=True)
+    assert instantiate(Conf(**kwargs)) == target(**kwargs)
