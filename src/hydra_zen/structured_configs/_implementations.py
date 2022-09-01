@@ -4,7 +4,6 @@ import functools
 import inspect
 import sys
 import warnings
-from collections import Counter, deque
 from dataclasses import (  # use this for runtime checks
     MISSING,
     Field as _Field,
@@ -50,7 +49,6 @@ from hydra_zen.typing import (
     Builds,
     Importable,
     Just,
-    Partial,
     PartialBuilds,
     SupportedPrimitive,
     ZenWrappers,
@@ -83,13 +81,15 @@ from ._globals import (
     ZEN_WRAPPERS_FIELD_NAME,
 )
 from ._type_guards import is_builds, is_just, is_old_partial_builds, uses_zen_processing
-from ._value_conversion import ZEN_VALUE_CONVERSION
 
 _T = TypeVar("_T")
 
 P = ParamSpec("P")
 R = TypeVar("R")
 
+# stores type -> value-conversion-fn
+# for types with specialized support from hydra-zen
+ZEN_VALUE_CONVERSION: Dict[type, Callable[[Any], Any]] = {}
 
 _builtin_function_or_method_type = type(len)
 
@@ -2020,31 +2020,3 @@ def get_target(obj: HasTarget) -> Any:
         pass  # makes sure we cover this branch in tests
 
     return target
-
-
-# registering value-conversions that depend on `builds`
-def _cast_via_tuple(dest_type: Type[_T]) -> Callable[[_T], Builds[Type[_T]]]:
-    def converter(value):
-        return builds(dest_type, tuple(value))()
-
-    return converter
-
-
-def _unpack_partial(value: Partial[_T]) -> PartialBuilds[Type[_T]]:
-    target = cast(Type[_T], value.func)
-    return builds(target, *value.args, **value.keywords, zen_partial=True)()
-
-
-ZEN_VALUE_CONVERSION[set] = _cast_via_tuple(set)
-ZEN_VALUE_CONVERSION[frozenset] = _cast_via_tuple(frozenset)
-ZEN_VALUE_CONVERSION[deque] = _cast_via_tuple(deque)
-
-if bytes in ZEN_SUPPORTED_PRIMITIVES:  # pragma: no cover
-    ZEN_VALUE_CONVERSION[bytes] = _cast_via_tuple(bytes)
-
-ZEN_VALUE_CONVERSION[bytearray] = _cast_via_tuple(bytearray)
-ZEN_VALUE_CONVERSION[range] = lambda value: builds(
-    range, value.start, value.stop, value.step
-)()
-ZEN_VALUE_CONVERSION[Counter] = lambda counter: builds(Counter, dict(counter))()
-ZEN_VALUE_CONVERSION[functools.partial] = _unpack_partial
