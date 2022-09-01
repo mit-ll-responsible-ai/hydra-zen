@@ -148,7 +148,7 @@ with Hydra. For example, a :py:class:`complex` value can be specified directly v
    _args_:
    - 3
 
-hydra-zen provides specialized support for values of the following types:
+hydra-zen provides specialized auto-config support for values of the following types:
 
 - :py:class:`bytes` (*support provided for OmegaConf < 2.2.0*)
 - :py:class:`bytearray`
@@ -163,6 +163,9 @@ hydra-zen provides specialized support for values of the following types:
 - :py:class:`set`
 - :py:class:`frozenset`
 
+hydra-zen also provides auto-config support for some third-pary libraries:
+
+- `pydantic.Field`
 
 *********************
 Third-Party Utilities
