@@ -34,7 +34,7 @@ from typing import (
 )
 
 from omegaconf import DictConfig, ListConfig
-from typing_extensions import Final, Literal, ParamSpec
+from typing_extensions import Final, Literal, ParamSpec, TypeAlias
 
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVES,
@@ -86,12 +86,14 @@ _T = TypeVar("_T")
 
 P = ParamSpec("P")
 R = TypeVar("R")
+Field_Entry: TypeAlias = Tuple[str, type, Field[Any]]
+
+# default zen_convert settings for `builds` and `hydrated_dataclass`
+_BUILDS_CONVERT_SETTINGS = AllConvert(dataclass=True)
 
 # stores type -> value-conversion-fn
 # for types with specialized support from hydra-zen
 ZEN_VALUE_CONVERSION: Dict[type, Callable[[Any], Any]] = {}
-
-_builtin_function_or_method_type = type(len)
 
 # signature param-types
 _POSITIONAL_ONLY: Final = inspect.Parameter.POSITIONAL_ONLY
@@ -99,6 +101,15 @@ _POSITIONAL_OR_KEYWORD: Final = inspect.Parameter.POSITIONAL_OR_KEYWORD
 _VAR_POSITIONAL: Final = inspect.Parameter.VAR_POSITIONAL
 _KEYWORD_ONLY: Final = inspect.Parameter.KEYWORD_ONLY
 _VAR_KEYWORD: Final = inspect.Parameter.VAR_KEYWORD
+
+
+_builtin_function_or_method_type = type(len)
+_lru_cache_type = type(functools.lru_cache(maxsize=128)(lambda: None))
+
+_BUILTIN_TYPES: Final = (_builtin_function_or_method_type, _lru_cache_type)
+
+del _lru_cache_type
+del _builtin_function_or_method_type
 
 
 def _retain_type_info(type_: type, value: Any, hydra_recursive: Optional[bool]):
@@ -165,11 +176,6 @@ def mutable_value(x: _T, *, zen_convert: Optional[ZenConvert] = None) -> _T:
     return field(default_factory=lambda: cast(x))
 
 
-Field_Entry = Tuple[str, type, Field[Any]]
-
-_BUILDS_CONVERT_SETTINGS = AllConvert(dataclass=True)
-
-
 # Alternate form, from PEP proposal:
 # https://github.com/microsoft/pyright/blob/master/specs/dataclass_transforms.md
 #
@@ -215,8 +221,8 @@ def hydrated_dataclass(
     *pos_args : SupportedPrimitive
         Positional arguments passed as ``hydra_target(*pos_args, ...)`` upon instantiation.
 
-        Arguments specified positionally are not included in the dataclass' signature and
-        are stored as a tuple bound to in the ``_args_`` field.
+        Arguments specified positionally are not included in the dataclass' signature
+        and are stored as a tuple bound to in the ``_args_`` field.
 
     zen_partial : Optional[bool]
         If ``True``, then the resulting config will instantiate as
@@ -261,8 +267,7 @@ def hydrated_dataclass(
         - ``"none"``: No conversion occurs; omegaconf containers are passed through (Default)
         - ``"partial"``: ``DictConfig`` and ``ListConfig`` objects converted to ``dict`` and
           ``list``, respectively. Structured configs and their fields are passed without conversion.
-        - ``"all"``: All passed objects are converted to dicts, lists, and primitives, without
-          a trace of OmegaConf containers.
+        - ``"all"``: All passed objects are converted to dicts, lists, and primitives, without a trace of OmegaConf containers.
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting config.
 
@@ -431,19 +436,6 @@ def _is_jax_compiled_func(value: Any) -> bool:  # pragma: no cover
         return False
 
 
-@functools.lru_cache(maxsize=128)
-def _throwaway():  # pragma: no cover
-    pass
-
-
-_lru_cache_type = type(_throwaway)
-
-_builtin_types = (_builtin_function_or_method_type, _lru_cache_type)
-
-del _throwaway
-del _lru_cache_type
-
-
 def _check_for_dynamically_defined_dataclass_type(target_path: str, value: Any) -> None:
     if target_path.startswith("types."):
         raise HydraZenUnsupportedPrimitiveError(
@@ -529,7 +521,7 @@ def sanitized_default_value(
                 and inspect.isclass(value)
             )
             or inspect.ismethod(value)
-            or isinstance(value, _builtin_types)
+            or isinstance(value, _BUILTIN_TYPES)
             or _is_ufunc(value)
             or _is_jax_compiled_func(value)
         )
