@@ -796,13 +796,13 @@ def builds(
     zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
     populate_full_signature: bool = False,
+    zen_convert: Optional[ZenConvert] = None,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     hydra_defaults: Optional[DefaultsList] = None,
     frozen: bool = False,
     builds_bases: Tuple[Type[DataClass_], ...] = (),
     dataclass_name: Optional[str] = None,
-    zen_convert: Optional[ZenConvert] = None,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Union[
     Type[Builds[Importable]],
@@ -812,7 +812,9 @@ def builds(
     """builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, hydra_recursive=None, hydra_convert=None, hydra_defaults=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
 
     `builds(target, *args, **kw)` returns a config that builds `target` when
-    instantiated: `instantiate(builds(target, *args, **kw)) == target(*args, **kw)`
+    instantiated.
+
+    `instantiate(builds(target, *args, **kw)) == target(*args, **kw)`
 
     Consult the Examples section of the docstring to see the various features of
     `builds` in action.
@@ -874,6 +876,19 @@ def builds(
         This option is not available for objects with inaccessible signatures, such as
         NumPy's various ufuncs.
 
+    zen_convert : Optional[ZenConvert]
+        A dictionary that modifies hydra-zen's value and type conversion behavior.
+        Consists of the following optional key-value pairs (:ref:`zen-convert`):
+
+        - `dataclass` : `bool` (default=True):
+            If `True` any dataclass type/instance without a
+            `_target_` field is automatically converted to a targeted config
+            that will instantiate to that type/instance. Otherwise the dataclass
+            type/instance will be passed through as-is.
+
+    builds_bases : Tuple[Type[DataClass], ...]
+        Specifies a tuple of parent classes that the resulting config inherits from.
+
     hydra_recursive : Optional[bool], optional (default=True)
         If ``True``, then Hydra will recursively instantiate all other
         hydra-config objects nested within this config [3]_.
@@ -902,10 +917,6 @@ def builds(
         I.e. setting/deleting an attribute of an instance will raise
         :py:class:`dataclasses.FrozenInstanceError` at runtime.
 
-    builds_bases : Tuple[Type[DataClass], ...]
-        Specifies a tuple of parent classes that the resulting config inherits from.
-        A ``PartialBuilds`` class (resulting from ``zen_partial=True``) cannot be a
-        parent of a ``Builds`` class (i.e. where `zen_partial=False` was specified).
 
     dataclass_name : Optional[str]
         If specified, determines the name of the returned class object.
@@ -923,8 +934,9 @@ def builds(
 
     Notes
     -----
-    The resulting "config" is a dataclass-object [5]_ with Hydra-specific attributes
-    attached to it [1]_. It posseses a `_target_` attribute is a
+    The resulting "config" is a dynamically-generated dataclass type [5]_ with
+    Hydra-specific attributes attached to it [1]_. It posseses a `_target_` attribute
+    that indicates the import path to the configured target as a string.
 
     Using any of the ``zen_xx`` features will result in a config that depends
     explicitly on hydra-zen. I.e. hydra-zen must be installed in order to

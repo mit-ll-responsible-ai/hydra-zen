@@ -206,6 +206,16 @@ def make_custom_builds_fn(
     populate_full_signature : bool, optional (default=False)
         Specifies a new the default value for ``builds(..., populate_full_signature=<..>)``
 
+    zen_convert : Optional[ZenConvert]
+        A dictionary that modifies hydra-zen's value and type conversion behavior.
+        Consists of the following optional key-value pairs (:ref:`zen-convert`):
+
+        - `dataclass` : `bool` (default=True):
+            If `True` any dataclass type/instance without a
+            `_target_` field is automatically converted to a targeted config
+            that will instantiate to that type/instance. Otherwise the dataclass
+            type/instance will be passed through as-is.
+
     hydra_recursive : Optional[bool], optional (default=True)
         Specifies a new the default value for ``builds(..., hydra_recursive=<..>)``
 
@@ -296,7 +306,7 @@ def make_custom_builds_fn(
         warnings.warn(
             HydraZenDeprecationWarning(
                 "Specifying `make_custom_builds_fn(builds_bases=<...>)` is deprecated "
-                "as of hydra-zen 0.7.0. It will be an error in hydra-zen 0.8.0. "
+                "as of hydra-zen 0.7.0. It will be an error in hydra-zen 0.9.0. "
                 "\n`builds_bases` must be specified via `builds` manually."
             ),
             stacklevel=2,

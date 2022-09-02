@@ -127,7 +127,7 @@ Additional Types, Supported via hydra-zen
 *****************************************
 
 Values of additional types can be specified directly via hydra-zen's 
-:ref:`config-creation functions <create-config>` (and other utility functions like ``to_yaml``), and hydra-zen will automatically 
+:ref:`config-creation functions <create-config>` (and other utility functions like ``to_yaml``) and those functions will automatically 
 create targeted configs to represent those values in a way that is compatible 
 with Hydra. For example, a :py:class:`complex` value can be specified directly via :func:`~hydra_zen.make_config`, and a targeted config will be created for that value.
 
@@ -162,10 +162,54 @@ hydra-zen provides specialized auto-config support for values of the following t
 - :py:class:`range`
 - :py:class:`set`
 - :py:class:`frozenset`
+- :py:func:`dataclasses.dataclass`
 
 hydra-zen also provides auto-config support for some third-pary libraries:
 
 - `pydantic.Field`
+
+.. _zen-convert:
+
+Controlling Value-Conversion Behavior
+*************************************
+Each of hydra-zen's config-creation functions has a `zen_config` parameter, which can 
+be passed a dictionary to modify the function's value and type conversion behaviors.
+`hydra_zen.typing.ZenConfig` is a :py:class:`typing.TypedDict` that can be used as a 
+convenience function to view and override these options.
+
+The following are the current zen-config options
+
+**dataclass : bool** 
+
+If `True` any dataclass type/instance without a `_target_` field is automatically 
+converted to a targeted config that will instantiate to that type/instance. Otherwise 
+the dataclass type/instance will be passed through as-is.
+
+.. code-block:: pycon
+   
+   >>> from hydra_zen import instantiate as I
+   >>> from hydra_zen import builds, just
+   >>> from dataclasses import dataclass
+   >>> @dataclass
+   ... class B:
+   ...     x: int
+   >>> b = B(x=1)
+
+   >>> I(just(b))
+   B(x=1)
+   >>> I(just(b, zen_convert={"dataclass": False}))  # returns omegaconf.DictConfig
+   {"x": 1}
+
+   >>> I(builds(dict, y=b))
+   {'y': B(x=1)}
+   >>> I(builds(dict, y=b, zen_convert={"dataclass": False}))  # returns omegaconf.DictConfig
+   {'y': {'x': 1}}   
+
+   >>> I(make_config(y=b))  # returns omegaconf.DictConfig
+   {'y': {'x': 1}}
+   >>> I(make_config(y=b, zen_convert={"dataclass": True}, hydra_convert="all"))
+   {'y': B(x=1)}
+
 
 *********************
 Third-Party Utilities

@@ -32,7 +32,6 @@ from omegaconf import DictConfig, ListConfig
 from typing_extensions import (
     Final,
     Literal,
-    NotRequired,
     ParamSpec,
     Protocol,
     Self,
@@ -51,6 +50,7 @@ __all__ = [
     "ZenWrappers",
     "ZenPartialBuilds",
     "HydraPartialBuilds",
+    "ZenConvert",
 ]
 
 P = ParamSpec("P")
@@ -262,4 +262,4 @@ convert_types: Final = {"dataclass": bool}
 
 
 class ZenConvert(TypedDict, total=False):
-    dataclass: NotRequired[bool]
+    dataclass: bool

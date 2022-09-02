@@ -169,6 +169,19 @@ def make_config(
 
         Named parameters of the forms ``hydra_xx``, ``zen_xx``, and ``_zen_xx`` are reserved to ensure future-compatibility, and cannot be specified by the user.
 
+    zen_convert : Optional[ZenConvert]
+        A dictionary that modifies hydra-zen's value and type conversion behavior.
+        Consists of the following optional key-value pairs (:ref:`zen-convert`):
+
+        - `dataclass` : `bool` (default=False):
+            If `True` any dataclass type/instance without a
+            `_target_` field is automatically converted to a targeted config
+            that will instantiate to that type/instance. Otherwise the dataclass
+            type/instance will be passed through as-is.
+
+    bases : Tuple[Type[DataClass], ...], optional (default=())
+        Base classes that the resulting config class will inherit from.
+
     hydra_recursive : Optional[bool], optional (default=True)
         If ``True``, then Hydra will recursively instantiate all other
         hydra-config objects nested within this dataclass [2]_.
@@ -189,10 +202,6 @@ def make_config(
         A list in an input config that instructs Hydra how to build the output config
         [7]_ [8]_. Each input config can have a Defaults List as a top level element. The
         Defaults List itself is not a part of output config.
-
-
-    bases : Tuple[Type[DataClass], ...], optional (default=())
-        Base classes that the resulting config class will inherit from.
 
     frozen : bool, optional (default=False)
         If ``True``, the resulting config class will produce 'frozen' (i.e. immutable) instances.

@@ -9,6 +9,7 @@ from ._implementations import (
     Partial,
     PartialBuilds,
     SupportedPrimitive,
+    ZenConvert,
     ZenPartialBuilds,
     ZenWrappers,
 )
@@ -23,4 +24,5 @@ __all__ = [
     "ZenWrappers",
     "ZenPartialBuilds",
     "HydraPartialBuilds",
+    "ZenConvert",
 ]
