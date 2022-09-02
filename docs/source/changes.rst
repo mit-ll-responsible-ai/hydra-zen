@@ -16,18 +16,25 @@ chronological order. All previous releases should still be available on pip.
 
 .. note:: This is documentation for an unreleased version of hydra-zen. You can try out this version pre-release version using `pip install --pre hydra-zen`
 
+Release Highlights
+------------------
+Outstanding among this release's improvements is the added capability for hydra-zen to automatically and recursively convert dataclasses to Hydra-compatible forms. 
+
+
+Previously, all dataclass types and instances
+
 Compatibility-Breaking Changes
 ------------------------------
-- This release drops support for Python 3.6. If you require Python 3.6, please restrict your hydra-zen installation dependency as `hydra-zen<0.8.0`.
+This release drops support for Python 3.6. If you require Python 3.6, please restrict your hydra-zen installation dependency as `hydra-zen<0.8.0`.
 
 
 Improvements
 ------------
+- Adds support for using `builds(<target>, populate_full_signature=True)` where `<target>` is a dataclass type that has a field with a default factory. (See :pull:`299`)
 - Adds auto-config support for `pydantic.Field`, improving hydra-zen's ability to automatically construct configs that describe pydantic models and dataclasses. (See :pull:`303`) 
 - :func:`~hydra_zen.builds` no longer has restrictions on inheritance patterns involving `PartialBuilds`-type configs. (See :pull:`290`)
 - Two new utility functions were added to the public API: :func:`~hydra_zen.is_partial_builds` and :func:`~hydra_zen.uses_zen_processing`
 - Improved :ref:`automatic type refinement <type-support>` for bare sequence types, and adds conditional support for `dict`, `list`, and `tuple` as type annotations when omegaconf 2.2.3+ is installed. (See :pull:`297`)
-- Adds support for using `builds(<target>, populate_full_signature=True)` where `<target>` is a dataclass type that has a field with a default factory. (See :pull:`299`)
 - The :ref:`automatic type refinement <type-support>` performed by :func:`~hydra_zen.builds` now has enhanced support for ``typing.Annotated``, ``typing.NewType``, and ``typing.TypeVarTuple``. (See :pull:`283`)
 
 
