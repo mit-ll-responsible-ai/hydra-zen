@@ -185,3 +185,16 @@ def test_nested_dataclasses(via_yaml: bool):
         assert instantiate(OmegaConf.create(to_yaml(conf))) == navbar
     else:
         assert instantiate(conf) == navbar
+
+
+@pyd_dataclass
+class PydFieldNoDefault:
+    btwn_0_and_3: int = Field(gt=0, lt=3)
+
+
+def test_pydantic_Field_no_default():
+    Conf = builds(PydFieldNoDefault, populate_full_signature=True)
+    out = instantiate(OmegaConf.create(to_yaml(Conf)), btwn_0_and_3=2)
+    assert isinstance(out, PydFieldNoDefault) and out == PydFieldNoDefault(
+        btwn_0_and_3=2
+    )

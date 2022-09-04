@@ -575,6 +575,9 @@ def sanitized_default_value(
             if value.default_factory is not None  # type: ignore
             else value.default  # type: ignore
         )
+        if isinstance(_val, pydantic.fields.UndefinedType):
+            return MISSING
+
         return sanitized_default_value(
             _val,
             allow_zen_conversion=allow_zen_conversion,
