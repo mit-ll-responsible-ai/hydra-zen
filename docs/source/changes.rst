@@ -36,19 +36,8 @@ Consider the following dataclass; neither the type-annotation for ``reduction_fn
       reduce_fn: Callable[[Sequence[float]], float] = sum  # <- not compat w/ Hydra
 
 
-.. code-block:: pycon
-   :caption: Instances of ``Bar`` are not compatible with Hydra/omegaconf
-
-   >>> from hydra_zen import to_yaml
-   >>> bar = Bar()
-   >>> to_yaml(bar)
-   -----------------------------------------------
-   ValidationError: Unexpected type annotation: Callable[Sequence[float], float]
-    full_key: reduce
-    object_type=Bar
-
-With the release of hydra-zen 0.8.0, we can now use :func:`~hydra_zen.just` to automatically create a Hydra-compatible 
-config that, when instantiated, returns ``Bar()``:
+With the release of hydra-zen 0.8.0, we can now use :func:`~hydra_zen.just` to 
+automatically create a Hydra-compatible config that, when instantiated, returns ``Bar()``:
 
 .. code-block:: pycon
    :caption: Using :func:`~hydra_zen.just` to create a Hydra-compatible structured config
@@ -56,13 +45,13 @@ config that, when instantiated, returns ``Bar()``:
    >>> from hydra_zen import just, instantiate
    >>> just_bar = just(Bar())
    
-   >>> print(to_yaml(just_bar))  # just_foo is yaml-serializable
+   >>> print(to_yaml(just_bar))
    _target_: __main__.Bar
    reduce_fn:
      _target_: hydra_zen.funcs.get_obj
      path: builtins.sum
    
-   >>> instantiate(just_bar)  # instantiate(just_bar) == Bar()
+   >>> instantiate(just_bar)  # returns Bar()
    Bar(reduce_fn=<built-in function sum>)
 
 This auto-conversion process works recursively as well
@@ -76,43 +65,13 @@ This auto-conversion process works recursively as well
    ...     bar: Bar
 
    >>> foobar = Foo(Bar(reduce_fn=mean))
-   >>> instantiate(just(foobar)) == foobar
-   True
+   >>> instantiate(just(foobar))
+   Foo(bar=Bar(reduce_fn=<function mean at 0x000001F224640310>))
+   >>> instantiate(builds(Foo, bar=Bar(sum)))
+   Foo(bar=Bar(reduce_fn=<built-in function sum>))
 
 Thus we can include these Hydra-compatible intermediates in our Hydra config or config store, and then use :func:`~hydra_zen.instantiate` to create the desired dataclass instances of ``Bar()`` and ``Foo(Bar(mean))`` within our app's task function.
-
-Finally, let's see that we can also make a Hydra-compatible config for a `pydantic dataclass <https://pydantic-docs.helpmanual.io/usage/dataclasses/>`_, which will perform enhanced runtime type and value-checking in our task-function:
-
-.. code-block:: python
-   :caption: Auto-config support for pydantic dataclasses
-   
-   from pydantic.dataclasses import dataclass as pyd_dataclass
-   from pydantic import Field, PositiveInt
-   
-   from hydra_zen import builds
-   
-   @pyd_dataclass
-   class PydanticExample:
-       btwn_0_and_3: int = Field(gt=0, lt=3)  # must satisfy 0 < x < 3
-       pos_int: PositiveInt = 10  # must satisfy 0 < x
-
-.. code-block:: pycon
-   :caption: Leveraging pydantic's runtime type and value checking via Hydra-compatible configs.
-
-   >>> Conf = builds(PydanticExample, populate_full_signature=True)
-
-   >>> instantiate(Conf, btwn_0_and_3=22)  # should raise: violates 0 < btwn_0_and_3 < 3
-   ---------------------------------------------------------------------------
-   ValidationError: 1 validation error for PydanticExample btwn_0_and_3 
-   ensure this value is less than 3 (type=value_error.number.not_lt; limit_value=3)
-
-   >>> instantiate(Conf, btwn_0_and_3=1, pos_int=-5)  # should raise: violates 0 < pos_int
-   ---------------------------------------------------------------------------
-   ValidationError: 1 validation error for PydanticExample pos_int
-   ensure this value is greater than 0 (type=value_error.number.not_gt; limit_value=0)
-   
-   >>> instantiate(Conf, btwn_0_and_3=1, pos_int=30)  # OK!
-   PydanticExample(btwn_0_and_3=1, pos_int=30)
+Note that this functionality works with `pydantic dataclasses <https://pydantic-docs.helpmanual.io/usage/dataclasses/>`_ as well, which enables us to leverage enhanced runtime value and type-checking.
 
 Big thanks to `Jasha10 <https://github.com/Jasha10>`_ for proposing and prototyping the crux of this new capability.
 
@@ -120,6 +79,58 @@ Compatibility-Breaking Changes
 ------------------------------
 This release drops support for Python 3.6. If you require Python 3.6, please restrict your hydra-zen installation dependency as `hydra-zen<0.8.0`.
 
+The addition of auto-config support for dataclasses (:pull:`301`) changes the default 
+behaviors of :func:`~hydra_zen.just` and :func:`~hydra_zen.builds`. Previously, all 
+dataclass types and instances lacking a `_target_` field would be left unprocessed by 
+these functions, and omegaconf would convert dataclass types and instances alike to 
+DictConfigs
+
+.. code-block:: python
+   :caption: hydra-zen < 0.8.0
+
+   from hydra_zen import just, builds, to_yaml
+   from dataclasses import dataclass
+   from omegaconf import DictConfig
+   
+   @dataclass
+   class A:
+       x: int = 1
+   
+   assert to_yaml(just(A)) == "x: 1\n"
+   assert to_yaml(just(A())) == "x: 1\n"
+   assert to_yaml(builds(dict, x=A)().x) == "x: 1\n"
+   assert to_yaml(builds(dict, x=A())().x) == "x: 1\n"
+
+Now these objects will automatically be converted to corresponding targeted configs 
+with the desired behavior under Hydra-instantiation:
+
+.. code-block:: python
+   :caption: hydra-zen >= 0.8.0
+
+   from hydra_zen import just, builds, instantiate
+   from dataclasses import dataclass
+
+   @dataclass
+   class A:
+       x: int = 1
+
+   assert instantiate(just(A)) is A
+   assert instantiate(builds(dict, x=A)().x) is A
+   
+   assert str(just(A())()) == "Builds_A(_target_='__main__.A', x=1)"
+   assert str(builds(dict, x=A(), hydra_convert="all")()) == "Builds_dict(_target_='builtins.dict', _convert_='all', x=<class 'types.Builds_A'>)"
+
+If you depended on the previous default behavior, you can recreate it by using the new 
+:ref:`zen-convert settings <zen-convert>` as so:
+
+.. code-block:: python
+   :caption: Restoring old default behavior
+   
+   from hydra_zen import just, make_custom_builds_fn
+   from functools import partial
+   
+   just = partial(just, zen_convert={"dataclass": False})
+   builds = make_custom_builds_fn(zen_convert={"dataclass": False})
 
 Improvements
 ------------
