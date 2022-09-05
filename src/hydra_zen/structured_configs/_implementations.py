@@ -481,8 +481,8 @@ def sanitized_default_value(
     if (
         structured_conf_permitted
         and convert_dataclass
-        and (is_dataclass(value) and not isinstance(value, type))
         and not is_builds(value)
+        and (is_dataclass(value) and not isinstance(value, type))
     ):
         # Auto-config dataclass instance
         # TODO: handle position-only arguments
