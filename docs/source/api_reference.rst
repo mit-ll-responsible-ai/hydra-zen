@@ -178,7 +178,7 @@ with Hydra. For example, a :py:class:`complex` value can be specified directly v
      path: builtins.sum
    
    >>> instantiate(just_bar)
-   Foo(reduce_fn=<built-in function sum>)
+   Bar(reduce_fn=<built-in function sum>)
 
 
 hydra-zen provides specialized auto-config support for values of the following types:
