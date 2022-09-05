@@ -123,8 +123,8 @@ Values of the following types can be specified directly in configs:
 
 .. _additional-types:
 
-Additional Types, Supported via hydra-zen
-*****************************************
+Auto-Config Support for Additional Types via hydra-zen
+******************************************************
 
 Values of additional types can be specified directly via hydra-zen's 
 :ref:`config-creation functions <create-config>` (and other utility functions like ``to_yaml``) and those functions will automatically 
@@ -132,21 +132,54 @@ create targeted configs to represent those values in a way that is compatible
 with Hydra. For example, a :py:class:`complex` value can be specified directly via :func:`~hydra_zen.make_config`, and a targeted config will be created for that value.
 
 .. code-block:: pycon
+   :caption: Demonstrating auto-config support for `complex`, `functools.partial` and `dataclasses.dataclass`
 
-   >>> from hydra_zen import make_config, to_yaml
+   >>> from hydra_zen import just, make_config, to_yaml, instantiate
+   >>> def print_yaml(x): print(to_yaml(x))
+
    >>> Conf = make_config(value=2.0 + 3.0j)
-   >>> print(to_yaml(Conf))
+   >>> print_yaml(Conf)
    value:
      real: 2.0
      imag: 3.0
      _target_: builtins.complex
-   
+
+.. code-block:: pycon
+
    >>> from functools import partial
-   >>> print(to_yaml(partial(int, 3)))
-   _target_: builtins.int
-   _partial_: true
-   _args_:
-   - 3
+
+   >>> Conf2 = builds(dict, x=partial(int, 3))
+   >>> print_yaml(Conf2)
+   _target_: builtins.dict
+   x:
+     _target_: builtins.int
+     _partial_: true
+     _args_:
+     - 3
+   >>> instantiate(Conf2) 
+   {'x': functools.partial(<class 'int'>, 3)}
+
+
+.. code-block:: pycon
+
+   >>> from typing import Callable, Sequence
+   >>> from dataclasses import dataclass
+   >>> 
+   >>> @dataclass
+   ... class Bar:
+   ...    reduce_fn: Callable[[Sequence[float]], float] = sum
+   >>>
+   >>> just_bar = just(Bar())
+   
+   >>> print_yaml(just_bar)
+   _target_: __main__.Bar
+   reduce_fn:
+     _target_: hydra_zen.funcs.get_obj
+     path: builtins.sum
+   
+   >>> instantiate(just_bar)
+   Foo(reduce_fn=<built-in function sum>)
+
 
 hydra-zen provides specialized auto-config support for values of the following types:
 
@@ -166,6 +199,7 @@ hydra-zen provides specialized auto-config support for values of the following t
 
 hydra-zen also provides auto-config support for some third-pary libraries:
 
+- `pydantic.dataclasses.dataclass`
 - `pydantic.Field`
 
 .. _zen-convert:

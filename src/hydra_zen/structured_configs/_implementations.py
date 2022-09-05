@@ -816,8 +816,7 @@ def builds(
 ]:
     """builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, hydra_recursive=None, hydra_convert=None, hydra_defaults=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
 
-    `builds(target, *args, **kw)` returns a config that builds `target` when
-    instantiated.
+    `builds(target, *args, **kw)` returns a config that, when instantiated, builds `target`.
 
     `instantiate(builds(target, *args, **kw)) == target(*args, **kw)`
 

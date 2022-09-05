@@ -60,6 +60,36 @@ launching Hydra jobs.
          ...
 
      FooConf = builds(foo, bar=2, baz=["abc"], populate_full_signature=True)
+  
+  You can even write dataclasses that aren't natively compatible with Hydra and dynamically convert them to Hydra-compatible structured configs.
+
+  .. code-block:: python
+     :caption: Converting a general dataclass to a Hydra-compatible structured config
+  
+     from dataclasses import dataclass
+     from typing import Callable, Sequence
+     
+     from hydra_zen import just, instantiate, to_yaml
+
+     @dataclass
+     class Bar:
+        # annotation not supported by Hydra
+        reduce_fn: Callable[[Sequence[float]], float]
+  
+     bar = Bar(reduce_fn=sum)  # value not supported by Hydra
+      
+     compat_bar = just(bar)  # returns a Hydra-compatible structured config!
+      
+     assert to_yaml(compat_bar) == """\
+     _target_: __main__.Bar
+     reduce_fn:
+       _target_: hydra_zen.funcs.get_obj
+       path: builtins.sum
+     """
+
+     inst_bar = instantiate(compat_bar)
+     assert isinstance(inst_bar, Bar)
+     assert inst_bar == bar
 
   This means that it is much **easier and safer** to write and maintain the configs for your Hydra applications:
   
@@ -67,12 +97,12 @@ launching Hydra jobs.
   - Write less, :ref:`stop repeating yourself <dry>`, and get more out of your configs.
   - Get automatic type-safety via :func:`~hydra_zen.builds`'s signature inspection.
   - :ref:`Validate your configs <builds-validation>` before launching your application.
-  
+  - Leverage :ref:`auto-config support <additional-types>` for additional types, like :py:class:`functools.partial`, that are not natively supported by Hydra.
+
 hydra-zen also also provides Hydra users with powerful, novel functionality. With it, we can:
 
 - Add :ref:`enhanced runtime type-checking <runtime-type-checking>` for our Hydra application, via :ref:`pydantic <pydantic-support>`, `beartype <https://github.com/beartype/beartype>`_, and other third-party libraries.
 - Design configs with specialized behaviors, like :ref:`partial configs <partial-config>`, or :ref:`configs with meta-fields <meta-field>`. 
-- Use :ref:`additional data types <additional-types>` in our configs, like :py:class:`pathlib.Path`, that are not natively supported by Hydra.
 - Leverage a powerful :ref:`functionality-injection framework <zen-wrapper>` in our Hydra applications.
 - Run static type-checkers on our config-creation code to catch incompatibilities with Hydra.
 

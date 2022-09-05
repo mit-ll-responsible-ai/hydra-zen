@@ -103,11 +103,11 @@ def just(
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
 ) -> Any:
-    """`just(obj)` returns a config that just returns `obj` when instantiated.
+    """`just(obj)` returns a config that, when instantiated, just returns `obj`.
 
     `instantiate(just(obj)) == obj`
 
-    `just` is designed to be idempotent: `just(obj) is just(just(obj))`
+    `just` is designed to be idempotent: `just(obj) == just(just(obj))`
 
     Parameters
     ----------
@@ -223,24 +223,27 @@ def just(
 
     `just` operates recursively within sequences and mappings.
 
-    >>> just({'a': [3-4j, 1+2j]})
-    'a': [ConfigComplex(real=3.0, imag=-4.0, _target_='builtins.complex'),
-         ConfigComplex(real=1.0, imag=2.0, _target_='builtins.complex')]}
-
     By default, `just` will convert a dataclass instance (including pydantic
     dataclasses) to a targeted config that will recreate the instance upon
-    Hydra-instantiation.
+    Hydra-instantiation. This enables users to leverage annotations and datatypes
+    that are not supported directly by Hydra.
 
     >>> from dataclasses import dataclass
     >>> @dataclass
     ... class B:
-    ...     x: int
+    ...     x: complex
     >>>
-    >>> Conf = just(B(x=1))
+    >>> Conf = just(B(x=2+3j))
     >>> Conf._target_, Conf.x
-    ('__main__.B', 1)
+    (__main__.B, ConfigComplex(real=2.0, imag=3.0, _target_='builtins.complex'))
     >>> instantiate(Conf)
-    B(x=1)
+    B(x=(2+3j))
+
+    >>> z_dict = {'a': [3-4j, 1+2j]}
+    >>> just(z_dict)
+    'a': [ConfigComplex(real=3.0, imag=-4.0, _target_='builtins.complex'),
+         ConfigComplex(real=1.0, imag=2.0, _target_='builtins.complex')]}
+    >>> assert instantiate(just(z_dict)) == z_dict
 
     This behavior can be modified via :ref:`zen-convert settings<zen-convert>`.
 

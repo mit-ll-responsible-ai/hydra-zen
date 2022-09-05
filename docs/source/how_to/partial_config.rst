@@ -3,7 +3,7 @@
 
 .. admonition:: The Answer
    
-   Simply use ``builds(<target>, zen_partial=True)`` to create a partial config.
+   Simply use ``builds(<target>, zen_partial=True, [...])`` or ``just(functools.partial(<target>, [...]))`` to create a partial config for ``<target>``.
 
 .. _partial-config:
 
@@ -82,11 +82,6 @@ Lastly, let's inspect the YAML-serialized config for :class:`OptimConf`.
    >>> from hydra_zen import to_yaml
 
    >>> print(to_yaml(OptimConf))
-   _target_: hydra_zen.funcs.zen_processing
-   _zen_target: __main__.Optimizer
-   _zen_partial: true
+   _target_: __main__.Optimizer
+   _partial_: true
    learning_rate: 0.1
-
-See that leveraging the ``zen_partial=True`` feature of :func:`~hydra_zen.builds` 
-introduces an explicit dependency on hydra-zen -- hydra-zen must be installed in order 
-to instantiate this YAML-based config.

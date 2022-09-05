@@ -18,10 +18,103 @@ chronological order. All previous releases should still be available on pip.
 
 Release Highlights
 ------------------
-Outstanding among this release's improvements is the added capability for hydra-zen to automatically and recursively convert dataclasses to Hydra-compatible forms. 
+This release adds auto-config support for dataclass types and instances, **including pydantic datclasses**. Thus one can now include in 
+a structured config type-annotations and default values that *are not natively 
+supported by Hydra*, and then use :func:`~hydra_zen.builds` and/or 
+:func:`~hydra_zen.just` to create a Hydra-compatible intermediate .
+
+Consider the following dataclass; neither the type-annotation for ``reduction_fn`` nor its default values are supported by Hydra/omegaconf, and thus it cannot be serialized to a yaml file nor used in a Hydra config.
+
+.. code-block:: python
+   :caption: A dataclass that cannot be used natively within a Hydra app as a structured config.
+
+   from typing import Callable, Sequence
+   from dataclasses import dataclass
+   
+   @dataclass
+   class Bar:
+      reduce_fn: Callable[[Sequence[float]], float] = sum  # <- not compat w/ Hydra
 
 
-Previously, all dataclass types and instances
+.. code-block:: pycon
+   :caption: Instances of ``Bar`` are not compatible with Hydra/omegaconf
+
+   >>> from hydra_zen import to_yaml
+   >>> bar = Bar()
+   >>> to_yaml(bar)
+   -----------------------------------------------
+   ValidationError: Unexpected type annotation: Callable[Sequence[float], float]
+    full_key: reduce
+    object_type=Bar
+
+With the release of hydra-zen 0.8.0, we can now use :func:`~hydra_zen.just` to automatically create a Hydra-compatible 
+config that, when instantiated, returns ``Bar()``:
+
+.. code-block:: pycon
+   :caption: Using :func:`~hydra_zen.just` to create a Hydra-compatible structured config
+
+   >>> from hydra_zen import just, instantiate
+   >>> just_bar = just(Bar())
+   
+   >>> print(to_yaml(just_bar))  # just_foo is yaml-serializable
+   _target_: __main__.Bar
+   reduce_fn:
+     _target_: hydra_zen.funcs.get_obj
+     path: builtins.sum
+   
+   >>> instantiate(just_bar)  # instantiate(just_bar) == Bar()
+   Bar(reduce_fn=<built-in function sum>)
+
+This auto-conversion process works recursively as well
+
+.. code-block:: pycon
+   :caption: Demonstrating recursive auto-conversion of dataclasses.
+
+   >>> from statistics import mean
+   >>> @dataclass
+   ... class Foo:
+   ...     bar: Bar
+
+   >>> foobar = Foo(Bar(reduce_fn=mean))
+   >>> instantiate(just(foobar)) == foobar
+   True
+
+Thus we can include these Hydra-compatible intermediates in our Hydra config or config store, and then use :func:`~hydra_zen.instantiate` to create the desired dataclass instances of ``Bar()`` and ``Foo(Bar(mean))`` within our app's task function.
+
+Finally, let's see that we can also make a Hydra-compatible config for a `pydantic dataclass <https://pydantic-docs.helpmanual.io/usage/dataclasses/>`_, which will perform enhanced runtime type and value-checking in our task-function:
+
+.. code-block:: python
+   :caption: Auto-config support for pydantic dataclasses
+   
+   from pydantic.dataclasses import dataclass as pyd_dataclass
+   from pydantic import Field, PositiveInt
+   
+   from hydra_zen import builds
+   
+   @pyd_dataclass
+   class PydanticExample:
+       btwn_0_and_3: int = Field(gt=0, lt=3)  # must satisfy 0 < x < 3
+       pos_int: PositiveInt = 10  # must satisfy 0 < x
+
+.. code-block:: pycon
+   :caption: Leveraging pydantic's runtime type and value checking via Hydra-compatible configs.
+
+   >>> Conf = builds(PydanticExample, populate_full_signature=True)
+
+   >>> instantiate(Conf, btwn_0_and_3=22)  # should raise: violates 0 < btwn_0_and_3 < 3
+   ---------------------------------------------------------------------------
+   ValidationError: 1 validation error for PydanticExample btwn_0_and_3 
+   ensure this value is less than 3 (type=value_error.number.not_lt; limit_value=3)
+
+   >>> instantiate(Conf, btwn_0_and_3=1, pos_int=-5)  # should raise: violates 0 < pos_int
+   ---------------------------------------------------------------------------
+   ValidationError: 1 validation error for PydanticExample pos_int
+   ensure this value is greater than 0 (type=value_error.number.not_gt; limit_value=0)
+   
+   >>> instantiate(Conf, btwn_0_and_3=1, pos_int=30)  # OK!
+   PydanticExample(btwn_0_and_3=1, pos_int=30)
+
+Big thanks to `Jasha10 <https://github.com/Jasha10>`_ for proposing and prototyping the crux of this new capability.
 
 Compatibility-Breaking Changes
 ------------------------------
@@ -30,21 +123,18 @@ This release drops support for Python 3.6. If you require Python 3.6, please res
 
 Improvements
 ------------
+- Adds auto-config support for `dataclasses.dataclass` (as highlighted above). (See :pull:`301`)
 - Adds support for using `builds(<target>, populate_full_signature=True)` where `<target>` is a dataclass type that has a field with a default factory. (See :pull:`299`)
 - Adds auto-config support for `pydantic.Field`, improving hydra-zen's ability to automatically construct configs that describe pydantic models and dataclasses. (See :pull:`303`) 
 - :func:`~hydra_zen.builds` no longer has restrictions on inheritance patterns involving `PartialBuilds`-type configs. (See :pull:`290`)
 - Two new utility functions were added to the public API: :func:`~hydra_zen.is_partial_builds` and :func:`~hydra_zen.uses_zen_processing`
-- Improved :ref:`automatic type refinement <type-support>` for bare sequence types, and adds conditional support for `dict`, `list`, and `tuple` as type annotations when omegaconf 2.2.3+ is installed. (See :pull:`297`)
 - The :ref:`automatic type refinement <type-support>` performed by :func:`~hydra_zen.builds` now has enhanced support for ``typing.Annotated``, ``typing.NewType``, and ``typing.TypeVarTuple``. (See :pull:`283`)
 
 
-Support for New Hydra/OmegaConf Features
-----------------------------------------
-OmegaConf ``v2.2.1`` is added native support for the following types:
+**Support for New Hydra/OmegaConf Features**
 
-- :py:class:`pathlib.Path`
-
-hydra-zen :ref:`already provides support for these <additional-types>`, but this version will defer to OmegaConf's native support when possible. (See :pull:`276`)
+- OmegaConf ``v2.2.1`` added native support for :py:class:`pathlib.Path`. hydra-zen :ref:`already provides support for these <additional-types>`, but will now defer to OmegaConf's native support when possible. (See :pull:`276`)
+- Improved :ref:`automatic type refinement <type-support>` for bare sequence types, and adds conditional support for `dict`, `list`, and `tuple` as type annotations when omegaconf 2.2.3+ is installed. (See :pull:`297`)
 
 
 Bug Fixes
