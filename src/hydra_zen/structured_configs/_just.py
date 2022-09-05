@@ -1,19 +1,14 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-from typing import Any, FrozenSet, Optional, Type, TypeVar, Union, overload
+from typing import Any, Callable, FrozenSet, Optional, Type, TypeVar, Union, overload
 
 from typing_extensions import Literal
 
 from hydra_zen.structured_configs import _utils
-from hydra_zen.typing import Builds, Importable, Just
+from hydra_zen.typing import Builds, Just
 from hydra_zen.typing._implementations import _HydraPrimitive  # type: ignore
 from hydra_zen.typing._implementations import _SupportedViaBuilds  # type: ignore
-from hydra_zen.typing._implementations import (
-    AllConvert,
-    DataClass_,
-    InstOrType,
-    ZenConvert,
-)
+from hydra_zen.typing._implementations import AllConvert, DataClass_, ZenConvert
 
 from ._implementations import sanitized_default_value
 from ._utils import merge_settings
@@ -21,6 +16,7 @@ from ._value_conversion import ConfigComplex
 
 # pyright: strict
 TD = TypeVar("TD", bound=DataClass_)
+TC = TypeVar("TC", bound=Callable[..., Any])
 TP = TypeVar("TP", bound=_HydraPrimitive)
 TB = TypeVar("TB", bound=Union[_SupportedViaBuilds, FrozenSet[Any]])
 
@@ -65,7 +61,18 @@ def just(
 
 @overload
 def just(
-    obj: InstOrType[TD],
+    obj: TC,
+    *,
+    zen_convert: Optional[ZenConvert] = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+) -> Type[Just[TC]]:  # pragma: no cover
+    ...
+
+
+@overload
+def just(
+    obj: TD,
     *,
     zen_convert: Literal[None] = ...,
     hydra_recursive: Optional[bool] = ...,
@@ -76,12 +83,12 @@ def just(
 
 @overload
 def just(
-    obj: Importable,
+    obj: DataClass_,
     *,
-    zen_convert: Optional[ZenConvert] = ...,
+    zen_convert: ZenConvert,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
-) -> Type[Just[Importable]]:  # pragma: no cover
+) -> Any:  # pragma: no cover
     ...
 
 
@@ -105,15 +112,14 @@ def just(
 ) -> Any:
     """`just(obj)` returns a config that, when instantiated, just returns `obj`.
 
-    `instantiate(just(obj)) == obj`
+    I.e., `instantiate(just(obj)) == obj`
 
     `just` is designed to be idempotent: `just(obj) == just(just(obj))`
 
     Parameters
     ----------
-    obj : Type | Callable[..., Any] HydraSupportedPrimitive | ZenSupportedPrimitive
-        A value, type (e.g. a class-object), or function-object that is supported by
-        either  hydra-zen or Hydra.
+    obj : Callable[..., Any] | HydraSupportedPrimitive | ZenSupportedPrimitive
+        A value, type (e.g. a class-object), or function-object that is either supported by Hydra or has auto-config support via hydra-zen.
 
     zen_convert : Optional[ZenConvert]
         A dictionary that modifies hydra-zen's value and type conversion behavior.
@@ -133,8 +139,8 @@ def just(
         If ``None``, the ``_recursive_`` attribute is not set on the resulting config.
 
     hydra_convert : Optional[Literal["none", "partial", "all"]], optional (default="none")
-        Determines how Hydra handles the non-primitive, omegaconf-specific objects passed to
-        ``<hydra_target>`` [3]_.
+        Determines how Hydra treats the non-primitive, omegaconf-specific objects
+        during instantiateion [3]_.
 
         - ``"none"``: No conversion occurs; omegaconf containers are passed through (Default)
         - ``"partial"``: ``DictConfig`` and ``ListConfig`` objects converted to ``dict`` and
@@ -147,8 +153,8 @@ def just(
 
     Returns
     -------
-    config : HydraSupportedPrimitive | Builds
-        A structured config that describes ``obj``.
+    out : HydraSupportedPrimitive | Builds[Type[obj]]
+        ``out`` is ``obj`` unchanged if ``obj`` is supported natively by Hydra, otherwise ``out`` is a dynamically-generated dataclass type or instance.
 
     Raises
     ------
@@ -167,7 +173,7 @@ def just(
 
     Notes
     -----
-    A "config" is a dynamically-generated dataclass type that is designed to be
+    Here, a "config" is a dynamically-generated dataclass type that is designed to be
     compatible with Hydra [1]_.
 
     The configs produced by ``just(<type_or_func>)`` introduce an explicit dependency
@@ -199,6 +205,9 @@ def just(
     >>> instantiate(just(my_func)) is my_func
     True
 
+    `just` dynamically generates dataclass types, a.k.a structured configs, to describe
+    ``obj``
+
     >>> just(A)()
     Just_A(_target_='hydra_zen.funcs.get_obj', path='__main__.A')
     >>> just(my_func)()
@@ -221,31 +230,31 @@ def just(
     >>> instantiate(just({1, 2, 3})
     {1, 2, 3}
 
-    `just` operates recursively within sequences and mappings.
-
-    By default, `just` will convert a dataclass instance (including pydantic
-    dataclasses) to a targeted config that will recreate the instance upon
-    Hydra-instantiation. This enables users to leverage annotations and datatypes
-    that are not supported directly by Hydra.
+    By default, `just` will convert a dataclass instance to a corresponding targeted
+    config. This behavior can be modified via :ref:`zen-convert settings<zen-convert>`.
 
     >>> from dataclasses import dataclass
     >>> @dataclass
     ... class B:
     ...     x: complex
     >>>
-    >>> Conf = just(B(x=2+3j))
-    >>> Conf._target_, Conf.x
-    (__main__.B, ConfigComplex(real=2.0, imag=3.0, _target_='builtins.complex'))
-    >>> instantiate(Conf)
-    B(x=(2+3j))
+    >>> instantiate(just(B)) is B
+    True
+    >>> instantiate(just(B(2+3j))) == B(2+3j)
+    True
+
+    `just` operates recursively within sequences, mappings, and dataclass fields.
 
     >>> z_dict = {'a': [3-4j, 1+2j]}
-    >>> just(z_dict)
-    'a': [ConfigComplex(real=3.0, imag=-4.0, _target_='builtins.complex'),
-         ConfigComplex(real=1.0, imag=2.0, _target_='builtins.complex')]}
     >>> assert instantiate(just(z_dict)) == z_dict
-
-    This behavior can be modified via :ref:`zen-convert settings<zen-convert>`.
+    >>>
+    >>> from typing import Any
+    >>> @dataclass
+    ... class C:
+    ...     x: Any
+    >>>
+    >>> instantiate(just(C(B(2+3j))))
+    C(B(2+3j))
 
     **Auto-Application of just**
 
