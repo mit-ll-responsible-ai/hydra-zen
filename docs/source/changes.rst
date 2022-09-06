@@ -42,7 +42,7 @@ automatically create a Hydra-compatible config that, when instantiated, returns 
 .. code-block:: pycon
    :caption: Using :func:`~hydra_zen.just` to create a Hydra-compatible structured config
 
-   >>> from hydra_zen import just, instantiate
+   >>> from hydra_zen import builds, just, instantiate, to_yaml
    >>> just_bar = just(Bar())
    
    >>> print(to_yaml(just_bar))

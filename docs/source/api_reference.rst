@@ -138,14 +138,14 @@ Auto-Config Support for Additional Types via hydra-zen
 ******************************************************
 
 Values of additional types can be specified directly via hydra-zen's 
-:ref:`config-creation functions <create-config>` (and other utility functions like ``to_yaml``) and those functions will automatically 
+:ref:`config-creation functions <create-config>` (and other utility functions like :func:`~hydra_zen.to_yaml`) and those functions will automatically 
 create targeted configs to represent those values in a way that is compatible 
 with Hydra. For example, a :py:class:`complex` value can be specified directly via :func:`~hydra_zen.make_config`, and a targeted config will be created for that value.
 
 .. code-block:: pycon
    :caption: Demonstrating auto-config support for `complex`, `functools.partial` and `dataclasses.dataclass`
 
-   >>> from hydra_zen import just, make_config, to_yaml, instantiate
+   >>> from hydra_zen import builds, just, make_config, to_yaml, instantiate
    >>> def print_yaml(x): print(to_yaml(x))
 
    >>> Conf = make_config(value=2.0 + 3.0j)
