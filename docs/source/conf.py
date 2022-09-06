@@ -46,6 +46,9 @@ extensions = [
     # "sphinx_codeautolink",
 ]
 
+autosummary_generate = False
+numpydoc_show_inherited_class_members = False
+
 # Strip input prompts:
 # https://sphinx-copybutton.readthedocs.io/en/latest/#strip-and-configure-input-prompts-for-code-cells
 copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: "

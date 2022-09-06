@@ -14,16 +14,3 @@
    .. autosummary::
    
       ~ZenField.__init__
-   
-   
-
-   
-   
-   .. rubric:: Attributes
-
-   .. autosummary::
-   
-      ~ZenField.hint
-      ~ZenField.zen_convert
-   
-   
