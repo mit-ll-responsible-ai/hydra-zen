@@ -275,9 +275,11 @@ class ZenConvert(TypedDict, total=False):
         If `True` any dataclass type/instance without a `_target_` field is
         automatically converted to a targeted config that will instantiate to that type/
         instance. Otherwise the dataclass type/instance will be passed through as-is.
-        Note that this only works with statically-defined dataclass types, where
+
+        Note that this only works with statically-defined dataclass types, whereas
         :func:`~hydra_zen.make_config` and :py:func:`dataclasses.make_dataclass`
-        dynamically generate dataclass types.
+        dynamically generate dataclass types. Additionally, this feature is not
+        compatible with a dataclass instance whose type possesses an `InitVar` field.
 
     Examples
     --------
