@@ -210,7 +210,7 @@
                 
   <div class="admonition-the-answer admonition">
 <p class="admonition-title">The Answer</p>
-<p>Simply use <code class="docutils literal notranslate"><span class="pre">builds(&lt;target&gt;,</span> <span class="pre">zen_partial=True)</span></code> to create a partial config.</p>
+<p>Simply use <code class="docutils literal notranslate"><span class="pre">builds(&lt;target&gt;,</span> <span class="pre">zen_partial=True,</span> <span class="pre">[...])</span></code> or <code class="docutils literal notranslate"><span class="pre">just(functools.partial(&lt;target&gt;,</span> <span class="pre">[...]))</span></code> to create a partial config for <code class="docutils literal notranslate"><span class="pre">&lt;target&gt;</span></code>.</p>
 </div>
 <section id="partially-configure-an-object">
 <span id="partial-config"></span><h1>Partially Configure an Object<a class="headerlink" href="#partially-configure-an-object" title="Permalink to this headline">#</a></h1>
@@ -280,16 +280,12 @@ function.</p>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">to_yaml</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">OptimConf</span><span class="p">))</span>
-<span class="go">_target_: hydra_zen.funcs.zen_processing</span>
-<span class="go">_zen_target: __main__.Optimizer</span>
-<span class="go">_zen_partial: true</span>
+<span class="go">_target_: __main__.Optimizer</span>
+<span class="go">_partial_: true</span>
 <span class="go">learning_rate: 0.1</span>
 </pre></div>
 </div>
 </div>
-<p>See that leveraging the <code class="docutils literal notranslate"><span class="pre">zen_partial=True</span></code> feature of <a class="reference internal" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a>
-introduces an explicit dependency on hydra-zen – hydra-zen must be installed in order
-to instantiate this YAML-based config.</p>
 </section>
 
 

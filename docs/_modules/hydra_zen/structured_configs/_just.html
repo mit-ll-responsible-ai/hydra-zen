@@ -172,65 +172,171 @@
   <h1>Source code for hydra_zen.structured_configs._just</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) 2022 Massachusetts Institute of Technology</span>
 <span class="c1"># SPDX-License-Identifier: MIT</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">FrozenSet</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">overload</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">FrozenSet</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">overload</span>
 
-<span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">Builds</span><span class="p">,</span> <span class="n">Importable</span><span class="p">,</span> <span class="n">Just</span>
+<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Literal</span>
+
+<span class="kn">from</span> <span class="nn">hydra_zen.structured_configs</span> <span class="kn">import</span> <span class="n">_utils</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">Builds</span><span class="p">,</span> <span class="n">Just</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">_HydraPrimitive</span>  <span class="c1"># type: ignore</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">_SupportedViaBuilds</span>  <span class="c1"># type: ignore</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">AllConvert</span><span class="p">,</span> <span class="n">DataClass_</span><span class="p">,</span> <span class="n">ZenConvert</span>
 
 <span class="kn">from</span> <span class="nn">._implementations</span> <span class="kn">import</span> <span class="n">sanitized_default_value</span>
+<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">merge_settings</span>
 <span class="kn">from</span> <span class="nn">._value_conversion</span> <span class="kn">import</span> <span class="n">ConfigComplex</span>
 
 <span class="c1"># pyright: strict</span>
-
+<span class="n">TD</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TD&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">DataClass_</span><span class="p">)</span>
+<span class="n">TC</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TC&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
 <span class="n">TP</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TP&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">_HydraPrimitive</span><span class="p">)</span>
 <span class="n">TB</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TB&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Union</span><span class="p">[</span><span class="n">_SupportedViaBuilds</span><span class="p">,</span> <span class="n">FrozenSet</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;just&quot;</span><span class="p">]</span>
 
 
+<span class="n">_JUST_CONVERT_SETTINGS</span> <span class="o">=</span> <span class="n">AllConvert</span><span class="p">(</span><span class="n">dataclass</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">just</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">TP</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TP</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+<span class="k">def</span> <span class="nf">just</span><span class="p">(</span>
+    <span class="n">obj</span><span class="p">:</span> <span class="n">TP</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TP</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="o">...</span>
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">just</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="nb">complex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigComplex</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+<span class="k">def</span> <span class="nf">just</span><span class="p">(</span>
+    <span class="n">obj</span><span class="p">:</span> <span class="nb">complex</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigComplex</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="o">...</span>
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">just</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">TB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">TB</span><span class="p">]]:</span>  <span class="c1"># pragma: no cover</span>
+<span class="k">def</span> <span class="nf">just</span><span class="p">(</span>
+    <span class="n">obj</span><span class="p">:</span> <span class="n">TB</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">TB</span><span class="p">]]:</span>  <span class="c1"># pragma: no cover</span>
     <span class="o">...</span>
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">just</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Importable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span>  <span class="c1"># pragma: no cover</span>
+<span class="k">def</span> <span class="nf">just</span><span class="p">(</span>
+    <span class="n">obj</span><span class="p">:</span> <span class="n">TC</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">TC</span><span class="p">]]:</span>  <span class="c1"># pragma: no cover</span>
     <span class="o">...</span>
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">just</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+<span class="k">def</span> <span class="nf">just</span><span class="p">(</span>
+    <span class="n">obj</span><span class="p">:</span> <span class="n">TD</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">TD</span><span class="p">]]]:</span>  <span class="c1"># pragma: no cover</span>
     <span class="o">...</span>
 
 
-<div class="viewcode-block" id="just"><a class="viewcode-back" href="../../../generated/hydra_zen.just.html#hydra_zen.just">[docs]</a><span class="k">def</span> <span class="nf">just</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Returns a structured config that &quot;just&quot; describes the specified value.</span>
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">just</span><span class="p">(</span>
+    <span class="n">obj</span><span class="p">:</span> <span class="n">DataClass_</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">zen_convert</span><span class="p">:</span> <span class="n">ZenConvert</span><span class="p">,</span>
+    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">just</span><span class="p">(</span>
+    <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="o">...</span>
+
+
+<div class="viewcode-block" id="just"><a class="viewcode-back" href="../../../generated/hydra_zen.just.html#hydra_zen.just">[docs]</a><span class="k">def</span> <span class="nf">just</span><span class="p">(</span>
+    <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;`just(obj)` returns a config that, when instantiated, just returns `obj`.</span>
+
+<span class="sd">    I.e., `instantiate(just(obj)) == obj`</span>
+
+<span class="sd">    `just` is designed to be idempotent: `just(obj) == just(just(obj))`</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    obj : Type | Callable[..., Any] HydraSupportedPrimitive | ZenSupportedPrimitive</span>
-<span class="sd">        A type (e.g. a class-object), function-object, or a value of a type that is</span>
-<span class="sd">        supported by either  hydra-zen or Hydra.</span>
+<span class="sd">    obj : Callable[..., Any] | HydraSupportedPrimitive | ZenSupportedPrimitive</span>
+<span class="sd">        A value, type (e.g. a class-object), or function-object that is either supported by Hydra or has auto-config support via hydra-zen.</span>
+
+<span class="sd">    zen_convert : Optional[ZenConvert]</span>
+<span class="sd">        A dictionary that modifies hydra-zen&#39;s value and type conversion behavior.</span>
+<span class="sd">        Consists of the following optional key-value pairs (:ref:`zen-convert`):</span>
+
+<span class="sd">        - `dataclass` : `bool` (default=True):</span>
+<span class="sd">            If `True` any dataclass type/instance without a</span>
+<span class="sd">            `_target_` field is automatically converted to a targeted config</span>
+<span class="sd">            that will instantiate to that type/instance. Otherwise the dataclass</span>
+<span class="sd">            type/instance will be passed through as-is.</span>
+
+
+<span class="sd">    hydra_recursive : Optional[bool], optional (default=True)</span>
+<span class="sd">        If ``True``, then Hydra will recursively instantiate all other</span>
+<span class="sd">        hydra-config objects nested within this config [2]_.</span>
+
+<span class="sd">        If ``None``, the ``_recursive_`` attribute is not set on the resulting config.</span>
+
+<span class="sd">    hydra_convert : Optional[Literal[&quot;none&quot;, &quot;partial&quot;, &quot;all&quot;]], optional (default=&quot;none&quot;)</span>
+<span class="sd">        Determines how Hydra treats the non-primitive, omegaconf-specific objects</span>
+<span class="sd">        during instantiateion [3]_.</span>
+
+<span class="sd">        - ``&quot;none&quot;``: No conversion occurs; omegaconf containers are passed through (Default)</span>
+<span class="sd">        - ``&quot;partial&quot;``: ``DictConfig`` and ``ListConfig`` objects converted to ``dict`` and</span>
+<span class="sd">          ``list``, respectively. Structured configs and their fields are passed without conversion.</span>
+<span class="sd">        - ``&quot;all&quot;``: All passed objects are converted to dicts, lists, and primitives, without</span>
+<span class="sd">          a trace of OmegaConf containers.</span>
+
+<span class="sd">        If ``None``, the ``_convert_`` attribute is not set on the resulting config.</span>
+
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    config : HydraSupportedPrimitive | Builds</span>
-<span class="sd">        A structured config that describes ``obj``.</span>
+<span class="sd">    out : HydraSupportedPrimitive | Builds[Type[obj]]</span>
+<span class="sd">        ``out`` is ``obj`` unchanged if ``obj`` is supported natively by Hydra, otherwise ``out`` is a dynamically-generated dataclass type or instance.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    hydra_zen.errors.HydraZenUnsupportedPrimitiveError</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] https://hydra.cc/docs/tutorials/structured_config/intro/</span>
+<span class="sd">    .. [2] https://hydra.cc/docs/advanced/instantiate_objects/overview/#recursive-instantiation</span>
+<span class="sd">    .. [3] https://hydra.cc/docs/advanced/instantiate_objects/overview/#parameter-conversion-strategies</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -239,24 +345,12 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
+<span class="sd">    Here, a &quot;config&quot; is a dynamically-generated dataclass type that is designed to be</span>
+<span class="sd">    compatible with Hydra [1]_.</span>
+
 <span class="sd">    The configs produced by ``just(&lt;type_or_func&gt;)`` introduce an explicit dependency</span>
 <span class="sd">    on hydra-zen. I.e. hydra-zen must be installed in order to instantiate any config</span>
 <span class="sd">    that used `just`.</span>
-
-<span class="sd">    hydra-zen provides specialized support for values of the following types:</span>
-
-<span class="sd">    - :py:class:`bytes`</span>
-<span class="sd">    - :py:class:`bytearray`</span>
-<span class="sd">    - :py:class:`complex`</span>
-<span class="sd">    - :py:class:`collections.Counter`</span>
-<span class="sd">    - :py:class:`collections.deque`</span>
-<span class="sd">    - :py:func:`functools.partial`</span>
-<span class="sd">    - :py:class:`pathlib.Path`</span>
-<span class="sd">    - :py:class:`pathlib.PosixPath`</span>
-<span class="sd">    - :py:class:`pathlib.WindowsPath`</span>
-<span class="sd">    - :py:class:`range`</span>
-<span class="sd">    - :py:class:`set`</span>
-<span class="sd">    - :py:class:`frozenset`</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -264,21 +358,7 @@
 
 <span class="sd">    &gt;&gt;&gt; from hydra_zen import just, instantiate, to_yaml</span>
 
-<span class="sd">    Using ``just`` to create a config that returns an object – without calling it –</span>
-<span class="sd">    upon instantiation.</span>
-
-<span class="sd">    &gt;&gt;&gt; class A: pass</span>
-<span class="sd">    &gt;&gt;&gt; Conf_A = just(A)  # returns a dataclass-type</span>
-<span class="sd">    &gt;&gt;&gt; instantiate(Conf_A) is A</span>
-<span class="sd">    True</span>
-
-<span class="sd">    &gt;&gt;&gt; def my_func(x: int): pass</span>
-<span class="sd">    &gt;&gt;&gt; Conf_func = just(my_func)  # returns a dataclass-type</span>
-<span class="sd">    &gt;&gt;&gt; instantiate(Conf_func) is my_func</span>
-<span class="sd">    True</span>
-
-
-<span class="sd">    Calling ``just`` on a value of a type that is natively supported by Hydra</span>
+<span class="sd">    Calling `just` on a value of a type that is natively supported by Hydra</span>
 <span class="sd">    will reurn that value unchanged</span>
 
 <span class="sd">    &gt;&gt;&gt; just(1)</span>
@@ -286,32 +366,72 @@
 <span class="sd">    &gt;&gt;&gt; just(False)</span>
 <span class="sd">    False</span>
 
-<span class="sd">    Calling ``just`` on a value of a type that has special support from hydra-zen</span>
-<span class="sd">    will return a structured config instance that, when instantiated, returns that</span>
-<span class="sd">    value</span>
+<span class="sd">    `just` can be used to create a config that will simply import a class-object or function when the config is instantiated by Hydra.</span>
+
+
+<span class="sd">    &gt;&gt;&gt; class A: pass</span>
+<span class="sd">    &gt;&gt;&gt; def my_func(x: int): pass</span>
+
+<span class="sd">    &gt;&gt;&gt; instantiate(just(A)) is A</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(just(my_func)) is my_func</span>
+<span class="sd">    True</span>
+
+<span class="sd">    `just` dynamically generates dataclass types, a.k.a structured configs, to describe</span>
+<span class="sd">    ``obj``</span>
+
+<span class="sd">    &gt;&gt;&gt; just(A)()</span>
+<span class="sd">    Just_A(_target_=&#39;hydra_zen.funcs.get_obj&#39;, path=&#39;__main__.A&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; just(my_func)()</span>
+<span class="sd">    Just_my_func(_target_=&#39;hydra_zen.funcs.get_obj&#39;, path=&#39;__main__.my_func&#39;)</span>
+
+<span class="sd">    **Auto-config support**</span>
+
+<span class="sd">    Calling `just` on a value of a type that has</span>
+<span class="sd">    :ref:`special support from hydra-zen &lt;additional-types&gt;`</span>
+<span class="sd">    will return a structured config instance that, when instantiated by Hydra, returns</span>
+<span class="sd">    that value.</span>
 
 <span class="sd">    &gt;&gt;&gt; just(1+2j)</span>
 <span class="sd">    ConfigComplex(real=1.0, imag=2.0, _target_=&#39;builtins.complex&#39;)</span>
-
 <span class="sd">    &gt;&gt;&gt; instantiate(just(1+2j))</span>
 <span class="sd">    (1+2j)</span>
 
 <span class="sd">    &gt;&gt;&gt; just({1, 2, 3})</span>
 <span class="sd">    Builds_set(_target_=&#39;builtins.set&#39;, _args_=((1, 2, 3),))</span>
-
 <span class="sd">    &gt;&gt;&gt; instantiate(just({1, 2, 3})</span>
 <span class="sd">    {1, 2, 3}</span>
 
-<span class="sd">    ``just`` operates recursively within sequences and mappings.</span>
+<span class="sd">    By default, `just` will convert a dataclass instance to a corresponding targeted</span>
+<span class="sd">    config. This behavior can be modified via :ref:`zen-convert settings&lt;zen-convert&gt;`.</span>
 
-<span class="sd">    &gt;&gt;&gt; just({&#39;a&#39;: [3-4j, 1+2j]})</span>
-<span class="sd">    &#39;a&#39;: [ConfigComplex(real=3.0, imag=-4.0, _target_=&#39;builtins.complex&#39;),</span>
-<span class="sd">         ConfigComplex(real=1.0, imag=2.0, _target_=&#39;builtins.complex&#39;)]}</span>
+<span class="sd">    &gt;&gt;&gt; from dataclasses import dataclass</span>
+<span class="sd">    &gt;&gt;&gt; @dataclass</span>
+<span class="sd">    ... class B:</span>
+<span class="sd">    ...     x: complex</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(just(B)) is B</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(just(B(2+3j))) == B(2+3j)</span>
+<span class="sd">    True</span>
+
+<span class="sd">    `just` operates recursively within sequences, mappings, and dataclass fields.</span>
+
+<span class="sd">    &gt;&gt;&gt; z_dict = {&#39;a&#39;: [3-4j, 1+2j]}</span>
+<span class="sd">    &gt;&gt;&gt; assert instantiate(just(z_dict)) == z_dict</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; from typing import Any</span>
+<span class="sd">    &gt;&gt;&gt; @dataclass</span>
+<span class="sd">    ... class C:</span>
+<span class="sd">    ...     x: Any</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(just(C(B(2+3j))))</span>
+<span class="sd">    C(B(2+3j))</span>
 
 <span class="sd">    **Auto-Application of just**</span>
 
-<span class="sd">    Both ``builds`` and ``make_config`` will automatically (and recursively) apply</span>
-<span class="sd">    ``just`` to all configured values. E.g. in the following example `just` will be</span>
+<span class="sd">    Both `builds` and `make_config` will automatically (and recursively) apply</span>
+<span class="sd">    `just` to all configured values. E.g. in the following example `just` will be</span>
 <span class="sd">    applied to both  the complex-valued the list and to ``sum``.</span>
 
 <span class="sd">    &gt;&gt;&gt; from hydra_zen import make_config</span>
@@ -333,12 +453,21 @@
 <span class="sd">    &gt;&gt;&gt; conf.reduction_fn(conf.data)</span>
 <span class="sd">    (3+5j)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">convert_settings</span> <span class="o">=</span> <span class="n">merge_settings</span><span class="p">(</span><span class="n">zen_convert</span><span class="p">,</span> <span class="n">_JUST_CONVERT_SETTINGS</span><span class="p">)</span>
+    <span class="k">del</span> <span class="n">zen_convert</span>
+    <span class="n">_utils</span><span class="o">.</span><span class="n">validate_hydra_options</span><span class="p">(</span>
+        <span class="n">hydra_recursive</span><span class="o">=</span><span class="n">hydra_recursive</span><span class="p">,</span> <span class="n">hydra_convert</span><span class="o">=</span><span class="n">hydra_convert</span>
+    <span class="p">)</span>
+
     <span class="k">return</span> <span class="n">sanitized_default_value</span><span class="p">(</span>
         <span class="n">obj</span><span class="p">,</span>
         <span class="n">allow_zen_conversion</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">structured_conf_permitted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">field_name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="n">error_prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">convert_dataclass</span><span class="o">=</span><span class="n">convert_settings</span><span class="p">[</span><span class="s2">&quot;dataclass&quot;</span><span class="p">],</span>
+        <span class="n">hydra_convert</span><span class="o">=</span><span class="n">hydra_convert</span><span class="p">,</span>
+        <span class="n">hydra_recursive</span><span class="o">=</span><span class="n">hydra_recursive</span><span class="p">,</span>
     <span class="p">)</span></div>
 </pre></div>
 

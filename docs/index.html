@@ -214,16 +214,20 @@
 </div>
 <section id="welcome-to-hydra-zen-s-documentation">
 <h1>Welcome to hydra-zen’s documentation!<a class="headerlink" href="#welcome-to-hydra-zen-s-documentation" title="Permalink to this headline">#</a></h1>
-<p>hydra-zen is a Python library that simplifies the process of writing code (be it research-grade or production-grade) that is:</p>
+<p>hydra-zen is a Python library that makes the <a class="reference external" href="https://hydra.cc/">Hydra framework</a>
+simpler and more elegant to use. Use hydra-zen to design your project to be:</p>
 <ul class="simple">
 <li><p><strong>Configurable</strong>: change deeply-nested parameters and swap out entire pieces of your program, all from the command line.</p></li>
 <li><p><strong>Repeatable</strong>: each run of your code will be self-documenting; the full configuration of your software is saved alongside your results.</p></li>
 <li><p><strong>Scalable</strong>: launch multiple runs of your software, be it on your local machine or across multiple nodes on a cluster.</p></li>
 </ul>
-<p>It builds off – and is fully compatible with – <a class="reference external" href="https://hydra.cc/">Hydra</a>, a
-framework for elegantly configuring complex applications. hydra-zen helps simplify the
-process of using Hydra by providing specialized functions for <a class="reference internal" href="api_reference.html#create-config"><span class="std std-ref">creating configs</span></a> and
-launching Hydra jobs.</p>
+<p>It provides functions that <a class="reference internal" href="api_reference.html#create-config"><span class="std std-ref">dynamically</span></a> and <a class="reference internal" href="api_reference.html#additional-types"><span class="std std-ref">automatically</span></a> generate configs for your code, which help to eliminate
+Hydra-specific boilerplate from your project.</p>
+<p>hydra-zen is fully compatible with Hydra, and is appropriate for use in both rapid
+prototypes and production-grade code. It is also great for designing your data science
+and machine learning research to be reproducible. hydra-zen provides specialized
+support for using NumPy, Jax, PyTorch, and Lightning (a.k.a PyTorch-Lightning) in your
+Hydra application.</p>
 <div class="admonition-attention-hydra-users admonition">
 <p class="admonition-title">Attention, Hydra users:</p>
 <p>If you are already use Hydra, let’s cut to the chase: <strong>the most important benefit of using hydra-zen is that it automatically and dynamically generates structured configs for you</strong>.</p>
@@ -254,19 +258,49 @@ launching Hydra jobs.</p>
 </pre></div>
 </div>
 </div>
+<p>You can even write dataclasses that aren’t natively compatible with Hydra and then use hydra-zen to dynamically convert them to Hydra-compatible structured configs.</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Converting a general dataclass to a Hydra-compatible structured config</span><a class="headerlink" href="#id3" title="Permalink to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Sequence</span>
+
+<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">just</span><span class="p">,</span> <span class="n">instantiate</span><span class="p">,</span> <span class="n">to_yaml</span>
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Bar</span><span class="p">:</span>
+   <span class="c1"># annotation not supported by Hydra</span>
+   <span class="n">reduce_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span> <span class="nb">float</span><span class="p">]</span>
+
+<span class="n">bar</span> <span class="o">=</span> <span class="n">Bar</span><span class="p">(</span><span class="n">reduce_fn</span><span class="o">=</span><span class="nb">sum</span><span class="p">)</span>  <span class="c1"># value not supported by Hydra</span>
+
+<span class="n">compat_bar</span> <span class="o">=</span> <span class="n">just</span><span class="p">(</span><span class="n">bar</span><span class="p">)</span>  <span class="c1"># returns a Hydra-compatible structured config!</span>
+
+<span class="k">assert</span> <span class="n">to_yaml</span><span class="p">(</span><span class="n">compat_bar</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">_target_: __main__.Bar</span>
+<span class="s2">reduce_fn:</span>
+<span class="s2">  _target_: hydra_zen.funcs.get_obj</span>
+<span class="s2">  path: builtins.sum</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">inst_bar</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">compat_bar</span><span class="p">)</span>
+<span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inst_bar</span><span class="p">,</span> <span class="n">Bar</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">inst_bar</span> <span class="o">==</span> <span class="n">bar</span>
+</pre></div>
+</div>
+</div>
 <p>This means that it is much <strong>easier and safer</strong> to write and maintain the configs for your Hydra applications:</p>
 <ul class="simple">
 <li><p>Write all of your configs in Python. No more yaml files!</p></li>
 <li><p>Write less, <a class="reference internal" href="explanation/dont_repeat_yourself.html#dry"><span class="std std-ref">stop repeating yourself</span></a>, and get more out of your configs.</p></li>
 <li><p>Get automatic type-safety via <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a>’s signature inspection.</p></li>
 <li><p><a class="reference internal" href="generated/hydra_zen.builds.html#builds-validation"><span class="std std-ref">Validate your configs</span></a> before launching your application.</p></li>
+<li><p>Leverage <a class="reference internal" href="api_reference.html#additional-types"><span class="std std-ref">auto-config support</span></a> for additional types, like <code class="xref py py-class docutils literal notranslate"><span class="pre">functools.partial</span></code>, that are not natively supported by Hydra.</p></li>
 </ul>
 </div>
 <p>hydra-zen also also provides Hydra users with powerful, novel functionality. With it, we can:</p>
 <ul class="simple">
 <li><p>Add <a class="reference internal" href="how_to/beartype.html#runtime-type-checking"><span class="std std-ref">enhanced runtime type-checking</span></a> for our Hydra application, via <a class="reference internal" href="explanation/type_refinement.html#pydantic-support"><span class="std std-ref">pydantic</span></a>, <a class="reference external" href="https://github.com/beartype/beartype">beartype</a>, and other third-party libraries.</p></li>
-<li><p>Design configs with specialized behaviors, like <a class="reference internal" href="how_to/partial_config.html#partial-config"><span class="std std-ref">partial configs</span></a>, or <a class="reference internal" href="generated/hydra_zen.builds.html#meta-field"><span class="std std-ref">configs with meta-fields</span></a>.</p></li>
-<li><p>Use <a class="reference internal" href="api_reference.html#additional-types"><span class="std std-ref">additional data types</span></a> in our configs, like <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a>, that are not natively supported by Hydra.</p></li>
+<li><p>Design configs specialized behaviors, like <a class="reference internal" href="generated/hydra_zen.builds.html#meta-field"><span class="std std-ref">configs with meta-fields</span></a>.</p></li>
 <li><p>Leverage a powerful <a class="reference internal" href="generated/hydra_zen.builds.html#zen-wrapper"><span class="std std-ref">functionality-injection framework</span></a> in our Hydra applications.</p></li>
 <li><p>Run static type-checkers on our config-creation code to catch incompatibilities with Hydra.</p></li>
 </ul>

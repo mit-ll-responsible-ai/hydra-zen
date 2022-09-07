@@ -14,7 +14,7 @@ robust support for more general type annotations.
 Hydra's Limited Type Support
 ----------------------------
 
-Hydra permits only `a narrow subset of type annotations <https://hydra.cc/docs/next/tutorials/structured_config/intro#structured-configs-supports>`_ to be present in a 
+Hydra permits only `a narrow subset of type annotations <https://hydra.cc/docs/tutorials/structured_config/intro#structured-configs-supports>`_ to be present in a 
 config:
 
    - ``Any``

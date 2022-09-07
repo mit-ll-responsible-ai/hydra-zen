@@ -194,7 +194,7 @@
 <span class="kn">from</span> <span class="nn">hydra_zen.errors</span> <span class="kn">import</span> <span class="n">HydraZenDeprecationWarning</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">ZenWrappers</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._builds_overloads</span> <span class="kn">import</span> <span class="n">FullBuilds</span><span class="p">,</span> <span class="n">PBuilds</span><span class="p">,</span> <span class="n">StdBuilds</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass_</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass_</span><span class="p">,</span> <span class="n">ZenConvert</span>
 
 <span class="kn">from</span> <span class="nn">._implementations</span> <span class="kn">import</span> <span class="n">builds</span>
 
@@ -222,6 +222,7 @@
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[()]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FullBuilds</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="o">...</span>
 
@@ -238,6 +239,7 @@
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PBuilds</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="o">...</span>
 
@@ -254,6 +256,7 @@
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[()]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StdBuilds</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="o">...</span>
 
@@ -270,6 +273,7 @@
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[()]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">FullBuilds</span><span class="p">,</span> <span class="n">StdBuilds</span><span class="p">]:</span>  <span class="c1"># pragma: no cover</span>
     <span class="o">...</span>
 
@@ -286,6 +290,7 @@
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">],</span>
+    <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StdBuilds</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="o">...</span>
 
@@ -302,6 +307,7 @@
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">PBuilds</span><span class="p">,</span> <span class="n">StdBuilds</span><span class="p">]:</span>  <span class="c1"># pragma: no cover</span>
     <span class="o">...</span>
 
@@ -318,6 +324,7 @@
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">],</span>
+    <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">PBuilds</span><span class="p">,</span> <span class="n">StdBuilds</span><span class="p">]:</span>  <span class="c1"># pragma: no cover</span>
     <span class="o">...</span>
 
@@ -334,6 +341,7 @@
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[()]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">FullBuilds</span><span class="p">,</span> <span class="n">PBuilds</span><span class="p">,</span> <span class="n">StdBuilds</span><span class="p">]:</span>  <span class="c1"># pragma: no cover</span>
     <span class="o">...</span>
 
@@ -348,6 +356,7 @@
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
+    <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">FullBuilds</span><span class="p">,</span> <span class="n">PBuilds</span><span class="p">,</span> <span class="n">StdBuilds</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;Returns the `builds` function, but with customized default values.</span>
 
@@ -368,6 +377,16 @@
 
 <span class="sd">    populate_full_signature : bool, optional (default=False)</span>
 <span class="sd">        Specifies a new the default value for ``builds(..., populate_full_signature=&lt;..&gt;)``</span>
+
+<span class="sd">    zen_convert : Optional[ZenConvert]</span>
+<span class="sd">        A dictionary that modifies hydra-zen&#39;s value and type conversion behavior.</span>
+<span class="sd">        Consists of the following optional key-value pairs (:ref:`zen-convert`):</span>
+
+<span class="sd">        - `dataclass` : `bool` (default=True):</span>
+<span class="sd">            If `True` any dataclass type/instance without a</span>
+<span class="sd">            `_target_` field is automatically converted to a targeted config</span>
+<span class="sd">            that will instantiate to that type/instance. Otherwise the dataclass</span>
+<span class="sd">            type/instance will be passed through as-is.</span>
 
 <span class="sd">    hydra_recursive : Optional[bool], optional (default=True)</span>
 <span class="sd">        Specifies a new the default value for ``builds(..., hydra_recursive=&lt;..&gt;)``</span>
@@ -459,7 +478,7 @@
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
             <span class="n">HydraZenDeprecationWarning</span><span class="p">(</span>
                 <span class="s2">&quot;Specifying `make_custom_builds_fn(builds_bases=&lt;...&gt;)` is deprecated &quot;</span>
-                <span class="s2">&quot;as of hydra-zen 0.7.0. It will be an error in hydra-zen 0.8.0. &quot;</span>
+                <span class="s2">&quot;as of hydra-zen 0.7.0. It will be an error in hydra-zen 0.9.0. &quot;</span>
                 <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">`builds_bases` must be specified via `builds` manually.&quot;</span>
             <span class="p">),</span>
             <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
@@ -472,6 +491,7 @@
         <span class="n">merged_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">builds</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">merged_kwargs</span><span class="p">)</span>
 
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">wrapped</span><span class="p">,</span> <span class="s2">&quot;_zen_convert&quot;</span><span class="p">,</span> <span class="n">zen_convert</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Union</span><span class="p">[</span><span class="n">FullBuilds</span><span class="p">,</span> <span class="n">PBuilds</span><span class="p">,</span> <span class="n">StdBuilds</span><span class="p">],</span> <span class="n">wrapped</span><span class="p">)</span></div>
 </pre></div>
 

@@ -281,19 +281,48 @@
 <h1>hydra_zen.just<a class="headerlink" href="#hydra-zen-just" title="Permalink to this headline">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="hydra_zen.just">
-<span class="sig-prename descclassname"><span class="pre">hydra_zen.</span></span><span class="sig-name descname"><span class="pre">just</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/structured_configs/_just.html#just"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.just" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns a structured config that “just” describes the specified value.</p>
-<dl class="field-list simple">
+<span class="sig-prename descclassname"><span class="pre">hydra_zen.</span></span><span class="sig-name descname"><span class="pre">just</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_recursive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/structured_configs/_just.html#just"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.just" title="Permalink to this definition">#</a></dt>
+<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">just(obj)</span></code> returns a config that, when instantiated, just returns <code class="xref py py-obj docutils literal notranslate"><span class="pre">obj</span></code>.</p>
+<p>I.e., <code class="xref py py-obj docutils literal notranslate"><span class="pre">instantiate(just(obj))</span> <span class="pre">==</span> <span class="pre">obj</span></code></p>
+<p><a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> is designed to be idempotent: <code class="xref py py-obj docutils literal notranslate"><span class="pre">just(obj)</span> <span class="pre">==</span> <span class="pre">just(just(obj))</span></code></p>
+<dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>obj</strong><span class="classifier">Type | Callable[…, Any] HydraSupportedPrimitive | ZenSupportedPrimitive</span></dt><dd><p>A type (e.g. a class-object), function-object, or a value of a type that is
-supported by either  hydra-zen or Hydra.</p>
+<dd class="field-odd"><dl>
+<dt><strong>obj</strong><span class="classifier">Callable[…, Any] | HydraSupportedPrimitive | ZenSupportedPrimitive</span></dt><dd><p>A value, type (e.g. a class-object), or function-object that is either supported by Hydra or has auto-config support via hydra-zen.</p>
+</dd>
+<dt><strong>zen_convert</strong><span class="classifier">Optional[ZenConvert]</span></dt><dd><p>A dictionary that modifies hydra-zen’s value and type conversion behavior.
+Consists of the following optional key-value pairs (<span class="xref std std-ref">zen-convert</span>):</p>
+<ul>
+<li><dl>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">dataclass</span></code><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a> (default=True):</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> any dataclass type/instance without a
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">_target_</span></code> field is automatically converted to a targeted config
+that will instantiate to that type/instance. Otherwise the dataclass
+type/instance will be passed through as-is.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt><strong>hydra_recursive</strong><span class="classifier">Optional[bool], optional (default=True)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then Hydra will recursively instantiate all other
+hydra-config objects nested within this config <a class="reference internal" href="#rcd3092d0866d-2" id="id1">[2]</a>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_recursive_</span></code> attribute is not set on the resulting config.</p>
+</dd>
+<dt><strong>hydra_convert</strong><span class="classifier">Optional[Literal[“none”, “partial”, “all”]], optional (default=”none”)</span></dt><dd><p>Determines how Hydra treats the non-primitive, omegaconf-specific objects
+during instantiateion <a class="reference internal" href="#rcd3092d0866d-3" id="id2">[3]</a>.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code>: No conversion occurs; omegaconf containers are passed through (Default)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;partial&quot;</span></code>: <code class="docutils literal notranslate"><span class="pre">DictConfig</span></code> and <code class="docutils literal notranslate"><span class="pre">ListConfig</span></code> objects converted to <code class="docutils literal notranslate"><span class="pre">dict</span></code> and
+<code class="docutils literal notranslate"><span class="pre">list</span></code>, respectively. Structured configs and their fields are passed without conversion.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>: All passed objects are converted to dicts, lists, and primitives, without
+a trace of OmegaConf containers.</p></li>
+</ul>
+<p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_convert_</span></code> attribute is not set on the resulting config.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt><strong>config</strong><span class="classifier">HydraSupportedPrimitive | Builds</span></dt><dd><p>A structured config that describes <code class="docutils literal notranslate"><span class="pre">obj</span></code>.</p>
+<dt><strong>out</strong><span class="classifier">HydraSupportedPrimitive | Builds[Type[obj]]</span></dt><dd><p><code class="docutils literal notranslate"><span class="pre">out</span></code> is <code class="docutils literal notranslate"><span class="pre">obj</span></code> unchanged if <code class="docutils literal notranslate"><span class="pre">obj</span></code> is supported natively by Hydra, otherwise <code class="docutils literal notranslate"><span class="pre">out</span></code> is a dynamically-generated dataclass type or instance.</p>
 </dd>
 </dl>
 </dd>
@@ -313,44 +342,29 @@ supported by either  hydra-zen or Hydra.</p>
 </dl>
 </div>
 <p class="rubric">Notes</p>
+<p>Here, a “config” is a dynamically-generated dataclass type that is designed to be
+compatible with Hydra <a class="reference internal" href="#rcd3092d0866d-1" id="id3">[1]</a>.</p>
 <p>The configs produced by <code class="docutils literal notranslate"><span class="pre">just(&lt;type_or_func&gt;)</span></code> introduce an explicit dependency
 on hydra-zen. I.e. hydra-zen must be installed in order to instantiate any config
 that used <a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a>.</p>
-<p>hydra-zen provides specialized support for values of the following types:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a></p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">complex</span></code></a></p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.Counter" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">collections.Counter</span></code></a></p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.deque" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">collections.deque</span></code></a></p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/functools.html#functools.partial" title="(in Python v3.10)"><code class="xref py py-func docutils literal notranslate"><span class="pre">functools.partial()</span></code></a></p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a></p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.PosixPath" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.PosixPath</span></code></a></p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.WindowsPath" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.WindowsPath</span></code></a></p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#range" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">range</span></code></a></p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a></p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#frozenset" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">frozenset</span></code></a></p></li>
-</ul>
+<p class="rubric">References</p>
+<dl class="citation">
+<dt class="label" id="rcd3092d0866d-1"><span class="brackets"><a class="fn-backref" href="#id3">1</a></span></dt>
+<dd><p><a class="reference external" href="https://hydra.cc/docs/tutorials/structured_config/intro/">https://hydra.cc/docs/tutorials/structured_config/intro/</a></p>
+</dd>
+<dt class="label" id="rcd3092d0866d-2"><span class="brackets"><a class="fn-backref" href="#id1">2</a></span></dt>
+<dd><p><a class="reference external" href="https://hydra.cc/docs/advanced/instantiate_objects/overview/#recursive-instantiation">https://hydra.cc/docs/advanced/instantiate_objects/overview/#recursive-instantiation</a></p>
+</dd>
+<dt class="label" id="rcd3092d0866d-3"><span class="brackets"><a class="fn-backref" href="#id2">3</a></span></dt>
+<dd><p><a class="reference external" href="https://hydra.cc/docs/advanced/instantiate_objects/overview/#parameter-conversion-strategies">https://hydra.cc/docs/advanced/instantiate_objects/overview/#parameter-conversion-strategies</a></p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
 <p><strong>Basic usage</strong></p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">just</span><span class="p">,</span> <span class="n">instantiate</span><span class="p">,</span> <span class="n">to_yaml</span>
 </pre></div>
 </div>
-<p>Using <code class="docutils literal notranslate"><span class="pre">just</span></code> to create a config that returns an object – without calling it –
-upon instantiation.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">A</span><span class="p">:</span> <span class="k">pass</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Conf_A</span> <span class="o">=</span> <span class="n">just</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>  <span class="c1"># returns a dataclass-type</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf_A</span><span class="p">)</span> <span class="ow">is</span> <span class="n">A</span>
-<span class="go">True</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">my_func</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span> <span class="k">pass</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Conf_func</span> <span class="o">=</span> <span class="n">just</span><span class="p">(</span><span class="n">my_func</span><span class="p">)</span>  <span class="c1"># returns a dataclass-type</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf_func</span><span class="p">)</span> <span class="ow">is</span> <span class="n">my_func</span>
-<span class="go">True</span>
-</pre></div>
-</div>
-<p>Calling <code class="docutils literal notranslate"><span class="pre">just</span></code> on a value of a type that is natively supported by Hydra
+<p>Calling <a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> on a value of a type that is natively supported by Hydra
 will reurn that value unchanged</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">just</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <span class="go">1</span>
@@ -358,34 +372,71 @@ will reurn that value unchanged</p>
 <span class="go">False</span>
 </pre></div>
 </div>
-<p>Calling <code class="docutils literal notranslate"><span class="pre">just</span></code> on a value of a type that has special support from hydra-zen
-will return a structured config instance that, when instantiated, returns that
-value</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">just</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="n">j</span><span class="p">)</span>
-<span class="go">ConfigComplex(real=1.0, imag=2.0, _target_=&#39;builtins.complex&#39;)</span>
+<p><a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> can be used to create a config that will simply import a class-object or function when the config is instantiated by Hydra.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">A</span><span class="p">:</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">my_func</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span> <span class="k">pass</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">just</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="n">j</span><span class="p">))</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">just</span><span class="p">(</span><span class="n">A</span><span class="p">))</span> <span class="ow">is</span> <span class="n">A</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">just</span><span class="p">(</span><span class="n">my_func</span><span class="p">))</span> <span class="ow">is</span> <span class="n">my_func</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> dynamically generates dataclass types, a.k.a structured configs, to describe
+<code class="docutils literal notranslate"><span class="pre">obj</span></code></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">just</span><span class="p">(</span><span class="n">A</span><span class="p">)()</span>
+<span class="go">Just_A(_target_=&#39;hydra_zen.funcs.get_obj&#39;, path=&#39;__main__.A&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">just</span><span class="p">(</span><span class="n">my_func</span><span class="p">)()</span>
+<span class="go">Just_my_func(_target_=&#39;hydra_zen.funcs.get_obj&#39;, path=&#39;__main__.my_func&#39;)</span>
+</pre></div>
+</div>
+<p><strong>Auto-config support</strong></p>
+<p>Calling <a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> on a value of a type that has
+<a class="reference internal" href="../api_reference.html#additional-types"><span class="std std-ref">special support from hydra-zen</span></a>
+will return a structured config instance that, when instantiated by Hydra, returns
+that value.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">just</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="n">j</span><span class="p">)</span>
+<span class="go">ConfigComplex(real=1.0, imag=2.0, _target_=&#39;builtins.complex&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">just</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="n">j</span><span class="p">))</span>
 <span class="go">(1+2j)</span>
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">just</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">})</span>
 <span class="go">Builds_set(_target_=&#39;builtins.set&#39;, _args_=((1, 2, 3),))</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">just</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">just</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">})</span>
 <span class="go">{1, 2, 3}</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">just</span></code> operates recursively within sequences and mappings.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">just</span><span class="p">({</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="o">-</span><span class="mi">4</span><span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="n">j</span><span class="p">]})</span>
-<span class="go">&#39;a&#39;: [ConfigComplex(real=3.0, imag=-4.0, _target_=&#39;builtins.complex&#39;),</span>
-<span class="go">     ConfigComplex(real=1.0, imag=2.0, _target_=&#39;builtins.complex&#39;)]}</span>
+<p>By default, <a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> will convert a dataclass instance to a corresponding targeted
+config. This behavior can be modified via <span class="xref std std-ref">zen-convert settings</span>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nd">@dataclass</span>
+<span class="gp">... </span><span class="k">class</span> <span class="nc">B</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">x</span><span class="p">:</span> <span class="nb">complex</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">just</span><span class="p">(</span><span class="n">B</span><span class="p">))</span> <span class="ow">is</span> <span class="n">B</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">just</span><span class="p">(</span><span class="n">B</span><span class="p">(</span><span class="mi">2</span><span class="o">+</span><span class="mi">3</span><span class="n">j</span><span class="p">)))</span> <span class="o">==</span> <span class="n">B</span><span class="p">(</span><span class="mi">2</span><span class="o">+</span><span class="mi">3</span><span class="n">j</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> operates recursively within sequences, mappings, and dataclass fields.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">z_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="o">-</span><span class="mi">4</span><span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="n">j</span><span class="p">]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">just</span><span class="p">(</span><span class="n">z_dict</span><span class="p">))</span> <span class="o">==</span> <span class="n">z_dict</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nd">@dataclass</span>
+<span class="gp">... </span><span class="k">class</span> <span class="nc">C</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">x</span><span class="p">:</span> <span class="n">Any</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">just</span><span class="p">(</span><span class="n">C</span><span class="p">(</span><span class="n">B</span><span class="p">(</span><span class="mi">2</span><span class="o">+</span><span class="mi">3</span><span class="n">j</span><span class="p">))))</span>
+<span class="go">C(B(2+3j))</span>
 </pre></div>
 </div>
 <p><strong>Auto-Application of just</strong></p>
-<p>Both <code class="docutils literal notranslate"><span class="pre">builds</span></code> and <code class="docutils literal notranslate"><span class="pre">make_config</span></code> will automatically (and recursively) apply
-<code class="docutils literal notranslate"><span class="pre">just</span></code> to all configured values. E.g. in the following example <a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> will be
+<p>Both <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> and <a class="reference internal" href="hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_config</span></code></a> will automatically (and recursively) apply
+<a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> to all configured values. E.g. in the following example <a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> will be
 applied to both  the complex-valued the list and to <code class="docutils literal notranslate"><span class="pre">sum</span></code>.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">make_config</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Conf2</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="n">j</span><span class="p">,</span> <span class="mi">2</span><span class="o">+</span><span class="mi">3</span><span class="n">j</span><span class="p">],</span> <span class="n">reduction_fn</span><span class="o">=</span><span class="nb">sum</span><span class="p">)</span>

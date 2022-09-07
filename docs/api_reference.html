@@ -292,6 +292,11 @@
      Working with YAMLs
     </a>
    </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#hydra-zen-typing">
+     hydra_zen.typing
+    </a>
+   </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -305,8 +310,8 @@
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#additional-types-supported-via-hydra-zen">
-     Additional Types, Supported via hydra-zen
+    <a class="reference internal nav-link" href="#auto-config-support-for-additional-types-via-hydra-zen">
+     Auto-Config Support for Additional Types via hydra-zen
     </a>
    </li>
   </ul>
@@ -384,10 +389,10 @@ the data and class-instances that we need for our application.</p>
 <td><p>Returns a config with user-defined field names and, optionally, associated default values and/or type annotations.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>(hydra_target, /, *pos_args[, ...])</p></td>
-<td><p>Returns a structured config, which describes how to instantiate/call <code class="docutils literal notranslate"><span class="pre">&lt;hydra_target&gt;</span></code> with both user-specified and auto-populated parameter values.</p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds(target,</span> <span class="pre">*args,</span> <span class="pre">**kw)</span></code> returns a config that, when instantiated, builds <code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a>(obj)</p></td>
-<td><p>Returns a structured config that &quot;just&quot; describes the specified value.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a>(obj, *[, zen_convert, hydra_recursive, ...])</p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">just(obj)</span></code> returns a config that, when instantiated, just returns <code class="xref py py-obj docutils literal notranslate"><span class="pre">obj</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.hydrated_dataclass.html#hydra_zen.hydrated_dataclass" title="hydra_zen.hydrated_dataclass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydrated_dataclass</span></code></a>(target, *pos_args[, ...])</p></td>
 <td><p>A decorator that uses <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> to create a dataclass with the appropriate Hydra-specific fields for specifying a targeted config <a class="reference internal" href="generated/hydra_zen.hydrated_dataclass.html#r8dd265aa7612-1" id="id1"><span>[R8dd265aa7612-1]</span></a>.</p></td>
@@ -457,6 +462,20 @@ The following utilities can be used to work with YAML-serialized configs.</p>
 </tbody>
 </table>
 </section>
+<section id="hydra-zen-typing">
+<h3>hydra_zen.typing<a class="headerlink" href="#hydra-zen-typing" title="Permalink to this headline">#</a></h3>
+<table class="autosummary longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenConvert</span></code>(_typename[, _fields])</p></td>
+<td><p>A TypedDict that provides a type-checked interface for specifying zen-convert options that configure the hydra-zen config-creation functions (e.g., <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">make_config</span></code>).</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <section id="configuration-value-types-supported-by-hydra-and-hydra-zen">
 <span id="valid-types"></span><h2>Configuration-Value Types Supported by Hydra and hydra-zen<a class="headerlink" href="#configuration-value-types-supported-by-hydra-and-hydra-zen" title="Permalink to this headline">#</a></h2>
@@ -479,28 +498,60 @@ of common types via its <a class="reference internal" href="#create-config"><spa
 <li><p><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a>  (<em>support added in OmegaConf 2.2.1</em>)</p></li>
 </ul>
 </section>
-<section id="additional-types-supported-via-hydra-zen">
-<span id="additional-types"></span><h3>Additional Types, Supported via hydra-zen<a class="headerlink" href="#additional-types-supported-via-hydra-zen" title="Permalink to this headline">#</a></h3>
+<section id="auto-config-support-for-additional-types-via-hydra-zen">
+<span id="additional-types"></span><h3>Auto-Config Support for Additional Types via hydra-zen<a class="headerlink" href="#auto-config-support-for-additional-types-via-hydra-zen" title="Permalink to this headline">#</a></h3>
 <p>Values of additional types can be specified directly via hydra-zen’s
-<a class="reference internal" href="#create-config"><span class="std std-ref">config-creation functions</span></a> (and other utility functions like <code class="docutils literal notranslate"><span class="pre">to_yaml</span></code>), and hydra-zen will automatically
+<a class="reference internal" href="#create-config"><span class="std std-ref">config-creation functions</span></a> (and other utility functions like <a class="reference internal" href="generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><code class="xref py py-func docutils literal notranslate"><span class="pre">to_yaml()</span></code></a>) and those functions will automatically
 create targeted configs to represent those values in a way that is compatible
 with Hydra. For example, a <a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">complex</span></code></a> value can be specified directly via <a class="reference internal" href="generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_config()</span></code></a>, and a targeted config will be created for that value.</p>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">make_config</span><span class="p">,</span> <span class="n">to_yaml</span>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Demonstrating auto-config support for <a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">complex</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functools.html#functools.partial" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">functools.partial</span></code></a> and <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dataclasses.dataclass</span></code></a></span><a class="headerlink" href="#id3" title="Permalink to this code">#</a></div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">builds</span><span class="p">,</span> <span class="n">just</span><span class="p">,</span> <span class="n">make_config</span><span class="p">,</span> <span class="n">to_yaml</span><span class="p">,</span> <span class="n">instantiate</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">print_yaml</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="nb">print</span><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">2.0</span> <span class="o">+</span> <span class="mf">3.0</span><span class="n">j</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">Conf</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">print_yaml</span><span class="p">(</span><span class="n">Conf</span><span class="p">)</span>
 <span class="go">value:</span>
 <span class="go">  real: 2.0</span>
 <span class="go">  imag: 3.0</span>
 <span class="go">  _target_: builtins.complex</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="mi">3</span><span class="p">)))</span>
-<span class="go">_target_: builtins.int</span>
-<span class="go">_partial_: true</span>
-<span class="go">_args_:</span>
-<span class="go">- 3</span>
 </pre></div>
 </div>
+</div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Conf2</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">print_yaml</span><span class="p">(</span><span class="n">Conf2</span><span class="p">)</span>
+<span class="go">_target_: builtins.dict</span>
+<span class="go">x:</span>
+<span class="go">  _target_: builtins.int</span>
+<span class="go">  _partial_: true</span>
+<span class="go">  _args_:</span>
+<span class="go">  - 3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf2</span><span class="p">)</span>
+<span class="go">{&#39;x&#39;: functools.partial(&lt;class &#39;int&#39;&gt;, 3)}</span>
+</pre></div>
+</div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nd">@dataclass</span>
+<span class="gp">... </span><span class="k">class</span> <span class="nc">Bar</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="n">reduce_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">just_bar</span> <span class="o">=</span> <span class="n">just</span><span class="p">(</span><span class="n">Bar</span><span class="p">())</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">print_yaml</span><span class="p">(</span><span class="n">just_bar</span><span class="p">)</span>
+<span class="go">_target_: __main__.Bar</span>
+<span class="go">reduce_fn:</span>
+<span class="go">  _target_: hydra_zen.funcs.get_obj</span>
+<span class="go">  path: builtins.sum</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">just_bar</span><span class="p">)</span>
+<span class="go">Bar(reduce_fn=&lt;built-in function sum&gt;)</span>
+</pre></div>
+</div>
+<p>Auto-config behaviors can be configured via the <span class="xref std std-ref">zen-convert API</span>.</p>
 <p>hydra-zen provides specialized auto-config support for values of the following types:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> (<em>support provided for OmegaConf &lt; 2.2.0</em>)</p></li>
@@ -515,9 +566,11 @@ with Hydra. For example, a <a class="reference external" href="https://docs.pyth
 <li><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#range" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">range</span></code></a></p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a></p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#frozenset" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">frozenset</span></code></a></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="(in Python v3.10)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataclasses.dataclass()</span></code></a></p></li>
 </ul>
 <p>hydra-zen also provides auto-config support for some third-pary libraries:</p>
 <ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydantic.dataclasses.dataclass</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydantic.Field</span></code></p></li>
 </ul>
 </section>

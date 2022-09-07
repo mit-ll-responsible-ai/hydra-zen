@@ -18,16 +18,21 @@
 Welcome to hydra-zen's documentation!
 =====================================
 
-hydra-zen is a Python library that simplifies the process of writing code (be it research-grade or production-grade) that is:
+hydra-zen is a Python library that makes the `Hydra framework <https://hydra.cc/>`_  
+simpler and more elegant to use. Use hydra-zen to design your project to be:
 
 - **Configurable**: change deeply-nested parameters and swap out entire pieces of your program, all from the command line. 
 - **Repeatable**: each run of your code will be self-documenting; the full configuration of your software is saved alongside your results.
 - **Scalable**: launch multiple runs of your software, be it on your local machine or across multiple nodes on a cluster.
 
-It builds off -- and is fully compatible with -- `Hydra <https://hydra.cc/>`_, a 
-framework for elegantly configuring complex applications. hydra-zen helps simplify the 
-process of using Hydra by providing specialized functions for :ref:`creating configs <create-config>` and 
-launching Hydra jobs. 
+It provides functions that :ref:`dynamically <create-config>` and :ref:`automatically <additional-types>` generate configs for your code, which help to eliminate 
+Hydra-specific boilerplate from your project. 
+
+hydra-zen is fully compatible with Hydra, and is appropriate for use in both rapid 
+prototypes and production-grade code. It is also great for designing your data science 
+and machine learning research to be reproducible. hydra-zen provides specialized 
+support for using NumPy, Jax, PyTorch, and Lightning (a.k.a PyTorch-Lightning) in your 
+Hydra application. 
 
 
 .. admonition:: Attention, Hydra users:
@@ -60,6 +65,36 @@ launching Hydra jobs.
          ...
 
      FooConf = builds(foo, bar=2, baz=["abc"], populate_full_signature=True)
+  
+  You can even write dataclasses that aren't natively compatible with Hydra and then use hydra-zen to dynamically convert them to Hydra-compatible structured configs.
+
+  .. code-block:: python
+     :caption: Converting a general dataclass to a Hydra-compatible structured config
+  
+     from dataclasses import dataclass
+     from typing import Callable, Sequence
+     
+     from hydra_zen import just, instantiate, to_yaml
+
+     @dataclass
+     class Bar:
+        # annotation not supported by Hydra
+        reduce_fn: Callable[[Sequence[float]], float]
+  
+     bar = Bar(reduce_fn=sum)  # value not supported by Hydra
+      
+     compat_bar = just(bar)  # returns a Hydra-compatible structured config!
+      
+     assert to_yaml(compat_bar) == """\
+     _target_: __main__.Bar
+     reduce_fn:
+       _target_: hydra_zen.funcs.get_obj
+       path: builtins.sum
+     """
+
+     inst_bar = instantiate(compat_bar)
+     assert isinstance(inst_bar, Bar)
+     assert inst_bar == bar
 
   This means that it is much **easier and safer** to write and maintain the configs for your Hydra applications:
   
@@ -67,12 +102,12 @@ launching Hydra jobs.
   - Write less, :ref:`stop repeating yourself <dry>`, and get more out of your configs.
   - Get automatic type-safety via :func:`~hydra_zen.builds`'s signature inspection.
   - :ref:`Validate your configs <builds-validation>` before launching your application.
-  
+  - Leverage :ref:`auto-config support <additional-types>` for additional types, like :py:class:`functools.partial`, that are not natively supported by Hydra.
+
 hydra-zen also also provides Hydra users with powerful, novel functionality. With it, we can:
 
 - Add :ref:`enhanced runtime type-checking <runtime-type-checking>` for our Hydra application, via :ref:`pydantic <pydantic-support>`, `beartype <https://github.com/beartype/beartype>`_, and other third-party libraries.
-- Design configs with specialized behaviors, like :ref:`partial configs <partial-config>`, or :ref:`configs with meta-fields <meta-field>`. 
-- Use :ref:`additional data types <additional-types>` in our configs, like :py:class:`pathlib.Path`, that are not natively supported by Hydra.
+- Design configs specialized behaviors, like :ref:`configs with meta-fields <meta-field>`. 
 - Leverage a powerful :ref:`functionality-injection framework <zen-wrapper>` in our Hydra applications.
 - Run static type-checkers on our config-creation code to catch incompatibilities with Hydra.
 
