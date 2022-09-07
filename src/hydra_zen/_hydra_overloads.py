@@ -140,7 +140,7 @@ def instantiate(config: Any, *args: Any, **kwargs: Any) -> Any:
 
     References
     ----------
-    .. [1] https://hydra.cc/docs/next/advanced/instantiate_objects/overview
+    .. [1] https://hydra.cc/docs/advanced/instantiate_objects/overview
     .. [2] https://omegaconf.readthedocs.io/en/latest/structured_config.html#simple-types
     .. [3] https://omegaconf.readthedocs.io/en/latest/structured_config.html#runtime-type-validation-and-conversion
     .. [4] https://omegaconf.readthedocs.io/en/latest/usage.html#variable-interpolation

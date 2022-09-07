@@ -26,6 +26,7 @@ from ._implementations import (
     Importable,
     PartialBuilds,
     SupportedPrimitive,
+    ZenConvert,
     ZenWrappers,
 )
 
@@ -53,6 +54,7 @@ class StdBuilds(Protocol):  # pragma: no cover
         dataclass_name: Optional[str] = ...,
         builds_bases: Tuple[()] = ...,
         frozen: bool = ...,
+        zen_convert: Optional[ZenConvert] = ...,
     ) -> Type[BuildsWithSig[Type[R], P]]:  # pragma: no cover
         ...
 
@@ -72,6 +74,7 @@ class StdBuilds(Protocol):  # pragma: no cover
         dataclass_name: Optional[str] = ...,
         builds_bases: Tuple[Type[DataClass_], ...] = ...,
         frozen: bool = ...,
+        zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: SupportedPrimitive,
     ) -> Type[Builds[Importable]]:  # pragma: no cover
         ...
@@ -92,6 +95,7 @@ class StdBuilds(Protocol):  # pragma: no cover
         dataclass_name: Optional[str] = ...,
         builds_bases: Tuple[Type[DataClass_], ...] = ...,
         frozen: bool = ...,
+        zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: SupportedPrimitive,
     ) -> Type[PartialBuilds[Importable]]:  # pragma: no cover
         ...
@@ -112,6 +116,7 @@ class StdBuilds(Protocol):  # pragma: no cover
         dataclass_name: Optional[str] = ...,
         builds_bases: Tuple[Type[DataClass_], ...] = ...,
         frozen: bool = ...,
+        zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: SupportedPrimitive,
     ) -> Union[
         Type[Builds[Importable]],
@@ -135,6 +140,7 @@ class StdBuilds(Protocol):  # pragma: no cover
         dataclass_name: Optional[str] = ...,
         builds_bases: Tuple[Type[DataClass_], ...] = ...,
         frozen: bool = ...,
+        zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: SupportedPrimitive,
     ) -> Union[
         Type[Builds[Importable]],
@@ -157,6 +163,7 @@ class StdBuilds(Protocol):  # pragma: no cover
         frozen: bool = False,
         builds_bases: Tuple[Type[DataClass_], ...] = (),
         dataclass_name: Optional[str] = None,
+        zen_convert: Optional[ZenConvert] = None,
         **kwargs_for_target: SupportedPrimitive,
     ) -> Union[
         Type[Builds[Importable]],
@@ -185,6 +192,7 @@ class FullBuilds(Protocol):  # pragma: no cover
         dataclass_name: Optional[str] = ...,
         builds_bases: Tuple[()] = ...,
         frozen: bool = ...,
+        zen_convert: Optional[ZenConvert] = ...,
     ) -> Type[BuildsWithSig[Type[R], P]]:
         ...
 
@@ -204,6 +212,7 @@ class FullBuilds(Protocol):  # pragma: no cover
         dataclass_name: Optional[str] = ...,
         builds_bases: Tuple[Type[DataClass_], ...] = ...,
         frozen: bool = ...,
+        zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: SupportedPrimitive,
     ) -> Type[Builds[Importable]]:
         ...
@@ -224,6 +233,7 @@ class FullBuilds(Protocol):  # pragma: no cover
         dataclass_name: Optional[str] = ...,
         builds_bases: Tuple[Type[DataClass_], ...] = ...,
         frozen: bool = ...,
+        zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: SupportedPrimitive,
     ) -> Type[PartialBuilds[Importable]]:
         ...
@@ -244,6 +254,7 @@ class FullBuilds(Protocol):  # pragma: no cover
         frozen: bool = ...,
         builds_bases: Tuple[Type[DataClass_], ...] = ...,
         dataclass_name: Optional[str] = ...,
+        zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: SupportedPrimitive,
     ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]:
         ...
@@ -264,6 +275,7 @@ class FullBuilds(Protocol):  # pragma: no cover
         frozen: bool = ...,
         builds_bases: Tuple[Type[DataClass_], ...] = ...,
         dataclass_name: Optional[str] = ...,
+        zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: SupportedPrimitive,
     ) -> Union[
         Type[Builds[Importable]],
@@ -286,6 +298,7 @@ class FullBuilds(Protocol):  # pragma: no cover
         frozen: bool = False,
         builds_bases: Tuple[Type[DataClass_], ...] = (),
         dataclass_name: Optional[str] = None,
+        zen_convert: Optional[ZenConvert] = None,
         **kwargs_for_target: SupportedPrimitive,
     ) -> Union[
         Type[Builds[Importable]],
@@ -314,6 +327,7 @@ class PBuilds(Protocol):  # pragma: no cover
         dataclass_name: Optional[str] = ...,
         builds_bases: Tuple[Type[DataClass_], ...] = ...,
         frozen: bool = ...,
+        zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: SupportedPrimitive,
     ) -> Type[PartialBuilds[Importable]]:
         ...
@@ -334,6 +348,7 @@ class PBuilds(Protocol):  # pragma: no cover
         dataclass_name: Optional[str] = ...,
         builds_bases: Tuple[()] = ...,
         frozen: bool = ...,
+        zen_convert: Optional[ZenConvert] = ...,
     ) -> Type[BuildsWithSig[Type[R], P]]:
         ...
 
@@ -353,6 +368,7 @@ class PBuilds(Protocol):  # pragma: no cover
         dataclass_name: Optional[str] = ...,
         builds_bases: Tuple[Type[DataClass_], ...] = ...,
         frozen: bool = ...,
+        zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: SupportedPrimitive,
     ) -> Union[
         Type[Builds[Importable]],
@@ -376,6 +392,7 @@ class PBuilds(Protocol):  # pragma: no cover
         dataclass_name: Optional[str] = ...,
         builds_bases: Tuple[Type[DataClass_], ...] = ...,
         frozen: bool = ...,
+        zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: SupportedPrimitive,
     ) -> Union[
         Type[Builds[Importable]],
@@ -400,6 +417,7 @@ class PBuilds(Protocol):  # pragma: no cover
         dataclass_name: Optional[str] = ...,
         builds_bases: Tuple[Type[DataClass_], ...] = ...,
         frozen: bool = ...,
+        zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: SupportedPrimitive,
     ) -> Union[
         Type[Builds[Importable]],
@@ -422,6 +440,7 @@ class PBuilds(Protocol):  # pragma: no cover
         frozen: bool = False,
         builds_bases: Tuple[Type[DataClass_], ...] = (),
         dataclass_name: Optional[str] = None,
+        zen_convert: Optional[ZenConvert] = None,
         **kwargs_for_target: SupportedPrimitive,
     ) -> Union[
         Type[Builds[Importable]],

@@ -100,6 +100,7 @@ def test_hydra_convert(
                 a_list=[1, 2],
                 a_struct_config=A,
                 an_int=1,
+                zen_convert={"dataclass": False},
                 **kwargs,
             )
         )

@@ -22,7 +22,7 @@ from typing_extensions import Final, Literal
 from hydra_zen.errors import HydraZenDeprecationWarning
 from hydra_zen.typing import ZenWrappers
 from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds, StdBuilds
-from hydra_zen.typing._implementations import DataClass_
+from hydra_zen.typing._implementations import DataClass_, ZenConvert
 
 from ._implementations import builds
 
@@ -50,6 +50,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     builds_bases: Tuple[()] = ...,
+    zen_convert: Optional[ZenConvert] = ...,
 ) -> FullBuilds:  # pragma: no cover
     ...
 
@@ -66,6 +67,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
+    zen_convert: Optional[ZenConvert] = ...,
 ) -> PBuilds:  # pragma: no cover
     ...
 
@@ -82,6 +84,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     builds_bases: Tuple[()] = ...,
+    zen_convert: Optional[ZenConvert] = ...,
 ) -> StdBuilds:  # pragma: no cover
     ...
 
@@ -98,6 +101,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     builds_bases: Tuple[()] = ...,
+    zen_convert: Optional[ZenConvert] = ...,
 ) -> Union[FullBuilds, StdBuilds]:  # pragma: no cover
     ...
 
@@ -114,6 +118,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     builds_bases: Tuple[Type[DataClass_], ...],
+    zen_convert: Optional[ZenConvert] = ...,
 ) -> StdBuilds:  # pragma: no cover
     ...
 
@@ -130,6 +135,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
+    zen_convert: Optional[ZenConvert] = ...,
 ) -> Union[PBuilds, StdBuilds]:  # pragma: no cover
     ...
 
@@ -146,6 +152,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     builds_bases: Tuple[Type[DataClass_], ...],
+    zen_convert: Optional[ZenConvert] = ...,
 ) -> Union[PBuilds, StdBuilds]:  # pragma: no cover
     ...
 
@@ -162,6 +169,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     builds_bases: Tuple[()] = ...,
+    zen_convert: Optional[ZenConvert] = ...,
 ) -> Union[FullBuilds, PBuilds, StdBuilds]:  # pragma: no cover
     ...
 
@@ -176,6 +184,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     frozen: bool = False,
     builds_bases: Tuple[Type[DataClass_], ...] = (),
+    zen_convert: Optional[ZenConvert] = None,
 ) -> Union[FullBuilds, PBuilds, StdBuilds]:
     """Returns the `builds` function, but with customized default values.
 
@@ -196,6 +205,16 @@ def make_custom_builds_fn(
 
     populate_full_signature : bool, optional (default=False)
         Specifies a new the default value for ``builds(..., populate_full_signature=<..>)``
+
+    zen_convert : Optional[ZenConvert]
+        A dictionary that modifies hydra-zen's value and type conversion behavior.
+        Consists of the following optional key-value pairs (:ref:`zen-convert`):
+
+        - `dataclass` : `bool` (default=True):
+            If `True` any dataclass type/instance without a
+            `_target_` field is automatically converted to a targeted config
+            that will instantiate to that type/instance. Otherwise the dataclass
+            type/instance will be passed through as-is.
 
     hydra_recursive : Optional[bool], optional (default=True)
         Specifies a new the default value for ``builds(..., hydra_recursive=<..>)``
@@ -287,7 +306,7 @@ def make_custom_builds_fn(
         warnings.warn(
             HydraZenDeprecationWarning(
                 "Specifying `make_custom_builds_fn(builds_bases=<...>)` is deprecated "
-                "as of hydra-zen 0.7.0. It will be an error in hydra-zen 0.8.0. "
+                "as of hydra-zen 0.7.0. It will be an error in hydra-zen 0.9.0. "
                 "\n`builds_bases` must be specified via `builds` manually."
             ),
             stacklevel=2,
@@ -300,4 +319,5 @@ def make_custom_builds_fn(
         merged_kwargs.update(kwargs)
         return builds(*args, **merged_kwargs)
 
+    setattr(wrapped, "_zen_convert", zen_convert)
     return cast(Union[FullBuilds, PBuilds, StdBuilds], wrapped)

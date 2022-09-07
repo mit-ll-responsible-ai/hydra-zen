@@ -32,17 +32,21 @@ for _module_name in OPTIONAL_TEST_DEPENDENCIES:
     if _module_name not in _installed:
         collect_ignore_glob.append(f"**/*{_module_name}*.py")
 
-if sys.version_info < (3, 8):
-    collect_ignore_glob.append("*py38*")
-
-if sys.version_info < (3, 9):
-    collect_ignore_glob.append("*py39*")
 
 if sys.version_info > (3, 6):
     collect_ignore_glob.append("*py36*")
 
 if sys.version_info < (3, 7):
     collect_ignore_glob.append("**/*test_sequence_coercion.py")
+
+if sys.version_info < (3, 8):
+    collect_ignore_glob.append("*py38*")
+
+if sys.version_info < (3, 9):
+    collect_ignore_glob.append("*py39*")
+
+if sys.version_info < (3, 10):
+    collect_ignore_glob.append("*py310*")
 
 
 @pytest.fixture()

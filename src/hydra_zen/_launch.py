@@ -128,8 +128,8 @@ def launch(
 
     References
     ----------
-    .. [1] https://hydra.cc/docs/next/advanced/override_grammar/basic
-    .. [2] https://hydra.cc/docs/next/configure_hydra/intro
+    .. [1] https://hydra.cc/docs/advanced/override_grammar/basic
+    .. [2] https://hydra.cc/docs/configure_hydra/intro
     .. [3] https://hydra.cc/docs/tutorials/basic/running_your_app/multi-run
 
     Examples

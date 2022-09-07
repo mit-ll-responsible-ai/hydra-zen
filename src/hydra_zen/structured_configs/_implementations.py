@@ -4,7 +4,6 @@ import functools
 import inspect
 import sys
 import warnings
-from collections import Counter, deque
 from dataclasses import (  # use this for runtime checks
     MISSING,
     Field as _Field,
@@ -35,7 +34,7 @@ from typing import (
 )
 
 from omegaconf import DictConfig, ListConfig
-from typing_extensions import Final, Literal, ParamSpec
+from typing_extensions import Final, Literal, ParamSpec, TypeAlias
 
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVES,
@@ -50,18 +49,19 @@ from hydra_zen.typing import (
     Builds,
     Importable,
     Just,
-    Partial,
     PartialBuilds,
     SupportedPrimitive,
     ZenWrappers,
 )
 from hydra_zen.typing._implementations import (
+    AllConvert,
     BuildsWithSig,
     DataClass_,
     DefaultsList,
     Field,
     HasTarget,
     InstOrType,
+    ZenConvert,
 )
 
 from ._globals import (
@@ -81,15 +81,19 @@ from ._globals import (
     ZEN_WRAPPERS_FIELD_NAME,
 )
 from ._type_guards import is_builds, is_just, is_old_partial_builds, uses_zen_processing
-from ._value_conversion import ZEN_VALUE_CONVERSION
 
 _T = TypeVar("_T")
 
 P = ParamSpec("P")
 R = TypeVar("R")
+Field_Entry: TypeAlias = Tuple[str, type, Field[Any]]
 
+# default zen_convert settings for `builds` and `hydrated_dataclass`
+_BUILDS_CONVERT_SETTINGS = AllConvert(dataclass=True)
 
-_builtin_function_or_method_type = type(len)
+# stores type -> value-conversion-fn
+# for types with specialized support from hydra-zen
+ZEN_VALUE_CONVERSION: Dict[type, Callable[[Any], Any]] = {}
 
 # signature param-types
 _POSITIONAL_ONLY: Final = inspect.Parameter.POSITIONAL_ONLY
@@ -97,6 +101,15 @@ _POSITIONAL_OR_KEYWORD: Final = inspect.Parameter.POSITIONAL_OR_KEYWORD
 _VAR_POSITIONAL: Final = inspect.Parameter.VAR_POSITIONAL
 _KEYWORD_ONLY: Final = inspect.Parameter.KEYWORD_ONLY
 _VAR_KEYWORD: Final = inspect.Parameter.VAR_KEYWORD
+
+
+_builtin_function_or_method_type = type(len)
+_lru_cache_type = type(functools.lru_cache(maxsize=128)(lambda: None))
+
+_BUILTIN_TYPES: Final = (_builtin_function_or_method_type, _lru_cache_type)
+
+del _lru_cache_type
+del _builtin_function_or_method_type
 
 
 def _retain_type_info(type_: type, value: Any, hydra_recursive: Optional[bool]):
@@ -125,7 +138,7 @@ def _retain_type_info(type_: type, value: Any, hydra_recursive: Optional[bool]):
     return False
 
 
-def mutable_value(x: _T) -> _T:
+def mutable_value(x: _T, *, zen_convert: Optional[ZenConvert] = None) -> _T:
     """Used to set a mutable object as a default value for a field
     in a dataclass.
 
@@ -157,11 +170,10 @@ def mutable_value(x: _T) -> _T:
     >>> HasMutableDefault()
     HasMutableDefault(a_list=[1, 2, 3])"""
     cast = type(x)  # ensure that we return a copy of the default value
-    x = sanitize_collection(x)
+    settings = _utils.merge_settings(zen_convert, _BUILDS_CONVERT_SETTINGS)
+    del zen_convert
+    x = sanitize_collection(x, convert_dataclass=settings["dataclass"])
     return field(default_factory=lambda: cast(x))
-
-
-Field_Entry = Tuple[str, type, Field[Any]]
 
 
 # Alternate form, from PEP proposal:
@@ -192,6 +204,7 @@ def hydrated_dataclass(
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     frozen: bool = False,
+    zen_convert: Optional[ZenConvert] = None,
 ) -> Callable[[Type[_T]], Type[_T]]:
     """A decorator that uses `builds` to create a dataclass with the appropriate
     Hydra-specific fields for specifying a targeted config [1]_.
@@ -208,8 +221,8 @@ def hydrated_dataclass(
     *pos_args : SupportedPrimitive
         Positional arguments passed as ``hydra_target(*pos_args, ...)`` upon instantiation.
 
-        Arguments specified positionally are not included in the dataclass' signature and
-        are stored as a tuple bound to in the ``_args_`` field.
+        Arguments specified positionally are not included in the dataclass' signature
+        and are stored as a tuple bound to in the ``_args_`` field.
 
     zen_partial : Optional[bool]
         If ``True``, then the resulting config will instantiate as
@@ -245,6 +258,16 @@ def hydrated_dataclass(
         This option is not available for objects with inaccessible signatures, such as
         NumPy's various ufuncs.
 
+    zen_convert : Optional[ZenConvert]
+        A dictionary that modifies hydra-zen's value and type conversion behavior.
+        Consists of the following optional key-value pairs (:ref:`zen-convert`):
+
+        - `dataclass` : `bool` (default=True):
+            If `True` any dataclass type/instance without a
+            `_target_` field is automatically converted to a targeted config
+            that will instantiate to that type/instance. Otherwise the dataclass
+            type/instance will be passed through as-is.
+
     hydra_recursive : Optional[bool], optional (default=True)
         If ``True``, then Hydra will recursively instantiate all other
         hydra-config objects nested within this config [3]_.
@@ -254,8 +277,7 @@ def hydrated_dataclass(
         - ``"none"``: No conversion occurs; omegaconf containers are passed through (Default)
         - ``"partial"``: ``DictConfig`` and ``ListConfig`` objects converted to ``dict`` and
           ``list``, respectively. Structured configs and their fields are passed without conversion.
-        - ``"all"``: All passed objects are converted to dicts, lists, and primitives, without
-          a trace of OmegaConf containers.
+        - ``"all"``: All passed objects are converted to dicts, lists, and primitives, without a trace of OmegaConf containers.
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting config.
 
@@ -285,10 +307,10 @@ def hydrated_dataclass(
 
     References
     ----------
-    .. [1] https://hydra.cc/docs/next/tutorials/structured_config/intro/
+    .. [1] https://hydra.cc/docs/tutorials/structured_config/intro/
     .. [2] https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation
-    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
-    .. [4] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
+    .. [3] https://hydra.cc/docs/advanced/instantiate_objects/overview/#recursive-instantiation
+    .. [4] https://hydra.cc/docs/advanced/instantiate_objects/overview/#parameter-conversion-strategies
 
     Examples
     --------
@@ -367,6 +389,7 @@ def hydrated_dataclass(
             builds_bases=(decorated_obj,),
             dataclass_name=decorated_obj.__name__,
             frozen=frozen,
+            zen_convert=zen_convert,
         )
 
     return wrapper
@@ -399,9 +422,6 @@ def _just(obj: Importable) -> Type[Just[Importable]]:
     return cast(Type[Just[Importable]], out_class)
 
 
-_KEY_ERROR_PREFIX = "Configuring dictionary key:"
-
-
 def _is_ufunc(value: Any) -> bool:
     # checks without importing numpy
     numpy = sys.modules.get("numpy")
@@ -426,17 +446,14 @@ def _is_jax_compiled_func(value: Any) -> bool:  # pragma: no cover
         return False
 
 
-@functools.lru_cache(maxsize=128)
-def _throwaway():  # pragma: no cover
-    pass
-
-
-_lru_cache_type = type(_throwaway)
-
-_builtin_types = (_builtin_function_or_method_type, _lru_cache_type)
-
-del _throwaway
-del _lru_cache_type
+def _check_for_dynamically_defined_dataclass_type(target_path: str, value: Any) -> None:
+    if target_path.startswith("types."):
+        raise HydraZenUnsupportedPrimitiveError(
+            f"Configuring {value}: Cannot auto-config an instance of a "
+            f"dynamically-generated dataclass type (e.g. one created from "
+            f"`hydra_zen.make_config` or `dataclasses.make_dataclass`). "
+            f"Consider disabling auto-config support for dataclasses here."
+        )
 
 
 def sanitized_default_value(
@@ -446,30 +463,102 @@ def sanitized_default_value(
     error_prefix: str = "",
     field_name: str = "",
     structured_conf_permitted: bool = True,
+    convert_dataclass: bool,
+    hydra_recursive: Optional[bool] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
 ) -> Any:
+    """Converts `value` to Hydra-supported type if necessary and possible. Otherwise
+    raises `HydraZenUnsupportedPrimitiveError`"""
+    # Common primitives supported by Hydra.
+    # We check exhaustively for all Hydra-supported primitives below but seek to
+    # speedup checks for common types here.
     if value is None or type(value) in {str, int, bool, float}:
         return value
 
+    # non-str collection
     if hasattr(value, "__iter__"):
-        value = sanitize_collection(value)
+        value = sanitize_collection(
+            value,
+            convert_dataclass=convert_dataclass,
+            hydra_convert=hydra_convert,
+            hydra_recursive=hydra_recursive,
+        )
 
+    # non-targeted dataclass instance
+    if (
+        structured_conf_permitted
+        and convert_dataclass
+        and not is_builds(value)
+        and (is_dataclass(value) and not isinstance(value, type))
+    ):
+        # Auto-config dataclass instance
+        # TODO: handle position-only arguments
+        _val_fields = fields(value)
+        if set(inspect.signature(type(value)).parameters) != {
+            f.name for f in _val_fields if f.init
+        }:
+            raise HydraZenUnsupportedPrimitiveError(
+                f"Configuring {value}: Cannot auto-config a dataclass instance whose "
+                f"type has an Init-only field. Consider using "
+                f"`builds({type(value).__name__}, ...)` instead."
+            )
+
+        converted_fields = {}
+        for _field in _val_fields:
+            if _field.init and hasattr(value, _field.name):
+                _val = getattr(value, _field.name)
+                converted_fields[_field.name] = sanitized_default_value(
+                    _val,
+                    allow_zen_conversion=allow_zen_conversion,
+                    field_name=_field.name,
+                    convert_dataclass=convert_dataclass,
+                )
+
+        out = builds(
+            type(value),
+            **converted_fields,
+            hydra_recursive=hydra_recursive,
+            hydra_convert=hydra_convert,
+        )
+        _check_for_dynamically_defined_dataclass_type(
+            getattr(out, TARGET_FIELD_NAME), value
+        )
+        return out
+
+    # importable callable (function, type, or method)
     if (
         structured_conf_permitted
         and callable(value)
         and (
             inspect.isfunction(value)
-            or (not is_dataclass(value) and inspect.isclass(value))
+            or (
+                (
+                    not is_dataclass(value)
+                    or (convert_dataclass and not is_builds(value))
+                )
+                and inspect.isclass(value)
+            )
             or inspect.ismethod(value)
-            or isinstance(value, _builtin_types)
+            or isinstance(value, _BUILTIN_TYPES)
             or _is_ufunc(value)
             or _is_jax_compiled_func(value)
         )
     ):
-        return _just(value)
+        # `value` is importable callable -- create config that will import
+        # `value` upon instantiation
+        out = _just(value)  # type: ignore
+        if convert_dataclass and is_dataclass(value):
+            _check_for_dynamically_defined_dataclass_type(
+                getattr(out, JUST_FIELD_NAME), value
+            )
+        return out
+
     resolved_value = value
     type_of_value = type(resolved_value)
 
-    # we don't use isinstance because we don't permit subclasses of supported
+    # hydra-zen supported primitives from stdlib
+    #
+    # Note: we don't use isinstance because we don't permit subclasses of supported
     # primitives
     if allow_zen_conversion and type_of_value in ZEN_SUPPORTED_PRIMITIVES:
         type_ = type(resolved_value)
@@ -488,22 +577,36 @@ def sanitized_default_value(
     ):
         return resolved_value
 
-    # check pydantic auto-config
+    # pydantic objects
     pydantic = sys.modules.get("pydantic")
     if pydantic is not None and isinstance(value, pydantic.fields.FieldInfo):
         _val = (
-            value.default_factory()
-            if value.default_factory is not None
-            else value.default
+            value.default_factory()  # type: ignore
+            if value.default_factory is not None  # type: ignore
+            else value.default  # type: ignore
         )
+        if isinstance(_val, pydantic.fields.UndefinedType):
+            return MISSING
+
         return sanitized_default_value(
             _val,
             allow_zen_conversion=allow_zen_conversion,
             error_prefix=error_prefix,
             field_name=field_name,
             structured_conf_permitted=structured_conf_permitted,
+            convert_dataclass=convert_dataclass,
+            hydra_convert=hydra_convert,
+            hydra_recursive=hydra_recursive,
         )
 
+    if isinstance(value, str):
+        # Supports pydantic.AnyURL
+        _v = str(value)
+        if type(_v) is str:
+            return _v
+
+    # `value` could no be converted to Hydra-compatible representation.
+    # Raise error
     if field_name:
         field_name = f", for field `{field_name}`,"
 
@@ -522,11 +625,17 @@ def sanitized_default_value(
     raise HydraZenUnsupportedPrimitiveError(err_msg)
 
 
-def sanitize_collection(x: _T) -> _T:
+def sanitize_collection(
+    x: _T,
+    *,
+    convert_dataclass: bool,
+    hydra_recursive: Optional[bool] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+) -> _T:
     """Pass contents of lists, tuples, or dicts through sanitized_default_values"""
     type_x = type(x)
     if type_x in {list, tuple}:
-        return type_x(sanitized_default_value(_x) for _x in x)  # type: ignore
+        return type_x(sanitized_default_value(_x, convert_dataclass=convert_dataclass, hydra_convert=hydra_convert, hydra_recursive=hydra_recursive) for _x in x)  # type: ignore
     elif type_x is dict:
         return {
             # Hydra doesn't permit structured configs for keys, thus we only
@@ -535,8 +644,14 @@ def sanitize_collection(x: _T) -> _T:
                 k,
                 allow_zen_conversion=False,
                 structured_conf_permitted=False,
-                error_prefix=_KEY_ERROR_PREFIX,
-            ): sanitized_default_value(v)
+                error_prefix="Configuring dictionary key:",
+                convert_dataclass=False,
+            ): sanitized_default_value(
+                v,
+                convert_dataclass=convert_dataclass,
+                hydra_convert=hydra_convert,
+                hydra_recursive=hydra_recursive,
+            )
             for k, v in x.items()  # type: ignore
         }
     else:
@@ -552,6 +667,7 @@ def sanitized_field(
     error_prefix: str = "",
     field_name: str = "",
     _mutable_default_permitted: bool = True,
+    convert_dataclass: bool,
 ) -> Field[Any]:
 
     value = sanitized_default_value(
@@ -559,6 +675,7 @@ def sanitized_field(
         allow_zen_conversion=allow_zen_conversion,
         error_prefix=error_prefix,
         field_name=field_name,
+        convert_dataclass=convert_dataclass,
     )
 
     type_value = type(value)
@@ -567,9 +684,14 @@ def sanitized_field(
         and type_value in HYDRA_SUPPORTED_PRIMITIVES
     ):
         if _mutable_default_permitted:
-            return cast(Field[Any], mutable_value(value))
+            return cast(
+                Field[Any],
+                mutable_value(value, zen_convert={"dataclass": convert_dataclass}),
+            )
         else:  # pragma: no cover
-            value = builds(type(value), value)
+            value = builds(
+                type(value), value, zen_convert={"dataclass": convert_dataclass}
+            )
 
     return _utils.field(default=value, init=init)
 
@@ -589,6 +711,7 @@ def builds(
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[()] = ...,
     frozen: bool = ...,
+    zen_convert: Optional[ZenConvert] = ...,
 ) -> Type[BuildsWithSig[Type[R], P]]:  # pragma: no cover
     ...
 
@@ -608,6 +731,7 @@ def builds(
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
+    zen_convert: Optional[ZenConvert] = ...,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Type[Builds[Importable]]:  # pragma: no cover
     ...
@@ -628,6 +752,7 @@ def builds(
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
+    zen_convert: Optional[ZenConvert] = ...,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Type[PartialBuilds[Importable]]:  # pragma: no cover
     ...
@@ -648,6 +773,7 @@ def builds(
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
+    zen_convert: Optional[ZenConvert] = ...,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Union[
     Type[Builds[Importable]],
@@ -671,6 +797,7 @@ def builds(
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
+    zen_convert: Optional[ZenConvert] = ...,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Union[
     Type[Builds[Importable]],
@@ -686,6 +813,7 @@ def builds(
     zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
     populate_full_signature: bool = False,
+    zen_convert: Optional[ZenConvert] = None,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     hydra_defaults: Optional[DefaultsList] = None,
@@ -700,8 +828,9 @@ def builds(
 ]:
     """builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, hydra_recursive=None, hydra_convert=None, hydra_defaults=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
 
-    Returns a structured config, which describes how to instantiate/call
-    ``<hydra_target>`` with both user-specified and auto-populated parameter values.
+    `builds(target, *args, **kw)` returns a config that, when instantiated, builds `target`.
+
+    `instantiate(builds(target, *args, **kw)) == target(*args, **kw)`
 
     Consult the Examples section of the docstring to see the various features of
     `builds` in action.
@@ -763,6 +892,19 @@ def builds(
         This option is not available for objects with inaccessible signatures, such as
         NumPy's various ufuncs.
 
+    zen_convert : Optional[ZenConvert]
+        A dictionary that modifies hydra-zen's value and type conversion behavior.
+        Consists of the following optional key-value pairs (:ref:`zen-convert`):
+
+        - `dataclass` : `bool` (default=True):
+            If `True` any dataclass type/instance without a
+            `_target_` field is automatically converted to a targeted config
+            that will instantiate to that type/instance. Otherwise the dataclass
+            type/instance will be passed through as-is.
+
+    builds_bases : Tuple[Type[DataClass], ...]
+        Specifies a tuple of parent classes that the resulting config inherits from.
+
     hydra_recursive : Optional[bool], optional (default=True)
         If ``True``, then Hydra will recursively instantiate all other
         hydra-config objects nested within this config [3]_.
@@ -783,7 +925,7 @@ def builds(
 
     hydra_defaults : None | list[str | dict[str, str | list[str] | None ]], optional (default = None)
         A list in an input config that instructs Hydra how to build the output config
-        [7]_ [8]_. Each input config can have a Defaults List as a top level element. The
+        [6]_ [7]_. Each input config can have a Defaults List as a top level element. The
         Defaults List itself is not a part of output config.
 
     frozen : bool, optional (default=False)
@@ -791,10 +933,6 @@ def builds(
         I.e. setting/deleting an attribute of an instance will raise
         :py:class:`dataclasses.FrozenInstanceError` at runtime.
 
-    builds_bases : Tuple[Type[DataClass], ...]
-        Specifies a tuple of parent classes that the resulting config inherits from.
-        A ``PartialBuilds`` class (resulting from ``zen_partial=True``) cannot be a
-        parent of a ``Builds`` class (i.e. where `zen_partial=False` was specified).
 
     dataclass_name : Optional[str]
         If specified, determines the name of the returned class object.
@@ -812,8 +950,9 @@ def builds(
 
     Notes
     -----
-    The resulting "config" is a dataclass-object [5]_ with Hydra-specific attributes
-    attached to it [1]_.
+    The resulting "config" is a dynamically-generated dataclass type [5]_ with
+    Hydra-specific attributes attached to it [1]_. It posseses a `_target_` attribute
+    that indicates the import path to the configured target as a string.
 
     Using any of the ``zen_xx`` features will result in a config that depends
     explicitly on hydra-zen. I.e. hydra-zen must be installed in order to
@@ -832,14 +971,13 @@ def builds(
 
     References
     ----------
-    .. [1] https://hydra.cc/docs/next/tutorials/structured_config/intro/
+    .. [1] https://hydra.cc/docs/tutorials/structured_config/intro/
     .. [2] https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation
-    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
-    .. [4] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
+    .. [3] https://hydra.cc/docs/advanced/instantiate_objects/overview/#recursive-instantiation
+    .. [4] https://hydra.cc/docs/advanced/instantiate_objects/overview/#parameter-conversion-strategies
     .. [5] https://docs.python.org/3/library/dataclasses.html
-    .. [6] https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation
-    .. [7] https://hydra.cc/docs/next/tutorials/structured_config/defaults/
-    .. [8] https://hydra.cc/docs/next/advanced/defaults_list/
+    .. [6] https://hydra.cc/docs/tutorials/structured_config/defaults/
+    .. [7] https://hydra.cc/docs/advanced/defaults_list/
 
     See Also
     --------
@@ -974,7 +1112,7 @@ def builds(
     instantiation process. Thus arbitrary metadata can be attached to a config.
 
     Let's create a config whose fields reference a meta-field via
-    relative-interpolation [6]_.
+    relative-interpolation [2]_.
 
     >>> Conf = builds(dict, a="${.s}", b="${.s}", zen_meta=dict(s=-10))
     >>> instantiate(Conf)
@@ -1035,6 +1173,9 @@ def builds(
     {'a': -4, 'b': 2}
     """
 
+    zen_convert_settings = _utils.merge_settings(zen_convert, _BUILDS_CONVERT_SETTINGS)
+    del zen_convert
+
     if not pos_args and not kwargs_for_target:
         # `builds()`
         raise TypeError(
@@ -1072,18 +1213,12 @@ def builds(
             f"`populate_full_signature` must be a boolean type, got: {populate_full_signature}"
         )
 
-    if hydra_recursive is not None and not isinstance(hydra_recursive, bool):
-        raise TypeError(
-            f"`hydra_recursive` must be a boolean type, got {hydra_recursive}"
-        )
-
     if zen_partial is not None and not isinstance(zen_partial, bool):
         raise TypeError(f"`zen_partial` must be a boolean type, got: {zen_partial}")
 
-    if hydra_convert is not None and hydra_convert not in {"none", "partial", "all"}:
-        raise ValueError(
-            f"`hydra_convert` must be 'none', 'partial', or 'all', got: {hydra_convert}"
-        )
+    _utils.validate_hydra_options(
+        hydra_recursive=hydra_recursive, hydra_convert=hydra_convert
+    )
 
     if not isinstance(frozen, bool):
         raise TypeError(f"frozen must be a bool, got: {frozen}")
@@ -1352,7 +1487,7 @@ def builds(
                 f"`hydra_defaults` must be type `None | list[str | dict[str, str | list[str] | None ]]`"
                 f", Got: {repr(hydra_defaults)}"
             )
-        hydra_defaults = sanitize_collection(hydra_defaults)
+        hydra_defaults = sanitize_collection(hydra_defaults, convert_dataclass=False)
         base_fields.append(
             (
                 DEFAULTS_LIST_FIELD_NAME,
@@ -1371,7 +1506,11 @@ def builds(
                 Tuple[Any, ...],
                 _utils.field(
                     default=tuple(
-                        sanitized_default_value(x, error_prefix=BUILDS_ERROR_PREFIX)
+                        sanitized_default_value(
+                            x,
+                            error_prefix=BUILDS_ERROR_PREFIX,
+                            convert_dataclass=zen_convert_settings["dataclass"],
+                        )
                         for x in _pos_args
                     ),
                     init=False,
@@ -1438,6 +1577,9 @@ def builds(
         _fields = {f.name: f for f in fields(target)}
         _update = {}
         for name, param in signature_params.items():
+            if name not in _fields:
+                # field is InitVar
+                continue
             f = _fields[name]
             if f.default_factory is not MISSING:
                 _update[name] = inspect.Parameter(
@@ -1507,7 +1649,9 @@ def builds(
 
             # validates
             _pos_args = tuple(
-                sanitized_default_value(x, allow_zen_conversion=False)
+                sanitized_default_value(
+                    x, allow_zen_conversion=False, convert_dataclass=False
+                )
                 for x in _pos_args
             )
             if _pos_args:
@@ -1718,6 +1862,7 @@ def builds(
                     allow_zen_conversion=False,
                     error_prefix=BUILDS_ERROR_PREFIX,
                     field_name=field_.name + " (set via inheritance)",
+                    convert_dataclass=False,
                 )
             del field_
 
@@ -1743,6 +1888,7 @@ def builds(
                     _mutable_default_permitted=_utils.mutable_default_permitted(
                         builds_bases, name
                     ),
+                    convert_dataclass=zen_convert_settings["dataclass"],
                 )
             elif (
                 PATCH_OMEGACONF_830
@@ -1761,6 +1907,7 @@ def builds(
                     _mutable_default_permitted=_utils.mutable_default_permitted(
                         builds_bases, name
                     ),
+                    convert_dataclass=zen_convert_settings["dataclass"],
                 )
             else:
                 _field = value
@@ -1900,31 +2047,3 @@ def get_target(obj: HasTarget) -> Any:
         pass  # makes sure we cover this branch in tests
 
     return target
-
-
-# registering value-conversions that depend on `builds`
-def _cast_via_tuple(dest_type: Type[_T]) -> Callable[[_T], Builds[Type[_T]]]:
-    def converter(value):
-        return builds(dest_type, tuple(value))()
-
-    return converter
-
-
-def _unpack_partial(value: Partial[_T]) -> PartialBuilds[Type[_T]]:
-    target = cast(Type[_T], value.func)
-    return builds(target, *value.args, **value.keywords, zen_partial=True)()
-
-
-ZEN_VALUE_CONVERSION[set] = _cast_via_tuple(set)
-ZEN_VALUE_CONVERSION[frozenset] = _cast_via_tuple(frozenset)
-ZEN_VALUE_CONVERSION[deque] = _cast_via_tuple(deque)
-
-if bytes in ZEN_SUPPORTED_PRIMITIVES:  # pragma: no cover
-    ZEN_VALUE_CONVERSION[bytes] = _cast_via_tuple(bytes)
-
-ZEN_VALUE_CONVERSION[bytearray] = _cast_via_tuple(bytearray)
-ZEN_VALUE_CONVERSION[range] = lambda value: builds(
-    range, value.start, value.stop, value.step
-)()
-ZEN_VALUE_CONVERSION[Counter] = lambda counter: builds(Counter, dict(counter))()
-ZEN_VALUE_CONVERSION[functools.partial] = _unpack_partial

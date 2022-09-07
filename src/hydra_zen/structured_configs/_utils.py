@@ -28,6 +28,7 @@ from omegaconf import II, DictConfig, ListConfig
 from typing_extensions import (
     Annotated,
     Final,
+    Literal,
     ParamSpecArgs,
     ParamSpecKwargs,
     TypeGuard,
@@ -44,7 +45,14 @@ from hydra_zen._compatibility import (
     Version,
 )
 from hydra_zen.errors import HydraZenValidationError
-from hydra_zen.typing._implementations import DataClass_, Field, InterpStr
+from hydra_zen.typing._implementations import (
+    AllConvert,
+    DataClass_,
+    Field,
+    InterpStr,
+    ZenConvert,
+    convert_types,
+)
 
 try:
     from typing import get_args, get_origin
@@ -272,6 +280,7 @@ def get_obj_path(obj: Any) -> str:
     if not is_classmethod(obj):
         return f"{module}.{name}"
     else:
+
         # __qualname__ reflects name of class that originaly defines classmethod.
         # Does not point to child in case of inheritance.
         #
@@ -557,3 +566,41 @@ def valid_defaults_list(hydra_defaults: Any) -> bool:
             category=UserWarning,
         )
     return True
+
+
+def merge_settings(
+    user_settings: Optional[ZenConvert], default_settings: AllConvert
+) -> AllConvert:
+    """Merges settings as `default_settings.update(user_settings)`"""
+    if user_settings is not None and not isinstance(user_settings, Mapping):
+        raise TypeError(
+            f"`zen_convert` must be None or Mapping[str, Any] (e.g. dict). Got {user_settings}"
+        )
+    settings = default_settings.copy()
+    if user_settings:
+        for k, v in user_settings.items():
+            if k not in convert_types:
+                raise ValueError(
+                    f"The key `{k}` is not a valid zen_convert setting. The available settings are: {', '.join(sorted(convert_types))}"
+                )
+            if not isinstance(v, convert_types[k]):
+                raise TypeError(
+                    f"Setting {k}={v} specified a value of the wrong type. Expected type: {convert_types[k].__name__}"
+                )
+            settings[k] = v
+    return settings
+
+
+def validate_hydra_options(
+    hydra_recursive: Optional[bool] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+) -> None:
+    if hydra_recursive is not None and not isinstance(hydra_recursive, bool):
+        raise TypeError(
+            f"`hydra_recursive` must be a boolean type, got {hydra_recursive}"
+        )
+
+    if hydra_convert is not None and hydra_convert not in {"none", "partial", "all"}:
+        raise ValueError(
+            f"`hydra_convert` must be 'none', 'partial', or 'all', got: {hydra_convert}"
+        )

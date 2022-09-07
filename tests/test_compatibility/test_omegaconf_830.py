@@ -115,7 +115,7 @@ def test_known_inheritance_issues_in_omegaconf_are_circumvented(
         and not isinstance(parent_default, (list, dict))
         and parent_field_name == "x"  # parent field overlaps
     ):
-        # ensure we only case to dataclass when necessary
+        # ensure we only cast to dataclass when necessary
         assert is_dataclass(Child.x)
     else:
         assert Child().x == child_default

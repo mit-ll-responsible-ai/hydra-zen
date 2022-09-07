@@ -14,9 +14,19 @@ from typing_extensions import Literal
 
 from hydra_zen._compatibility import PATCH_OMEGACONF_830
 from hydra_zen.structured_configs import _utils
-from hydra_zen.structured_configs._implementations import sanitize_collection
+from hydra_zen.structured_configs._implementations import (
+    _BUILDS_CONVERT_SETTINGS,
+    sanitize_collection,
+)
 from hydra_zen.typing import SupportedPrimitive
-from hydra_zen.typing._implementations import DataClass, DataClass_, DefaultsList, Field
+from hydra_zen.typing._implementations import (
+    AllConvert,
+    DataClass,
+    DataClass_,
+    DefaultsList,
+    Field,
+    ZenConvert,
+)
 
 from .._compatibility import HYDRA_SUPPORTS_PARTIAL
 from ._globals import (
@@ -77,22 +87,34 @@ class ZenField:
     hint: type = Any
     default: Union[SupportedPrimitive, Field[Any]] = _utils.field(default=NOTHING)
     name: Union[str, Type[NOTHING]] = NOTHING
+    zen_convert: InitVar[Optional[ZenConvert]] = None
     _permit_default_factory: InitVar[bool] = True
 
-    def __post_init__(self, _permit_default_factory: bool) -> None:
+    def __post_init__(
+        self, zen_convert: InitVar[Optional[ZenConvert]], _permit_default_factory: bool
+    ) -> None:
         if not isinstance(self.name, str):
             if self.name is not NOTHING:
                 raise TypeError(f"`ZenField.name` expects a string, got: {self.name}")
+        convert_settings = _utils.merge_settings(zen_convert, _BUILDS_CONVERT_SETTINGS)
+        del zen_convert
 
         self.hint = _utils.sanitized_type(self.hint)
 
         if self.default is not NOTHING:
             self.default = sanitized_field(
-                self.default, _mutable_default_permitted=_permit_default_factory
+                self.default,
+                _mutable_default_permitted=_permit_default_factory,
+                convert_dataclass=convert_settings["dataclass"],
             )
 
 
-def _repack_zenfield(value: ZenField, name: str, bases: Tuple[DataClass_, ...]):
+def _repack_zenfield(
+    value: ZenField,
+    name: str,
+    bases: Tuple[DataClass_, ...],
+    zen_convert: ZenConvert,
+):
     default = value.default
 
     if (
@@ -107,8 +129,12 @@ def _repack_zenfield(value: ZenField, name: str, bases: Tuple[DataClass_, ...]):
             default=default.default_factory(),
             name=value.name,
             _permit_default_factory=False,
+            zen_convert=zen_convert,
         )
     return value
+
+
+_MAKE_CONFIG_SETTINGS = AllConvert(dataclass=False)
 
 
 def make_config(
@@ -119,6 +145,7 @@ def make_config(
     config_name: str = "Config",
     frozen: bool = False,
     bases: Tuple[Type[DataClass_], ...] = (),
+    zen_convert: Optional[ZenConvert] = None,
     **fields_as_kwargs: Union[SupportedPrimitive, ZenField],
 ) -> Type[DataClass]:
     """
@@ -142,6 +169,19 @@ def make_config(
 
         Named parameters of the forms ``hydra_xx``, ``zen_xx``, and ``_zen_xx`` are reserved to ensure future-compatibility, and cannot be specified by the user.
 
+    zen_convert : Optional[ZenConvert]
+        A dictionary that modifies hydra-zen's value and type conversion behavior.
+        Consists of the following optional key-value pairs (:ref:`zen-convert`):
+
+        - `dataclass` : `bool` (default=False):
+            If `True` any dataclass type/instance without a
+            `_target_` field is automatically converted to a targeted config
+            that will instantiate to that type/instance. Otherwise the dataclass
+            type/instance will be passed through as-is.
+
+    bases : Tuple[Type[DataClass], ...], optional (default=())
+        Base classes that the resulting config class will inherit from.
+
     hydra_recursive : Optional[bool], optional (default=True)
         If ``True``, then Hydra will recursively instantiate all other
         hydra-config objects nested within this dataclass [2]_.
@@ -162,10 +202,6 @@ def make_config(
         A list in an input config that instructs Hydra how to build the output config
         [7]_ [8]_. Each input config can have a Defaults List as a top level element. The
         Defaults List itself is not a part of output config.
-
-
-    bases : Tuple[Type[DataClass], ...], optional (default=())
-        Base classes that the resulting config class will inherit from.
 
     frozen : bool, optional (default=False)
         If ``True``, the resulting config class will produce 'frozen' (i.e. immutable) instances.
@@ -215,14 +251,14 @@ def make_config(
 
     References
     ----------
-    .. [1] https://hydra.cc/docs/next/tutorials/structured_config/intro/
-    .. [2] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#recursive-instantiation
-    .. [3] https://hydra.cc/docs/next/advanced/instantiate_objects/overview/#parameter-conversion-strategies
+    .. [1] https://hydra.cc/docs/tutorials/structured_config/intro/
+    .. [2] https://hydra.cc/docs/advanced/instantiate_objects/overview/#recursive-instantiation
+    .. [3] https://hydra.cc/docs/advanced/instantiate_objects/overview/#parameter-conversion-strategies
     .. [4] https://docs.python.org/3/library/dataclasses.html
-    .. [5] https://hydra.cc/docs/next/tutorials/structured_config/intro/#structured-configs-supports
+    .. [5] https://hydra.cc/docs/tutorials/structured_config/intro/#structured-configs-supports
     .. [6] https://docs.python.org/3/library/dataclasses.html#default-factory-functions
-    .. [7] https://hydra.cc/docs/next/tutorials/structured_config/defaults/
-    .. [8] https://hydra.cc/docs/next/advanced/defaults_list/
+    .. [7] https://hydra.cc/docs/tutorials/structured_config/defaults/
+    .. [8] https://hydra.cc/docs/advanced/defaults_list/
 
     Examples
     --------
@@ -332,6 +368,10 @@ def make_config(
 
     See :ref:`data-val` for more general data validation capabilities via hydra-zen.
     """
+    convert_settings = _utils.merge_settings(zen_convert, _MAKE_CONFIG_SETTINGS)
+    convert_settings = cast(ZenConvert, convert_settings)
+    del zen_convert
+
     for _field in fields_as_args:
         if not isinstance(_field, (str, ZenField)):
             raise TypeError(
@@ -389,18 +429,20 @@ def make_config(
         hydra_convert=hydra_convert,
         hydra_recursive=hydra_recursive,
         hydra_defaults=hydra_defaults,
-        **fields_as_kwargs,
+        **{k: None for k in fields_as_kwargs},
     )
 
     normalized_fields: Dict[str, ZenField] = {}
 
     for _field in fields_as_args:
         if isinstance(_field, str):
-            normalized_fields[_field] = ZenField(name=_field, hint=Any)
+            normalized_fields[_field] = ZenField(
+                name=_field, hint=Any, zen_convert=convert_settings
+            )
         else:
             assert isinstance(_field.name, str)
             normalized_fields[_field.name] = _repack_zenfield(
-                _field, _field.name, bases
+                _field, _field.name, bases, convert_settings
             )
 
     for name, value in fields_as_kwargs.items():
@@ -414,9 +456,12 @@ def make_config(
                 name=name,
                 default=value,
                 _permit_default_factory=default_factory_permitted,
+                zen_convert=convert_settings,
             )
         else:
-            normalized_fields[name] = _repack_zenfield(value, name=name, bases=bases)
+            normalized_fields[name] = _repack_zenfield(
+                value, name=name, bases=bases, zen_convert=convert_settings
+            )
 
     # fields without defaults must come first
     config_fields: List[Union[Tuple[str, type], Tuple[str, type, Any]]] = [
@@ -462,7 +507,7 @@ def make_config(
         )
 
     if hydra_defaults is not None:
-        hydra_defaults = sanitize_collection(hydra_defaults)
+        hydra_defaults = sanitize_collection(hydra_defaults, convert_dataclass=False)
         config_fields.append(
             (
                 DEFAULTS_LIST_FIELD_NAME,

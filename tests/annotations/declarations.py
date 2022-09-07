@@ -150,6 +150,15 @@ def check_just():
     reveal_type(partiald_f, expected_text="partial[int]")
     reveal_type(partiald_f(), expected_text="int")
 
+    # test dataclass conversion
+    @dataclass
+    class B:
+        ...
+
+    reveal_type(just(B), expected_text="Type[Just[Type[B]]]")
+    reveal_type(just(B()), expected_text="Type[Builds[Type[B]]]")
+    reveal_type(just(B(), zen_convert={"dataclass": False}), expected_text="Any")
+
 
 @dataclass
 class SomeDataClass:

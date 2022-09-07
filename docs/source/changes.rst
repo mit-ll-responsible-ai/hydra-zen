@@ -16,28 +16,136 @@ chronological order. All previous releases should still be available on pip.
 
 .. note:: This is documentation for an unreleased version of hydra-zen. You can try out this version pre-release version using `pip install --pre hydra-zen`
 
+Release Highlights
+------------------
+This release adds auto-config support for dataclass types and instances, **including pydantic datclasses**. Thus one can now include in 
+a structured config type-annotations and default values that *are not natively 
+supported by Hydra*, and then use :func:`~hydra_zen.builds` and/or 
+:func:`~hydra_zen.just` to create a Hydra-compatible intermediate .
+
+Consider the following dataclass; neither the type-annotation for ``reduction_fn`` nor its default values are supported by Hydra/omegaconf, and thus it cannot be serialized to a yaml file nor used in a Hydra config.
+
+.. code-block:: python
+   :caption: A dataclass that cannot be used natively within a Hydra app as a structured config.
+
+   from typing import Callable, Sequence
+   from dataclasses import dataclass
+   
+   @dataclass
+   class Bar:
+      reduce_fn: Callable[[Sequence[float]], float] = sum  # <- not compat w/ Hydra
+
+
+With the release of hydra-zen 0.8.0, we can now use :func:`~hydra_zen.just` to 
+automatically create a Hydra-compatible config that, when instantiated, returns ``Bar()``:
+
+.. code-block:: pycon
+   :caption: Using :func:`~hydra_zen.just` to create a Hydra-compatible structured config
+
+   >>> from hydra_zen import builds, just, instantiate, to_yaml
+   >>> just_bar = just(Bar())
+   
+   >>> print(to_yaml(just_bar))
+   _target_: __main__.Bar
+   reduce_fn:
+     _target_: hydra_zen.funcs.get_obj
+     path: builtins.sum
+   
+   >>> instantiate(just_bar)  # returns Bar()
+   Bar(reduce_fn=<built-in function sum>)
+
+This auto-conversion process works recursively as well
+
+.. code-block:: pycon
+   :caption: Demonstrating recursive auto-conversion of dataclasses.
+
+   >>> from statistics import mean
+   >>> @dataclass
+   ... class Foo:
+   ...     bar: Bar
+
+   >>> foobar = Foo(Bar(reduce_fn=mean))
+   >>> instantiate(just(foobar))
+   Foo(bar=Bar(reduce_fn=<function mean at 0x000001F224640310>))
+   >>> instantiate(builds(Foo, bar=Bar(sum)))
+   Foo(bar=Bar(reduce_fn=<built-in function sum>))
+
+Thus we can include these Hydra-compatible intermediates in our Hydra config or config store, and then use :func:`~hydra_zen.instantiate` to create the desired dataclass instances of ``Bar()`` and ``Foo(Bar(mean))`` within our app's task function.
+Note that this functionality works with `pydantic dataclasses <https://pydantic-docs.helpmanual.io/usage/dataclasses/>`_ as well, which enables us to leverage enhanced runtime value and type-checking.
+
+Big thanks to `Jasha10 <https://github.com/Jasha10>`_ for proposing and prototyping the crux of this new capability.
+
 Compatibility-Breaking Changes
 ------------------------------
-- This release drops support for Python 3.6. If you require Python 3.6, please restrict your hydra-zen installation dependency as `hydra-zen<0.8.0`.
+This release drops support for Python 3.6. If you require Python 3.6, please restrict your hydra-zen installation dependency as `hydra-zen<0.8.0`.
 
+The addition of auto-config support for dataclasses (:pull:`301`) changes the default 
+behaviors of :func:`~hydra_zen.just` and :func:`~hydra_zen.builds`. Previously, all 
+dataclass types and instances lacking a `_target_` field would be left unprocessed by 
+these functions, and omegaconf would convert dataclass types and instances alike to 
+DictConfigs
+
+.. code-block:: python
+   :caption: hydra-zen < 0.8.0
+
+   from hydra_zen import just, builds, to_yaml
+   from dataclasses import dataclass
+   from omegaconf import DictConfig
+   
+   @dataclass
+   class A:
+       x: int = 1
+   
+   assert to_yaml(just(A)) == "x: 1\n"
+   assert to_yaml(just(A())) == "x: 1\n"
+   assert to_yaml(builds(dict, x=A)().x) == "x: 1\n"
+   assert to_yaml(builds(dict, x=A())().x) == "x: 1\n"
+
+Now these objects will automatically be converted to corresponding targeted configs 
+with the desired behavior under Hydra-instantiation:
+
+.. code-block:: python
+   :caption: hydra-zen >= 0.8.0
+
+   from hydra_zen import just, builds, instantiate
+   from dataclasses import dataclass
+
+   @dataclass
+   class A:
+       x: int = 1
+
+   assert instantiate(just(A)) is A
+   assert instantiate(builds(dict, x=A)().x) is A
+   
+   assert str(just(A())()) == "Builds_A(_target_='__main__.A', x=1)"
+   assert str(builds(dict, x=A(), hydra_convert="all")()) == "Builds_dict(_target_='builtins.dict', _convert_='all', x=<class 'types.Builds_A'>)"
+
+If you depended on the previous default behavior, you can recreate it by using the new 
+:ref:`zen-convert settings <zen-convert>` as so:
+
+.. code-block:: python
+   :caption: Restoring old default behavior
+   
+   from hydra_zen import just, make_custom_builds_fn
+   from functools import partial
+   
+   just = partial(just, zen_convert={"dataclass": False})
+   builds = make_custom_builds_fn(zen_convert={"dataclass": False})
 
 Improvements
 ------------
+- Adds auto-config support for `dataclasses.dataclass` (as highlighted above). (See :pull:`301`)
+- Adds support for using `builds(<target>, populate_full_signature=True)` where `<target>` is a dataclass type that has a field with a default factory. (See :pull:`299`)
 - Adds auto-config support for `pydantic.Field`, improving hydra-zen's ability to automatically construct configs that describe pydantic models and dataclasses. (See :pull:`303`) 
 - :func:`~hydra_zen.builds` no longer has restrictions on inheritance patterns involving `PartialBuilds`-type configs. (See :pull:`290`)
 - Two new utility functions were added to the public API: :func:`~hydra_zen.is_partial_builds` and :func:`~hydra_zen.uses_zen_processing`
-- Improved :ref:`automatic type refinement <type-support>` for bare sequence types, and adds conditional support for `dict`, `list`, and `tuple` as type annotations when omegaconf 2.2.3+ is installed. (See :pull:`297`)
-- Adds support for using `builds(<target>, populate_full_signature=True)` where `<target>` is a dataclass type that has a field with a default factory. (See :pull:`299`)
 - The :ref:`automatic type refinement <type-support>` performed by :func:`~hydra_zen.builds` now has enhanced support for ``typing.Annotated``, ``typing.NewType``, and ``typing.TypeVarTuple``. (See :pull:`283`)
 
 
-Support for New Hydra/OmegaConf Features
-----------------------------------------
-OmegaConf ``v2.2.1`` is added native support for the following types:
+**Support for New Hydra/OmegaConf Features**
 
-- :py:class:`pathlib.Path`
-
-hydra-zen :ref:`already provides support for these <additional-types>`, but this version will defer to OmegaConf's native support when possible. (See :pull:`276`)
+- OmegaConf ``v2.2.1`` added native support for :py:class:`pathlib.Path`. hydra-zen :ref:`already provides support for these <additional-types>`, but will now defer to OmegaConf's native support when possible. (See :pull:`276`)
+- Improved :ref:`automatic type refinement <type-support>` for bare sequence types, and adds conditional support for `dict`, `list`, and `tuple` as type annotations when omegaconf 2.2.3+ is installed. (See :pull:`297`)
 
 
 Bug Fixes
@@ -393,7 +501,7 @@ New Features
    - `Read about hydra-zen compatibility with pydantic <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/126>`_
    - `Read about hydra-zen compatibility with beartype <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/128>`_
    
-  The type-checking capabilities offered by :func:`~hydra_zen.third_party.pydantic.validates_with_pydantic` and :func:`~hydra_zen.third_party.beartype.validates_with_beartype`, respectively, are both far more robust than those `offered by Hydra <https://hydra.cc/docs/next/tutorials/structured_config/intro/#structured-configs-supports>`_.
+  The type-checking capabilities offered by :func:`~hydra_zen.third_party.pydantic.validates_with_pydantic` and :func:`~hydra_zen.third_party.beartype.validates_with_beartype`, respectively, are both far more robust than those `offered by Hydra <https://hydra.cc/docs/tutorials/structured_config/intro/#structured-configs-supports>`_.
 - A new, simplified method for creating a structured config, via :func:`~hydra_zen.make_config`.
   
    This serves as a much more succinct way to create a dataclass, where specifying type-annotations is optional. Additionally, provided type-annotations and default values are automatically adapted to be made compatible with Hydra. `Read more here <https://github.com/mit-ll-responsible-ai/hydra-zen/pull/130>`_.

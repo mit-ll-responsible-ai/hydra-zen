@@ -1,6 +1,7 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import string
+import warnings
 from typing import Any, Callable, Dict, List, TypeVar, Union
 
 import hypothesis.strategies as st
@@ -296,6 +297,5 @@ def test_bad_relative_interp_warns(wrappers, expected_match):
     ["${s}", "${.s}", ["${.s}"], ["${..s}", "${..s}"], ["${..s}", "${..s}", "${..s}"]],
 )
 def test_interp_doesnt_warn(wrappers):
-    with pytest.warns(None) as record:  # type: ignore
+    with warnings.catch_warnings():
         builds(dict, zen_wrappers=wrappers, zen_meta=dict(s=1))
-    assert not record

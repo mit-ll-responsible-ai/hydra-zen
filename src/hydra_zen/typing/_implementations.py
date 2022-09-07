@@ -30,6 +30,7 @@ from typing import (
 
 from omegaconf import DictConfig, ListConfig
 from typing_extensions import (
+    Final,
     Literal,
     ParamSpec,
     Protocol,
@@ -49,6 +50,7 @@ __all__ = [
     "ZenWrappers",
     "ZenPartialBuilds",
     "HydraPartialBuilds",
+    "ZenConvert",
 ]
 
 P = ParamSpec("P")
@@ -249,3 +251,88 @@ else:
 DefaultsList = List[
     Union[str, DataClass_, Mapping[str, Union[None, str, Sequence[str]]]]
 ]
+
+
+# Lists all zen-convert settings and their types. Not part of public API
+class AllConvert(TypedDict, total=True):
+    dataclass: bool
+
+
+# used for runtime type-checking
+convert_types: Final = {"dataclass": bool}
+
+
+class ZenConvert(TypedDict, total=False):
+    """A TypedDict that provides a type-checked interface for specifying zen-convert
+    options that configure the hydra-zen config-creation functions (e.g., `builds`,
+    `just`, and `make_config`).
+
+    Note that, at runtime, `ZenConvert` is simply a dictionary with type-annotations. There is no enforced runtime validation of its keys and values.
+
+    Parameters
+    ----------
+    dataclass : bool
+        If `True` any dataclass type/instance without a `_target_` field is
+        automatically converted to a targeted config that will instantiate to that type/
+        instance. Otherwise the dataclass type/instance will be passed through as-is.
+
+        Note that this only works with statically-defined dataclass types, whereas
+        :func:`~hydra_zen.make_config` and :py:func:`dataclasses.make_dataclass`
+        dynamically generate dataclass types. Additionally, this feature is not
+        compatible with a dataclass instance whose type possesses an `InitVar` field.
+
+    Examples
+    --------
+    >>> from hydra_zen.typing import ZenConvert as zc
+    >>> zc()
+    {}
+    >>> zc(dataclass=True)
+    {"dataclass": True}
+    >>> zc(apple=1)  # static type-checker will raise, but runtime will not
+    {"apple": 1}
+
+    **Configuring dataclass auto-config behaviors**
+
+    >>> from hydra_zen import instantiate as I
+    >>> from hydra_zen import builds, just
+    >>> from dataclasses import dataclass
+    >>> @dataclass
+    ... class B:
+    ...     x: int
+    >>> b = B(x=1)
+
+    >>> I(just(b))
+    B(x=1)
+    >>> I(just(b, zen_convert=zc(dataclass=False)))  # returns omegaconf.DictConfig
+    {"x": 1}
+
+    >>> I(builds(dict, y=b))
+    {'y': B(x=1)}
+    >>> I(builds(dict, y=b, zen_convert=zc(dataclass=False)))  # returns omegaconf.DictConfig
+    {'y': {'x': 1}}
+
+    >>> I(make_config(y=b))  # returns omegaconf.DictConfig
+    {'y': {'x': 1}}
+    >>> I(make_config(y=b, zen_convert=zc(dataclass=True, hydra_convert="all"))
+    {'y': B(x=1)}
+
+    Auto-config support does not work with dynamically-generated dataclass types
+
+    >>> just(make_config(z=1))
+    HydraZenUnsupportedPrimitiveError: ...
+    >>> I(just(make_config(z=1), zen_convert=zc(dataclass=False)))
+    {'z': 1}
+
+    A dataclass with a `_target_` field will not be converted:
+
+    >>> @dataclass
+    ... class BuildsStr:
+    ...     _target_: str = 'builtins.str'
+    ...
+    >>> BuildsStr is just(BuildsStr)
+    True
+    >>> (builds_str := BuildsStr()) is just(builds_str)
+    True
+    """
+
+    dataclass: bool

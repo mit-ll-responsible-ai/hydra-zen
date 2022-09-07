@@ -1,64 +1,170 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-from typing import Any, FrozenSet, Type, TypeVar, Union, overload
+from typing import Any, Callable, FrozenSet, Optional, Type, TypeVar, Union, overload
 
-from hydra_zen.typing import Builds, Importable, Just
+from typing_extensions import Literal
+
+from hydra_zen.structured_configs import _utils
+from hydra_zen.typing import Builds, Just
 from hydra_zen.typing._implementations import _HydraPrimitive  # type: ignore
 from hydra_zen.typing._implementations import _SupportedViaBuilds  # type: ignore
+from hydra_zen.typing._implementations import AllConvert, DataClass_, ZenConvert
 
 from ._implementations import sanitized_default_value
+from ._utils import merge_settings
 from ._value_conversion import ConfigComplex
 
 # pyright: strict
-
+TD = TypeVar("TD", bound=DataClass_)
+TC = TypeVar("TC", bound=Callable[..., Any])
 TP = TypeVar("TP", bound=_HydraPrimitive)
 TB = TypeVar("TB", bound=Union[_SupportedViaBuilds, FrozenSet[Any]])
 
 __all__ = ["just"]
 
 
+_JUST_CONVERT_SETTINGS = AllConvert(dataclass=True)
+
+
 @overload
-def just(obj: TP) -> TP:  # pragma: no cover
+def just(
+    obj: TP,
+    *,
+    zen_convert: Optional[ZenConvert] = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+) -> TP:  # pragma: no cover
     ...
 
 
 @overload
-def just(obj: complex) -> ConfigComplex:  # pragma: no cover
+def just(
+    obj: complex,
+    *,
+    zen_convert: Optional[ZenConvert] = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+) -> ConfigComplex:  # pragma: no cover
     ...
 
 
 @overload
-def just(obj: TB) -> Builds[Type[TB]]:  # pragma: no cover
+def just(
+    obj: TB,
+    *,
+    zen_convert: Optional[ZenConvert] = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+) -> Builds[Type[TB]]:  # pragma: no cover
     ...
 
 
 @overload
-def just(obj: Importable) -> Type[Just[Importable]]:  # pragma: no cover
+def just(
+    obj: TC,
+    *,
+    zen_convert: Optional[ZenConvert] = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+) -> Type[Just[TC]]:  # pragma: no cover
     ...
 
 
 @overload
-def just(obj: Any) -> Any:  # pragma: no cover
+def just(
+    obj: TD,
+    *,
+    zen_convert: Literal[None] = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+) -> Type[Builds[Type[TD]]]:  # pragma: no cover
     ...
 
 
-def just(obj: Any) -> Any:
-    """Returns a structured config that "just" describes the specified value.
+@overload
+def just(
+    obj: DataClass_,
+    *,
+    zen_convert: ZenConvert,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+) -> Any:  # pragma: no cover
+    ...
+
+
+@overload
+def just(
+    obj: Any,
+    *,
+    zen_convert: Optional[ZenConvert] = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+) -> Any:  # pragma: no cover
+    ...
+
+
+def just(
+    obj: Any,
+    *,
+    zen_convert: Optional[ZenConvert] = None,
+    hydra_recursive: Optional[bool] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+) -> Any:
+    """`just(obj)` returns a config that, when instantiated, just returns `obj`.
+
+    I.e., `instantiate(just(obj)) == obj`
+
+    `just` is designed to be idempotent: `just(obj) == just(just(obj))`
 
     Parameters
     ----------
-    obj : Type | Callable[..., Any] HydraSupportedPrimitive | ZenSupportedPrimitive
-        A type (e.g. a class-object), function-object, or a value of a type that is
-        supported by either  hydra-zen or Hydra.
+    obj : Callable[..., Any] | HydraSupportedPrimitive | ZenSupportedPrimitive
+        A value, type (e.g. a class-object), or function-object that is either supported by Hydra or has auto-config support via hydra-zen.
+
+    zen_convert : Optional[ZenConvert]
+        A dictionary that modifies hydra-zen's value and type conversion behavior.
+        Consists of the following optional key-value pairs (:ref:`zen-convert`):
+
+        - `dataclass` : `bool` (default=True):
+            If `True` any dataclass type/instance without a
+            `_target_` field is automatically converted to a targeted config
+            that will instantiate to that type/instance. Otherwise the dataclass
+            type/instance will be passed through as-is.
+
+
+    hydra_recursive : Optional[bool], optional (default=True)
+        If ``True``, then Hydra will recursively instantiate all other
+        hydra-config objects nested within this config [2]_.
+
+        If ``None``, the ``_recursive_`` attribute is not set on the resulting config.
+
+    hydra_convert : Optional[Literal["none", "partial", "all"]], optional (default="none")
+        Determines how Hydra treats the non-primitive, omegaconf-specific objects
+        during instantiateion [3]_.
+
+        - ``"none"``: No conversion occurs; omegaconf containers are passed through (Default)
+        - ``"partial"``: ``DictConfig`` and ``ListConfig`` objects converted to ``dict`` and
+          ``list``, respectively. Structured configs and their fields are passed without conversion.
+        - ``"all"``: All passed objects are converted to dicts, lists, and primitives, without
+          a trace of OmegaConf containers.
+
+        If ``None``, the ``_convert_`` attribute is not set on the resulting config.
+
 
     Returns
     -------
-    config : HydraSupportedPrimitive | Builds
-        A structured config that describes ``obj``.
+    out : HydraSupportedPrimitive | Builds[Type[obj]]
+        ``out`` is ``obj`` unchanged if ``obj`` is supported natively by Hydra, otherwise ``out`` is a dynamically-generated dataclass type or instance.
 
     Raises
     ------
     hydra_zen.errors.HydraZenUnsupportedPrimitiveError
+
+    References
+    ----------
+    .. [1] https://hydra.cc/docs/tutorials/structured_config/intro/
+    .. [2] https://hydra.cc/docs/advanced/instantiate_objects/overview/#recursive-instantiation
+    .. [3] https://hydra.cc/docs/advanced/instantiate_objects/overview/#parameter-conversion-strategies
 
     See Also
     --------
@@ -67,24 +173,12 @@ def just(obj: Any) -> Any:
 
     Notes
     -----
+    Here, a "config" is a dynamically-generated dataclass type that is designed to be
+    compatible with Hydra [1]_.
+
     The configs produced by ``just(<type_or_func>)`` introduce an explicit dependency
     on hydra-zen. I.e. hydra-zen must be installed in order to instantiate any config
     that used `just`.
-
-    hydra-zen provides specialized support for values of the following types:
-
-    - :py:class:`bytes`
-    - :py:class:`bytearray`
-    - :py:class:`complex`
-    - :py:class:`collections.Counter`
-    - :py:class:`collections.deque`
-    - :py:func:`functools.partial`
-    - :py:class:`pathlib.Path`
-    - :py:class:`pathlib.PosixPath`
-    - :py:class:`pathlib.WindowsPath`
-    - :py:class:`range`
-    - :py:class:`set`
-    - :py:class:`frozenset`
 
     Examples
     --------
@@ -92,21 +186,7 @@ def just(obj: Any) -> Any:
 
     >>> from hydra_zen import just, instantiate, to_yaml
 
-    Using ``just`` to create a config that returns an object – without calling it –
-    upon instantiation.
-
-    >>> class A: pass
-    >>> Conf_A = just(A)  # returns a dataclass-type
-    >>> instantiate(Conf_A) is A
-    True
-
-    >>> def my_func(x: int): pass
-    >>> Conf_func = just(my_func)  # returns a dataclass-type
-    >>> instantiate(Conf_func) is my_func
-    True
-
-
-    Calling ``just`` on a value of a type that is natively supported by Hydra
+    Calling `just` on a value of a type that is natively supported by Hydra
     will reurn that value unchanged
 
     >>> just(1)
@@ -114,32 +194,72 @@ def just(obj: Any) -> Any:
     >>> just(False)
     False
 
-    Calling ``just`` on a value of a type that has special support from hydra-zen
-    will return a structured config instance that, when instantiated, returns that
-    value
+    `just` can be used to create a config that will simply import a class-object or function when the config is instantiated by Hydra.
+
+
+    >>> class A: pass
+    >>> def my_func(x: int): pass
+
+    >>> instantiate(just(A)) is A
+    True
+    >>> instantiate(just(my_func)) is my_func
+    True
+
+    `just` dynamically generates dataclass types, a.k.a structured configs, to describe
+    ``obj``
+
+    >>> just(A)()
+    Just_A(_target_='hydra_zen.funcs.get_obj', path='__main__.A')
+    >>> just(my_func)()
+    Just_my_func(_target_='hydra_zen.funcs.get_obj', path='__main__.my_func')
+
+    **Auto-config support**
+
+    Calling `just` on a value of a type that has
+    :ref:`special support from hydra-zen <additional-types>`
+    will return a structured config instance that, when instantiated by Hydra, returns
+    that value.
 
     >>> just(1+2j)
     ConfigComplex(real=1.0, imag=2.0, _target_='builtins.complex')
-
     >>> instantiate(just(1+2j))
     (1+2j)
 
     >>> just({1, 2, 3})
     Builds_set(_target_='builtins.set', _args_=((1, 2, 3),))
-
     >>> instantiate(just({1, 2, 3})
     {1, 2, 3}
 
-    ``just`` operates recursively within sequences and mappings.
+    By default, `just` will convert a dataclass instance to a corresponding targeted
+    config. This behavior can be modified via :ref:`zen-convert settings<zen-convert>`.
 
-    >>> just({'a': [3-4j, 1+2j]})
-    'a': [ConfigComplex(real=3.0, imag=-4.0, _target_='builtins.complex'),
-         ConfigComplex(real=1.0, imag=2.0, _target_='builtins.complex')]}
+    >>> from dataclasses import dataclass
+    >>> @dataclass
+    ... class B:
+    ...     x: complex
+    >>>
+    >>> instantiate(just(B)) is B
+    True
+    >>> instantiate(just(B(2+3j))) == B(2+3j)
+    True
+
+    `just` operates recursively within sequences, mappings, and dataclass fields.
+
+    >>> z_dict = {'a': [3-4j, 1+2j]}
+    >>> assert instantiate(just(z_dict)) == z_dict
+    >>>
+    >>> from typing import Any
+    >>> @dataclass
+    ... class C:
+    ...     x: Any
+    >>>
+    >>> instantiate(just(C(B(2+3j))))
+    C(B(2+3j))
 
     **Auto-Application of just**
 
-    Both ``builds`` and ``make_config`` will automatically (and recursively) apply
-    ``just`` to all configured values. E.g. in the following example `just` will be
+    Both `builds` and `make_config` will automatically (and recursively) apply
+    `just` to all configured values. E.g. in the following example `just` will be
     applied to both  the complex-valued the list and to ``sum``.
 
     >>> from hydra_zen import make_config
@@ -161,10 +281,19 @@ def just(obj: Any) -> Any:
     >>> conf.reduction_fn(conf.data)
     (3+5j)
     """
+    convert_settings = merge_settings(zen_convert, _JUST_CONVERT_SETTINGS)
+    del zen_convert
+    _utils.validate_hydra_options(
+        hydra_recursive=hydra_recursive, hydra_convert=hydra_convert
+    )
+
     return sanitized_default_value(
         obj,
         allow_zen_conversion=True,
         structured_conf_permitted=True,
         field_name="",
         error_prefix="",
+        convert_dataclass=convert_settings["dataclass"],
+        hydra_convert=hydra_convert,
+        hydra_recursive=hydra_recursive,
     )

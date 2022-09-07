@@ -272,9 +272,10 @@ def test_builds_partial_with_full_sig_excludes_non_specified_params(
         **user_specified_values,
         populate_full_signature=True,
         zen_partial=True,
+        zen_convert={"dataclass": False},
     )
 
-    expected_sig = [  # type: ignore
+    expected_sig = [
         (var_name, name_to_type[var_name], user_specified_values[var_name])
         for var_name in sorted(user_specified_values)
     ] + [

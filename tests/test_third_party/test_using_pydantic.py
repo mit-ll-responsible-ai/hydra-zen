@@ -1,15 +1,18 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-from typing import Any
+import dataclasses
+from typing import Any, List, Optional
 
 import hypothesis.strategies as st
 import pytest
+from hydra.errors import InstantiationException
 from hypothesis import given, settings
+from omegaconf import OmegaConf
 from pydantic import AnyUrl, Field, PositiveFloat
 from pydantic.dataclasses import dataclass as pyd_dataclass
 from typing_extensions import Literal
 
-from hydra_zen import builds, instantiate
+from hydra_zen import builds, instantiate, just, to_yaml
 from hydra_zen.third_party.pydantic import validates_with_pydantic
 
 parametrize_pydantic_fields = pytest.mark.parametrize(
@@ -41,7 +44,7 @@ def test_pydantic_specific_fields_class(custom_type, good_val, bad_val):
             pass
 
     A.__init__.__annotations__["x"] = custom_type
-    validates_with_pydantic(A)  # type: ignore
+    validates_with_pydantic(A)
 
     A(good_val)
     with pytest.raises(Exception):
@@ -102,6 +105,44 @@ def test_documented_example_raises(x):
 
 
 @pyd_dataclass
+class User:
+    id: int
+    name: str = "John Doe"
+    friends: List[int] = dataclasses.field(default_factory=lambda: [0])
+    age: Optional[int] = dataclasses.field(
+        default=None,
+        metadata=dict(title="The age of the user", description="do not lie!"),
+    )
+    height: Optional[int] = Field(None, title="The height in cm", ge=50, le=300)
+
+
+@pytest.mark.parametrize(
+    "config_maker",
+    [
+        lambda u1: just(u1, hydra_convert="all"),
+        # test hydra-convert applies within container
+        lambda u1: just([u1], hydra_convert="all")[0],
+    ],
+)
+def test_just_on_pydantic_dataclass(config_maker):
+    u1 = User(id="42")  # type: ignore
+    Conf = config_maker(u1)
+    ju1 = instantiate(Conf)
+    assert ju1 == u1 and isinstance(ju1, User)
+
+
+def test_pydantic_runtime_type_checking():
+
+    Conf = builds(User, populate_full_signature=True, hydra_convert="all")
+    inst_bad = Conf(id=22, height=-50, age=-100)
+    with pytest.raises(InstantiationException):
+        instantiate(inst_bad)  # pydantic raises on invalid height
+
+    inst_good = instantiate(Conf(id=22, height=50, age=25))
+    assert inst_good == User(id=22, height=50, age=25) and isinstance(inst_good, User)
+
+
+@pyd_dataclass
 class HasDefault:
     x: int = Field(default=1)
 
@@ -123,3 +164,37 @@ class HasDefaultFactory:
 def test_pop_sig_with_pydantic_Field(target, kwargs):
     Conf = builds(target, populate_full_signature=True)
     assert instantiate(Conf(**kwargs)) == target(**kwargs)
+
+
+@pyd_dataclass
+class NavbarButton:
+    href: AnyUrl
+
+
+@pyd_dataclass
+class Navbar:
+    button: NavbarButton
+
+
+@given(...)
+def test_nested_dataclasses(via_yaml: bool):
+    navbar = Navbar(button=("https://example.com",))  # type: ignore
+    conf = just(navbar)
+    if via_yaml:
+        # ensure serializable
+        assert instantiate(OmegaConf.create(to_yaml(conf))) == navbar
+    else:
+        assert instantiate(conf) == navbar
+
+
+@pyd_dataclass
+class PydFieldNoDefault:
+    btwn_0_and_3: int = Field(gt=0, lt=3)
+
+
+def test_pydantic_Field_no_default():
+    Conf = builds(PydFieldNoDefault, populate_full_signature=True)
+    out = instantiate(OmegaConf.create(to_yaml(Conf)), btwn_0_and_3=2)
+    assert isinstance(out, PydFieldNoDefault) and out == PydFieldNoDefault(
+        btwn_0_and_3=2
+    )
