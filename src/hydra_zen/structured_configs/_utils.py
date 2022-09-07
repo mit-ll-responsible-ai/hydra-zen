@@ -574,7 +574,7 @@ def merge_settings(
     """Merges settings as `default_settings.update(user_settings)`"""
     if user_settings is not None and not isinstance(user_settings, Mapping):
         raise TypeError(
-            f"`zen_convert` is None or a Mapping (e.g. dict). Got {user_settings}"
+            f"`zen_convert` must be None or Mapping[str, Any] (e.g. dict). Got {user_settings}"
         )
     settings = default_settings.copy()
     if user_settings:
