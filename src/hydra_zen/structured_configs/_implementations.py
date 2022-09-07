@@ -467,9 +467,15 @@ def sanitized_default_value(
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
 ) -> Any:
+    """Converts `value` to Hydra-supported type if necessary and possible. Otherwise
+    raises `HydraZenUnsupportedPrimitiveError`"""
+    # Common primitives supported by Hydra.
+    # We check exhaustively for all Hydra-supported primitives below but seek to
+    # speedup checks for common types here.
     if value is None or type(value) in {str, int, bool, float}:
         return value
 
+    # non-str collection
     if hasattr(value, "__iter__"):
         value = sanitize_collection(
             value,
@@ -478,6 +484,7 @@ def sanitized_default_value(
             hydra_recursive=hydra_recursive,
         )
 
+    # non-targeted dataclass instance
     if (
         structured_conf_permitted
         and convert_dataclass
@@ -518,6 +525,7 @@ def sanitized_default_value(
         )
         return out
 
+    # importable callable (function, type, or method)
     if (
         structured_conf_permitted
         and callable(value)
@@ -548,7 +556,9 @@ def sanitized_default_value(
     resolved_value = value
     type_of_value = type(resolved_value)
 
-    # we don't use isinstance because we don't permit subclasses of supported
+    # hydra-zen supported primitives from stdlib
+    #
+    # Note: we don't use isinstance because we don't permit subclasses of supported
     # primitives
     if allow_zen_conversion and type_of_value in ZEN_SUPPORTED_PRIMITIVES:
         type_ = type(resolved_value)
@@ -567,7 +577,7 @@ def sanitized_default_value(
     ):
         return resolved_value
 
-    # check pydantic auto-config
+    # pydantic objects
     pydantic = sys.modules.get("pydantic")
     if pydantic is not None and isinstance(value, pydantic.fields.FieldInfo):
         _val = (
@@ -595,6 +605,8 @@ def sanitized_default_value(
         if type(_v) is str:
             return _v
 
+    # `value` could no be converted to Hydra-compatible representation.
+    # Raise error/
     if field_name:
         field_name = f", for field `{field_name}`,"
 
