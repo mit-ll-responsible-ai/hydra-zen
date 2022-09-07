@@ -606,7 +606,7 @@ def sanitized_default_value(
             return _v
 
     # `value` could no be converted to Hydra-compatible representation.
-    # Raise error/
+    # Raise error
     if field_name:
         field_name = f", for field `{field_name}`,"
 
