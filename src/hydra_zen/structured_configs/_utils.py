@@ -594,7 +594,7 @@ def merge_settings(
 def validate_hydra_options(
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
-):
+) -> None:
     if hydra_recursive is not None and not isinstance(hydra_recursive, bool):
         raise TypeError(
             f"`hydra_recursive` must be a boolean type, got {hydra_recursive}"
