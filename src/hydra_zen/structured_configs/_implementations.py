@@ -547,7 +547,7 @@ def sanitized_default_value(
         # `value` is importable callable -- create config that will import
         # `value` upon instantiation
         out = _just(value)  # type: ignore
-        if is_dataclass(value):
+        if convert_dataclass and is_dataclass(value):
             _check_for_dynamically_defined_dataclass_type(
                 getattr(out, JUST_FIELD_NAME), value
             )
