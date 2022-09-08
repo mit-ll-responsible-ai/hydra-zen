@@ -34,7 +34,7 @@ from typing import (
 )
 
 from omegaconf import DictConfig, ListConfig
-from typing_extensions import Final, Literal, ParamSpec, TypeAlias
+from typing_extensions import Final, Literal, ParamSpec, TypeAlias, dataclass_transform
 
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVES,
@@ -176,24 +176,7 @@ def mutable_value(x: _T, *, zen_convert: Optional[ZenConvert] = None) -> _T:
     return field(default_factory=lambda: cast(x))
 
 
-# Alternate form, from PEP proposal:
-# https://github.com/microsoft/pyright/blob/master/specs/dataclass_transforms.md
-#
-# This enables static checkers to work with third-party decorators that create
-# dataclass-like objects
-def __dataclass_transform__(
-    *,
-    eq_default: bool = True,
-    order_default: bool = False,
-    kw_only_default: bool = False,
-    field_descriptors: Tuple[Union[type, Callable[..., Any]], ...] = (()),
-) -> Callable[[_T], _T]:
-    # If used within a stub file, the following implementation can be
-    # replaced with "...".
-    return lambda a: a
-
-
-@__dataclass_transform__()
+@dataclass_transform()
 def hydrated_dataclass(
     target: Callable[..., Any],
     *pos_args: SupportedPrimitive,
