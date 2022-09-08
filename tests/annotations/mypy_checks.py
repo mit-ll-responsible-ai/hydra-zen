@@ -1,5 +1,7 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+from typing import Type
+
 from typing_extensions import assert_type
 
 from hydra_zen import builds, instantiate, make_custom_builds_fn
@@ -43,3 +45,24 @@ def check_make_custom_builds() -> None:
     assert_type(instantiate(partial_builds(f))(), str)
 
     full_builds(f)(y=2)  # type: ignore [call-arg]
+
+
+# def check_just() -> None:
+#     from hydra_zen import just
+
+#     class A:
+#         ...
+
+#     # fails due to: https://github.com/python/mypy/issues/13623
+#     assert_type(instantiate(just(A)), Type[A])
+
+
+## hydrated_dataclass not yet supported: https://github.com/python/mypy/issues/12840
+# def check_hydrated_dataclass() -> None:
+#     from hydra_zen import hydrated_dataclass
+
+#     @hydrated_dataclass(dict)
+#     class A:
+#         x: int
+
+#     assert_type(A(1).x, int)
