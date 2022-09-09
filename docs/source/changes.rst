@@ -135,10 +135,11 @@ If you depended on the previous default behavior, you can recreate it by using t
 Improvements
 ------------
 - Adds auto-config support for `dataclasses.dataclass` (as highlighted above). (See :pull:`301`)
+- :func:`~hydra_zen.builds` no longer has restrictions on inheritance patterns involving `PartialBuilds`-type configs. (See :pull:`290`)
 - We now verify that basic use cases of our config-creation and instantiation functions type-check correctly via mypy. Previously, we had only assured type-checking behavior via pyright
+- Added :class:`~hydra_zen.typing.ZenConvert` typed dictionary to document new zen-convert options for :func:`~hydra_zen.builds`, :func:`~hydra_zen.just`, and :func:`~hydra_zen.make_config`. (See :pull:`301`)
 - Adds support for using `builds(<target>, populate_full_signature=True)` where `<target>` is a dataclass type that has a field with a default factory. (See :pull:`299`)
 - Adds auto-config support for `pydantic.Field`, improving hydra-zen's ability to automatically construct configs that describe pydantic models and dataclasses. (See :pull:`303`) 
-- :func:`~hydra_zen.builds` no longer has restrictions on inheritance patterns involving `PartialBuilds`-type configs. (See :pull:`290`)
 - Two new utility functions were added to the public API: :func:`~hydra_zen.is_partial_builds` and :func:`~hydra_zen.uses_zen_processing`
 - The :ref:`automatic type refinement <type-support>` performed by :func:`~hydra_zen.builds` now has enhanced support for ``typing.Annotated``, ``typing.NewType``, and ``typing.TypeVarTuple``. (See :pull:`283`)
 
