@@ -4,25 +4,14 @@
 import inspect
 import warnings
 from functools import wraps
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Mapping,
-    Optional,
-    Tuple,
-    Type,
-    Union,
-    cast,
-    overload,
-)
+from typing import Any, Callable, Dict, Mapping, Optional, Union, cast, overload
 
 from typing_extensions import Final, Literal
 
 from hydra_zen.errors import HydraZenDeprecationWarning
 from hydra_zen.typing import ZenWrappers
 from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds, StdBuilds
-from hydra_zen.typing._implementations import DataClass_, ZenConvert
+from hydra_zen.typing._implementations import ZenConvert
 
 from ._implementations import builds
 
@@ -38,7 +27,7 @@ __BUILDS_DEFAULTS: Final[Dict[str, Any]] = {
 del _builds_sig
 
 
-# partial=False, pop-sig=True; no parents
+# partial=False, pop-sig=True
 @overload
 def make_custom_builds_fn(
     *,
@@ -49,7 +38,6 @@ def make_custom_builds_fn(
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
-    builds_bases: Tuple[()] = ...,
     zen_convert: Optional[ZenConvert] = ...,
 ) -> FullBuilds:  # pragma: no cover
     ...
@@ -66,13 +54,12 @@ def make_custom_builds_fn(
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
-    builds_bases: Tuple[Type[DataClass_], ...] = ...,
     zen_convert: Optional[ZenConvert] = ...,
 ) -> PBuilds:  # pragma: no cover
     ...
 
 
-# partial=False, pop-sig=False, no parents
+# partial=False, pop-sig=False
 @overload
 def make_custom_builds_fn(
     *,
@@ -83,13 +70,12 @@ def make_custom_builds_fn(
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
-    builds_bases: Tuple[()] = ...,
     zen_convert: Optional[ZenConvert] = ...,
 ) -> StdBuilds:  # pragma: no cover
     ...
 
 
-# partial=False, pop-sig=bool, no parents
+# partial=False, pop-sig=bool
 @overload
 def make_custom_builds_fn(
     *,
@@ -100,26 +86,8 @@ def make_custom_builds_fn(
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
-    builds_bases: Tuple[()] = ...,
     zen_convert: Optional[ZenConvert] = ...,
 ) -> Union[FullBuilds, StdBuilds]:  # pragma: no cover
-    ...
-
-
-# partial=False, pop-sig=bool, with parents
-@overload
-def make_custom_builds_fn(
-    *,
-    zen_partial: Literal[False, None] = ...,
-    populate_full_signature: bool = ...,
-    zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
-    zen_meta: Optional[Mapping[str, Any]] = ...,
-    hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
-    frozen: bool = ...,
-    builds_bases: Tuple[Type[DataClass_], ...],
-    zen_convert: Optional[ZenConvert] = ...,
-) -> StdBuilds:  # pragma: no cover
     ...
 
 
@@ -134,13 +102,12 @@ def make_custom_builds_fn(
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
-    builds_bases: Tuple[Type[DataClass_], ...] = ...,
     zen_convert: Optional[ZenConvert] = ...,
 ) -> Union[PBuilds, StdBuilds]:  # pragma: no cover
     ...
 
 
-# partial=bool, pop-sig=bool, with parents
+# partial=bool, pop-sig=bool
 @overload
 def make_custom_builds_fn(
     *,
@@ -151,24 +118,6 @@ def make_custom_builds_fn(
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
-    builds_bases: Tuple[Type[DataClass_], ...],
-    zen_convert: Optional[ZenConvert] = ...,
-) -> Union[PBuilds, StdBuilds]:  # pragma: no cover
-    ...
-
-
-# partial=bool, pop-sig=bool, no parents
-@overload
-def make_custom_builds_fn(
-    *,
-    zen_partial: Union[bool, None],
-    populate_full_signature: bool,
-    zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
-    zen_meta: Optional[Mapping[str, Any]] = ...,
-    hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
-    frozen: bool = ...,
-    builds_bases: Tuple[()] = ...,
     zen_convert: Optional[ZenConvert] = ...,
 ) -> Union[FullBuilds, PBuilds, StdBuilds]:  # pragma: no cover
     ...
@@ -183,7 +132,6 @@ def make_custom_builds_fn(
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     frozen: bool = False,
-    builds_bases: Tuple[Type[DataClass_], ...] = (),
     zen_convert: Optional[ZenConvert] = None,
 ) -> Union[FullBuilds, PBuilds, StdBuilds]:
     """Returns the `builds` function, but with customized default values.
@@ -288,7 +236,7 @@ def make_custom_builds_fn(
     <Validation error: "c" is not "a" or "b">
     """
 
-    excluded_fields = {"dataclass_name", "hydra_defaults"}
+    excluded_fields = {"dataclass_name", "hydra_defaults", "builds_bases"}
     LOCALS = locals()
 
     # Ensures that new defaults added to `builds` must be reflected
