@@ -1,284 +1,318 @@
 
 <!DOCTYPE html>
 
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
-    <title>hydra_zen.just &#8212; hydra-zen  documentation</title>
-    
-  <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-
-    
-  <link rel="stylesheet"
-    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
-
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
-    
-  <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
-
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
-    <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
-    <script src="../_static/gtag.js"></script>
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="hydra_zen.hydrated_dataclass" href="hydra_zen.hydrated_dataclass.html" />
-    <link rel="prev" title="hydra_zen.builds" href="hydra_zen.builds.html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
-    
-      
-      <link rel="icon" sizes="32x32" href="../_static/hydra_zen_favicon_32x32.png">
-      
-    
-      
-      <link rel="icon" sizes="64x64" href="../_static/hydra_zen_favicon_64x64.png">
-      
-    
-
-    <!-- Google Analytics -->
-    
-  </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
-    
-    <div class="container-fluid" id="banner"></div>
-
-    
-    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
-
-  <div id="navbar-start">
-    
-    
-
-<a class="navbar-brand" href="../index.html">
-  <img src="../_static/Hydra-Zen_logo_full_filled_bkgrnd_smaller.png" class="logo" alt="logo">
-</a>
-
-
-    
-  </div>
-
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-  
-  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
-    <div id="navbar-center" class="mr-auto">
-      
-      <div class="navbar-center-item">
-        <ul id="navbar-main-elements" class="navbar-nav">
-    <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../tutorials.html">
-  Tutorials
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../how_tos.html">
-  How-To Guides
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../explanation.html">
-  Explanation
- </a>
-</li>
-
-<li class="toctree-l1 current active nav-item">
- <a class="reference internal nav-link" href="../api_reference.html">
-  Reference
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../changes.html">
-  Changelog
- </a>
-</li>
-
-    
-</ul>
-      </div>
-      
-    </div>
-
-    <div id="navbar-end">
-      
-      <div class="navbar-end-item">
-        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
-        <li class="nav-item">
-          <a class="nav-link" href="https://github.com/mit-ll-responsible-ai/hydra-zen" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label></a>
-        </li>
-      </ul>
-      </div>
-      
-    </div>
-  </div>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="Docutils 0.18.1: http://docutils.sourceforge.net/" name="generator"/>
+<title>hydra_zen.just — hydra-zen  documentation</title>
+<script>
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+<!-- Loaded before other Sphinx assets -->
+<link href="../_static/styles/theme.css?digest=9b1a4fa89bdd0e95b23b" rel="stylesheet"/>
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=9b1a4fa89bdd0e95b23b" rel="stylesheet"/>
+<link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css" rel="stylesheet"/>
+<link as="font" crossorigin="" href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" rel="preload" type="font/woff2"/>
+<link as="font" crossorigin="" href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" rel="preload" type="font/woff2"/>
+<link href="../_static/pygments.css" rel="stylesheet" type="text/css">
+<link href="../_static/copybutton.css" rel="stylesheet" type="text/css">
+<link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css">
+<link href="../_static/tabs.css" rel="stylesheet" type="text/css">
+<!-- Pre-loaded scripts that we'll load fully later -->
+<link as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=9b1a4fa89bdd0e95b23b" rel="preload"/>
+<script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+<script src="../_static/jquery.js"></script>
+<script src="../_static/underscore.js"></script>
+<script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+<script src="../_static/doctools.js"></script>
+<script src="../_static/clipboard.min.js"></script>
+<script src="../_static/copybutton.js"></script>
+<script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
+<script src="../_static/gtag.js"></script>
+<link href="../genindex.html" rel="index" title="Index">
+<link href="../search.html" rel="search" title="Search">
+<link href="hydra_zen.hydrated_dataclass.html" rel="next" title="hydra_zen.hydrated_dataclass"/>
+<link href="hydra_zen.builds.html" rel="prev" title="hydra_zen.builds"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="en" name="docsearch:language"/>
+</link></link></link></link></link></link></head>
+<body data-default-mode="" data-offset="180" data-spy="scroll" data-target="#bd-toc-nav">
+<input class="sidebar-toggle" id="__primary" name="__primary" type="checkbox"/>
+<label class="overlay overlay-primary" for="__primary"></label>
+<input class="sidebar-toggle" id="__secondary" name="__secondary" type="checkbox"/>
+<label class="overlay overlay-secondary" for="__secondary"></label>
+<div class="search-button__wrapper">
+<div class="search-button__overlay"></div>
+<div class="search-button__search-container">
+<form action="../search.html" class="bd-search d-flex align-items-center" method="get">
+<i class="icon fas fa-search"></i>
+<input aria-label="Search the docs ..." autocapitalize="off" autocomplete="off" autocorrect="off" class="form-control" id="search-input" name="q" placeholder="Search the docs ..." spellcheck="false" type="search"/>
+<span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
 </div>
-    </nav>
-    
-
-    <div class="container-xl">
-      <div class="row">
-          
-            
-            <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar">
-              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
-</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
-  <div class="bd-toc-item active">
-    <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="hydra_zen.launch.html">
+</div>
+<nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+<label class="sidebar-toggle primary-toggle" for="__primary">
+<span class="fas fa-bars"></span>
+</label>
+<div id="navbar-start">
+<a class="navbar-brand logo" href="../index.html">
+<img alt="Logo image" class="logo__image only-light" src="../_static/Hydra-Zen_logo_full_filled_bkgrnd_smaller.png"/>
+<img alt="Logo image" class="logo__image only-dark" src="../_static/Hydra-Zen_logo_full_filled_bkgrnd_smaller.png"/>
+</a>
+</div>
+<div class="col-lg-9 navbar-header-items">
+<div class="mr-auto" id="navbar-center">
+<div class="navbar-center-item">
+<nav class="navbar-nav">
+<p aria-label="Site Navigation" aria-level="1" class="sidebar-header-items__title" role="heading">
+        Site Navigation
+    </p>
+<ul class="navbar-nav" id="navbar-main-elements">
+<li class="nav-item">
+<a class="nav-link" href="../tutorials.html">
+                        Tutorials
+                    </a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../how_tos.html">
+                        How-To Guides
+                    </a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../explanation.html">
+                        Explanation
+                    </a>
+</li>
+<li class="nav-item current active">
+<a class="nav-link" href="../api_reference.html">
+                        Reference
+                    </a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../changes.html">
+                        Changelog
+                    </a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+<div id="navbar-end">
+<div class="navbar-end-item navbar-end__search-button-container">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search">
+<i class="fas fa-search"></i>
+</button>
+</div>
+<div class="navbar-end-item">
+<span class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+<a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+<a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+<a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+</div>
+<div class="navbar-end-item">
+<ul aria-label="Icon Links" class="navbar-nav" id="navbar-icon-links">
+<li class="nav-item">
+<a class="nav-link" href="https://github.com/mit-ll-responsible-ai/hydra-zen" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+<label class="sr-only">GitHub</label></a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="search-button-container--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search">
+<i class="fas fa-search"></i>
+</button>
+</div>
+<label class="sidebar-toggle secondary-toggle" for="__secondary">
+<span class="fas fa-outdent"></span>
+</label>
+</div>
+</nav>
+<div class="bd-container">
+<div class="bd-container__inner bd-page-width">
+<div class="bd-sidebar-primary bd-sidebar">
+<div class="sidebar-header-items sidebar-primary__section">
+<div class="sidebar-header-items__center">
+<div class="navbar-center-item">
+<nav class="navbar-nav">
+<p aria-label="Site Navigation" aria-level="1" class="sidebar-header-items__title" role="heading">
+        Site Navigation
+    </p>
+<ul class="navbar-nav" id="navbar-main-elements">
+<li class="nav-item">
+<a class="nav-link" href="../tutorials.html">
+                        Tutorials
+                    </a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../how_tos.html">
+                        How-To Guides
+                    </a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../explanation.html">
+                        Explanation
+                    </a>
+</li>
+<li class="nav-item current active">
+<a class="nav-link" href="../api_reference.html">
+                        Reference
+                    </a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="../changes.html">
+                        Changelog
+                    </a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+<div class="sidebar-header-items__end">
+<div class="navbar-end-item">
+<span class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+<a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+<a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+<a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+</div>
+<div class="navbar-end-item">
+<ul aria-label="Icon Links" class="navbar-nav" id="navbar-icon-links">
+<li class="nav-item">
+<a class="nav-link" href="https://github.com/mit-ll-responsible-ai/hydra-zen" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+<label class="sr-only">GitHub</label></a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sidebar-start-items sidebar-primary__section">
+<div class="sidebar-start-items__item"><nav aria-label="Section navigation" class="bd-links" id="bd-docs-nav">
+<p aria-level="1" class="bd-links__title" role="heading">
+    Section Navigation
+  </p>
+<div class="bd-toc-item navbar-nav">
+<ul class="nav bd-sidenav">
+<li class="toctree-l1">
+<a class="reference internal" href="hydra_zen.launch.html">
    hydra_zen.launch
   </a>
- </li>
+</li>
 </ul>
 <ul class="current nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="hydra_zen.make_config.html">
+<li class="toctree-l1">
+<a class="reference internal" href="hydra_zen.make_config.html">
    hydra_zen.make_config
   </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="hydra_zen.builds.html">
+</li>
+<li class="toctree-l1">
+<a class="reference internal" href="hydra_zen.builds.html">
    hydra_zen.builds
   </a>
- </li>
- <li class="toctree-l1 current active">
-  <a class="current reference internal" href="#">
+</li>
+<li class="toctree-l1 current active">
+<a class="current reference internal" href="#">
    hydra_zen.just
   </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="hydra_zen.hydrated_dataclass.html">
+</li>
+<li class="toctree-l1">
+<a class="reference internal" href="hydra_zen.hydrated_dataclass.html">
    hydra_zen.hydrated_dataclass
   </a>
- </li>
+</li>
 </ul>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="hydra_zen.instantiate.html">
+<li class="toctree-l1">
+<a class="reference internal" href="hydra_zen.instantiate.html">
    hydra_zen.instantiate
   </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="hydra_zen.get_target.html">
+</li>
+<li class="toctree-l1">
+<a class="reference internal" href="hydra_zen.get_target.html">
    hydra_zen.get_target
   </a>
- </li>
+</li>
 </ul>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="hydra_zen.make_custom_builds_fn.html">
+<li class="toctree-l1">
+<a class="reference internal" href="hydra_zen.make_custom_builds_fn.html">
    hydra_zen.make_custom_builds_fn
   </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="hydra_zen.is_partial_builds.html">
+</li>
+<li class="toctree-l1">
+<a class="reference internal" href="hydra_zen.is_partial_builds.html">
    hydra_zen.is_partial_builds
   </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="hydra_zen.uses_zen_processing.html">
+</li>
+<li class="toctree-l1">
+<a class="reference internal" href="hydra_zen.uses_zen_processing.html">
    hydra_zen.uses_zen_processing
   </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="hydra_zen.ZenField.html">
+</li>
+<li class="toctree-l1">
+<a class="reference internal" href="hydra_zen.ZenField.html">
    hydra_zen.ZenField
   </a>
- </li>
+</li>
 </ul>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="hydra_zen.to_yaml.html">
+<li class="toctree-l1">
+<a class="reference internal" href="hydra_zen.to_yaml.html">
    hydra_zen.to_yaml
   </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="hydra_zen.save_as_yaml.html">
+</li>
+<li class="toctree-l1">
+<a class="reference internal" href="hydra_zen.save_as_yaml.html">
    hydra_zen.save_as_yaml
   </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="hydra_zen.load_from_yaml.html">
+</li>
+<li class="toctree-l1">
+<a class="reference internal" href="hydra_zen.load_from_yaml.html">
    hydra_zen.load_from_yaml
   </a>
- </li>
+</li>
 </ul>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="hydra_zen.third_party.beartype.validates_with_beartype.html">
+<li class="toctree-l1">
+<a class="reference internal" href="hydra_zen.typing.ZenConvert.html">
+   hydra_zen.typing.ZenConvert
+  </a>
+</li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1">
+<a class="reference internal" href="hydra_zen.third_party.beartype.validates_with_beartype.html">
    hydra_zen.third_party.beartype.validates_with_beartype
   </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="hydra_zen.third_party.pydantic.validates_with_pydantic.html">
+</li>
+<li class="toctree-l1">
+<a class="reference internal" href="hydra_zen.third_party.pydantic.validates_with_pydantic.html">
    hydra_zen.third_party.pydantic.validates_with_pydantic
   </a>
- </li>
+</li>
 </ul>
-
-  </div>
+</div>
 </nav>
-              </div>
-              <div class="sidebar-end-items">
-              </div>
-            </div>
-            
-          
-
-          
-          <div class="d-none d-xl-block col-xl-2 bd-toc">
-            
-              
-              <div class="toc-item">
-                
-
-<nav id="bd-toc-nav">
-    
-</nav>
-              </div>
-              
-              <div class="toc-item">
-                
-              </div>
-              
-            
-          </div>
-          
-
-          
-          
-            
-          
-          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
-              
-              <div>
-                
-  <section id="hydra-zen-just">
-<h1>hydra_zen.just<a class="headerlink" href="#hydra-zen-just" title="Permalink to this headline">#</a></h1>
+</div>
+</div>
+<div class="sidebar-end-items sidebar-primary__section">
+<div class="sidebar-end-items__item">
+</div>
+</div>
+</div>
+<main class="bd-main">
+<div class="bd-content">
+<div class="bd-article-container">
+<div class="bd-header-article">
+</div>
+<article class="bd-article" role="main">
+<section id="hydra-zen-just">
+<h1>hydra_zen.just<a class="headerlink" href="#hydra-zen-just" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="hydra_zen.just">
 <span class="sig-prename descclassname"><span class="pre">hydra_zen.</span></span><span class="sig-name descname"><span class="pre">just</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_recursive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/structured_configs/_just.html#just"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.just" title="Permalink to this definition">#</a></dt>
@@ -286,12 +320,12 @@
 <p>I.e., <code class="xref py py-obj docutils literal notranslate"><span class="pre">instantiate(just(obj))</span> <span class="pre">==</span> <span class="pre">obj</span></code></p>
 <p><a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> is designed to be idempotent: <code class="xref py py-obj docutils literal notranslate"><span class="pre">just(obj)</span> <span class="pre">==</span> <span class="pre">just(just(obj))</span></code></p>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
 <dt><strong>obj</strong><span class="classifier">Callable[…, Any] | HydraSupportedPrimitive | ZenSupportedPrimitive</span></dt><dd><p>A value, type (e.g. a class-object), or function-object that is either supported by Hydra or has auto-config support via hydra-zen.</p>
 </dd>
 <dt><strong>zen_convert</strong><span class="classifier">Optional[ZenConvert]</span></dt><dd><p>A dictionary that modifies hydra-zen’s value and type conversion behavior.
-Consists of the following optional key-value pairs (<span class="xref std std-ref">zen-convert</span>):</p>
+Consists of the following optional key-value pairs (<a class="reference internal" href="hydra_zen.typing.ZenConvert.html#zen-convert"><span class="std std-ref">hydra_zen.typing.ZenConvert</span></a>):</p>
 <ul>
 <li><dl>
 <dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">dataclass</span></code><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a> (default=True):</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> any dataclass type/instance without a
@@ -310,23 +344,23 @@ hydra-config objects nested within this config <a class="reference internal" hre
 <dt><strong>hydra_convert</strong><span class="classifier">Optional[Literal[“none”, “partial”, “all”]], optional (default=”none”)</span></dt><dd><p>Determines how Hydra treats the non-primitive, omegaconf-specific objects
 during instantiateion <a class="reference internal" href="#rcd3092d0866d-3" id="id2">[3]</a>.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code>: No conversion occurs; omegaconf containers are passed through (Default)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;partial&quot;</span></code>: <code class="docutils literal notranslate"><span class="pre">DictConfig</span></code> and <code class="docutils literal notranslate"><span class="pre">ListConfig</span></code> objects converted to <code class="docutils literal notranslate"><span class="pre">dict</span></code> and
+<li><p><code class="docutils literal notranslate"><span class="pre">"none"</span></code>: No conversion occurs; omegaconf containers are passed through (Default)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">"partial"</span></code>: <code class="docutils literal notranslate"><span class="pre">DictConfig</span></code> and <code class="docutils literal notranslate"><span class="pre">ListConfig</span></code> objects converted to <code class="docutils literal notranslate"><span class="pre">dict</span></code> and
 <code class="docutils literal notranslate"><span class="pre">list</span></code>, respectively. Structured configs and their fields are passed without conversion.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>: All passed objects are converted to dicts, lists, and primitives, without
+<li><p><code class="docutils literal notranslate"><span class="pre">"all"</span></code>: All passed objects are converted to dicts, lists, and primitives, without
 a trace of OmegaConf containers.</p></li>
 </ul>
 <p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_convert_</span></code> attribute is not set on the resulting config.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt><strong>out</strong><span class="classifier">HydraSupportedPrimitive | Builds[Type[obj]]</span></dt><dd><p><code class="docutils literal notranslate"><span class="pre">out</span></code> is <code class="docutils literal notranslate"><span class="pre">obj</span></code> unchanged if <code class="docutils literal notranslate"><span class="pre">obj</span></code> is supported natively by Hydra, otherwise <code class="docutils literal notranslate"><span class="pre">out</span></code> is a dynamically-generated dataclass type or instance.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-odd">Raises</dt>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt>hydra_zen.errors.HydraZenUnsupportedPrimitiveError</dt><dd></dd>
 </dl>
@@ -348,20 +382,23 @@ compatible with Hydra <a class="reference internal" href="#rcd3092d0866d-1" id="
 on hydra-zen. I.e. hydra-zen must be installed in order to instantiate any config
 that used <a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a>.</p>
 <p class="rubric">References</p>
-<dl class="citation">
-<dt class="label" id="rcd3092d0866d-1"><span class="brackets"><a class="fn-backref" href="#id3">1</a></span></dt>
-<dd><p><a class="reference external" href="https://hydra.cc/docs/tutorials/structured_config/intro/">https://hydra.cc/docs/tutorials/structured_config/intro/</a></p>
-</dd>
-<dt class="label" id="rcd3092d0866d-2"><span class="brackets"><a class="fn-backref" href="#id1">2</a></span></dt>
-<dd><p><a class="reference external" href="https://hydra.cc/docs/advanced/instantiate_objects/overview/#recursive-instantiation">https://hydra.cc/docs/advanced/instantiate_objects/overview/#recursive-instantiation</a></p>
-</dd>
-<dt class="label" id="rcd3092d0866d-3"><span class="brackets"><a class="fn-backref" href="#id2">3</a></span></dt>
-<dd><p><a class="reference external" href="https://hydra.cc/docs/advanced/instantiate_objects/overview/#parameter-conversion-strategies">https://hydra.cc/docs/advanced/instantiate_objects/overview/#parameter-conversion-strategies</a></p>
-</dd>
-</dl>
+<div class="citation-list" role="list">
+<div class="citation" id="rcd3092d0866d-1" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a href="#id3" role="doc-backlink">1</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://hydra.cc/docs/tutorials/structured_config/intro/">https://hydra.cc/docs/tutorials/structured_config/intro/</a></p>
+</div>
+<div class="citation" id="rcd3092d0866d-2" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a href="#id1" role="doc-backlink">2</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://hydra.cc/docs/advanced/instantiate_objects/overview/#recursive-instantiation">https://hydra.cc/docs/advanced/instantiate_objects/overview/#recursive-instantiation</a></p>
+</div>
+<div class="citation" id="rcd3092d0866d-3" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a href="#id2" role="doc-backlink">3</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://hydra.cc/docs/advanced/instantiate_objects/overview/#parameter-conversion-strategies">https://hydra.cc/docs/advanced/instantiate_objects/overview/#parameter-conversion-strategies</a></p>
+</div>
+</div>
 <p class="rubric">Examples</p>
 <p><strong>Basic usage</strong></p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">just</span><span class="p">,</span> <span class="n">instantiate</span><span class="p">,</span> <span class="n">to_yaml</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><span class="n">just</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a>
 </pre></div>
 </div>
 <p>Calling <a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> on a value of a type that is natively supported by Hydra
@@ -374,7 +411,7 @@ will reurn that value unchanged</p>
 </div>
 <p><a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> can be used to create a config that will simply import a class-object or function when the config is instantiated by Hydra.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">A</span><span class="p">:</span> <span class="k">pass</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">my_func</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span> <span class="k">pass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">my_func</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">):</span> <span class="k">pass</span>
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">just</span><span class="p">(</span><span class="n">A</span><span class="p">))</span> <span class="ow">is</span> <span class="n">A</span>
@@ -386,9 +423,9 @@ will reurn that value unchanged</p>
 <p><a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> dynamically generates dataclass types, a.k.a structured configs, to describe
 <code class="docutils literal notranslate"><span class="pre">obj</span></code></p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">just</span><span class="p">(</span><span class="n">A</span><span class="p">)()</span>
-<span class="go">Just_A(_target_=&#39;hydra_zen.funcs.get_obj&#39;, path=&#39;__main__.A&#39;)</span>
+<span class="go">Just_A(_target_='hydra_zen.funcs.get_obj', path='__main__.A')</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">just</span><span class="p">(</span><span class="n">my_func</span><span class="p">)()</span>
-<span class="go">Just_my_func(_target_=&#39;hydra_zen.funcs.get_obj&#39;, path=&#39;__main__.my_func&#39;)</span>
+<span class="go">Just_my_func(_target_='hydra_zen.funcs.get_obj', path='__main__.my_func')</span>
 </pre></div>
 </div>
 <p><strong>Auto-config support</strong></p>
@@ -397,23 +434,23 @@ will reurn that value unchanged</p>
 will return a structured config instance that, when instantiated by Hydra, returns
 that value.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">just</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="n">j</span><span class="p">)</span>
-<span class="go">ConfigComplex(real=1.0, imag=2.0, _target_=&#39;builtins.complex&#39;)</span>
+<span class="go">ConfigComplex(real=1.0, imag=2.0, _target_='builtins.complex')</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">just</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="n">j</span><span class="p">))</span>
 <span class="go">(1+2j)</span>
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">just</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">})</span>
-<span class="go">Builds_set(_target_=&#39;builtins.set&#39;, _args_=((1, 2, 3),))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">just</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">})</span>
+<span class="go">Builds_set(_target_='builtins.set', _args_=((1, 2, 3),))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">just</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">}))</span>
 <span class="go">{1, 2, 3}</span>
 </pre></div>
 </div>
 <p>By default, <a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> will convert a dataclass instance to a corresponding targeted
-config. This behavior can be modified via <span class="xref std std-ref">zen-convert settings</span>.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nd">@dataclass</span>
+config. This behavior can be modified via <a class="reference internal" href="hydra_zen.typing.ZenConvert.html#zen-convert"><span class="std std-ref">zen-convert settings</span></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a>
+<span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="nd">@dataclass</span></a>
 <span class="gp">... </span><span class="k">class</span> <span class="nc">B</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="n">x</span><span class="p">:</span> <span class="nb">complex</span>
+<span class="gp">... </span>    <span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#complex" title="complex"><span class="nb">complex</span></a>
 <span class="go">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">just</span><span class="p">(</span><span class="n">B</span><span class="p">))</span> <span class="ow">is</span> <span class="n">B</span>
 <span class="go">True</span>
@@ -422,13 +459,13 @@ config. This behavior can be modified via <span class="xref std std-ref">zen-con
 </pre></div>
 </div>
 <p><a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> operates recursively within sequences, mappings, and dataclass fields.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">z_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="o">-</span><span class="mi">4</span><span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="n">j</span><span class="p">]}</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">z_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'a'</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="o">-</span><span class="mi">4</span><span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="n">j</span><span class="p">]}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">just</span><span class="p">(</span><span class="n">z_dict</span><span class="p">))</span> <span class="o">==</span> <span class="n">z_dict</span>
 <span class="go">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#module-typing" title="typing"><span class="nn">typing</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Any" title="typing.Any"><span class="n">Any</span></a>
 <span class="gp">&gt;&gt;&gt; </span><span class="nd">@dataclass</span>
 <span class="gp">... </span><span class="k">class</span> <span class="nc">C</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="n">x</span><span class="p">:</span> <span class="n">Any</span>
+<span class="gp">... </span>    <span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Any" title="typing.Any"><span class="n">Any</span></a>
 <span class="go">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">just</span><span class="p">(</span><span class="n">C</span><span class="p">(</span><span class="n">B</span><span class="p">(</span><span class="mi">2</span><span class="o">+</span><span class="mi">3</span><span class="n">j</span><span class="p">))))</span>
 <span class="go">C(B(2+3j))</span>
@@ -438,11 +475,11 @@ config. This behavior can be modified via <span class="xref std std-ref">zen-con
 <p>Both <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> and <a class="reference internal" href="hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_config</span></code></a> will automatically (and recursively) apply
 <a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> to all configured values. E.g. in the following example <a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> will be
 applied to both  the complex-valued the list and to <code class="docutils literal notranslate"><span class="pre">sum</span></code>.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">make_config</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Conf2</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="n">j</span><span class="p">,</span> <span class="mi">2</span><span class="o">+</span><span class="mi">3</span><span class="n">j</span><span class="p">],</span> <span class="n">reduction_fn</span><span class="o">=</span><span class="nb">sum</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Conf2</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="n">j</span><span class="p">,</span> <span class="mi">2</span><span class="o">+</span><span class="mi">3</span><span class="n">j</span><span class="p">],</span> <span class="n">reduction_fn</span><span class="o">=</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#sum" title="sum"><span class="nb">sum</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">Conf2</span><span class="p">))</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">Conf2</span><span class="p">))</span>
 <span class="go">data:</span>
 <span class="go">- real: 1.0</span>
 <span class="go">  imag: 2.0</span>
@@ -461,55 +498,62 @@ applied to both  the complex-valued the list and to <code class="docutils litera
 </pre></div>
 </div>
 </dd></dl>
-
 </section>
-
-
-              </div>
-              
-              
-              <!-- Previous / next buttons -->
-<div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="hydra_zen.builds.html" title="previous page">
-        <i class="fas fa-angle-left"></i>
-        <div class="prev-next-info">
-            <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">hydra_zen.builds</p>
-        </div>
-    </a>
-    <a class='right-next' id="next-link" href="hydra_zen.hydrated_dataclass.html" title="next page">
-    <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">hydra_zen.hydrated_dataclass</p>
-    </div>
-    <i class="fas fa-angle-right"></i>
+</article>
+<footer class="bd-footer-article">
+<!-- Previous / next buttons -->
+<div class="prev-next-area">
+<a class="left-prev" href="hydra_zen.builds.html" id="prev-link" title="previous page">
+<i class="fas fa-angle-left"></i>
+<div class="prev-next-info">
+<p class="prev-next-subtitle">previous</p>
+<p class="prev-next-title">hydra_zen.builds</p>
+</div>
+</a>
+<a class="right-next" href="hydra_zen.hydrated_dataclass.html" id="next-link" title="next page">
+<div class="prev-next-info">
+<p class="prev-next-subtitle">next</p>
+<p class="prev-next-title">hydra_zen.hydrated_dataclass</p>
+</div>
+<i class="fas fa-angle-right"></i>
+</a>
+</div>
+</footer>
+</div>
+<div class="bd-sidebar-secondary bd-toc">
+<div class="toc-item">
+</div>
+<div class="toc-item">
+<div class="tocsection sourcelink">
+<a href="../_sources/generated/hydra_zen.just.rst.txt">
+<i class="fas fa-file-alt"></i> Show Source
     </a>
 </div>
-              
-          </main>
-          
-
-      </div>
-    </div>
-  
-  <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
-<footer class="footer mt-5 mt-md-0">
-  <div class="container">
-    
-    <div class="footer-item">
-      <p class="copyright">
-    &copy; Copyright 2022 Massachusetts Institute of Technology.<br>
-</p>
-    </div>
-    
-    <div class="footer-item">
-      <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
-</p>
-    </div>
-    
-  </div>
+</div>
+</div>
+</div>
+<footer class="bd-footer-content">
+<div class="bd-footer-content__inner">
+</div>
 </footer>
-  </body>
+</main>
+</div>
+</div>
+<!-- Scripts loaded after <body> so the DOM is not blocked -->
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=9b1a4fa89bdd0e95b23b"></script>
+<footer class="bd-footer"><div class="bd-footer__inner container">
+<div class="footer-item">
+<p class="copyright">
+
+    © Copyright 2022 Massachusetts Institute of Technology.<br/>
+</p>
+</div>
+<div class="footer-item">
+<p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.1.1.<br/>
+</p>
+</div>
+</div>
+</footer>
+</body>
 </html>
