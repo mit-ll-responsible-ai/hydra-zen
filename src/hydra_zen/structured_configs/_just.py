@@ -227,7 +227,7 @@ def just(
 
     >>> just({1, 2, 3})
     Builds_set(_target_='builtins.set', _args_=((1, 2, 3),))
-    >>> instantiate(just({1, 2, 3})
+    >>> instantiate(just({1, 2, 3}))
     {1, 2, 3}
 
     By default, `just` will convert a dataclass instance to a corresponding targeted
