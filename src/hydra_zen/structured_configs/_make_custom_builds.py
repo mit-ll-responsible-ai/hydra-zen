@@ -171,9 +171,6 @@ def make_custom_builds_fn(
     frozen : bool, optional (default=False)
         Specifies a new the default value for ``builds(..., frozen=<..>)``
 
-    builds_bases : Tuple[DataClass, ...]
-        Specifies a new the default value for ``builds(..., builds_bases=<..>)``
-
     Returns
     -------
     custom_builds
@@ -234,7 +231,7 @@ def make_custom_builds_fn(
     <Validation error: "c" is not "a" or "b">
     """
 
-    excluded_fields = {"dataclass_name", "hydra_defaults", "builds_bases"}
+    excluded_fields = frozenset({"dataclass_name", "hydra_defaults", "builds_bases"})
     LOCALS = locals()
 
     # Ensures that new defaults added to `builds` must be reflected
