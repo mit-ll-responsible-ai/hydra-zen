@@ -126,15 +126,13 @@ and trainer. We'll also define the task function that trains and tests our model
    from zen_model import UniversalFuncModule, single_layer_nn
    
    import pytorch_lightning as pl
-   from hydra_zen import builds, just, make_config, make_custom_builds_fn, instantiate
+   from hydra_zen import builds, make_config, make_custom_builds_fn, instantiate
    
    pbuilds = make_custom_builds_fn(zen_partial=True, populate_full_signature=True)
    
    OptimConf = pbuilds(Adam)
    
-   LoaderConf = pbuilds(
-       DataLoader, batch_size=25, shuffle=True, drop_last=True, zen_partial=True
-   )
+   LoaderConf = pbuilds(DataLoader, batch_size=25, shuffle=True, drop_last=True)
    
    ModelConf = builds(single_layer_nn, num_neurons=10)
 
@@ -142,15 +140,13 @@ and trainer. We'll also define the task function that trains and tests our model
    LitConf = pbuilds(
        UniversalFuncModule,
        model=ModelConf,
-       target_fn=just(tr.cos),
+       target_fn=tr.cos,
        training_domain=builds(
            tr.linspace, start=-2 * math.pi, end=2 * math.pi, steps=1000
        ),
    )
    
-   TrainerConf = builds(
-       pl.Trainer, max_epochs=100, progress_bar_refresh_rate=0, zen_partial=False
-   )
+   TrainerConf = builds(pl.Trainer, max_epochs=100)
    
    ExperimentConfig = make_config(
        optim=OptimConf,
