@@ -694,20 +694,6 @@ def check_make_custom_builds_no_args():
         expected_text="Type[Builds[(x: int, y: str, z: bool = False) -> Literal[1]]]",
     )
 
-    Parent = make_config(x=1)
-
-    # specifying parent should produce default `builds`
-    builds2 = make_custom_builds_fn(
-        populate_full_signature=True, builds_bases=(Parent,)
-    )
-
-    Conf2 = builds2(f)
-
-    reveal_type(
-        Conf2,
-        expected_text="Type[Builds[(x: int, y: str, z: bool = False) -> Literal[1]]]",
-    )
-
 
 def check_make_custom_builds_pop_sig():
     def f(x: int, y: str, z: bool = False):
@@ -745,19 +731,6 @@ def check_make_custom_builds_partial():
 
     reveal_type(
         Conf2,
-        expected_text="Type[ZenPartialBuilds[(x: int, y: str, z: bool = False) -> int]] | Type[HydraPartialBuilds[(x: int, y: str, z: bool = False) -> int]]",
-    )
-
-    Parent = make_config(x=1)
-
-    partial_builds3 = make_custom_builds_fn(
-        zen_partial=True, builds_bases=(Parent,), populate_full_signature=True
-    )
-
-    Conf3 = partial_builds3(f)
-
-    reveal_type(
-        Conf3,
         expected_text="Type[ZenPartialBuilds[(x: int, y: str, z: bool = False) -> int]] | Type[HydraPartialBuilds[(x: int, y: str, z: bool = False) -> int]]",
     )
 
@@ -941,18 +914,6 @@ def check_partial_narrowing_full(
 
 
 def check_make_custom_builds_overloads(boolean: bool, optional_boolean: Optional[bool]):
-    Parent = builds(int)
-
-    # Returns `StdBuilds`
-    reveal_type(
-        make_custom_builds_fn(populate_full_signature=boolean, builds_bases=(Parent,)),
-        expected_text="StdBuilds",
-    )
-
-    reveal_type(
-        make_custom_builds_fn(builds_bases=(Parent,)),
-        expected_text="StdBuilds",
-    )
 
     # partial = False, pop-sig = False
     reveal_type(make_custom_builds_fn(zen_partial=False), expected_text="StdBuilds")
@@ -973,13 +934,6 @@ def check_make_custom_builds_overloads(boolean: bool, optional_boolean: Optional
         expected_text="PBuilds",
     )
 
-    reveal_type(
-        make_custom_builds_fn(
-            zen_partial=True, populate_full_signature=False, builds_bases=(Parent,)
-        ),
-        expected_text="PBuilds",
-    )
-
     # Returns `PBuilds | StdBuilds``
     reveal_type(
         make_custom_builds_fn(zen_partial=False, populate_full_signature=boolean),
@@ -995,28 +949,6 @@ def check_make_custom_builds_overloads(boolean: bool, optional_boolean: Optional
         make_custom_builds_fn(
             populate_full_signature=False, zen_partial=optional_boolean
         ),
-        expected_text="PBuilds | StdBuilds",
-    )
-    reveal_type(
-        make_custom_builds_fn(
-            populate_full_signature=True,
-            zen_partial=optional_boolean,
-            builds_bases=(Parent,),
-        ),
-        expected_text="PBuilds | StdBuilds",
-    )
-
-    reveal_type(
-        make_custom_builds_fn(
-            populate_full_signature=boolean,
-            zen_partial=optional_boolean,
-            builds_bases=(Parent,),
-        ),
-        expected_text="PBuilds | StdBuilds",
-    )
-
-    reveal_type(
-        make_custom_builds_fn(zen_partial=optional_boolean, builds_bases=(Parent,)),
         expected_text="PBuilds | StdBuilds",
     )
 
