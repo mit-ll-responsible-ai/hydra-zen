@@ -6,7 +6,6 @@ import pytest
 from hypothesis import assume, example, given
 
 from hydra_zen import builds, make_custom_builds_fn, to_yaml
-from hydra_zen.errors import HydraZenDeprecationWarning
 from tests.custom_strategies import partitions, valid_builds_args
 
 _builds_sig = inspect.signature(builds)
@@ -46,7 +45,7 @@ def _corrupt_kwargs(kwargs: dict):
 
 
 @given(
-    bad_kwargs=valid_builds_args().map(_corrupt_kwargs),
+    bad_kwargs=valid_builds_args(excluded=("builds_bases",)).map(_corrupt_kwargs),
 )
 def test_raises_on_bad_defaults(bad_kwargs):
     try:
@@ -69,7 +68,7 @@ def f2(x, y: str):
     "ignore:A structured config was supplied for `zen_wrappers`"
 )
 @given(
-    kwargs=partitions(valid_builds_args(), ordered=False),
+    kwargs=partitions(valid_builds_args(excluded=("builds_bases",)), ordered=False),
     target=st.sampled_from([f1, f2]),
 )
 def test_make_builds_fn_produces_builds_with_expected_defaults_and_behaviors(
@@ -85,8 +84,3 @@ def test_make_builds_fn_produces_builds_with_expected_defaults_and_behaviors(
     # this should be the same as passing all of these args directly to vanilla builds
     via_builds = builds(target, **kwargs_passed_through, **kwargs_as_defaults)
     assert to_yaml(via_custom) == to_yaml(via_builds)
-
-
-def test_builds_bases_deprecation():
-    with pytest.warns(HydraZenDeprecationWarning):
-        make_custom_builds_fn(builds_bases=((builds(int),)))

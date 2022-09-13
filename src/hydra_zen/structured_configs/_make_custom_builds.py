@@ -2,13 +2,11 @@
 # SPDX-License-Identifier: MIT
 # pyright: strict
 import inspect
-import warnings
 from functools import wraps
 from typing import Any, Callable, Dict, Mapping, Optional, Union, cast, overload
 
 from typing_extensions import Final, Literal
 
-from hydra_zen.errors import HydraZenDeprecationWarning
 from hydra_zen.typing import ZenWrappers
 from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds, StdBuilds
 from hydra_zen.typing._implementations import ZenConvert
@@ -249,16 +247,6 @@ def make_custom_builds_fn(
 
     # let `builds` validate the new defaults!
     builds(builds, **_new_defaults)
-
-    if _new_defaults["builds_bases"]:
-        warnings.warn(
-            HydraZenDeprecationWarning(
-                "Specifying `make_custom_builds_fn(builds_bases=<...>)` is deprecated "
-                "as of hydra-zen 0.7.0. It will be an error in hydra-zen 0.9.0. "
-                "\n`builds_bases` must be specified via `builds` manually."
-            ),
-            stacklevel=2,
-        )
 
     @wraps(builds)
     def wrapped(*args: Any, **kwargs: Any):
