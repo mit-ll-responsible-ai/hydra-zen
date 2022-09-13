@@ -92,7 +92,7 @@ extlinks = {
 # a list of builtin themes.
 #
 html_theme = "pydata_sphinx_theme"
-html_logo = "../../brand/Hydra-Zen_logo_full_filled_bkgrnd_smaller.png"
+html_logo = "../../brand/Hydra-Zen_logo_full_light_blue.png"
 
 html_theme_options = {
     "collapse_navigation": True,
