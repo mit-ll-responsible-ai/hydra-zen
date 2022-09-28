@@ -294,3 +294,20 @@ def test_multiple_pre_calls(pre_call):
     g = zen_identity.func
     assert zen(pre_call=pre_call)(g)(cfg=cfg) == 1
     assert Pre.record == [1] * (len(pre_call) if isinstance(pre_call, list) else 1)
+
+
+@pytest.mark.usefixtures("cleandir")
+def test_hydra_main():
+    import subprocess
+    from pathlib import Path
+
+    from hydra_zen import load_from_yaml
+
+    path = (Path(__file__).parent / "dummy_zen_main.py").absolute()
+    assert not (Path.cwd() / "outputs").is_dir()
+    subprocess.run(["python", path, "x=1", "y=2"]).check_returncode()
+    assert (Path.cwd() / "outputs").is_dir()
+
+    *_, latest_job = sorted((Path.cwd() / "outputs").glob("*/*"))
+
+    assert load_from_yaml(latest_job / ".hydra" / "config.yaml") == {"x": 1, "y": 2}

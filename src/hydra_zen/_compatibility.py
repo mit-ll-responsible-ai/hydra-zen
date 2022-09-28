@@ -36,6 +36,7 @@ def _get_version(ver_str: str) -> Version:
 OMEGACONF_VERSION: Final = _get_version(omegaconf.__version__)
 HYDRA_VERSION: Final = _get_version(hydra.__version__)
 
+SUPPORTS_VERSION_BASE = HYDRA_VERSION >= (1, 2, 0)
 
 # OmegaConf issue 830 describes a bug associated with structured configs
 # composed via inheritance, where the child's attribute is a default-factory

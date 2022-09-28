@@ -13,7 +13,7 @@ from hydra.plugins.sweeper import Sweeper
 from hydra.types import HydraContext, RunMode
 from omegaconf import DictConfig, ListConfig, OmegaConf
 
-from hydra_zen._compatibility import HYDRA_VERSION
+from hydra_zen._compatibility import SUPPORTS_VERSION_BASE
 from hydra_zen._hydra_overloads import instantiate
 from hydra_zen.typing._implementations import DataClass, InstOrType
 
@@ -238,7 +238,7 @@ def launch(
         job_name=job_name,
         **(
             {}
-            if (HYDRA_VERSION < (1, 2, 0) or version_base is _NotSet)
+            if (not SUPPORTS_VERSION_BASE or version_base is _NotSet)
             else {"version_base": version_base}
         )
     ):

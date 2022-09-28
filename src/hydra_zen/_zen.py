@@ -19,6 +19,8 @@ from typing import (
     overload,
 )
 
+import hydra
+from hydra.main import _UNSPECIFIED_  # type: ignore
 from omegaconf import Container, DictConfig, ListConfig, OmegaConf
 from typing_extensions import Literal, ParamSpec, TypeGuard
 
@@ -26,7 +28,7 @@ from hydra_zen import instantiate
 from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.typing._implementations import DataClass_
 
-from ._compatibility import HYDRA_SUPPORTS_LIST_INSTANTIATION
+from ._compatibility import HYDRA_SUPPORTS_LIST_INSTANTIATION, SUPPORTS_VERSION_BASE
 from .structured_configs._type_guards import is_dataclass
 
 __all__ = ["zen"]
@@ -181,6 +183,44 @@ class Zen(Generic[P, T1]):
         )  # type: ignore
 
         return out
+
+    def hydra_main(
+        self,
+        config_path: Optional[str] = _UNSPECIFIED_,
+        config_name: Optional[str] = None,
+        version_base: Optional[str] = _UNSPECIFIED_,
+    ) -> Callable[[Any], Any]:
+        """
+        Returns a Hydra-CLI compatible version of the wrapped function: `hydra.main(zen(func))`
+
+        Parameters
+        ----------
+        config_path : Optional[str]
+            The config path, a directory relative to the declaring python file.
+
+            If config_path is not specified no directory is added to the Config search path.
+
+        config_name : Optional[str]
+            The name of the config (usually the file name without the .yaml extension)
+
+        version_base : Optional[str]
+            There are three classes of values that the version_base parameter supports, given new and existing users greater control of the default behaviors to use.
+
+            - If the version_base parameter is not specified, Hydra 1.x will use defaults compatible with version 1.1. Also in this case, a warning is issued to indicate an explicit version_base is preferred.
+            - If the version_base parameter is None, then the defaults are chosen for the current minor Hydra version. For example for Hydra 1.2, then would imply config_path=None and hydra.job.chdir=False.
+            - If the version_base parameter is an explicit version string like "1.1", then the defaults appropriate to that version are used.
+
+        Returns
+        -------
+        hydra_main : Callable[[Any], Any]
+            hydra.main(zen(func))
+        """
+
+        kw = dict(config_path=config_path, config_name=config_name)
+        if SUPPORTS_VERSION_BASE:
+            kw["version_base"] = version_base
+
+        return hydra.main(**kw)(self)()
 
 
 @overload
