@@ -7,9 +7,10 @@ import pytest
 from hypothesis import given, strategies as st
 from omegaconf import DictConfig
 
-from hydra_zen import builds, make_config, zen
+from hydra_zen import builds, make_config, to_yaml, zen
 from hydra_zen._zen import Zen
 from hydra_zen.errors import HydraZenValidationError
+from tests.custom_strategies import everything_except
 
 
 @zen
@@ -98,6 +99,23 @@ def test_interpolations_are_resolved(y: int, as_dict_config: bool):
     assert out == ({"x": y}, [y], {"a": y}, {"b": y}, y)
 
 
+@pytest.mark.parametrize(
+    "cfg",
+    [
+        dict(x=21),
+        DictConfig(dict(x=21)),
+        make_config(x=21),
+        to_yaml(dict(x=21)),
+    ],
+)
+def test_supported_config_types(cfg):
+    @zen
+    def f(x):
+        return x
+
+    assert f(cfg) == 21
+
+
 def test_zen_resolves_default_factories():
     Cfg = make_config(x=[1, 2, 3])
     assert zen_identity(Cfg) == [1, 2, 3]
@@ -157,6 +175,19 @@ def test_zen_validation_cfg_missing_parameter(cfg, func):
         match=r"`cfg` is missing the following fields",
     ):
         zen(func).validate(cfg)
+
+
+@given(bad_config=everything_except((list, dict, str)))
+def test_zen_validate_bad_config(bad_config):
+    @zen
+    def f(*a, **k):
+        ...
+
+    with pytest.raises(
+        HydraZenValidationError,
+        match=r"`cfg` Must be a dataclass, dict/DictConfig, list/ListConfig, or yaml-string",
+    ):
+        f(bad_config)
 
 
 def test_zen_validation_excluded_param():
@@ -257,7 +288,7 @@ pre_call_strat = st.just(lambda cfg: Pre.record.append(cfg.x))
 @given(
     pre_call=(pre_call_strat | st.lists(pre_call_strat)),
 )
-def test_pre_and_post_call(pre_call):
+def test_multiple_pre_calls(pre_call):
     Pre.record.clear()
     cfg = make_config(x=1, y="a")
     g = zen_identity.func

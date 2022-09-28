@@ -1,28 +1,33 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 # pyright: strict
-from dataclasses import is_dataclass
+
 from inspect import Parameter, signature
 from typing import (
     Any,
     Callable,
+    Dict,
     Generic,
     Iterable,
     List,
     Optional,
     Sequence,
+    Tuple,
+    Type,
     TypeVar,
     Union,
     overload,
 )
 
-from omegaconf import DictConfig, ListConfig, OmegaConf
-from omegaconf._utils import is_structured_config
+from omegaconf import Container, DictConfig, ListConfig, OmegaConf
 from typing_extensions import Literal, ParamSpec, TypeGuard
 
 from hydra_zen import instantiate
 from hydra_zen.errors import HydraZenValidationError
-from hydra_zen.typing._implementations import DataClass
+from hydra_zen.typing._implementations import DataClass_
+
+from ._compatibility import HYDRA_SUPPORTS_LIST_INSTANTIATION
+from .structured_configs._type_guards import is_dataclass
 
 __all__ = ["zen"]
 
@@ -31,8 +36,25 @@ T1 = TypeVar("T1")
 P = ParamSpec("P")
 
 
-def is_config(cfg: Any) -> TypeGuard[Union[DataClass, DictConfig, ListConfig]]:
-    return is_dataclass(cfg) or OmegaConf.is_config(cfg)
+if HYDRA_SUPPORTS_LIST_INSTANTIATION:
+    _SUPPORTED_INSTANTIATION_TYPES: Tuple[Any, ...] = (dict, DictConfig, list, ListConfig)  # type: ignore
+else:  # pragma: no cover
+    _SUPPORTED_INSTANTIATION_TYPES: Tuple[Any, ...] = (dict, DictConfig)  # type: ignore
+
+
+def is_instantiable(
+    cfg: Any,
+) -> TypeGuard[
+    Union[
+        DataClass_,
+        Type[DataClass_],
+        DictConfig,
+        ListConfig,
+        List[Any],
+        Dict[str, Any],
+    ]
+]:
+    return is_dataclass(cfg) or isinstance(cfg, _SUPPORTED_INSTANTIATION_TYPES)
 
 
 SKIPPED_PARAM_KINDS = frozenset(
@@ -105,11 +127,32 @@ class Zen(Generic[P, T1]):
                 f"`cfg` is missing the following fields: {', '.join(missing_params)}"
             )
 
-    def __call__(self, cfg: Any) -> T1:
-        if is_structured_config(cfg):
+    def __call__(
+        self,
+        cfg: Union[
+            DataClass_,
+            Type[DataClass_],
+            Dict[Any, Any],
+            List[Any],
+            ListConfig,
+            DictConfig,
+            str,
+        ],
+    ) -> T1:
+        if is_dataclass(cfg):
             # ensures that default factories and interpolated fields
             # are resolved
             cfg = OmegaConf.structured(cfg)
+
+        elif not OmegaConf.is_config(cfg):
+            if not isinstance(cfg, (dict, list, str)):
+                raise HydraZenValidationError(
+                    f"`cfg` Must be a dataclass, dict/DictConfig, list/ListConfig, or "
+                    f"yaml-string. Got {cfg}"
+                )
+            cfg = OmegaConf.create(cfg)
+
+        assert isinstance(cfg, Container)
 
         # resolves all interpolated values in-place
         OmegaConf.resolve(cfg)
@@ -130,9 +173,9 @@ class Zen(Generic[P, T1]):
         }
 
         out = self.func(
-            *(instantiate(x) if is_config(x) else x for x in args_),
+            *(instantiate(x) if is_instantiable(x) else x for x in args_),
             **{
-                name: instantiate(val) if is_config(val) else val
+                name: instantiate(val) if is_instantiable(val) else val
                 for name, val in cfg_kwargs.items()
             },
         )  # type: ignore

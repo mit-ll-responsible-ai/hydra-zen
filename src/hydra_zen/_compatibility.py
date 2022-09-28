@@ -70,6 +70,8 @@ ZEN_SUPPORTED_PRIMITIVES: Set[type] = {
     range,
 }
 
+HYDRA_SUPPORTS_LIST_INSTANTIATION = HYDRA_VERSION >= Version(1, 1, 2)
+
 
 if HYDRA_SUPPORTS_BYTES:  # pragma: no cover
     HYDRA_SUPPORTED_PRIMITIVES.add(bytes)
