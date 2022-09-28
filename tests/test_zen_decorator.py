@@ -1,5 +1,6 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+import os
 import random
 import sys
 from dataclasses import dataclass
@@ -298,7 +299,7 @@ def test_multiple_pre_calls(pre_call):
 
 
 @pytest.mark.skipif(
-    sys.platform.startswith("win"),
+    sys.platform.startswith("win") and bool(os.environ.get("ON_GITHUB_ACTIONS")),
     reason="Things are weird on GitHub Actions and Windows",
 )
 @pytest.mark.usefixtures("cleandir")
@@ -315,4 +316,8 @@ def test_hydra_main():
 
     *_, latest_job = sorted((Path.cwd() / "outputs").glob("*/*"))
 
-    assert load_from_yaml(latest_job / ".hydra" / "config.yaml") == {"x": 1, "y": 2}
+    assert load_from_yaml(latest_job / ".hydra" / "config.yaml") == {
+        "x": 1,
+        "y": 2,
+        "z": "${y}",
+    }
