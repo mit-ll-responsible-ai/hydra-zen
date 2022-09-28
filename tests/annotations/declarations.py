@@ -32,6 +32,7 @@ from hydra_zen import (
     make_config,
     make_custom_builds_fn,
     mutable_value,
+    zen,
 )
 from hydra_zen.structured_configs._value_conversion import ConfigComplex, ConfigPath
 from hydra_zen.typing import (
@@ -1038,3 +1039,31 @@ def check_instantiate():
     assert_type(instantiate([]), Any)
     assert_type(instantiate(Cfg), Any)
     assert_type(instantiate(Cfg()), Any)
+
+
+def check_zen():
+    @zen
+    def zen_f(x: int) -> str:
+        ...
+
+    assert_type(zen_f({"a": 1}), str)
+    assert_type(zen_f(DictConfig({"a": 1})), str)
+    assert_type(zen_f([]), str)
+    assert_type(zen_f(ListConfig([])), str)
+    assert_type(zen_f("some yaml"), str)
+
+    zen_f(1)  # type: ignore
+    reveal_type(zen_f.func, expected_text="(x: int) -> str")
+
+    @zen(pre_call=None)
+    def zen_f2(x: int) -> str:
+        ...
+
+    assert_type(zen_f2({"a": 1}), str)
+    assert_type(zen_f2(DictConfig({"a": 1})), str)
+    assert_type(zen_f2([]), str)
+    assert_type(zen_f2(ListConfig([])), str)
+    assert_type(zen_f2("some yaml"), str)
+
+    zen_f2(1)  # type: ignore
+    reveal_type(zen_f2.func, expected_text="(x: int) -> str")

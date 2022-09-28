@@ -54,7 +54,7 @@ def is_just(x: Any) -> TypeGuard[Just[Any]]:
     return False
 
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragama: no cover
 
     def is_dataclass(obj: Any) -> TypeGuard[Union[DataClass_, Type[DataClass_]]]:
         ...
