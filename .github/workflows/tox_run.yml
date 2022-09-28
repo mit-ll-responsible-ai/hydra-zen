@@ -1,8 +1,5 @@
 name: Tests
 
-env:
-  ON_GITHUB_ACTIONS: 1
-
 on:
   # Trigger the workflow on push or pull request,
   # but only for the main branch

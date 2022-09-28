@@ -299,7 +299,7 @@ def test_multiple_pre_calls(pre_call):
 
 
 @pytest.mark.skipif(
-    sys.platform.startswith("win") and bool(os.environ.get("ON_GITHUB_ACTIONS")),
+    sys.platform.startswith("win") and bool(os.environ.get("CI")),
     reason="Things are weird on GitHub Actions and Windows",
 )
 @pytest.mark.usefixtures("cleandir")
