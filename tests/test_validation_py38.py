@@ -8,7 +8,8 @@ import pytest
 from hypothesis import given
 from omegaconf import OmegaConf
 
-from hydra_zen import builds, instantiate, to_yaml
+from hydra_zen import builds, instantiate, make_config, to_yaml, zen
+from hydra_zen.errors import HydraZenValidationError
 from tests import valid_hydra_literals
 
 
@@ -18,6 +19,19 @@ def x_is_pos_only(x, /):
 
 def xy_are_pos_only(x, y, /):
     return x, y
+
+
+def test_zen_decorator_with_positional_only_args():
+    zen_f = zen(x_is_pos_only)
+    with pytest.raises(
+        HydraZenValidationError,
+        match=r"has 1 positional-only arguments, but `cfg` specifies 0",
+    ):
+        zen_f.validate(make_config())
+
+    cfg = builds(x_is_pos_only, 1)
+    zen_f.validate(cfg)
+    assert zen_f(cfg) == 1
 
 
 @pytest.mark.parametrize("func", [x_is_pos_only])

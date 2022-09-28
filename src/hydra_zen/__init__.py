@@ -10,6 +10,7 @@ from ._hydra_overloads import (
 )
 from ._launch import launch
 from ._version import get_versions
+from ._zen import zen
 from .structured_configs import (
     ZenField,
     builds,
@@ -39,6 +40,7 @@ __all__ = [
     "launch",
     "is_partial_builds",
     "uses_zen_processing",
+    "zen",
 ]
 
 __version__ = get_versions()["version"]
