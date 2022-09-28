@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 import pytest
 from hypothesis import given, strategies as st
+from omegaconf import DictConfig
 
 from hydra_zen import builds, make_config, zen
 from hydra_zen._zen import Zen
@@ -75,6 +76,26 @@ def test_zen_precall_precedes_instantiation(seed: int):
     expected = f.func(2, random.randint(0, 10))
 
     assert actual == expected
+
+
+@given(y=st.sampled_from(range(10)), as_dict_config=st.booleans())
+def test_interpolations_are_resolved(y: int, as_dict_config: bool):
+    @zen
+    def f(dict_, list_, builds_, make_config_, direct):
+        return dict_, list_, builds_, make_config_, direct
+
+    cfg_maker = make_config if not as_dict_config else lambda **kw: DictConfig(kw)
+    out = f(
+        cfg_maker(
+            dict_={"x": "${y}"},
+            list_=["${y}"],
+            builds_=builds(dict, a="${y}"),
+            make_config_=make_config(b="${y}"),
+            direct="${y}",
+            y=y,
+        )
+    )
+    assert out == ({"x": y}, [y], {"a": y}, {"b": y}, y)
 
 
 def test_zen_resolves_default_factories():

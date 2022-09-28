@@ -17,6 +17,7 @@ from typing import (
 )
 
 from omegaconf import DictConfig, ListConfig, OmegaConf
+from omegaconf._utils import is_structured_config
 from typing_extensions import Literal, ParamSpec, TypeGuard
 
 from hydra_zen import instantiate
@@ -105,8 +106,13 @@ class Zen(Generic[P, T1]):
             )
 
     def __call__(self, cfg: Any) -> T1:
-        if callable(cfg):
-            cfg = cfg()  # instantiate dataclass to resolve default-factory
+        if is_structured_config(cfg):
+            # ensures that default factories and interpolated fields
+            # are resolved
+            cfg = OmegaConf.structured(cfg)
+
+        # resolves all interpolated values in-place
+        OmegaConf.resolve(cfg)
 
         if self.pre_call is not None:
             self.pre_call(cfg)
