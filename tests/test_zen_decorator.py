@@ -1,6 +1,7 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import random
+import sys
 from dataclasses import dataclass
 
 import pytest
@@ -296,6 +297,10 @@ def test_multiple_pre_calls(pre_call):
     assert Pre.record == [1] * (len(pre_call) if isinstance(pre_call, list) else 1)
 
 
+@pytest.mark.skipif(
+    sys.platform.startswith("win"),
+    reason="Things are weird on GitHub Actions and Windows",
+)
 @pytest.mark.usefixtures("cleandir")
 def test_hydra_main():
     import subprocess
