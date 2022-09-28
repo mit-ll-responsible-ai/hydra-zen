@@ -141,6 +141,16 @@ class Zen(Generic[P, T1]):
             str,
         ],
     ) -> T1:
+        """
+        Parameters
+        ----------
+        cfg : dict | list | DataClass | Type[DataClass] | str
+            A config object or yaml-string whose attributes will be extracted by-name
+            according to the signature of `func` and passed to `func`.
+
+            Attributes of types that can be instantiated by Hydra will be instantiated
+            prior to being passed to `func`.
+        """
         if is_dataclass(cfg):
             # ensures that default factories and interpolated fields
             # are resolved
