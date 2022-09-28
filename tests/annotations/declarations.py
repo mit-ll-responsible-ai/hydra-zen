@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Any, Callable, List, Mapping, Optional, Tuple, Type, TypeVar, Union
 
 from omegaconf import MISSING, DictConfig, ListConfig
-from typing_extensions import Literal
+from typing_extensions import Literal, assert_type
 
 from hydra_zen import (
     ZenField,
@@ -1025,3 +1025,16 @@ def check_launch():
 
     f(Xonf)
     launch(Xonf, f)
+
+
+def check_instantiate():
+    @dataclass
+    class Cfg:
+        ...
+
+    assert_type(instantiate(DictConfig({})), Any)
+    assert_type(instantiate({}), Any)
+    assert_type(instantiate(ListConfig([])), Any)
+    assert_type(instantiate([]), Any)
+    assert_type(instantiate(Cfg), Any)
+    assert_type(instantiate(Cfg()), Any)
