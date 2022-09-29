@@ -1,8 +1,5 @@
 name: Nightly
 
-env:
-  ON_GITHUB_ACTIONS: 1
-
 on:
   schedule:
     - cron: '0 2 * * *' # run at 2 AM UTC
