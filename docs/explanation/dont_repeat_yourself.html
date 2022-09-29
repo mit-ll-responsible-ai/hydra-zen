@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="Docutils 0.18.1: http://docutils.sourceforge.net/" name="generator"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="Docutils 0.19: https://docutils.sourceforge.io/" name="generator"/>
 <meta content="hydra-zen eliminates the repetitive patterns involved in designing a Hydra-based project by providing users with functions for dynamically generating configurations for their project." name="description"/>
 <title>Don’t Repeat Yourself: Keeping DRY with Dynamically-Generated Configs 🌞 — hydra-zen  documentation</title>
 <script>
@@ -20,7 +20,7 @@
 <link href="../_static/pygments.css" rel="stylesheet" type="text/css">
 <link href="../_static/copybutton.css" rel="stylesheet" type="text/css">
 <link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css">
-<link href="../_static/tabs.css" rel="stylesheet" type="text/css">
+<link href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" rel="stylesheet" type="text/css">
 <link href="../_static/hydra_zen_favicon_32x32.png" rel="icon" sizes="32x32" type="image/png">
 <link href="../_static/hydra_zen_favicon_64x64.png" rel="icon" sizes="64x64" type="image/png"/>
 <!-- Pre-loaded scripts that we'll load fully later -->
@@ -34,7 +34,7 @@
 <script src="../_static/copybutton.js"></script>
 <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
 <script src="../_static/gtag.js"></script>
-<script src="../_static/tabs.js"></script>
+<script src="../_static/design-tabs.js"></script>
 <script>DOCUMENTATION_OPTIONS.pagename = 'explanation/dont_repeat_yourself';</script>
 <link href="../genindex.html" rel="index" title="Index">
 <link href="../search.html" rel="search" title="Search"/>
@@ -268,8 +268,11 @@ you soaking <strong>WET (Writing Everything Twice)</strong>.</p>
 <section id="statically-defined-configs-are-wet">
 <h2>Statically-Defined Configs are WET<a class="headerlink" href="#statically-defined-configs-are-wet" title="Permalink to this heading">#</a></h2>
 <p>Manually writing a structured config for <code class="docutils literal notranslate"><span class="pre">DNN</span></code> entails hard-coding its current import-path as a string as wll as explicitly mirroring its signature:</p>
-<div class="sphinx-tabs docutils container">
-<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">dataclass-based config</button><button aria-controls="panel-0-0-1" aria-selected="false" class="sphinx-tabs-tab" id="tab-0-0-1" name="0-1" role="tab" tabindex="-1">yaml-based config</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><div class="literal-block-wrapper docutils container" id="id2">
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio"/>
+<label class="sd-tab-label" for="sd-tab-item-0">
+dataclass-based config</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id2">
 <div class="code-block-caption"><span class="caption-text">Manually configuring <code class="docutils literal notranslate"><span class="pre">DNN</span></code> with a dataclass</span><a class="headerlink" href="#id2" title="Permalink to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a>
 
@@ -283,7 +286,11 @@ you soaking <strong>WET (Writing Everything Twice)</strong>.</p>
 </pre></div>
 </div>
 </div>
-</div><div aria-labelledby="tab-0-0-1" class="sphinx-tabs-panel" hidden="true" id="panel-0-0-1" name="0-1" role="tabpanel" tabindex="0"><div class="literal-block-wrapper docutils container" id="id3">
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio"/>
+<label class="sd-tab-label" for="sd-tab-item-1">
+yaml-based config</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id3">
 <div class="code-block-caption"><span class="caption-text">Manually configuring <code class="docutils literal notranslate"><span class="pre">DNN</span></code> with a YAML file</span><a class="headerlink" href="#id3" title="Permalink to this code">#</a></div>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">vision.model.DNN</span><span class="w"></span>
 <span class="nt">input_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">???</span><span class="w"></span>
@@ -296,7 +303,8 @@ you soaking <strong>WET (Writing Everything Twice)</strong>.</p>
 </pre></div>
 </div>
 </div>
-</div></div>
+</div>
+</div>
 <p>Doing this once isn’t so cumbersome, but consider that any time we modify <code class="docutils literal notranslate"><span class="pre">DNN</span></code> by:</p>
 <ul class="simple">
 <li><p>changing its location (e.g. move it to <code class="docutils literal notranslate"><span class="pre">vision.classifiers.DNN</span></code>)</p></li>
