@@ -154,10 +154,9 @@ class Zen(Generic[P, T1]):
 
                 if more_than_one_required or len(_f_params) == 0:
                     raise HydraZenValidationError(
-                        f"pre_call fn {_f} must be able to accept a single positional argument"
+                        f"pre_call function {_f} must be able to accept a single "
+                        "positional argument"
                     )
-                del _f_params, more_than_one_required
-            del _f
 
         cfg = self._normalize_cfg(__cfg)
 
