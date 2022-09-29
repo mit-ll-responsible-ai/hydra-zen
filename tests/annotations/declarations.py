@@ -1075,3 +1075,12 @@ def check_zen():
     @zen(ZenWrapper=MyZen)
     def zen_rewrapped(x: int) -> str:
         ...
+
+    reveal_type(zen_rewrapped, expected_text="Zen[(x: int), str]")
+
+    def f(x: int):
+        ...
+
+    zen_rewrapped2 = zen(f, ZenWrapper=MyZen)
+
+    reveal_type(zen_rewrapped2, expected_text="Zen[(x: int), None]")
