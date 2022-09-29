@@ -1084,3 +1084,30 @@ def check_zen():
     zen_rewrapped2 = zen(f, ZenWrapper=MyZen)
 
     reveal_type(zen_rewrapped2, expected_text="Zen[(x: int), None]")
+
+    # valid pre-call
+    @zen(pre_call=lambda cfg: None)
+    def h1():
+        ...
+
+    @zen(pre_call=[lambda cfg: None])
+    def h2():
+        ...
+
+    @zen(pre_call=zen(lambda x, y: None))
+    def h3():
+        ...
+
+    # bad pre-call
+
+    @zen(pre_call=1)  # type: ignore
+    def g1():
+        ...
+
+    @zen(pre_call=lambda x, y: None)  # type: ignore
+    def g2():
+        ...
+
+    @zen(pre_call=[lambda x, y: None])  # type: ignore
+    def g3():
+        ...

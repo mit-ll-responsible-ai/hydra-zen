@@ -64,7 +64,7 @@ def test_zen_wrapper_trick(precall):
 
 
 @given(seed=st.sampled_from(range(4)))
-def test_zen_precall_precedes_instantiation(seed: int):
+def test_zen_pre_call_precedes_instantiation(seed: int):
     @zen(pre_call=zen(lambda seed: random.seed(seed)))
     def f(x: int, y: int):
         return x, y
@@ -263,6 +263,31 @@ def test_zen_validate_no_sig(not_inspectable):
         match="hydra_zen.zen can only wrap callables that possess inspectable signatures",
     ):
         zen(not_inspectable)
+
+
+@pytest.mark.parametrize(
+    "bad_pre_call", [lambda: None, lambda x, y: None, lambda x, y, z=1: None]
+)
+def test_pre_call_validates_wrong_num_args(bad_pre_call):
+    with pytest.raises(
+        HydraZenValidationError,
+        match=r"must be able to accept a single positional argument",
+    ):
+        zen(
+            lambda x: None,
+            pre_call=bad_pre_call,
+        ).validate({"x": 1})
+
+
+def test_pre_call_validates_bad_param_name():
+    with pytest.raises(
+        HydraZenValidationError,
+        match=r"`cfg` is missing the following fields",
+    ):
+        zen(
+            lambda x: None,
+            pre_call=zen(lambda missing: None),
+        ).validate({"x": 1})
 
 
 @pytest.mark.parametrize(
