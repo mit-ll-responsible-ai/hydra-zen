@@ -276,7 +276,7 @@ def test_pre_call_validates_wrong_num_args(bad_pre_call):
         zen(
             lambda x: None,
             pre_call=bad_pre_call,
-        ).validate({"x": 1})
+        )
 
 
 def test_pre_call_validates_bad_param_name():
@@ -354,7 +354,9 @@ class Pre:
     record = []
 
 
-pre_call_strat = st.just(lambda cfg: Pre.record.append(cfg.x))
+pre_call_strat = st.just(lambda cfg: Pre.record.append(cfg.x)) | st.just(
+    lambda cfg, optional=None: Pre.record.append(cfg.x)
+)
 
 
 @given(

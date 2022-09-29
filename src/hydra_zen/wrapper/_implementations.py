@@ -76,6 +76,8 @@ def _flat_call(x: Iterable[Callable[P, Any]]) -> Callable[P, None]:
     return f
 
 
+# TODO: enable specification of kwargs
+# TODO: Enable hydra_main to accept config directly -- auto register in config-store
 class Zen(Generic[P, T1]):
     # Specifies reserved parameter name specified to pass the
     # config through to the task function
@@ -94,14 +96,6 @@ class Zen(Generic[P, T1]):
                 "hydra_zen.zen can only wrap callables that possess inspectable signatures."
             )
 
-        self._pre_call_iterable = (
-            (pre_call,) if not isinstance(pre_call, Iterable) else pre_call
-        )
-
-        self.pre_call = (
-            pre_call if not isinstance(pre_call, Iterable) else _flat_call(pre_call)
-        )
-
         if self.CFG_NAME in self.parameters:
             self._has_zen_cfg = True
             self.parameters = {
@@ -111,6 +105,29 @@ class Zen(Generic[P, T1]):
             }
         else:
             self._has_zen_cfg = False
+
+        self._pre_call_iterable = (
+            (pre_call,) if not isinstance(pre_call, Iterable) else pre_call
+        )
+
+        # validate pre-call signatures
+        for _f in self._pre_call_iterable:
+            if _f is None:
+                continue
+
+            _f_params = signature(_f).parameters
+
+            if (sum(p.default is p.empty for p in _f_params.values()) > 1) or len(
+                _f_params
+            ) == 0:
+                raise HydraZenValidationError(
+                    f"pre_call function {_f} must be able to accept a single "
+                    "positional argument"
+                )
+
+        self.pre_call = (
+            pre_call if not isinstance(pre_call, Iterable) else _flat_call(pre_call)
+        )
 
     def _normalize_cfg(
         self,
@@ -142,21 +159,8 @@ class Zen(Generic[P, T1]):
 
     def validate(self, __cfg: Any, excluded_params: Iterable[str] = ()) -> None:
         for _f in self._pre_call_iterable:
-            if _f is None:
-                continue
             if isinstance(_f, Zen):
                 _f.validate(__cfg)
-            else:
-                _f_params = signature(_f).parameters
-                more_than_one_required = (
-                    sum(p.default is p.empty for p in _f_params.values()) > 1
-                )
-
-                if more_than_one_required or len(_f_params) == 0:
-                    raise HydraZenValidationError(
-                        f"pre_call function {_f} must be able to accept a single "
-                        "positional argument"
-                    )
 
         cfg = self._normalize_cfg(__cfg)
 
