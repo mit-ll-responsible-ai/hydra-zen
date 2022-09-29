@@ -157,17 +157,28 @@ def test_zen_cfg_passthrough(x: int, y: int):
     assert cfg == {"x": x, "y": y, "z": y}
 
 
-@given(x=st.integers(-5, 5))
-def test_custom_zen_wrapper(x):
+@given(x=st.integers(-5, 5), wrap_mode=st.sampled_from(["decorator", "inline"]))
+def test_custom_zen_wrapper(x, wrap_mode):
     class MyZen(Zen):
         CFG_NAME: str = "secret_cfg"
 
         def __call__(self, cfg) -> Tuple[Any, str]:
             return (super().__call__(cfg), "moo")
 
-    @zen(ZenWrapper=MyZen)
-    def f(x: int, secret_cfg):
-        return x, secret_cfg
+    if wrap_mode == "decorator":
+
+        @zen(ZenWrapper=MyZen)
+        def f(x: int, secret_cfg):
+            return x, secret_cfg
+
+    elif wrap_mode == "inline":
+
+        def _f(x: int, secret_cfg):
+            return x, secret_cfg
+
+        f = zen(_f, ZenWrapper=MyZen)
+    else:
+        assert False
 
     cfg = {"x": x}
     f.validate(cfg)
