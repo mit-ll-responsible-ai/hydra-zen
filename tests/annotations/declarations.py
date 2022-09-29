@@ -46,6 +46,7 @@ from hydra_zen.typing import (
 )
 from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds, StdBuilds
 from hydra_zen.typing._implementations import DataClass_, HydraPartialBuilds
+from hydra_zen.wrapper import Zen
 
 T = TypeVar("T")
 
@@ -1067,3 +1068,10 @@ def check_zen():
 
     zen_f2(1)  # type: ignore
     reveal_type(zen_f2.func, expected_text="(x: int) -> str")
+
+    class MyZen(Zen):
+        ...
+
+    @zen(ZenWrapper=MyZen)
+    def zen_rewrapped(x: int) -> str:
+        ...

@@ -10,6 +10,7 @@ from typing import (
     Generic,
     Iterable,
     List,
+    Mapping,
     Optional,
     Sequence,
     Tuple,
@@ -28,8 +29,8 @@ from hydra_zen import instantiate
 from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.typing._implementations import DataClass_
 
-from ._compatibility import HYDRA_SUPPORTS_LIST_INSTANTIATION, SUPPORTS_VERSION_BASE
-from .structured_configs._type_guards import is_dataclass
+from .._compatibility import HYDRA_SUPPORTS_LIST_INSTANTIATION, SUPPORTS_VERSION_BASE
+from ..structured_configs._type_guards import is_dataclass
 
 __all__ = ["zen"]
 
@@ -75,8 +76,11 @@ def _flat_call(x: Iterable[Callable[P, Any]]) -> Callable[P, None]:
     return f
 
 
-# TODO: add hydra-main method
 class Zen(Generic[P, T1]):
+    # Specifies reserved parameter name specified to pass the
+    # config through to the task function
+    CFG_NAME: str = "zen_cfg"
+
     def __init__(
         self,
         func: Callable[P, T1],
@@ -84,7 +88,7 @@ class Zen(Generic[P, T1]):
     ) -> None:
         self.func: Callable[P, T1] = func
         try:
-            self.parameters = signature(self.func).parameters
+            self.parameters: Mapping[str, Parameter] = signature(self.func).parameters
         except (ValueError, TypeError):
             raise HydraZenValidationError(
                 "hydra_zen.zen can only wrap callables that possess inspectable signatures."
@@ -93,7 +97,47 @@ class Zen(Generic[P, T1]):
             pre_call if not isinstance(pre_call, Iterable) else _flat_call(pre_call)
         )
 
-    def validate(self, cfg: Any, excluded_params: Iterable[str] = ()):
+        if self.CFG_NAME in self.parameters:
+            self._has_zen_cfg = True
+            self.parameters = {
+                name: param
+                for name, param in self.parameters.items()
+                if name != self.CFG_NAME
+            }
+        else:
+            self._has_zen_cfg = False
+
+    def _normalize_cfg(
+        self,
+        cfg: Union[
+            DataClass_,
+            Type[DataClass_],
+            Dict[Any, Any],
+            List[Any],
+            ListConfig,
+            DictConfig,
+            str,
+        ],
+    ) -> Container:
+        if is_dataclass(cfg):
+            # ensures that default factories and interpolated fields
+            # are resolved
+            cfg = OmegaConf.structured(cfg)
+
+        elif not OmegaConf.is_config(cfg):
+            if not isinstance(cfg, (dict, list, str)):
+                raise HydraZenValidationError(
+                    f"`cfg` Must be a dataclass, dict/DictConfig, list/ListConfig, or "
+                    f"yaml-string. Got {cfg}"
+                )
+            cfg = OmegaConf.create(cfg)
+
+        assert isinstance(cfg, Container)
+        return cfg
+
+    def validate(self, __cfg: Any, excluded_params: Iterable[str] = ()) -> None:
+        cfg = self._normalize_cfg(__cfg)
+
         excluded_params = set(excluded_params)
 
         num_pos_only = sum(
@@ -131,7 +175,7 @@ class Zen(Generic[P, T1]):
 
     def __call__(
         self,
-        cfg: Union[
+        __cfg: Union[
             DataClass_,
             Type[DataClass_],
             Dict[Any, Any],
@@ -145,26 +189,13 @@ class Zen(Generic[P, T1]):
         Parameters
         ----------
         cfg : dict | list | DataClass | Type[DataClass] | str
-            A config object or yaml-string whose attributes will be extracted by-name
-            according to the signature of `func` and passed to `func`.
+            (positional only) A config object or yaml-string whose attributes will be
+            extracted by-name according to the signature of `func` and passed to `func`.
 
             Attributes of types that can be instantiated by Hydra will be instantiated
             prior to being passed to `func`.
         """
-        if is_dataclass(cfg):
-            # ensures that default factories and interpolated fields
-            # are resolved
-            cfg = OmegaConf.structured(cfg)
-
-        elif not OmegaConf.is_config(cfg):
-            if not isinstance(cfg, (dict, list, str)):
-                raise HydraZenValidationError(
-                    f"`cfg` Must be a dataclass, dict/DictConfig, list/ListConfig, or "
-                    f"yaml-string. Got {cfg}"
-                )
-            cfg = OmegaConf.create(cfg)
-
-        assert isinstance(cfg, Container)
+        cfg = self._normalize_cfg(__cfg)
 
         # resolves all interpolated values in-place
         OmegaConf.resolve(cfg)
@@ -184,15 +215,16 @@ class Zen(Generic[P, T1]):
             if param.kind not in SKIPPED_PARAM_KINDS
         }
 
-        out = self.func(
+        extra_kwargs = {self.CFG_NAME: cfg} if self._has_zen_cfg else {}
+
+        return self.func(
             *(instantiate(x) if is_instantiable(x) else x for x in args_),
             **{
                 name: instantiate(val) if is_instantiable(val) else val
                 for name, val in cfg_kwargs.items()
             },
+            **extra_kwargs,
         )  # type: ignore
-
-        return out
 
     def hydra_main(
         self,
@@ -238,6 +270,7 @@ def zen(
     __func: Callable[P, T1],
     *,
     pre_call: PreCall = ...,
+    ZenWrapper: Type[Zen[P, T1]] = Zen,
 ) -> Zen[P, T1]:  # pragma: no cover
     ...
 
@@ -247,6 +280,7 @@ def zen(
     __func: Literal[None] = ...,
     *,
     pre_call: PreCall = ...,
+    ZenWrapper: Type[Zen[Any, Any]] = ...,
 ) -> Callable[[Callable[P, T1]], Zen[P, T1]]:  # pragma: no cover
     ...
 
@@ -255,12 +289,13 @@ def zen(
     __func: Optional[Callable[P, T1]] = None,
     *,
     pre_call: PreCall = None,
+    ZenWrapper: Type[Zen[P, T1]] = Zen,
 ) -> Union[Zen[P, T1], Callable[[Callable[P, T1]], Zen[P, T1]]]:
 
     if __func is not None:
-        return Zen(__func, pre_call=pre_call)
+        return ZenWrapper(__func, pre_call=pre_call)
 
     def wrap(f: Callable[P, T1]) -> Zen[P, T1]:
-        return Zen(func=f, pre_call=pre_call)
+        return ZenWrapper(func=f, pre_call=pre_call)
 
     return wrap

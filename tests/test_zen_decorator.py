@@ -1,17 +1,19 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+
 import os
 import random
 import sys
 from dataclasses import dataclass
+from typing import Any, Tuple
 
 import pytest
 from hypothesis import given, strategies as st
 from omegaconf import DictConfig
 
 from hydra_zen import builds, make_config, to_yaml, zen
-from hydra_zen._zen import Zen
 from hydra_zen.errors import HydraZenValidationError
+from hydra_zen.wrapper import Zen
 from tests.custom_strategies import everything_except
 
 
@@ -142,6 +144,38 @@ def test_zen_works_on_partiald_funcs():
     assert zen_pf(make_config(y="a")) == (1, "a")
     zen_pf.validate(make_config(x=2, y="a"))
     assert zen_pf(make_config(x=2, y="a")) == (2, "a")
+
+
+@given(x=st.integers(-5, 5), y=st.integers(-5, 5))
+def test_zen_cfg_passthrough(x: int, y: int):
+    @zen
+    def f(x: int, zen_cfg):
+        return (x, zen_cfg)
+
+    x_out, cfg = f({"x": x, "y": y, "z": "${y}"})
+    assert x_out == x
+    assert cfg == {"x": x, "y": y, "z": y}
+
+
+@given(x=st.integers(-5, 5))
+def test_custom_zen_wrapper(x):
+    class MyZen(Zen):
+        CFG_NAME: str = "secret_cfg"
+
+        def __call__(self, cfg) -> Tuple[Any, str]:
+            return (super().__call__(cfg), "moo")
+
+    @zen(ZenWrapper=MyZen)
+    def f(x: int, secret_cfg):
+        return x, secret_cfg
+
+    cfg = {"x": x}
+    f.validate(cfg)
+
+    (out_x1, cfg), moo = f(cfg)  # type: ignore
+    assert out_x1 == x
+    assert cfg == {"x": x}
+    assert moo == "moo"
 
 
 class A:
@@ -294,7 +328,7 @@ def test_multiple_pre_calls(pre_call):
     Pre.record.clear()
     cfg = make_config(x=1, y="a")
     g = zen_identity.func
-    assert zen(pre_call=pre_call)(g)(cfg=cfg) == 1
+    assert zen(pre_call=pre_call)(g)(cfg) == 1
     assert Pre.record == [1] * (len(pre_call) if isinstance(pre_call, list) else 1)
 
 

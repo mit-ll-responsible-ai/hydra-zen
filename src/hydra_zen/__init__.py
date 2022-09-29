@@ -10,7 +10,6 @@ from ._hydra_overloads import (
 )
 from ._launch import launch
 from ._version import get_versions
-from ._zen import zen
 from .structured_configs import (
     ZenField,
     builds,
@@ -22,6 +21,7 @@ from .structured_configs import (
 )
 from .structured_configs._implementations import get_target
 from .structured_configs._type_guards import is_partial_builds, uses_zen_processing
+from .wrapper._implementations import zen
 
 __all__ = [
     "builds",
