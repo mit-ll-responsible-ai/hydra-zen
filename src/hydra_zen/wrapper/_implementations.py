@@ -76,8 +76,9 @@ def _flat_call(x: Iterable[Callable[P, Any]]) -> Callable[P, None]:
     return f
 
 
-# TODO: enable specification of kwargs
+# TODO: enable specification of kwargs / extract-all
 # TODO: Enable hydra_main to accept config directly -- auto register in config-store
+# TODO: Enable kwarg-based calls of the function???
 class Zen(Generic[P, T1]):
     # Specifies reserved parameter name specified to pass the
     # config through to the task function
