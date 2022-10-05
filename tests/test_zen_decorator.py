@@ -392,4 +392,5 @@ def test_hydra_main():
         "x": 1,
         "y": 2,
         "z": "${y}",
+        "seed": 12,
     }
