@@ -31,7 +31,7 @@ _installed = {pkg.key for pkg in pkg_resources.working_set}
 
 for _module_name in OPTIONAL_TEST_DEPENDENCIES:
     if _module_name not in _installed:
-        collect_ignore_glob.append(f"**/*{_module_name}*.py")
+        collect_ignore_glob.append(f"*{_module_name}*.py")
 
 if sys.version_info > (3, 6):
     collect_ignore_glob.append("*py36*")
