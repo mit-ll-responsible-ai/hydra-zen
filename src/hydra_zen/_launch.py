@@ -1,8 +1,20 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import warnings
+from collections import UserList
 from dataclasses import fields, is_dataclass
-from typing import Any, Callable, List, Mapping, Optional, Type, Union
+from typing import (
+    Any,
+    Callable,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    cast,
+)
 
 from hydra import initialize
 from hydra._internal.callbacks import Callbacks
@@ -17,9 +29,73 @@ from hydra_zen._compatibility import HYDRA_VERSION
 from hydra_zen._hydra_overloads import instantiate
 from hydra_zen.typing._implementations import DataClass, InstOrType
 
+T = TypeVar("T", bound=Any)
+
 
 class _NotSet:  # pragma: no cover
     pass
+
+
+class multirun(UserList):
+    """Signals that a sequence is to be iterated over in a multirun"""
+
+    pass
+
+
+class hydra_list(UserList):
+    """Signals that a sequence is provided as a single configured value (i.e. it is not
+    to be iterated over during a multirun)"""
+
+    pass
+
+
+def _safe_name(x: Any) -> str:
+    return getattr(x, "__name__", str(x))
+
+
+def value_check(
+    name: str,
+    value: T,
+    type_: Union[type, Tuple[type, ...]],
+) -> T:
+    """
+    For internal use only.
+
+    Used to check the type of `value`. Numerical types can also be bound-checked.
+
+    Examples
+    --------
+    >>> value_check("x", 1, type_=str)
+    TypeError: `x` must be of type(s) `str`, got 1 (type: int)
+
+    Raises
+    ------
+    TypeError"""
+    # check internal params
+    assert isinstance(name, str), name
+
+    if not isinstance(value, type_):
+        raise TypeError(
+            f"`{name}` must be of type(s) "
+            f"`{_safe_name(type_)}`, got {value} (type: {_safe_name(type(value))})"
+        )
+
+    return cast(T, value)
+
+
+OverrideDict = Mapping[str, Union[int, float, bool, str, dict, multirun, hydra_list]]
+
+
+def _process_dict_overrides(overrides: OverrideDict) -> List[str]:
+    launch_overrides = []
+    if overrides is not None:
+        for k, v in overrides.items():
+            value_check(k, v, type_=(int, float, bool, str, dict, multirun, hydra_list))
+            if isinstance(v, multirun):
+                v = ",".join(str(item) for item in v)
+
+            launch_overrides.append(f"{k}={v}")
+    return launch_overrides
 
 
 def _store_config(
@@ -58,7 +134,7 @@ def _store_config(
 def launch(
     config: Union[InstOrType[DataClass], Mapping[str, Any]],
     task_function: Callable[[Any], Any],
-    overrides: Optional[List[str]] = None,
+    overrides: Optional[Union[OverrideDict, List[str]]] = None,
     multirun: bool = False,
     version_base: Optional[Union[str, Type[_NotSet]]] = _NotSet,
     to_dictconfig: bool = False,
@@ -232,6 +308,11 @@ def launch(
     else:
         config_name = _store_config(config, config_name)
 
+    # allow user to provide a dictionary of override values
+    # instead of just a list of strings
+    if isinstance(overrides, Mapping):
+        overrides = _process_dict_overrides(overrides)
+
     # Initializes Hydra and add the config_path to the config search path
     with initialize(
         config_path=None,
@@ -240,7 +321,7 @@ def launch(
             {}
             if (HYDRA_VERSION < (1, 2, 0) or version_base is _NotSet)
             else {"version_base": version_base}
-        )
+        ),
     ):
 
         # taken from hydra.compose with support for MULTIRUN
