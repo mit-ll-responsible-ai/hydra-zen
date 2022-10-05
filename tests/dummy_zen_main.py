@@ -8,7 +8,7 @@ cs.store(name="my_app", node=make_config("x", "y", z="${y}"))
 
 @zen
 def f(x: int, y: int, z: int):
-    ...
+    return x + y + z
 
 
 if __name__ == "__main__":
