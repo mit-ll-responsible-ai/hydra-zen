@@ -126,7 +126,7 @@ class Zen(Generic[P, T1]):
                     "positional argument"
                 )
 
-        self.pre_call = (
+        self.pre_call: Optional[Callable[[Any], Any]] = (
             pre_call if not isinstance(pre_call, Iterable) else _flat_call(pre_call)
         )
 
