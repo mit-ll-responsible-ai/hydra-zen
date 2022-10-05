@@ -24,7 +24,7 @@ OPTIONAL_TEST_DEPENDENCIES = (
     "pytorch_lightning",
     "pydantic",
     "beartype",
-    "hydra_submitit_launcher",
+    "submitit",
 )
 
 _installed = {pkg.key for pkg in pkg_resources.working_set}
