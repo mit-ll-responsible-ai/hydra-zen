@@ -1,10 +1,12 @@
 import string
+from pathlib import Path
 
 import hypothesis.strategies as st
 import pytest
 from hypothesis import given, settings
+from omegaconf import ListConfig
 
-from hydra_zen import instantiate, launch, make_config
+from hydra_zen import instantiate, launch, load_from_yaml, make_config
 from hydra_zen._launch import hydra_list, multirun, value_check
 
 any_types = st.from_type(type)
@@ -61,7 +63,6 @@ def test_overrides_roundtrip(
     list_,
     mrun,
 ):
-
     overrides = {
         "+int_": int_,
         "+float_": float_,
@@ -76,6 +77,61 @@ def test_overrides_roundtrip(
     for i, job in enumerate(jobs):
         assert job.return_value.int_ == int_
         assert job.return_value.bool_ == bool_
+        assert job.return_value.float_ == float_
         assert job.return_value.str_ == str_
         assert job.return_value.list_ == list_
         assert job.return_value.mrun == mrun[i]
+
+
+@pytest.mark.usefixtures("cleandir")
+@settings(max_examples=10, deadline=None)
+@given(
+    int_=st.integers(),
+    bool_=st.booleans(),
+    float_=st.floats(-10, 10),
+    list_=st.lists(st.integers()),
+    str_=st.text(alphabet=string.ascii_lowercase).filter(
+        lambda x: x != "true" and x != "false"
+    ),
+    mrun=st.lists(
+        st.booleans() | st.lists(st.integers()),
+        min_size=2,
+        max_size=5,
+    ),
+)
+def test_overrides_yaml(
+    int_,
+    bool_,
+    float_,
+    str_,
+    list_,
+    mrun,
+):
+    overrides = {
+        "+int_": int_,
+        "+float_": float_,
+        "+str_": str_,
+        "+bool_": bool_,
+        "+list_": hydra_list(list_),
+        "+mrun": multirun(mrun),
+    }
+    (jobs,) = launch(make_config(), instantiate, overrides, multirun=True)
+
+    assert len(jobs) == len(mrun)
+    for i, job in enumerate(jobs):
+        overrides_yamls = list(Path(job.working_dir).glob("**/overrides.yaml"))
+        assert len(overrides_yamls) == 1
+        overrides_yaml = overrides_yamls[0]
+
+        yaml = load_from_yaml(overrides_yaml)
+        assert isinstance(yaml, ListConfig)
+        assert len(yaml) == 6
+        for param_val in yaml:
+            param, val = param_val.split("=")
+            assert param in list(overrides.keys())
+
+            override_val = overrides[param]
+            if isinstance(override_val, multirun):
+                assert val == str(mrun[i]).strip().replace(" ", "")
+            else:
+                assert val == str(override_val).strip().replace(" ", "")
