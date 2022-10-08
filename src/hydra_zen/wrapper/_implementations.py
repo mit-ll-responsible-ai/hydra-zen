@@ -23,7 +23,7 @@ from typing import (
 import hydra
 from hydra.main import _UNSPECIFIED_  # type: ignore
 from omegaconf import Container, DictConfig, ListConfig, OmegaConf
-from typing_extensions import Literal, ParamSpec, TypeGuard
+from typing_extensions import Literal, ParamSpec, TypeAlias, TypeGuard
 
 from hydra_zen import instantiate
 from hydra_zen.errors import HydraZenValidationError
@@ -31,6 +31,7 @@ from hydra_zen.typing._implementations import DataClass_
 
 from .._compatibility import HYDRA_SUPPORTS_LIST_INSTANTIATION, SUPPORTS_VERSION_BASE
 from ..structured_configs._type_guards import is_dataclass
+from ..structured_configs._utils import safe_name
 
 __all__ = ["zen"]
 
@@ -44,19 +45,19 @@ if HYDRA_SUPPORTS_LIST_INSTANTIATION:
 else:  # pragma: no cover
     _SUPPORTED_INSTANTIATION_TYPES: Tuple[Any, ...] = (dict, DictConfig)  # type: ignore
 
+ConfigLike: TypeAlias = Union[
+    DataClass_,
+    Type[DataClass_],
+    DictConfig,
+    ListConfig,
+    List[Any],
+    Dict[str, Any],
+]
+
 
 def is_instantiable(
     cfg: Any,
-) -> TypeGuard[
-    Union[
-        DataClass_,
-        Type[DataClass_],
-        DictConfig,
-        ListConfig,
-        List[Any],
-        Dict[str, Any],
-    ]
-]:
+) -> TypeGuard[ConfigLike]:
     return is_dataclass(cfg) or isinstance(cfg, _SUPPORTED_INSTANTIATION_TYPES)
 
 
@@ -78,11 +79,13 @@ def _flat_call(x: Iterable[Callable[P, Any]]) -> Callable[P, None]:
 
 # TODO: enable specification of kwargs / extract-all
 # TODO: Enable hydra_main to accept config directly -- auto register in config-store
-# TODO: Enable kwarg-based calls of the function???
 class Zen(Generic[P, T1]):
     # Specifies reserved parameter name specified to pass the
     # config through to the task function
     CFG_NAME: str = "zen_cfg"
+
+    def __repr__(self) -> str:
+        return f"zen[{(safe_name(self.func))}({', '.join(self.parameters)})](cfg, /)"
 
     def __init__(
         self,
@@ -202,15 +205,7 @@ class Zen(Generic[P, T1]):
 
     def __call__(
         self,
-        __cfg: Union[
-            DataClass_,
-            Type[DataClass_],
-            Dict[Any, Any],
-            List[Any],
-            ListConfig,
-            DictConfig,
-            str,
-        ],
+        __cfg: Union[ConfigLike, str],
     ) -> T1:
         """
         Parameters
@@ -282,7 +277,7 @@ class Zen(Generic[P, T1]):
         Returns
         -------
         hydra_main : Callable[[Any], Any]
-            hydra.main(zen(func))
+            hydra.main(zen(func))()
         """
 
         kw = dict(config_path=config_path, config_name=config_name)
@@ -318,7 +313,116 @@ def zen(
     pre_call: PreCall = None,
     ZenWrapper: Type[Zen[P, T1]] = Zen,
 ) -> Union[Zen[P, T1], Callable[[Callable[P, T1]], Zen[P, T1]]]:
+    """zen(func, /, pre_call, ZenWrapper)
 
+    A decorator that returns a function that will auto-extract, resolve, and
+    instantiate fields from an input config based on the decorated function's signature.
+
+    .. code-block:: pycon
+
+       >>> Cfg = dict(x=1, y=builds(int, 4), z="${y}", unused=100)
+       >>> zen(lambda x, y, z : x+y+z)(Cfg)
+       9
+
+    The main purpose of `zen` is to enable a user to write/use Hydra-agnostic functions
+    as the task functions for their Hydra app.
+
+    Parameters
+    ----------
+    func : Callable[Sig, R]
+        The function being decorated. (This is a positional-only argument)
+
+    pre_call : Optional[Callable[[Any], Any] | Iterable[Callable[[Any], Any]]]
+        One or more functions that will be called with the input config prior
+        to the decorated functions. An iterable of pre-call functions are called
+        from left (low-index) to right (high-index).
+
+    ZenWrapper : Type[hydra_zen.wrapper.Zen], optional (default=Zen)
+        If specified, a subclass of `Zen` that customizes the behavior of the wrapper.
+
+    Returns
+    -------
+    Zen[Sig, R]
+        A callable with signature (conf: ConfigLike) -> R
+
+        The wrapped function, an instance of `hydra_zen.wrapper.Zen`, which accepts
+        a single Hydra config. The parameters of the decorated function determine the
+        fields that are extracted from the config; only those fields that are accessed
+        will be resolved and instantiated.
+
+    Notes
+    -----
+    ConfigLike is DataClass | list[Any] | dict[str, Any] | DictConfig | ListConfig
+
+    The fields extracted from the input config are determined by the signature of the
+    decorated function. There is an exception: including a parameter named "zen_cfg"
+    in the function's signature will signal to `zen` to pass through the full config to
+    that field (This specific parameter name can be overridden via `Zen.CFG_NAME`).
+
+    All values (extracted from the input config) of types belonging to ConfigLike will
+    be instantiated before being passed to the wrapped function.
+
+    Examples
+    --------
+    **Basic Usage**
+
+    Using `zen` as a decorator
+
+    >>> from hydra_zen import zen, make_config, builds
+    >>> @zen
+    ... def f(x, y): return x + y
+
+    The resulting decorated function accepts a single argument: a Hydra-compatible config that has the attributes "x" and "y":
+
+    >>> f
+    zen[f(x, y)](cfg, /)
+
+    Dataclasses, dictionaries, and omegaconf containers are acceptable inputs.
+    Interpolated fields will be resolved and sub-configs will be instantiated.
+    Excess fields in the config are unused.
+
+    >>> f(make_config(x=1, y=2, z=999))  # z is not used
+    3
+    >>> f(dict(x=2, y="${x}"))  # y will resolve to 2
+    4
+    >>> f(dict(x=2, y=builds(int, 10)))  # y will instantiate to 10
+    12
+
+    The wrapped function can be accessed directly
+
+    >>> f.func
+    <function __main__.f(x, y)>
+    >>> f.func(-1, 1)
+    0
+
+    **Using `@zen` instead of `@hydra.main`**
+
+    The object returned by zen provides a convenience method – `Zen.hydra_main` – so
+    that users need not double-wrap with `@hydra.main` to create a CLI:
+
+    .. code-block:: python
+
+        # example.py
+        from hydra.core.config_store import ConfigStore
+
+        from hydra_zen import builds, zen
+
+        def f(x: int, y: int):
+            print(x, y)
+
+        cs = ConfigStore.instance()
+        cs.store(name="my_app", node=builds(f, populate_full_signature=True))
+
+
+        if __name__ == "__main__":
+            zen(f).hydra_main(config_name="my_app", config_path=None)
+
+    .. code-block:: console
+
+       $ python example.py x=1 y=2
+       1 2
+
+    """
     if __func is not None:
         return ZenWrapper(__func, pre_call=pre_call)
 

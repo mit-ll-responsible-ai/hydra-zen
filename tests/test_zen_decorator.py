@@ -47,6 +47,30 @@ def test_zen_basic_usecase():
     assert f(Cfg) == 2 * "cow"
 
 
+def test_zen_repr():
+    assert repr(zen(lambda x, y: None)) == "zen[<lambda>(x, y)](cfg, /)"
+    assert (
+        repr(zen(pre_call=lambda x: x)(lambda x, y: None))
+        == "zen[<lambda>(x, y)](cfg, /)"
+    )
+    assert repr(zen(make_config("x", "y"))) == "zen[Config(x, y)](cfg, /)"
+
+
+@pytest.mark.parametrize(
+    "target",
+    [
+        function,
+        function_with_args,
+        function_with_kwargs,
+        function_with_args_kwargs,
+        zen_identity,
+        make_config("x", "y"),
+    ],
+)
+def test_repr_doesnt_crash(target):
+    assert isinstance(repr(target), str)
+
+
 @pytest.mark.parametrize("precall", [None, lambda x: x])
 def test_zen_wrapper_trick(precall):
     def f(x):

@@ -12,9 +12,9 @@ Encyclopedia Hydrazennica.
 All reference documentation includes detailed Examples sections. Please scroll to the 
 bottom of any given reference page to see the examples.
 
-*************************
-Launching Jobs with Hydra
-*************************
+**************************************
+Creating and Launching Jobs with Hydra
+**************************************
 
 hydra-zen provides users the ability to launch a Hydra job via a 
 Python function instead of from a commandline interface.
@@ -25,7 +25,7 @@ Python function instead of from a commandline interface.
    :toctree: generated/
 
    launch
-
+   zen
 
 *********************************
 Creating and Working with Configs
