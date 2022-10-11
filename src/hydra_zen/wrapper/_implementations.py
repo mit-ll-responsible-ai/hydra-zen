@@ -277,7 +277,7 @@ class Zen(Generic[P, T1]):
         Returns
         -------
         hydra_main : Callable[[Any], Any]
-            hydra.main(zen(func))()
+            hydra.main(zen(func), [...])()
         """
 
         kw = dict(config_path=config_path, config_name=config_name)
@@ -345,10 +345,11 @@ def zen(
     Zen[Sig, R]
         A callable with signature (conf: ConfigLike) -> R
 
-        The wrapped function, an instance of `hydra_zen.wrapper.Zen`, which accepts
-        a single Hydra config. The parameters of the decorated function determine the
-        fields that are extracted from the config; only those fields that are accessed
-        will be resolved and instantiated.
+        The wrapped function is an instance of `hydra_zen.wrapper.Zen` and accepts
+        a single Hydra config (a dataclass, dictionary, or omegaconf container). The
+        parameters of the decorated function's signature determine the fields that are
+        extracted from the config; only those fields that are accessed will be resolved
+        and instantiated.
 
     Notes
     -----
@@ -377,9 +378,9 @@ def zen(
     >>> f
     zen[f(x, y)](cfg, /)
 
-    Dataclasses, dictionaries, and omegaconf containers are acceptable inputs.
-    Interpolated fields will be resolved and sub-configs will be instantiated.
-    Excess fields in the config are unused.
+    "Configs" – dataclasses, dictionaries, and omegaconf containers – are acceptable
+    inputs to zen-wrapped functions. Interpolated fields will be resolved and
+    sub-configs will be instantiated. Excess fields in the config are unused.
 
     >>> f(make_config(x=1, y=2, z=999))  # z is not used
     3
@@ -395,6 +396,44 @@ def zen(
     >>> f.func(-1, 1)
     0
 
+    `zen` is compatible with partial'd functions.
+
+    >>> from functools import partial
+    >>> pf = partial(lambda x, y: x + y, x=10)
+    >>> zpf = zen(pf)
+    >>> zpf(dict(y=1))
+    11
+    >>> zpf(dict(x='${y}', y=1))
+    2
+
+    **Including a pre-call function**
+
+    Given that a zen-wrapped function will automatically extract and instantiate config
+    fields upon being called, it can be necessary to include a pre-call step that
+    occurs prior to any instantiation. `zen` can be passed one or more pre-call
+    functions that will be called with the input config as a precursor to calling the
+    decorated function.
+
+    Consider the following scenario where the config's instantiation involves drawing a
+    random value, which we want to be made deterministic with a configurable seed. We
+    will use a pre-call function to seed the RNG.
+
+    >>> import random
+    >>> from hydra_zen import builds, zen
+
+    >>> Cfg = dict(
+    ...         rand_val=builds(random.randint, 0, 10),
+    ...         seed=0,
+    ... )
+
+    >>> @zen(pre_call=lambda cfg: random.seed(cfg.seed))
+    ... def f(rand_val: int):
+    ...     return rand_val
+
+    >>> [f(Cfg) for _ in range(10)]
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6]
+
+
     **Using `@zen` instead of `@hydra.main`**
 
     The object returned by zen provides a convenience method – `Zen.hydra_main` – so
@@ -407,15 +446,15 @@ def zen(
 
         from hydra_zen import builds, zen
 
-        def f(x: int, y: int):
+        def task(x: int, y: int):
             print(x, y)
 
         cs = ConfigStore.instance()
-        cs.store(name="my_app", node=builds(f, populate_full_signature=True))
+        cs.store(name="my_app", node=builds(task, populate_full_signature=True))
 
 
         if __name__ == "__main__":
-            zen(f).hydra_main(config_name="my_app", config_path=None)
+            zen(task).hydra_main(config_name="my_app", config_path=None)
 
     .. code-block:: console
 
