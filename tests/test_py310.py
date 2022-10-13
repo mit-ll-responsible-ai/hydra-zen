@@ -5,7 +5,6 @@ import sys
 assert sys.version_info > (3, 9)
 
 from dataclasses import KW_ONLY, dataclass
-from typing import Any, Dict, List, Tuple
 
 import pytest
 from omegaconf import OmegaConf

@@ -15,7 +15,7 @@ def test_hydrated_simple_example():
 
 
 def power(x: float, exponent: float) -> float:
-    return x ** exponent
+    return x**exponent
 
 
 def test_hydrated_with_partial_exampled():
