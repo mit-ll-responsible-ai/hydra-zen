@@ -6,14 +6,18 @@ build-backend = "setuptools.build_meta"
 name = "hydra_zen"
 dynamic = ["version"]
 description = "Configurable, reproducible, and scalable workflows in Python, via Hydra"
-
-
+readme = "README.md"
 requires-python = ">=3.7"
+dependencies=[
+  "hydra-core >= 1.1.0",
+  "typing-extensions >= 4.1.0",
+]
 license = {file = "LICENSE.txt"}
-keywords= [ "machine learning", "research", "configuration", "scalable", "reproducible", "yaml", "Hydra", "dataclass"]  # Optional
+keywords= [ "machine learning", "research", "configuration", "scalable", "reproducible", "yaml", "Hydra", "dataclass"]
+
 authors = [
-  {name = "Justin Goodwin", email = "jgoodwin@ll.mit.edu" },
   {name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" },
+  {name = "Justin Goodwin", email = "jgoodwin@ll.mit.edu" },
 ]
 maintainers = [
   {name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" },
@@ -30,11 +34,6 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Topic :: Scientific/Engineering",
     "Programming Language :: Python :: 3 :: Only",
-]
-
-dependencies=[
-  "hydra-core >= 1.1.0",
-  "typing-extensions >= 4.1.0",
 ]
 
 [project.optional-dependencies]
@@ -56,7 +55,7 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
-exclude = ["hydra_zen.tests*", "hydra_zen.tests.*"]
+exclude = ["tests*", "tests.*"]
 
 [tool.setuptools.package-data]
 hydra_zen = ["py.typed"]
@@ -72,11 +71,7 @@ parentdir_prefix = "hydra_zen-"
 [tool.isort]
 known_first_party = ["hydra_zen", "tests"]
 profile = "black"
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
 combine_as_imports = true
-line_length = 88
 
 [tool.coverage.report]
 omit = ["src/hydra_zen/_version.py"]
