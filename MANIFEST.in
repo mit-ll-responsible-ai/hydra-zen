@@ -1,3 +1,0 @@
-include versioneer.py
-include src/hydra_zen/_version.py
-exclude project_tooling/*
