@@ -43,9 +43,8 @@ __all__ = [
 
 if not TYPE_CHECKING:
     try:
-        from ._version import version as __version__, version_tuple
-    except ImportError:
+        from ._version import version as __version__
+    except ImportError:  # pragma: no cover
         __version__ = "unknown version"
-        version_tuple = (0, 0, "unknown version")
-else:
+else:  # pragma: no cover
     __version__: str

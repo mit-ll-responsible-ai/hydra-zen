@@ -1,6 +1,8 @@
 [build-system]
-requires = [ "setuptools >= 35.0.2", "wheel >= 0.29.0", "setuptools_scm[toml]>=6.0"]
+requires = [ "setuptools >= 35.0.2", "wheel >= 0.29.0", "setuptools_scm[toml]==7.0.5"]
 build-backend = "setuptools.build_meta"
+
+
 
 [project]
 name = "hydra_zen"
@@ -49,9 +51,13 @@ beartype = ["beartype>=0.8.0"]
 "Bug Reports" = "https://github.com/mit-ll-responsible-ai/hydra-zen/issues"
 "Source" = "https://github.com/mit-ll-responsible-ai/hydra-zen"
 
+
+
 [tool.setuptools_scm]
 write_to = "src/hydra_zen/_version.py"
 version_scheme = "no-guess-dev"
+
+
 
 [tool.setuptools]
 package-dir = {"" = "src"}
@@ -63,25 +69,37 @@ exclude = ["tests*", "tests.*"]
 [tool.setuptools.package-data]
 hydra_zen = ["py.typed"]
 
-# [tool.versioneer]
-# VCS = "git"
-# style = "pep440"
-# versionfile_source = "src/hydra_zen/_version.py"
-# versionfile_build = "hydra_zen/_version.py"
-# tag_prefix = "v"
-# parentdir_prefix = "hydra_zen-"
+
 
 [tool.isort]
 known_first_party = ["hydra_zen", "tests"]
 profile = "black"
 combine_as_imports = true
 
+
+
 [tool.coverage.report]
 omit = ["src/hydra_zen/_version.py"]
+
+
+
+[tool.pyright]
+include = ["src"]
+exclude = [
+       "**/node_modules",
+       "**/__pycache__",
+       "src/hydra_zen/_version.py",
+       "**/third_party",
+]
+reportUnnecessaryTypeIgnoreComment = true
+reportUnnecessaryIsInstance = false
+
+
 
 [tool.tox]
 legacy_tox_ini = """
 [tox]
+isolated_build = True
 envlist = py37, py38, py39, py310, ml-env
 
 [gh-actions]

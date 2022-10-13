@@ -62,6 +62,12 @@ def requires_A(x: int):
     pass
 
 
+def check_version():
+    import hydra_zen
+
+    reveal_type(hydra_zen.__version__, expected_text="str")
+
+
 # test type behaviors
 def check_partial_builds_on_class():
     reveal_type(
