@@ -1,0 +1,190 @@
+[build-system]
+requires = [ "setuptools >= 35.0.2", "wheel >= 0.29.0", "setuptools_scm[toml]==7.0.5"]
+build-backend = "setuptools.build_meta"
+
+
+
+[project]
+name = "hydra_zen"
+dynamic = ["version"]
+description = "Configurable, reproducible, and scalable workflows in Python, via Hydra"
+readme = "README.md"
+requires-python = ">=3.7"
+dependencies=[
+  "hydra-core >= 1.1.0",
+  "typing-extensions >= 4.1.0",
+]
+license = {file = "LICENSE.txt"}
+keywords= [ "machine learning", "research", "configuration", "scalable", "reproducible", "yaml", "Hydra", "dataclass"]
+
+authors = [
+  {name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" },
+  {name = "Justin Goodwin", email = "jgoodwin@ll.mit.edu" },
+]
+maintainers = [
+  {name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" },
+]
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Scientific/Engineering",
+    "Programming Language :: Python :: 3 :: Only",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest >= 3.8",
+    "hypothesis >= 6.28.0",
+]
+pydantic = ["pydantic>=1.8.2"]
+beartype = ["beartype>=0.8.0"]
+
+[project.urls]
+"Homepage" = "https://mit-ll-responsible-ai.github.io/hydra-zen/"
+"Bug Reports" = "https://github.com/mit-ll-responsible-ai/hydra-zen/issues"
+"Source" = "https://github.com/mit-ll-responsible-ai/hydra-zen"
+
+
+
+[tool.setuptools_scm]
+write_to = "src/hydra_zen/_version.py"
+version_scheme = "no-guess-dev"
+
+
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["tests*", "tests.*"]
+
+[tool.setuptools.package-data]
+hydra_zen = ["py.typed"]
+
+
+
+[tool.isort]
+known_first_party = ["hydra_zen", "tests"]
+profile = "black"
+combine_as_imports = true
+
+
+
+[tool.coverage.report]
+omit = ["src/hydra_zen/_version.py"]
+
+
+
+[tool.pyright]
+include = ["src"]
+exclude = [
+       "**/node_modules",
+       "**/__pycache__",
+       "src/hydra_zen/_version.py",
+       "**/third_party",
+]
+reportUnnecessaryTypeIgnoreComment = true
+reportUnnecessaryIsInstance = false
+
+
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+isolated_build = True
+envlist = py37, py38, py39, py310, ml-env
+
+[gh-actions]
+python =
+  3.7: py37
+  3.8: py38
+  3.9: py38
+  3.10: py310
+
+
+[testenv]
+deps = pytest
+       hypothesis
+commands = pytest \
+           {posargs}
+
+
+[testenv:min-deps]  # test against minimum dependency versions
+deps = hydra-core==1.1.0
+       omegaconf==2.1.1
+       typing-extensions==4.1.0
+       {[testenv]deps}
+basepython = python3.7
+
+
+[testenv:pre-release]  # test against pre-releases of dependencies
+pip_pre = true
+deps = {[testenv]deps}
+       pydantic
+       beartype
+       cloudpickle
+basepython = python3.8
+
+[testenv:hydra-1p1p2-pre-release]  # test against pre-releases of dependencies
+pip_pre = true
+deps = hydra-core==1.1.2
+       {[testenv]deps}
+       pydantic
+       beartype
+       cloudpickle
+basepython = python3.8
+
+[testenv:omegaconf-2p2p2]  # guard against regressions for type sanitization
+pip_pre = true
+deps = omegaconf==2.2.2
+       {[testenv]deps}
+       pydantic
+       beartype
+       cloudpickle
+basepython = python3.8
+
+[testenv:coverage]
+setenv = NUMBA_DISABLE_JIT=1
+usedevelop = true
+basepython = python3.8
+deps = {[testenv]deps}
+       coverage[toml]
+       pytest-cov
+       numpy
+       pydantic
+       beartype
+       cloudpickle
+commands = pytest --cov-report term-missing --cov-config=pyproject.toml --cov-fail-under=100 --cov=hydra_zen tests
+
+
+[testenv:third-party]
+install_command = pip install --upgrade --upgrade-strategy eager {opts} {packages}
+basepython = python3.8
+deps = {[testenv]deps}
+       torch
+       pytorch-lightning
+       numpy
+       jaxlib
+       jax
+       pydantic
+       beartype
+
+
+[testenv:format]
+deps =
+    autoflake
+    black
+    isort
+commands =
+    autoflake --recursive --in-place --remove-duplicate-keys --remove-unused-variables .
+    isort .
+    black .
+"""
