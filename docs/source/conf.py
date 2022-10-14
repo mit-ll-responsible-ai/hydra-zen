@@ -42,7 +42,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "numpydoc",
     "sphinx_copybutton",
-    "sphinx_tabs.tabs",
+    "sphinx_design",
     "sphinx_codeautolink",
 ]
 

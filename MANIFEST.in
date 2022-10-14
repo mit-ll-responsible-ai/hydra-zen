@@ -1,3 +1,3 @@
-include versioneer.py
-include src/hydra_zen/_version.py
-exclude project_tooling/*
+recursive-exclude tests *
+recursive-exclude project_tooling *
+global-exclude *.py[cod]

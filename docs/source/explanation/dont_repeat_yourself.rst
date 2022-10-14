@@ -39,9 +39,10 @@ Statically-Defined Configs are WET
 
 Manually writing a structured config for ``DNN`` entails hard-coding its current import-path as a string as wll as explicitly mirroring its signature:
 
-.. tabs::
 
-   .. tab:: dataclass-based config
+.. tab-set::
+
+   .. tab-item:: dataclass-based config
 
       .. code-block:: python
          :caption: Manually configuring ``DNN`` with a dataclass
@@ -56,7 +57,7 @@ Manually writing a structured config for ``DNN`` entails hard-coding its current
              device: str = "cpu"
              _target_: str = "vision.model.DNN"
 
-   .. tab:: yaml-based config
+   .. tab-item:: yaml-based config
 
       .. code-block:: yaml
          :caption: Manually configuring ``DNN`` with a YAML file
