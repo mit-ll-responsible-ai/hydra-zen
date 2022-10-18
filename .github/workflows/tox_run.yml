@@ -80,7 +80,7 @@ jobs:
         pip install tox tox-gh-actions
     - name: Cache tox environments
       id: cache-third-party
-      uses: actions/cache@v3
+      uses: actions/cache@v3.0.11
       with:
         path: .tox
         key: tox-third-party-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
@@ -162,7 +162,7 @@ jobs:
       id: npm-cache
       run: |
         echo "::set-output name=dir::$(npm config get cache)"
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3.0.11
       with:
         path: ${{ steps.npm-cache.outputs.dir }}
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
