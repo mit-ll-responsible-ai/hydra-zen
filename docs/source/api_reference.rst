@@ -26,6 +26,7 @@ Python function instead of from a commandline interface.
 
    launch
    zen
+   wrapper.Zen
 
 *********************************
 Creating and Working with Configs

@@ -257,6 +257,9 @@ class Zen(Generic[P, R]):
 
     def __call__(self, __cfg: Union[ConfigLike, str]) -> R:
         """
+        Extracts values from the input config based on the decorated function's
+        signature, resolves & instantiates them, and calls the function with them.
+
         Parameters
         ----------
         cfg : dict | list | DataClass | Type[DataClass] | str
@@ -331,7 +334,7 @@ class Zen(Generic[P, R]):
         Returns
         -------
         hydra_main : Callable[[Any], Any]
-            hydra.main(zen(func), [...])()
+            Equivalent to `hydra.main(zen(func), [...])()`
         """
 
         kw = dict(config_path=config_path, config_name=config_name)
@@ -370,7 +373,7 @@ def zen(
     exclude: Optional[Union[str, Iterable[str]]] = None,
     ZenWrapper: Type[Zen[P, R]] = Zen,
 ) -> Union[Zen[P, R], Callable[[Callable[P, R]], Zen[P, R]]]:
-    """zen(func, /, pre_call, ZenWrapper)
+    r"""zen(func, /, pre_call, ZenWrapper)
 
     A decorator that returns a function that will auto-extract, resolve, and
     instantiate fields from an input config based on the decorated function's signature.
@@ -378,7 +381,7 @@ def zen(
     .. code-block:: pycon
 
        >>> Cfg = dict(x=1, y=builds(int, 4), z="${y}", unused=100)
-       >>> zen(lambda x, y, z : x+y+z)(Cfg)
+       >>> zen(lambda x, y, z : x+y+z)(Cfg)  # x=1, y=4, z=4
        9
 
     The main purpose of `zen` is to enable a user to write/use Hydra-agnostic functions
@@ -394,6 +397,9 @@ def zen(
         to the decorated functions. An iterable of pre-call functions are called
         from left (low-index) to right (high-index).
 
+        This is useful, e.g., for seeding a RNG prior to the instantiation phase
+        that is triggered when calling the decorated function.
+
     exclude: Optional[str | Iterable[str]]
         Specifies one or more parameter names in the function's signature
         that will not be extracted from input configs by the zen-wrapped function.
@@ -406,7 +412,7 @@ def zen(
     Returns
     -------
     Zen[Sig, R]
-        A callable with signature (conf: ConfigLike) -> R
+        A callable with signature `(conf: ConfigLike, \\) -> R`
 
         The wrapped function is an instance of `hydra_zen.wrapper.Zen` and accepts
         a single Hydra config (a dataclass, dictionary, or omegaconf container). The
@@ -469,7 +475,8 @@ def zen(
     >>> zpf(dict(x='${y}', y=1))
     2
 
-    Excluding particular variables from being extracted from a config:
+    One can specify `exclude` to prevent particular variables from being extracted from
+    a config:
 
     >>> def f(x=1, y=2): return (x, y)
     >>> zen(f)(dict(x=-10, y=-20))  # extracts x & y from config to call f
@@ -489,7 +496,7 @@ def zen(
 
     Consider the following scenario where the config's instantiation involves drawing a
     random value, which we want to be made deterministic with a configurable seed. We
-    will use a pre-call function to seed the RNG.
+    will use a pre-call function to seed the RNG prior to the subsequent instantiation.
 
     >>> import random
     >>> from hydra_zen import builds, zen
@@ -534,7 +541,6 @@ def zen(
        $ python example.py x=1 y=2
        3
 
-       A `zen`-wrapped function can validate configs without calling the function itself. This makes it easy to test compatibility between your task functions and configs (e.g., as part of your CI/CD process)
 
     **Validating input configs**
 
@@ -552,6 +558,18 @@ def zen(
     >>> zen_f.validate({"x": 1, "seed": 10})  # OK
     >>> zen_f.validate({"x": 1})  # Missing seed as required by pre-call
     HydraZenValidationError: `cfg` is missing the following fields: seed
+
+    **Passing Through The Config**
+
+    Some task functions require complete access to the full config to gain access to
+    sub-configs. One can specify the field named `zen_config` in their task function's
+    signature to signal `zen` that it should pass the full config to that parameter .
+
+    >>> @zen
+    ... def f(x: int, zen_cfg):
+    ...     return x, zen_cfg
+    >>> f(dict(x=1, y="${x}"))
+    (1, {'x': 1, 'y': 1})
     """
     if __func is not None:
         return ZenWrapper(__func, pre_call=pre_call, exclude=exclude)
