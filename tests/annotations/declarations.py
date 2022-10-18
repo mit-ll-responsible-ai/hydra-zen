@@ -1117,3 +1117,16 @@ def check_zen():
     @zen(pre_call=[lambda x, y: None])  # type: ignore
     def g3():
         ...
+
+    # valid excludes
+    @zen(exclude="a")
+    def p1():
+        ...
+
+    @zen(exclude=("a" for _ in range(1)))
+    def p2():
+        ...
+
+    @zen(exclude=1)  # type: ignore
+    def p3():
+        ...

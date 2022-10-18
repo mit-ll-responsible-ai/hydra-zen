@@ -1,5 +1,5 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: MIR
 # pyright: strict
 
 from inspect import Parameter, signature
@@ -13,6 +13,7 @@ from typing import (
     Mapping,
     Optional,
     Sequence,
+    Set,
     Tuple,
     Type,
     TypeVar,
@@ -36,7 +37,7 @@ from ..structured_configs._utils import safe_name
 __all__ = ["zen"]
 
 
-T1 = TypeVar("T1")
+R = TypeVar("R")
 P = ParamSpec("P")
 
 
@@ -78,8 +79,21 @@ def _flat_call(x: Iterable[Callable[P, Any]]) -> Callable[P, None]:
 
 
 # TODO: enable specification of kwargs / extract-all
-# TODO: Enable hydra_main to accept config directly -- auto register in config-store
-class Zen(Generic[P, T1]):
+class Zen(Generic[P, R]):
+    """Implements the decorator logic that is exposed by `hydra_zen.zen`
+
+    Attributes
+    ----------
+    CFG_NAME : str
+        The reserved parameter name specifies to pass the input config through
+        to the inner function. Can be overwritted via subclassing. Defaults
+        to 'zen_cfg'
+
+    See Also
+    --------
+    zen : A decorator that returns a function that will auto-extract, resolve, and instantiate fields from an input config based on the decorated function's signature.
+    """
+
     # Specifies reserved parameter name specified to pass the
     # config through to the task function
     CFG_NAME: str = "zen_cfg"
@@ -89,16 +103,43 @@ class Zen(Generic[P, T1]):
 
     def __init__(
         self,
-        func: Callable[P, T1],
+        func: Callable[P, R],
         pre_call: PreCall = None,
+        exclude: Optional[Union[str, Iterable[str]]] = None,
     ) -> None:
-        self.func: Callable[P, T1] = func
+        """
+        Parameters
+        ----------
+        func : Callable[Sig, R]
+            The function being decorated. (This is a positional-only argument)
+
+        pre_call : Optional[Callable[[Any], Any] | Iterable[Callable[[Any], Any]]]
+            One or more functions that will be called with the input config prior
+            to the decorated functions. An iterable of pre-call functions are called
+            from left (low-index) to right (high-index).
+
+        exclude: Optional[str | Iterable[str]]
+            Specifies one or more parameter names in the function's signature
+            that will not be extracted from input configs by the zen-wrapped function.
+
+            A single string of comma-separated names can be specified.
+        """
+        self.func: Callable[P, R] = func
         try:
             self.parameters: Mapping[str, Parameter] = signature(self.func).parameters
         except (ValueError, TypeError):
             raise HydraZenValidationError(
                 "hydra_zen.zen can only wrap callables that possess inspectable signatures."
             )
+
+        self._exclude: Set[str]
+
+        if exclude is None:
+            self._exclude = set()
+        elif isinstance(exclude, str):
+            self._exclude = {k.strip() for k in exclude.split(",")}
+        else:
+            self._exclude = set(exclude)
 
         if self.CFG_NAME in self.parameters:
             self._has_zen_cfg = True
@@ -161,14 +202,25 @@ class Zen(Generic[P, T1]):
         assert isinstance(cfg, Container)
         return cfg
 
-    def validate(self, __cfg: Any, excluded_params: Iterable[str] = ()) -> None:
+    def validate(self, __cfg: Union[ConfigLike, str]) -> None:
+        """Validates the input config based on the decorated function without calling said function.
+
+        Parameters
+        ----------
+        cfg : dict | list | DataClass | Type[DataClass] | str
+            (positional only) A config object or yaml-string whose attributes will be
+            checked according to the signature of `func`.
+
+        Raises
+        ------
+        HydraValidationError
+            `cfg` is not a valid input to the zen-wrapped function.
+        """
         for _f in self._pre_call_iterable:
             if isinstance(_f, Zen):
                 _f.validate(__cfg)
 
         cfg = self._normalize_cfg(__cfg)
-
-        excluded_params = set(excluded_params)
 
         num_pos_only = sum(
             p.kind is p.POSITIONAL_ONLY for p in self.parameters.values()
@@ -189,7 +241,7 @@ class Zen(Generic[P, T1]):
 
         missing_params: List[str] = []
         for name, param in self.parameters.items():
-            if name in excluded_params:
+            if name in self._exclude:
                 continue
 
             if param.kind in SKIPPED_PARAM_KINDS:
@@ -203,10 +255,7 @@ class Zen(Generic[P, T1]):
                 f"`cfg` is missing the following fields: {', '.join(missing_params)}"
             )
 
-    def __call__(
-        self,
-        __cfg: Union[ConfigLike, str],
-    ) -> T1:
+    def __call__(self, __cfg: Union[ConfigLike, str]) -> R:
         """
         Parameters
         ----------
@@ -216,6 +265,11 @@ class Zen(Generic[P, T1]):
 
             Attributes of types that can be instantiated by Hydra will be instantiated
             prior to being passed to `func`.
+
+        Returns
+        -------
+        func_out : R
+            The result of `func(<args extracted from cfg>)`
         """
         cfg = self._normalize_cfg(__cfg)
 
@@ -234,7 +288,7 @@ class Zen(Generic[P, T1]):
                 else getattr(cfg, name)
             )
             for name, param in self.parameters.items()
-            if param.kind not in SKIPPED_PARAM_KINDS
+            if param.kind not in SKIPPED_PARAM_KINDS and name not in self._exclude
         }
 
         extra_kwargs = {self.CFG_NAME: cfg} if self._has_zen_cfg else {}
@@ -289,11 +343,12 @@ class Zen(Generic[P, T1]):
 
 @overload
 def zen(
-    __func: Callable[P, T1],
+    __func: Callable[P, R],
     *,
     pre_call: PreCall = ...,
-    ZenWrapper: Type[Zen[P, T1]] = Zen,
-) -> Zen[P, T1]:  # pragma: no cover
+    ZenWrapper: Type[Zen[P, R]] = Zen,
+    exclude: Optional[Union[str, Iterable[str]]] = None,
+) -> Zen[P, R]:  # pragma: no cover
     ...
 
 
@@ -303,16 +358,18 @@ def zen(
     *,
     pre_call: PreCall = ...,
     ZenWrapper: Type[Zen[Any, Any]] = ...,
-) -> Callable[[Callable[P, T1]], Zen[P, T1]]:  # pragma: no cover
+    exclude: Optional[Union[str, Iterable[str]]] = None,
+) -> Callable[[Callable[P, R]], Zen[P, R]]:  # pragma: no cover
     ...
 
 
 def zen(
-    __func: Optional[Callable[P, T1]] = None,
+    __func: Optional[Callable[P, R]] = None,
     *,
     pre_call: PreCall = None,
-    ZenWrapper: Type[Zen[P, T1]] = Zen,
-) -> Union[Zen[P, T1], Callable[[Callable[P, T1]], Zen[P, T1]]]:
+    exclude: Optional[Union[str, Iterable[str]]] = None,
+    ZenWrapper: Type[Zen[P, R]] = Zen,
+) -> Union[Zen[P, R], Callable[[Callable[P, R]], Zen[P, R]]]:
     """zen(func, /, pre_call, ZenWrapper)
 
     A decorator that returns a function that will auto-extract, resolve, and
@@ -336,6 +393,12 @@ def zen(
         One or more functions that will be called with the input config prior
         to the decorated functions. An iterable of pre-call functions are called
         from left (low-index) to right (high-index).
+
+    exclude: Optional[str | Iterable[str]]
+        Specifies one or more parameter names in the function's signature
+        that will not be extracted from input configs by the zen-wrapped function.
+
+        A single string of comma-separated names can be specified.
 
     ZenWrapper : Type[hydra_zen.wrapper.Zen], optional (default=Zen)
         If specified, a subclass of `Zen` that customizes the behavior of the wrapper.
@@ -406,6 +469,16 @@ def zen(
     >>> zpf(dict(x='${y}', y=1))
     2
 
+    Excluding particular variables from being extracted from a config:
+
+    >>> def f(x=1, y=2): return (x, y)
+    >>> zen(f)(dict(x=-10, y=-20))  # extracts x & y from config to call f
+    (-10, -20)
+    >>> zen(f, exclude="x")(dict(x=-10, y=-20))  # extracts y from config to call f(x=1, ...)
+    (1, -20)
+    >>> zen(f, exclude="x,y")(dict(x=-10, y=-20))  # defers to f's defaults
+    (1, 2)
+
     **Including a pre-call function**
 
     Given that a zen-wrapped function will automatically extract and instantiate config
@@ -447,7 +520,7 @@ def zen(
         from hydra_zen import builds, zen
 
         def task(x: int, y: int):
-            print(x, y)
+            print(x + y)
 
         cs = ConfigStore.instance()
         cs.store(name="my_app", node=builds(task, populate_full_signature=True))
@@ -459,13 +532,31 @@ def zen(
     .. code-block:: console
 
        $ python example.py x=1 y=2
-       1 2
+       3
 
+       A `zen`-wrapped function can validate configs without calling the function itself. This makes it easy to test compatibility between your task functions and configs (e.g., as part of your CI/CD process)
+
+    **Validating input configs**
+
+    An input config can be validated against a zen-wrapped function without calling said function via the `.validate` method.
+
+    >>> def f(x: int): ...
+    >>> zen_f = zen(f)
+    >>> zen_f.validate({"x": 1})  # OK
+    >>> zen_f.validate({"y": 1})  # Missing x
+    HydraZenValidationError: `cfg` is missing the following fields: x
+
+    Validation propagates through zen-wrapped pre-call functions:
+
+    >>> zen_f = zen(f, pre_call=zen(lambda seed: None))
+    >>> zen_f.validate({"x": 1, "seed": 10})  # OK
+    >>> zen_f.validate({"x": 1})  # Missing seed as required by pre-call
+    HydraZenValidationError: `cfg` is missing the following fields: seed
     """
     if __func is not None:
-        return ZenWrapper(__func, pre_call=pre_call)
+        return ZenWrapper(__func, pre_call=pre_call, exclude=exclude)
 
-    def wrap(f: Callable[P, T1]) -> Zen[P, T1]:
-        return ZenWrapper(func=f, pre_call=pre_call)
+    def wrap(f: Callable[P, R]) -> Zen[P, R]:
+        return ZenWrapper(func=f, pre_call=pre_call, exclude=exclude)
 
     return wrap

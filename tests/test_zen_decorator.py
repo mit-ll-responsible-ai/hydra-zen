@@ -57,6 +57,23 @@ def test_zen_repr():
 
 
 @pytest.mark.parametrize(
+    "exclude,expected",
+    [
+        (None, (1, 0)),
+        ("y", (1, 2)),
+        ("y,", (1, 2)),
+        (["y"], (1, 2)),
+        ("x,y", (-2, 2)),
+        (["x", "y"], (-2, 2)),
+    ],
+)
+def test_zen_excluded_param(exclude, expected):
+    zenf = zen(lambda x=-2, y=2: (x, y), exclude=exclude)
+    conf = dict(x=1, y=0)
+    assert zenf(conf) == expected
+
+
+@pytest.mark.parametrize(
     "target",
     [
         function,
@@ -262,7 +279,7 @@ def test_zen_validate_bad_config(bad_config):
 
 
 def test_zen_validation_excluded_param():
-    zen(lambda x: ...).validate(make_config(), excluded_params=("x",))
+    zen(lambda x: ..., exclude="x").validate(make_config())
 
 
 def test_zen_validation_cfg_has_bad_pos_args():
