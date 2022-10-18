@@ -1003,7 +1003,7 @@ def check_hydra_defaults(
     builds(int, hydra_defaults=["_self_", ["a"]])  # type: ignore
     builds(int, hydra_defaults=["_self_", {("a",): "b"}])  # type: ignore
     builds(int, hydra_defaults={"a": "b"})  # type: ignore
-    builds(int, hydra_defaults="_self_")  # type: ignore
+    builds(int, hydra_defaults="_self_")
 
     builds(
         int,
