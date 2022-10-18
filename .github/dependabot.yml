@@ -8,4 +8,4 @@ updates:
     directory: "/docs/"
     schedule:
       interval: "weekly"
-    target-branch>: "docs"
+    target-branch: "docs"
