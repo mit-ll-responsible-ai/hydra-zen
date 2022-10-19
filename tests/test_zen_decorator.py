@@ -127,8 +127,8 @@ def test_zen_pre_call_precedes_instantiation(seed: int):
 @given(y=st.sampled_from(range(10)), as_dict_config=st.booleans())
 def test_interpolations_are_resolved(y: int, as_dict_config: bool):
     @zen
-    def f(dict_, list_, builds_, make_config_, direct):
-        return dict_, list_, builds_, make_config_, direct
+    def f(dict_, list_, builds_, make_config_, direct, nested):
+        return dict_, list_, builds_, make_config_, direct, nested
 
     cfg_maker = make_config if not as_dict_config else lambda **kw: DictConfig(kw)
     out = f(
@@ -138,10 +138,11 @@ def test_interpolations_are_resolved(y: int, as_dict_config: bool):
             builds_=builds(dict, a="${y}"),
             make_config_=make_config(b="${y}"),
             direct="${y}",
+            nested=dict(top=dict(bottom="${...y}")),
             y=y,
         )
     )
-    assert out == ({"x": y}, [y], {"a": y}, {"b": y}, y)
+    assert out == ({"x": y}, [y], {"a": y}, {"b": y}, y, {"top": {"bottom": y}})
 
 
 @pytest.mark.parametrize(
