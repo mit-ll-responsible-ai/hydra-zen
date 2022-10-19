@@ -1,9 +1,9 @@
-sphinx==5.1.1
-pydata-sphinx-theme==0.10.1
-numpydoc==1.4.0
+sphinx==5.3.0
+pydata-sphinx-theme==0.11.0
+numpydoc==1.5.0
 sphinx-copybutton==0.5.0
 sphinx-design==0.3.0
 sphinx-codeautolink==0.11.0
 # third-party utilities
-beartype==0.8.1
+beartype==0.11.0
 pydantic==1.10.2
