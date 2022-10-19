@@ -21,6 +21,7 @@ from .structured_configs import (
 )
 from .structured_configs._implementations import get_target
 from .structured_configs._type_guards import is_partial_builds, uses_zen_processing
+from .wrapper import zen
 
 __all__ = [
     "builds",
@@ -39,6 +40,7 @@ __all__ = [
     "launch",
     "is_partial_builds",
     "uses_zen_processing",
+    "zen",
 ]
 
 if not TYPE_CHECKING:

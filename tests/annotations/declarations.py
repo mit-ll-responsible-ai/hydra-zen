@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Any, Callable, List, Mapping, Optional, Tuple, Type, TypeVar, Union
 
 from omegaconf import MISSING, DictConfig, ListConfig
-from typing_extensions import Literal
+from typing_extensions import Literal, assert_type
 
 from hydra_zen import (
     ZenField,
@@ -32,6 +32,7 @@ from hydra_zen import (
     make_config,
     make_custom_builds_fn,
     mutable_value,
+    zen,
 )
 from hydra_zen.structured_configs._value_conversion import ConfigComplex, ConfigPath
 from hydra_zen.typing import (
@@ -45,6 +46,7 @@ from hydra_zen.typing import (
 )
 from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds, StdBuilds
 from hydra_zen.typing._implementations import DataClass_, HydraPartialBuilds
+from hydra_zen.wrapper import Zen
 
 T = TypeVar("T")
 
@@ -1031,3 +1033,103 @@ def check_launch():
 
     f(Xonf)
     launch(Xonf, f)
+
+
+def check_instantiate():
+    @dataclass
+    class Cfg:
+        ...
+
+    assert_type(instantiate(DictConfig({})), Any)
+    assert_type(instantiate({}), Any)
+    assert_type(instantiate(ListConfig([])), Any)
+    assert_type(instantiate([]), Any)
+    assert_type(instantiate(Cfg), Any)
+    assert_type(instantiate(Cfg()), Any)
+
+
+def check_zen():
+    @zen
+    def zen_f(x: int) -> str:
+        ...
+
+    assert_type(zen_f({"a": 1}), str)
+    assert_type(zen_f(DictConfig({"a": 1})), str)
+    assert_type(zen_f("some yaml"), str)
+
+    assert_type(zen_f([]))  # type: ignore
+    assert_type(zen_f(ListConfig([])))  # type: ignore
+
+    zen_f(1)  # type: ignore
+    reveal_type(zen_f.func, expected_text="(x: int) -> str")
+
+    @zen(pre_call=None)
+    def zen_f2(x: int) -> str:
+        ...
+
+    assert_type(zen_f2({"a": 1}), str)
+    assert_type(zen_f2(DictConfig({"a": 1})), str)
+    assert_type(zen_f2("some yaml"), str)
+
+    zen_f2(1)  # type: ignore
+    reveal_type(zen_f2.func, expected_text="(x: int) -> str")
+
+    class MyZen(Zen):
+        ...
+
+    @zen(ZenWrapper=MyZen)
+    def zen_rewrapped(x: int) -> str:
+        ...
+
+    reveal_type(zen_rewrapped, expected_text="Zen[(x: int), str]")
+
+    @zen(unpack_kwargs=True)
+    def unpacks_kw(**kw):
+        ...
+
+    def f(x: int):
+        ...
+
+    zen_rewrapped2 = zen(f, ZenWrapper=MyZen)
+
+    reveal_type(zen_rewrapped2, expected_text="Zen[(x: int), None]")
+
+    # valid pre-call
+    @zen(pre_call=lambda cfg: None)
+    def h1():
+        ...
+
+    @zen(pre_call=[lambda cfg: None])
+    def h2():
+        ...
+
+    @zen(pre_call=zen(lambda x, y: None))
+    def h3():
+        ...
+
+    # bad pre-call
+
+    @zen(pre_call=1)  # type: ignore
+    def g1():
+        ...
+
+    @zen(pre_call=lambda x, y: None)  # type: ignore
+    def g2():
+        ...
+
+    @zen(pre_call=[lambda x, y: None])  # type: ignore
+    def g3():
+        ...
+
+    # valid excludes
+    @zen(exclude="a")
+    def p1():
+        ...
+
+    @zen(exclude=("a" for _ in range(1)))
+    def p2():
+        ...
+
+    @zen(exclude=1)  # type: ignore
+    def p3():
+        ...

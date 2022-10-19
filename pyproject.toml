@@ -111,6 +111,7 @@ python =
 
 
 [testenv]
+passenv = *
 deps = pytest
        hypothesis
 commands = pytest \

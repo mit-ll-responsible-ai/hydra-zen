@@ -23,7 +23,7 @@ E.g.
 import pathlib
 from dataclasses import is_dataclass
 from functools import wraps
-from typing import IO, Any, Callable, Type, TypeVar, Union, cast, overload
+from typing import IO, Any, Callable, Dict, List, Type, TypeVar, Union, cast, overload
 
 from hydra.utils import instantiate as hydra_instantiate
 from omegaconf import MISSING, DictConfig, ListConfig, OmegaConf
@@ -88,7 +88,15 @@ def instantiate(
 
 @overload
 def instantiate(
-    config: Union[HasTarget, ListConfig, DictConfig, DataClass_, Type[DataClass_]],
+    config: Union[
+        HasTarget,
+        ListConfig,
+        DictConfig,
+        DataClass_,
+        Type[DataClass_],
+        Dict[Any, Any],
+        List[Any],
+    ],
     *args: Any,
     **kwargs: Any
 ) -> Any:  # pragma: no cover
