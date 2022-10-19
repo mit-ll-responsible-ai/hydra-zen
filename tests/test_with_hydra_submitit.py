@@ -1,4 +1,5 @@
-import os
+# Copyright (c) 2022 Massachusetts Institute of Technology
+# SPDX-License-Identifier: MIT
 import pickle
 import sys
 
@@ -6,8 +7,8 @@ import pytest
 
 
 @pytest.mark.skipif(
-    sys.platform.startswith("win") and bool(os.environ.get("CI")),
-    reason="Things are weird on GitHub Actions and Windows",
+    sys.platform.startswith("win"),
+    reason="Submitit doesn't work on Windows",
 )
 @pytest.mark.usefixtures("cleandir")
 def test_pickling_with_hydra_main():
