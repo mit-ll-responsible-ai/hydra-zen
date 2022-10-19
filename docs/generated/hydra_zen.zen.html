@@ -301,7 +301,7 @@ and instantiated.</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>ConfigLike is DataClass | list[Any] | dict[str, Any] | DictConfig | ListConfig</p>
+<p>ConfigLike is DataClass | dict[str, Any] | DictConfig</p>
 <p>The fields extracted from the input config are determined by the signature of the
 decorated function. There is an exception: including a parameter named “zen_cfg”
 in the function’s signature will signal to <a class="reference internal" href="#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code></a> to pass through the full config to
@@ -372,6 +372,17 @@ a config:</p>
 <span class="go">(1, {'b': 22})</span>
 </pre></div>
 </div>
+<p><strong>Passing Through The Config</strong></p>
+<p>Some task functions require complete access to the full config to gain access to
+sub-configs. One can specify the field named <code class="xref py py-obj docutils literal notranslate"><span class="pre">zen_config</span></code> in their task function’s
+signature to signal <a class="reference internal" href="#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code></a> that it should pass the full config to that parameter .</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@zen</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">zen_cfg</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">zen_cfg</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"$</span><span class="si">{x}</span><span class="s2">"</span><span class="p">))</span>
+<span class="go">(1, {'x': 1, 'y': 1})</span>
+</pre></div>
+</div>
 <p><strong>Including a pre-call function</strong></p>
 <p>Given that a zen-wrapped function will automatically extract and instantiate config
 fields upon being called, it can be necessary to include a pre-call step that
@@ -439,17 +450,6 @@ that users need not double-wrap with <code class="xref py py-obj docutils litera
 <span class="gp">&gt;&gt;&gt; </span><span class="n">zen_f</span><span class="o">.</span><span class="n">validate</span><span class="p">({</span><span class="s2">"x"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"seed"</span><span class="p">:</span> <span class="mi">10</span><span class="p">})</span>  <span class="c1"># OK</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">zen_f</span><span class="o">.</span><span class="n">validate</span><span class="p">({</span><span class="s2">"x"</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>  <span class="c1"># Missing seed as required by pre-call</span>
 <span class="go">HydraZenValidationError: `cfg` is missing the following fields: seed</span>
-</pre></div>
-</div>
-<p><strong>Passing Through The Config</strong></p>
-<p>Some task functions require complete access to the full config to gain access to
-sub-configs. One can specify the field named <code class="xref py py-obj docutils literal notranslate"><span class="pre">zen_config</span></code> in their task function’s
-signature to signal <a class="reference internal" href="#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code></a> that it should pass the full config to that parameter .</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@zen</span>
-<span class="gp">... </span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">zen_cfg</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">zen_cfg</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"$</span><span class="si">{x}</span><span class="s2">"</span><span class="p">))</span>
-<span class="go">(1, {'x': 1, 'y': 1})</span>
 </pre></div>
 </div>
 </dd></dl>

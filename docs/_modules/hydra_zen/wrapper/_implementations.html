@@ -781,7 +781,7 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    ConfigLike is DataClass | list[Any] | dict[str, Any] | DictConfig | ListConfig</span>
+<span class="sd">    ConfigLike is DataClass | dict[str, Any] | DictConfig</span>
 
 <span class="sd">    The fields extracted from the input config are determined by the signature of the</span>
 <span class="sd">    decorated function. There is an exception: including a parameter named &quot;zen_cfg&quot;</span>
@@ -856,6 +856,19 @@
 <span class="sd">    &gt;&gt;&gt; zen(f, unpack_kwargs=True)(cfg)</span>
 <span class="sd">    (1, {&#39;b&#39;: 22})</span>
 
+
+<span class="sd">    **Passing Through The Config**</span>
+
+<span class="sd">    Some task functions require complete access to the full config to gain access to</span>
+<span class="sd">    sub-configs. One can specify the field named `zen_config` in their task function&#39;s</span>
+<span class="sd">    signature to signal `zen` that it should pass the full config to that parameter .</span>
+
+<span class="sd">    &gt;&gt;&gt; @zen</span>
+<span class="sd">    ... def f(x: int, zen_cfg):</span>
+<span class="sd">    ...     return x, zen_cfg</span>
+<span class="sd">    &gt;&gt;&gt; f(dict(x=1, y=&quot;${x}&quot;))</span>
+<span class="sd">    (1, {&#39;x&#39;: 1, &#39;y&#39;: 1})</span>
+<span class="sd">    </span>
 <span class="sd">    **Including a pre-call function**</span>
 
 <span class="sd">    Given that a zen-wrapped function will automatically extract and instantiate config</span>
@@ -931,18 +944,6 @@
 <span class="sd">    &gt;&gt;&gt; zen_f.validate({&quot;x&quot;: 1, &quot;seed&quot;: 10})  # OK</span>
 <span class="sd">    &gt;&gt;&gt; zen_f.validate({&quot;x&quot;: 1})  # Missing seed as required by pre-call</span>
 <span class="sd">    HydraZenValidationError: `cfg` is missing the following fields: seed</span>
-
-<span class="sd">    **Passing Through The Config**</span>
-
-<span class="sd">    Some task functions require complete access to the full config to gain access to</span>
-<span class="sd">    sub-configs. One can specify the field named `zen_config` in their task function&#39;s</span>
-<span class="sd">    signature to signal `zen` that it should pass the full config to that parameter .</span>
-
-<span class="sd">    &gt;&gt;&gt; @zen</span>
-<span class="sd">    ... def f(x: int, zen_cfg):</span>
-<span class="sd">    ...     return x, zen_cfg</span>
-<span class="sd">    &gt;&gt;&gt; f(dict(x=1, y=&quot;${x}&quot;))</span>
-<span class="sd">    (1, {&#39;x&#39;: 1, &#39;y&#39;: 1})</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">__func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">ZenWrapper</span><span class="p">(</span>
