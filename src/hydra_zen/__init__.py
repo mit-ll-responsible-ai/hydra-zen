@@ -1,5 +1,6 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+from typing import TYPE_CHECKING
 
 from ._hydra_overloads import (
     MISSING,
@@ -9,7 +10,6 @@ from ._hydra_overloads import (
     to_yaml,
 )
 from ._launch import launch
-from ._version import get_versions
 from .structured_configs import (
     ZenField,
     builds,
@@ -21,6 +21,7 @@ from .structured_configs import (
 )
 from .structured_configs._implementations import get_target
 from .structured_configs._type_guards import is_partial_builds, uses_zen_processing
+from .wrapper import zen
 
 __all__ = [
     "builds",
@@ -39,7 +40,13 @@ __all__ = [
     "launch",
     "is_partial_builds",
     "uses_zen_processing",
+    "zen",
 ]
 
-__version__ = get_versions()["version"]
-del get_versions
+if not TYPE_CHECKING:
+    try:
+        from ._version import version as __version__
+    except ImportError:  # pragma: no cover
+        __version__ = "unknown version"
+else:  # pragma: no cover
+    __version__: str

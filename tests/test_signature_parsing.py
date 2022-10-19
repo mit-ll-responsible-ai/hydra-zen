@@ -534,12 +534,10 @@ class C(A):
 
 class D(A):
     py_310_sig = (("a", int),)
-    pass
 
 
 class E(B):
     py_310_sig = (("a", int),)
-    pass
 
 
 @pytest.mark.parametrize("Obj", [A, B, C, D, E])

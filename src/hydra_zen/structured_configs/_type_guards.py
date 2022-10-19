@@ -2,13 +2,14 @@
 # SPDX-License-Identifier: MIT
 # pyright: strict
 from functools import partial
-from typing import Any
+from typing import TYPE_CHECKING, Any, Type, Union
 
 from typing_extensions import TypeGuard
 
 from hydra_zen._compatibility import HYDRA_SUPPORTS_PARTIAL
 from hydra_zen.funcs import get_obj, zen_processing
 from hydra_zen.typing import Builds, Just, PartialBuilds
+from hydra_zen.typing._implementations import DataClass_
 
 from ._globals import (
     JUST_FIELD_NAME,
@@ -19,7 +20,7 @@ from ._globals import (
     ZEN_TARGET_FIELD_NAME,
 )
 
-__all__ = ["is_partial_builds", "uses_zen_processing"]
+__all__ = ["is_partial_builds", "uses_zen_processing", "is_dataclass"]
 
 # We need to check if things are Builds, Just, PartialBuilds to a higher
 # fidelity than is provided by `isinstance(..., <Protocol>)`. I.e. we want to
@@ -51,6 +52,15 @@ def is_just(x: Any) -> TypeGuard[Just[Any]]:
             # ensures we conver this branch in tests
             return False
     return False
+
+
+if TYPE_CHECKING:  # pragma: no cover
+
+    def is_dataclass(obj: Any) -> TypeGuard[Union[DataClass_, Type[DataClass_]]]:
+        ...
+
+else:
+    from dataclasses import is_dataclass
 
 
 def is_old_partial_builds(x: Any) -> bool:  # pragma: no cover
