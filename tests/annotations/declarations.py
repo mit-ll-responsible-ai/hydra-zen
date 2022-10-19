@@ -1055,9 +1055,10 @@ def check_zen():
 
     assert_type(zen_f({"a": 1}), str)
     assert_type(zen_f(DictConfig({"a": 1})), str)
-    assert_type(zen_f([]), str)
-    assert_type(zen_f(ListConfig([])), str)
     assert_type(zen_f("some yaml"), str)
+
+    assert_type(zen_f([]))  # type: ignore
+    assert_type(zen_f(ListConfig([])))  # type: ignore
 
     zen_f(1)  # type: ignore
     reveal_type(zen_f.func, expected_text="(x: int) -> str")
@@ -1068,8 +1069,6 @@ def check_zen():
 
     assert_type(zen_f2({"a": 1}), str)
     assert_type(zen_f2(DictConfig({"a": 1})), str)
-    assert_type(zen_f2([]), str)
-    assert_type(zen_f2(ListConfig([])), str)
     assert_type(zen_f2("some yaml"), str)
 
     zen_f2(1)  # type: ignore
@@ -1083,6 +1082,10 @@ def check_zen():
         ...
 
     reveal_type(zen_rewrapped, expected_text="Zen[(x: int), str]")
+
+    @zen(unpack_kwargs=True)
+    def unpacks_kw(**kw):
+        ...
 
     def f(x: int):
         ...

@@ -23,7 +23,7 @@ from typing import (
 
 import hydra
 from hydra.main import _UNSPECIFIED_  # type: ignore
-from omegaconf import Container, DictConfig, ListConfig, OmegaConf
+from omegaconf import DictConfig, ListConfig, OmegaConf
 from typing_extensions import Literal, ParamSpec, TypeAlias, TypeGuard
 
 from hydra_zen import instantiate
@@ -49,10 +49,8 @@ else:  # pragma: no cover
 ConfigLike: TypeAlias = Union[
     DataClass_,
     Type[DataClass_],
+    Dict[Any, Any],
     DictConfig,
-    ListConfig,
-    List[Any],
-    Dict[str, Any],
 ]
 
 
@@ -78,7 +76,6 @@ def _flat_call(x: Iterable[Callable[P, Any]]) -> Callable[P, None]:
     return f
 
 
-# TODO: enable specification of kwargs / extract-all
 class Zen(Generic[P, R]):
     """Implements the decorator logic that is exposed by `hydra_zen.zen`
 
@@ -103,15 +100,23 @@ class Zen(Generic[P, R]):
 
     def __init__(
         self,
-        func: Callable[P, R],
-        pre_call: PreCall = None,
+        __func: Callable[P, R],
+        *,
         exclude: Optional[Union[str, Iterable[str]]] = None,
+        pre_call: PreCall = None,
+        unpack_kwargs: bool = False,
     ) -> None:
         """
         Parameters
         ----------
         func : Callable[Sig, R]
             The function being decorated. (This is a positional-only argument)
+
+        unpack_kwargs: bool, optional (default=False)
+            If `True` a `**kwargs` field in the decorated function's signature will be
+            populated by all of the input config entries that are not specified by the
+            rest of the signature (and that are not specified by the `exclude`
+            argument).
 
         pre_call : Optional[Callable[[Any], Any] | Iterable[Callable[[Any], Any]]]
             One or more functions that will be called with the input config prior
@@ -124,13 +129,21 @@ class Zen(Generic[P, R]):
 
             A single string of comma-separated names can be specified.
         """
-        self.func: Callable[P, R] = func
+        self.func: Callable[P, R] = __func
+
         try:
             self.parameters: Mapping[str, Parameter] = signature(self.func).parameters
         except (ValueError, TypeError):
             raise HydraZenValidationError(
                 "hydra_zen.zen can only wrap callables that possess inspectable signatures."
             )
+
+        if not isinstance(unpack_kwargs, bool):  # type: ignore
+            raise TypeError(f"`unpack_kwargs` must be type `bool` got {unpack_kwargs}")
+
+        self._unpack_kwargs: bool = unpack_kwargs and any(
+            p.kind is p.VAR_KEYWORD for p in self.parameters.values()
+        )
 
         self._exclude: Set[str]
 
@@ -174,8 +187,8 @@ class Zen(Generic[P, R]):
             pre_call if not isinstance(pre_call, Iterable) else _flat_call(pre_call)
         )
 
+    @staticmethod
     def _normalize_cfg(
-        self,
         cfg: Union[
             DataClass_,
             Type[DataClass_],
@@ -185,21 +198,25 @@ class Zen(Generic[P, R]):
             DictConfig,
             str,
         ],
-    ) -> Container:
+    ) -> DictConfig:
         if is_dataclass(cfg):
             # ensures that default factories and interpolated fields
             # are resolved
             cfg = OmegaConf.structured(cfg)
 
         elif not OmegaConf.is_config(cfg):
-            if not isinstance(cfg, (dict, list, str)):
+            if not isinstance(cfg, (dict, str)):
                 raise HydraZenValidationError(
-                    f"`cfg` Must be a dataclass, dict/DictConfig, list/ListConfig, or "
-                    f"yaml-string. Got {cfg}"
+                    f"`cfg` must be a dataclass, dict/DictConfig, or "
+                    f"dict-style yaml-string. Got {cfg}"
                 )
             cfg = OmegaConf.create(cfg)
 
-        assert isinstance(cfg, Container)
+        if not isinstance(cfg, DictConfig):
+            raise HydraZenValidationError(
+                f"`cfg` must be a dataclass, dict/DictConfig, or "
+                f"dict-style yaml-string. Got {cfg}"
+            )
         return cfg
 
     def validate(self, __cfg: Union[ConfigLike, str]) -> None:
@@ -262,7 +279,7 @@ class Zen(Generic[P, R]):
 
         Parameters
         ----------
-        cfg : dict | list | DataClass | Type[DataClass] | str
+        cfg : dict | DataClass | Type[DataClass] | str
             (positional only) A config object or yaml-string whose attributes will be
             extracted by-name according to the signature of `func` and passed to `func`.
 
@@ -275,7 +292,6 @@ class Zen(Generic[P, R]):
             The result of `func(<args extracted from cfg>)`
         """
         cfg = self._normalize_cfg(__cfg)
-
         # resolves all interpolated values in-place
         OmegaConf.resolve(cfg)
 
@@ -295,7 +311,15 @@ class Zen(Generic[P, R]):
         }
 
         extra_kwargs = {self.CFG_NAME: cfg} if self._has_zen_cfg else {}
-
+        if self._unpack_kwargs:
+            names = (
+                name
+                for name in cfg
+                if name not in cfg_kwargs
+                and name not in self._exclude
+                and isinstance(name, str)
+            )
+            cfg_kwargs.update({name: cfg[name] for name in names})
         return self.func(
             *(instantiate(x) if is_instantiable(x) else x for x in args_),
             **{
@@ -348,6 +372,7 @@ class Zen(Generic[P, R]):
 def zen(
     __func: Callable[P, R],
     *,
+    unpack_kwargs: bool = ...,
     pre_call: PreCall = ...,
     ZenWrapper: Type[Zen[P, R]] = Zen,
     exclude: Optional[Union[str, Iterable[str]]] = None,
@@ -359,6 +384,7 @@ def zen(
 def zen(
     __func: Literal[None] = ...,
     *,
+    unpack_kwargs: bool = ...,
     pre_call: PreCall = ...,
     ZenWrapper: Type[Zen[Any, Any]] = ...,
     exclude: Optional[Union[str, Iterable[str]]] = None,
@@ -369,6 +395,7 @@ def zen(
 def zen(
     __func: Optional[Callable[P, R]] = None,
     *,
+    unpack_kwargs: bool = False,
     pre_call: PreCall = None,
     exclude: Optional[Union[str, Iterable[str]]] = None,
     ZenWrapper: Type[Zen[P, R]] = Zen,
@@ -391,6 +418,11 @@ def zen(
     ----------
     func : Callable[Sig, R]
         The function being decorated. (This is a positional-only argument)
+
+    unpack_kwargs: bool, optional (default=False)
+        If `True` a `**kwargs` field in the decorated function's signature will be
+        populated by all of the input config entries that are not specified by the rest
+        of the signature (and that are not specified by the `exclude` argument).
 
     pre_call : Optional[Callable[[Any], Any] | Iterable[Callable[[Any], Any]]]
         One or more functions that will be called with the input config prior
@@ -486,6 +518,17 @@ def zen(
     >>> zen(f, exclude="x,y")(dict(x=-10, y=-20))  # defers to f's defaults
     (1, 2)
 
+    Populating a `**kwargs` field via `unpack_kwargs=True`:
+
+    >>> def f(a, **kw):
+    ...     return a, kw
+
+    >>> cfg = dict(a=1, b=22)
+    >>> zen(f, unpack_kwargs=False)(cfg)
+    (1, {})
+    >>> zen(f, unpack_kwargs=True)(cfg)
+    (1, {'b': 22})
+
     **Including a pre-call function**
 
     Given that a zen-wrapped function will automatically extract and instantiate config
@@ -502,6 +545,9 @@ def zen(
     >>> from hydra_zen import builds, zen
 
     >>> Cfg = dict(
+    ...         # `rand_val` will be instantiated and draw from randint upon
+    ...         # calling the zen-wrapped function, thus we need a pre-call
+    ...         # function to set the global RNG seed prior to instantiation
     ...         rand_val=builds(random.randint, 0, 10),
     ...         seed=0,
     ... )
@@ -572,9 +618,13 @@ def zen(
     (1, {'x': 1, 'y': 1})
     """
     if __func is not None:
-        return ZenWrapper(__func, pre_call=pre_call, exclude=exclude)
+        return ZenWrapper(
+            __func, pre_call=pre_call, exclude=exclude, unpack_kwargs=unpack_kwargs
+        )
 
     def wrap(f: Callable[P, R]) -> Zen[P, R]:
-        return ZenWrapper(func=f, pre_call=pre_call, exclude=exclude)
+        return ZenWrapper(
+            f, pre_call=pre_call, exclude=exclude, unpack_kwargs=unpack_kwargs
+        )
 
     return wrap

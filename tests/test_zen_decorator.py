@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from typing import Any, Tuple
 
 import pytest
-from hypothesis import given, strategies as st
+from hypothesis import example, given, strategies as st
 from omegaconf import DictConfig
 
 from hydra_zen import builds, make_config, to_yaml, zen
@@ -67,8 +67,9 @@ def test_zen_repr():
         (["x", "y"], (-2, 2)),
     ],
 )
-def test_zen_excluded_param(exclude, expected):
-    zenf = zen(lambda x=-2, y=2: (x, y), exclude=exclude)
+@given(unpack_kw=st.booleans())
+def test_zen_excluded_param(exclude, expected, unpack_kw):
+    zenf = zen(lambda x=-2, y=2, **kw: (x, y), exclude=exclude, unpack_kwargs=unpack_kw)
     conf = dict(x=1, y=0)
     assert zenf(conf) == expected
 
@@ -76,12 +77,12 @@ def test_zen_excluded_param(exclude, expected):
 @pytest.mark.parametrize(
     "target",
     [
-        function,
-        function_with_args,
-        function_with_kwargs,
-        function_with_args_kwargs,
+        zen(function),
+        zen(function_with_args),
+        zen(function_with_kwargs),
+        zen(function_with_args_kwargs),
         zen_identity,
-        make_config("x", "y"),
+        zen(lambda x: x),
     ],
 )
 def test_repr_doesnt_crash(target):
@@ -126,9 +127,9 @@ def test_zen_pre_call_precedes_instantiation(seed: int):
 
 @given(y=st.sampled_from(range(10)), as_dict_config=st.booleans())
 def test_interpolations_are_resolved(y: int, as_dict_config: bool):
-    @zen
-    def f(dict_, list_, builds_, make_config_, direct, nested):
-        return dict_, list_, builds_, make_config_, direct, nested
+    @zen(unpack_kwargs=True)
+    def f(dict_, list_, builds_, make_config_, direct, **kw):
+        return dict_, list_, builds_, make_config_, direct, kw["nested"]
 
     cfg_maker = make_config if not as_dict_config else lambda **kw: DictConfig(kw)
     out = f(
@@ -188,10 +189,10 @@ def test_zen_works_on_partiald_funcs():
     assert zen_pf(make_config(x=2, y="a")) == (2, "a")
 
 
-@given(x=st.integers(-5, 5), y=st.integers(-5, 5))
-def test_zen_cfg_passthrough(x: int, y: int):
-    @zen
-    def f(x: int, zen_cfg):
+@given(x=st.integers(-5, 5), y=st.integers(-5, 5), unpack_kw=st.booleans())
+def test_zen_cfg_passthrough(x: int, y: int, unpack_kw: bool):
+    @zen(unpack_kwargs=unpack_kw)
+    def f(x: int, zen_cfg, **kw):
         return (x, zen_cfg)
 
     x_out, cfg = f({"x": x, "y": y, "z": "${y}"})
@@ -266,7 +267,9 @@ def test_zen_validation_cfg_missing_parameter(cfg, func):
         zen(func).validate(cfg)
 
 
-@given(bad_config=everything_except((list, dict, str)))
+@example(to_yaml(["a", "b"]))
+@example(["a", "b"])
+@given(bad_config=everything_except((dict, str)))
 def test_zen_validate_bad_config(bad_config):
     @zen
     def f(*a, **k):
@@ -274,9 +277,14 @@ def test_zen_validate_bad_config(bad_config):
 
     with pytest.raises(
         HydraZenValidationError,
-        match=r"`cfg` Must be a dataclass, dict/DictConfig, list/ListConfig, or yaml-string",
+        match=r"`cfg` must be a ",
     ):
         f(bad_config)
+
+
+def test_validate_unpack_kwargs():
+    with pytest.raises(TypeError, match=r"`unpack_kwargs` must be type `bool`"):
+        zen(lambda a: None, unpack_kwargs="apple")  # type: ignore
 
 
 def test_zen_validation_excluded_param():
@@ -347,8 +355,9 @@ def test_pre_call_validates_bad_param_name():
     y=st.integers(-10, 10),
     # kwargs=st.dictionaries(st.sampled_from(["z", "not_a_field"]), st.integers()),
     instantiate_cfg=st.booleans(),
+    unpack_kw=st.booleans(),
 )
-def test_zen_call(x: int, y: int, instantiate_cfg, func):
+def test_zen_call(x: int, y: int, instantiate_cfg, func, unpack_kw):
 
     cfg = make_config(x=x, y=y)
     if instantiate_cfg:
@@ -356,14 +365,14 @@ def test_zen_call(x: int, y: int, instantiate_cfg, func):
 
     # kwargs.pop("not_a_field", None)
     expected = func(x, y)
-    actual = zen(func)(cfg)
+    actual = zen(func, unpack_kwargs=unpack_kw)(cfg)
     assert expected == actual
 
 
-@given(x=st.sampled_from(range(10)))
-def test_zen_function_respects_with_defaults(x):
-    @zen
-    def f(x: int = 2):
+@given(x=st.sampled_from(range(10)), unpack_kw=st.booleans())
+def test_zen_function_respects_with_defaults(x, unpack_kw: bool):
+    @zen(unpack_kwargs=unpack_kw)
+    def f(x: int = 2, **kw):
         return x
 
     assert f(make_config()) == 2  # defer to x's default
@@ -379,6 +388,12 @@ def raises():
     [
         lambda x: zen_identity(make_config(x=builds(int, x))),
         lambda x: zen_identity(make_config(x=builds(int, x), y=builds(raises))),
+        lambda x: zen(lambda x: x, unpack_kwargs=True)(
+            dict(x=builds(int, x), y=builds(raises))
+        ),
+        lambda x: zen(lambda **kw: kw["x"], unpack_kwargs=True, exclude="y")(
+            dict(x=builds(int, x), y=builds(raises))
+        ),
     ],
 )
 @given(x=st.sampled_from(range(10)))
@@ -436,3 +451,34 @@ def test_hydra_main():
         "z": "${y}",
         "seed": 12,
     }
+
+
+@pytest.mark.parametrize(
+    "zen_func",
+    [
+        zen(lambda x, **kw: {"x": x, **kw}, unpack_kwargs=True),
+        zen(unpack_kwargs=True)(lambda x, **kw: {"x": x, **kw}),
+    ],
+)
+@given(
+    x=st.sampled_from(range(-3, 3)),
+    # non-string keys should be skipped by unpack_kw
+    kw=st.dictionaries(
+        st.sampled_from("abcdef") | st.sampled_from([1, 2]), st.integers()
+    ),
+)
+def test_unpack_kw_basic_behavior(zen_func, x, kw):
+    inp = dict(x=builds(int, x))
+    inp.update(kw)
+    out = zen_func(inp)
+    expected = {"x": x, **{k: v for k, v in kw.items() if isinstance(k, str)}}
+    assert out == expected
+
+
+def test_unpack_kw_non_redundant():
+    x, y, kw = zen(lambda x, y=2, **kw: (x, y, kw), unpack_kwargs=True)(
+        dict(x=1, z="${x}")
+    )
+    assert x == 1
+    assert y == 2
+    assert kw == {"z": 1}  # x should not be in kw
