@@ -22,12 +22,15 @@ from typing import (
 )
 
 import hydra
+from hydra.core.config_store import ConfigStore
 from hydra.main import _UNSPECIFIED_  # type: ignore
+from hydra.utils import instantiate
 from omegaconf import DictConfig, ListConfig, OmegaConf
 from typing_extensions import Literal, ParamSpec, TypeAlias, TypeGuard
 
-from hydra_zen import instantiate
+from hydra_zen import builds, instantiate
 from hydra_zen.errors import HydraZenValidationError
+from hydra_zen.typing import Builds
 from hydra_zen.typing._implementations import DataClass_
 
 from .._compatibility import HYDRA_SUPPORTS_LIST_INSTANTIATION, SUPPORTS_VERSION_BASE
@@ -39,7 +42,7 @@ __all__ = ["zen"]
 
 R = TypeVar("R")
 P = ParamSpec("P")
-
+F = TypeVar("F", bound=Callable[..., Any])
 
 if HYDRA_SUPPORTS_LIST_INSTANTIATION:
     _SUPPORTED_INSTANTIATION_TYPES: Tuple[Any, ...] = (dict, DictConfig, list, ListConfig)  # type: ignore
@@ -541,7 +544,7 @@ def zen(
     ...     return x, zen_cfg
     >>> f(dict(x=1, y="${x}"))
     (1, {'x': 1, 'y': 1})
-    
+
     **Including a pre-call function**
 
     Given that a zen-wrapped function will automatically extract and instantiate config
@@ -629,3 +632,51 @@ def zen(
         )
 
     return wrap
+
+
+def default_to_config(target: Any, **kw: Any) -> Type[Builds[Any]]:
+    if is_dataclass(target) and isinstance(target, type):
+        base = target if isinstance(target, type) else type(target)
+        return builds(target, **kw, builds_bases=(base,), populate_full_signature=True)
+    else:
+        return builds(target, **kw, populate_full_signature=True)
+
+
+# TODO: permit node?
+def store(
+    __f: Optional[F] = None,
+    *,
+    name: Union[str, Callable[[Any], str]] = lambda target: safe_name(target),
+    group: Optional[Union[str, Callable[[Any], str]]] = None,
+    package: Optional[Union[str, Callable[[Any], str]]] = None,
+    provider: Optional[str] = None,
+    to_config: Callable[[F], Any] = default_to_config,
+    store_instance: ConfigStore = ConfigStore.instance(),
+    **to_config_kw: Any,
+) -> Union[F, Callable[[F], F]]:
+    def _store(__g: F) -> F:
+        _name = name(__f) if callable(name) else name
+        if not isinstance(_name, str):  # type: ignore
+            raise TypeError(f"`name` must be a string, got {_name}")
+
+        _group = group(__f) if callable(group) else group
+        if _group is not None and not isinstance(_group, str):  # type: ignore
+            raise TypeError(f"`group` must be a string or None, got {_group}")
+
+        _pkg = package(__f) if callable(package) else package
+        if _pkg is not None and not isinstance(_pkg, str):  # type: ignore
+            raise TypeError(f"`group` must be a string or None, got {_pkg}")
+
+        node = to_config(__g, **to_config_kw)
+        store_instance.store(
+            name=_name,
+            node=node,
+            group=_group,
+            package=_pkg,
+            provider=provider,
+        )
+        return __g
+
+    if __f is not None:
+        return _store(__f)
+    return _store
