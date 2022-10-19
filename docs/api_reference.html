@@ -206,6 +206,8 @@
 <div class="bd-toc-item navbar-nav">
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.launch.html">hydra_zen.launch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.zen.html">hydra_zen.zen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.wrapper.Zen.html">hydra_zen.wrapper.Zen</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.make_config.html">hydra_zen.make_config</a></li>
@@ -255,14 +257,20 @@
 <p>Encyclopedia Hydrazennica.</p>
 <p>All reference documentation includes detailed Examples sections. Please scroll to the
 bottom of any given reference page to see the examples.</p>
-<section id="launching-jobs-with-hydra">
-<h2>Launching Jobs with Hydra<a class="headerlink" href="#launching-jobs-with-hydra" title="Permalink to this heading">#</a></h2>
+<section id="creating-and-launching-jobs-with-hydra">
+<h2>Creating and Launching Jobs with Hydra<a class="headerlink" href="#creating-and-launching-jobs-with-hydra" title="Permalink to this heading">#</a></h2>
 <p>hydra-zen provides users the ability to launch a Hydra job via a
 Python function instead of from a commandline interface.</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">launch</span></code></a>(config, task_function[, overrides, ...])</p></td>
 <td><p>Launch a Hydra job using a Python-based interface.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code></a>(func, /, pre_call, ZenWrapper)</p></td>
+<td><p>A decorator that returns a function that will auto-extract, resolve, and instantiate fields from an input config based on the decorated function's signature.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.wrapper.Zen.html#hydra_zen.wrapper.Zen" title="hydra_zen.wrapper.Zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wrapper.Zen</span></code></a>(_Zen__func, *[, exclude, ...])</p></td>
+<td><p>Implements the decorator logic that is exposed by <a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.zen</span></code></a></p></td>
 </tr>
 </tbody>
 </table>
@@ -499,8 +507,8 @@ with Hydra. For example, a <a class="reference external" href="https://docs.pyth
 <nav class="page-toc" id="bd-toc-nav">
 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry">
-<a class="reference internal nav-link" href="#launching-jobs-with-hydra">
-   Launching Jobs with Hydra
+<a class="reference internal nav-link" href="#creating-and-launching-jobs-with-hydra">
+   Creating and Launching Jobs with Hydra
   </a>
 </li>
 <li class="toc-h2 nav-item toc-entry">

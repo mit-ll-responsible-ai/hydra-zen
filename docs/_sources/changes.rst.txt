@@ -10,6 +10,66 @@ chronological order. All previous releases should still be available on pip.
 
 .. _v0.8.0:
 
+---------------------
+0.9.0rc2 - 2022-10-19
+---------------------
+
+.. note:: This is documentation for an unreleased version of hydra-zen. You can try out this version pre-release version using `pip install --pre hydra-zen`
+
+
+Release Highlights
+------------------
+This release adds the :func:`~hydra_zen.zen` decorator, which enables users to use Hydra-agnostic task functions for their Hydra app; the decorator will automatically extract, resolve, and instantiate fields from an input config based on the function's signature. 
+
+This encourages users to eliminate Hydra-specific boilerplate code from their projects and to instead opt for task functions with explicit signatures, including functions from third parties.
+
+E.g., :func:`~hydra_zen.zen` enables us to replace the following Hydra-specific task function:
+
+.. code-block:: python
+   :caption: The "old school" way of designing a task function for a Hydra app
+
+   import hydra
+   from hydra.utils import instantiate
+   
+   @hydra.main(config_name="my_app", config_path=None, version_base="1.2")
+   def trainer_task_fn(cfg):
+      model = instantiate(cfg.model)
+      data = instantiate(cfg.data)
+      partial_optim = instantiate(cfg.partial_optim)
+      trainer = instantiate(cfg.trainer)
+      
+      optim = partial_optim(model.parameters())
+      trainer(model, optim, data).fit(cfg.num_epochs)
+   
+   if __name__ == "__main__":
+      trainer_task_fn()      
+
+with a Hydra-agnostic task function that has an explicit signature:
+
+.. code-block:: python
+   :caption: Using `zen` to design a Hydra-agnostic task function
+
+   from hydra_zen import zen
+   
+   @zen
+   def trainer_task_fn(model, data, partial_optim, trainer, num_epochs: int):
+      # All config-field extraction & instantiation is automated/mediated by zen
+      optim = partial_optim(model.parameters())
+      trainer(model, optim, data).fit(num_epochs)
+   
+   if __name__ == "__main__":
+      trainer_task_fn.hydra_main(config_name="my_app", config_path=None)
+
+
+There are plenty more bells and whistles to :func:`~hydra_zen.zen`, refer to :pull:`310` and its reference documentation for more details.
+
+New Features
+------------
+- Adds the :func:`~hydra_zen.zen` decorator (see :pull:`310`)
+- Adds the :func:`~hydra_zen.wrapper.Zen` decorator-class (see :pull:`310`)
+
+.. _v0.8.0:
+
 ------------------
 0.8.0 - 2022-09-13
 ------------------
