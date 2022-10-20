@@ -27,7 +27,7 @@ from hydra.core.config_store import ConfigStore
 from hydra.main import _UNSPECIFIED_  # type: ignore
 from hydra.utils import instantiate
 from omegaconf import DictConfig, ListConfig, OmegaConf
-from typing_extensions import Literal, ParamSpec, Protocol, Self, TypeAlias, TypeGuard
+from typing_extensions import Literal, ParamSpec, Protocol, TypeAlias, TypeGuard
 
 from hydra_zen import instantiate, make_custom_builds_fn
 from hydra_zen.errors import HydraZenValidationError
@@ -669,7 +669,7 @@ class StoreFn(Protocol):
 
     @overload
     def __call__(
-        self: Self,
+        self,
         __f: Literal[None] = None,
         *,
         name: Union[str, Callable[[Any], str]] = ...,
