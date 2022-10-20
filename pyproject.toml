@@ -82,6 +82,9 @@ combine_as_imports = true
 omit = ["src/hydra_zen/_version.py"]
 
 
+[tool.pytest.ini_options]
+xfail_strict=true
+
 
 [tool.pyright]
 include = ["src"]

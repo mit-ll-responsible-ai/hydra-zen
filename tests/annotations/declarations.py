@@ -32,6 +32,7 @@ from hydra_zen import (
     make_config,
     make_custom_builds_fn,
     mutable_value,
+    store,
     zen,
 )
 from hydra_zen.structured_configs._value_conversion import ConfigComplex, ConfigPath
@@ -1132,4 +1133,42 @@ def check_zen():
 
     @zen(exclude=1)  # type: ignore
     def p3():
+        ...
+
+
+def check_store():
+    @store
+    def f(x: int, y: int) -> str:
+        ...
+
+    @store(name="hi")
+    def f2(x: int, y: int) -> str:
+        ...
+
+    reveal_type(f, expected_text="(x: int, y: int) -> str")
+    reveal_type(f2, expected_text="(x: int, y: int) -> str")
+
+    reveal_type(store(f), expected_text="(x: int, y: int) -> str")
+    reveal_type(store(f, name="bye"), expected_text="(x: int, y: int) -> str")
+    reveal_type(store(name="bye")(f), expected_text="(x: int, y: int) -> str")
+
+    apple_store = store(group="apple")
+
+    @apple_store
+    def a1(x: int) -> bool:
+        ...
+
+    @apple_store(name="hello")
+    def a2(x: int) -> bool:
+        ...
+
+    reveal_type(a1, expected_text="(x: int) -> bool")
+    reveal_type(a2, expected_text="(x: int) -> bool")
+
+    reveal_type(apple_store(a1), expected_text="(x: int) -> bool")
+    reveal_type(apple_store(a1, name="bye"), expected_text="(x: int) -> bool")
+    reveal_type(apple_store(name="bye")(a1), expected_text="(x: int) -> bool")
+
+    @store(f)  # type: ignore
+    def bad(x: int, y: int) -> str:
         ...

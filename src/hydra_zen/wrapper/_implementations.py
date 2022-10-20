@@ -18,6 +18,7 @@ from typing import (
     Type,
     TypeVar,
     Union,
+    cast,
     overload,
 )
 
@@ -26,18 +27,17 @@ from hydra.core.config_store import ConfigStore
 from hydra.main import _UNSPECIFIED_  # type: ignore
 from hydra.utils import instantiate
 from omegaconf import DictConfig, ListConfig, OmegaConf
-from typing_extensions import Literal, ParamSpec, TypeAlias, TypeGuard
+from typing_extensions import Literal, ParamSpec, Protocol, Self, TypeAlias, TypeGuard
 
-from hydra_zen import builds, instantiate
+from hydra_zen import instantiate, make_custom_builds_fn
 from hydra_zen.errors import HydraZenValidationError
-from hydra_zen.typing import Builds
 from hydra_zen.typing._implementations import DataClass_
 
 from .._compatibility import HYDRA_SUPPORTS_LIST_INSTANTIATION, SUPPORTS_VERSION_BASE
 from ..structured_configs._type_guards import is_dataclass
 from ..structured_configs._utils import safe_name
 
-__all__ = ["zen"]
+__all__ = ["zen", "store", "Zen"]
 
 
 R = TypeVar("R")
@@ -634,15 +634,86 @@ def zen(
     return wrap
 
 
-def default_to_config(target: Any, **kw: Any) -> Type[Builds[Any]]:
-    if is_dataclass(target) and isinstance(target, type):
-        base = target if isinstance(target, type) else type(target)
-        return builds(target, **kw, builds_bases=(base,), populate_full_signature=True)
+fbuilds = make_custom_builds_fn(populate_full_signature=True)
+
+
+def default_to_config(target: Any, **kw: Any) -> Union[DataClass_, Type[DataClass_]]:
+    if is_dataclass(target):
+        if isinstance(target, type):
+            return fbuilds(target, **kw, builds_bases=(target,))
+        else:
+            if kw:
+                raise ValueError(
+                    "store(<dataclass-instance>, [...]) does not support specifying keyword arguments"
+                )
+            return target
     else:
-        return builds(target, **kw, populate_full_signature=True)
+        return fbuilds(target, **kw)
 
 
-# TODO: permit node?
+class StoreFn(Protocol):
+    @overload
+    def __call__(
+        self,
+        __f: F,
+        *,
+        name: Union[str, Callable[[Any], str]] = ...,
+        group: Optional[Union[str, Callable[[Any], str]]] = ...,
+        package: Optional[Union[str, Callable[[Any], str]]] = ...,
+        provider: Optional[str] = ...,
+        to_config: Callable[[F], Any] = ...,
+        store_instance: ConfigStore = ...,
+        **to_config_kw: Any,
+    ) -> F:
+        ...
+
+    @overload
+    def __call__(
+        self: Self,
+        __f: Literal[None] = None,
+        *,
+        name: Union[str, Callable[[Any], str]] = ...,
+        group: Optional[Union[str, Callable[[Any], str]]] = ...,
+        package: Optional[Union[str, Callable[[Any], str]]] = ...,
+        provider: Optional[str] = ...,
+        to_config: Callable[[Any], Any] = ...,
+        store_instance: ConfigStore = ...,
+        **to_config_kw: Any,
+    ) -> "StoreFn":
+        ...
+
+
+@overload
+def store(
+    __f: F,
+    *,
+    name: Union[str, Callable[[Any], str]] = ...,
+    group: Optional[Union[str, Callable[[Any], str]]] = ...,
+    package: Optional[Union[str, Callable[[Any], str]]] = ...,
+    provider: Optional[str] = ...,
+    to_config: Callable[[F], Any] = ...,
+    store_instance: ConfigStore = ...,
+    **to_config_kw: Any,
+) -> F:
+    ...
+
+
+@overload
+def store(
+    __f: Literal[None] = None,
+    *,
+    name: Union[str, Callable[[Any], str]] = ...,
+    group: Optional[Union[str, Callable[[Any], str]]] = ...,
+    package: Optional[Union[str, Callable[[Any], str]]] = ...,
+    provider: Optional[str] = ...,
+    to_config: Callable[[Any], Any] = ...,
+    store_instance: ConfigStore = ...,
+    **to_config_kw: Any,
+) -> StoreFn:
+    ...
+
+
+# TODO: guard repo override / internal repo
 def store(
     __f: Optional[F] = None,
     *,
@@ -653,21 +724,49 @@ def store(
     to_config: Callable[[F], Any] = default_to_config,
     store_instance: ConfigStore = ConfigStore.instance(),
     **to_config_kw: Any,
-) -> Union[F, Callable[[F], F]]:
-    def _store(__g: F) -> F:
-        _name = name(__f) if callable(name) else name
+) -> Union[F, StoreFn]:
+    def _store(
+        __g: Optional[F] = None,
+        *,
+        name: Union[str, Callable[[Any], str]] = name,
+        group: Optional[Union[str, Callable[[Any], str]]] = group,
+        package: Optional[Union[str, Callable[[Any], str]]] = package,
+        provider: Optional[str] = provider,
+        to_config: Callable[[F], Any] = to_config,
+        store_instance: ConfigStore = store_instance,
+        _outer_kw: Any = to_config_kw,
+        **to_config_kw: Any,
+    ) -> Union[F, StoreFn]:
+        # Note:
+        # the pattern (..., **{**a, **b}) updates a with b and then unpacks updated `a`.
+        # This is not equivalent to (..., **a, **b), where there can be errors
+        # associated with receiving multiple values for a given argument
+        if __g is None:
+            return store(
+                name=name,
+                group=group,
+                package=package,
+                to_config=to_config,
+                store_instance=store_instance,
+                **{**_outer_kw, **to_config_kw},
+            )
+
+        _name = name(__g) if callable(name) else name
         if not isinstance(_name, str):  # type: ignore
             raise TypeError(f"`name` must be a string, got {_name}")
+        del name
 
-        _group = group(__f) if callable(group) else group
+        _group = group(__g) if callable(group) else group
         if _group is not None and not isinstance(_group, str):  # type: ignore
             raise TypeError(f"`group` must be a string or None, got {_group}")
+        del group
 
-        _pkg = package(__f) if callable(package) else package
+        _pkg = package(__g) if callable(package) else package
         if _pkg is not None and not isinstance(_pkg, str):  # type: ignore
-            raise TypeError(f"`group` must be a string or None, got {_pkg}")
+            raise TypeError(f"`package` must be a string or None, got {_pkg}")
+        del package
 
-        node = to_config(__g, **to_config_kw)
+        node = to_config(__g, **{**_outer_kw, **to_config_kw})
         store_instance.store(
             name=_name,
             node=node,
@@ -679,4 +778,4 @@ def store(
 
     if __f is not None:
         return _store(__f)
-    return _store
+    return cast(StoreFn, _store)

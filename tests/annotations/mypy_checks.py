@@ -3,7 +3,7 @@
 
 from typing_extensions import assert_type
 
-from hydra_zen import builds, instantiate, make_custom_builds_fn
+from hydra_zen import builds, instantiate, make_custom_builds_fn, store
 
 
 def check_builds() -> None:
@@ -44,6 +44,46 @@ def check_make_custom_builds() -> None:
     assert_type(instantiate(partial_builds(f))(), str)
 
     full_builds(f)(y=2)  # type: ignore [call-arg]
+
+
+def check_store() -> None:
+    @store
+    def f(x: int, y: int) -> str:
+        ...
+
+    @store(name="hi")
+    def f2(x: int, y: int) -> str:
+        ...
+
+    reveal_type(f)
+    reveal_type(f2)
+
+    reveal_type(store(f))
+    reveal_type(store(f, name="bye"))
+    reveal_type(store(name="bye")(f))
+
+    apple_store = store(group="apple")
+
+    @apple_store
+    def a1(x: int) -> bool:
+        ...
+
+    @apple_store(name="hello")
+    def a2(x: int) -> bool:
+        ...
+
+    reveal_type(a1)
+    reveal_type(a2)
+    apple_store(name="bye")
+    apple_store(name=22)  # type: ignore [call-overload]
+
+    reveal_type(apple_store(a1))
+    reveal_type(apple_store(a1, name="bye"))
+    reveal_type(apple_store(name="bye")(a1))
+
+    @store(f)  # type: ignore [arg-type, call-arg]
+    def bad(x: int, y: int) -> str:
+        ...
 
 
 # def check_just() -> None:
