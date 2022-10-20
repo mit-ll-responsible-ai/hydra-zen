@@ -45,7 +45,7 @@ def instantiate_from_repo(name: str, **kw):
     ],
 )
 @pytest.mark.usefixtures("configstore_repo")
-def test_basic_store_patterns(apply_store: Callable[[], Any]):
+def test_kw_overrides(apply_store: Callable[[], Any]):
     out = apply_store()
     assert out is func
     assert instantiate_from_repo("func") == (1, 2)
