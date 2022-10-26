@@ -186,13 +186,13 @@ def just(
 
     >>> from hydra_zen import just, instantiate, to_yaml
 
-    Calling `just` on a value of a type that is natively supported by Hydra
-    will reurn that value unchanged
+    `just`, called on a value of a type that is natively supported by Hydra,
+    will return that value unchanged:
 
     >>> just(1)
     1
-    >>> just(False)
-    False
+    >>> just({"a": False})
+    {"a": False}
 
     `just` can be used to create a config that will simply import a class-object or function when the config is instantiated by Hydra.
 
