@@ -1172,3 +1172,27 @@ def check_store():
     @store(f)  # type: ignore
     def bad(x: int, y: int) -> str:
         ...
+
+    # checking that store type-checks against to_config
+    store(1)  # type: ignore
+    store(1, to_config=just)
+
+    store()(1, to_config=builds)  # type: ignore
+    store()(1, to_config=just)
+    store()()(1, to_config=builds)  # type: ignore
+
+    @store
+    @dataclass
+    class A:
+        x: int
+
+    @store(name="hi")
+    @dataclass
+    class B:
+        y: str
+
+    assert_type(A(1).x, int)
+    assert_type(B("a").y, str)
+
+    store(A)
+    store(A(1))

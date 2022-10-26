@@ -3,7 +3,7 @@
 
 from typing_extensions import assert_type
 
-from hydra_zen import builds, instantiate, make_custom_builds_fn, store
+from hydra_zen import builds, instantiate, just, make_custom_builds_fn, store
 
 
 def check_builds() -> None:
@@ -84,6 +84,14 @@ def check_store() -> None:
     @store(f)  # type: ignore [arg-type, call-arg]
     def bad(x: int, y: int) -> str:
         ...
+
+    # checking that store type-checks against to_config
+    # mypy isn't as good as pyright here
+
+    # store(1)  # false negative
+    # store()(1, to_config=builds)  # false negative
+    store(1, to_config=just)
+    store()(1, to_config=just)
 
 
 # def check_just() -> None:

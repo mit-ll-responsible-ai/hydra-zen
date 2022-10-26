@@ -1,12 +1,13 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
+from dataclasses import dataclass
 from typing import Any, Callable, Optional
 
 import pytest
 from hydra.core.config_store import ConfigStore
 
-from hydra_zen import instantiate, store
+from hydra_zen import instantiate, just, store
 
 cs = ConfigStore().instance()
 
@@ -18,7 +19,11 @@ def func(a: int, b: int):
 
 
 def instantiate_from_repo(
-    name: str, group: Optional[str] = None, package: Optional[str] = None, **kw
+    name: str,
+    group: Optional[str] = None,
+    package: Optional[str] = None,
+    provider: Optional[str] = None,
+    **kw,
 ):
     """Fetches config-node from repo by name and instantiates it
     with provided kwargs"""
@@ -27,6 +32,7 @@ def instantiate_from_repo(
     else:
         item = cs.repo[f"{name}.yaml"]
     assert item.package == package
+    assert item.provider == provider
     return instantiate(item.node, **kw)
 
 
@@ -140,8 +146,145 @@ def test_package_overrides(apply_store: Callable[[], Any]):
     assert instantiate_from_repo(name="func", package="dunk", a=1, b=2) == (1, 2)
 
 
+def special_fn(x, **kw):
+    kw["target"] = just(x)
+    return kw
+
+
+def never_call(*a, **k):
+    assert False
+
+
+@pytest.mark.parametrize(
+    "apply_store",
+    [
+        pytest.param(lambda: store(func, to_config=special_fn, a=1, b=2), id="inline"),
+        pytest.param(
+            lambda: store(to_config=special_fn, a=1, b=2)(func),
+            id="decorated",
+        ),
+        pytest.param(
+            lambda: store(to_config=never_call, a=1, b=2)(func, to_config=special_fn),
+            id="partiald_inline",
+        ),
+        pytest.param(
+            lambda: store(to_config=never_call, a=1, b=2)(to_config=special_fn)(func),
+            id="partiald_decorated",
+        ),
+        pytest.param(
+            lambda: store(to_config=never_call, a=22, b=2)(to_config=never_call)(
+                func, to_config=special_fn, a=1
+            ),
+            id="kw_overrides",
+        ),
+        pytest.param(
+            lambda: store(to_config=never_call, a=1, b=2)(func),
+            id="ensure_can_fail1",
+            marks=pytest.mark.xfail,
+        ),
+        pytest.param(
+            lambda: store(func, to_config=never_call, a=1, b=2),
+            id="ensure_can_fail2",
+            marks=pytest.mark.xfail,
+        ),
+        pytest.param(
+            lambda: store(func, a=1, b=2),
+            id="ensure_can_fail3",
+            marks=pytest.mark.xfail,
+        ),
+        pytest.param(
+            lambda: store(func, a=1, b=3, to_config=special_fn),
+            id="ensure_can_fail4",
+            marks=pytest.mark.xfail,
+        ),
+    ],
+)
+@pytest.mark.usefixtures("configstore_repo")
+def test_to_config_overrides(apply_store: Callable[[], Any]):
+    out = apply_store()
+    assert out is func
+    assert instantiate_from_repo(name="func") == dict(a=1, b=2, target=func)
+
+
+class CustomStore:
+    def store(
+        self,
+        name: str,
+        node: Any,
+        group: Optional[str] = None,
+        package: Optional[str] = None,
+        provider: Optional[str] = None,
+    ):
+        assert False
+
+
+override_store = CustomStore()
+
+
+@pytest.mark.parametrize(
+    "apply_store",
+    [
+        pytest.param(lambda: store(func, store_instance=override_store), id="inline"),
+        pytest.param(
+            lambda: store(store_instance=override_store)(func),
+            id="decorated",
+        ),
+        pytest.param(
+            lambda: store()(store_instance=override_store)(func),
+            id="partiald_decorated",
+        ),
+    ],
+)
+@pytest.mark.usefixtures("configstore_repo")
+def test_store_instance_overrides(apply_store: Callable[[], Any]):
+    with pytest.raises(AssertionError):
+        apply_store()
+
+
+@pytest.mark.parametrize(
+    "apply_store",
+    [
+        pytest.param(lambda: store(func, provider="dunk", a=1, b=2), id="inline"),
+        pytest.param(lambda: store(provider="dunk")(func), id="decorated"),
+        pytest.param(
+            lambda: store(provider="O1")(func, provider="dunk"), id="partiald_inline"
+        ),
+        pytest.param(
+            lambda: store(provider="O1")(provider="dunk")(func), id="partiald_decorated"
+        ),
+        pytest.param(
+            lambda: store(provider="O1")(provider="O2")(func, provider="dunk"),
+            id="kw_overrides",
+        ),
+        pytest.param(
+            lambda: store(provider="BAD")(func),
+            id="ensure_can_fail",
+            marks=pytest.mark.xfail,
+        ),
+    ],
+)
+@pytest.mark.usefixtures("configstore_repo")
+def test_provider_overrides(apply_store: Callable[[], Any]):
+    out = apply_store()
+    assert out is func
+    assert instantiate_from_repo(name="func", provider="dunk", a=1, b=2) == (1, 2)
+
+
 @pytest.mark.parametrize("bad_val", [1, True, ("a",)])
 @pytest.mark.parametrize("field_name", ["name", "group", "package"])
 def test_store_param_validation(bad_val, field_name: str):
     with pytest.raises(TypeError, match=rf"`{field_name}` must be"):
         store(func, **{field_name: bad_val})
+
+
+@dataclass
+class DC:
+    ...
+
+
+dc = DC()
+
+
+def validate_get_name():
+    with pytest.raises(TypeError, match=r"Cannot infer config store entry name"):
+        store(dc)
