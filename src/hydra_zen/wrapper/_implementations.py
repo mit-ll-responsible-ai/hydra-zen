@@ -42,7 +42,7 @@ __all__ = ["zen", "store", "Zen"]
 
 R = TypeVar("R")
 P = ParamSpec("P")
-F = TypeVar("F", bound=Callable[..., Any])
+F = TypeVar("F")
 
 if HYDRA_SUPPORTS_LIST_INSTANTIATION:
     _SUPPORTED_INSTANTIATION_TYPES: Tuple[Any, ...] = (dict, DictConfig, list, ListConfig)  # type: ignore
@@ -637,7 +637,9 @@ def zen(
 fbuilds = make_custom_builds_fn(populate_full_signature=True)
 
 
-def default_to_config(target: Any, **kw: Any) -> Union[DataClass_, Type[DataClass_]]:
+def default_to_config(
+    target: Union[Callable[..., Any], DataClass_], **kw: Any
+) -> Union[DataClass_, Type[DataClass_]]:
     if is_dataclass(target):
         if isinstance(target, type):
             return fbuilds(target, **kw, builds_bases=(target,))
@@ -648,7 +650,30 @@ def default_to_config(target: Any, **kw: Any) -> Union[DataClass_, Type[DataClas
                 )
             return target
     else:
-        return fbuilds(target, **kw)
+        t = cast(Callable[..., Any], target)
+        return fbuilds(t, **kw)
+
+
+def get_name(target: Any) -> str:
+    name = getattr(target, "__name__", None)
+    if not isinstance(name, str):
+        raise TypeError(
+            f"Cannot infer config store entry name for {target}. Please manually "
+            f"specify `store({target}, name=<some name>, [...])`"
+        )
+    return name
+
+
+class ConfigStoreLike(Protocol):
+    def store(
+        self,
+        name: str,
+        node: Any,
+        group: Optional[str] = None,
+        package: Optional[str] = None,
+        provider: Optional[str] = None,
+    ):
+        ...
 
 
 class StoreFn(Protocol):
@@ -662,7 +687,7 @@ class StoreFn(Protocol):
         package: Optional[Union[str, Callable[[Any], str]]] = ...,
         provider: Optional[str] = ...,
         to_config: Callable[[F], Any] = ...,
-        store_instance: ConfigStore = ...,
+        store_instance: ConfigStoreLike = ...,
         **to_config_kw: Any,
     ) -> F:
         ...
@@ -677,7 +702,7 @@ class StoreFn(Protocol):
         package: Optional[Union[str, Callable[[Any], str]]] = ...,
         provider: Optional[str] = ...,
         to_config: Callable[[Any], Any] = ...,
-        store_instance: ConfigStore = ...,
+        store_instance: ConfigStoreLike = ...,
         **to_config_kw: Any,
     ) -> "StoreFn":
         ...
@@ -691,8 +716,8 @@ def store(
     group: Optional[Union[str, Callable[[Any], str]]] = ...,
     package: Optional[Union[str, Callable[[Any], str]]] = ...,
     provider: Optional[str] = ...,
-    to_config: Callable[[F], Any] = ...,
-    store_instance: ConfigStore = ...,
+    to_config: Callable[[F], Any] = default_to_config,
+    store_instance: ConfigStoreLike = ...,
     **to_config_kw: Any,
 ) -> F:
     ...
@@ -707,7 +732,7 @@ def store(
     package: Optional[Union[str, Callable[[Any], str]]] = ...,
     provider: Optional[str] = ...,
     to_config: Callable[[Any], Any] = ...,
-    store_instance: ConfigStore = ...,
+    store_instance: ConfigStoreLike = ...,
     **to_config_kw: Any,
 ) -> StoreFn:
     ...
@@ -717,12 +742,12 @@ def store(
 def store(
     __f: Optional[F] = None,
     *,
-    name: Union[str, Callable[[Any], str]] = lambda target: safe_name(target),
+    name: Union[str, Callable[[Any], str]] = get_name,
     group: Optional[Union[str, Callable[[Any], str]]] = None,
     package: Optional[Union[str, Callable[[Any], str]]] = None,
     provider: Optional[str] = None,
     to_config: Callable[[F], Any] = default_to_config,
-    store_instance: ConfigStore = ConfigStore.instance(),
+    store_instance: ConfigStoreLike = ConfigStore.instance(),
     **to_config_kw: Any,
 ) -> Union[F, StoreFn]:
     def _store(
@@ -733,7 +758,7 @@ def store(
         package: Optional[Union[str, Callable[[Any], str]]] = package,
         provider: Optional[str] = provider,
         to_config: Callable[[F], Any] = to_config,
-        store_instance: ConfigStore = store_instance,
+        store_instance: ConfigStoreLike = store_instance,
         _outer_kw: Any = to_config_kw,
         **to_config_kw: Any,
     ) -> Union[F, StoreFn]:
@@ -747,6 +772,7 @@ def store(
                 group=group,
                 package=package,
                 to_config=to_config,
+                provider=provider,
                 store_instance=store_instance,
                 **{**_outer_kw, **to_config_kw},
             )
