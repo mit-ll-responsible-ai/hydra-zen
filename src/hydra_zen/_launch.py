@@ -3,6 +3,7 @@
 import warnings
 from collections import UserList
 from dataclasses import fields, is_dataclass
+from types import NoneType
 from typing import (
     Any,
     Callable,
@@ -84,7 +85,7 @@ def value_check(
     return cast(T, value)
 
 
-OverrideValues = Union[int, float, bool, str, dict, multirun, hydra_list]
+OverrideValues = Union[None, int, float, bool, str, dict, multirun, hydra_list]
 OverrideDict = Dict[str, OverrideValues]
 
 
@@ -92,9 +93,16 @@ def _process_dict_overrides(overrides: OverrideDict) -> List[str]:
     launch_overrides = []
     if overrides is not None:
         for k, v in overrides.items():
-            value_check(k, v, type_=(int, float, bool, str, dict, multirun, hydra_list))
+            value_check(
+                k,
+                v,
+                type_=(NoneType, int, float, bool, str, dict, multirun, hydra_list),
+            )
             if isinstance(v, multirun):
                 v = ",".join(str(item) for item in v)
+
+            if v is None:
+                v = "null"
 
             launch_overrides.append(f"{k}={v}")
     return launch_overrides

@@ -42,6 +42,7 @@ def test_type_passes_valid_type(target_type, value):
 @pytest.mark.usefixtures("cleandir")
 @settings(max_examples=10, deadline=None)
 @given(
+    none_=st.none(),
     int_=st.integers(),
     bool_=st.booleans(),
     float_=st.floats(-10, 10),
@@ -56,6 +57,7 @@ def test_type_passes_valid_type(target_type, value):
     ),
 )
 def test_overrides_roundtrip(
+    none_,
     int_,
     bool_,
     float_,
@@ -64,6 +66,7 @@ def test_overrides_roundtrip(
     mrun,
 ):
     overrides = {
+        "+none_": none_,
         "+int_": int_,
         "+float_": float_,
         "+str_": str_,
@@ -75,6 +78,7 @@ def test_overrides_roundtrip(
 
     assert len(jobs) == len(mrun)
     for i, job in enumerate(jobs):
+        assert job.return_value.none_ == none_
         assert job.return_value.int_ == int_
         assert job.return_value.bool_ == bool_
         assert job.return_value.float_ == float_
@@ -86,6 +90,7 @@ def test_overrides_roundtrip(
 @pytest.mark.usefixtures("cleandir")
 @settings(max_examples=10, deadline=None)
 @given(
+    none_=st.none(),
     int_=st.integers(),
     bool_=st.booleans(),
     float_=st.floats(-10, 10),
@@ -100,6 +105,7 @@ def test_overrides_roundtrip(
     ),
 )
 def test_overrides_kwargs_roundtrip(
+    none_,
     int_,
     bool_,
     float_,
@@ -108,6 +114,7 @@ def test_overrides_kwargs_roundtrip(
     mrun,
 ):
     overrides = {
+        "+none_": none_,
         "+int_": int_,
         "+float_": float_,
         "+str_": str_,
@@ -122,6 +129,7 @@ def test_overrides_kwargs_roundtrip(
     assert len(jobs1[0]) == len(mrun)
     for i, (job, job1) in enumerate(zip(jobs[0], jobs1[0])):
         assert job.return_value.foo == 1 and job1.return_value.foo == 2
+        assert job.return_value.none_ == job1.return_value.none_ == none_
         assert job.return_value.int_ == job1.return_value.int_ == int_
         assert job.return_value.bool_ == job1.return_value.bool_ == bool_
         assert job.return_value.float_ == job1.return_value.float_ == float_
