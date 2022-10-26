@@ -6,6 +6,7 @@ from dataclasses import fields, is_dataclass
 from typing import (
     Any,
     Callable,
+    Dict,
     List,
     Mapping,
     Optional,
@@ -83,7 +84,8 @@ def value_check(
     return cast(T, value)
 
 
-OverrideDict = Mapping[str, Union[int, float, bool, str, dict, multirun, hydra_list]]
+OverrideValues = Union[int, float, bool, str, dict, multirun, hydra_list]
+OverrideDict = Dict[str, OverrideValues]
 
 
 def _process_dict_overrides(overrides: OverrideDict) -> List[str]:
@@ -141,6 +143,7 @@ def launch(
     config_name: str = "zen_launch",
     job_name: str = "zen_launch",
     with_log_configuration: bool = True,
+    **override_kwargs: OverrideValues,
 ) -> Union[JobReturn, Any]:
     r"""Launch a Hydra job using a Python-based interface.
 
@@ -310,8 +313,15 @@ def launch(
 
     # allow user to provide a dictionary of override values
     # instead of just a list of strings
-    if isinstance(overrides, Mapping):
+    if isinstance(overrides, Dict):
+        overrides.update(override_kwargs)
         overrides = _process_dict_overrides(overrides)
+    else:
+        override_kwargs_list = _process_dict_overrides(override_kwargs)
+        if overrides:
+            overrides += override_kwargs_list
+        else:
+            overrides = override_kwargs_list
 
     # Initializes Hydra and add the config_path to the config search path
     with initialize(
