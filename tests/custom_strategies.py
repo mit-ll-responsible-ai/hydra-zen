@@ -7,7 +7,7 @@ from hydra_zen import builds
 from hydra_zen.structured_configs._utils import get_obj_path
 from hydra_zen.typing._implementations import ZenConvert
 
-__all__ = ["valid_builds_args", "partitions"]
+__all__ = ["valid_builds_args", "partitions", "everything_except"]
 
 _Sequence = Union[List, Tuple, Deque]
 T = TypeVar("T", bound=Union[_Sequence, Dict[str, Any]])
@@ -100,3 +100,11 @@ def partitions(
     if isinstance(collection, st.SearchStrategy):
         return collection.flatmap(lambda x: _partition(x, ordered=ordered))  # type: ignore
     return cast(st.SearchStrategy[Tuple[T, T]], _partition(collection, ordered))
+
+
+def everything_except(excluded_types):
+    return (
+        st.from_type(type)
+        .flatmap(st.from_type)
+        .filter(lambda x: not isinstance(x, excluded_types))
+    )
