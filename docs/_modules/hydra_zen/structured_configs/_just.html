@@ -513,13 +513,13 @@
 
 <span class="sd">    &gt;&gt;&gt; from hydra_zen import just, instantiate, to_yaml</span>
 
-<span class="sd">    Calling `just` on a value of a type that is natively supported by Hydra</span>
-<span class="sd">    will reurn that value unchanged</span>
+<span class="sd">    `just`, called on a value of a type that is natively supported by Hydra,</span>
+<span class="sd">    will return that value unchanged:</span>
 
 <span class="sd">    &gt;&gt;&gt; just(1)</span>
 <span class="sd">    1</span>
-<span class="sd">    &gt;&gt;&gt; just(False)</span>
-<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; just({&quot;a&quot;: False})</span>
+<span class="sd">    {&quot;a&quot;: False}</span>
 
 <span class="sd">    `just` can be used to create a config that will simply import a class-object or function when the config is instantiated by Hydra.</span>
 

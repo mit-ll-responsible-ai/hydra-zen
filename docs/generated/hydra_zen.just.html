@@ -341,12 +341,12 @@ that used <a class="reference internal" href="#hydra_zen.just" title="hydra_zen.
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><span class="n">just</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a>
 </pre></div>
 </div>
-<p>Calling <a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> on a value of a type that is natively supported by Hydra
-will reurn that value unchanged</p>
+<p><a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a>, called on a value of a type that is natively supported by Hydra,
+will return that value unchanged:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">just</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <span class="go">1</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">just</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
-<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">just</span><span class="p">({</span><span class="s2">"a"</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+<span class="go">{"a": False}</span>
 </pre></div>
 </div>
 <p><a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> can be used to create a config that will simply import a class-object or function when the config is instantiated by Hydra.</p>
