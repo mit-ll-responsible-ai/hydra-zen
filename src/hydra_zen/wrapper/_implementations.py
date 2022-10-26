@@ -654,7 +654,7 @@ def default_to_config(
         return fbuilds(t, **kw)
 
 
-def get_name(target: Any) -> str:
+def get_name(target: Any, _: Any) -> str:
     name = getattr(target, "__name__", None)
     if not isinstance(name, str):
         raise TypeError(
@@ -664,8 +664,8 @@ def get_name(target: Any) -> str:
     return name
 
 
-class ConfigStoreLike(Protocol):
-    def store(
+class HydraStoreFn(Protocol):
+    def __call__(
         self,
         name: str,
         node: Any,
@@ -682,12 +682,12 @@ class StoreFn(Protocol):
         self,
         __f: F,
         *,
-        name: Union[str, Callable[[Any], str]] = ...,
-        group: Optional[Union[str, Callable[[Any], str]]] = ...,
-        package: Optional[Union[str, Callable[[Any], str]]] = ...,
+        name: Union[str, Callable[[Any, Any], str]] = ...,
+        group: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
+        package: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
         provider: Optional[str] = ...,
         to_config: Callable[[F], Any] = ...,
-        store_instance: ConfigStoreLike = ...,
+        store_fn: HydraStoreFn = ...,
         **to_config_kw: Any,
     ) -> F:
         ...
@@ -697,12 +697,12 @@ class StoreFn(Protocol):
         self,
         __f: Literal[None] = None,
         *,
-        name: Union[str, Callable[[Any], str]] = ...,
-        group: Optional[Union[str, Callable[[Any], str]]] = ...,
-        package: Optional[Union[str, Callable[[Any], str]]] = ...,
+        name: Union[str, Callable[[Any, Any], str]] = ...,
+        group: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
+        package: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
         provider: Optional[str] = ...,
         to_config: Callable[[Any], Any] = ...,
-        store_instance: ConfigStoreLike = ...,
+        store_fn: HydraStoreFn = ...,
         **to_config_kw: Any,
     ) -> "StoreFn":
         ...
@@ -712,12 +712,12 @@ class StoreFn(Protocol):
 def store(
     __f: F,
     *,
-    name: Union[str, Callable[[Any], str]] = ...,
-    group: Optional[Union[str, Callable[[Any], str]]] = ...,
-    package: Optional[Union[str, Callable[[Any], str]]] = ...,
+    name: Union[str, Callable[[Any, Any], str]] = ...,
+    group: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
+    package: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
     provider: Optional[str] = ...,
     to_config: Callable[[F], Any] = default_to_config,
-    store_instance: ConfigStoreLike = ...,
+    store_fn: HydraStoreFn = ...,
     **to_config_kw: Any,
 ) -> F:
     ...
@@ -727,12 +727,12 @@ def store(
 def store(
     __f: Literal[None] = None,
     *,
-    name: Union[str, Callable[[Any], str]] = ...,
-    group: Optional[Union[str, Callable[[Any], str]]] = ...,
-    package: Optional[Union[str, Callable[[Any], str]]] = ...,
+    name: Union[str, Callable[[Any, Any], str]] = ...,
+    group: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
+    package: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
     provider: Optional[str] = ...,
     to_config: Callable[[Any], Any] = ...,
-    store_instance: ConfigStoreLike = ...,
+    store_fn: HydraStoreFn = ...,
     **to_config_kw: Any,
 ) -> StoreFn:
     ...
@@ -742,23 +742,23 @@ def store(
 def store(
     __f: Optional[F] = None,
     *,
-    name: Union[str, Callable[[Any], str]] = get_name,
-    group: Optional[Union[str, Callable[[Any], str]]] = None,
-    package: Optional[Union[str, Callable[[Any], str]]] = None,
+    name: Union[str, Callable[[Any, Any], str]] = get_name,
+    group: Optional[Union[str, Callable[[Any, Any], str]]] = None,
+    package: Optional[Union[str, Callable[[Any, Any], str]]] = None,
     provider: Optional[str] = None,
     to_config: Callable[[F], Any] = default_to_config,
-    store_instance: ConfigStoreLike = ConfigStore.instance(),
+    store_fn: HydraStoreFn = ConfigStore.instance().store,
     **to_config_kw: Any,
 ) -> Union[F, StoreFn]:
     def _store(
         __g: Optional[F] = None,
         *,
-        name: Union[str, Callable[[Any], str]] = name,
-        group: Optional[Union[str, Callable[[Any], str]]] = group,
-        package: Optional[Union[str, Callable[[Any], str]]] = package,
+        name: Union[str, Callable[[Any, Any], str]] = name,
+        group: Optional[Union[str, Callable[[Any, Any], str]]] = group,
+        package: Optional[Union[str, Callable[[Any, Any], str]]] = package,
         provider: Optional[str] = provider,
         to_config: Callable[[F], Any] = to_config,
-        store_instance: ConfigStoreLike = store_instance,
+        store_fn: HydraStoreFn = store_fn,
         _outer_kw: Any = to_config_kw,
         **to_config_kw: Any,
     ) -> Union[F, StoreFn]:
@@ -773,27 +773,28 @@ def store(
                 package=package,
                 to_config=to_config,
                 provider=provider,
-                store_instance=store_instance,
+                store_fn=store_fn,
                 **{**_outer_kw, **to_config_kw},
             )
 
-        _name = name(__g) if callable(name) else name
+        node = to_config(__g, **{**_outer_kw, **to_config_kw})
+
+        _name = name(__g, node) if callable(name) else name
         if not isinstance(_name, str):  # type: ignore
             raise TypeError(f"`name` must be a string, got {_name}")
         del name
 
-        _group = group(__g) if callable(group) else group
+        _group = group(__g, node) if callable(group) else group
         if _group is not None and not isinstance(_group, str):  # type: ignore
             raise TypeError(f"`group` must be a string or None, got {_group}")
         del group
 
-        _pkg = package(__g) if callable(package) else package
+        _pkg = package(__g, node) if callable(package) else package
         if _pkg is not None and not isinstance(_pkg, str):  # type: ignore
             raise TypeError(f"`package` must be a string or None, got {_pkg}")
         del package
 
-        node = to_config(__g, **{**_outer_kw, **to_config_kw})
-        store_instance.store(
+        store_fn(
             name=_name,
             node=node,
             group=_group,

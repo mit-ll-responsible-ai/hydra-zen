@@ -206,37 +206,32 @@ def test_to_config_overrides(apply_store: Callable[[], Any]):
     assert instantiate_from_repo(name="func") == dict(a=1, b=2, target=func)
 
 
-class CustomStore:
-    def store(
-        self,
-        name: str,
-        node: Any,
-        group: Optional[str] = None,
-        package: Optional[str] = None,
-        provider: Optional[str] = None,
-    ):
-        assert False
-
-
-override_store = CustomStore()
+def override_store(
+    name: str,
+    node: Any,
+    group: Optional[str] = None,
+    package: Optional[str] = None,
+    provider: Optional[str] = None,
+):
+    assert False
 
 
 @pytest.mark.parametrize(
     "apply_store",
     [
-        pytest.param(lambda: store(func, store_instance=override_store), id="inline"),
+        pytest.param(lambda: store(func, store_fn=override_store), id="inline"),
         pytest.param(
-            lambda: store(store_instance=override_store)(func),
+            lambda: store(store_fn=override_store)(func),
             id="decorated",
         ),
         pytest.param(
-            lambda: store()(store_instance=override_store)(func),
+            lambda: store()(store_fn=override_store)(func),
             id="partiald_decorated",
         ),
     ],
 )
 @pytest.mark.usefixtures("configstore_repo")
-def test_store_instance_overrides(apply_store: Callable[[], Any]):
+def test_store_fn_overrides(apply_store: Callable[[], Any]):
     with pytest.raises(AssertionError):
         apply_store()
 
