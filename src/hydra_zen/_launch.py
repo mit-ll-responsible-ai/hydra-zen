@@ -12,6 +12,7 @@ from typing import (
     Optional,
     Tuple,
     Type,
+    TypeAlias,
     TypeVar,
     Union,
     cast,
@@ -31,21 +32,22 @@ from hydra_zen._hydra_overloads import instantiate
 from hydra_zen.typing._implementations import DataClass, InstOrType
 
 T = TypeVar("T", bound=Any)
+HydraPrimitives: TypeAlias = Union[None, int, float, bool, str, Dict[str, str]]
 
 
 class _NotSet:  # pragma: no cover
     pass
 
 
-class multirun(UserList):
-    """Signals that a sequence is to be iterated over in a multirun"""
+class hydra_list(UserList[HydraPrimitives]):
+    """Signals that a sequence is provided as a single configured value (i.e. it is not
+    to be iterated over during a multirun)"""
 
     pass
 
 
-class hydra_list(UserList):
-    """Signals that a sequence is provided as a single configured value (i.e. it is not
-    to be iterated over during a multirun)"""
+class multirun(UserList[Union[HydraPrimitives, hydra_list]]):
+    """Signals that a sequence is to be iterated over in a multirun"""
 
     pass
 
@@ -84,8 +86,8 @@ def value_check(
     return cast(T, value)
 
 
-OverrideValues = Union[None, int, float, bool, str, dict, multirun, hydra_list]
-OverrideDict = Dict[str, OverrideValues]
+OverrideValues: TypeAlias = Union[HydraPrimitives, multirun, hydra_list]
+OverrideDict: TypeAlias = Dict[str, OverrideValues]
 
 
 def _process_dict_overrides(overrides: OverrideDict) -> List[str]:
@@ -319,15 +321,12 @@ def launch(
 
     # allow user to provide a dictionary of override values
     # instead of just a list of strings
+    overrides = overrides if overrides is not None else []
     if isinstance(overrides, Dict):
-        overrides.update(override_kwargs)
         overrides = _process_dict_overrides(overrides)
-    else:
-        override_kwargs_list = _process_dict_overrides(override_kwargs)
-        if overrides:
-            overrides += override_kwargs_list
-        else:
-            overrides = override_kwargs_list
+
+    override_kwargs_list = _process_dict_overrides(override_kwargs)
+    overrides += override_kwargs_list
 
     # Initializes Hydra and add the config_path to the config search path
     with initialize(
@@ -347,7 +346,7 @@ def launch(
         # Load configuration
         cfg = gh.hydra.compose_config(
             config_name=config_name,
-            overrides=overrides if overrides is not None else [],
+            overrides=overrides,
             run_mode=RunMode.RUN if not multirun else RunMode.MULTIRUN,
             from_shell=False,
             with_log_configuration=with_log_configuration,
