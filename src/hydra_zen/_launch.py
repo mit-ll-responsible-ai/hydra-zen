@@ -12,11 +12,11 @@ from typing import (
     Optional,
     Tuple,
     Type,
-    TypeAlias,
     TypeVar,
     Union,
     cast,
 )
+from typing_extensions import  TypeAlias
 
 from hydra import initialize
 from hydra._internal.callbacks import Callbacks
@@ -322,7 +322,7 @@ def launch(
     # allow user to provide a dictionary of override values
     # instead of just a list of strings
     overrides = overrides if overrides is not None else []
-    if isinstance(overrides, Dict):
+    if isinstance(overrides, dict):
         overrides = _process_dict_overrides(overrides)
 
     override_kwargs_list = _process_dict_overrides(override_kwargs)
