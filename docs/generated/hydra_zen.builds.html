@@ -310,7 +310,7 @@ NumPy’s various ufuncs.</p>
 Consists of the following optional key-value pairs (<a class="reference internal" href="hydra_zen.typing.ZenConvert.html#zen-convert"><span class="std std-ref">hydra_zen.typing.ZenConvert</span></a>):</p>
 <ul>
 <li><dl>
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">dataclass</span></code><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a> (default=True):</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> any dataclass type/instance without a
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">dataclass</span></code><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a> (default=True):</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> any dataclass type/instance without a
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">_target_</span></code> field is automatically converted to a targeted config
 that will instantiate to that type/instance. Otherwise the dataclass
 type/instance will be passed through as-is.</p>
@@ -342,7 +342,7 @@ Defaults List itself is not a part of output config.</p>
 </dd>
 <dt><strong>frozen</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the resulting config will create frozen (i.e. immutable) instances.
 I.e. setting/deleting an attribute of an instance will raise
-<a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.FrozenInstanceError" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataclasses.FrozenInstanceError</span></code></a> at runtime.</p>
+<a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.FrozenInstanceError" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataclasses.FrozenInstanceError</span></code></a> at runtime.</p>
 </dd>
 <dt><strong>dataclass_name</strong><span class="classifier">Optional[str]</span></dt><dd><p>If specified, determines the name of the returned class object.</p>
 </dd>
