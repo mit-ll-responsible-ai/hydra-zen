@@ -7,6 +7,7 @@ from typing import (
     Any,
     Callable,
     Dict,
+    Generic,
     List,
     Mapping,
     Optional,
@@ -16,7 +17,6 @@ from typing import (
     Union,
     cast,
 )
-from typing_extensions import  TypeAlias
 
 from hydra import initialize
 from hydra._internal.callbacks import Callbacks
@@ -26,6 +26,7 @@ from hydra.core.utils import JobReturn, run_job
 from hydra.plugins.sweeper import Sweeper
 from hydra.types import HydraContext, RunMode
 from omegaconf import DictConfig, ListConfig, OmegaConf
+from typing_extensions import TypeAlias
 
 from hydra_zen._compatibility import SUPPORTS_VERSION_BASE
 from hydra_zen._hydra_overloads import instantiate
@@ -39,14 +40,20 @@ class _NotSet:  # pragma: no cover
     pass
 
 
-class hydra_list(UserList[HydraPrimitives]):
+T1 = TypeVar("T1", bound=HydraPrimitives)
+
+
+class hydra_list(UserList, Generic[T1]):
     """Signals that a sequence is provided as a single configured value (i.e. it is not
     to be iterated over during a multirun)"""
 
     pass
 
 
-class multirun(UserList[Union[HydraPrimitives, hydra_list]]):
+T2 = TypeVar("T2", bound=Union[HydraPrimitives, hydra_list[HydraPrimitives]])
+
+
+class multirun(UserList, Generic[T2]):
     """Signals that a sequence is to be iterated over in a multirun"""
 
     pass
