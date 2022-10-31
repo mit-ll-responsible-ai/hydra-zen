@@ -6,8 +6,15 @@ import pytest
 from hypothesis import given, settings
 from omegaconf import ListConfig
 
-from hydra_zen import instantiate, launch, load_from_yaml, make_config
-from hydra_zen._launch import hydra_list, multirun, value_check
+from hydra_zen import (
+    hydra_list,
+    instantiate,
+    launch,
+    load_from_yaml,
+    make_config,
+    multirun,
+)
+from hydra_zen._launch import value_check
 
 any_types = st.from_type(type)
 
