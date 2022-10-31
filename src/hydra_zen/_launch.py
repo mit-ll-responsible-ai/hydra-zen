@@ -4,6 +4,7 @@ import warnings
 from collections import UserList
 from dataclasses import fields, is_dataclass
 from typing import (
+    TYPE_CHECKING,
     Any,
     Callable,
     Dict,
@@ -35,6 +36,12 @@ from hydra_zen.typing._implementations import DataClass, InstOrType
 T = TypeVar("T", bound=Any)
 HydraPrimitives: TypeAlias = Union[None, int, float, bool, str, Dict[str, str]]
 
+if TYPE_CHECKING:  # pragma: no cover
+    # branching needed to deal with pyright type-completeness complaints
+    TUserList: TypeAlias = UserList[Any]
+else:
+    TUserList = UserList
+
 
 class _NotSet:  # pragma: no cover
     pass
@@ -43,7 +50,7 @@ class _NotSet:  # pragma: no cover
 T1 = TypeVar("T1", bound=HydraPrimitives)
 
 
-class hydra_list(UserList, Generic[T1]):
+class hydra_list(TUserList, Generic[T1]):
     """Signals that a sequence is provided as a single configured value (i.e. it is not
     to be iterated over during a multirun)"""
 
@@ -53,7 +60,7 @@ class hydra_list(UserList, Generic[T1]):
 T2 = TypeVar("T2", bound=Union[HydraPrimitives, hydra_list[HydraPrimitives]])
 
 
-class multirun(UserList, Generic[T2]):
+class multirun(TUserList, Generic[T2]):
     """Signals that a sequence is to be iterated over in a multirun"""
 
     pass
@@ -93,7 +100,11 @@ def value_check(
     return cast(T, value)
 
 
-OverrideValues: TypeAlias = Union[HydraPrimitives, multirun, hydra_list]
+OverrideValues: TypeAlias = Union[
+    HydraPrimitives,
+    multirun[Union[HydraPrimitives, hydra_list[HydraPrimitives]]],
+    hydra_list[HydraPrimitives],
+]
 OverrideDict: TypeAlias = Dict[str, OverrideValues]
 
 
