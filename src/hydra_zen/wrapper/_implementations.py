@@ -454,7 +454,7 @@ def zen(
 
     Notes
     -----
-    ConfigLike is DataClass | list[Any] | dict[str, Any] | DictConfig | ListConfig
+    ConfigLike is DataClass | dict[str, Any] | DictConfig
 
     The fields extracted from the input config are determined by the signature of the
     decorated function. There is an exception: including a parameter named "zen_cfg"
@@ -529,6 +529,19 @@ def zen(
     >>> zen(f, unpack_kwargs=True)(cfg)
     (1, {'b': 22})
 
+
+    **Passing Through The Config**
+
+    Some task functions require complete access to the full config to gain access to
+    sub-configs. One can specify the field named `zen_config` in their task function's
+    signature to signal `zen` that it should pass the full config to that parameter .
+
+    >>> @zen
+    ... def f(x: int, zen_cfg):
+    ...     return x, zen_cfg
+    >>> f(dict(x=1, y="${x}"))
+    (1, {'x': 1, 'y': 1})
+    
     **Including a pre-call function**
 
     Given that a zen-wrapped function will automatically extract and instantiate config
@@ -604,18 +617,6 @@ def zen(
     >>> zen_f.validate({"x": 1, "seed": 10})  # OK
     >>> zen_f.validate({"x": 1})  # Missing seed as required by pre-call
     HydraZenValidationError: `cfg` is missing the following fields: seed
-
-    **Passing Through The Config**
-
-    Some task functions require complete access to the full config to gain access to
-    sub-configs. One can specify the field named `zen_config` in their task function's
-    signature to signal `zen` that it should pass the full config to that parameter .
-
-    >>> @zen
-    ... def f(x: int, zen_cfg):
-    ...     return x, zen_cfg
-    >>> f(dict(x=1, y="${x}"))
-    (1, {'x': 1, 'y': 1})
     """
     if __func is not None:
         return ZenWrapper(
