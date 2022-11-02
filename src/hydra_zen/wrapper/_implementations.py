@@ -27,7 +27,15 @@ from hydra.core.config_store import ConfigStore
 from hydra.main import _UNSPECIFIED_  # type: ignore
 from hydra.utils import instantiate
 from omegaconf import DictConfig, ListConfig, OmegaConf
-from typing_extensions import Literal, ParamSpec, Protocol, TypeAlias, TypeGuard
+from typing_extensions import (
+    Final,
+    Literal,
+    ParamSpec,
+    Protocol,
+    TypeAlias,
+    TypedDict,
+    TypeGuard,
+)
 
 from hydra_zen import instantiate, make_custom_builds_fn
 from hydra_zen.errors import HydraZenValidationError
@@ -708,101 +716,192 @@ class StoreFn(Protocol):
         ...
 
 
-@overload
-def store(
-    __f: F,
-    *,
-    name: Union[str, Callable[[Any, Any], str]] = ...,
-    group: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
-    package: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
-    provider: Optional[str] = ...,
-    to_config: Callable[[F], Any] = default_to_config,
-    store_fn: HydraStoreFn = ...,
-    **to_config_kw: Any,
-) -> F:
-    ...
+# @overload
+# def store(
+#     __f: F,
+#     *,
+#     name: Union[str, Callable[[Any, Any], str]] = ...,
+#     group: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
+#     package: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
+#     provider: Optional[str] = ...,
+#     to_config: Callable[[F], Any] = default_to_config,
+#     store_fn: HydraStoreFn = ...,
+#     **to_config_kw: Any,
+# ) -> F:
+#     ...
 
 
-@overload
-def store(
-    __f: Literal[None] = None,
-    *,
-    name: Union[str, Callable[[Any, Any], str]] = ...,
-    group: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
-    package: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
-    provider: Optional[str] = ...,
-    to_config: Callable[[Any], Any] = ...,
-    store_fn: HydraStoreFn = ...,
-    **to_config_kw: Any,
-) -> StoreFn:
-    ...
+# @overload
+# def store(
+#     __f: Literal[None] = None,
+#     *,
+#     name: Union[str, Callable[[Any, Any], str]] = ...,
+#     group: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
+#     package: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
+#     provider: Optional[str] = ...,
+#     to_config: Callable[[Any], Any] = ...,
+#     store_fn: HydraStoreFn = ...,
+#     **to_config_kw: Any,
+# ) -> StoreFn:
+#     ...
 
 
-# TODO: guard repo override / internal repo
-def store(
-    __f: Optional[F] = None,
-    *,
-    name: Union[str, Callable[[Any, Any], str]] = get_name,
-    group: Optional[Union[str, Callable[[Any, Any], str]]] = None,
-    package: Optional[Union[str, Callable[[Any, Any], str]]] = None,
-    provider: Optional[str] = None,
-    to_config: Callable[[F], Any] = default_to_config,
-    store_fn: HydraStoreFn = ConfigStore.instance().store,
-    **to_config_kw: Any,
-) -> Union[F, StoreFn]:
-    def _store(
-        __g: Optional[F] = None,
-        *,
-        name: Union[str, Callable[[Any, Any], str]] = name,
-        group: Optional[Union[str, Callable[[Any, Any], str]]] = group,
-        package: Optional[Union[str, Callable[[Any, Any], str]]] = package,
-        provider: Optional[str] = provider,
-        to_config: Callable[[F], Any] = to_config,
-        store_fn: HydraStoreFn = store_fn,
-        _outer_kw: Any = to_config_kw,
-        **to_config_kw: Any,
-    ) -> Union[F, StoreFn]:
-        # Note:
-        # the pattern (..., **{**a, **b}) updates a with b and then unpacks updated `a`.
-        # This is not equivalent to (..., **a, **b), where there can be errors
-        # associated with receiving multiple values for a given argument
-        if __g is None:
-            return store(
-                name=name,
-                group=group,
-                package=package,
-                to_config=to_config,
-                provider=provider,
-                store_fn=store_fn,
-                **{**_outer_kw, **to_config_kw},
+# # TODO: guard repo override / internal repo
+# def store(
+#     __f: Optional[F] = None,
+#     *,
+#     name: Union[str, Callable[[Any, Any], str]] = get_name,
+#     group: Optional[Union[str, Callable[[Any, Any], str]]] = None,
+#     package: Optional[Union[str, Callable[[Any, Any], str]]] = None,
+#     provider: Optional[str] = None,
+#     to_config: Callable[[F], Any] = default_to_config,
+#     store_fn: HydraStoreFn = ConfigStore.instance().store,
+#     **to_config_kw: Any,
+# ) -> Union[F, StoreFn]:
+#     def _store(
+#         __g: Optional[F] = None,
+#         *,
+#         name: Union[str, Callable[[Any, Any], str]] = name,
+#         group: Optional[Union[str, Callable[[Any, Any], str]]] = group,
+#         package: Optional[Union[str, Callable[[Any, Any], str]]] = package,
+#         provider: Optional[str] = provider,
+#         to_config: Callable[[F], Any] = to_config,
+#         store_fn: HydraStoreFn = store_fn,
+#         _outer_kw: Any = to_config_kw,
+#         **to_config_kw: Any,
+#     ) -> Union[F, StoreFn]:
+#         # Note:
+#         # the pattern (..., **{**a, **b}) updates a with b and then unpacks updated `a`.
+#         # This is not equivalent to (..., **a, **b), where there can be errors
+#         # associated with receiving multiple values for a given argument
+#         if __g is None:
+#             return store(
+#                 name=name,
+#                 group=group,
+#                 package=package,
+#                 to_config=to_config,
+#                 provider=provider,
+#                 store_fn=store_fn,
+#                 **{**_outer_kw, **to_config_kw},
+#             )
+
+#         node = to_config(__g, **{**_outer_kw, **to_config_kw})
+
+#         _name = name(__g, node) if callable(name) else name
+#         if not isinstance(_name, str):  # type: ignore
+#             raise TypeError(f"`name` must be a string, got {_name}")
+#         del name
+
+#         _group = group(__g, node) if callable(group) else group
+#         if _group is not None and not isinstance(_group, str):  # type: ignore
+#             raise TypeError(f"`group` must be a string or None, got {_group}")
+#         del group
+
+#         _pkg = package(__g, node) if callable(package) else package
+#         if _pkg is not None and not isinstance(_pkg, str):  # type: ignore
+#             raise TypeError(f"`package` must be a string or None, got {_pkg}")
+#         del package
+
+#         store_fn(
+#             name=_name,
+#             node=node,
+#             group=_group,
+#             package=_pkg,
+#             provider=provider,
+#         )
+#         return __g
+
+#     if __f is not None:
+#         return _store(__f)
+#     return cast(StoreFn, _store)
+
+
+class _Defaults(TypedDict):
+    name: Union[str, Callable[[Any, Any], str]]
+    group: Optional[Union[str, Callable[[Any, Any], str]]]
+    package: Optional[Union[str, Callable[[Any, Any], str]]]
+    provider: Optional[str]
+    to_config: Callable[[Any], Any]
+    __kw: Dict[str, Any]
+
+
+defaults: Final = _Defaults(
+    name=get_name,
+    group=None,
+    package=None,
+    provider=None,
+    to_config=default_to_config,
+    __kw={},
+)
+
+_DEFAULT_KEYS: Final = {"name", "group", "package", "provider", "to_config"}
+
+
+# TODO: Prevent overwrites
+# TODO: Test that statefulness doesnt get mutated
+# TODO: Type annotations / overrides
+class ZenStore:
+    __slots__ = ("name", "_internal_repo", "_defaults", "_queue")
+
+    def __init__(self, name: Optional[str] = None) -> None:
+        self.name = "store" if name is None else name
+        self._internal_repo: Dict[Tuple[Any, Any, Any, Any], Any] = {}
+        self._queue: Dict[Tuple[Any, Any, Any, Any], Any] = {}
+        self._defaults = defaults.copy()
+
+    def __call__(self, __f: Any = None, **kw: Any):
+        if __f is None:
+            _s = type(self)(self.name)
+            _s._defaults = self._defaults.copy()
+            new_defaults: _Defaults = {k: kw[k] for k in _DEFAULT_KEYS if k in kw}  # type: ignore
+
+            new_defaults["__kw"] = {
+                **_s._defaults["__kw"],
+                **{k: kw[k] for k in set(kw) - _DEFAULT_KEYS},
+            }
+            _s._defaults.update(new_defaults)
+            return _s
+        else:
+            to_config = kw.get("to_config", self._defaults["to_config"])
+            name = kw.get("name", self._defaults["name"])
+            group = kw.get("group", self._defaults["group"])
+            package = kw.get("package", self._defaults["package"])
+            provider = kw.get("provider", self._defaults["provider"])
+
+            node = to_config(
+                __f,
+                **{
+                    **self._defaults["__kw"],
+                    **{k: kw[k] for k in set(kw) - _DEFAULT_KEYS},
+                },
             )
 
-        node = to_config(__g, **{**_outer_kw, **to_config_kw})
+            _name = name(__f, node) if callable(name) else name
+            if not isinstance(_name, str):
+                raise TypeError(f"`name` must be a string, got {_name}")
+            del name
 
-        _name = name(__g, node) if callable(name) else name
-        if not isinstance(_name, str):  # type: ignore
-            raise TypeError(f"`name` must be a string, got {_name}")
-        del name
+            _group = group(__f, node) if callable(group) else group
+            if _group is not None and not isinstance(_group, str):
+                raise TypeError(f"`group` must be a string or None, got {_group}")
+            del group
 
-        _group = group(__g, node) if callable(group) else group
-        if _group is not None and not isinstance(_group, str):  # type: ignore
-            raise TypeError(f"`group` must be a string or None, got {_group}")
-        del group
+            _pkg = package(__f, node) if callable(package) else package
+            if _pkg is not None and not isinstance(_pkg, str):
+                raise TypeError(f"`package` must be a string or None, got {_pkg}")
+            del package
 
-        _pkg = package(__g, node) if callable(package) else package
-        if _pkg is not None and not isinstance(_pkg, str):  # type: ignore
-            raise TypeError(f"`package` must be a string or None, got {_pkg}")
-        del package
+            self._internal_repo[_name, _group, _pkg, provider] = node
+            self._queue[_name, _group, _pkg, provider] = node
+            self.add_to_hydra_store()
+            return __f
 
-        store_fn(
-            name=_name,
-            node=node,
-            group=_group,
-            package=_pkg,
-            provider=provider,
-        )
-        return __g
+    def add_to_hydra_store(self):
+        for (name, group, package, provider), node in self._queue.items():
+            ConfigStore.instance().store(
+                name=name, group=group, package=package, provider=provider, node=node
+            )
+        self._queue.clear()
 
-    if __f is not None:
-        return _store(__f)
-    return cast(StoreFn, _store)
+
+store = ZenStore()

@@ -219,26 +219,6 @@ def override_store(
 @pytest.mark.parametrize(
     "apply_store",
     [
-        pytest.param(lambda: store(func, store_fn=override_store), id="inline"),
-        pytest.param(
-            lambda: store(store_fn=override_store)(func),
-            id="decorated",
-        ),
-        pytest.param(
-            lambda: store()(store_fn=override_store)(func),
-            id="partiald_decorated",
-        ),
-    ],
-)
-@pytest.mark.usefixtures("configstore_repo")
-def test_store_fn_overrides(apply_store: Callable[[], Any]):
-    with pytest.raises(AssertionError):
-        apply_store()
-
-
-@pytest.mark.parametrize(
-    "apply_store",
-    [
         pytest.param(lambda: store(func, provider="dunk", a=1, b=2), id="inline"),
         pytest.param(lambda: store(provider="dunk")(func), id="decorated"),
         pytest.param(
