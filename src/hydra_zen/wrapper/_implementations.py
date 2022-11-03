@@ -35,6 +35,7 @@ from typing_extensions import (
     Literal,
     ParamSpec,
     Protocol,
+    Self,
     TypeAlias,
     TypedDict,
     TypeGuard,
@@ -650,8 +651,11 @@ fbuilds = make_custom_builds_fn(populate_full_signature=True)
 
 
 def default_to_config(
-    target: Union[Callable[..., Any], DataClass_], **kw: Any
-) -> Union[DataClass_, Type[DataClass_]]:
+    target: Union[
+        Callable[..., Any], DataClass_, List[Any], Dict[Any, Any], ListConfig
+    ],
+    **kw: Any,
+) -> Union[DataClass_, Type[DataClass_], ListConfig, DictConfig]:
     if is_dataclass(target):
         if isinstance(target, type):
             if get_obj_path(target).startswith("types."):
@@ -696,138 +700,6 @@ class HydraStoreFn(Protocol):
         ...
 
 
-# class StoreFn(Protocol):
-#     @overload
-#     def __call__(
-#         self,
-#         __f: F,
-#         *,
-#         name: Union[str, Callable[[Any, Any], str]] = ...,
-#         group: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
-#         package: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
-#         provider: Optional[str] = ...,
-#         to_config: Callable[[F], Any] = ...,
-#         store_fn: HydraStoreFn = ...,
-#         **to_config_kw: Any,
-#     ) -> F:
-#         ...
-
-#     @overload
-#     def __call__(
-#         self,
-#         __f: Literal[None] = None,
-#         *,
-#         name: Union[str, Callable[[Any, Any], str]] = ...,
-#         group: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
-#         package: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
-#         provider: Optional[str] = ...,
-#         to_config: Callable[[Any], Any] = ...,
-#         store_fn: HydraStoreFn = ...,
-#         **to_config_kw: Any,
-#     ) -> "StoreFn":
-#         ...
-
-
-# @overload
-# def store(
-#     __f: F,
-#     *,
-#     name: Union[str, Callable[[Any, Any], str]] = ...,
-#     group: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
-#     package: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
-#     provider: Optional[str] = ...,
-#     to_config: Callable[[F], Any] = default_to_config,
-#     store_fn: HydraStoreFn = ...,
-#     **to_config_kw: Any,
-# ) -> F:
-#     ...
-
-
-# @overload
-# def store(
-#     __f: Literal[None] = None,
-#     *,
-#     name: Union[str, Callable[[Any, Any], str]] = ...,
-#     group: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
-#     package: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
-#     provider: Optional[str] = ...,
-#     to_config: Callable[[Any], Any] = ...,
-#     store_fn: HydraStoreFn = ...,
-#     **to_config_kw: Any,
-# ) -> StoreFn:
-#     ...
-
-
-# # TODO: guard repo override / internal repo
-# def store(
-#     __f: Optional[F] = None,
-#     *,
-#     name: Union[str, Callable[[Any, Any], str]] = get_name,
-#     group: Optional[Union[str, Callable[[Any, Any], str]]] = None,
-#     package: Optional[Union[str, Callable[[Any, Any], str]]] = None,
-#     provider: Optional[str] = None,
-#     to_config: Callable[[F], Any] = default_to_config,
-#     store_fn: HydraStoreFn = ConfigStore.instance().store,
-#     **to_config_kw: Any,
-# ) -> Union[F, StoreFn]:
-#     def _store(
-#         __g: Optional[F] = None,
-#         *,
-#         name: Union[str, Callable[[Any, Any], str]] = name,
-#         group: Optional[Union[str, Callable[[Any, Any], str]]] = group,
-#         package: Optional[Union[str, Callable[[Any, Any], str]]] = package,
-#         provider: Optional[str] = provider,
-#         to_config: Callable[[F], Any] = to_config,
-#         store_fn: HydraStoreFn = store_fn,
-#         _outer_kw: Any = to_config_kw,
-#         **to_config_kw: Any,
-#     ) -> Union[F, StoreFn]:
-#         # Note:
-#         # the pattern (..., **{**a, **b}) updates a with b and then unpacks updated `a`.
-#         # This is not equivalent to (..., **a, **b), where there can be errors
-#         # associated with receiving multiple values for a given argument
-#         if __g is None:
-#             return store(
-#                 name=name,
-#                 group=group,
-#                 package=package,
-#                 to_config=to_config,
-#                 provider=provider,
-#                 store_fn=store_fn,
-#                 **{**_outer_kw, **to_config_kw},
-#             )
-
-#         node = to_config(__g, **{**_outer_kw, **to_config_kw})
-
-#         _name = name(__g, node) if callable(name) else name
-#         if not isinstance(_name, str):  # type: ignore
-#             raise TypeError(f"`name` must be a string, got {_name}")
-#         del name
-
-#         _group = group(__g, node) if callable(group) else group
-#         if _group is not None and not isinstance(_group, str):  # type: ignore
-#             raise TypeError(f"`group` must be a string or None, got {_group}")
-#         del group
-
-#         _pkg = package(__g, node) if callable(package) else package
-#         if _pkg is not None and not isinstance(_pkg, str):  # type: ignore
-#             raise TypeError(f"`package` must be a string or None, got {_pkg}")
-#         del package
-
-#         store_fn(
-#             name=_name,
-#             node=node,
-#             group=_group,
-#             package=_pkg,
-#             provider=provider,
-#         )
-#         return __g
-
-#     if __f is not None:
-#         return _store(__f)
-#     return cast(StoreFn, _store)
-
-
 class _Entry(TypedDict):
     name: str
     group: Optional[str]
@@ -867,7 +739,6 @@ def _resolve_node(entry: _Entry) -> _Entry:
     return entry
 
 
-# TODO: Type annotations / overrides
 class ZenStore:
     __slots__ = (
         "name",
@@ -908,7 +779,41 @@ class ZenStore:
         self._deferred_store = deferred_hydra_store
         self._overwrite_ok = overwrite_ok
 
-    def __call__(self, __f: Any = None, **kw: Any):
+    @overload
+    def __call__(
+        self,
+        __f: F,
+        *,
+        name: Union[str, Callable[[Any], str]] = ...,
+        group: Optional[Union[str, Callable[[Any], str]]] = ...,
+        package: Optional[Union[str, Callable[[Any], str]]] = ...,
+        provider: Optional[str] = ...,
+        to_config: Callable[[F], Any] = default_to_config,
+        store_fn: HydraStoreFn = ...,
+        **to_config_kw: Any,
+    ) -> F:
+        ...
+
+    # TODO: ZenStore -> Self when mypy adds support for Self
+    #       https://github.com/python/mypy/pull/11666
+    @overload
+    def __call__(
+        self,
+        __f: Literal[None] = None,
+        *,
+        name: Union[str, Callable[[Any], str]] = ...,
+        group: Optional[Union[str, Callable[[Any], str]]] = ...,
+        package: Optional[Union[str, Callable[[Any], str]]] = ...,
+        provider: Optional[str] = ...,
+        to_config: Callable[[Any], Any] = ...,
+        store_fn: HydraStoreFn = ...,
+        **to_config_kw: Any,
+    ) -> "ZenStore":
+        ...
+
+    def __call__(
+        self: Self, __f: Optional[F] = None, **kw: Any
+    ) -> Union[F, "ZenStore"]:
         if __f is None:
             _s = type(self)(
                 self.name,

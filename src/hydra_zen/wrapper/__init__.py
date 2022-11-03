@@ -3,6 +3,6 @@
 
 # pyright: strict
 
-from ._implementations import Zen, store, zen
+from ._implementations import Zen, ZenStore, store, zen
 
-__all__ = ["zen", "Zen", "store"]
+__all__ = ["zen", "Zen", "store", "ZenStore"]

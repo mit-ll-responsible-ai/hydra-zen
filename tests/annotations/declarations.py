@@ -1,7 +1,7 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
-# These tests help to ensure that our typed interfaces have the desired behvarior, when
+# These tests help to ensure that our typed interfaces have the desired behavior, when
 # being processed by static type-checkers. Specifically we test using pyright.
 #
 # We perform contrapositive testing using lines with the pattern:
@@ -18,7 +18,18 @@ from dataclasses import dataclass
 from enum import Enum
 from functools import partial
 from pathlib import Path
-from typing import Any, Callable, List, Mapping, Optional, Tuple, Type, TypeVar, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
 
 from omegaconf import MISSING, DictConfig, ListConfig
 from typing_extensions import Literal, assert_type
@@ -47,7 +58,7 @@ from hydra_zen.typing import (
 )
 from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds, StdBuilds
 from hydra_zen.typing._implementations import DataClass_, HydraPartialBuilds
-from hydra_zen.wrapper import Zen
+from hydra_zen.wrapper import Zen, ZenStore
 
 T = TypeVar("T")
 
@@ -1196,3 +1207,21 @@ def check_store():
 
     store(A)
     store(A(1))
+
+    class SubStore(ZenStore):
+        ...
+
+    substore = SubStore()
+    substore1 = substore(a=1)
+    x = substore1(dict(a=1))
+
+    # TODO: Enable when mypy supports Self
+    # assert_type(substore1, SubStore)
+
+    assert_type(x, Dict[str, int])
+
+    # check __getitem__
+    assert_type(store["name"], Any)
+    store["name", None]
+    store["name", "group"]
+    store["name", "group", "bad"]  # type: ignore

@@ -413,7 +413,14 @@ def test_deferred_to_config(name, group):
     s = ZenStore(deferred_to_config=False)
     s = s(to_config=never_call)
     with pytest.raises(AssertionError):
-        s(1, name=name, group=group)
+        s(dict(a=1), name=name, group=group)
+
+
+def test_self_partialing_preserves_subclass():
+    s1 = NoHydra()
+    s2 = s1()
+    assert s1 is not s2
+    assert isinstance(s2, NoHydra)
 
 
 @pytest.mark.parametrize("name", "ab")
