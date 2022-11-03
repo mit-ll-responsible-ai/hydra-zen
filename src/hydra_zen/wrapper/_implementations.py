@@ -30,15 +30,7 @@ from hydra.core.config_store import ConfigStore
 from hydra.main import _UNSPECIFIED_  # type: ignore
 from hydra.utils import instantiate
 from omegaconf import DictConfig, ListConfig, OmegaConf
-from typing_extensions import (
-    Final,
-    Literal,
-    ParamSpec,
-    Protocol,
-    TypeAlias,
-    TypedDict,
-    TypeGuard,
-)
+from typing_extensions import Final, Literal, ParamSpec, TypeAlias, TypedDict, TypeGuard
 
 from hydra_zen import instantiate, just, make_custom_builds_fn
 from hydra_zen.errors import HydraZenValidationError
@@ -687,18 +679,6 @@ def get_name(target: Any) -> str:
     return name
 
 
-class HydraStoreFn(Protocol):
-    def __call__(
-        self,
-        name: str,
-        node: Any,
-        group: Optional[str] = None,
-        package: Optional[str] = None,
-        provider: Optional[str] = None,
-    ):  # pragma: no cover
-        ...
-
-
 class _Entry(TypedDict):
     name: str
     group: Optional[str]
@@ -730,8 +710,8 @@ _DEFAULT_KEYS: Final[FrozenSet[str]] = frozenset(_Defaults.__required_keys__ - {
 
 
 def _resolve_node(entry: _Entry) -> _Entry:
-    """Given an entry, updates the entry so that its node
-    is not deferred, and returns the entry"""
+    """Given an entry, updates the entry so that its node is not deferred, and returns
+    the entry. This function is a passthrough for an entry whose node is not deferred"""
     item = entry["node"]
     if not isinstance(item, type) and callable(item):
         entry["node"] = item()
@@ -770,7 +750,7 @@ class ZenStore:
                 f"deferred_hydra_store must be a bool, got {deferred_hydra_store}"
             )
 
-        self.name = "store" if name is None else name
+        self.name: str = "store" if name is None else name
         self._internal_repo: Dict[Tuple[str, Optional[str]], _Entry] = {}
         self._queue: Deque[_Entry] = deque([])
         self._defaults = defaults.copy()
@@ -788,7 +768,6 @@ class ZenStore:
         package: Optional[Union[str, Callable[[Any], str]]] = ...,
         provider: Optional[str] = ...,
         to_config: Callable[[F], Any] = default_to_config,
-        store_fn: HydraStoreFn = ...,
         **to_config_kw: Any,
     ) -> F:
         ...
@@ -805,7 +784,6 @@ class ZenStore:
         package: Optional[Union[str, Callable[[Any], str]]] = ...,
         provider: Optional[str] = ...,
         to_config: Callable[[Any], Any] = ...,
-        store_fn: HydraStoreFn = ...,
         **to_config_kw: Any,
     ) -> "ZenStore":
         ...
@@ -887,7 +865,7 @@ class ZenStore:
             key = (key, None)
         return _resolve_node(self._internal_repo[key])["node"]
 
-    def add_to_hydra_store(self, overwrite_ok: Optional[bool] = None):
+    def add_to_hydra_store(self, overwrite_ok: Optional[bool] = None) -> None:
 
         while self._queue:
             entry = _resolve_node(self._queue.popleft())
@@ -919,4 +897,4 @@ class ZenStore:
         return name + ".yaml" in repo
 
 
-store = ZenStore(deferred_to_config=True)
+store: ZenStore = ZenStore(deferred_to_config=True)
