@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 from dataclasses import dataclass
 from functools import partial
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Hashable, Optional
 
 import pytest
 from hydra.core.config_store import ConfigStore
@@ -10,6 +10,7 @@ from hypothesis import given
 from omegaconf import DictConfig, ListConfig
 
 from hydra_zen import builds, instantiate, just, make_config, store
+from hydra_zen._compatibility import HYDRA_SUPPORTS_LIST_INSTANTIATION
 from hydra_zen.wrapper._implementations import ZenStore
 
 cs = ConfigStore().instance()
@@ -329,6 +330,8 @@ def test_overwrite_ok(outer: bool, inner: bool):
 )
 @pytest.mark.usefixtures("clean_store")
 def test_default_to_config_produces_instantiable_configs(target):
+    if not HYDRA_SUPPORTS_LIST_INSTANTIATION and isinstance(target, (list, ListConfig)):
+        pytest.xfail("Hydra doesn't support list instantiation")
     store(target, name="target")
     store.add_to_hydra_store()
     instantiate_from_repo("target")
@@ -342,7 +345,7 @@ class NoHydra(ZenStore):
 
 
 @given(...)
-def test_self_partialing_reflects_state(zstore: NoHydra):
+def test_self_partialing_reflects_mutable_state(zstore: NoHydra):
     zstore2 = zstore()
     zstore3 = zstore(a=22)
     stores = [zstore2, zstore3]
@@ -360,7 +363,40 @@ def test_self_partialing_reflects_state(zstore: NoHydra):
 
     assert len(zstore._queue) == 3
     assert len(zstore._internal_repo) == 3
-    assert zstore._internal_repo is zstore2._internal_repo
-    assert zstore._internal_repo is zstore3._internal_repo
-    assert zstore._queue is zstore2._queue
-    assert zstore._queue is zstore3._queue
+    for attr in zstore.__slots__:
+        x = getattr(zstore, attr)
+        if not isinstance(x, Hashable):
+            continue
+        assert x is getattr(zstore2, attr)
+        assert x is getattr(zstore3, attr)
+
+
+@given(...)
+def test_stores_have_independent_mutable_state(store1: ZenStore, store2: ZenStore):
+    for attr in store1.__slots__:
+        x = getattr(store1, attr)
+        if isinstance(x, Hashable):
+            continue
+        assert x is not getattr(store2, attr)
+
+
+@pytest.mark.parametrize("name", "ab")
+@pytest.mark.parametrize("group", [None, "c", "d"])
+@pytest.mark.usefixtures("clean_store")
+def test_deferred_to_config(name, group):
+    Store = partial(ZenStore, deferred_hydra_store=True)
+
+    s = Store(deferred_to_config=True)
+    s(1, name=name, group=group, to_config=never_call)
+    with pytest.raises(AssertionError):
+        s.add_to_hydra_store()
+
+    s = Store(deferred_to_config=True)
+    s(1, name=name, group=group, to_config=never_call)
+    with pytest.raises(AssertionError):
+        s[name, group]
+
+    s = ZenStore(deferred_to_config=False)
+    s = s(to_config=never_call)
+    with pytest.raises(AssertionError):
+        s(1, name=name, group=group)

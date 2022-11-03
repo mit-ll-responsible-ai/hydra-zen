@@ -866,7 +866,6 @@ def _resolve_node(entry: _Entry) -> _Entry:
     return entry
 
 
-# TODO: Test that statefulness doesnt get mutated
 # TODO: Type annotations / overrides
 class ZenStore:
     __slots__ = (
