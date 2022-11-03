@@ -1,13 +1,16 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-
 from dataclasses import dataclass
+from functools import partial
 from typing import Any, Callable, Optional
 
 import pytest
 from hydra.core.config_store import ConfigStore
+from hypothesis import given
+from omegaconf import DictConfig, ListConfig
 
-from hydra_zen import instantiate, just, store
+from hydra_zen import builds, instantiate, just, make_config, store
+from hydra_zen.wrapper._implementations import ZenStore
 
 cs = ConfigStore().instance()
 
@@ -56,9 +59,10 @@ def instantiate_from_repo(
         ),
     ],
 )
-@pytest.mark.usefixtures("configstore_repo")
+@pytest.mark.usefixtures("clean_store")
 def test_kw_overrides(apply_store: Callable[[], Any]):
     out = apply_store()
+    store.add_to_hydra_store()
     assert out is func
     assert instantiate_from_repo("func") == (1, 2)
 
@@ -82,10 +86,11 @@ def test_kw_overrides(apply_store: Callable[[], Any]):
         ),
     ],
 )
-@pytest.mark.usefixtures("configstore_repo")
+@pytest.mark.usefixtures("clean_store")
 def test_name_overrides(apply_store: Callable[[], Any]):
     out = apply_store()
     assert out is func
+    store.add_to_hydra_store()
     assert instantiate_from_repo("dunk", a=1, b=2) == (1, 2)
 
 
@@ -110,10 +115,11 @@ def test_name_overrides(apply_store: Callable[[], Any]):
         ),
     ],
 )
-@pytest.mark.usefixtures("configstore_repo")
+@pytest.mark.usefixtures("clean_store")
 def test_group_overrides(apply_store: Callable[[], Any]):
     out = apply_store()
     assert out is func
+    store.add_to_hydra_store()
     assert instantiate_from_repo(name="func", group="dunk", a=1, b=2) == (1, 2)
 
 
@@ -139,10 +145,11 @@ def test_group_overrides(apply_store: Callable[[], Any]):
         ),
     ],
 )
-@pytest.mark.usefixtures("configstore_repo")
+@pytest.mark.usefixtures("clean_store")
 def test_package_overrides(apply_store: Callable[[], Any]):
     out = apply_store()
     assert out is func
+    store.add_to_hydra_store()
     assert instantiate_from_repo(name="func", package="dunk", a=1, b=2) == (1, 2)
 
 
@@ -199,10 +206,11 @@ def never_call(*a, **k):
         ),
     ],
 )
-@pytest.mark.usefixtures("configstore_repo")
+@pytest.mark.usefixtures("clean_store")
 def test_to_config_overrides(apply_store: Callable[[], Any]):
     out = apply_store()
     assert out is func
+    store.add_to_hydra_store()
     assert instantiate_from_repo(name="func") == dict(a=1, b=2, target=func)
 
 
@@ -238,18 +246,21 @@ def override_store(
         ),
     ],
 )
-@pytest.mark.usefixtures("configstore_repo")
+@pytest.mark.usefixtures("clean_store")
 def test_provider_overrides(apply_store: Callable[[], Any]):
     out = apply_store()
     assert out is func
+    store.add_to_hydra_store()
     assert instantiate_from_repo(name="func", provider="dunk", a=1, b=2) == (1, 2)
 
 
 @pytest.mark.parametrize("bad_val", [1, True, ("a",)])
 @pytest.mark.parametrize("field_name", ["name", "group", "package"])
+@pytest.mark.usefixtures("clean_store")
 def test_store_param_validation(bad_val, field_name: str):
     with pytest.raises(TypeError, match=rf"`{field_name}` must be"):
         store(func, **{field_name: bad_val})
+        store.add_to_hydra_store()
 
 
 @dataclass
@@ -260,6 +271,96 @@ class DC:
 dc = DC()
 
 
-def validate_get_name():
+def test_validate_get_name():
     with pytest.raises(TypeError, match=r"Cannot infer config store entry name"):
         store(dc)
+
+
+@pytest.mark.parametrize("name1", "ab")
+@pytest.mark.parametrize("name2", "ab")
+@pytest.mark.parametrize("group1", [None, "c", "d"])
+@pytest.mark.parametrize("group2", [None, "c", "d"])
+@pytest.mark.usefixtures("clean_store")
+def test_raise_on_redundant_store(
+    name1: str, name2: str, group1: Optional[str], group2: Optional[str]
+):
+    _store = ZenStore(overwrite_ok=False)
+
+    _store({"a": 1}, name=name1, group=group1)
+    if (name1, group1) == (name2, group2):
+        with pytest.raises(ValueError):
+            _store({"b": 2}, name=name2, group=group2)
+    else:
+        _store({"b": 2}, name=name2, group=group2)
+
+
+@pytest.mark.parametrize("outer", [True, False])
+@pytest.mark.parametrize("inner", [True, False])
+@pytest.mark.usefixtures("clean_store")
+def test_overwrite_ok(outer: bool, inner: bool):
+    _store = ZenStore(overwrite_ok=outer)
+    _store({}, name="a")
+    if not outer:
+        with pytest.raises(ValueError):
+            _store({}, name="a")
+        return
+    _store({}, name="a")
+    if not inner:
+        with pytest.raises(ValueError):
+            _store.add_to_hydra_store(overwrite_ok=inner)
+    else:
+        _store.add_to_hydra_store(overwrite_ok=inner)
+
+
+@pytest.mark.parametrize(
+    "target",
+    [
+        {"a": 1},
+        ["a", "b"],
+        DictConfig({"a": 1}),
+        ListConfig(["a", "b"]),
+        make_config(),
+        make_config()(),
+        builds(dict, a=1),
+        DC,
+        dc,
+        partial(func, a=1, b=1),
+    ],
+)
+@pytest.mark.usefixtures("clean_store")
+def test_default_to_config_produces_instantiable_configs(target):
+    store(target, name="target")
+    store.add_to_hydra_store()
+    instantiate_from_repo("target")
+
+
+class NoHydra(ZenStore):
+    # needed for hypothesis test -- we can't use clean_store fixture
+    # per-test
+    def add_to_hydra_store(self, overwrite_ok: Optional[bool] = None):
+        return
+
+
+@given(...)
+def test_self_partialing_reflects_state(zstore: NoHydra):
+    zstore2 = zstore()
+    zstore3 = zstore(a=22)
+    stores = [zstore2, zstore3]
+
+    for attr in zstore.__slots__:
+        if attr == "_defaults":
+            continue
+
+        for s in stores:
+            assert getattr(zstore, attr) == getattr(s, attr)
+    # assert not zstore._internal_repo
+    zstore(dict(a=1), name="a")
+    zstore2(dict(a=2), name="b")
+    zstore3(dict(a=3), name="c")
+
+    assert len(zstore._queue) == 3
+    assert len(zstore._internal_repo) == 3
+    assert zstore._internal_repo is zstore2._internal_repo
+    assert zstore._internal_repo is zstore3._internal_repo
+    assert zstore._queue is zstore2._queue
+    assert zstore._queue is zstore3._queue

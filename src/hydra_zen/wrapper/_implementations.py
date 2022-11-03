@@ -2,11 +2,14 @@
 # SPDX-License-Identifier: MIR
 # pyright: strict
 
+from collections import deque
 from inspect import Parameter, signature
 from typing import (
     Any,
     Callable,
+    Deque,
     Dict,
+    FrozenSet,
     Generic,
     Iterable,
     List,
@@ -37,8 +40,9 @@ from typing_extensions import (
     TypeGuard,
 )
 
-from hydra_zen import instantiate, make_custom_builds_fn
+from hydra_zen import instantiate, just, make_custom_builds_fn
 from hydra_zen.errors import HydraZenValidationError
+from hydra_zen.structured_configs._utils import get_obj_path
 from hydra_zen.typing._implementations import DataClass_
 
 from .._compatibility import HYDRA_SUPPORTS_LIST_INSTANTIATION, SUPPORTS_VERSION_BASE
@@ -650,6 +654,9 @@ def default_to_config(
 ) -> Union[DataClass_, Type[DataClass_]]:
     if is_dataclass(target):
         if isinstance(target, type):
+            if get_obj_path(target).startswith("types."):
+                # handles dataclasses returned by make_config()
+                return target
             return fbuilds(target, **kw, builds_bases=(target,))
         else:
             if kw:
@@ -657,12 +664,16 @@ def default_to_config(
                     "store(<dataclass-instance>, [...]) does not support specifying keyword arguments"
                 )
             return target
+    elif isinstance(target, (dict, list)):
+        return just(target)
+    elif isinstance(target, (DictConfig, ListConfig)):
+        return target
     else:
         t = cast(Callable[..., Any], target)
         return fbuilds(t, **kw)
 
 
-def get_name(target: Any, _: Any) -> str:
+def get_name(target: Any) -> str:
     name = getattr(target, "__name__", None)
     if not isinstance(name, str):
         raise TypeError(
@@ -816,15 +827,24 @@ class StoreFn(Protocol):
 #     return cast(StoreFn, _store)
 
 
-class _Defaults(TypedDict):
-    name: Union[str, Callable[[Any, Any], str]]
-    group: Optional[Union[str, Callable[[Any, Any], str]]]
-    package: Optional[Union[str, Callable[[Any, Any], str]]]
+class _Entry(TypedDict):
+    name: str
+    group: Optional[str]
+    package: Optional[str]
     provider: Optional[str]
-    to_config: Callable[[Any], Any]
+    node: Any
+
+
+class _Defaults(TypedDict):
+    name: Union[str, Callable[[Any], str]]
+    group: Optional[Union[str, Callable[[Any], str]]]
+    package: Optional[Union[str, Callable[[Any], str]]]
+    provider: Optional[str]
     __kw: Dict[str, Any]
+    to_config: Callable[[Any], Any]
 
 
+# TODO: make frozen dict
 defaults: Final = _Defaults(
     name=get_name,
     group=None,
@@ -834,25 +854,58 @@ defaults: Final = _Defaults(
     __kw={},
 )
 
-_DEFAULT_KEYS: Final = {"name", "group", "package", "provider", "to_config"}
+_DEFAULT_KEYS: Final[FrozenSet[str]] = frozenset(_Defaults.__required_keys__ - {"__kw"})  # type: ignore
 
 
-# TODO: Prevent overwrites
+def _resolve_node(entry: _Entry) -> _Entry:
+    """Given an entry, updates the entry so that its node
+    is not deferred, and returns the entry"""
+    item = entry["node"]
+    if not isinstance(item, type) and callable(item):
+        entry["node"] = item()
+    return entry
+
+
 # TODO: Test that statefulness doesnt get mutated
 # TODO: Type annotations / overrides
 class ZenStore:
-    __slots__ = ("name", "_internal_repo", "_defaults", "_queue")
+    __slots__ = (
+        "name",
+        "_internal_repo",
+        "_defaults",
+        "_queue",
+        "_deferred_to_config",
+        "_deferred_store",
+        "_overwrite_ok",
+    )
 
-    def __init__(self, name: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        name: Optional[str] = None,
+        *,
+        deferred_to_config: bool = True,
+        deferred_hydra_store: bool = True,
+        overwrite_ok: bool = False,
+    ) -> None:
         self.name = "store" if name is None else name
-        self._internal_repo: Dict[Tuple[Any, Any, Any, Any], Any] = {}
-        self._queue: Dict[Tuple[Any, Any, Any, Any], Any] = {}
+        self._internal_repo: Dict[Tuple[str, Optional[str]], _Entry] = {}
+        self._queue: Deque[_Entry] = deque([])
         self._defaults = defaults.copy()
+        self._deferred_to_config = deferred_to_config
+        self._deferred_store = deferred_hydra_store
+        self._overwrite_ok = overwrite_ok
 
     def __call__(self, __f: Any = None, **kw: Any):
         if __f is None:
-            _s = type(self)(self.name)
+            _s = type(self)(
+                self.name,
+                deferred_to_config=self._deferred_to_config,
+                deferred_hydra_store=self._deferred_store,
+                overwrite_ok=self._overwrite_ok,
+            )
             _s._defaults = self._defaults.copy()
+            _s._internal_repo = self._internal_repo
+            _s._queue = self._queue
             new_defaults: _Defaults = {k: kw[k] for k in _DEFAULT_KEYS if k in kw}  # type: ignore
 
             new_defaults["__kw"] = {
@@ -868,40 +921,87 @@ class ZenStore:
             package = kw.get("package", self._defaults["package"])
             provider = kw.get("provider", self._defaults["provider"])
 
-            node = to_config(
-                __f,
-                **{
-                    **self._defaults["__kw"],
-                    **{k: kw[k] for k in set(kw) - _DEFAULT_KEYS},
-                },
-            )
-
-            _name = name(__f, node) if callable(name) else name
+            _name = name(__f) if callable(name) else name
             if not isinstance(_name, str):
                 raise TypeError(f"`name` must be a string, got {_name}")
             del name
 
-            _group = group(__f, node) if callable(group) else group
+            _group = group(__f) if callable(group) else group
             if _group is not None and not isinstance(_group, str):
                 raise TypeError(f"`group` must be a string or None, got {_group}")
             del group
 
-            _pkg = package(__f, node) if callable(package) else package
+            _pkg = package(__f) if callable(package) else package
             if _pkg is not None and not isinstance(_pkg, str):
                 raise TypeError(f"`package` must be a string or None, got {_pkg}")
             del package
 
-            self._internal_repo[_name, _group, _pkg, provider] = node
-            self._queue[_name, _group, _pkg, provider] = node
-            self.add_to_hydra_store()
+            merged_kw = {
+                **self._defaults["__kw"],
+                **{k: kw[k] for k in set(kw) - _DEFAULT_KEYS},
+            }
+
+            if self._deferred_to_config:
+                node = lambda: to_config(__f, **merged_kw)  # noqa: E731
+            else:
+                node = to_config(__f, **merged_kw)
+
+            entry = _Entry(
+                name=_name,
+                group=_group,
+                package=_pkg,
+                provider=provider,
+                node=node,
+            )
+
+            if not self._overwrite_ok and (_name, _group) in self._internal_repo:
+                raise ValueError(
+                    f"(name={entry['name']} group={entry['group']}): "
+                    f"Hydra config store entry already exists. Specify "
+                    f"`overwrite_ok=True` to enable replacing config store entries"
+                )
+            self._internal_repo[_name, _group] = entry
+            self._queue.append(entry)
+
+            if not self._deferred_store:
+                self.add_to_hydra_store()
             return __f
 
-    def add_to_hydra_store(self):
-        for (name, group, package, provider), node in self._queue.items():
-            ConfigStore.instance().store(
-                name=name, group=group, package=package, provider=provider, node=node
-            )
-        self._queue.clear()
+    def __getitem__(self, key: Union[str, Tuple[str, Optional[str]]]) -> Any:
+        if isinstance(key, str):
+            key = (key, None)
+        return _resolve_node(self._internal_repo[key])["node"]
+
+    def add_to_hydra_store(self, overwrite_ok: Optional[bool] = None):
+
+        while self._queue:
+            entry = _resolve_node(self._queue.popleft())
+            if (
+                overwrite_ok is False
+                or (overwrite_ok is None and not self._overwrite_ok)
+            ) and self._exists_in_hydra_store(name=entry["name"], group=entry["group"]):
+                raise ValueError(
+                    f"(name={entry['name']} group={entry['group']}): "
+                    f"Hydra config store entry already exists. Specify "
+                    f"`overwrite_ok=True` to enable replacing config store entries"
+                )
+            ConfigStore.instance().store(**entry)
+
+    def _exists_in_hydra_store(
+        self,
+        *,
+        name: str,
+        group: Optional[str],
+        hydra_store: ConfigStore = ConfigStore().instance(),
+    ) -> bool:
+        repo = hydra_store.repo
+
+        if group is not None:
+            _grp = repo.get(group)
+            if _grp is None:
+                return False
+            repo: Dict[str, Any] = _grp
+        return name + ".yaml" in repo
 
 
-store = ZenStore()
+store = ZenStore(deferred_to_config=True)
