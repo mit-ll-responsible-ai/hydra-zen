@@ -887,6 +887,19 @@ class ZenStore:
         deferred_hydra_store: bool = True,
         overwrite_ok: bool = False,
     ) -> None:
+        if not isinstance(deferred_to_config, bool):  # type: ignore
+            raise TypeError(
+                f"deferred_to_config must be a bool, got {deferred_to_config}"
+            )
+
+        if not isinstance(overwrite_ok, bool):  # type: ignore
+            raise TypeError(f"overwrite_ok must be a bool, got {overwrite_ok}")
+
+        if not isinstance(deferred_hydra_store, bool):  # type: ignore
+            raise TypeError(
+                f"deferred_hydra_store must be a bool, got {deferred_hydra_store}"
+            )
+
         self.name = "store" if name is None else name
         self._internal_repo: Dict[Tuple[str, Optional[str]], _Entry] = {}
         self._queue: Deque[_Entry] = deque([])

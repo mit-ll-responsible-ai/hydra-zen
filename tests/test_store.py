@@ -432,3 +432,11 @@ def test_default_to_config_validates_dataclass_instance_with_kw():
 
     with pytest.raises(ValueError):
         store["dc"]
+
+
+@pytest.mark.parametrize(
+    "param_name", ["deferred_to_config", "deferred_hydra_store", "overwrite_ok"]
+)
+def test_validate_init(param_name):
+    with pytest.raises(TypeError, match=f"{param_name} must be a bool"):
+        ZenStore(**{param_name: "bad"})
