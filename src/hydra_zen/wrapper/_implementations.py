@@ -35,7 +35,6 @@ from typing_extensions import (
     Literal,
     ParamSpec,
     Protocol,
-    Self,
     TypeAlias,
     TypedDict,
     TypeGuard,
@@ -811,9 +810,7 @@ class ZenStore:
     ) -> "ZenStore":
         ...
 
-    def __call__(
-        self: Self, __f: Optional[F] = None, **kw: Any
-    ) -> Union[F, "ZenStore"]:
+    def __call__(self, __f: Optional[F] = None, **kw: Any) -> Union[F, "ZenStore"]:
         if __f is None:
             _s = type(self)(
                 self.name,
