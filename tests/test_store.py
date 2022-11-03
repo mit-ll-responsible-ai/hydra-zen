@@ -378,6 +378,7 @@ def test_stores_have_independent_mutable_state(store1: ZenStore, store2: ZenStor
         if isinstance(x, Hashable):
             continue
         assert x is not getattr(store2, attr)
+        assert x is not getattr(store, attr)  # check default store
 
 
 @pytest.mark.parametrize("name", "ab")
