@@ -769,7 +769,7 @@ class ZenStore:
         provider: Optional[str] = ...,
         to_config: Callable[[F], Any] = default_to_config,
         **to_config_kw: Any,
-    ) -> F:
+    ) -> F:  # pragma: no cover
         ...
 
     # TODO: ZenStore -> Self when mypy adds support for Self
@@ -785,7 +785,7 @@ class ZenStore:
         provider: Optional[str] = ...,
         to_config: Callable[[Any], Any] = ...,
         **to_config_kw: Any,
-    ) -> "ZenStore":
+    ) -> "ZenStore":  # pragma: no cover
         ...
 
     def __call__(self, __f: Optional[F] = None, **kw: Any) -> Union[F, "ZenStore"]:
