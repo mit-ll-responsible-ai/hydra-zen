@@ -1,5 +1,6 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+import re
 from dataclasses import dataclass
 from functools import partial
 from typing import Any, Callable, Hashable, Optional
@@ -295,19 +296,31 @@ def test_raise_on_redundant_store(
         _store({"b": 2}, name=name2, group=group2)
 
 
+@pytest.mark.parametrize("name", "ab")
+@pytest.mark.parametrize("group", [None, "c", "d"])
 @pytest.mark.parametrize("outer", [True, False])
 @pytest.mark.parametrize("inner", [True, False])
 @pytest.mark.usefixtures("clean_store")
-def test_overwrite_ok(outer: bool, inner: bool):
+def test_overwrite_ok(outer: bool, inner: bool, name, group):
     _store = ZenStore(overwrite_ok=outer)
-    _store({}, name="a")
+    _store({}, name=name, group=group)
     if not outer:
-        with pytest.raises(ValueError):
-            _store({}, name="a")
+        with pytest.raises(
+            ValueError,
+            match=re.escape(
+                f"(name={name} group={group}): Hydra config store entry already exists"
+            ),
+        ):
+            _store({}, name=name, group=group)
         return
-    _store({}, name="a")
+    _store({}, name=name, group=group)
     if not inner:
-        with pytest.raises(ValueError):
+        with pytest.raises(
+            ValueError,
+            match=re.escape(
+                f"(name={name} group={group}): Hydra config store entry already exists"
+            ),
+        ):
             _store.add_to_hydra_store(overwrite_ok=inner)
     else:
         _store.add_to_hydra_store(overwrite_ok=inner)
@@ -401,3 +414,21 @@ def test_deferred_to_config(name, group):
     s = s(to_config=never_call)
     with pytest.raises(AssertionError):
         s(1, name=name, group=group)
+
+
+@pytest.mark.parametrize("name", "ab")
+@pytest.mark.parametrize("deferred_to_config", [True, False])
+@pytest.mark.usefixtures("clean_store")
+def test_getitem(deferred_to_config: bool, name: str):
+    s = ZenStore(deferred_to_config=deferred_to_config)
+    conf = make_config()()
+    s(conf, name=name)
+    assert s[name] is conf
+
+
+@pytest.mark.usefixtures("clean_store")
+def test_default_to_config_validates_dataclass_instance_with_kw():
+    store(make_config(a=2)(), name="dc", a=1)
+
+    with pytest.raises(ValueError):
+        store["dc"]

@@ -661,7 +661,8 @@ def default_to_config(
         else:
             if kw:
                 raise ValueError(
-                    "store(<dataclass-instance>, [...]) does not support specifying keyword arguments"
+                    "store(<dataclass-instance>, [...]) does not support specifying "
+                    "keyword arguments"
                 )
             return target
     elif isinstance(target, (dict, list)):
@@ -691,40 +692,40 @@ class HydraStoreFn(Protocol):
         group: Optional[str] = None,
         package: Optional[str] = None,
         provider: Optional[str] = None,
-    ):
+    ):  # pragma: no cover
         ...
 
 
-class StoreFn(Protocol):
-    @overload
-    def __call__(
-        self,
-        __f: F,
-        *,
-        name: Union[str, Callable[[Any, Any], str]] = ...,
-        group: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
-        package: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
-        provider: Optional[str] = ...,
-        to_config: Callable[[F], Any] = ...,
-        store_fn: HydraStoreFn = ...,
-        **to_config_kw: Any,
-    ) -> F:
-        ...
+# class StoreFn(Protocol):
+#     @overload
+#     def __call__(
+#         self,
+#         __f: F,
+#         *,
+#         name: Union[str, Callable[[Any, Any], str]] = ...,
+#         group: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
+#         package: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
+#         provider: Optional[str] = ...,
+#         to_config: Callable[[F], Any] = ...,
+#         store_fn: HydraStoreFn = ...,
+#         **to_config_kw: Any,
+#     ) -> F:
+#         ...
 
-    @overload
-    def __call__(
-        self,
-        __f: Literal[None] = None,
-        *,
-        name: Union[str, Callable[[Any, Any], str]] = ...,
-        group: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
-        package: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
-        provider: Optional[str] = ...,
-        to_config: Callable[[Any], Any] = ...,
-        store_fn: HydraStoreFn = ...,
-        **to_config_kw: Any,
-    ) -> "StoreFn":
-        ...
+#     @overload
+#     def __call__(
+#         self,
+#         __f: Literal[None] = None,
+#         *,
+#         name: Union[str, Callable[[Any, Any], str]] = ...,
+#         group: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
+#         package: Optional[Union[str, Callable[[Any, Any], str]]] = ...,
+#         provider: Optional[str] = ...,
+#         to_config: Callable[[Any], Any] = ...,
+#         store_fn: HydraStoreFn = ...,
+#         **to_config_kw: Any,
+#     ) -> "StoreFn":
+#         ...
 
 
 # @overload
