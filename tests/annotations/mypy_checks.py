@@ -4,6 +4,7 @@
 from typing_extensions import assert_type
 
 from hydra_zen import builds, instantiate, just, make_custom_builds_fn, store
+from hydra_zen.wrapper import ZenStore
 
 
 def check_builds() -> None:
@@ -55,14 +56,15 @@ def check_store() -> None:
     def f2(x: int, y: int) -> str:
         ...
 
-    reveal_type(f)
-    reveal_type(f2)
+    # reveal_type(f)
+    # reveal_type(f2)
 
-    reveal_type(store(f))
-    reveal_type(store(f, name="bye"))
-    reveal_type(store(name="bye")(f))
+    # reveal_type(store(f))
+    # reveal_type(store(f, name="bye"))
+    # reveal_type(store(name="bye")(f))
 
     apple_store = store(group="apple")
+    assert_type(apple_store, ZenStore)
 
     @apple_store
     def a1(x: int) -> bool:
@@ -72,14 +74,15 @@ def check_store() -> None:
     def a2(x: int) -> bool:
         ...
 
-    reveal_type(a1)
-    reveal_type(a2)
+    assert_type(a2(1), bool)
+    assert_type(store()(a1)(1), bool)
+    assert_type(store()(a1)("a"), bool)  # type: ignore [arg-type]
     apple_store(name="bye")
     apple_store(name=22)  # type: ignore [call-overload]
 
-    reveal_type(apple_store(a1))
-    reveal_type(apple_store(a1, name="bye"))
-    reveal_type(apple_store(name="bye")(a1))
+    # reveal_type(apple_store(a1))
+    # reveal_type(apple_store(a1, name="bye"))
+    # reveal_type(apple_store(name="bye")(a1))
 
     @store(f)  # type: ignore [arg-type, call-arg]
     def bad(x: int, y: int) -> str:
