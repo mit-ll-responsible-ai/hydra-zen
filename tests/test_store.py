@@ -299,9 +299,9 @@ def test_store_nested_groups(include_none: bool):
 
     if include_none:
         assert local_store.groups == [None, "A", "A/B", "A/B/C"]
+        assert len(local_store[None]) == 1
     else:
         assert local_store.groups == ["A", "A/B", "A/B/C"]
-    assert len(local_store[None]) == 1
     assert len(local_store["A"]) == 4
     assert len(local_store["A/B"]) == 2
     assert len(local_store["A/B/C"]) == 1
