@@ -266,10 +266,20 @@ def test_store_nested_groups(include_none: bool):
     local_store = ZenStore(deferred_hydra_store=False)
     if include_none:
         local_store({"a": 0}, name="a")
+
+    assert isinstance(repr(local_store), str)
+
     local_store({"a": 1}, group="A", name="a")
+    assert isinstance(repr(local_store), str)
+
     local_store({"a": 2}, group="A", name="b")
+    assert isinstance(repr(local_store), str)
+
     local_store({"a": 3}, group="A/B", name="ab")
+    assert isinstance(repr(local_store), str)
+
     local_store({"a": 4}, group="A/B/C", name="abc")
+    assert isinstance(repr(local_store), str)
 
     if include_none:
         assert instantiate_from_repo(name="a") == instantiate(local_store[None, "a"])
