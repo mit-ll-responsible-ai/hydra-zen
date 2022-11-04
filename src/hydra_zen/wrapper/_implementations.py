@@ -759,7 +759,7 @@ class ZenStore:
         self._deferred_store = deferred_hydra_store
         self._overwrite_ok = overwrite_ok
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         groups_contents: DefaultDict[Optional[str], List[str]] = defaultdict(list)
         for grp, name in self._internal_repo:
             groups_contents[grp].append(name)
