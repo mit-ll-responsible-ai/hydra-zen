@@ -33,7 +33,10 @@ def instantiate_from_repo(
     """Fetches config-node from repo by name and instantiates it
     with provided kwargs"""
     if group is not None:
-        item = cs.repo[group][f"{name}.yaml"]
+        repo = cs.repo
+        for group_name in group.split("/"):
+            repo = repo[group_name]
+        item = repo[f"{name}.yaml"]
     else:
         item = cs.repo[f"{name}.yaml"]
     assert item.package == package
@@ -256,6 +259,46 @@ def test_provider_overrides(apply_store: Callable[[], Any]):
     assert instantiate_from_repo(name="func", provider="dunk", a=1, b=2) == (1, 2)
 
 
+@pytest.mark.usefixtures("clean_store")
+def test_store_nested_groups():
+    # Tests that nested groups are stored in Hydra store as-expected
+    # and that ZenStore's __getitem__ has parity with the store
+    local_store = ZenStore(deferred_hydra_store=False)
+    local_store({"a": 1}, group="A", name="a")
+    local_store({"a": 2}, group="A", name="b")
+    local_store({"a": 3}, group="A/B", name="ab")
+    local_store({"a": 4}, group="A/B/C", name="abc")
+
+    assert instantiate_from_repo(name="a", group="A") == instantiate(
+        local_store["A", "a"]
+    )
+    assert instantiate_from_repo(name="a", group="A") == {"a": 1}
+
+    assert instantiate_from_repo(name="b", group="A") == instantiate(
+        local_store["A", "b"]
+    )
+
+    assert instantiate_from_repo(name="b", group="A") == {"a": 2}
+
+    assert instantiate_from_repo(name="ab", group="A/B") == instantiate(
+        local_store["A/B", "ab"]
+    )
+    assert instantiate_from_repo(name="ab", group="A/B") == {"a": 3}
+
+    assert instantiate_from_repo(name="abc", group="A/B/C") == instantiate(
+        local_store["A/B/C", "abc"]
+    )
+    assert instantiate_from_repo(name="abc", group="A/B/C") == {"a": 4}
+
+    assert local_store.groups == ["A", "A/B", "A/B/C"]
+    assert len(local_store["A"]) == 4
+    assert len(local_store["A/B"]) == 2
+    assert len(local_store["A/B/C"]) == 1
+
+    assert set(local_store["A/B"]) < set(local_store["A"])
+    assert set(local_store["A/B/C"]) < set(local_store["A/B"])
+
+
 @pytest.mark.parametrize("bad_val", [1, True, ("a",)])
 @pytest.mark.parametrize("field_name", ["name", "group", "package"])
 @pytest.mark.usefixtures("clean_store")
@@ -280,8 +323,8 @@ def test_validate_get_name():
 
 @pytest.mark.parametrize("name1", "ab")
 @pytest.mark.parametrize("name2", "ab")
-@pytest.mark.parametrize("group1", [None, "c", "d"])
-@pytest.mark.parametrize("group2", [None, "c", "d"])
+@pytest.mark.parametrize("group1", [None, "c", "d", "e/f", "e/f/g"])
+@pytest.mark.parametrize("group2", [None, "c", "d", "e/f", "e/f/g"])
 @pytest.mark.usefixtures("clean_store")
 def test_raise_on_redundant_store(
     name1: str, name2: str, group1: Optional[str], group2: Optional[str]
@@ -297,7 +340,7 @@ def test_raise_on_redundant_store(
 
 
 @pytest.mark.parametrize("name", "ab")
-@pytest.mark.parametrize("group", [None, "c", "d"])
+@pytest.mark.parametrize("group", [None, "c", "d", "e/f", "e/f/g"])
 @pytest.mark.parametrize("outer", [True, False])
 @pytest.mark.parametrize("inner", [True, False])
 @pytest.mark.usefixtures("clean_store")
@@ -395,7 +438,7 @@ def test_stores_have_independent_mutable_state(store1: ZenStore, store2: ZenStor
 
 
 @pytest.mark.parametrize("name", "ab")
-@pytest.mark.parametrize("group", [None, "c", "d"])
+@pytest.mark.parametrize("group", [None, "c", "d", "e/f", "e/f/g"])
 @pytest.mark.usefixtures("clean_store")
 def test_deferred_to_config(name, group):
     Store = partial(ZenStore, deferred_hydra_store=True)
@@ -408,7 +451,7 @@ def test_deferred_to_config(name, group):
     s = Store(deferred_to_config=True)
     s(1, name=name, group=group, to_config=never_call)
     with pytest.raises(AssertionError):
-        s[name, group]
+        s[group, name]
 
     s = ZenStore(deferred_to_config=False)
     s = s(to_config=never_call)
@@ -430,7 +473,7 @@ def test_getitem(deferred_to_config: bool, name: str):
     s = ZenStore(deferred_to_config=deferred_to_config)
     conf = make_config()()
     s(conf, name=name)
-    assert s[name] is conf
+    assert s[None, name] is conf
 
 
 @pytest.mark.usefixtures("clean_store")
@@ -438,7 +481,7 @@ def test_default_to_config_validates_dataclass_instance_with_kw():
     store(make_config(a=2)(), name="dc", a=1)
 
     with pytest.raises(ValueError):
-        store["dc"]
+        store[None, "dc"]
 
 
 @pytest.mark.parametrize(

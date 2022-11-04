@@ -2,11 +2,12 @@
 # SPDX-License-Identifier: MIR
 # pyright: strict
 
-from collections import deque
+from collections import defaultdict, deque
 from inspect import Parameter, signature
 from typing import (
     Any,
     Callable,
+    DefaultDict,
     Deque,
     Dict,
     FrozenSet,
@@ -750,13 +751,19 @@ class ZenStore:
                 f"deferred_hydra_store must be a bool, got {deferred_hydra_store}"
             )
 
-        self.name: str = "store" if name is None else name
-        self._internal_repo: Dict[Tuple[str, Optional[str]], _Entry] = {}
+        self.name: str = "custom_store" if name is None else name
+        self._internal_repo: Dict[Tuple[Optional[str], str], _Entry] = {}
         self._queue: Deque[_Entry] = deque([])
         self._defaults = defaults.copy()
         self._deferred_to_config = deferred_to_config
         self._deferred_store = deferred_hydra_store
         self._overwrite_ok = overwrite_ok
+
+    def __repr__(self):
+        groups_contents: DefaultDict[Optional[str], List[str]] = defaultdict(list)
+        for grp, name in self._internal_repo:
+            groups_contents[grp].append(name)
+        return f"{self.name} (group -> names)\n{dict(groups_contents)}"
 
     @overload
     def __call__(
@@ -847,22 +854,43 @@ class ZenStore:
                 node=node,
             )
 
-            if not self._overwrite_ok and (_name, _group) in self._internal_repo:
+            if not self._overwrite_ok and (_group, _name) in self._internal_repo:
                 raise ValueError(
                     f"(name={entry['name']} group={entry['group']}): "
                     f"Hydra config store entry already exists. Specify "
                     f"`overwrite_ok=True` to enable replacing config store entries"
                 )
-            self._internal_repo[_name, _group] = entry
+            self._internal_repo[_group, _name] = entry
             self._queue.append(entry)
 
             if not self._deferred_store:
                 self.add_to_hydra_store()
             return __f
 
-    def __getitem__(self, key: Union[str, Tuple[str, Optional[str]]]) -> Any:
-        if isinstance(key, str):
-            key = (key, None)
+    @property
+    def groups(self) -> List[Optional[str]]:
+        return sorted(set(group for group, _ in self._internal_repo))  # type: ignore
+
+    @overload
+    def __getitem__(self, key: Tuple[Optional[str], str]) -> Any:
+        ...
+
+    @overload
+    def __getitem__(self, key: Optional[str]) -> Dict[Tuple[Optional[str], str], Any]:
+        ...
+
+    def __getitem__(self, key: Union[Optional[str], Tuple[Optional[str], str]]) -> Any:
+        # store[group] ->
+        #  {(group, name): node1, (group, name2): node2, (group/subgroup, name3): node3}
+        #
+        # store[group, name] -> node
+        if isinstance(key, str) or key is None:
+            key_not_none = key is not None
+            return {
+                (group, name): _resolve_node(entry)["node"]
+                for (group, name), entry in self._internal_repo.items()
+                if group == key or (key_not_none and group.startswith(key + "/"))  # type: ignore
+            }
         return _resolve_node(self._internal_repo[key])["node"]
 
     def add_to_hydra_store(self, overwrite_ok: Optional[bool] = None) -> None:
@@ -890,11 +918,13 @@ class ZenStore:
         repo = hydra_store.repo
 
         if group is not None:
-            _grp = repo.get(group)
-            if _grp is None:
-                return False
-            repo: Dict[str, Any] = _grp
+            for group_name in group.split("/"):
+                repo = repo.get(group_name)
+                if repo is None:
+                    return False
         return name + ".yaml" in repo
 
 
-store: ZenStore = ZenStore(deferred_to_config=True)
+store: ZenStore = ZenStore(
+    name="store", deferred_to_config=True, deferred_hydra_store=True
+)

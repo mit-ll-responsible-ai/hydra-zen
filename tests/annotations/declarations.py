@@ -1221,7 +1221,7 @@ def check_store():
     assert_type(x, Dict[str, int])
 
     # check __getitem__
-    assert_type(store["name"], Any)
-    store["name", None]
-    store["name", "group"]
+    assert_type(store["group"], Dict[Tuple[Optional[str], str], Any])
+    assert_type(store[None, "name"], Any)
+    assert_type(store["group", "name"], Any)
     store["name", "group", "bad"]  # type: ignore
