@@ -879,11 +879,13 @@ class ZenStore:
             return sorted(no_none)
 
     @overload
-    def __getitem__(self, key: Tuple[Optional[str], str]) -> Any:
+    def __getitem__(self, key: Tuple[Optional[str], str]) -> Any:  # pragma: no cover
         ...
 
     @overload
-    def __getitem__(self, key: Optional[str]) -> Dict[Tuple[Optional[str], str], Any]:
+    def __getitem__(
+        self, key: Optional[str]
+    ) -> Dict[Tuple[Optional[str], str], Any]:  # pragma: no cover
         ...
 
     def __getitem__(self, key: Union[Optional[str], Tuple[Optional[str], str]]) -> Any:
@@ -897,7 +899,7 @@ class ZenStore:
                 (group, name): _resolve_node(entry)["node"]
                 for (group, name), entry in self._internal_repo.items()
                 if group == key
-                or (key_not_none and group is not None and group.startswith(key + "/"))
+                or (key_not_none and group is not None and group.startswith(key + "/"))  # type: ignore
             }
         return _resolve_node(self._internal_repo[key])["node"]
 

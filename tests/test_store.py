@@ -259,19 +259,22 @@ def test_provider_overrides(apply_store: Callable[[], Any]):
     assert instantiate_from_repo(name="func", provider="dunk", a=1, b=2) == (1, 2)
 
 
+@pytest.mark.parametrize("include_none", [True, False])
 @pytest.mark.usefixtures("clean_store")
-def test_store_nested_groups():
+def test_store_nested_groups(include_none: bool):
     # Tests that nested groups are stored in Hydra store as-expected
     # and that ZenStore's __getitem__ has parity with the store
     local_store = ZenStore(deferred_hydra_store=False)
-    local_store({"a": 0}, name="a")
+    if include_none:
+        local_store({"a": 0}, name="a")
     local_store({"a": 1}, group="A", name="a")
     local_store({"a": 2}, group="A", name="b")
     local_store({"a": 3}, group="A/B", name="ab")
     local_store({"a": 4}, group="A/B/C", name="abc")
 
-    assert instantiate_from_repo(name="a") == instantiate(local_store[None, "a"])
-    assert instantiate_from_repo(name="a") == {"a": 0}
+    if include_none:
+        assert instantiate_from_repo(name="a") == instantiate(local_store[None, "a"])
+        assert instantiate_from_repo(name="a") == {"a": 0}
 
     assert instantiate_from_repo(name="a", group="A") == instantiate(
         local_store["A", "a"]
@@ -294,7 +297,10 @@ def test_store_nested_groups():
     )
     assert instantiate_from_repo(name="abc", group="A/B/C") == {"a": 4}
 
-    assert local_store.groups == [None, "A", "A/B", "A/B/C"]
+    if include_none:
+        assert local_store.groups == [None, "A", "A/B", "A/B/C"]
+    else:
+        assert local_store.groups == ["A", "A/B", "A/B/C"]
     assert len(local_store[None]) == 1
     assert len(local_store["A"]) == 4
     assert len(local_store["A/B"]) == 2
