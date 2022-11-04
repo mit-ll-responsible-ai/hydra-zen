@@ -51,14 +51,15 @@ with a Hydra-agnostic task function that has an explicit signature:
 
    from hydra_zen import zen
    
-   @zen
    def trainer_task_fn(model, data, partial_optim, trainer, num_epochs: int):
-      # All config-field extraction & instantiation is automated/mediated by zen
       optim = partial_optim(model.parameters())
       trainer(model, optim, data).fit(num_epochs)
    
    if __name__ == "__main__":
-      trainer_task_fn.hydra_main(config_name="my_app", config_path=None)
+      # All config-field extraction & instantiation is automated/mediated by zen.
+      # I.e. `zen` will extract & instantiate model, data, etc. from the input
+      # config and pass it to `trainer_task_fn`
+      zen(trainer_task_fn).hydra_main(config_name="my_app", config_path=None)
 
 
 There are plenty more bells and whistles to :func:`~hydra_zen.zen`, refer to :pull:`310` and its reference documentation for more details.
