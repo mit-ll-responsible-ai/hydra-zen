@@ -10,9 +10,8 @@ from hydra.core.config_store import ConfigStore
 from hypothesis import given
 from omegaconf import DictConfig, ListConfig
 
-from hydra_zen import builds, instantiate, just, make_config, store
+from hydra_zen import ZenStore, builds, instantiate, just, make_config, store
 from hydra_zen._compatibility import HYDRA_SUPPORTS_LIST_INSTANTIATION
-from hydra_zen.wrapper._implementations import ZenStore
 
 cs = ConfigStore().instance()
 

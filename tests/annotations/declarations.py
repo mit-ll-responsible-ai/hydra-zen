@@ -36,6 +36,7 @@ from typing_extensions import Literal, assert_type
 
 from hydra_zen import (
     ZenField,
+    ZenStore,
     builds,
     get_target,
     instantiate,
@@ -58,7 +59,7 @@ from hydra_zen.typing import (
 )
 from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds, StdBuilds
 from hydra_zen.typing._implementations import DataClass_, HydraPartialBuilds
-from hydra_zen.wrapper import Zen, ZenStore
+from hydra_zen.wrapper import Zen
 
 T = TypeVar("T")
 

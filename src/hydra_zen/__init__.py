@@ -21,7 +21,7 @@ from .structured_configs import (
 )
 from .structured_configs._implementations import get_target
 from .structured_configs._type_guards import is_partial_builds, uses_zen_processing
-from .wrapper import store, zen
+from .wrapper import ZenStore, store, zen
 
 __all__ = [
     "builds",
@@ -42,6 +42,7 @@ __all__ = [
     "uses_zen_processing",
     "zen",
     "store",
+    "ZenStore",
 ]
 
 if not TYPE_CHECKING:
