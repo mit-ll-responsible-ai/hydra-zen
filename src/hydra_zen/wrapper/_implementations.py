@@ -868,8 +868,15 @@ class ZenStore:
             return __f
 
     @property
-    def groups(self) -> List[Optional[str]]:
-        return sorted(set(group for group, _ in self._internal_repo))  # type: ignore
+    def groups(self) -> Sequence[Optional[str]]:
+        set_: Set[Optional[str]] = set(group for group, _ in self._internal_repo)
+        if None in set_:
+            set_.remove(None)
+            no_none = cast(Set[str], set_)
+            return [None] + sorted(no_none)
+        else:
+            no_none = cast(Set[str], set_)
+            return sorted(no_none)
 
     @overload
     def __getitem__(self, key: Tuple[Optional[str], str]) -> Any:
@@ -889,7 +896,8 @@ class ZenStore:
             return {
                 (group, name): _resolve_node(entry)["node"]
                 for (group, name), entry in self._internal_repo.items()
-                if group == key or (key_not_none and group.startswith(key + "/"))  # type: ignore
+                if group == key
+                or (key_not_none and group is not None and group.startswith(key + "/"))
             }
         return _resolve_node(self._internal_repo[key])["node"]
 

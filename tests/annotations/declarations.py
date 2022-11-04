@@ -1225,3 +1225,9 @@ def check_store():
     assert_type(store[None, "name"], Any)
     assert_type(store["group", "name"], Any)
     store["name", "group", "bad"]  # type: ignore
+
+    # check __call__overrides
+    store({}, name=1)  # type: ignore
+    store({}, group=1)  # type: ignore
+    store(name=1)  # type: ignore
+    store(group=1)  # type: ignore
