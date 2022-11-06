@@ -914,9 +914,11 @@ class ZenStore:
             return any(k[0] is None for k in self._internal_repo)
 
         if isinstance(key, str):
+            key_w_end: str = key + "/"
             return any(
-                key == group or group is not None and group.startswith(key + "/")
+                key == group or group.startswith(key_w_end)
                 for group, _ in self._internal_repo
+                if group is not None
             )
         return key in self._internal_repo
 
