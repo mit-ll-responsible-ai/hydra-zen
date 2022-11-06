@@ -1232,3 +1232,7 @@ def check_store():
     store({}, group=1)  # type: ignore
     store(name=1)  # type: ignore
     store(group=1)  # type: ignore
+
+    assert_type(list(store), List[Tuple[Optional[str], str]])
+    assert_type("group" in store, bool)
+    assert_type(("group", "name") in store, bool)

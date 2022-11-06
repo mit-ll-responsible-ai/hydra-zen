@@ -510,3 +510,58 @@ def test_default_to_config_validates_dataclass_instance_with_kw():
 def test_validate_init(param_name):
     with pytest.raises(TypeError, match=f"{param_name} must be a bool"):
         ZenStore(**{param_name: "bad"})
+
+
+def contains(key, store_):
+    assert key in store_ and store_[key]
+
+
+def not_contains(key, store_):
+    assert key not in store_
+    try:
+        v = store_["key"]
+    except KeyError:
+        return
+    assert not v
+
+
+@pytest.mark.usefixtures("clean_store")
+def test_contains():
+    _store = ZenStore()
+    _store({"": 2}, name="grape")
+    _store({"": 1}, group="a/b", name="apple")
+    assert_contains = partial(contains, store_=_store)
+    assert_not_contains = partial(not_contains, store_=_store)
+    assert_contains("a")
+    assert_contains("a/b")
+    assert_not_contains("b")
+    assert_not_contains("b/a")
+    assert_not_contains("c")
+    assert_not_contains("a/c")
+    assert_not_contains("a/b/c")
+    assert_not_contains("a/c/b")
+    assert_contains(("a/b", "apple"))
+    assert_not_contains(("a", "apple"))
+    assert_not_contains(("a/b", "pear"))
+    assert_contains(None)
+    assert_contains((None, "grape"))
+    assert_not_contains((None, "apple"))
+    assert_not_contains(1)
+    assert_not_contains((1, 2))
+
+
+def test_iter():
+    _store = ZenStore()
+    _store({"": 2}, name="grape")
+    _store({"": 1}, group="a/b", name="apple")
+    assert list(_store) == [(None, "grape"), ("a/b", "apple")]
+
+
+def test_items():
+    _store = ZenStore()
+    _store({"": 2}, name="grape")
+    _store({"": 1}, group="a/b", name="apple")
+    assert list([(k, v["node"]) for k, v in _store.items()]) == [
+        ((None, "grape"), {"": 2}),
+        (("a/b", "apple"), {"": 1}),
+    ]
