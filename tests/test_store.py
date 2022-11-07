@@ -554,14 +554,7 @@ def test_iter():
     _store = ZenStore()
     _store({"": 2}, name="grape")
     _store({"": 1}, group="a/b", name="apple")
-    assert list(_store) == [(None, "grape"), ("a/b", "apple")]
-
-
-def test_items():
-    _store = ZenStore()
-    _store({"": 2}, name="grape")
-    _store({"": 1}, group="a/b", name="apple")
-    assert list([(k, v["node"]) for k, v in _store.items()]) == [
-        ((None, "grape"), {"": 2}),
-        (("a/b", "apple"), {"": 1}),
+    assert list((v["group"], v["name"], v["node"]) for v in _store) == [
+        (None, "grape", {"": 2}),
+        ("a/b", "apple", {"": 1}),
     ]

@@ -50,8 +50,9 @@ R = TypeVar("R")
 P = ParamSpec("P")
 F = TypeVar("F")
 
-Group: TypeAlias = Optional[str]
+GroupName: TypeAlias = Optional[str]
 NodeName: TypeAlias = str
+Config: TypeAlias = Any
 
 if HYDRA_SUPPORTS_LIST_INSTANTIATION:
     _SUPPORTED_INSTANTIATION_TYPES: Tuple[Any, ...] = (dict, DictConfig, list, ListConfig)  # type: ignore
@@ -684,17 +685,18 @@ def get_name(target: Any) -> str:
     return name
 
 
+# TODO: add to hydra_zen.typing
 class _Entry(TypedDict):
     name: NodeName
-    group: Group
+    group: GroupName
     package: Optional[str]
     provider: Optional[str]
-    node: Any
+    node: Config
 
 
 class _Defaults(TypedDict):
     name: Union[NodeName, Callable[[Any], NodeName]]
-    group: Union[Group, Callable[[Any], Group]]
+    group: Union[GroupName, Callable[[Any], GroupName]]
     package: Optional[Union[str, Callable[[Any], str]]]
     provider: Optional[str]
     __kw: Dict[str, Any]
@@ -772,13 +774,13 @@ class ZenStore:
     @overload
     def __call__(
         self,
-        __f: F,
+        __target: F,
         *,
         name: Union[NodeName, Callable[[Any], NodeName]] = ...,
-        group: Union[Group, Callable[[Any], Group]] = ...,
+        group: Union[GroupName, Callable[[Any], GroupName]] = ...,
         package: Optional[Union[str, Callable[[Any], str]]] = ...,
         provider: Optional[str] = ...,
-        to_config: Callable[[F], Any] = default_to_config,
+        to_config: Callable[[F], Config] = default_to_config,
         **to_config_kw: Any,
     ) -> F:  # pragma: no cover
         ...
@@ -788,19 +790,19 @@ class ZenStore:
     @overload
     def __call__(
         self,
-        __f: Literal[None] = None,
+        __target: Literal[None] = None,
         *,
         name: Union[NodeName, Callable[[Any], NodeName]] = ...,
-        group: Union[Group, Callable[[Any], Group]] = ...,
+        group: Union[GroupName, Callable[[Any], GroupName]] = ...,
         package: Optional[Union[str, Callable[[Any], str]]] = ...,
         provider: Optional[str] = ...,
-        to_config: Callable[[Any], Any] = ...,
+        to_config: Callable[[Any], Config] = ...,
         **to_config_kw: Any,
     ) -> "ZenStore":  # pragma: no cover
         ...
 
-    def __call__(self, __f: Optional[F] = None, **kw: Any) -> Union[F, "ZenStore"]:
-        if __f is None:
+    def __call__(self, __target: Optional[F] = None, **kw: Any) -> Union[F, "ZenStore"]:
+        if __target is None:
             _s = type(self)(
                 self.name,
                 deferred_to_config=self._deferred_to_config,
@@ -808,8 +810,12 @@ class ZenStore:
                 overwrite_ok=self._overwrite_ok,
             )
             _s._defaults = self._defaults.copy()
+
+            # Important: mirror internal state *by reference* to ensure `_s` and
+            # `self` remain in sync
             _s._internal_repo = self._internal_repo
             _s._queue = self._queue
+
             new_defaults: _Defaults = {k: kw[k] for k in _DEFAULT_KEYS if k in kw}  # type: ignore
 
             new_defaults["__kw"] = {
@@ -825,17 +831,17 @@ class ZenStore:
             package = kw.get("package", self._defaults["package"])
             provider = kw.get("provider", self._defaults["provider"])
 
-            _name: NodeName = name(__f) if callable(name) else name
+            _name: NodeName = name(__target) if callable(name) else name
             if not isinstance(_name, str):  # type: ignore
                 raise TypeError(f"`name` must be a string, got {_name}")
             del name
 
-            _group: Group = group(__f) if callable(group) else group
+            _group: GroupName = group(__target) if callable(group) else group
             if _group is not None and not isinstance(_group, str):  # type: ignore
                 raise TypeError(f"`group` must be a string or None, got {_group}")
             del group
 
-            _pkg = package(__f) if callable(package) else package
+            _pkg = package(__target) if callable(package) else package
             if _pkg is not None and not isinstance(_pkg, str):
                 raise TypeError(f"`package` must be a string or None, got {_pkg}")
             del package
@@ -846,9 +852,13 @@ class ZenStore:
             }
 
             if self._deferred_to_config:
-                node = lambda: to_config(__f, **merged_kw)  # noqa: E731
+
+                def deferred_to_config():
+                    return to_config(__target, **merged_kw)  # noqa: E731
+
+                node = deferred_to_config
             else:
-                node = to_config(__f, **merged_kw)
+                node = to_config(__target, **merged_kw)
 
             entry = _Entry(
                 name=_name,
@@ -869,12 +879,12 @@ class ZenStore:
 
             if not self._deferred_store:
                 self.add_to_hydra_store()
-            return __f
+            return __target
 
     @property
-    def groups(self) -> Sequence[Group]:
+    def groups(self) -> Sequence[GroupName]:
         """Returns a sorted list of the groups registered with this store"""
-        set_: Set[Group] = set(group for group, _ in self._internal_repo)
+        set_: Set[GroupName] = set(group for group, _ in self._internal_repo)
         if None in set_:
             set_.remove(None)
             no_none = cast(Set[str], set_)
@@ -884,16 +894,18 @@ class ZenStore:
             return sorted(no_none)
 
     @overload
-    def __getitem__(self, key: Tuple[Group, NodeName]) -> Any:  # pragma: no cover
+    def __getitem__(
+        self, key: Tuple[GroupName, NodeName]
+    ) -> Config:  # pragma: no cover
         ...
 
     @overload
     def __getitem__(
-        self, key: Group
-    ) -> Dict[Tuple[Group, NodeName], Any]:  # pragma: no cover
+        self, key: GroupName
+    ) -> Dict[Tuple[GroupName, NodeName], Config]:  # pragma: no cover
         ...
 
-    def __getitem__(self, key: Union[Group, Tuple[Group, NodeName]]) -> Any:
+    def __getitem__(self, key: Union[GroupName, Tuple[GroupName, NodeName]]) -> Any:
         # store[group] ->
         #  {(group, name): node1, (group, name2): node2, (group/subgroup, name3): node3}
         #
@@ -908,7 +920,7 @@ class ZenStore:
             }
         return _resolve_node(self._internal_repo[key])["node"]
 
-    def __contains__(self, key: Union[Group, Tuple[Group, NodeName]]) -> bool:
+    def __contains__(self, key: Union[GroupName, Tuple[GroupName, NodeName]]) -> bool:
         """Checks if group or (group, node-name) exists in zen-store"""
         if key is None:
             return any(k[0] is None for k in self._internal_repo)
@@ -922,11 +934,8 @@ class ZenStore:
             )
         return key in self._internal_repo
 
-    def __iter__(self) -> Generator[Tuple[Group, NodeName], None, None]:
-        yield from self._internal_repo
-
-    def items(self) -> Generator[Tuple[Tuple[Group, NodeName], _Entry], None, None]:
-        yield from ((k, _resolve_node(v)) for k, v in self._internal_repo.items())
+    def __iter__(self) -> Generator[_Entry, None, None]:
+        yield from (_resolve_node(v) for v in self._internal_repo.values())
 
     def add_to_hydra_store(self, overwrite_ok: Optional[bool] = None) -> None:
 
@@ -947,7 +956,7 @@ class ZenStore:
         self,
         *,
         name: NodeName,
-        group: Group,
+        group: GroupName,
         hydra_store: ConfigStore = ConfigStore().instance(),
     ) -> bool:
         repo = hydra_store.repo
