@@ -449,6 +449,8 @@ def sanitized_default_value(
     convert_dataclass: bool,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    dataclass_name: Optional[str] = None,
+    zen_module: Optional[str] = None,
 ) -> Any:
     """Converts `value` to Hydra-supported type if necessary and possible. Otherwise
     raises `HydraZenUnsupportedPrimitiveError`"""
@@ -465,6 +467,7 @@ def sanitized_default_value(
             convert_dataclass=convert_dataclass,
             hydra_convert=hydra_convert,
             hydra_recursive=hydra_recursive,
+            zen_module=zen_module,
         )
 
     # non-targeted dataclass instance
@@ -502,6 +505,8 @@ def sanitized_default_value(
             **converted_fields,
             hydra_recursive=hydra_recursive,
             hydra_convert=hydra_convert,
+            zen_module=zen_module,
+            dataclass_name=dataclass_name,
         )
         _check_for_dynamically_defined_dataclass_type(
             getattr(out, TARGET_FIELD_NAME), value
@@ -580,6 +585,8 @@ def sanitized_default_value(
             convert_dataclass=convert_dataclass,
             hydra_convert=hydra_convert,
             hydra_recursive=hydra_recursive,
+            zen_module=zen_module,
+            dataclass_name=dataclass_name,
         )
 
     if isinstance(value, str):
@@ -614,6 +621,8 @@ def sanitize_collection(
     convert_dataclass: bool,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    dataclass_name: Optional[str] = None,
+    zen_module: Optional[str] = None,
 ) -> _T:
     """Pass contents of lists, tuples, or dicts through sanitized_default_values"""
     type_x = type(x)
@@ -634,6 +643,8 @@ def sanitize_collection(
                 convert_dataclass=convert_dataclass,
                 hydra_convert=hydra_convert,
                 hydra_recursive=hydra_recursive,
+                dataclass_name=dataclass_name,
+                zen_module=zen_module,
             )
             for k, v in x.items()  # type: ignore
         }
@@ -695,6 +706,7 @@ def builds(
     builds_bases: Tuple[()] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
+    zen_module: Optional[str] = ...,
 ) -> Type[BuildsWithSig[Type[R], P]]:  # pragma: no cover
     ...
 
@@ -715,6 +727,7 @@ def builds(
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
+    zen_module: Optional[str] = ...,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Type[Builds[Importable]]:  # pragma: no cover
     ...
@@ -736,6 +749,7 @@ def builds(
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
+    zen_module: Optional[str] = ...,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Type[PartialBuilds[Importable]]:  # pragma: no cover
     ...
@@ -757,6 +771,7 @@ def builds(
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
+    zen_module: Optional[str] = ...,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Union[
     Type[Builds[Importable]],
@@ -781,6 +796,7 @@ def builds(
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
+    zen_module: Optional[str] = ...,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Union[
     Type[Builds[Importable]],
@@ -803,6 +819,7 @@ def builds(
     frozen: bool = False,
     builds_bases: Tuple[Type[DataClass_], ...] = (),
     dataclass_name: Optional[str] = None,
+    zen_module: Optional[str] = None,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Union[
     Type[Builds[Importable]],
@@ -916,14 +933,22 @@ def builds(
         I.e. setting/deleting an attribute of an instance will raise
         :py:class:`dataclasses.FrozenInstanceError` at runtime.
 
-
     dataclass_name : Optional[str]
         If specified, determines the name of the returned class object.
+
+    zen_module : Optional[str]
+        If specified, determines the __module__ attribute of the returned class object.
+
+        Specifying the name of the module from which the class object can be imported
+        is necessary for the object to be compatible with pickling.
+
+        Specifying an inaccurate module name can break functionality in Hydra and
+        hydra-zen.
 
     Returns
     -------
     Config : Type[Builds[Type[T]]] | Type[PartialBuilds[Type[T]]]
-        A structured config that describes how to build ``hydra_target``.
+        A structured config (a dataclass object) that describes how to build ``hydra_target``.
 
     Raises
     ------
@@ -934,7 +959,7 @@ def builds(
     Notes
     -----
     The resulting "config" is a dynamically-generated dataclass type [5]_ with
-    Hydra-specific attributes attached to it [1]_. It posseses a `_target_` attribute
+    Hydra-specific attributes attached to it [1]_. It possesses a `_target_` attribute
     that indicates the import path to the configured target as a string.
 
     Using any of the ``zen_xx`` features will result in a config that depends
@@ -1199,8 +1224,10 @@ def builds(
     if zen_partial is not None and not isinstance(zen_partial, bool):
         raise TypeError(f"`zen_partial` must be a boolean type, got: {zen_partial}")
 
-    _utils.validate_hydra_options(
-        hydra_recursive=hydra_recursive, hydra_convert=hydra_convert
+    _utils.validate_config_creation_options(
+        hydra_recursive=hydra_recursive,
+        hydra_convert=hydra_convert,
+        zen_module=zen_module,
     )
 
     if not isinstance(frozen, bool):
@@ -1913,6 +1940,8 @@ def builds(
     out = make_dataclass(
         dataclass_name, fields=sanitized_base_fields, bases=builds_bases, frozen=frozen
     )
+    if zen_module:
+        out.__module__ = zen_module
 
     out.__doc__ = (
         f"A structured config designed to {'partially ' if zen_partial else ''}initialize/call "

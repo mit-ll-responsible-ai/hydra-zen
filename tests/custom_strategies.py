@@ -41,6 +41,7 @@ _valid_builds_strats = dict(
         st.sampled_from([builds(x) for x in (int, len, dict)]), unique=True
     ).map(tuple),
     zen_convert=st.none() | st.from_type(ZenConvert),
+    zen_module=st.none() | st.sampled_from(["mathy", "zooey", "treetree"]),
 )
 
 

@@ -33,6 +33,8 @@ def just(
     zen_convert: Optional[ZenConvert] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    dataclass_name: Optional[str] = ...,
+    zen_module: Optional[str] = ...,
 ) -> TP:  # pragma: no cover
     ...
 
@@ -44,6 +46,8 @@ def just(
     zen_convert: Optional[ZenConvert] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    dataclass_name: Optional[str] = ...,
+    zen_module: Optional[str] = ...,
 ) -> ConfigComplex:  # pragma: no cover
     ...
 
@@ -55,6 +59,8 @@ def just(
     zen_convert: Optional[ZenConvert] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    dataclass_name: Optional[str] = ...,
+    zen_module: Optional[str] = ...,
 ) -> Builds[Type[TB]]:  # pragma: no cover
     ...
 
@@ -66,6 +72,8 @@ def just(
     zen_convert: Optional[ZenConvert] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    dataclass_name: Optional[str] = ...,
+    zen_module: Optional[str] = ...,
 ) -> Type[Just[TC]]:  # pragma: no cover
     ...
 
@@ -77,6 +85,8 @@ def just(
     zen_convert: Literal[None] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    dataclass_name: Optional[str] = ...,
+    zen_module: Optional[str] = ...,
 ) -> Type[Builds[Type[TD]]]:  # pragma: no cover
     ...
 
@@ -88,6 +98,8 @@ def just(
     zen_convert: ZenConvert,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    dataclass_name: Optional[str] = ...,
+    zen_module: Optional[str] = ...,
 ) -> Any:  # pragma: no cover
     ...
 
@@ -99,6 +111,8 @@ def just(
     zen_convert: Optional[ZenConvert] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    dataclass_name: Optional[str] = ...,
+    zen_module: Optional[str] = ...,
 ) -> Any:  # pragma: no cover
     ...
 
@@ -109,6 +123,8 @@ def just(
     zen_convert: Optional[ZenConvert] = None,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    dataclass_name: Optional[str] = None,
+    zen_module: Optional[str] = None,
 ) -> Any:
     """`just(obj)` returns a config that, when instantiated, just returns `obj`.
 
@@ -140,7 +156,7 @@ def just(
 
     hydra_convert : Optional[Literal["none", "partial", "all"]], optional (default="none")
         Determines how Hydra treats the non-primitive, omegaconf-specific objects
-        during instantiateion [3]_.
+        during instantiation [3]_.
 
         - ``"none"``: No conversion occurs; omegaconf containers are passed through (Default)
         - ``"partial"``: ``DictConfig`` and ``ListConfig`` objects converted to ``dict`` and
@@ -283,10 +299,13 @@ def just(
     """
     convert_settings = merge_settings(zen_convert, _JUST_CONVERT_SETTINGS)
     del zen_convert
-    _utils.validate_hydra_options(
-        hydra_recursive=hydra_recursive, hydra_convert=hydra_convert
+    _utils.validate_config_creation_options(
+        hydra_recursive=hydra_recursive,
+        hydra_convert=hydra_convert,
+        zen_module=zen_module,
     )
 
+    # TODO: ensure zen_module propagates through, e.g., just(partial(dict), zen_module="a")
     return sanitized_default_value(
         obj,
         allow_zen_conversion=True,
@@ -294,6 +313,8 @@ def just(
         field_name="",
         error_prefix="",
         convert_dataclass=convert_settings["dataclass"],
+        dataclass_name=dataclass_name,
+        zen_module=zen_module,
         hydra_convert=hydra_convert,
         hydra_recursive=hydra_recursive,
     )

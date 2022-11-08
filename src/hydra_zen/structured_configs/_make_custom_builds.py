@@ -37,6 +37,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
+    zen_module: Optional[str] = ...,
 ) -> FullBuilds:  # pragma: no cover
     ...
 
@@ -53,6 +54,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
+    zen_module: Optional[str] = ...,
 ) -> PBuilds:  # pragma: no cover
     ...
 
@@ -69,6 +71,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
+    zen_module: Optional[str] = ...,
 ) -> StdBuilds:  # pragma: no cover
     ...
 
@@ -85,6 +88,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
+    zen_module: Optional[str] = ...,
 ) -> Union[FullBuilds, StdBuilds]:  # pragma: no cover
     ...
 
@@ -101,6 +105,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
+    zen_module: Optional[str] = ...,
 ) -> Union[PBuilds, StdBuilds]:  # pragma: no cover
     ...
 
@@ -117,6 +122,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
+    zen_module: Optional[str] = ...,
 ) -> Union[FullBuilds, PBuilds, StdBuilds]:  # pragma: no cover
     ...
 
@@ -131,6 +137,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     frozen: bool = False,
     zen_convert: Optional[ZenConvert] = None,
+    zen_module: Optional[str] = None,
 ) -> Union[FullBuilds, PBuilds, StdBuilds]:
     """Returns the `builds` function, but with customized default values.
 

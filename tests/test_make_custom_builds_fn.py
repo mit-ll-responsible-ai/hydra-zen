@@ -1,5 +1,6 @@
 import inspect
 import string
+from typing import Optional
 
 import hypothesis.strategies as st
 import pytest
@@ -68,7 +69,9 @@ def f2(x, y: str):
     "ignore:A structured config was supplied for `zen_wrappers`"
 )
 @given(
-    kwargs=partitions(valid_builds_args(excluded=("builds_bases",)), ordered=False),
+    kwargs=partitions(
+        valid_builds_args(excluded=("builds_bases", "zen_module")), ordered=False
+    ),
     target=st.sampled_from([f1, f2]),
 )
 def test_make_builds_fn_produces_builds_with_expected_defaults_and_behaviors(
@@ -84,3 +87,12 @@ def test_make_builds_fn_produces_builds_with_expected_defaults_and_behaviors(
     # this should be the same as passing all of these args directly to vanilla builds
     via_builds = builds(target, **kwargs_passed_through, **kwargs_as_defaults)
     assert to_yaml(via_custom) == to_yaml(via_builds)
+
+
+@pytest.mark.parametrize("outer_module", [None, "a", "b"])
+@pytest.mark.parametrize("inner_module", [None, "z"])
+def test_zen_module(outer_module: str, inner_module: Optional[str]):
+    builds = make_custom_builds_fn(zen_module=outer_module)
+    kw = {"zen_module": inner_module} if inner_module else {}
+    conf = builds(dict, **kw)
+    assert conf.__module__ == (inner_module or outer_module) or "types"

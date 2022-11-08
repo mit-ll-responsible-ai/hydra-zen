@@ -591,9 +591,10 @@ def merge_settings(
     return settings
 
 
-def validate_hydra_options(
+def validate_config_creation_options(
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    zen_module: Optional[str] = None,
 ) -> None:
     if hydra_recursive is not None and not isinstance(hydra_recursive, bool):
         raise TypeError(
@@ -603,4 +604,12 @@ def validate_hydra_options(
     if hydra_convert is not None and hydra_convert not in {"none", "partial", "all"}:
         raise ValueError(
             f"`hydra_convert` must be 'none', 'partial', or 'all', got: {hydra_convert}"
+        )
+
+    if zen_module is not None and (
+        not isinstance(zen_module, str) or not zen_module.isidentifier()
+    ):
+        raise ValueError(
+            f"zen_module must None or string that is a valid Python identifier."
+            f" Got: {zen_module}"
         )
