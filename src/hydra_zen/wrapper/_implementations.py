@@ -29,7 +29,6 @@ from typing import (
 
 import hydra
 from hydra.core.config_store import ConfigStore
-from hydra.main import _UNSPECIFIED_  # type: ignore
 from hydra.utils import instantiate
 from omegaconf import DictConfig, ListConfig, OmegaConf
 from typing_extensions import Final, Literal, ParamSpec, TypeAlias, TypedDict, TypeGuard
@@ -53,6 +52,8 @@ F = TypeVar("F")
 GroupName: TypeAlias = Optional[str]
 NodeName: TypeAlias = str
 Config: TypeAlias = Any
+
+_UNSPECIFIED_: Any = object()
 
 if HYDRA_SUPPORTS_LIST_INSTANTIATION:
     _SUPPORTED_INSTANTIATION_TYPES: Tuple[Any, ...] = (dict, DictConfig, list, ListConfig)  # type: ignore
@@ -349,7 +350,7 @@ class Zen(Generic[P, R]):
         version_base: Optional[str] = _UNSPECIFIED_,
     ) -> Callable[[Any], Any]:
         """
-        Returns a Hydra-CLI compatible version of the wrapped function: `hydra.main(zen(func))`
+        Generates a Hydra-CLI for the wrapped function. Equivalent to `hydra.main(zen(func), [...])()`
 
         Parameters
         ----------
@@ -374,8 +375,12 @@ class Zen(Generic[P, R]):
             Equivalent to `hydra.main(zen(func), [...])()`
         """
 
-        kw = dict(config_path=config_path, config_name=config_name)
-        if SUPPORTS_VERSION_BASE:
+        kw = dict(config_name=config_name)
+
+        if config_path is not _UNSPECIFIED_:
+            kw["config_path"] = config_path
+
+        if SUPPORTS_VERSION_BASE and version_base is not _UNSPECIFIED_:
             kw["version_base"] = version_base
 
         return hydra.main(**kw)(self)()
