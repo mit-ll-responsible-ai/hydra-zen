@@ -686,7 +686,7 @@ def get_name(target: Any) -> str:
 
 
 # TODO: add to hydra_zen.typing
-class _Entry(TypedDict):
+class StoreEntry(TypedDict):
     name: NodeName
     group: GroupName
     package: Optional[str]
@@ -716,11 +716,25 @@ defaults: Final = _Defaults(
 _DEFAULT_KEYS: Final[FrozenSet[str]] = frozenset(_Defaults.__required_keys__ - {"__kw"})  # type: ignore
 
 
-def _resolve_node(entry: _Entry) -> _Entry:
+class _Deferred:
+    __slots__ = ("to_config", "target", "kw")
+
+    def __init__(
+        self, to_config: Callable[[F], Config], target: F, kw: Dict[str, Any]
+    ) -> None:
+        self.to_config = to_config
+        self.target = target
+        self.kw = kw
+
+    def __call__(self) -> Any:
+        return self.to_config(self.target, **self.kw)
+
+
+def _resolve_node(entry: StoreEntry) -> StoreEntry:
     """Given an entry, updates the entry so that its node is not deferred, and returns
     the entry. This function is a passthrough for an entry whose node is not deferred"""
     item = entry["node"]
-    if not isinstance(item, type) and callable(item):
+    if isinstance(item, _Deferred):
         entry["node"] = item()
     return entry
 
@@ -758,8 +772,8 @@ class ZenStore:
             )
 
         self.name: str = "custom_store" if name is None else name
-        self._internal_repo: Dict[Tuple[Optional[str], str], _Entry] = {}
-        self._queue: Deque[_Entry] = deque([])
+        self._internal_repo: Dict[Tuple[Optional[str], str], StoreEntry] = {}
+        self._queue: Deque[StoreEntry] = deque([])
         self._defaults = defaults.copy()
         self._deferred_to_config = deferred_to_config
         self._deferred_store = deferred_hydra_store
@@ -769,8 +783,9 @@ class ZenStore:
         groups_contents: DefaultDict[Optional[str], List[str]] = defaultdict(list)
         for grp, name in self._internal_repo:
             groups_contents[grp].append(name)
-        return f"{self.name} (group -> node names)\n{dict(groups_contents)}"
+        return f"({self.name}){dict(groups_contents)}"
 
+    # TODO: support *to_config_pos_args
     @overload
     def __call__(
         self,
@@ -852,15 +867,11 @@ class ZenStore:
             }
 
             if self._deferred_to_config:
-
-                def deferred_to_config():
-                    return to_config(__target, **merged_kw)  # noqa: E731
-
-                node = deferred_to_config
+                node = _Deferred(to_config, __target, merged_kw)
             else:
                 node = to_config(__target, **merged_kw)
 
-            entry = _Entry(
+            entry = StoreEntry(
                 name=_name,
                 group=_group,
                 package=_pkg,
@@ -905,6 +916,7 @@ class ZenStore:
     ) -> Dict[Tuple[GroupName, NodeName], Config]:  # pragma: no cover
         ...
 
+    # TODO: create .get_entry
     def __getitem__(self, key: Union[GroupName, Tuple[GroupName, NodeName]]) -> Any:
         # store[group] ->
         #  {(group, name): node1, (group, name2): node2, (group/subgroup, name3): node3}
@@ -912,11 +924,14 @@ class ZenStore:
         # store[group, name] -> node
         if isinstance(key, str) or key is None:
             key_not_none = key is not None
+            key_w_ender = key + "/" if key is not None else "<NEVER>"
             return {
                 (group, name): _resolve_node(entry)["node"]
                 for (group, name), entry in self._internal_repo.items()
                 if group == key
-                or (key_not_none and group is not None and group.startswith(key + "/"))  # type: ignore
+                or (
+                    key_not_none and group is not None and group.startswith(key_w_ender)
+                )
             }
         return _resolve_node(self._internal_repo[key])["node"]
 
@@ -934,7 +949,7 @@ class ZenStore:
             )
         return key in self._internal_repo
 
-    def __iter__(self) -> Generator[_Entry, None, None]:
+    def __iter__(self) -> Generator[StoreEntry, None, None]:
         yield from (_resolve_node(v) for v in self._internal_repo.values())
 
     def add_to_hydra_store(self, overwrite_ok: Optional[bool] = None) -> None:
