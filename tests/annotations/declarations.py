@@ -60,7 +60,7 @@ from hydra_zen.typing import (
 from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds, StdBuilds
 from hydra_zen.typing._implementations import DataClass_, HydraPartialBuilds
 from hydra_zen.wrapper import Zen
-from hydra_zen.wrapper._implementations import _Entry
+from hydra_zen.wrapper._implementations import StoreEntry
 
 T = TypeVar("T")
 
@@ -1234,6 +1234,6 @@ def check_store():
     store(name=1)  # type: ignore
     store(group=1)  # type: ignore
 
-    assert_type(list(store), List[_Entry])
+    assert_type(list(store), List[StoreEntry])
     assert_type("group" in store, bool)
     assert_type(("group", "name") in store, bool)
