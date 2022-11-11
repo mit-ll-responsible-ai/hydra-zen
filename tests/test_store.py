@@ -13,7 +13,14 @@ from hydra.core.config_store import ConfigStore
 from hypothesis import given, settings
 from omegaconf import DictConfig, ListConfig
 
-from hydra_zen import ZenStore, builds, instantiate, just, make_config, store
+from hydra_zen import (
+    ZenStore,
+    builds,
+    instantiate,
+    just,
+    make_config,
+    store as default_store,
+)
 from hydra_zen._compatibility import HYDRA_SUPPORTS_LIST_INSTANTIATION
 from tests.custom_strategies import new_stores, store_entries
 
@@ -24,14 +31,14 @@ cs = ConfigStore().instance()
 def clean_store():
     """Provides access to configstore repo and restores state after test"""
     prev_state = deepcopy(cs.repo)
-    zen_prev_state = (store._internal_repo.copy(), store._queue.copy())
+    zen_prev_state = (default_store._internal_repo.copy(), default_store._queue.copy())
     try:
         yield cs.repo
     finally:
         cs.repo = prev_state
         int_repo, queue = zen_prev_state
-        store._internal_repo = int_repo
-        store._queue = queue
+        default_store._internal_repo = int_repo
+        default_store._queue = queue
 
 
 def func(a: int, b: int):
@@ -64,18 +71,20 @@ def instantiate_from_repo(
 @pytest.mark.parametrize(
     "apply_store",
     [
-        pytest.param(lambda: store(func, a=1, b=2), id="inline"),
-        pytest.param(lambda: store(a=1, b=2)(func), id="decorated"),
-        pytest.param(lambda: store()(func, a=1, b=2), id="partiald_inline"),
-        pytest.param(lambda: store()(a=1, b=2)(func), id="partiald_decorated"),
-        pytest.param(lambda: store(a=-22)(a=1, b=-22)(func, b=2), id="kw_overrides"),
+        pytest.param(lambda: default_store(func, a=1, b=2), id="inline"),
+        pytest.param(lambda: default_store(a=1, b=2)(func), id="decorated"),
+        pytest.param(lambda: default_store()(func, a=1, b=2), id="partiald_inline"),
+        pytest.param(lambda: default_store()(a=1, b=2)(func), id="partiald_decorated"),
         pytest.param(
-            lambda: store(name="BAD")(func),
+            lambda: default_store(a=-22)(a=1, b=-22)(func, b=2), id="kw_overrides"
+        ),
+        pytest.param(
+            lambda: default_store(name="BAD")(func),
             id="ensure_can_fail1",
             marks=pytest.mark.xfail,
         ),
         pytest.param(
-            lambda: store(a=22, b=10)(func),
+            lambda: default_store(a=22, b=10)(func),
             id="ensure_can_fail2",
             marks=pytest.mark.xfail,
         ),
@@ -84,7 +93,7 @@ def instantiate_from_repo(
 @pytest.mark.usefixtures("clean_store")
 def test_kw_overrides(apply_store: Callable[[], Any]):
     out = apply_store()
-    store.add_to_hydra_store()
+    default_store.add_to_hydra_store()
     assert out is func
     assert instantiate_from_repo("func") == (1, 2)
 
@@ -92,17 +101,20 @@ def test_kw_overrides(apply_store: Callable[[], Any]):
 @pytest.mark.parametrize(
     "apply_store",
     [
-        pytest.param(lambda: store(func, name="dunk", a=1, b=2), id="inline"),
-        pytest.param(lambda: store(name="dunk")(func), id="decorated"),
-        pytest.param(lambda: store(name="O1")(func, name="dunk"), id="partiald_inline"),
+        pytest.param(lambda: default_store(func, name="dunk", a=1, b=2), id="inline"),
+        pytest.param(lambda: default_store(name="dunk")(func), id="decorated"),
         pytest.param(
-            lambda: store(name="O1")(name="dunk")(func), id="partiald_decorated"
+            lambda: default_store(name="O1")(func, name="dunk"), id="partiald_inline"
         ),
         pytest.param(
-            lambda: store(name="O1")(name="O2")(func, name="dunk"), id="kw_overrides"
+            lambda: default_store(name="O1")(name="dunk")(func), id="partiald_decorated"
         ),
         pytest.param(
-            lambda: store(name="BAD")(func),
+            lambda: default_store(name="O1")(name="O2")(func, name="dunk"),
+            id="kw_overrides",
+        ),
+        pytest.param(
+            lambda: default_store(name="BAD")(func),
             id="ensure_can_fail",
             marks=pytest.mark.xfail,
         ),
@@ -112,26 +124,28 @@ def test_kw_overrides(apply_store: Callable[[], Any]):
 def test_name_overrides(apply_store: Callable[[], Any]):
     out = apply_store()
     assert out is func
-    store.add_to_hydra_store()
+    default_store.add_to_hydra_store()
     assert instantiate_from_repo("dunk", a=1, b=2) == (1, 2)
 
 
 @pytest.mark.parametrize(
     "apply_store",
     [
-        pytest.param(lambda: store(func, group="dunk", a=1, b=2), id="inline"),
-        pytest.param(lambda: store(group="dunk")(func), id="decorated"),
+        pytest.param(lambda: default_store(func, group="dunk", a=1, b=2), id="inline"),
+        pytest.param(lambda: default_store(group="dunk")(func), id="decorated"),
         pytest.param(
-            lambda: store(group="O1")(func, group="dunk"), id="partiald_inline"
+            lambda: default_store(group="O1")(func, group="dunk"), id="partiald_inline"
         ),
         pytest.param(
-            lambda: store(group="O1")(group="dunk")(func), id="partiald_decorated"
+            lambda: default_store(group="O1")(group="dunk")(func),
+            id="partiald_decorated",
         ),
         pytest.param(
-            lambda: store(group="O1")(group="O2")(func, group="dunk"), id="kw_overrides"
+            lambda: default_store(group="O1")(group="O2")(func, group="dunk"),
+            id="kw_overrides",
         ),
         pytest.param(
-            lambda: store(group="BAD")(func),
+            lambda: default_store(group="BAD")(func),
             id="ensure_can_fail",
             marks=pytest.mark.xfail,
         ),
@@ -141,27 +155,31 @@ def test_name_overrides(apply_store: Callable[[], Any]):
 def test_group_overrides(apply_store: Callable[[], Any]):
     out = apply_store()
     assert out is func
-    store.add_to_hydra_store()
+    default_store.add_to_hydra_store()
     assert instantiate_from_repo(name="func", group="dunk", a=1, b=2) == (1, 2)
 
 
 @pytest.mark.parametrize(
     "apply_store",
     [
-        pytest.param(lambda: store(func, package="dunk", a=1, b=2), id="inline"),
-        pytest.param(lambda: store(package="dunk")(func), id="decorated"),
         pytest.param(
-            lambda: store(package="O1")(func, package="dunk"), id="partiald_inline"
+            lambda: default_store(func, package="dunk", a=1, b=2), id="inline"
+        ),
+        pytest.param(lambda: default_store(package="dunk")(func), id="decorated"),
+        pytest.param(
+            lambda: default_store(package="O1")(func, package="dunk"),
+            id="partiald_inline",
         ),
         pytest.param(
-            lambda: store(package="O1")(package="dunk")(func), id="partiald_decorated"
+            lambda: default_store(package="O1")(package="dunk")(func),
+            id="partiald_decorated",
         ),
         pytest.param(
-            lambda: store(package="O1")(package="O2")(func, package="dunk"),
+            lambda: default_store(package="O1")(package="O2")(func, package="dunk"),
             id="kw_overrides",
         ),
         pytest.param(
-            lambda: store(package="BAD")(func),
+            lambda: default_store(package="BAD")(func),
             id="ensure_can_fail",
             marks=pytest.mark.xfail,
         ),
@@ -171,7 +189,7 @@ def test_group_overrides(apply_store: Callable[[], Any]):
 def test_package_overrides(apply_store: Callable[[], Any]):
     out = apply_store()
     assert out is func
-    store.add_to_hydra_store()
+    default_store.add_to_hydra_store()
     assert instantiate_from_repo(name="func", package="dunk", a=1, b=2) == (1, 2)
 
 
@@ -187,42 +205,48 @@ def never_call(*a, **k):
 @pytest.mark.parametrize(
     "apply_store",
     [
-        pytest.param(lambda: store(func, to_config=special_fn, a=1, b=2), id="inline"),
         pytest.param(
-            lambda: store(to_config=special_fn, a=1, b=2)(func),
+            lambda: default_store(func, to_config=special_fn, a=1, b=2), id="inline"
+        ),
+        pytest.param(
+            lambda: default_store(to_config=special_fn, a=1, b=2)(func),
             id="decorated",
         ),
         pytest.param(
-            lambda: store(to_config=never_call, a=1, b=2)(func, to_config=special_fn),
+            lambda: default_store(to_config=never_call, a=1, b=2)(
+                func, to_config=special_fn
+            ),
             id="partiald_inline",
         ),
         pytest.param(
-            lambda: store(to_config=never_call, a=1, b=2)(to_config=special_fn)(func),
+            lambda: default_store(to_config=never_call, a=1, b=2)(to_config=special_fn)(
+                func
+            ),
             id="partiald_decorated",
         ),
         pytest.param(
-            lambda: store(to_config=never_call, a=22, b=2)(to_config=never_call)(
-                func, to_config=special_fn, a=1
-            ),
+            lambda: default_store(to_config=never_call, a=22, b=2)(
+                to_config=never_call
+            )(func, to_config=special_fn, a=1),
             id="kw_overrides",
         ),
         pytest.param(
-            lambda: store(to_config=never_call, a=1, b=2)(func),
+            lambda: default_store(to_config=never_call, a=1, b=2)(func),
             id="ensure_can_fail1",
             marks=pytest.mark.xfail,
         ),
         pytest.param(
-            lambda: store(func, to_config=never_call, a=1, b=2),
+            lambda: default_store(func, to_config=never_call, a=1, b=2),
             id="ensure_can_fail2",
             marks=pytest.mark.xfail,
         ),
         pytest.param(
-            lambda: store(func, a=1, b=2),
+            lambda: default_store(func, a=1, b=2),
             id="ensure_can_fail3",
             marks=pytest.mark.xfail,
         ),
         pytest.param(
-            lambda: store(func, a=1, b=3, to_config=special_fn),
+            lambda: default_store(func, a=1, b=3, to_config=special_fn),
             id="ensure_can_fail4",
             marks=pytest.mark.xfail,
         ),
@@ -232,7 +256,7 @@ def never_call(*a, **k):
 def test_to_config_overrides(apply_store: Callable[[], Any]):
     out = apply_store()
     assert out is func
-    store.add_to_hydra_store()
+    default_store.add_to_hydra_store()
     assert instantiate_from_repo(name="func") == dict(a=1, b=2, target=func)
 
 
@@ -249,20 +273,24 @@ def override_store(
 @pytest.mark.parametrize(
     "apply_store",
     [
-        pytest.param(lambda: store(func, provider="dunk", a=1, b=2), id="inline"),
-        pytest.param(lambda: store(provider="dunk")(func), id="decorated"),
         pytest.param(
-            lambda: store(provider="O1")(func, provider="dunk"), id="partiald_inline"
+            lambda: default_store(func, provider="dunk", a=1, b=2), id="inline"
+        ),
+        pytest.param(lambda: default_store(provider="dunk")(func), id="decorated"),
+        pytest.param(
+            lambda: default_store(provider="O1")(func, provider="dunk"),
+            id="partiald_inline",
         ),
         pytest.param(
-            lambda: store(provider="O1")(provider="dunk")(func), id="partiald_decorated"
+            lambda: default_store(provider="O1")(provider="dunk")(func),
+            id="partiald_decorated",
         ),
         pytest.param(
-            lambda: store(provider="O1")(provider="O2")(func, provider="dunk"),
+            lambda: default_store(provider="O1")(provider="O2")(func, provider="dunk"),
             id="kw_overrides",
         ),
         pytest.param(
-            lambda: store(provider="BAD")(func),
+            lambda: default_store(provider="BAD")(func),
             id="ensure_can_fail",
             marks=pytest.mark.xfail,
         ),
@@ -272,7 +300,7 @@ def override_store(
 def test_provider_overrides(apply_store: Callable[[], Any]):
     out = apply_store()
     assert out is func
-    store.add_to_hydra_store()
+    default_store.add_to_hydra_store()
     assert instantiate_from_repo(name="func", provider="dunk", a=1, b=2) == (1, 2)
 
 
@@ -345,8 +373,8 @@ def test_store_nested_groups(include_none: bool):
 @pytest.mark.usefixtures("clean_store")
 def test_store_param_validation(bad_val, field_name: str):
     with pytest.raises(TypeError, match=rf"`{field_name}` must be"):
-        store(func, **{field_name: bad_val})
-        store.add_to_hydra_store()
+        default_store(func, **{field_name: bad_val})
+        default_store.add_to_hydra_store()
 
 
 @dataclass
@@ -359,7 +387,7 @@ dc = DC()
 
 def test_validate_get_name():
     with pytest.raises(TypeError, match=r"Cannot infer config store entry name"):
-        store(dc)
+        default_store(dc)
 
 
 @pytest.mark.parametrize("name1", "ab")
@@ -429,8 +457,8 @@ def test_overwrite_ok(outer: bool, inner: bool, name, group):
 def test_default_to_config_produces_instantiable_configs(target):
     if not HYDRA_SUPPORTS_LIST_INSTANTIATION and isinstance(target, (list, ListConfig)):
         pytest.xfail("Hydra doesn't support list instantiation")
-    store(target, name="target")
-    store.add_to_hydra_store()
+    default_store(target, name="target")
+    default_store.add_to_hydra_store()
     instantiate_from_repo("target")
 
 
@@ -475,7 +503,7 @@ def test_stores_have_independent_mutable_state(store1: ZenStore, store2: ZenStor
         if isinstance(x, Hashable):
             continue
         assert x is not getattr(store2, attr)
-        assert x is not getattr(store, attr)  # check default store
+        assert x is not getattr(default_store, attr)  # check default store
 
 
 @pytest.mark.parametrize("name", "ab")
@@ -509,10 +537,10 @@ def test_self_partialing_preserves_subclass():
 
 @pytest.mark.usefixtures("clean_store")
 def test_default_to_config_validates_dataclass_instance_with_kw():
-    store(make_config(a=2)(), name="dc", a=1)
+    default_store(make_config(a=2)(), name="dc", a=1)
 
     with pytest.raises(ValueError):
-        store[None, "dc"]
+        default_store[None, "dc"]
 
 
 @pytest.mark.parametrize(
