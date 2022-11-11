@@ -10,7 +10,7 @@ from typing import Any, Callable, Hashable, Optional
 import hypothesis.strategies as st
 import pytest
 from hydra.core.config_store import ConfigStore
-from hypothesis import given, settings
+from hypothesis import assume, given, note, settings
 from omegaconf import DictConfig, ListConfig
 
 from hydra_zen import (
@@ -462,38 +462,32 @@ def test_default_to_config_produces_instantiable_configs(target):
     instantiate_from_repo("target")
 
 
-class NoHydra(ZenStore):
-    # needed for hypothesis test -- we can't use clean_store fixture
-    # per-test
-    def add_to_hydra_store(self, overwrite_ok: Optional[bool] = None):
-        return
+@given(zstore=new_stores())
+def test_self_partialing_reflects_mutable_state(zstore: ZenStore):
+    with clean_store():
+        zstore2 = zstore()
+        zstore3 = zstore(a=22)
+        stores = [zstore2, zstore3]
 
+        for attr in zstore.__slots__:
+            if attr == "_defaults":
+                continue
 
-@given(...)
-def test_self_partialing_reflects_mutable_state(zstore: NoHydra):
-    zstore2 = zstore()
-    zstore3 = zstore(a=22)
-    stores = [zstore2, zstore3]
+            for s in stores:
+                assert getattr(zstore, attr) == getattr(s, attr)
+        # assert not zstore._internal_repo
+        zstore(dict(a=1), name="a")
+        zstore2(dict(a=2), name="b")
+        zstore3(dict(a=3), name="c")
 
-    for attr in zstore.__slots__:
-        if attr == "_defaults":
-            continue
-
-        for s in stores:
-            assert getattr(zstore, attr) == getattr(s, attr)
-    # assert not zstore._internal_repo
-    zstore(dict(a=1), name="a")
-    zstore2(dict(a=2), name="b")
-    zstore3(dict(a=3), name="c")
-
-    assert len(zstore._queue) == 3
-    assert len(zstore._internal_repo) == 3
-    for attr in zstore.__slots__:
-        x = getattr(zstore, attr)
-        if not isinstance(x, Hashable):
-            continue
-        assert x is getattr(zstore2, attr)
-        assert x is getattr(zstore3, attr)
+        assert len(zstore._queue) == (3 if zstore._deferred_store else 0)
+        assert len(zstore._internal_repo) == 3
+        for attr in zstore.__slots__:
+            x = getattr(zstore, attr)
+            if not isinstance(x, Hashable):
+                continue
+            assert x is getattr(zstore2, attr)
+            assert x is getattr(zstore3, attr)
 
 
 @given(...)
@@ -529,10 +523,13 @@ def test_deferred_to_config(name, group):
 
 
 def test_self_partialing_preserves_subclass():
-    s1 = NoHydra()
+    class SubStore(ZenStore):
+        ...
+
+    s1 = SubStore()
     s2 = s1()
     assert s1 is not s2
-    assert isinstance(s2, NoHydra)
+    assert isinstance(s2, SubStore)
 
 
 @pytest.mark.usefixtures("clean_store")
@@ -565,7 +562,7 @@ def not_contains(key, store_):
 
 
 @pytest.mark.usefixtures("clean_store")
-def test_contains():
+def test_contains_manual():
     _store = ZenStore()
     _store({"": 2}, name="grape")
     _store({"": 1}, group="a/b", name="apple")
@@ -587,6 +584,27 @@ def test_contains():
     assert_not_contains((None, "apple"))
     assert_not_contains(1)
     assert_not_contains((1, 2))
+
+
+@given(...)
+def test_contains_consistent_with_getitem(store: ZenStore):
+    assert "NOTAGROUP" not in store
+    assert "NOTAGROUP/" not in store
+    assert "/NOTAGROUP" not in store
+    for entry in store:
+        group = entry["group"]
+        name = entry["name"]
+        assert group in store
+        assert (group, name) in store
+        assert name not in store
+        assert (name, group) not in store  # type: ignore
+
+        if group is None:
+            continue
+
+        group_parts = group.split("/")
+        for n in range(1, len(group_parts) + 1):
+            assert "/".join(group_parts[:n]) in store
 
 
 @given(entries=st.lists(store_entries()), sub_store=st.booleans())
@@ -633,21 +651,23 @@ def test_repeated_add_to_hydra_store_ok(store: ZenStore, num_adds: int):
             assert not store.has_enqueued()
 
 
-# def test_store_protects_overwriting_entries_in_hydra_store(sotr:):
+@given(...)
+def test_store_protects_overwriting_entries_in_hydra_store(store: ZenStore):
+    with clean_store():
+        assume(store and store.has_enqueued())
+        entry, *_ = store
+        note(f"entry: {entry}")
+        note(f"{store._internal_repo}, {store._queue}")
+        cs.store(**entry)
 
-
-@pytest.mark.parametrize("name", "ab")
-@pytest.mark.parametrize("deferred_to_config", [True, False])
-@pytest.mark.usefixtures("clean_store")
-def test_getitem_manual(deferred_to_config: bool, name: str):
-    s = ZenStore(deferred_to_config=deferred_to_config)
-    conf = make_config()()
-    s(conf, name=name)
-    assert s[None, name] is conf
+        with pytest.raises(ValueError):
+            store.add_to_hydra_store(overwrite_ok=False)
+        store.add_to_hydra_store(overwrite_ok=True)
 
 
 @given(...)
 def test_getitem(store: ZenStore):
+    assume(store)
     with clean_store():
         for entry in store:
             assert store[entry["group"], entry["name"]] is entry["node"]
