@@ -584,6 +584,7 @@ def test_contains_manual():
     assert_not_contains((None, "apple"))
     assert_not_contains(1)
     assert_not_contains((1, 2))
+    assert_not_contains(("a", "apple", "grape"))
 
 
 @given(...)
@@ -597,7 +598,11 @@ def test_contains_consistent_with_getitem(store: ZenStore):
         assert group in store
         assert (group, name) in store
         assert name not in store
+        assert not store[name]
+
         assert (name, group) not in store  # type: ignore
+        with pytest.raises(KeyError):
+            store[name, group]  # type: ignore
 
         if group is None:
             continue

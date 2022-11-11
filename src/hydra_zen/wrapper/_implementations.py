@@ -36,7 +36,13 @@ from typing_extensions import Final, Literal, ParamSpec, TypeAlias, TypedDict, T
 from hydra_zen import instantiate, just, make_custom_builds_fn
 from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.structured_configs._utils import get_obj_path
-from hydra_zen.typing._implementations import DataClass_
+from hydra_zen.typing._implementations import (
+    DataClass_,
+    GroupName,
+    Node,
+    NodeName,
+    StoreEntry,
+)
 
 from .._compatibility import HYDRA_SUPPORTS_LIST_INSTANTIATION, SUPPORTS_VERSION_BASE
 from ..structured_configs._type_guards import is_dataclass
@@ -49,9 +55,6 @@ R = TypeVar("R")
 P = ParamSpec("P")
 F = TypeVar("F")
 
-GroupName: TypeAlias = Optional[str]
-NodeName: TypeAlias = str
-Config: TypeAlias = Any
 
 _UNSPECIFIED_: Any = object()
 
@@ -690,15 +693,6 @@ def get_name(target: Any) -> str:
     return name
 
 
-# TODO: add to hydra_zen.typing
-class StoreEntry(TypedDict):
-    name: NodeName
-    group: GroupName
-    package: Optional[str]
-    provider: Optional[str]
-    node: Config
-
-
 class _Defaults(TypedDict):
     name: Union[NodeName, Callable[[Any], NodeName]]
     group: Union[GroupName, Callable[[Any], GroupName]]
@@ -725,7 +719,7 @@ class _Deferred:
     __slots__ = ("to_config", "target", "kw")
 
     def __init__(
-        self, to_config: Callable[[F], Config], target: F, kw: Dict[str, Any]
+        self, to_config: Callable[[F], Node], target: F, kw: Dict[str, Any]
     ) -> None:
         self.to_config = to_config
         self.target = target
@@ -800,7 +794,7 @@ class ZenStore:
         group: Union[GroupName, Callable[[Any], GroupName]] = ...,
         package: Optional[Union[str, Callable[[Any], str]]] = ...,
         provider: Optional[str] = ...,
-        to_config: Callable[[F], Config] = default_to_config,
+        to_config: Callable[[F], Node] = default_to_config,
         **to_config_kw: Any,
     ) -> F:  # pragma: no cover
         ...
@@ -816,7 +810,7 @@ class ZenStore:
         group: Union[GroupName, Callable[[Any], GroupName]] = ...,
         package: Optional[Union[str, Callable[[Any], str]]] = ...,
         provider: Optional[str] = ...,
-        to_config: Callable[[Any], Config] = ...,
+        to_config: Callable[[Any], Node] = ...,
         **to_config_kw: Any,
     ) -> "ZenStore":  # pragma: no cover
         ...
@@ -940,18 +934,16 @@ class ZenStore:
         return bool(self._internal_repo)
 
     @overload
-    def __getitem__(
-        self, key: Tuple[GroupName, NodeName]
-    ) -> Config:  # pragma: no cover
+    def __getitem__(self, key: Tuple[GroupName, NodeName]) -> Node:  # pragma: no cover
         ...
 
     @overload
     def __getitem__(
         self, key: GroupName
-    ) -> Dict[Tuple[GroupName, NodeName], Config]:  # pragma: no cover
+    ) -> Dict[Tuple[GroupName, NodeName], Node]:  # pragma: no cover
         ...
 
-    def __getitem__(self, key: Union[GroupName, Tuple[GroupName, NodeName]]) -> Config:
+    def __getitem__(self, key: Union[GroupName, Tuple[GroupName, NodeName]]) -> Node:
         # store[group] ->
         #  {(group, name): node1, (group, name2): node2, (group/subgroup, name3): node3}
         #
