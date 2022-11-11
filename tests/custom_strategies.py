@@ -1,9 +1,20 @@
 import string
-from typing import Any, Deque, Dict, List, Sequence, Tuple, TypeVar, Union, cast
+from typing import (
+    Any,
+    Deque,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    TypeVar,
+    Union,
+    cast,
+)
 
 import hypothesis.strategies as st
 
-from hydra_zen import builds
+from hydra_zen import ZenStore, builds
 from hydra_zen.structured_configs._utils import get_obj_path
 from hydra_zen.typing._implementations import ZenConvert
 
@@ -98,7 +109,7 @@ def partitions(
 ) -> st.SearchStrategy[Tuple[T, T]]:
     """Randomly partitions a collection or dictionary into two partitions."""
     if isinstance(collection, st.SearchStrategy):
-        return collection.flatmap(lambda x: _partition(x, ordered=ordered))  # type: ignore
+        return collection.flatmap(lambda x: _partition(x, ordered=ordered))
     return cast(st.SearchStrategy[Tuple[T, T]], _partition(collection, ordered))
 
 
@@ -108,3 +119,51 @@ def everything_except(excluded_types):
         .flatmap(st.from_type)
         .filter(lambda x: not isinstance(x, excluded_types))
     )
+
+
+def f():
+    pass
+
+
+f_Build = builds(f, dataclass_name="f_Build")
+
+
+@st.composite
+def store_entries(draw: st.DrawFn):
+    group = draw(st.lists(st.sampled_from("abcde")).map(lambda x: None if not x else x))
+    if group is not None:
+        group = "/".join(group)
+    name = draw(st.uuids().map(str))
+    package = draw(st.none() | st.sampled_from("xyz"))
+    target = draw(st.sampled_from([{"a": 1}, f_Build, f]))
+    return (target, {"name": name, "group": group, "package": package})
+
+
+@st.composite
+def new_stores(draw: st.DrawFn, deferred_hydra_store: Optional[bool] = None):
+    name = draw(st.none() | st.sampled_from(["foo", "bar", "baz"]))
+    return ZenStore(
+        name,
+        deferred_hydra_store=draw(
+            st.booleans().map(lambda x: not x), label="deferred_hydra_store"
+        )
+        if deferred_hydra_store is None
+        else deferred_hydra_store,
+        overwrite_ok=draw(st.booleans(), label="overwrite_ok"),
+        deferred_to_config=draw(
+            st.booleans().map(lambda x: not x), label="deferred_to_config"
+        ),
+    )
+
+
+@st.composite
+def stores(draw: st.DrawFn):
+    """Returned stores always defer storing to hydra store to prevent unexpected
+    change in global state"""
+    store = draw(new_stores(deferred_hydra_store=True))
+    for target, kw in draw(st.lists(store_entries())):
+        store(target, **kw)
+    return store
+
+
+st.register_type_strategy(ZenStore, stores())

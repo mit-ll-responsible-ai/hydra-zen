@@ -1,19 +1,37 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import re
+from contextlib import contextmanager
+from copy import deepcopy
 from dataclasses import dataclass
 from functools import partial
 from typing import Any, Callable, Hashable, Optional
 
+import hypothesis.strategies as st
 import pytest
 from hydra.core.config_store import ConfigStore
-from hypothesis import given
+from hypothesis import given, settings
 from omegaconf import DictConfig, ListConfig
 
 from hydra_zen import ZenStore, builds, instantiate, just, make_config, store
 from hydra_zen._compatibility import HYDRA_SUPPORTS_LIST_INSTANTIATION
+from tests.custom_strategies import new_stores, store_entries
 
 cs = ConfigStore().instance()
+
+
+@contextmanager
+def clean_store():
+    """Provides access to configstore repo and restores state after test"""
+    prev_state = deepcopy(cs.repo)
+    zen_prev_state = (store._internal_repo.copy(), store._queue.copy())
+    try:
+        yield cs.repo
+    finally:
+        cs.repo = prev_state
+        int_repo, queue = zen_prev_state
+        store._internal_repo = int_repo
+        store._queue = queue
 
 
 def func(a: int, b: int):
@@ -267,19 +285,22 @@ def test_store_nested_groups(include_none: bool):
     if include_none:
         local_store({"a": 0}, name="a")
 
-    assert isinstance(repr(local_store), str)
+    def check_repr():
+        assert isinstance(repr(local_store), str)
+
+    check_repr()
 
     local_store({"a": 1}, group="A", name="a")
-    assert isinstance(repr(local_store), str)
+    check_repr()
 
     local_store({"a": 2}, group="A", name="b")
-    assert isinstance(repr(local_store), str)
+    check_repr()
 
     local_store({"a": 3}, group="A/B", name="ab")
-    assert isinstance(repr(local_store), str)
+    check_repr()
 
     local_store({"a": 4}, group="A/B/C", name="abc")
-    assert isinstance(repr(local_store), str)
+    check_repr()
 
     if include_none:
         assert instantiate_from_repo(name="a") == instantiate(local_store[None, "a"])
@@ -486,16 +507,6 @@ def test_self_partialing_preserves_subclass():
     assert isinstance(s2, NoHydra)
 
 
-@pytest.mark.parametrize("name", "ab")
-@pytest.mark.parametrize("deferred_to_config", [True, False])
-@pytest.mark.usefixtures("clean_store")
-def test_getitem(deferred_to_config: bool, name: str):
-    s = ZenStore(deferred_to_config=deferred_to_config)
-    conf = make_config()()
-    s(conf, name=name)
-    assert s[None, name] is conf
-
-
 @pytest.mark.usefixtures("clean_store")
 def test_default_to_config_validates_dataclass_instance_with_kw():
     store(make_config(a=2)(), name="dc", a=1)
@@ -550,11 +561,66 @@ def test_contains():
     assert_not_contains((1, 2))
 
 
-def test_iter():
-    _store = ZenStore()
-    _store({"": 2}, name="grape")
-    _store({"": 1}, group="a/b", name="apple")
-    assert list((v["group"], v["name"], v["node"]) for v in _store) == [
-        (None, "grape", {"": 2}),
-        ("a/b", "apple", {"": 1}),
-    ]
+@given(entries=st.lists(store_entries()), sub_store=st.booleans())
+def test_iter(entries, sub_store):
+    with clean_store():
+        _store = ZenStore()
+        _store_it = _store() if sub_store else _store
+
+        for target, kw in entries:
+            _store_it(target, **kw)
+
+        del _store_it
+
+        iter_out = list(_store)
+        assert len(iter_out) == len(entries)
+
+
+@settings(max_examples=10)
+@given(entries=st.lists(store_entries()), store=new_stores(), sub_store=st.booleans())
+def test_bool(entries, store: ZenStore, sub_store: bool):
+    with clean_store():
+        _store_it = store() if sub_store else store
+
+        for target, kw in entries:
+            _store_it(target, **kw)
+        del _store_it
+
+        assert bool(entries) is bool(store)
+
+
+@given(...)
+def test_repr(store: ZenStore):
+    assert isinstance(repr(store), str)
+
+
+@given(store=..., num_adds=st.integers(1, 5))
+def test_repeated_add_to_hydra_store_ok(store: ZenStore, num_adds: int):
+    # store should clear internal queue so that multiple add-to-store calls
+    # don't conflict
+    assert bool(store) is store.has_enqueued()
+    with clean_store():
+        for _ in range(num_adds):
+            store.add_to_hydra_store()
+            assert not store.has_enqueued()
+
+
+# def test_store_protects_overwriting_entries_in_hydra_store(sotr:):
+
+
+@pytest.mark.parametrize("name", "ab")
+@pytest.mark.parametrize("deferred_to_config", [True, False])
+@pytest.mark.usefixtures("clean_store")
+def test_getitem_manual(deferred_to_config: bool, name: str):
+    s = ZenStore(deferred_to_config=deferred_to_config)
+    conf = make_config()()
+    s(conf, name=name)
+    assert s[None, name] is conf
+
+
+@given(...)
+def test_getitem(store: ZenStore):
+    with clean_store():
+        for entry in store:
+            assert store[entry["group"], entry["name"]] is entry["node"]
+            assert len(store[entry["group"]]) > 0

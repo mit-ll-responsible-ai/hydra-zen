@@ -664,13 +664,13 @@ def default_to_config(
                 # handles dataclasses returned by make_config()
                 return target
             return fbuilds(target, **kw, builds_bases=(target,))
-        else:
-            if kw:
-                raise ValueError(
-                    "store(<dataclass-instance>, [...]) does not support specifying "
-                    "keyword arguments"
-                )
-            return target
+        if kw:
+            raise ValueError(
+                "store(<dataclass-instance>, [...]) does not support specifying "
+                "keyword arguments"
+            )
+        return target
+
     elif isinstance(target, (dict, list)):
         return just(target)
     elif isinstance(target, (DictConfig, ListConfig)):
@@ -909,6 +909,36 @@ class ZenStore:
             no_none = cast(Set[str], set_)
             return sorted(no_none)
 
+    def has_enqueued(self) -> bool:
+        """`True` if this store has entries that have not yet been added to
+        Hydra's config store.
+
+        Returns
+        -------
+        bool
+
+        Examples
+        --------
+        >>> from hydra_zen import ZenStore
+        >>> store = ZenStore(deferred_hydra_store=True)
+        >>> store.has_enqueued()
+        False
+
+        >>> store({"a": 1}, name)
+        >>> store.has_enqueued()
+        True
+
+        >>> store.add_to_hydra_store()
+        >>> store.has_enqueued()
+        False
+        """
+        return bool(self._queue)
+
+    def __bool__(self) -> bool:
+        """`True` if entries have been added to this store, regardless of whether or
+        not they have been added to Hydra's config store"""
+        return bool(self._internal_repo)
+
     @overload
     def __getitem__(
         self, key: Tuple[GroupName, NodeName]
@@ -921,8 +951,7 @@ class ZenStore:
     ) -> Dict[Tuple[GroupName, NodeName], Config]:  # pragma: no cover
         ...
 
-    # TODO: create .get_entry
-    def __getitem__(self, key: Union[GroupName, Tuple[GroupName, NodeName]]) -> Any:
+    def __getitem__(self, key: Union[GroupName, Tuple[GroupName, NodeName]]) -> Config:
         # store[group] ->
         #  {(group, name): node1, (group, name2): node2, (group/subgroup, name3): node3}
         #
@@ -938,7 +967,10 @@ class ZenStore:
                     key_not_none and group is not None and group.startswith(key_w_ender)
                 )
             }
-        return _resolve_node(self._internal_repo[key])["node"]
+        return self.get_entry(*key)["node"]
+
+    def get_entry(self, group: GroupName, name: NodeName) -> StoreEntry:
+        return _resolve_node(self._internal_repo[(group, name)])
 
     def __contains__(self, key: Union[GroupName, Tuple[GroupName, NodeName]]) -> bool:
         """Checks if group or (group, node-name) exists in zen-store"""
