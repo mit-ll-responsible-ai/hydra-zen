@@ -739,6 +739,31 @@ def _resolve_node(entry: StoreEntry) -> StoreEntry:
 
 
 class ZenStore:
+    """An abstraction over Hydra's config store, which enables users to maintain
+    multiple, isolated store instances before populating Hydra's global config store.
+
+    `ZenStore` is also designed to consolidate the config-creation and storage process;
+    it can be used to decorate config-targets and dataclasses, enabling "inline" config
+    creation and storage patterns.
+
+    This is a "self-partialing" object, meaning a store instance can overwrite its own
+    default values. Please consult the examples for more details.
+
+    `hydra_zen.store` is available as a pre-instantiated, globally-available store:
+
+    .. code-block:: python
+
+       store = ZenStore(
+           name="store",
+           deferred_to_config=True,
+           deferred_hydra_store=True,
+       )
+
+    Examples
+    --------
+
+    """
+
     __slots__ = (
         "name",
         "_internal_repo",
@@ -779,10 +804,12 @@ class ZenStore:
         self._overwrite_ok = overwrite_ok
 
     def __repr__(self) -> str:
+        # TODO: nicer repr?
         groups_contents: DefaultDict[Optional[str], List[str]] = defaultdict(list)
         for grp, name in self._internal_repo:
             groups_contents[grp].append(name)
-        return f"({self.name}){dict(groups_contents)}"
+
+        return f"{self.name}\n{repr(dict(groups_contents))}"
 
     # TODO: support *to_config_pos_args
     @overload
@@ -1014,5 +1041,7 @@ class ZenStore:
 
 
 store: ZenStore = ZenStore(
-    name="store", deferred_to_config=True, deferred_hydra_store=True
+    name="store",
+    deferred_to_config=True,
+    deferred_hydra_store=True,
 )
