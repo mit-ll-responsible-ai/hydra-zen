@@ -266,6 +266,7 @@ class Zen(Generic[P, R]):
             raise HydraZenValidationError(
                 f"`cfg._args_` must be a sequence type (e.g. a list), got {_args_}"
             )
+
         if num_pos_only and len(_args_) != num_pos_only:
             raise HydraZenValidationError(
                 f"{self.func} has {num_pos_only} positional-only arguments, but "
@@ -693,17 +694,22 @@ def get_name(target: Any) -> str:
     return name
 
 
-class _Defaults(TypedDict):
+class _StoreCallSig(TypedDict):
+    """Arguments for ZenStore.__call__
+
+    This default dict enables us to easily update/merge the default arguments for a
+    specific ZenStore instance, in support of self-partialing behavior."""
+
     name: Union[NodeName, Callable[[Any], NodeName]]
     group: Union[GroupName, Callable[[Any], GroupName]]
     package: Optional[Union[str, Callable[[Any], str]]]
     provider: Optional[str]
-    __kw: Dict[str, Any]
+    __kw: Dict[str, Any]  # kwargs passed to to_config
     to_config: Callable[[Any], Any]
 
 
 # TODO: make frozen dict
-defaults: Final = _Defaults(
+defaults: Final = _StoreCallSig(
     name=get_name,
     group=None,
     package=None,
@@ -712,7 +718,7 @@ defaults: Final = _Defaults(
     __kw={},
 )
 
-_DEFAULT_KEYS: Final[FrozenSet[str]] = frozenset(_Defaults.__required_keys__ - {"__kw"})  # type: ignore
+_DEFAULT_KEYS: Final[FrozenSet[str]] = frozenset(_StoreCallSig.__required_keys__ - {"__kw"})  # type: ignore
 
 
 class _Deferred:
@@ -761,6 +767,46 @@ class ZenStore:
 
     Examples
     --------
+    **Basic usage**
+
+    Adding a config to hydra-zen's global `ZenStore` instance. Each config must have
+    an associated name. Optionally, a group, package, and/or provider may be specified
+    for the entry as well.
+
+    >>> from hydra_zen import store
+    >>> optim_conf = store({"lr": 0.01, "momentum": 0.9}, name="sgd", group="optim")
+    >>> store
+    store
+    {'optim': ['sgd']}
+
+    By default, the stored config(s) will be "enqueued" for addition to Hydra's config
+    store, and `add_to_hydra_store` must be called to add the store's enqueued configs
+    to Hydra's central store (modify this behavior via `store = ZenStore(deferred_hydra_store=True)`)
+
+    >>> store.has_enqueued()
+    True
+    >>> store.add_to_hydra_store()  # updates Hydra's global store
+    >>> store.has_enqueued()
+    False
+
+    Overwriting an entry will result in an error; this behavior can be modified via
+    `store = ZenStore(overwrite_ok=True)`.
+
+    >>> store({}, name="sgd", group="optim")  # same name & group as above
+    ValueError: (name=sgd group=optim): Hydra config store entry already exists. Specify `overwrite_ok=True` to enable replacing config store entries
+
+    Creating a distinct store.
+
+    >>> from hydra_zen import ZenStore
+    >>> new_store = ZenStore(name=new)
+    >>> store
+    store
+    {'optim': ['sgd']}
+    >>> new_store
+    new
+    {}
+    >>> store == new_store
+    False
 
     """
 
@@ -796,12 +842,18 @@ class ZenStore:
             )
 
         self.name: str = "custom_store" if name is None else name
-        self._internal_repo: Dict[Tuple[Optional[str], str], StoreEntry] = {}
+
+        # The following attributes are mirrored across store instances that are
+        # created via the 'self-partialing' process
+        self._internal_repo: Dict[Tuple[GroupName, NodeName], StoreEntry] = {}
+        # Internal repo entries that have yet to be added to Hydra's config store
         self._queue: Deque[StoreEntry] = deque([])
-        self._defaults = defaults.copy()
+
         self._deferred_to_config = deferred_to_config
         self._deferred_store = deferred_hydra_store
         self._overwrite_ok = overwrite_ok
+        # Contains the current default arguments for `self.__call__`
+        self._defaults: _StoreCallSig = defaults.copy()
 
     def __repr__(self) -> str:
         # TODO: nicer repr?
@@ -810,6 +862,12 @@ class ZenStore:
             groups_contents[grp].append(name)
 
         return f"{self.name}\n{repr(dict(groups_contents))}"
+
+    def __eq__(self, __o: object) -> bool:
+        """Stores are 'equal' iff they reference the same internal repo and queue"""
+        if not isinstance(__o, ZenStore):
+            return False
+        return __o._internal_repo is self._internal_repo and __o._queue is self._queue
 
     # TODO: support *to_config_pos_args
     @overload
@@ -857,7 +915,7 @@ class ZenStore:
             _s._internal_repo = self._internal_repo
             _s._queue = self._queue
 
-            new_defaults: _Defaults = {k: kw[k] for k in _DEFAULT_KEYS if k in kw}  # type: ignore
+            new_defaults: _StoreCallSig = {k: kw[k] for k in _DEFAULT_KEYS if k in kw}  # type: ignore
 
             new_defaults["__kw"] = {
                 **_s._defaults["__kw"],
@@ -908,8 +966,9 @@ class ZenStore:
             if not self._overwrite_ok and (_group, _name) in self._internal_repo:
                 raise ValueError(
                     f"(name={entry['name']} group={entry['group']}): "
-                    f"Hydra config store entry already exists. Specify "
-                    f"`overwrite_ok=True` to enable replacing config store entries"
+                    f"Store entry already exists. Use a store initialized "
+                    f"with `ZenStore(overwrite_ok=True)` to overwrite config store "
+                    f"entries."
                 )
             self._internal_repo[_group, _name] = entry
             self._queue.append(entry)

@@ -419,9 +419,7 @@ def test_overwrite_ok(outer: bool, inner: bool, name, group):
     if not outer:
         with pytest.raises(
             ValueError,
-            match=re.escape(
-                f"(name={name} group={group}): Hydra config store entry already exists"
-            ),
+            match=re.escape(f"(name={name} group={group}): Store entry already exists"),
         ):
             _store({}, name=name, group=group)
         return
@@ -479,6 +477,10 @@ def test_self_partialing_reflects_mutable_state(zstore: ZenStore):
         zstore(dict(a=1), name="a")
         zstore2(dict(a=2), name="b")
         zstore3(dict(a=3), name="c")
+
+        assert zstore == zstore2
+        assert zstore == zstore3
+        assert zstore2 == zstore3
 
         assert len(zstore._queue) == (3 if zstore._deferred_store else 0)
         assert len(zstore._internal_repo) == 3
@@ -677,3 +679,17 @@ def test_getitem(store: ZenStore):
         for entry in store:
             assert store[entry["group"], entry["name"]] is entry["node"]
             assert len(store[entry["group"]]) > 0
+
+
+@given(...)
+def test_eq(store1: ZenStore, store2: ZenStore):
+    with clean_store():
+        assert store1 != store2
+        assert store1 != 1
+        assert store1 == store1
+        assert store1 == store1(param="blah")
+
+        store1.add_to_hydra_store()
+        store2.add_to_hydra_store()
+        assert store1 != store2
+        assert store1 == store1(param="blah")

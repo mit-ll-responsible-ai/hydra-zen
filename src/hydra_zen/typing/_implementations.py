@@ -266,6 +266,7 @@ NodeName: TypeAlias = str
 Node: TypeAlias = Any
 
 
+# TODO: make immutable
 class StoreEntry(TypedDict):
     name: NodeName
     group: GroupName
