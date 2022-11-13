@@ -676,6 +676,7 @@ def default_to_config(
         return target
 
     elif isinstance(target, (dict, list)):
+        # TODO: convert to OmegaConf containers?
         return just(target)
     elif isinstance(target, (DictConfig, ListConfig)):
         return target
@@ -777,10 +778,12 @@ class ZenStore:
     for the entry as well.
 
     >>> from hydra_zen import store
-    >>> optim_conf = store({"lr": 0.01, "momentum": 0.9}, name="sgd", group="optim")
-    >>> store
+    >>> _ = store({"lr": 0.01, "momentum": 0.9}, name="sgd", group="optim")
+    >>> _ = store({"lr": 0.001}, name="adam", group="optim")
     store
-    {'optim': ['sgd']}
+    {'optim': ['sgd', 'adam']}
+    >>> store["optim", "sgd"]  # (group, name) -> config node
+    {'lr': 0.01, 'momentum': 0.9}
 
     By default, the stored config(s) will be "enqueued" for addition to Hydra's config
     store, and `add_to_hydra_store` must be called to add the store's enqueued configs
@@ -788,7 +791,7 @@ class ZenStore:
 
     >>> store.has_enqueued()
     True
-    >>> store.add_to_hydra_store()  # updates Hydra's global store
+    >>> store.add_to_hydra_store()  # adds all enqueued entries to Hydra's global store
     >>> store.has_enqueued()
     False
 
@@ -801,16 +804,66 @@ class ZenStore:
     Creating a distinct store.
 
     >>> from hydra_zen import ZenStore
-    >>> new_store = ZenStore(name=new)
-    >>> store
-    store
-    {'optim': ['sgd']}
-    >>> new_store
-    new
-    {}
-    >>> store == new_store
+    >>> new_store = ZenStore(name="new", overwrite_ok=True)
+    >>> _new_store({"a": 1}, name="apple")
+    >>> store.has_enqueued()
     False
+    >>> new_store.has_enqueued()
+    True
 
+    **Auto-Config Capabilities**
+
+    The input to a store is processed by the store's `to_config` function prior to
+    creating the store entry. By default this is `hydra_zen.wrappers.default_to_config`,
+    which applies `hydra_zen.builds` and `hydra_zen.just` to inputs based on their
+    types.
+
+    For instance, consider the following function:
+
+    >>> from hydra_zen import to_yaml
+    >>> def sum_it(a: int, b: int): return a+b
+
+    We can pass `sum_it` directly to our store to leverage auto-config and auto-naming
+    capabilities.
+
+    >>> _ = new_store(sum_it, a=1, b=2)  # name is inferred
+    >>> config = new_store[None, "sum_it"]  # (group, name) -> config node
+    >>> print(to_yaml(config))
+    _target_: __main__.sum_it
+    a: 1
+    b: 2
+
+    Here, `builds(sum_it, a=1, b=2)` was called under the hood by `new_store` to create
+    the stored config.
+
+    **Support for Decorator Patterns**
+
+    `store` is a passthrough and can be used as a decorator. Let's add two store
+    entries for `func` by decorating it.
+
+    >>> from hydra_zen import ZenStore, to_yaml
+    >>> def pp(x): print(to_yaml(x))  # for pretty printing
+    >>> hz_store = ZenStore()
+
+    >>> @hz_store(a=1, b=22, name="func1")
+    ... @hz_store(a=-10, name="func2")
+    ... def func(a: int, b: int):
+    ...     return a - b
+
+    >>> func(10, 3)
+    7
+    >>> pp(hz_store[None, "func1"])
+    _target_: __main__.func
+    a: 1
+    b: 22
+    >>> pp(hz_store[None, "func2"])
+    _target_: __main__.func
+    b: ???
+    a: -10
+
+    Note that, by default, the application of `to_config` via the store is deferred
+    until the config is actually accessed (by the user or when added to Hydra's store).
+    This minimizes the runtime overhead associated with decorating functions this way.
     """
 
     __slots__ = (
@@ -1039,7 +1092,7 @@ class ZenStore:
         # store[group, name] -> node
         if isinstance(key, str) or key is None:
             key_not_none = key is not None
-            key_w_ender = key + "/" if key is not None else "<NEVER>"
+            key_w_ender = key + "/" if key is not None else "<ZEN_NEVER>"
             return {
                 (group, name): _resolve_node(entry, copy=False)["node"]
                 for (group, name), entry in self._internal_repo.items()

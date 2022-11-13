@@ -642,6 +642,7 @@ def test_bool(entries, store: ZenStore, sub_store: bool):
         assert bool(entries) is bool(store)
 
 
+@settings(max_examples=20)
 @given(...)
 def test_repr(store: ZenStore):
     assert isinstance(repr(store), str)
@@ -672,6 +673,7 @@ def test_store_protects_overwriting_entries_in_hydra_store(store: ZenStore):
         store.add_to_hydra_store(overwrite_ok=True)
 
 
+@settings(max_examples=20)
 @given(...)
 def test_getitem(store: ZenStore):
     assume(store)
@@ -681,6 +683,7 @@ def test_getitem(store: ZenStore):
             assert len(store[entry["group"]]) > 0
 
 
+@settings(max_examples=20)
 @given(...)
 def test_eq(store1: ZenStore, store2: ZenStore):
     with clean_store():
