@@ -786,8 +786,8 @@ class ZenStore:
     {'lr': 0.01, 'momentum': 0.9}
 
     By default, the stored config(s) will be "enqueued" for addition to Hydra's config
-    store, and `add_to_hydra_store` must be called to add the store's enqueued configs
-    to Hydra's central store (modify this behavior via `store = ZenStore(deferred_hydra_store=True)`)
+    store, and `.add_to_hydra_store()` must be called to add the enqueued configs
+    to Hydra's central store (modify this behavior via `ZenStore(deferred_hydra_store=True)`).
 
     >>> store.has_enqueued()
     True
@@ -796,9 +796,9 @@ class ZenStore:
     False
 
     Overwriting an entry will result in an error; this behavior can be modified via
-    `store = ZenStore(overwrite_ok=True)`.
+    `ZenStore(overwrite_ok=True)`.
 
-    >>> store({}, name="sgd", group="optim")  # same name & group as above
+    >>> store({}, name="sgd", group="optim")  # same name and group as above
     ValueError: (name=sgd group=optim): Hydra config store entry already exists. Specify `overwrite_ok=True` to enable replacing config store entries
 
     Creating a distinct store.
@@ -863,7 +863,8 @@ class ZenStore:
 
     Note that, by default, the application of `to_config` via the store is deferred
     until the config is actually accessed (by the user or when added to Hydra's store).
-    This minimizes the runtime overhead associated with decorating functions this way.
+    This minimizes the runtime overhead associated with decorating functions this way
+    in use cases where the stored configs are not utilitized.
     """
 
     __slots__ = (
