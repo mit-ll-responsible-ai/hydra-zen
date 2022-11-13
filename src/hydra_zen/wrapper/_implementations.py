@@ -850,7 +850,7 @@ class ZenStore:
     ... def func(a: int, b: int):
     ...     return a - b
 
-    >>> func(10, 3)
+    >>> func(10, 3)  # the decorated function is left unchanged
     7
     >>> pp(hz_store[None, "func1"])
     _target_: __main__.func
