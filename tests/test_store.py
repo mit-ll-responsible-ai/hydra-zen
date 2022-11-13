@@ -693,3 +693,31 @@ def test_eq(store1: ZenStore, store2: ZenStore):
         store2.add_to_hydra_store()
         assert store1 != store2
         assert store1 == store1(param="blah")
+
+
+@settings(max_examples=20)
+@given(...)
+def test_get_entry(store: ZenStore):
+    assume(store)
+    entry, *_ = store
+    entry_ = store.get_entry(entry["group"], name=entry["name"])
+    assert entry == entry_
+
+
+@settings(max_examples=20)
+@given(store=...)
+@pytest.mark.parametrize(
+    "getter",
+    [
+        lambda store, *_: next(iter(store)),
+        lambda store, group, name: store.get_entry(group, name),
+    ],
+)
+def test_entry_access_cannot_mutate_store(store: ZenStore, getter):
+    assume(store)
+    entries = tuple(d.copy() for d in store)
+
+    entry = getter(store, entries[0]["group"], entries[0]["name"])
+    entry["name"] = 2222
+    new_entries = tuple(d.copy() for d in store)
+    assert all(e in new_entries for e in entries)

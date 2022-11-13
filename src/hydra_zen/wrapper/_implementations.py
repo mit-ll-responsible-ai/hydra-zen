@@ -735,12 +735,15 @@ class _Deferred:
         return self.to_config(self.target, **self.kw)
 
 
-def _resolve_node(entry: StoreEntry) -> StoreEntry:
+def _resolve_node(entry: StoreEntry, copy: bool) -> StoreEntry:
     """Given an entry, updates the entry so that its node is not deferred, and returns
     the entry. This function is a passthrough for an entry whose node is not deferred"""
     item = entry["node"]
     if isinstance(item, _Deferred):
         entry["node"] = item()
+
+    if copy:
+        entry = entry.copy()
     return entry
 
 
@@ -1038,17 +1041,17 @@ class ZenStore:
             key_not_none = key is not None
             key_w_ender = key + "/" if key is not None else "<NEVER>"
             return {
-                (group, name): _resolve_node(entry)["node"]
+                (group, name): _resolve_node(entry, copy=False)["node"]
                 for (group, name), entry in self._internal_repo.items()
                 if group == key
                 or (
                     key_not_none and group is not None and group.startswith(key_w_ender)
                 )
             }
-        return self.get_entry(*key)["node"]
+        return _resolve_node(self._internal_repo[key], copy=False)["node"]
 
     def get_entry(self, group: GroupName, name: NodeName) -> StoreEntry:
-        return _resolve_node(self._internal_repo[(group, name)])
+        return _resolve_node(self._internal_repo[(group, name)], copy=True)
 
     def __contains__(self, key: Union[GroupName, Tuple[GroupName, NodeName]]) -> bool:
         """Checks if group or (group, node-name) exists in zen-store"""
@@ -1065,12 +1068,12 @@ class ZenStore:
         return key in self._internal_repo
 
     def __iter__(self) -> Generator[StoreEntry, None, None]:
-        yield from (_resolve_node(v) for v in self._internal_repo.values())
+        yield from (_resolve_node(v, copy=True) for v in self._internal_repo.values())
 
     def add_to_hydra_store(self, overwrite_ok: Optional[bool] = None) -> None:
 
         while self._queue:
-            entry = _resolve_node(self._queue.popleft())
+            entry = _resolve_node(self._queue.popleft(), copy=False)
             if (
                 overwrite_ok is False
                 or (overwrite_ok is None and not self._overwrite_ok)
