@@ -71,12 +71,12 @@ New Features
 
 Improvements
 ------------
-- :func:`~hydra_zen.hydrated_dataclass` will now produce a pickle-compatible dataclass type. See :pull:`310`.
+- :func:`~hydra_zen.hydrated_dataclass` will now produce a pickle-compatible dataclass type. See :pull:`338`.
 
 
 Compatibility-Breaking Changes
 ------------------------------
-- Previously, any class decorated by :func:`~hydra_zen.hydrated_dataclass` would have a `__module__` attribute set to `typing`. Now the class's `__module__` will reflect the module where its static definition resides. This enables pickle-compatibility  (:pull:`310`). This is unlikely to cause any issues for users.
+- Previously, any class decorated by :func:`~hydra_zen.hydrated_dataclass` would have a `__module__` attribute set to `typing`. Now the class's `__module__` will reflect the module where its static definition resides. This enables pickle-compatibility  (:pull:`338`). This is unlikely to cause any issues for users.
 
 .. _v0.8.0:
 
