@@ -8,7 +8,7 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse 
 chronological order. All previous releases should still be available on pip.
 
-.. _v0.8.0:
+.. _v0.9.0:
 
 ---------------------
 0.9.0rc3 - 2022-11-17
@@ -71,8 +71,12 @@ New Features
 
 Improvements
 ------------
-- :func:`~hydra_zen.hydrated_dataclass` will now produce a pickle-compatible dataclass type.
+- :func:`~hydra_zen.hydrated_dataclass` will now produce a pickle-compatible dataclass type. See :pull:`310`.
 
+
+Compatibility-Breaking Changes
+------------------------------
+- Previously, any class decorated by :func:`~hydra_zen.hydrated_dataclass` would have its `__module__` attribute value of `typing`. Now, in accordance to the pickle-compatibility added in :pull:`310`, the class's `__module__` will reflect the module where its static definition resides. It is highly unlikely that this will impact any users in a negative way.
 
 .. _v0.8.0:
 
