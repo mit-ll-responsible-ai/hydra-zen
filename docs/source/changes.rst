@@ -11,7 +11,7 @@ chronological order. All previous releases should still be available on pip.
 .. _v0.8.0:
 
 ---------------------
-0.9.0rc2 - 2022-10-19
+0.9.0rc3 - 2022-11-17
 ---------------------
 
 .. note:: This is documentation for an unreleased version of hydra-zen. You can try out this pre-release version using `pip install --pre hydra-zen`

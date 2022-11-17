@@ -208,7 +208,7 @@ def fn_target(x: int, y: int):
     return x + y
 
 
-@hydrated_dataclass(int)
+@hydrated_dataclass(fn_target)
 class HydratedExample:
     x: int
     y: int = 3
