@@ -11,7 +11,7 @@ chronological order. All previous releases should still be available on pip.
 .. _v0.8.0:
 
 ---------------------
-0.9.0rc2 - 2022-10-19
+0.9.0rc3 - 2022-11-17
 ---------------------
 
 .. note:: This is documentation for an unreleased version of hydra-zen. You can try out this pre-release version using `pip install --pre hydra-zen`
@@ -67,6 +67,12 @@ New Features
 ------------
 - Adds the :func:`~hydra_zen.zen` decorator (see :pull:`310`)
 - Adds the :func:`~hydra_zen.wrapper.Zen` decorator-class (see :pull:`310`)
+
+
+Improvements
+------------
+- :func:`~hydra_zen.hydrated_dataclass` will now produce a pickle-compatible dataclass type.
+
 
 .. _v0.8.0:
 

@@ -686,7 +686,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="k">return</span> <span class="n">builds</span><span class="p">(</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span>
             <span class="n">target</span><span class="p">,</span>
             <span class="o">*</span><span class="n">pos_args</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
@@ -701,6 +701,8 @@
             <span class="n">frozen</span><span class="o">=</span><span class="n">frozen</span><span class="p">,</span>
             <span class="n">zen_convert</span><span class="o">=</span><span class="n">zen_convert</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="vm">__module__</span> <span class="o">=</span> <span class="n">decorated_obj</span><span class="o">.</span><span class="vm">__module__</span>
+        <span class="k">return</span> <span class="n">out</span>
 
     <span class="k">return</span> <span class="n">wrapper</span></div>
 
