@@ -68,6 +68,12 @@ New Features
 - Adds the :func:`~hydra_zen.zen` decorator (see :pull:`310`)
 - Adds the :func:`~hydra_zen.wrapper.Zen` decorator-class (see :pull:`310`)
 
+
+Improvements
+------------
+- :func:`~hydra_zen.hydrated_dataclass` will now produce a pickle-compatible dataclass type.
+
+
 .. _v0.8.0:
 
 ------------------

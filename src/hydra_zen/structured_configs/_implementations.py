@@ -359,7 +359,7 @@ def hydrated_dataclass(
         else:
             kwargs: Dict[str, Any] = {}
 
-        return builds(
+        out = builds(
             target,
             *pos_args,
             **kwargs,
@@ -374,6 +374,8 @@ def hydrated_dataclass(
             frozen=frozen,
             zen_convert=zen_convert,
         )
+        out.__module__ = decorated_obj.__module__
+        return out
 
     return wrapper
 
