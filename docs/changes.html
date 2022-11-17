@@ -246,16 +246,16 @@ chronological order. All previous releases should still be available on pip.</p>
 <p>with a Hydra-agnostic task function that has an explicit signature:</p>
 <div class="literal-block-wrapper docutils container" id="id33">
 <div class="code-block-caption"><span class="caption-text">Using <code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code> to design a Hydra-agnostic task function</span><a class="headerlink" href="#id33" title="Permalink to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a>
-
-<a class="sphinx-codeautolink-a" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="nd">@zen</span></a>
-<span class="k">def</span> <span class="nf">trainer_task_fn</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">partial_optim</span><span class="p">,</span> <span class="n">trainer</span><span class="p">,</span> <span class="n">num_epochs</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">):</span>
-   <span class="c1"># All config-field extraction &amp; instantiation is automated/mediated by zen</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># note: no Hydra or hydra-zen specific logic here</span>
+<span class="k">def</span> <span class="nf">trainer_task_fn</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">partial_optim</span><span class="p">,</span> <span class="n">trainer</span><span class="p">,</span> <span class="n">num_epochs</span><span class="p">):</span>
    <span class="n">optim</span> <span class="o">=</span> <span class="n">partial_optim</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
    <span class="n">trainer</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">optim</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">)</span>
 
 <span class="k">if</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/reference/import.html#name__" title="__name__"><span class="vm">__name__</span></a> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
-   <span class="n">trainer_task_fn</span><span class="o">.</span><span class="n">hydra_main</span><span class="p">(</span><span class="n">config_name</span><span class="o">=</span><span class="s2">"my_app"</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+   <span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a>
+
+   <span class="c1"># All config-field extraction &amp; instantiation is automated/mediated by zen</span>
+   <a class="sphinx-codeautolink-a" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">(</span><span class="n">trainer_task_fn</span><span class="p">)</span><span class="o">.</span><span class="n">hydra_main</span><span class="p">(</span><span class="n">config_name</span><span class="o">=</span><span class="s2">"my_app"</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">version_base</span><span class="o">=</span><span class="s2">"1.2"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
