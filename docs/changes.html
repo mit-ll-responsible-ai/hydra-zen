@@ -213,7 +213,7 @@
 <p>This is a record of all past hydra-zen releases and what went into them, in reverse
 chronological order. All previous releases should still be available on pip.</p>
 <section id="rc3-2022-11-17">
-<span id="v0-8-0"></span><h2>0.9.0rc3 - 2022-11-17<a class="headerlink" href="#rc3-2022-11-17" title="Permalink to this heading">#</a></h2>
+<span id="v0-9-0"></span><h2>0.9.0rc3 - 2022-11-17<a class="headerlink" href="#rc3-2022-11-17" title="Permalink to this heading">#</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This is documentation for an unreleased version of hydra-zen. You can try out this pre-release version using <code class="xref py py-obj docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--pre</span> <span class="pre">hydra-zen</span></code></p>
@@ -271,14 +271,20 @@ chronological order. All previous releases should still be available on pip.</p>
 <section id="improvements">
 <h3>Improvements<a class="headerlink" href="#improvements" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="generated/hydra_zen.hydrated_dataclass.html#hydra_zen.hydrated_dataclass" title="hydra_zen.hydrated_dataclass"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydrated_dataclass()</span></code></a> will now produce a pickle-compatible dataclass type.</p></li>
+<li><p><a class="reference internal" href="generated/hydra_zen.hydrated_dataclass.html#hydra_zen.hydrated_dataclass" title="hydra_zen.hydrated_dataclass"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydrated_dataclass()</span></code></a> will now produce a pickle-compatible dataclass type. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/310">pull request #310</a>.</p></li>
+</ul>
+</section>
+<section id="compatibility-breaking-changes">
+<h3>Compatibility-Breaking Changes<a class="headerlink" href="#compatibility-breaking-changes" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Previously, any class decorated by <a class="reference internal" href="generated/hydra_zen.hydrated_dataclass.html#hydra_zen.hydrated_dataclass" title="hydra_zen.hydrated_dataclass"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydrated_dataclass()</span></code></a> would have its <code class="xref py py-obj docutils literal notranslate"><span class="pre">__module__</span></code> attribute value of <a class="reference external" href="https://docs.python.org/3/library/typing.html#module-typing" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">typing</span></code></a>. Now, in accordance to the pickle-compatibility added in <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/310">pull request #310</a>, the class’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">__module__</span></code> will reflect the module where its static definition resides. It is highly unlikely that this will impact any users in a negative way.</p></li>
 </ul>
 </section>
 </section>
-<section id="id1">
-<span id="id2"></span><h2>0.8.0 - 2022-09-13<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h2>
-<section id="id3">
-<h3>Release Highlights<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h3>
+<section id="v0-8-0">
+<span id="id1"></span><h2>0.8.0 - 2022-09-13<a class="headerlink" href="#v0-8-0" title="Permalink to this heading">#</a></h2>
+<section id="id2">
+<h3>Release Highlights<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h3>
 <p>This release adds auto-config support for dataclass types and instances, <strong>including pydantic datclasses</strong>. Thus one can now include in
 a structured config type-annotations and default values that <em>are not natively
 supported by Hydra</em>, and then use <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> and/or
@@ -333,8 +339,8 @@ automatically create a Hydra-compatible config that, when instantiated, returns 
 Note that this functionality works with <a class="reference external" href="https://pydantic-docs.helpmanual.io/usage/dataclasses/">pydantic dataclasses</a> as well, which enables us to leverage enhanced runtime value and type-checking.</p>
 <p>Big thanks to <a class="reference external" href="https://github.com/Jasha10">Jasha10</a> for proposing and prototyping the crux of this new capability.</p>
 </section>
-<section id="compatibility-breaking-changes">
-<h3>Compatibility-Breaking Changes<a class="headerlink" href="#compatibility-breaking-changes" title="Permalink to this heading">#</a></h3>
+<section id="id3">
+<h3>Compatibility-Breaking Changes<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h3>
 <p>This release drops support for Python 3.6. If you require Python 3.6, please restrict your hydra-zen installation dependency as <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra-zen&lt;0.8.0</span></code>.</p>
 <p>Specifing <code class="xref py py-obj docutils literal notranslate"><span class="pre">make_custom_builds_fn([...],</span> <span class="pre">builds_bases=&lt;...&gt;)</span></code> was deprecated in
 hydra-zen 0.7.0 (<a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/263">pull request #263</a>). Accordingly, this option has now been removed from
@@ -852,20 +858,25 @@ hydra-zen will maintain a wide window of compatibility with Hydra versions; we t
      Improvements
     </a>
 </li>
+<li class="toc-h3 nav-item toc-entry">
+<a class="reference internal nav-link" href="#compatibility-breaking-changes">
+     Compatibility-Breaking Changes
+    </a>
+</li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry">
-<a class="reference internal nav-link" href="#id1">
+<a class="reference internal nav-link" href="#v0-8-0">
    0.8.0 - 2022-09-13
   </a>
 <ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry">
-<a class="reference internal nav-link" href="#id3">
+<a class="reference internal nav-link" href="#id2">
      Release Highlights
     </a>
 </li>
 <li class="toc-h3 nav-item toc-entry">
-<a class="reference internal nav-link" href="#compatibility-breaking-changes">
+<a class="reference internal nav-link" href="#id3">
      Compatibility-Breaking Changes
     </a>
 </li>
