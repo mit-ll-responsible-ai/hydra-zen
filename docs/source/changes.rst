@@ -76,7 +76,7 @@ Improvements
 
 Compatibility-Breaking Changes
 ------------------------------
-- Previously, any class decorated by :func:`~hydra_zen.hydrated_dataclass` would have its `__module__` attribute value of `typing`. Now, in accordance to the pickle-compatibility added in :pull:`310`, the class's `__module__` will reflect the module where its static definition resides. It is highly unlikely that this will impact any users in a negative way.
+- Previously, any class decorated by :func:`~hydra_zen.hydrated_dataclass` would have a `__module__` attribute set to `typing`. Now the class's `__module__` will reflect the module where its static definition resides. This enables pickle-compatibility  (:pull:`310`). This is unlikely to cause any issues for users.
 
 .. _v0.8.0:
 
