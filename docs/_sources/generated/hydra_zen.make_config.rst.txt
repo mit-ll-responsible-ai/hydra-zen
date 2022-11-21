@@ -1,4 +1,4 @@
-﻿hydra\_zen.make\_config
+hydra\_zen.make\_config
 =======================
 
 .. currentmodule:: hydra_zen

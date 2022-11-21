@@ -1,4 +1,4 @@
-﻿hydra\_zen.instantiate
+hydra\_zen.instantiate
 ======================
 
 .. currentmodule:: hydra_zen

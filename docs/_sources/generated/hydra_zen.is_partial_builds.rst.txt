@@ -1,4 +1,4 @@
-﻿hydra\_zen.is\_partial\_builds
+hydra\_zen.is\_partial\_builds
 ==============================
 
 .. currentmodule:: hydra_zen

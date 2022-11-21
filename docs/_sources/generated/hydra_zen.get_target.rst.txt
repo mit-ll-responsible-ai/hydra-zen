@@ -1,4 +1,4 @@
-﻿hydra\_zen.get\_target
+hydra\_zen.get\_target
 ======================
 
 .. currentmodule:: hydra_zen

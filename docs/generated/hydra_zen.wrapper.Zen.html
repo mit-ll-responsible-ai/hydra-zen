@@ -402,7 +402,7 @@ to ‘zen_cfg’</p>
 <td><p>Extracts values from the input config based on the decorated function's signature, resolves &amp; instantiates them, and calls the function with them.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#hydra_zen.wrapper.Zen.hydra_main" title="hydra_zen.wrapper.Zen.hydra_main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_main</span></code></a>([config_path, config_name, ...])</p></td>
-<td><p>Returns a Hydra-CLI compatible version of the wrapped function: <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra.main(zen(func))</span></code></p></td>
+<td><p>Generates a Hydra-CLI for the wrapped function.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#hydra_zen.wrapper.Zen.validate" title="hydra_zen.wrapper.Zen.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(_Zen__cfg)</p></td>
 <td><p>Validates the input config based on the decorated function without calling said function.</p></td>
@@ -483,7 +483,7 @@ checked according to the signature of <code class="xref py py-obj docutils liter
 <dl class="py method">
 <dt class="sig sig-object py" id="hydra_zen.wrapper.Zen.hydra_main">
 <span class="sig-name descname"><span class="pre">hydra_main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path=&lt;object</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_name=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version_base=&lt;object</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/wrapper/_implementations.html#Zen.hydra_main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.wrapper.Zen.hydra_main" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns a Hydra-CLI compatible version of the wrapped function: <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra.main(zen(func))</span></code></p>
+<dd><p>Generates a Hydra-CLI for the wrapped function. Equivalent to <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra.main(zen(func),</span> <span class="pre">[...])()</span></code></p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
@@ -527,7 +527,7 @@ checked according to the signature of <code class="xref py py-obj docutils liter
 <td><p>Validates the input config based on the decorated function without calling said function.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#hydra_zen.wrapper.Zen.hydra_main" title="hydra_zen.wrapper.Zen.hydra_main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_main</span></code></a>([config_path, config_name, ...])</p></td>
-<td><p>Returns a Hydra-CLI compatible version of the wrapped function: <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra.main(zen(func))</span></code></p></td>
+<td><p>Generates a Hydra-CLI for the wrapped function.</p></td>
 </tr>
 </tbody>
 </table>

@@ -301,6 +301,19 @@ the data and class-instances that we need for our application.</p>
 </tbody>
 </table>
 </section>
+<section id="storing-configs">
+<h3>Storing Configs<a class="headerlink" href="#storing-configs" title="Permalink to this heading">#</a></h3>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenStore</span></code>([name, deferred_to_config, ...])</p></td>
+<td><p>An abstraction over Hydra's config store, which enables users to maintain multiple, isolated store instances before populating Hydra's global config store.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">wrapper.default_to_config</span></code>(target, **kw)</p></td>
+<td><p>Creates a config that describes <code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="instantiating-and-resolving-configs">
 <h3>Instantiating and Resolving Configs<a class="headerlink" href="#instantiating-and-resolving-configs" title="Permalink to this heading">#</a></h3>
 <table class="autosummary longtable table autosummary">
@@ -519,6 +532,11 @@ with Hydra. For example, a <a class="reference external" href="https://docs.pyth
 <li class="toc-h3 nav-item toc-entry">
 <a class="reference internal nav-link" href="#creating-configs">
      Creating Configs
+    </a>
+</li>
+<li class="toc-h3 nav-item toc-entry">
+<a class="reference internal nav-link" href="#storing-configs">
+     Storing Configs
     </a>
 </li>
 <li class="toc-h3 nav-item toc-entry">
