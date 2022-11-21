@@ -1,4 +1,4 @@
-﻿hydra\_zen.ZenField
+hydra\_zen.ZenField
 ===================
 
 .. currentmodule:: hydra_zen

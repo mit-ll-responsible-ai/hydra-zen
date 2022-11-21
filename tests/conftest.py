@@ -1,18 +1,22 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-
 import logging
 import os
 import sys
 import tempfile
+from copy import deepcopy
 from typing import Dict, Iterable, Optional
 
 import hypothesis.strategies as st
 import pkg_resources
 import pytest
+from hydra.core.config_store import ConfigStore
 from omegaconf import DictConfig, ListConfig
 
+from hydra_zen import store
 from hydra_zen._compatibility import HYDRA_VERSION
+
+_store = ConfigStore.instance()
 
 # Skip collection of tests that don't work on the current version of Python.
 collect_ignore_glob = []
@@ -58,6 +62,18 @@ def cleandir() -> Iterable[str]:
         yield tmpdirname  # yields control to the test to be run
         os.chdir(old_dir)
         logging.shutdown()
+
+
+@pytest.fixture()
+def clean_store() -> Iterable[dict]:
+    """Provides access to configstore repo and restores state after test"""
+    prev_state = deepcopy(_store.repo)
+    zen_prev_state = (store._internal_repo.copy(), store._queue.copy())
+    yield _store.repo
+    _store.repo = prev_state
+    int_repo, queue = zen_prev_state
+    store._internal_repo = int_repo
+    store._queue = queue
 
 
 @pytest.fixture()

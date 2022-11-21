@@ -53,6 +53,17 @@ Creating Configs
    hydrated_dataclass
 
 
+Storing Configs
+***************
+.. currentmodule:: hydra_zen
+
+.. autosummary::
+   :toctree: generated/
+
+   ZenStore
+   wrapper.default_to_config
+
+
 Instantiating and Resolving Configs
 ***********************************
 

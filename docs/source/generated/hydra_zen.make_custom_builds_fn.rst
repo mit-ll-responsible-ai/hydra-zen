@@ -1,4 +1,4 @@
-﻿hydra\_zen.make\_custom\_builds\_fn
+hydra\_zen.make\_custom\_builds\_fn
 ===================================
 
 .. currentmodule:: hydra_zen

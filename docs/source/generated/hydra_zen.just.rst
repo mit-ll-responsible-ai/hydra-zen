@@ -1,4 +1,4 @@
-﻿hydra\_zen.just
+hydra\_zen.just
 ===============
 
 .. currentmodule:: hydra_zen
