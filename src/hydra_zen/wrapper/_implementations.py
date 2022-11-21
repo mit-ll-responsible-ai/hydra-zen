@@ -682,10 +682,9 @@ def default_to_config(
     inputs to `hydra_zen.ZenStore`. It behavior can be summarized based on the type of
     `target`
 
-    - OmegaConf containers are returned unchanged
-    - Lists and dictionaries are processed by `hydra_zen.just`
-    - A dataclass instance is returned unchanged
+    - OmegaConf containers and dataclass *instances* are returned unchanged
     - A dataclass type is processed as `builds(target, **kw, populate_full_signature=True, builds_bases=(target,))`
+    - Lists and dictionaries are processed by `hydra_zen.just`
     - All other inputs are processed as `builds(target, **kw, populate_full_signature=True)`
 
     Parameters
@@ -698,6 +697,38 @@ def default_to_config(
     Returns
     -------
     target_config :  DataClass | Type[DataClass] | list | dict
+
+    Examples
+    --------
+    Lists and dictionaries
+
+    >>> from hydra_zen.wrapper import default_to_config
+    >>> default_to_config([1, {"z": 2+2j}])
+    [1, {'z': ConfigComplex(real=2.0, imag=2.0, _target_='builtins.complex')}]
+
+    Dataclass types
+
+    >>> from dataclasses import dataclass
+    >>>
+    >>> @dataclass
+    ... class A:
+    ...     x: int
+    ...     y: int
+
+    >>> Builds_A = default_to_config(A, y=22)
+    >>> Builds_A(x=1)
+    Builds_A(x=1, y=22, _target_='__main__.A')
+    >>> issubclass(Builds_A, A)
+    True
+
+    A function
+
+    >>> from hydra_zen import to_yaml
+    >>> def func(x: int, y: int): ...
+    >>> print(to_yaml(default_to_config(func)))
+    _target_: __main__.func
+    x: ???
+    'y': ???
     """
     if is_dataclass(target):
         if isinstance(target, type):
@@ -726,6 +757,7 @@ class _HasName(Protocol):
     __name__: str
 
 
+# TODO: Should we automatically snake-case?
 def get_name(target: _HasName) -> str:
     name = getattr(target, "__name__", None)
     if not isinstance(name, str):

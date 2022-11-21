@@ -19,9 +19,9 @@ chronological order. All previous releases should still be available on pip.
 
 Release Highlights
 ------------------
-This release adds the :func:`~hydra_zen.zen` decorator, which enables users to use Hydra-agnostic task functions for their Hydra app; the decorator will automatically extract, resolve, and instantiate fields from an input config based on the function's signature. 
+This release introduces :func:`~hydra_zen.zen` and :class:`~hydra_zen.ZenStore`, which enable hydra-zen users to eliminate Hydra-specific boilerplate code from their projects, and to utilize new patterns and best practices for working with config stores.
 
-This encourages users to eliminate Hydra-specific boilerplate code from their projects and to instead opt for task functions with explicit signatures, including functions from third parties.
+The :func:`~hydra_zen.zen` decorator enables of use Hydra-agnostic task functions in Hydra apps; the decorator will automatically extract, resolve, and instantiate fields from an input config based on the function's signature. This encourages users to eliminate Hydra-specific boilerplate code from their projects and to instead opt for task functions with explicit signatures, which can include functions from third parties.
 
 E.g., :func:`~hydra_zen.zen` enables us to replace the following Hydra-specific task function:
 
@@ -63,10 +63,55 @@ with a Hydra-agnostic task function that has an explicit signature:
 
 There are plenty more bells and whistles to :func:`~hydra_zen.zen`, refer to :pull:`310` and its reference documentation for more details.
 
+:class:`~hydra_zen.ZenStore` is an abstraction over Hydra's config store.
+It enables users to maintain multiple, isolated store instances before populating Hydra's global config store.
+It also protects users from accidentally overwriting  entries in Hydra's global store
+
+This enables objects to be stored using a decorator pattern, e.g.
+
+.. code-block:: python
+   :caption: Using `hydra_zen.store` as a decorator to auto-configure and store objects.
+
+   from dataclasses import dataclass
+   from hydra_zen import store
+
+   profile_store = store(group="profile")
+
+   # Adds two store entries under the "profile" group of the store
+   # with configured defaults for `has_root`
+   @profile_store(name="admin", has_root=True)
+   @profile_store(name="basic", has_root=False)
+   @dataclass
+   class Profile:
+       username: str
+       schema: str
+       has_root: bool
+
+:class:`~hydra_zen.ZenStore` also possesses auto-config capabilities: it will automatically apply :func:`~hyda_zen.builds` and :func:`~hyda_zen.just` in intuitive ways on inputs to generate the stored configs.
+
+.. code-block:: python
+   :caption: Using `hydra_zen.store` auto-generate and store configs
+
+   from hydra_zen import ZenStore
+   from torch.optim import Adam, AdamW, RMSprop
+
+   torch_store = ZenStore("torch_store")
+
+   # Specify defaults for storing entries (group=optim)
+   # and for generating configs (_partial_=True and lr=1e-3)
+   torch_store = torch_store(group="optim", zen_partial=True, lr=0.001)
+
+   # Automatically applies `builds(<obj>, zen_partial=True, lr=0.001)` 
+   # to create and then store configs under the "optim" group
+   torch_store(Adam, name="adam", amsgrad=True)
+   torch_store(AdamW, name="adamw", betas=(0.1, 0.999))
+   torch_store(RMSprop, name="rmsprop")
+
 New Features
 ------------
 - Adds the :func:`~hydra_zen.zen` decorator (see :pull:`310`)
 - Adds the :func:`~hydra_zen.wrapper.Zen` decorator-class (see :pull:`310`)
+- Adds the :class:`~hydra_zen.ZenStore` decorator (see :pull:`331`)
 
 
 Improvements
