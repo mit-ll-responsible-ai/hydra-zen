@@ -666,10 +666,39 @@ fbuilds = make_custom_builds_fn(populate_full_signature=True)
 
 def default_to_config(
     target: Union[
-        Callable[..., Any], DataClass_, List[Any], Dict[Any, Any], ListConfig
+        Callable[..., Any],
+        DataClass_,
+        List[Any],
+        Dict[Any, Any],
+        ListConfig,
+        DictConfig,
     ],
     **kw: Any,
 ) -> Union[DataClass_, Type[DataClass_], ListConfig, DictConfig]:
+    """Creates a config that describes `target`.
+
+    This function is designed to selectively apply `hydra_zen.builds` or
+    `hydra_zen.just` in a way that permits maximum compatibility with common
+    inputs to `hydra_zen.ZenStore`. It behavior can be summarized based on the type of
+    `target`
+
+    - OmegaConf containers are returned unchanged
+    - Lists and dictionaries are processed by `hydra_zen.just`
+    - A dataclass instance is returned unchanged
+    - A dataclass type is processed as `builds(target, **kw, populate_full_signature=True, builds_bases=(target,))`
+    - All other inputs are processed as `builds(target, **kw, populate_full_signature=True)`
+
+    Parameters
+    ----------
+    target : Callable[..., Any] | DataClass | Type[DataClass] | list | dict
+
+    **kw : Any
+        Keyword arguments to be passed to `builds`.
+
+    Returns
+    -------
+    target_config :  DataClass | Type[DataClass] | list | dict
+    """
     if is_dataclass(target):
         if isinstance(target, type):
             if get_obj_path(target).startswith("types."):
@@ -767,10 +796,9 @@ class ZenStore:
 
     `ZenStore` is also designed to consolidate the config-creation and storage process;
     it can be used to decorate config-targets and dataclasses, enabling "inline" config
-    creation and storage patterns.
-
-    This is a "self-partialing" object, meaning a store instance can overwrite its own
-    default values. Please consult the examples for more details.
+    creation and storage patterns. This is also a "self-partialing" object, meaning a
+    store instance can overwrite its own default values. Please consult the
+    :ref:`examples <self-partial>` for more details.
 
     `hydra_zen.store` is available as a pre-instantiated, globally-available store,
     which is initialized as:
@@ -813,7 +841,7 @@ class ZenStore:
     >>> store.has_enqueued()
     False
 
-    Attempting to overwrite an entry will result in an error.
+    By default, attempting to overwrite an entry will result in an error.
 
     >>> store({}, name="sgd", group="optim")  # same name and group as above
     ValueError: (name=sgd group=optim): Hydra config store entry already exists.
@@ -836,23 +864,24 @@ class ZenStore:
     **Auto-config capabilities**
 
     The input to a store is processed by the store's `to_config` function prior to
-    creating the store entry. By default this is `hydra_zen.wrapper.default_to_config`,
-    which applies `hydra_zen.builds` or `hydra_zen.just` to inputs based on their
-    types.
+    creating the stored config node. By default this calls
+    `hydra_zen.wrapper.default_to_config`, which applies `hydra_zen.builds` or
+    `hydra_zen.just` to inputs based on their types.
 
     For instance, consider the following function:
 
     >>> def sum_it(a: int, b: int): return a + b
 
     We can pass `sum_it` directly to our store to leverage auto-config and auto-naming
-    capabilities. Here, `builds(sum_it, a=1, b=2)` will be called under the hood by `new_store` to create the config for `sum_it`.
+    capabilities. Here, `builds(sum_it, a=1, b=2)` will be called under the hood by
+    `new_store` to create the config for `sum_it`.
 
     >>> from hydra_zen import to_yaml
     >>> def pp(x): print(to_yaml(x))  # for pretty printing configs
 
-    >>> auto_store = ZenStore()
-    >>> _ = auto_store(sum_it, a=1, b=2)  # entry name defaults to `sum_it.__name__`
-    >>> config = auto_store[None, "sum_it"]  # (group, name) -> config node
+    >>> store2 = ZenStore()
+    >>> _ = store2(sum_it, a=1, b=2)  # entry name defaults to `sum_it.__name__`
+    >>> config = store2[None, "sum_it"]
     >>> pp(config)
     _target_: __main__.sum_it
     a: 1
@@ -863,33 +892,31 @@ class ZenStore:
 
     **Support for decorator patterns**
 
-    `store` is a passthrough and can be used as a decorator. Let's add two store
-    entries for `func` by decorating it.
+    `ZenStore.__call__` is a pass-through and can be used as a decorator. Let's add two
+    store entries for `func` by decorating it.
 
     >>> from hydra_zen import ZenStore, to_yaml
-    >>> hz_store = ZenStore()
+    >>> store = ZenStore()
 
-    >>> @hz_store(a=1, b=22, name="func1")
-    ... @hz_store(a=-10, name="func2")
+    >>> @store(a=1, b=22, name="func1")
+    ... @store(a=-10, name="func2")
     ... def func(a: int, b: int):
     ...     return a - b
 
     >>> func(10, 3)  # the decorated function is left unchanged
     7
-    >>> pp(hz_store[None, "func1"])
+    >>> pp(store[None, "func1"])
     _target_: __main__.func
     a: 1
     b: 22
-    >>> pp(hz_store[None, "func2"])
+    >>> pp(store[None, "func2"])
     _target_: __main__.func
     b: ???
     a: -10
 
     Note that, by default, the application of `to_config` via the store is deferred
-    until the config is actually accessed (by the user or when added to Hydra's store).
-    This minimizes the runtime overhead associated with decorating functions this way
-    – the runtime cost of creating configs is deferred until said configs are actually
-    accessed.
+    until that entry is actually accessed. This defers the runtime cost of constructing
+    configs for the decorated function so that it need not be paid until necessary.
 
     .. _self-partial:
 
@@ -898,10 +925,11 @@ class ZenStore:
     The default values for a store's `__call__` parameters – `group`, `to_config`, etc.
     – can easily be customized. Simpy call the store with those new values and
     without specifying an object to be stored. This will return a "mirrored" store
-    instance – with the same internals as the original store – with updated defaults.
+    instance – with the same internal state as the original store – with updated
+    defaults.
 
     For example, let's create a store where we want to store multiple configs under a
-    'math' group and under a 'tool' group, respectively.
+    `'math'` group and under a `'functools'` group, respectively.
 
     >>> import math
     >>> import functools
@@ -924,7 +952,7 @@ class ZenStore:
     {'math': ['floor', 'ceil'], 'functools': ['lru_cache', 'wraps']}
 
     These "self-partialing" patterns can be chained indefinitely and can be used to set
-    partial defaults specified for the config itself
+    partial defaults for the `to_config` function.
 
     >>> profile_store = new_store(group="profile")
     >>> schemaless = profile_store(schema="<none>")
@@ -1350,8 +1378,7 @@ class ZenStore:
         Notes
         -----
         Mutating the returned mappings will not affect the store's internal entries.
-        Mutating node in the returned entry may have unintended consequences and
-        is not advised.
+        Mutating node in an entry may have unintended consequences and is not advised.
 
         Examples
         --------
