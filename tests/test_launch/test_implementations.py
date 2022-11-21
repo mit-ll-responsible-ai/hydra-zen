@@ -12,7 +12,7 @@ from hydra.plugins.sweeper import Sweeper
 from omegaconf.omegaconf import OmegaConf
 
 from hydra_zen import builds, instantiate, launch, make_config
-from hydra_zen._compatibility import HYDRA_VERSION
+from hydra_zen._compatibility import SUPPORTS_VERSION_BASE
 from hydra_zen._launch import _store_config
 
 try:
@@ -168,11 +168,15 @@ class LocalBasicSweeper(Sweeper):
         )
 
     def sweep(self, arguments):
+        assert self.launcher is not None
+        assert self.hydra_context is not None
+
         parser = OverridesParser.create(config_loader=self.hydra_context.config_loader)
         override = parser.parse_overrides(arguments)[0]
         key = override.get_key_element()
         sweep = [f"{key}={val}" for val in override.sweep_string_iterator()]
         overrides = [[x] for x in sweep]
+
         returns = []
         for i, batch in enumerate(overrides):
             result = self.launcher.launch([batch], initial_job_idx=i)[0]
@@ -201,7 +205,10 @@ def test_launch_with_multirun_plugin(plugin, version_base):
         assert j.return_value == {"a": i + 1, "b": 1}
 
 
-@pytest.mark.skipif(HYDRA_VERSION < (1, 2, 0), reason="version_base not supported")
+@pytest.mark.filterwarnings(
+    "ignore:Future Hydra versions will no longer change working directory"
+)
+@pytest.mark.skipif(not SUPPORTS_VERSION_BASE, reason="version_base not supported")
 @pytest.mark.parametrize("version_base", ["1.1", "1.2", None])
 @pytest.mark.usefixtures("cleandir")
 def test_version_base(version_base: Optional[str]):
