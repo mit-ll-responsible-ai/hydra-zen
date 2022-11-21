@@ -392,7 +392,9 @@ class Zen(Generic[P, R]):
         if config_path is not _UNSPECIFIED_:
             kw["config_path"] = config_path
 
-        if SUPPORTS_VERSION_BASE and version_base is not _UNSPECIFIED_:
+        if (
+            SUPPORTS_VERSION_BASE and version_base is not _UNSPECIFIED_
+        ):  # pragma: no cover
             kw["version_base"] = version_base
 
         return hydra.main(**kw)(self)()
