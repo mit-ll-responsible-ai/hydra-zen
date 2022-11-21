@@ -8,13 +8,13 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse 
 chronological order. All previous releases should still be available on pip.
 
-.. _v0.8.0:
+.. _v0.9.0:
 
 ---------------------
-0.9.0rc2 - 2022-10-19
+0.9.0rc3 - 2022-11-17
 ---------------------
 
-.. note:: This is documentation for an unreleased version of hydra-zen. You can try out this version pre-release version using `pip install --pre hydra-zen`
+.. note:: This is documentation for an unreleased version of hydra-zen. You can try out this pre-release version using `pip install --pre hydra-zen`
 
 
 Release Highlights
@@ -49,17 +49,16 @@ with a Hydra-agnostic task function that has an explicit signature:
 .. code-block:: python
    :caption: Using `zen` to design a Hydra-agnostic task function
 
-   from hydra_zen import zen
-   
-   def trainer_task_fn(model, data, partial_optim, trainer, num_epochs: int):
+   # note: no Hydra or hydra-zen specific logic here
+   def trainer_task_fn(model, data, partial_optim, trainer, num_epochs):
       optim = partial_optim(model.parameters())
       trainer(model, optim, data).fit(num_epochs)
    
    if __name__ == "__main__":
-      # All config-field extraction & instantiation is automated/mediated by zen.
-      # I.e. `zen` will extract & instantiate model, data, etc. from the input
-      # config and pass it to `trainer_task_fn`
-      zen(trainer_task_fn).hydra_main(config_name="my_app", config_path=None)
+      from hydra_zen import zen
+      
+      # All config-field extraction & instantiation is automated/mediated by zen
+      zen(trainer_task_fn).hydra_main(config_name="my_app", config_path=None,version_base="1.2")
 
 
 There are plenty more bells and whistles to :func:`~hydra_zen.zen`, refer to :pull:`310` and its reference documentation for more details.
@@ -68,6 +67,16 @@ New Features
 ------------
 - Adds the :func:`~hydra_zen.zen` decorator (see :pull:`310`)
 - Adds the :func:`~hydra_zen.wrapper.Zen` decorator-class (see :pull:`310`)
+
+
+Improvements
+------------
+- :func:`~hydra_zen.hydrated_dataclass` will now produce a pickle-compatible dataclass type. See :pull:`338`.
+
+
+Compatibility-Breaking Changes
+------------------------------
+- Previously, any class decorated by :func:`~hydra_zen.hydrated_dataclass` would have a `__module__` attribute set to `typing`. Now the class's `__module__` will reflect the module where its static definition resides. This enables pickle-compatibility  (:pull:`338`). This is unlikely to cause any issues for users.
 
 .. _v0.8.0:
 
