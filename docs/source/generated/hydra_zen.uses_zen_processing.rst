@@ -1,4 +1,4 @@
-﻿hydra\_zen.uses\_zen\_processing
+hydra\_zen.uses\_zen\_processing
 ================================
 
 .. currentmodule:: hydra_zen

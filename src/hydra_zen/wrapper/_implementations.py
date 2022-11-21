@@ -31,7 +31,15 @@ import hydra
 from hydra.core.config_store import ConfigStore
 from hydra.utils import instantiate
 from omegaconf import DictConfig, ListConfig, OmegaConf
-from typing_extensions import Final, Literal, ParamSpec, TypeAlias, TypedDict, TypeGuard
+from typing_extensions import (
+    Final,
+    Literal,
+    ParamSpec,
+    Protocol,
+    TypeAlias,
+    TypedDict,
+    TypeGuard,
+)
 
 from hydra_zen import instantiate, just, make_custom_builds_fn
 from hydra_zen.errors import HydraZenValidationError
@@ -685,12 +693,17 @@ def default_to_config(
         return fbuilds(t, **kw)
 
 
-def get_name(target: Any) -> str:
+class _HasName(Protocol):
+    __name__: str
+
+
+def get_name(target: _HasName) -> str:
     name = getattr(target, "__name__", None)
     if not isinstance(name, str):
         raise TypeError(
-            f"Cannot infer config store entry name for {target}. Please manually "
-            f"specify `store({target}, name=<some name>, [...])`"
+            f"Cannot infer config store entry name for {target}. It does not have a "
+            f"`__name__` attribute. Please manually specify `store({target}, "
+            f"name=<some name>, [...])`"
         )
     return name
 
@@ -759,12 +772,13 @@ class ZenStore:
     This is a "self-partialing" object, meaning a store instance can overwrite its own
     default values. Please consult the examples for more details.
 
-    `hydra_zen.store` is available as a pre-instantiated, globally-available store:
+    `hydra_zen.store` is available as a pre-instantiated, globally-available store,
+    which is initialized as:
 
     .. code-block:: python
 
        store = ZenStore(
-           name="store",
+           name="zen_store",
            deferred_to_config=True,
            deferred_hydra_store=True,
        )
@@ -773,21 +787,25 @@ class ZenStore:
     --------
     **Basic usage**
 
-    Adding a config to hydra-zen's global `ZenStore` instance. Each config must have
-    an associated name. Optionally, a group, package, and/or provider may be specified
-    for the entry as well.
+    Let's add a config to hydra-zen's pre-instantiated `ZenStore` instance. Each config
+    must have an associated name. Optionally, a group, package, and/or provider may be
+    specified for the entry as well.
 
     >>> from hydra_zen import store
     >>> _ = store({"lr": 0.01, "momentum": 0.9}, name="sgd", group="optim")
     >>> _ = store({"lr": 0.001}, name="adam", group="optim")
-    store
+    zen_store
     {'optim': ['sgd', 'adam']}
+
+    A store's entries are keyed by their `(group, name)` pair (the default group is
+    `None`).
+
     >>> store["optim", "sgd"]  # (group, name) -> config node
     {'lr': 0.01, 'momentum': 0.9}
 
     By default, the stored config(s) will be "enqueued" for addition to Hydra's config
     store, and `.add_to_hydra_store()` must be called to add the enqueued configs
-    to Hydra's central store (modify this behavior via `ZenStore(deferred_hydra_store=True)`).
+    to Hydra's central store.
 
     >>> store.has_enqueued()
     True
@@ -795,54 +813,60 @@ class ZenStore:
     >>> store.has_enqueued()
     False
 
-    Overwriting an entry will result in an error; this behavior can be modified via
-    `ZenStore(overwrite_ok=True)`.
+    Attempting to overwrite an entry will result in an error.
 
     >>> store({}, name="sgd", group="optim")  # same name and group as above
-    ValueError: (name=sgd group=optim): Hydra config store entry already exists. Specify `overwrite_ok=True` to enable replacing config store entries
+    ValueError: (name=sgd group=optim): Hydra config store entry already exists.
+    Specify `overwrite_ok=True` to enable replacing config store entries
 
-    Creating a distinct store.
+    We can create a distinct store that has an independent internal repository of
+    configs.
 
     >>> from hydra_zen import ZenStore
-    >>> new_store = ZenStore(name="new", overwrite_ok=True)
-    >>> _new_store({"a": 1}, name="apple")
-    >>> store.has_enqueued()
-    False
-    >>> new_store.has_enqueued()
-    True
+    >>> new_store = ZenStore("new_store")
+    >>> _ = new_store([1, 2, 3], name="backbone")
 
-    **Auto-Config Capabilities**
+    >>> store
+    zen_store
+    {'optim': ['sgd', 'adam']}
+    >>> new_store
+    new_store
+    {None: ['backbone']}
+
+    **Auto-config capabilities**
 
     The input to a store is processed by the store's `to_config` function prior to
-    creating the store entry. By default this is `hydra_zen.wrappers.default_to_config`,
-    which applies `hydra_zen.builds` and `hydra_zen.just` to inputs based on their
+    creating the store entry. By default this is `hydra_zen.wrapper.default_to_config`,
+    which applies `hydra_zen.builds` or `hydra_zen.just` to inputs based on their
     types.
 
     For instance, consider the following function:
 
-    >>> from hydra_zen import to_yaml
-    >>> def sum_it(a: int, b: int): return a+b
+    >>> def sum_it(a: int, b: int): return a + b
 
     We can pass `sum_it` directly to our store to leverage auto-config and auto-naming
-    capabilities.
+    capabilities. Here, `builds(sum_it, a=1, b=2)` will be called under the hood by `new_store` to create the config for `sum_it`.
 
-    >>> _ = new_store(sum_it, a=1, b=2)  # name is inferred
-    >>> config = new_store[None, "sum_it"]  # (group, name) -> config node
-    >>> print(to_yaml(config))
+    >>> from hydra_zen import to_yaml
+    >>> def pp(x): print(to_yaml(x))  # for pretty printing configs
+
+    >>> auto_store = ZenStore()
+    >>> _ = auto_store(sum_it, a=1, b=2)  # entry name defaults to `sum_it.__name__`
+    >>> config = auto_store[None, "sum_it"]  # (group, name) -> config node
+    >>> pp(config)
     _target_: __main__.sum_it
     a: 1
     b: 2
 
-    Here, `builds(sum_it, a=1, b=2)` was called under the hood by `new_store` to create
-    the stored config.
+    Refer to `hydra_zen.wrapper.default_to_config` for more details about the default
+    auto-config behaviors of `ZenStore`.
 
-    **Support for Decorator Patterns**
+    **Support for decorator patterns**
 
     `store` is a passthrough and can be used as a decorator. Let's add two store
     entries for `func` by decorating it.
 
     >>> from hydra_zen import ZenStore, to_yaml
-    >>> def pp(x): print(to_yaml(x))  # for pretty printing
     >>> hz_store = ZenStore()
 
     >>> @hz_store(a=1, b=22, name="func1")
@@ -864,7 +888,68 @@ class ZenStore:
     Note that, by default, the application of `to_config` via the store is deferred
     until the config is actually accessed (by the user or when added to Hydra's store).
     This minimizes the runtime overhead associated with decorating functions this way
-    in use cases where the stored configs are not utilitized.
+    – the runtime cost of creating configs is deferred until said configs are actually
+    accessed.
+
+    .. _self-partial:
+
+    **Customizable store defaults via 'self-partialing' patterns**
+
+    The default values for a store's `__call__` parameters – `group`, `to_config`, etc.
+    – can easily be customized. Simpy call the store with those new values and
+    without specifying an object to be stored. This will return a "mirrored" store
+    instance – with the same internals as the original store – with updated defaults.
+
+    For example, let's create a store where we want to store multiple configs under a
+    'math' group and under a 'tool' group, respectively.
+
+    >>> import math
+    >>> import functools
+
+    >>> new_store = ZenStore()
+    >>> math_store = new_store(group="math")  # overwrites group default
+    >>> tool_store = new_store(group="functools")  # overwrites group default
+
+    >>> math_store(math.floor)  # equivalent to: `new_store(math.floor, group="math")`
+    >>> math_store(math.ceil)
+    >>> tool_store(functools.lru_cache)
+    >>> tool_store(functools.wraps)
+
+    `math_store` and `tool_store` both share the same internal state as `new_store`, but
+    have overwritten default values for the `group`. See that `new_store` has entries
+    under these corresponding groups:
+
+    >>> new_store
+    custom_store
+    {'math': ['floor', 'ceil'], 'functools': ['lru_cache', 'wraps']}
+
+    These "self-partialing" patterns can be chained indefinitely and can be used to set
+    partial defaults specified for the config itself
+
+    >>> profile_store = new_store(group="profile")
+    >>> schemaless = profile_store(schema="<none>")
+
+    >>> from dataclasses import dataclass
+    >>> @profile_store(name="admin", has_root=True)
+    >>> @schemaless(name="test_admin", has_root=True)
+    >>> @schemaless(name="test_user", has_root=False)
+    >>> @dataclass
+    >>> class Profile:
+    >>>     username: str
+    >>>     schema: str
+    >>>     has_root: bool
+
+    >>> pp(new_store["profile", "admin"])
+    username: ???
+    schema: ???
+    has_root: true
+    _target_: __main__.Profile
+
+    >>> pp(new_store["profile", "test_admin"])
+    username: ???
+    schema: <none>
+    has_root: true
+    _target_: __main__.Profile
     """
 
     __slots__ = (
@@ -885,6 +970,25 @@ class ZenStore:
         deferred_hydra_store: bool = True,
         overwrite_ok: bool = False,
     ) -> None:
+        """
+        Parameters
+        ----------
+        name : Optional[str]
+            The name for this store.
+
+        deferred_to_config : bool, optional (default=True)
+            If `True` (default), this store will a not apply `to_config` to the
+            target until that specific entry is accessed by the store.
+
+        deferred_hydra_store : bool, optional (default=True)
+            If `True` (default), this store will not add entries to Hydra's global
+            config store until `store.add_to_hydra_store` is called explicitly.
+
+        overwrite_ok : bool, optional (default=False)
+            If `False` (default), attempting to overwrite entries in this store and
+            trying to use this store to overwrite entries in Hydra's global store
+            will raise a `ValueError`.
+        """
         if not isinstance(deferred_to_config, bool):  # type: ignore
             raise TypeError(
                 f"deferred_to_config must be a bool, got {deferred_to_config}"
@@ -921,7 +1025,21 @@ class ZenStore:
         return f"{self.name}\n{repr(dict(groups_contents))}"
 
     def __eq__(self, __o: object) -> bool:
-        """Stores are 'equal' iff they reference the same internal repo and queue"""
+        """Returns `True` if two stores share identical internal repos and queues.
+
+        Examples
+        --------
+        >>> from hydra_zen import ZenStore
+        >>> store1 = ZenStore()
+        >>> store2 = ZenStore()
+        >>> store1_a = store1(group='a')
+        >>> _ = store1_a(dict(x=1), name="foo")
+
+        >>> store1 == store1_a
+        True
+        >>> store1 == store2
+        False
+        """
         if not isinstance(__o, ZenStore):
             return False
         return __o._internal_repo is self._internal_repo and __o._queue is self._queue
@@ -932,9 +1050,9 @@ class ZenStore:
         self,
         __target: F,
         *,
-        name: Union[NodeName, Callable[[Any], NodeName]] = ...,
-        group: Union[GroupName, Callable[[Any], GroupName]] = ...,
-        package: Optional[Union[str, Callable[[Any], str]]] = ...,
+        name: Union[NodeName, Callable[[F], NodeName]] = ...,
+        group: Union[GroupName, Callable[[F], GroupName]] = ...,
+        package: Optional[Union[str, Callable[[F], str]]] = ...,
         provider: Optional[str] = ...,
         to_config: Callable[[F], Node] = default_to_config,
         **to_config_kw: Any,
@@ -958,6 +1076,56 @@ class ZenStore:
         ...
 
     def __call__(self, __target: Optional[F] = None, **kw: Any) -> Union[F, "ZenStore"]:
+        """__call__(target : Optional[T] = None, /, name: NodeName | Callable[[Any], NodeName]] = ..., group: GroupName | Callable[[T], GroupName]] = None, package: Optional[str | Callable[[T], str]]] | None], provider: Optional[str], to_config: Callable[[T], Node] = ..., **to_config_kw: Any) -> T | ZenStore
+
+        The interface to an initialized store. Can be used to store a config or to
+        :ref:`customize the default values <self-partial>` of the store.
+
+        Parameters
+        ----------
+        obj : Optional[T]
+            The object to be stored. This is a **positional-only** argument.
+
+            If `obj` is not specified, then the provided arguments are used to create a
+            mirrored store instance with updated default arguments.
+
+        name : NodeName | Callable[[T], NodeName]
+            The entry's name, or a callable that will be called as
+            `(obj) -> entry-name`. The default is `lambda obj: obj.__name__`.
+            Store entries are keyed off of `(group, name)`.
+
+        group : Optional[GroupName | Callable[[T], GroupName]]
+            The entry's group's name, or a callable that will be called as
+            `(obj) -> entry-group`. The default is `None`. Subgroups can be
+            specified using / within the group name.
+
+            Store entries are keyed off of `(group, name)`.
+
+        to_config : Callable[[T], Node] = default_to_config
+            Called on `obj` to produce the entry's "node" (the config).
+            Refer to  `hydra_zen.wrapper.default_to_config` for the default
+            behavior. Specify `lambda x: x` to have `obj` be stored directly
+            as the entry's node.
+
+            By default the call to `to_config` is deferred until the entry
+            is actually accessed by the store.
+
+        package : Optional[str | Callable[[Any], str]]
+            The entry's package. Default is `None`.
+
+        provider : Optional[str]
+            An optional provider name for the entry.
+
+        **to_config_kw : Any
+            Additional arguments that will be passed to `to_config`.
+
+        Returns
+        -------
+        T | ZenStore
+            If `obj` was specified, it is returned unchanged. Otherwise a new instance
+            of `ZenStore` is return, which mirrors the internal state of this store and
+            has updated default arguments.
+        """
         if __target is None:
             _s = type(self)(
                 self.name,
@@ -1087,6 +1255,41 @@ class ZenStore:
         ...
 
     def __getitem__(self, key: Union[GroupName, Tuple[GroupName, NodeName]]) -> Node:
+        """Access a entry's config node by specifying `(group, name)`. Or, access a
+        mapping of `(group, name) -> node` for all nodes in a specified group,
+        including nodes within subgroups.
+
+        See Also
+        --------
+        ZenStore.get_entry
+
+        Examples
+        --------
+        >>> from hydra_zen import store
+        >>> store(dict(x=1), name="a", group="fruit")
+        >>> store(dict(x=2), name="b", group="fruit/apple")
+        >>> store(dict(x=3), name="c", group="fruit/apple")
+        >>> store(dict(x=4), name="d", group="fruit/orange")
+        >>> store(dict(x=5), name="e", group="veggie")
+
+        Accessing an individual entry's config node.
+
+        >>> store["fruit/apple", "b"]
+        {'x': 2}
+
+        Accessing all config nodes under the "fruit/apple" group
+
+        >>> store["fruit/apple"]
+        {('fruit/apple', 'b'): {'x': 2}, ('fruit/apple', 'c'): {'x': 3}}
+
+        Accessing all config nodes under the "fruit" group
+
+        >>> store["fruit"]
+        {('fruit', 'a'): {'x': 1},
+         ('fruit/apple', 'b'): {'x': 2},
+         ('fruit/apple', 'c'): {'x': 3},
+         ('fruit/orange', 'd'): {'x': 4}}
+        """
         # store[group] ->
         #  {(group, name): node1, (group, name2): node2, (group/subgroup, name3): node3}
         #
@@ -1105,10 +1308,30 @@ class ZenStore:
         return _resolve_node(self._internal_repo[key], copy=False)["node"]
 
     def get_entry(self, group: GroupName, name: NodeName) -> StoreEntry:
+        """Access a store entry, which is a mapping that specifies the entry's
+        name, group, package, provider, and node.
+
+        Notes
+        -----
+        Mutating the returned mapping will not affect the store's internal entry.
+        Mutating node in the returned entry may have unintended consequences and
+        is not advised.
+
+        Examples
+        --------
+        >>> from hydra_zen import store, ZenStore
+        >>> store(dict(x=1), name="a", group="fruit")
+        >>> store.get_entry("fruit", "a")
+        {'name': 'a',
+         'group': 'fruit',
+         'package': None,
+         'provider': None,
+         'node': {'x': 1}}
+        """
         return _resolve_node(self._internal_repo[(group, name)], copy=True)
 
     def __contains__(self, key: Union[GroupName, Tuple[GroupName, NodeName]]) -> bool:
-        """Checks if group or (group, node-name) exists in zen-store"""
+        """Checks if group or (group, node-name) exists in zen-store."""
         if key is None:
             return any(k[0] is None for k in self._internal_repo)
 
@@ -1122,9 +1345,49 @@ class ZenStore:
         return key in self._internal_repo
 
     def __iter__(self) -> Generator[StoreEntry, None, None]:
+        """Yields all entries in this store.
+
+        Notes
+        -----
+        Mutating the returned mappings will not affect the store's internal entries.
+        Mutating node in the returned entry may have unintended consequences and
+        is not advised.
+
+        Examples
+        --------
+        >>> from hydra_zen import store
+        >>> store(dict(x=1), name="a", group="fruit")
+        >>> store(dict(x=2), name="b", group="fruit/orange")
+        >>> store(dict(x=3), name="c", group="veggie")
+
+        >>> list(store)
+        [{'name': 'a',
+          'group': 'fruit',
+          'package': None,
+          'provider': None,
+          'node': {'x': 1}},
+         {'name': 'b',
+          'group': 'fruit/orange',
+          'package': None,
+          'provider': None,
+          'node': {'x': 2}},
+         {'name': 'c',
+          'group': 'veggie',
+          'package': None,
+          'provider': None,
+          'node': {'x': 3}}]
+        """
         yield from (_resolve_node(v, copy=True) for v in self._internal_repo.values())
 
     def add_to_hydra_store(self, overwrite_ok: Optional[bool] = None) -> None:
+        """Adds all of this store's enqueued entries to Hydra's global config store.
+
+        Parameters
+        ----------
+        overwrite_ok : Optional[bool]
+            If `False`, this method raises `ValueError` if an entry in Hydra's config
+            store will be overwritten. Defaults to the value of `overwrite_ok`
+            specified when initializing this store."""
 
         while self._queue:
             entry = _resolve_node(self._queue.popleft(), copy=False)
@@ -1157,7 +1420,7 @@ class ZenStore:
 
 
 store: ZenStore = ZenStore(
-    name="store",
+    name="zen_store",
     deferred_to_config=True,
     deferred_hydra_store=True,
 )

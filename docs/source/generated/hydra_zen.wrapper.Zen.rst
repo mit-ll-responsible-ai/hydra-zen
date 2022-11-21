@@ -1,4 +1,4 @@
-﻿hydra\_zen.wrapper.Zen
+hydra\_zen.wrapper.Zen
 ======================
 
 .. currentmodule:: hydra_zen.wrapper
