@@ -114,7 +114,8 @@ New Features
 ------------
 - Adds the :func:`~hydra_zen.zen` decorator (see :pull:`310`)
 - Adds the :func:`~hydra_zen.wrapper.Zen` decorator-class (see :pull:`310`)
-- Adds the :class:`~hydra_zen.ZenStore` decorator (see :pull:`331`)
+- Adds the :class:`~hydra_zen.ZenStore` class (see :pull:`331`)
+- Adds `hyda_zen.store`, which is a pre-initialized instance of :class:`~hydra_zen.ZenStore` (see :pull:`331`)
 
 
 Improvements
