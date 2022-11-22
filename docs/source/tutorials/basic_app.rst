@@ -71,6 +71,7 @@ Hydra-based application:
 1. A "config", which defines the configurable interface of our application.
 2. A task function, which accepts the populated config, and whose body specifies the code that will be executed when our application is launched.
 
+Once we create this typical Hydra app, we will iterate on it and simplify things by using how hydra-zen's :func:`hydra_zen.zen` wrapper.
 
 Writing the Application
 -----------------------
@@ -235,11 +236,12 @@ Simplifying Things with :func:`hydra_zen.zen`
 
 We can simplify our task function, removing Hydra-specific logic from it, by using :func:`hydra_zen.zen`. 
 
-Let's update our task function in `my_app.py` to be a simple function whose signature is what defines the `player1` and `player2` fields. Then we can use :func:`hydra_zen.builds` instead of :func:`hydra_zen.make_config` to create our config.
+Let's update our task function in `my_app.py` to be a simple function whose signature determines the fields that will be extracted and instantiated from our config.
+Then we can use :func:`hydra_zen.builds`, instead of :func:`hydra_zen.make_config`, to generate our config based off of the task function's signature.
 
 
 .. code-block:: python
-   :caption: Simplified contents of my_appw.py:
+   :caption: Simplified contents of my_app.py:
     
    from hydra_zen import builds
     
@@ -256,8 +258,19 @@ Let's update our task function in `my_app.py` to be a simple function whose sign
    Config = builds(task_function, populate_full_signature=True)
 
 
-Now we will supply a zen-wrapped version of our task function to :func:`hydra_zen.launch`; it will extract and instantiate all of the fields from our input config and
-pass them to our task function.
+Wrapping this function as
+
+.. code-block:: python
+   :caption: Simplified contents of my_app.py:
+    
+   from hydra_zen import zen
+
+   hydra_compat_task_fn = zen(task_function)
+
+returns a Hydra-compatible task function, which accepts a single input config just like our original task function did. However, the `zen` wrapper adds the logic of extracting
+and instantiating the `player1` and `player2` fields from our config for us.
+
+Now we will supply a zen-wrapped version of our task function to :func:`hydra_zen.launch`; all other aspects of launching our app and inspecting its results are unchanged.
 
 .. code-block:: pycon
    :caption: Launching our application
