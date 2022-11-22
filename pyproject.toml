@@ -14,7 +14,7 @@ dependencies=[
   "hydra-core >= 1.1.0",
   "typing-extensions >= 4.1.0",
 ]
-license = "MIT"
+license = {text = "MIT"}
 keywords= [ "machine learning", "research", "configuration", "scalable", "reproducible", "yaml", "Hydra", "dataclass"]
 
 authors = [
