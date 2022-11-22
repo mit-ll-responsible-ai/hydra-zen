@@ -295,13 +295,13 @@ It also protects users from accidentally overwriting  entries in Hydra’s globa
 
 <span class="c1"># Specify defaults for storing entries (group=optim)</span>
 <span class="c1"># and for generating configs (_partial_=True and lr=1e-3)</span>
-<span class="n">torch_store</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">torch_store</span></a><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">"optim"</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+<span class="n">optim_store</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">torch_store</span></a><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">"optim"</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
 
 <span class="c1"># Automatically applies `builds(&lt;obj&gt;, zen_partial=True, lr=0.001)`</span>
 <span class="c1"># to create and then store configs under the "optim" group</span>
-<span class="n">torch_store</span><span class="p">(</span><span class="n">Adam</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"adam"</span><span class="p">,</span> <span class="n">amsgrad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">torch_store</span><span class="p">(</span><span class="n">AdamW</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"adamw"</span><span class="p">,</span> <span class="n">betas</span><span class="o">=</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.999</span><span class="p">))</span>
-<span class="n">torch_store</span><span class="p">(</span><span class="n">RMSprop</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"rmsprop"</span><span class="p">)</span>
+<span class="n">optim_store</span><span class="p">(</span><span class="n">Adam</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"adam"</span><span class="p">,</span> <span class="n">amsgrad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">optim_store</span><span class="p">(</span><span class="n">AdamW</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"adamw"</span><span class="p">,</span> <span class="n">betas</span><span class="o">=</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.999</span><span class="p">))</span>
+<span class="n">optim_store</span><span class="p">(</span><span class="n">RMSprop</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"rmsprop"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

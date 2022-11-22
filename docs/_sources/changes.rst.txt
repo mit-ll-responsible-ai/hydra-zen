@@ -102,13 +102,13 @@ This enables objects to be stored using a decorator pattern, e.g.
 
    # Specify defaults for storing entries (group=optim)
    # and for generating configs (_partial_=True and lr=1e-3)
-   torch_store = torch_store(group="optim", zen_partial=True, lr=0.001)
+   optim_store = torch_store(group="optim", zen_partial=True, lr=0.001)
 
    # Automatically applies `builds(<obj>, zen_partial=True, lr=0.001)` 
    # to create and then store configs under the "optim" group
-   torch_store(Adam, name="adam", amsgrad=True)
-   torch_store(AdamW, name="adamw", betas=(0.1, 0.999))
-   torch_store(RMSprop, name="rmsprop")
+   optim_store(Adam, name="adam", amsgrad=True)
+   optim_store(AdamW, name="adamw", betas=(0.1, 0.999))
+   optim_store(RMSprop, name="rmsprop")
 
 New Features
 ------------
