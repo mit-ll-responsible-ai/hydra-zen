@@ -1174,27 +1174,29 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from hydra_zen import to_yaml, store, ZenStore</span>
+<span class="sd">    &gt;&gt;&gt; def pp(x): print(to_yaml(x))  # for pretty printing configs</span>
+
 <span class="sd">    **Basic usage**</span>
 
-<span class="sd">    Let&#39;s add a config to hydra-zen&#39;s pre-instantiated `ZenStore` instance. Each config</span>
-<span class="sd">    must have an associated name. Optionally, a group, package, and/or provider may be</span>
-<span class="sd">    specified for the entry as well.</span>
+<span class="sd">    Let&#39;s add a config to hydra-zen&#39;s pre-instantiated `ZenStore` instance. Each store</span>
+<span class="sd">    entry must have an associated name. Optionally, a group, package, and/or provider</span>
+<span class="sd">    may be specified for the entry as well.</span>
 
-<span class="sd">    &gt;&gt;&gt; from hydra_zen import store</span>
 <span class="sd">    &gt;&gt;&gt; _ = store({&quot;lr&quot;: 0.01, &quot;momentum&quot;: 0.9}, name=&quot;sgd&quot;, group=&quot;optim&quot;)</span>
 <span class="sd">    &gt;&gt;&gt; _ = store({&quot;lr&quot;: 0.001}, name=&quot;adam&quot;, group=&quot;optim&quot;)</span>
 <span class="sd">    zen_store</span>
 <span class="sd">    {&#39;optim&#39;: [&#39;sgd&#39;, &#39;adam&#39;]}</span>
 
-<span class="sd">    A store&#39;s entries are keyed by their `(group, name)` pair (the default group is</span>
+<span class="sd">    A store&#39;s entries are keyed by their `(group, name)` pairs (the default group is</span>
 <span class="sd">    `None`).</span>
 
 <span class="sd">    &gt;&gt;&gt; store[&quot;optim&quot;, &quot;sgd&quot;]  # (group, name) -&gt; config node</span>
 <span class="sd">    {&#39;lr&#39;: 0.01, &#39;momentum&#39;: 0.9}</span>
 
 <span class="sd">    By default, the stored config(s) will be &quot;enqueued&quot; for addition to Hydra&#39;s config</span>
-<span class="sd">    store, and `.add_to_hydra_store()` must be called to add the enqueued configs</span>
-<span class="sd">    to Hydra&#39;s central store.</span>
+<span class="sd">    store, and the method `.add_to_hydra_store()` must be called to add the enqueued</span>
+<span class="sd">    configs to Hydra&#39;s central store.</span>
 
 <span class="sd">    &gt;&gt;&gt; store.has_enqueued()</span>
 <span class="sd">    True</span>
@@ -1211,7 +1213,6 @@
 <span class="sd">    We can create a distinct store that has an independent internal repository of</span>
 <span class="sd">    configs.</span>
 
-<span class="sd">    &gt;&gt;&gt; from hydra_zen import ZenStore</span>
 <span class="sd">    &gt;&gt;&gt; new_store = ZenStore(&quot;new_store&quot;)</span>
 <span class="sd">    &gt;&gt;&gt; _ = new_store([1, 2, 3], name=&quot;backbone&quot;)</span>
 
@@ -1225,7 +1226,7 @@
 <span class="sd">    **Auto-config capabilities**</span>
 
 <span class="sd">    The input to a store is processed by the store&#39;s `to_config` function prior to</span>
-<span class="sd">    creating the stored config node. By default this calls</span>
+<span class="sd">    creating the stored config node. This defaults to</span>
 <span class="sd">    `hydra_zen.wrapper.default_to_config`, which applies `hydra_zen.builds` or</span>
 <span class="sd">    `hydra_zen.just` to inputs based on their types.</span>
 
@@ -1236,9 +1237,6 @@
 <span class="sd">    We can pass `sum_it` directly to our store to leverage auto-config and auto-naming</span>
 <span class="sd">    capabilities. Here, `builds(sum_it, a=1, b=2)` will be called under the hood by</span>
 <span class="sd">    `new_store` to create the config for `sum_it`.</span>
-
-<span class="sd">    &gt;&gt;&gt; from hydra_zen import to_yaml</span>
-<span class="sd">    &gt;&gt;&gt; def pp(x): print(to_yaml(x))  # for pretty printing configs</span>
 
 <span class="sd">    &gt;&gt;&gt; store2 = ZenStore()</span>
 <span class="sd">    &gt;&gt;&gt; _ = store2(sum_it, a=1, b=2)  # entry name defaults to `sum_it.__name__`</span>
@@ -1256,7 +1254,6 @@
 <span class="sd">    `ZenStore.__call__` is a pass-through and can be used as a decorator. Let&#39;s add two</span>
 <span class="sd">    store entries for `func` by decorating it.</span>
 
-<span class="sd">    &gt;&gt;&gt; from hydra_zen import ZenStore, to_yaml</span>
 <span class="sd">    &gt;&gt;&gt; store = ZenStore()</span>
 
 <span class="sd">    &gt;&gt;&gt; @store(a=1, b=22, name=&quot;func1&quot;)</span>
@@ -1299,14 +1296,15 @@
 <span class="sd">    &gt;&gt;&gt; math_store = new_store(group=&quot;math&quot;)  # overwrites group default</span>
 <span class="sd">    &gt;&gt;&gt; tool_store = new_store(group=&quot;functools&quot;)  # overwrites group default</span>
 
+<span class="sd">    `math_store` and `tool_store` both share the same internal state as `new_store`, but</span>
+<span class="sd">    have overwritten default values for the `group`.</span>
+
 <span class="sd">    &gt;&gt;&gt; math_store(math.floor)  # equivalent to: `new_store(math.floor, group=&quot;math&quot;)`</span>
 <span class="sd">    &gt;&gt;&gt; math_store(math.ceil)</span>
 <span class="sd">    &gt;&gt;&gt; tool_store(functools.lru_cache)</span>
 <span class="sd">    &gt;&gt;&gt; tool_store(functools.wraps)</span>
 
-<span class="sd">    `math_store` and `tool_store` both share the same internal state as `new_store`, but</span>
-<span class="sd">    have overwritten default values for the `group`. See that `new_store` has entries</span>
-<span class="sd">    under these corresponding groups:</span>
+<span class="sd">    See that `new_store` has entries under these corresponding groups:</span>
 
 <span class="sd">    &gt;&gt;&gt; new_store</span>
 <span class="sd">    custom_store</span>

@@ -277,26 +277,29 @@ which is initialized as:</p>
 </pre></div>
 </div>
 <p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">ZenStore</span></a>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">pp</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">(</span><span class="n">x</span><span class="p">))</span>  <span class="c1"># for pretty printing configs</span>
+</pre></div>
+</div>
 <p><strong>Basic usage</strong></p>
-<p>Let’s add a config to hydra-zen’s pre-instantiated <a class="reference internal" href="#hydra_zen.ZenStore" title="hydra_zen.ZenStore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenStore</span></code></a> instance. Each config
-must have an associated name. Optionally, a group, package, and/or provider may be
-specified for the entry as well.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">store</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">store</span><span class="p">({</span><span class="s2">"lr"</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span> <span class="s2">"momentum"</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">},</span> <span class="n">name</span><span class="o">=</span><span class="s2">"sgd"</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s2">"optim"</span><span class="p">)</span>
+<p>Let’s add a config to hydra-zen’s pre-instantiated <a class="reference internal" href="#hydra_zen.ZenStore" title="hydra_zen.ZenStore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenStore</span></code></a> instance. Each store
+entry must have an associated name. Optionally, a group, package, and/or provider
+may be specified for the entry as well.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">store</span><span class="p">({</span><span class="s2">"lr"</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span> <span class="s2">"momentum"</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">},</span> <span class="n">name</span><span class="o">=</span><span class="s2">"sgd"</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s2">"optim"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">store</span><span class="p">({</span><span class="s2">"lr"</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">},</span> <span class="n">name</span><span class="o">=</span><span class="s2">"adam"</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s2">"optim"</span><span class="p">)</span>
 <span class="go">zen_store</span>
 <span class="go">{'optim': ['sgd', 'adam']}</span>
 </pre></div>
 </div>
-<p>A store’s entries are keyed by their <code class="xref py py-obj docutils literal notranslate"><span class="pre">(group,</span> <span class="pre">name)</span></code> pair (the default group is
+<p>A store’s entries are keyed by their <code class="xref py py-obj docutils literal notranslate"><span class="pre">(group,</span> <span class="pre">name)</span></code> pairs (the default group is
 <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>).</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span><span class="p">[</span><span class="s2">"optim"</span><span class="p">,</span> <span class="s2">"sgd"</span><span class="p">]</span>  <span class="c1"># (group, name) -&gt; config node</span>
 <span class="go">{'lr': 0.01, 'momentum': 0.9}</span>
 </pre></div>
 </div>
 <p>By default, the stored config(s) will be “enqueued” for addition to Hydra’s config
-store, and <a class="reference internal" href="#hydra_zen.ZenStore.add_to_hydra_store" title="hydra_zen.ZenStore.add_to_hydra_store"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_to_hydra_store()</span></code></a> must be called to add the enqueued configs
-to Hydra’s central store.</p>
+store, and the method <a class="reference internal" href="#hydra_zen.ZenStore.add_to_hydra_store" title="hydra_zen.ZenStore.add_to_hydra_store"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_to_hydra_store()</span></code></a> must be called to add the enqueued
+configs to Hydra’s central store.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span><span class="o">.</span><span class="n">has_enqueued</span><span class="p">()</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">store</span><span class="o">.</span><span class="n">add_to_hydra_store</span><span class="p">()</span>  <span class="c1"># adds all enqueued entries to Hydra's global store</span>
@@ -312,9 +315,8 @@ to Hydra’s central store.</p>
 </div>
 <p>We can create a distinct store that has an independent internal repository of
 configs.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">ZenStore</span></a>
-<span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">new_store</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">ZenStore</span></a><span class="p">(</span><span class="s2">"new_store"</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">new_store</span></a><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">"backbone"</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">new_store</span> <span class="o">=</span> <span class="n">ZenStore</span><span class="p">(</span><span class="s2">"new_store"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">new_store</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">"backbone"</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span>
@@ -327,7 +329,7 @@ configs.</p>
 </div>
 <p><strong>Auto-config capabilities</strong></p>
 <p>The input to a store is processed by the store’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">to_config</span></code> function prior to
-creating the stored config node. By default this calls
+creating the stored config node. This defaults to
 <a class="reference internal" href="hydra_zen.wrapper.default_to_config.html#hydra_zen.wrapper.default_to_config" title="hydra_zen.wrapper.default_to_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.wrapper.default_to_config</span></code></a>, which applies <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.builds</span></code></a> or
 <a class="reference internal" href="hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.just</span></code></a> to inputs based on their types.</p>
 <p>For instance, consider the following function:</p>
@@ -337,10 +339,6 @@ creating the stored config node. By default this calls
 <p>We can pass <code class="xref py py-obj docutils literal notranslate"><span class="pre">sum_it</span></code> directly to our store to leverage auto-config and auto-naming
 capabilities. Here, <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds(sum_it,</span> <span class="pre">a=1,</span> <span class="pre">b=2)</span></code> will be called under the hood by
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">new_store</span></code> to create the config for <code class="xref py py-obj docutils literal notranslate"><span class="pre">sum_it</span></code>.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">pp</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">(</span><span class="n">x</span><span class="p">))</span>  <span class="c1"># for pretty printing configs</span>
-</pre></div>
-</div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">store2</span> <span class="o">=</span> <span class="n">ZenStore</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">store2</span><span class="p">(</span><span class="n">sum_it</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># entry name defaults to `sum_it.__name__`</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">store2</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">"sum_it"</span><span class="p">]</span>
@@ -355,8 +353,7 @@ auto-config behaviors of <a class="reference internal" href="#hydra_zen.ZenStore
 <p><strong>Support for decorator patterns</strong></p>
 <p><a class="reference internal" href="#hydra_zen.ZenStore.__call__" title="hydra_zen.ZenStore.__call__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenStore.__call__</span></code></a> is a pass-through and can be used as a decorator. Let’s add two
 store entries for <code class="xref py py-obj docutils literal notranslate"><span class="pre">func</span></code> by decorating it.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">ZenStore</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a>
-<span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">store</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">ZenStore</span></a><span class="p">()</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="n">ZenStore</span><span class="p">()</span>
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@store</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">22</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"func1"</span><span class="p">)</span>
@@ -397,15 +394,15 @@ defaults.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tool_store</span> <span class="o">=</span> <span class="n">new_store</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">"functools"</span><span class="p">)</span>  <span class="c1"># overwrites group default</span>
 </pre></div>
 </div>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">math_store</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">tool_store</span></code> both share the same internal state as <code class="xref py py-obj docutils literal notranslate"><span class="pre">new_store</span></code>, but
+have overwritten default values for the <code class="xref py py-obj docutils literal notranslate"><span class="pre">group</span></code>.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">math_store</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">)</span>  <span class="c1"># equivalent to: `new_store(math.floor, group="math")`</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">math_store</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tool_store</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tool_store</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">math_store</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">tool_store</span></code> both share the same internal state as <code class="xref py py-obj docutils literal notranslate"><span class="pre">new_store</span></code>, but
-have overwritten default values for the <code class="xref py py-obj docutils literal notranslate"><span class="pre">group</span></code>. See that <code class="xref py py-obj docutils literal notranslate"><span class="pre">new_store</span></code> has entries
-under these corresponding groups:</p>
+<p>See that <code class="xref py py-obj docutils literal notranslate"><span class="pre">new_store</span></code> has entries under these corresponding groups:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">new_store</span>
 <span class="go">custom_store</span>
 <span class="go">{'math': ['floor', 'ceil'], 'functools': ['lru_cache', 'wraps']}</span>

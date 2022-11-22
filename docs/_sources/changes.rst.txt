@@ -19,7 +19,7 @@ chronological order. All previous releases should still be available on pip.
 
 Release Highlights
 ------------------
-This release introduces :func:`~hydra_zen.zen` and :class:`~hydra_zen.ZenStore`, which enable hydra-zen users to eliminate Hydra-specific boilerplate code from their projects, and to utilize new patterns and best practices for working with config stores.
+This release introduces :func:`~hydra_zen.zen` and :class:`~hydra_zen.ZenStore`, which enable hydra-zen users to eliminate Hydra-specific boilerplate code from their projects and to utilize new patterns and best practices for working with config stores.
 
 The :func:`~hydra_zen.zen` decorator enables of use Hydra-agnostic task functions in Hydra apps; the decorator will automatically extract, resolve, and instantiate fields from an input config based on the function's signature. This encourages users to eliminate Hydra-specific boilerplate code from their projects and to instead opt for task functions with explicit signatures, which can include functions from third parties.
 
