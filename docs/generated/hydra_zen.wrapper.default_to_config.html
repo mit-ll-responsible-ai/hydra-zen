@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="Docutils 0.19: https://docutils.sourceforge.io/" name="generator"/>
-<title>hydra_zen.save_as_yaml — hydra-zen  documentation</title>
+<title>hydra_zen.wrapper.default_to_config — hydra-zen  documentation</title>
 <script>
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
@@ -36,11 +36,11 @@
 <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
 <script src="../_static/gtag.js"></script>
 <script src="../_static/design-tabs.js"></script>
-<script>DOCUMENTATION_OPTIONS.pagename = 'generated/hydra_zen.save_as_yaml';</script>
+<script>DOCUMENTATION_OPTIONS.pagename = 'generated/hydra_zen.wrapper.default_to_config';</script>
 <link href="../genindex.html" rel="index" title="Index">
 <link href="../search.html" rel="search" title="Search"/>
-<link href="hydra_zen.load_from_yaml.html" rel="next" title="hydra_zen.load_from_yaml"/>
-<link href="hydra_zen.to_yaml.html" rel="prev" title="hydra_zen.to_yaml"/>
+<link href="hydra_zen.instantiate.html" rel="next" title="hydra_zen.instantiate"/>
+<link href="hydra_zen.ZenStore.html" rel="prev" title="hydra_zen.ZenStore"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <meta content="en" name="docsearch:language"/>
 </link></link></link></link></link></link></link></head>
@@ -214,9 +214,9 @@
 <li class="toctree-l1"><a class="reference internal" href="hydra_zen.just.html">hydra_zen.just</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hydra_zen.hydrated_dataclass.html">hydra_zen.hydrated_dataclass</a></li>
 </ul>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="hydra_zen.ZenStore.html">hydra_zen.ZenStore</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hydra_zen.wrapper.default_to_config.html">hydra_zen.wrapper.default_to_config</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">hydra_zen.wrapper.default_to_config</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="hydra_zen.instantiate.html">hydra_zen.instantiate</a></li>
@@ -228,9 +228,9 @@
 <li class="toctree-l1"><a class="reference internal" href="hydra_zen.uses_zen_processing.html">hydra_zen.uses_zen_processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hydra_zen.ZenField.html">hydra_zen.ZenField</a></li>
 </ul>
-<ul class="current nav bd-sidenav">
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="hydra_zen.to_yaml.html">hydra_zen.to_yaml</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">hydra_zen.save_as_yaml</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hydra_zen.save_as_yaml.html">hydra_zen.save_as_yaml</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hydra_zen.load_from_yaml.html">hydra_zen.load_from_yaml</a></li>
 </ul>
 <ul class="nav bd-sidenav">
@@ -255,55 +255,66 @@
 <div class="bd-header-article">
 </div>
 <article class="bd-article" role="main">
-<section id="hydra-zen-save-as-yaml">
-<h1>hydra_zen.save_as_yaml<a class="headerlink" href="#hydra-zen-save-as-yaml" title="Permalink to this heading">#</a></h1>
+<section id="hydra-zen-wrapper-default-to-config">
+<h1>hydra_zen.wrapper.default_to_config<a class="headerlink" href="#hydra-zen-wrapper-default-to-config" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="hydra_zen.save_as_yaml">
-<span class="sig-prename descclassname"><span class="pre">hydra_zen.</span></span><span class="sig-name descname"><span class="pre">save_as_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolve</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/_hydra_overloads.html#save_as_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.save_as_yaml" title="Permalink to this definition">#</a></dt>
-<dd><p>Save a config to a yaml-format file</p>
-<p>This is an alias of <code class="docutils literal notranslate"><span class="pre">omegaconf.Omegaconf.save</span></code> <a class="reference internal" href="#rc25ddf84b03d-1" id="id1">[1]</a>.</p>
+<dt class="sig sig-object py" id="hydra_zen.wrapper.default_to_config">
+<span class="sig-prename descclassname"><span class="pre">hydra_zen.wrapper.</span></span><span class="sig-name descname"><span class="pre">default_to_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/wrapper/_implementations.html#default_to_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.wrapper.default_to_config" title="Permalink to this definition">#</a></dt>
+<dd><p>Creates a config that describes <code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code>.</p>
+<p>This function is designed to selectively apply <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.builds</span></code></a> or
+<a class="reference internal" href="hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.just</span></code></a> in a way that permits maximum compatibility with common
+inputs to <a class="reference internal" href="hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.ZenStore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.ZenStore</span></code></a>. It behavior can be summarized based on the type of
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code></p>
+<ul class="simple">
+<li><p>OmegaConf containers and dataclass <em>instances</em> are returned unchanged</p></li>
+<li><p>A dataclass type is processed as <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds(target,</span> <span class="pre">**kw,</span> <span class="pre">populate_full_signature=True,</span> <span class="pre">builds_bases=(target,))</span></code></p></li>
+<li><p>Lists and dictionaries are processed by <a class="reference internal" href="hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.just</span></code></a></p></li>
+<li><p>All other inputs are processed as <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds(target,</span> <span class="pre">**kw,</span> <span class="pre">populate_full_signature=True)</span></code></p></li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>config</strong><span class="classifier">Any</span></dt><dd><p>A config object.</p>
-</dd>
-<dt><strong>f</strong><span class="classifier">str | pathlib.Path | IO[Any]</span></dt><dd><p>The path of the file file, or a file object, to be written to.</p>
-</dd>
-<dt><strong>resolve</strong><span class="classifier">bool, optional (default=None)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> interpolations will be resolved in the config prior to serialization <a class="reference internal" href="#rc25ddf84b03d-2" id="id2">[2]</a>.
-See Examples section of <a class="reference internal" href="hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_yaml</span></code></a> for details.</p>
+<dt><strong>target</strong><span class="classifier">Callable[…, Any] | DataClass | Type[DataClass] | list | dict</span></dt><dd></dd>
+<dt><strong>**kw</strong><span class="classifier">Any</span></dt><dd><p>Keyword arguments to be passed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code>.</p>
 </dd>
 </dl>
 </dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>target_config</strong><span class="classifier">DataClass | Type[DataClass] | list | dict</span></dt><dd></dd>
 </dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<dl class="simple">
-<dt><a class="reference internal" href="hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_yaml</span></code></a></dt><dd><p>Serialize a config as a yaml-formatted string.</p>
-</dd>
-<dt><a class="reference internal" href="hydra_zen.load_from_yaml.html#hydra_zen.load_from_yaml" title="hydra_zen.load_from_yaml"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_from_yaml</span></code></a></dt><dd><p>Load a config from a yaml-format file.</p>
 </dd>
 </dl>
-</div>
-<p class="rubric">References</p>
-<div class="citation-list" role="list">
-<div class="citation" id="rc25ddf84b03d-1" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a href="#id1" role="doc-backlink">1</a><span class="fn-bracket">]</span></span>
-<p><a class="reference external" href="https://omegaconf.readthedocs.io/en/2.0_branch/usage.html#save-load-yaml-file">https://omegaconf.readthedocs.io/en/2.0_branch/usage.html#save-load-yaml-file</a></p>
-</div>
-<div class="citation" id="rc25ddf84b03d-2" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a href="#id2" role="doc-backlink">2</a><span class="fn-bracket">]</span></span>
-<p><a class="reference external" href="https://omegaconf.readthedocs.io/en/2.0_branch/usage.html#variable-interpolation">https://omegaconf.readthedocs.io/en/2.0_branch/usage.html#variable-interpolation</a></p>
-</div>
-</div>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.save_as_yaml.html#hydra_zen.save_as_yaml" title="hydra_zen.save_as_yaml"><span class="n">save_as_yaml</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.load_from_yaml.html#hydra_zen.load_from_yaml" title="hydra_zen.load_from_yaml"><span class="n">load_from_yaml</span></a>
+<p>Lists and dictionaries</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen.wrapper</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.wrapper.default_to_config.html#hydra_zen.wrapper.default_to_config" title="hydra_zen.wrapper.default_to_config"><span class="n">default_to_config</span></a>
+<span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.wrapper.default_to_config.html#hydra_zen.wrapper.default_to_config" title="hydra_zen.wrapper.default_to_config"><span class="n">default_to_config</span></a><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="p">{</span><span class="s2">"z"</span><span class="p">:</span> <span class="mi">2</span><span class="o">+</span><span class="mi">2</span><span class="n">j</span><span class="p">}])</span>
+<span class="go">[1, {'z': ConfigComplex(real=2.0, imag=2.0, _target_='builtins.complex')}]</span>
 </pre></div>
 </div>
-<p><strong>Basic usage</strong></p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="s2">"foo"</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">save_as_yaml</span><span class="p">(</span><span class="n">Conf</span><span class="p">,</span> <span class="s2">"test.yaml"</span><span class="p">)</span>  <span class="c1"># file written to: test.yaml</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">load_from_yaml</span><span class="p">(</span><span class="s2">"test.yaml"</span><span class="p">)</span>
-<span class="go">{'a': 1, 'b': 'foo'}</span>
+<p>Dataclass types</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="nd">@dataclass</span></a>
+<span class="gp">... </span><span class="k">class</span> <span class="nc">A</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a>
+<span class="gp">... </span>    <span class="n">y</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Builds_A</span> <span class="o">=</span> <span class="n">default_to_config</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">22</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Builds_A</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">Builds_A(x=1, y=22, _target_='__main__.A')</span>
+<span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#issubclass" title="issubclass"><span class="nb">issubclass</span></a><span class="p">(</span><span class="n">Builds_A</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>A function</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">):</span> <span class="o">...</span>
+<span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">(</span><span class="n">default_to_config</span><span class="p">(</span><span class="n">func</span><span class="p">)))</span>
+<span class="go">_target_: __main__.func</span>
+<span class="go">x: ???</span>
+<span class="go">'y': ???</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -312,17 +323,17 @@ See Examples section of <a class="reference internal" href="hydra_zen.to_yaml.ht
 <footer class="bd-footer-article">
 <!-- Previous / next buttons -->
 <div class="prev-next-area">
-<a class="left-prev" href="hydra_zen.to_yaml.html" id="prev-link" title="previous page">
+<a class="left-prev" href="hydra_zen.ZenStore.html" id="prev-link" title="previous page">
 <i class="fa-solid fa-angle-left"></i>
 <div class="prev-next-info">
 <p class="prev-next-subtitle">previous</p>
-<p class="prev-next-title">hydra_zen.to_yaml</p>
+<p class="prev-next-title">hydra_zen.ZenStore</p>
 </div>
 </a>
-<a class="right-next" href="hydra_zen.load_from_yaml.html" id="next-link" title="next page">
+<a class="right-next" href="hydra_zen.instantiate.html" id="next-link" title="next page">
 <div class="prev-next-info">
 <p class="prev-next-subtitle">next</p>
-<p class="prev-next-title">hydra_zen.load_from_yaml</p>
+<p class="prev-next-title">hydra_zen.instantiate</p>
 </div>
 <i class="fa-solid fa-angle-right"></i>
 </a>
@@ -337,10 +348,10 @@ See Examples section of <a class="reference internal" href="hydra_zen.to_yaml.ht
 <nav class="page-toc" id="bd-toc-nav">
 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry">
-<a class="reference internal nav-link" href="#hydra_zen.save_as_yaml">
+<a class="reference internal nav-link" href="#hydra_zen.wrapper.default_to_config">
 <code class="docutils literal notranslate">
 <span class="pre">
-     save_as_yaml()
+     default_to_config()
     </span>
 </code>
 </a>
@@ -355,7 +366,7 @@ See Examples section of <a class="reference internal" href="hydra_zen.to_yaml.ht
 </div>
 <div class="toc-item">
 <div class="tocsection sourcelink">
-<a href="../_sources/generated/hydra_zen.save_as_yaml.rst.txt">
+<a href="../_sources/generated/hydra_zen.wrapper.default_to_config.rst.txt">
 <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
 </div>
