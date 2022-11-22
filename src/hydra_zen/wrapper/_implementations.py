@@ -847,27 +847,29 @@ class ZenStore:
 
     Examples
     --------
+    >>> from hydra_zen import to_yaml, store, ZenStore
+    >>> def pp(x): print(to_yaml(x))  # for pretty printing configs
+
     **Basic usage**
 
-    Let's add a config to hydra-zen's pre-instantiated `ZenStore` instance. Each config
-    must have an associated name. Optionally, a group, package, and/or provider may be
-    specified for the entry as well.
+    Let's add a config to hydra-zen's pre-instantiated `ZenStore` instance. Each store
+    entry must have an associated name. Optionally, a group, package, and/or provider
+    may be specified for the entry as well.
 
-    >>> from hydra_zen import store
     >>> _ = store({"lr": 0.01, "momentum": 0.9}, name="sgd", group="optim")
     >>> _ = store({"lr": 0.001}, name="adam", group="optim")
     zen_store
     {'optim': ['sgd', 'adam']}
 
-    A store's entries are keyed by their `(group, name)` pair (the default group is
+    A store's entries are keyed by their `(group, name)` pairs (the default group is
     `None`).
 
     >>> store["optim", "sgd"]  # (group, name) -> config node
     {'lr': 0.01, 'momentum': 0.9}
 
     By default, the stored config(s) will be "enqueued" for addition to Hydra's config
-    store, and `.add_to_hydra_store()` must be called to add the enqueued configs
-    to Hydra's central store.
+    store, and the method `.add_to_hydra_store()` must be called to add the enqueued
+    configs to Hydra's central store.
 
     >>> store.has_enqueued()
     True
@@ -884,7 +886,6 @@ class ZenStore:
     We can create a distinct store that has an independent internal repository of
     configs.
 
-    >>> from hydra_zen import ZenStore
     >>> new_store = ZenStore("new_store")
     >>> _ = new_store([1, 2, 3], name="backbone")
 
@@ -898,7 +899,7 @@ class ZenStore:
     **Auto-config capabilities**
 
     The input to a store is processed by the store's `to_config` function prior to
-    creating the stored config node. By default this calls
+    creating the stored config node. This defaults to
     `hydra_zen.wrapper.default_to_config`, which applies `hydra_zen.builds` or
     `hydra_zen.just` to inputs based on their types.
 
@@ -909,9 +910,6 @@ class ZenStore:
     We can pass `sum_it` directly to our store to leverage auto-config and auto-naming
     capabilities. Here, `builds(sum_it, a=1, b=2)` will be called under the hood by
     `new_store` to create the config for `sum_it`.
-
-    >>> from hydra_zen import to_yaml
-    >>> def pp(x): print(to_yaml(x))  # for pretty printing configs
 
     >>> store2 = ZenStore()
     >>> _ = store2(sum_it, a=1, b=2)  # entry name defaults to `sum_it.__name__`
@@ -929,7 +927,6 @@ class ZenStore:
     `ZenStore.__call__` is a pass-through and can be used as a decorator. Let's add two
     store entries for `func` by decorating it.
 
-    >>> from hydra_zen import ZenStore, to_yaml
     >>> store = ZenStore()
 
     >>> @store(a=1, b=22, name="func1")
@@ -972,14 +969,15 @@ class ZenStore:
     >>> math_store = new_store(group="math")  # overwrites group default
     >>> tool_store = new_store(group="functools")  # overwrites group default
 
+    `math_store` and `tool_store` both share the same internal state as `new_store`, but
+    have overwritten default values for the `group`.
+
     >>> math_store(math.floor)  # equivalent to: `new_store(math.floor, group="math")`
     >>> math_store(math.ceil)
     >>> tool_store(functools.lru_cache)
     >>> tool_store(functools.wraps)
 
-    `math_store` and `tool_store` both share the same internal state as `new_store`, but
-    have overwritten default values for the `group`. See that `new_store` has entries
-    under these corresponding groups:
+    See that `new_store` has entries under these corresponding groups:
 
     >>> new_store
     custom_store
