@@ -429,10 +429,13 @@
 
 
 <div class="viewcode-block" id="Zen"><a class="viewcode-back" href="../../../generated/hydra_zen.wrapper.Zen.html#hydra_zen.Zen">[docs]</a><span class="k">class</span> <span class="nc">Zen</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]):</span>
-    <span class="sd">&quot;&quot;&quot;Implements the decorator logic that is exposed by `hydra_zen.zen`</span>
+    <span class="sd">&quot;&quot;&quot;Implements the wrapping logic that is exposed by `hydra_zen.zen`</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
+<span class="sd">    func : Callable[Sig, R]</span>
+<span class="sd">        The function that was wrapped.</span>
+
 <span class="sd">    CFG_NAME : str</span>
 <span class="sd">        The reserved parameter name specifies to pass the input config through</span>
 <span class="sd">        to the inner function. Can be overwritted via subclassing. Defaults</span>
@@ -461,18 +464,18 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        func : Callable[Sig, R]</span>
-<span class="sd">            The function being decorated. (This is a positional-only argument)</span>
+<span class="sd">        func : Callable[Sig, R], positional-only</span>
+<span class="sd">            The function being wrapped.</span>
 
 <span class="sd">        unpack_kwargs: bool, optional (default=False)</span>
-<span class="sd">            If `True` a `**kwargs` field in the decorated function&#39;s signature will be</span>
+<span class="sd">            If `True` a `**kwargs` field in the wrapped function&#39;s signature will be</span>
 <span class="sd">            populated by all of the input config entries that are not specified by the</span>
 <span class="sd">            rest of the signature (and that are not specified by the `exclude`</span>
 <span class="sd">            argument).</span>
 
 <span class="sd">        pre_call : Optional[Callable[[Any], Any] | Iterable[Callable[[Any], Any]]]</span>
 <span class="sd">            One or more functions that will be called with the input config prior</span>
-<span class="sd">            to the decorated functions. An iterable of pre-call functions are called</span>
+<span class="sd">            to the wrapped functions. An iterable of pre-call functions are called</span>
 <span class="sd">            from left (low-index) to right (high-index).</span>
 
 <span class="sd">        exclude: Optional[str | Iterable[str]]</span>
@@ -761,35 +764,38 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]],</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]]]:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;zen(func, /, pre_call, ZenWrapper)</span>
 
-<span class="sd">    A decorator that returns a function that will auto-extract, resolve, and</span>
-<span class="sd">    instantiate fields from an input config based on the decorated function&#39;s signature.</span>
+<span class="sd">    A wrapper that returns a function that will auto-extract, resolve, and</span>
+<span class="sd">    instantiate fields from an input config based on the wrapped function&#39;s signature.</span>
 
 <span class="sd">    .. code-block:: pycon</span>
 
-<span class="sd">       &gt;&gt;&gt; Cfg = dict(x=1, y=builds(int, 4), z=&quot;${y}&quot;, unused=100)</span>
-<span class="sd">       &gt;&gt;&gt; zen(lambda x, y, z : x+y+z)(Cfg)  # x=1, y=4, z=4</span>
+<span class="sd">       &gt;&gt;&gt; fn = lambda x, y, z : x+y+z</span>
+<span class="sd">       &gt;&gt;&gt; wrapped_fn = zen(fn)</span>
+
+<span class="sd">       &gt;&gt;&gt; cfg = dict(x=1, y=builds(int, 4), z=&quot;${y}&quot;, unused=100)</span>
+<span class="sd">       &gt;&gt;&gt; wrapped_fn(cfg)  # x=1, y=4, z=4</span>
 <span class="sd">       9</span>
 
 <span class="sd">    The main purpose of `zen` is to enable a user to write/use Hydra-agnostic functions</span>
-<span class="sd">    as the task functions for their Hydra app.</span>
+<span class="sd">    as the task functions for their Hydra app. See &quot;Notes&quot; for more details.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    func : Callable[Sig, R]</span>
-<span class="sd">        The function being decorated. (This is a positional-only argument)</span>
+<span class="sd">    func : Callable[Sig, R], positional-only</span>
+<span class="sd">        The function being wrapped.</span>
 
 <span class="sd">    unpack_kwargs: bool, optional (default=False)</span>
-<span class="sd">        If `True` a `**kwargs` field in the decorated function&#39;s signature will be</span>
+<span class="sd">        If `True` a `**kwargs` field in the wrapped function&#39;s signature will be</span>
 <span class="sd">        populated by all of the input config entries that are not specified by the rest</span>
 <span class="sd">        of the signature (and that are not specified by the `exclude` argument).</span>
 
 <span class="sd">    pre_call : Optional[Callable[[Any], Any] | Iterable[Callable[[Any], Any]]]</span>
 <span class="sd">        One or more functions that will be called with the input config prior</span>
-<span class="sd">        to the decorated functions. An iterable of pre-call functions are called</span>
+<span class="sd">        to the wrapped function. An iterable of pre-call functions are called</span>
 <span class="sd">        from left (low-index) to right (high-index).</span>
 
 <span class="sd">        This is useful, e.g., for seeding a RNG prior to the instantiation phase</span>
-<span class="sd">        that is triggered when calling the decorated function.</span>
+<span class="sd">        that is triggered when calling the wrapped function.</span>
 
 <span class="sd">    exclude: Optional[str | Iterable[str]]</span>
 <span class="sd">        Specifies one or more parameter names in the function&#39;s signature</span>
@@ -802,59 +808,79 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    Zen[Sig, R]</span>
+<span class="sd">    wrapped : Zen[Sig, R]</span>
 <span class="sd">        A callable with signature `(conf: ConfigLike, \\) -&gt; R`</span>
 
 <span class="sd">        The wrapped function is an instance of `hydra_zen.wrapper.Zen` and accepts</span>
 <span class="sd">        a single Hydra config (a dataclass, dictionary, or omegaconf container). The</span>
-<span class="sd">        parameters of the decorated function&#39;s signature determine the fields that are</span>
+<span class="sd">        parameters of the wrapped function&#39;s signature determine the fields that are</span>
 <span class="sd">        extracted from the config; only those fields that are accessed will be resolved</span>
 <span class="sd">        and instantiated.</span>
 
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    hydra_zen.wrapper.Zen : Implements the wrapping logic that is exposed by `hydra_zen.zen`.</span>
+
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    ConfigLike is DataClass | dict[str, Any] | DictConfig</span>
+<span class="sd">    The following pseudo code conveys the core functionality of `zen`:</span>
 
-<span class="sd">    The fields extracted from the input config are determined by the signature of the</span>
-<span class="sd">    decorated function. There is an exception: including a parameter named &quot;zen_cfg&quot;</span>
-<span class="sd">    in the function&#39;s signature will signal to `zen` to pass through the full config to</span>
-<span class="sd">    that field (This specific parameter name can be overridden via `Zen.CFG_NAME`).</span>
+<span class="sd">    .. code-block:: python</span>
 
-<span class="sd">    All values (extracted from the input config) of types belonging to ConfigLike will</span>
-<span class="sd">    be instantiated before being passed to the wrapped function.</span>
+<span class="sd">       from hydra_zen import instantiate as inst</span>
+
+<span class="sd">       def zen(func):</span>
+<span class="sd">           sig = get_signature(func)</span>
+
+<span class="sd">           def wrapped(cfg):</span>
+<span class="sd">               cfg = resolve_interpolated_fields(cfg)</span>
+<span class="sd">               kwargs = {p: inst(getattr(cfg, p)) for p in sig}</span>
+<span class="sd">               return func(**kwargs)</span>
+<span class="sd">           return wrapped</span>
+
+<span class="sd">    The presence of a parameter named &quot;zen_cfg&quot; in the wrapped function&#39;s signature</span>
+<span class="sd">    will cause `zen` to pass the full, resolved config to that field. This specific</span>
+<span class="sd">    parameter name can be overridden via `Zen.CFG_NAME`.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    **Basic Usage**</span>
 
-<span class="sd">    Using `zen` as a decorator</span>
-
 <span class="sd">    &gt;&gt;&gt; from hydra_zen import zen, make_config, builds</span>
-<span class="sd">    &gt;&gt;&gt; @zen</span>
-<span class="sd">    ... def f(x, y): return x + y</span>
+<span class="sd">    &gt;&gt;&gt; def f(x, y): return x + y</span>
+<span class="sd">    &gt;&gt;&gt; zen_f = zen(f)</span>
 
-<span class="sd">    The resulting decorated function accepts a single argument: a Hydra-compatible config that has the attributes &quot;x&quot; and &quot;y&quot;:</span>
+<span class="sd">    The wrapped function – `zen_f` – accepts a single argument: a Hydra-compatible</span>
+<span class="sd">    config that has the attributes &quot;x&quot; and &quot;y&quot;:</span>
 
-<span class="sd">    &gt;&gt;&gt; f</span>
+<span class="sd">    &gt;&gt;&gt; zen_f</span>
 <span class="sd">    zen[f(x, y)](cfg, /)</span>
 
 <span class="sd">    &quot;Configs&quot; – dataclasses, dictionaries, and omegaconf containers – are acceptable</span>
 <span class="sd">    inputs to zen-wrapped functions. Interpolated fields will be resolved and</span>
 <span class="sd">    sub-configs will be instantiated. Excess fields in the config are unused.</span>
 
-<span class="sd">    &gt;&gt;&gt; f(make_config(x=1, y=2, z=999))  # z is not used</span>
+<span class="sd">    &gt;&gt;&gt; zen_f(make_config(x=1, y=2, z=999))  # z is not used</span>
 <span class="sd">    3</span>
-<span class="sd">    &gt;&gt;&gt; f(dict(x=2, y=&quot;${x}&quot;))  # y will resolve to 2</span>
+<span class="sd">    &gt;&gt;&gt; zen_f(dict(x=2, y=&quot;${x}&quot;))  # y will resolve to 2</span>
 <span class="sd">    4</span>
-<span class="sd">    &gt;&gt;&gt; f(dict(x=2, y=builds(int, 10)))  # y will instantiate to 10</span>
+<span class="sd">    &gt;&gt;&gt; zen_f(dict(x=2, y=builds(int, 10)))  # y will instantiate to 10</span>
 <span class="sd">    12</span>
 
 <span class="sd">    The wrapped function can be accessed directly</span>
 
-<span class="sd">    &gt;&gt;&gt; f.func</span>
+<span class="sd">    &gt;&gt;&gt; zen_f.func</span>
 <span class="sd">    &lt;function __main__.f(x, y)&gt;</span>
-<span class="sd">    &gt;&gt;&gt; f.func(-1, 1)</span>
+<span class="sd">    &gt;&gt;&gt; zen_f.func(-1, 1)</span>
 <span class="sd">    0</span>
+
+<span class="sd">    `zen` can be used as a decorator</span>
+
+<span class="sd">    &gt;&gt;&gt; @zen</span>
+<span class="sd">    ... def zen_f(x, y):</span>
+<span class="sd">    ...     return x + y</span>
+<span class="sd">    &gt;&gt;&gt; zen_f({&#39;x&#39;: 1, &#39;y&#39;: 2})</span>
+<span class="sd">    3</span>
 
 <span class="sd">    `zen` is compatible with partial&#39;d functions.</span>
 
@@ -870,36 +896,36 @@
 <span class="sd">    a config:</span>
 
 <span class="sd">    &gt;&gt;&gt; def f(x=1, y=2): return (x, y)</span>
-<span class="sd">    &gt;&gt;&gt; zen(f)(dict(x=-10, y=-20))  # extracts x &amp; y from config to call f</span>
+<span class="sd">    &gt;&gt;&gt; cfg = {&quot;x&quot;: -10, &quot;y&quot;: -20}</span>
+<span class="sd">    &gt;&gt;&gt; zen(f)(cfg)  # extracts x &amp; y from config to call f</span>
 <span class="sd">    (-10, -20)</span>
-<span class="sd">    &gt;&gt;&gt; zen(f, exclude=&quot;x&quot;)(dict(x=-10, y=-20))  # extracts y from config to call f(x=1, ...)</span>
+<span class="sd">    &gt;&gt;&gt; zen(f, exclude=&quot;x&quot;)(cfg)  # extracts y from config to call f(x=1, ...)</span>
 <span class="sd">    (1, -20)</span>
-<span class="sd">    &gt;&gt;&gt; zen(f, exclude=&quot;x,y&quot;)(dict(x=-10, y=-20))  # defers to f&#39;s defaults</span>
+<span class="sd">    &gt;&gt;&gt; zen(f, exclude=&quot;x,y&quot;)(cfg)  # defers to f&#39;s defaults</span>
 <span class="sd">    (1, 2)</span>
 
 <span class="sd">    Populating a `**kwargs` field via `unpack_kwargs=True`:</span>
 
-<span class="sd">    &gt;&gt;&gt; def f(a, **kw):</span>
+<span class="sd">    &gt;&gt;&gt; def g(a, **kw):</span>
 <span class="sd">    ...     return a, kw</span>
-
-<span class="sd">    &gt;&gt;&gt; cfg = dict(a=1, b=22)</span>
-<span class="sd">    &gt;&gt;&gt; zen(f, unpack_kwargs=False)(cfg)</span>
+<span class="sd">    &gt;&gt;&gt; cfg = dict(a=1, b=22, foo=&quot;bar&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; zen(g, unpack_kwargs=False)(cfg)</span>
 <span class="sd">    (1, {})</span>
-<span class="sd">    &gt;&gt;&gt; zen(f, unpack_kwargs=True)(cfg)</span>
-<span class="sd">    (1, {&#39;b&#39;: 22})</span>
+<span class="sd">    &gt;&gt;&gt; zen(g, unpack_kwargs=True)(cfg)</span>
+<span class="sd">    (1, {&#39;b&#39;: 22, &#39;foo&#39;: &#39;bar&#39;})</span>
 
 
-<span class="sd">    **Passing Through The Config**</span>
+<span class="sd">    **Passing Through The Full Input Config**</span>
 
 <span class="sd">    Some task functions require complete access to the full config to gain access to</span>
 <span class="sd">    sub-configs. One can specify the field named `zen_config` in their task function&#39;s</span>
 <span class="sd">    signature to signal `zen` that it should pass the full config to that parameter .</span>
 
 <span class="sd">    &gt;&gt;&gt; @zen</span>
-<span class="sd">    ... def f(x: int, zen_cfg):</span>
+<span class="sd">    ... def zf(x: int, zen_cfg):</span>
 <span class="sd">    ...     return x, zen_cfg</span>
-<span class="sd">    &gt;&gt;&gt; f(dict(x=1, y=&quot;${x}&quot;))</span>
-<span class="sd">    (1, {&#39;x&#39;: 1, &#39;y&#39;: 1})</span>
+<span class="sd">    &gt;&gt;&gt; zf(dict(x=1, y=&quot;${x}&quot;, foo=&quot;bar&quot;))</span>
+<span class="sd">    (1, {&#39;x&#39;: 1, &#39;y&#39;: 1, &#39;foo&#39;: &#39;bar&#39;})</span>
 
 <span class="sd">    **Including a pre-call function**</span>
 
@@ -909,33 +935,29 @@
 <span class="sd">    functions that will be called with the input config as a precursor to calling the</span>
 <span class="sd">    decorated function.</span>
 
-<span class="sd">    Consider the following scenario where the config&#39;s instantiation involves drawing a</span>
-<span class="sd">    random value, which we want to be made deterministic with a configurable seed. We</span>
-<span class="sd">    will use a pre-call function to seed the RNG prior to the subsequent instantiation.</span>
+<span class="sd">    Consider the following scenario where the instantiating the input config involves</span>
+<span class="sd">    drawing a random value, which we want to be made deterministic with a configurable</span>
+<span class="sd">    seed. We will use a pre-call function to seed the RNG prior to the instantiation.</span>
 
 <span class="sd">    &gt;&gt;&gt; import random</span>
 <span class="sd">    &gt;&gt;&gt; from hydra_zen import builds, zen</span>
-
-<span class="sd">    &gt;&gt;&gt; Cfg = dict(</span>
-<span class="sd">    ...         # `rand_val` will be instantiated and draw from randint upon</span>
-<span class="sd">    ...         # calling the zen-wrapped function, thus we need a pre-call</span>
-<span class="sd">    ...         # function to set the global RNG seed prior to instantiation</span>
-<span class="sd">    ...         rand_val=builds(random.randint, 0, 10),</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; def func(rand_val: int): return rand_val</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; cfg = dict(</span>
 <span class="sd">    ...         seed=0,</span>
+<span class="sd">    ...         rand_val=builds(random.randint, 0, 10),</span>
 <span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; wrapped = zen(func, pre_call=lambda cfg: random.seed(cfg.seed))</span>
 
-<span class="sd">    &gt;&gt;&gt; @zen(pre_call=lambda cfg: random.seed(cfg.seed))</span>
-<span class="sd">    ... def f(rand_val: int):</span>
-<span class="sd">    ...     return rand_val</span>
-
-<span class="sd">    &gt;&gt;&gt; [f(Cfg) for _ in range(10)]</span>
+<span class="sd">    &gt;&gt;&gt; [wrapped(cfg) for _ in range(10)]</span>
 <span class="sd">    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6]</span>
 
 
-<span class="sd">    **Using `@zen` instead of `@hydra.main`**</span>
+<span class="sd">    **Using `zen` instead of `@hydra.main`**</span>
 
-<span class="sd">    The object returned by zen provides a convenience method – `Zen.hydra_main` – so</span>
-<span class="sd">    that users need not double-wrap with `@hydra.main` to create a CLI:</span>
+<span class="sd">    The object returned by zen provides a convenience method – `Zen.hydra_main` –</span>
+<span class="sd">    to generate a CLI for a zen-wrapped task function:</span>
 
 <span class="sd">    .. code-block:: python</span>
 
@@ -962,7 +984,8 @@
 
 <span class="sd">    **Validating input configs**</span>
 
-<span class="sd">    An input config can be validated against a zen-wrapped function without calling said function via the `.validate` method.</span>
+<span class="sd">    An input config can be validated against a zen-wrapped function – without calling</span>
+<span class="sd">    said function – via the `.validate` method.</span>
 
 <span class="sd">    &gt;&gt;&gt; def f(x: int): ...</span>
 <span class="sd">    &gt;&gt;&gt; zen_f = zen(f)</span>
@@ -1175,7 +1198,9 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; from hydra_zen import to_yaml, store, ZenStore</span>
-<span class="sd">    &gt;&gt;&gt; def pp(x): print(to_yaml(x))  # for pretty printing configs</span>
+<span class="sd">    &gt;&gt;&gt; def pyaml(x):</span>
+<span class="sd">    ...     # for pretty printing configs</span>
+<span class="sd">    ...     print(to_yaml(x))</span>
 
 <span class="sd">    **Basic usage**</span>
 
@@ -1183,16 +1208,18 @@
 <span class="sd">    entry must have an associated name. Optionally, a group, package, and/or provider</span>
 <span class="sd">    may be specified for the entry as well.</span>
 
-<span class="sd">    &gt;&gt;&gt; _ = store({&quot;lr&quot;: 0.01, &quot;momentum&quot;: 0.9}, name=&quot;sgd&quot;, group=&quot;optim&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; _ = store({&quot;lr&quot;: 0.001}, name=&quot;adam&quot;, group=&quot;optim&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; config1 = {&#39;name&#39;: &#39;Roger&#39;, &#39;age&#39;: 24}</span>
+<span class="sd">    &gt;&gt;&gt; config2 = {&#39;name&#39;: &#39;Rita&#39;, &#39;age&#39;: 27}</span>
+<span class="sd">    &gt;&gt;&gt; _ = store(config1, name=&quot;roger&quot;, group=&quot;profiles&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; _ = store(config2, name=&quot;rita&quot;, group=&quot;profiles&quot;)</span>
 <span class="sd">    zen_store</span>
-<span class="sd">    {&#39;optim&#39;: [&#39;sgd&#39;, &#39;adam&#39;]}</span>
+<span class="sd">    {&#39;profiles&#39;: [&#39;roger&#39;, &#39;rita&#39;]}</span>
 
 <span class="sd">    A store&#39;s entries are keyed by their `(group, name)` pairs (the default group is</span>
 <span class="sd">    `None`).</span>
 
-<span class="sd">    &gt;&gt;&gt; store[&quot;optim&quot;, &quot;sgd&quot;]  # (group, name) -&gt; config node</span>
-<span class="sd">    {&#39;lr&#39;: 0.01, &#39;momentum&#39;: 0.9}</span>
+<span class="sd">    &gt;&gt;&gt; store[&quot;profiles&quot;, &quot;roger&quot;]  # (group, name) -&gt; config node</span>
+<span class="sd">    {&#39;name&#39;: &#39;Roger&#39;, age: 24}</span>
 
 <span class="sd">    By default, the stored config(s) will be &quot;enqueued&quot; for addition to Hydra&#39;s config</span>
 <span class="sd">    store, and the method `.add_to_hydra_store()` must be called to add the enqueued</span>
@@ -1206,8 +1233,8 @@
 
 <span class="sd">    By default, attempting to overwrite an entry will result in an error.</span>
 
-<span class="sd">    &gt;&gt;&gt; store({}, name=&quot;sgd&quot;, group=&quot;optim&quot;)  # same name and group as above</span>
-<span class="sd">    ValueError: (name=sgd group=optim): Hydra config store entry already exists.</span>
+<span class="sd">    &gt;&gt;&gt; store({}, name=&quot;rita&quot;, group=&quot;profiles&quot;)  # same name and group as above</span>
+<span class="sd">    ValueError: (name=rita group=profiles): Hydra config store entry already exists.</span>
 <span class="sd">    Specify `overwrite_ok=True` to enable replacing config store entries</span>
 
 <span class="sd">    We can create a distinct store that has an independent internal repository of</span>
@@ -1218,7 +1245,7 @@
 
 <span class="sd">    &gt;&gt;&gt; store</span>
 <span class="sd">    zen_store</span>
-<span class="sd">    {&#39;optim&#39;: [&#39;sgd&#39;, &#39;adam&#39;]}</span>
+<span class="sd">    {&#39;profiles&#39;: [&#39;roger&#39;, &#39;rita&#39;]}</span>
 <span class="sd">    &gt;&gt;&gt; new_store</span>
 <span class="sd">    new_store</span>
 <span class="sd">    {None: [&#39;backbone&#39;]}</span>
@@ -1241,7 +1268,7 @@
 <span class="sd">    &gt;&gt;&gt; store2 = ZenStore()</span>
 <span class="sd">    &gt;&gt;&gt; _ = store2(sum_it, a=1, b=2)  # entry name defaults to `sum_it.__name__`</span>
 <span class="sd">    &gt;&gt;&gt; config = store2[None, &quot;sum_it&quot;]</span>
-<span class="sd">    &gt;&gt;&gt; pp(config)</span>
+<span class="sd">    &gt;&gt;&gt; pyaml(config)</span>
 <span class="sd">    _target_: __main__.sum_it</span>
 <span class="sd">    a: 1</span>
 <span class="sd">    b: 2</span>
@@ -1263,11 +1290,11 @@
 
 <span class="sd">    &gt;&gt;&gt; func(10, 3)  # the decorated function is left unchanged</span>
 <span class="sd">    7</span>
-<span class="sd">    &gt;&gt;&gt; pp(store[None, &quot;func1&quot;])</span>
+<span class="sd">    &gt;&gt;&gt; pyaml(store[None, &quot;func1&quot;])</span>
 <span class="sd">    _target_: __main__.func</span>
 <span class="sd">    a: 1</span>
 <span class="sd">    b: 22</span>
-<span class="sd">    &gt;&gt;&gt; pp(store[None, &quot;func2&quot;])</span>
+<span class="sd">    &gt;&gt;&gt; pyaml(store[None, &quot;func2&quot;])</span>
 <span class="sd">    _target_: __main__.func</span>
 <span class="sd">    b: ???</span>
 <span class="sd">    a: -10</span>
@@ -1326,13 +1353,13 @@
 <span class="sd">    &gt;&gt;&gt;     schema: str</span>
 <span class="sd">    &gt;&gt;&gt;     has_root: bool</span>
 
-<span class="sd">    &gt;&gt;&gt; pp(new_store[&quot;profile&quot;, &quot;admin&quot;])</span>
+<span class="sd">    &gt;&gt;&gt; pyaml(new_store[&quot;profile&quot;, &quot;admin&quot;])</span>
 <span class="sd">    username: ???</span>
 <span class="sd">    schema: ???</span>
 <span class="sd">    has_root: true</span>
 <span class="sd">    _target_: __main__.Profile</span>
 
-<span class="sd">    &gt;&gt;&gt; pp(new_store[&quot;profile&quot;, &quot;test_admin&quot;])</span>
+<span class="sd">    &gt;&gt;&gt; pyaml(new_store[&quot;profile&quot;, &quot;test_admin&quot;])</span>
 <span class="sd">    username: ???</span>
 <span class="sd">    schema: &lt;none&gt;</span>
 <span class="sd">    has_root: true</span>
@@ -1701,7 +1728,7 @@
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        Mutating the returned mapping will not affect the store&#39;s internal entry.</span>
-<span class="sd">        Mutating node in the returned entry may have unintended consequences and</span>
+<span class="sd">        Mutating a node in the returned entry may have unintended consequences and</span>
 <span class="sd">        is not advised.</span>
 
 <span class="sd">        Examples</span>
@@ -1737,7 +1764,7 @@
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        Mutating the returned mappings will not affect the store&#39;s internal entries.</span>
-<span class="sd">        Mutating node in an entry may have unintended consequences and is not advised.</span>
+<span class="sd">        Mutating a node in an entry may have unintended consequences and is not advised.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>

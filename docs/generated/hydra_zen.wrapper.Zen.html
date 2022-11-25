@@ -381,7 +381,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="hydra_zen.wrapper.Zen">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hydra_zen.wrapper.</span></span><span class="sig-name descname"><span class="pre">Zen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_Zen__func</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_call</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unpack_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/wrapper/_implementations.html#Zen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.wrapper.Zen" title="Permalink to this definition">#</a></dt>
-<dd><p>Implements the decorator logic that is exposed by <a class="reference internal" href="hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.zen</span></code></a></p>
+<dd><p>Implements the wrapping logic that is exposed by <a class="reference internal" href="hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.zen</span></code></a></p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
@@ -392,6 +392,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Attributes<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
+<dt><strong>func</strong><span class="classifier">Callable[Sig, R]</span></dt><dd><p>The function that was wrapped.</p>
+</dd>
 <dt><strong>CFG_NAME</strong><span class="classifier">str</span></dt><dd><p>The reserved parameter name specifies to pass the input config through
 to the inner function. Can be overwritted via subclassing. Defaults
 to ‘zen_cfg’</p>
@@ -419,15 +421,15 @@ to ‘zen_cfg’</p>
 <dd><dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>func</strong><span class="classifier">Callable[Sig, R]</span></dt><dd><p>The function being decorated. (This is a positional-only argument)</p>
+<dt><strong>func</strong><span class="classifier">Callable[Sig, R], positional-only</span></dt><dd><p>The function being wrapped.</p>
 </dd>
-<dt><strong>unpack_kwargs: bool, optional (default=False)</strong></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> a <code class="xref py py-obj docutils literal notranslate"><span class="pre">**kwargs</span></code> field in the decorated function’s signature will be
+<dt><strong>unpack_kwargs: bool, optional (default=False)</strong></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> a <code class="xref py py-obj docutils literal notranslate"><span class="pre">**kwargs</span></code> field in the wrapped function’s signature will be
 populated by all of the input config entries that are not specified by the
 rest of the signature (and that are not specified by the <code class="xref py py-obj docutils literal notranslate"><span class="pre">exclude</span></code>
 argument).</p>
 </dd>
 <dt><strong>pre_call</strong><span class="classifier">Optional[Callable[[Any], Any] | Iterable[Callable[[Any], Any]]]</span></dt><dd><p>One or more functions that will be called with the input config prior
-to the decorated functions. An iterable of pre-call functions are called
+to the wrapped functions. An iterable of pre-call functions are called
 from left (low-index) to right (high-index).</p>
 </dd>
 <dt><strong>exclude: Optional[str | Iterable[str]]</strong></dt><dd><p>Specifies one or more parameter names in the function’s signature

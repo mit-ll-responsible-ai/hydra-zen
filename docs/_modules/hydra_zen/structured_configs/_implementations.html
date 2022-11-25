@@ -1140,12 +1140,13 @@
 <span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, hydra_recursive=None, hydra_convert=None, hydra_defaults=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)</span>
 
-<span class="sd">    `builds(target, *args, **kw)` returns a config that, when instantiated, builds `target`.</span>
+<span class="sd">    `builds(target, *args, **kw)` returns a Hydra-compatible config that, when</span>
+<span class="sd">    instantiated, returns `target(*args, **kw)`.</span>
 
-<span class="sd">    `instantiate(builds(target, *args, **kw)) == target(*args, **kw)`</span>
+<span class="sd">    I.e., `instantiate(builds(target, *args, **kw)) == target(*args, **kw)`</span>
 
-<span class="sd">    Consult the Examples section of the docstring to see the various features of</span>
-<span class="sd">    `builds` in action.</span>
+<span class="sd">    Consult the Notes section for more details, and the Examples section to see</span>
+<span class="sd">    the various features of `builds` in action.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1157,14 +1158,14 @@
 <span class="sd">        Positional arguments passed as ``&lt;hydra_target&gt;(*pos_args, ...)`` upon</span>
 <span class="sd">        instantiation.</span>
 
-<span class="sd">        Arguments specified positionally are not included in the dataclass&#39; signature</span>
+<span class="sd">        Arguments specified positionally are not included in the config&#39;s signature</span>
 <span class="sd">        and are stored as a tuple bound to in the ``_args_`` field.</span>
 
 <span class="sd">    **kwargs_for_target : SupportedPrimitive</span>
 <span class="sd">        The keyword arguments passed as ``&lt;hydra_target&gt;(..., **kwargs_for_target)``</span>
 <span class="sd">        upon instantiation.</span>
 
-<span class="sd">        The arguments specified here solely determine the signature of the resulting</span>
+<span class="sd">        The arguments specified here determine the signature of the resulting</span>
 <span class="sd">        config, unless ``populate_full_signature=True`` is specified (see below).</span>
 
 <span class="sd">        Named parameters of the forms that have the prefixes ``hydra_``, ``zen_`` or</span>
@@ -1252,7 +1253,8 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    Config : Type[Builds[Type[T]]] | Type[PartialBuilds[Type[T]]]</span>
-<span class="sd">        A structured config that describes how to build ``hydra_target``.</span>
+<span class="sd">        A dynamically-generated structured config (i.e. a dataclass type) that</span>
+<span class="sd">        describes how to build ``hydra_target``.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -1262,6 +1264,42 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
+<span class="sd">    The following pseudo code conveys the core functionality of `builds`:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">       from dataclasses import make_dataclass</span>
+
+<span class="sd">       def builds(target, populate_full_signature=False, **kw):</span>
+<span class="sd">           # Dynamically defines a Hydra-compatible dataclass type.</span>
+<span class="sd">           # Akin to doing:</span>
+<span class="sd">           #</span>
+<span class="sd">           # @dataclass</span>
+<span class="sd">           # class Builds_thing:</span>
+<span class="sd">           #     _target_: str = get_import_path(target)</span>
+<span class="sd">           #     # etc.</span>
+
+<span class="sd">           _target_ = get_import_path(target)</span>
+
+<span class="sd">           if populate_full_signature:</span>
+<span class="sd">               sig = get_signature(target)</span>
+<span class="sd">               kw = {**sig, **kw}  # merge w/ preference for kw</span>
+
+<span class="sd">           type_annots = [get_hints(target)[k] for k in kw]</span>
+
+<span class="sd">           fields = [(&quot;_target_&quot;, str, _target_)]</span>
+<span class="sd">           fields += [</span>
+<span class="sd">               (</span>
+<span class="sd">                   field_name,</span>
+<span class="sd">                   hydra_compat_type_annot(hint),</span>
+<span class="sd">                   hydra_compat_val(v),</span>
+<span class="sd">               )</span>
+<span class="sd">               for hint, (field_name, v) in zip(type_annots, kw.items())</span>
+<span class="sd">           ]</span>
+
+<span class="sd">           Config = make_dataclass(f&quot;Builds_{target}&quot;, fields)</span>
+<span class="sd">           return Config</span>
+
 <span class="sd">    The resulting &quot;config&quot; is a dynamically-generated dataclass type [5]_ with</span>
 <span class="sd">    Hydra-specific attributes attached to it [1]_. It posseses a `_target_` attribute</span>
 <span class="sd">    that indicates the import path to the configured target as a string.</span>
@@ -1294,7 +1332,7 @@
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 <span class="sd">    instantiate: Instantiates a configuration created by `builds`, returning the instantiated target.</span>
-<span class="sd">    make_custom_builds_fn: Returns the `builds` function, but one with customized default values.</span>
+<span class="sd">    make_custom_builds_fn: Returns a new `builds` function with customized default values.</span>
 <span class="sd">    make_config: Creates a general config with customized field names, default values, and annotations.</span>
 <span class="sd">    get_target: Returns the target-object from a targeted structured config.</span>
 <span class="sd">    just: Produces a config that, when instantiated by Hydra, &quot;just&quot; returns the un-instantiated target-object.</span>
@@ -1302,21 +1340,37 @@
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
+<span class="sd">    These examples describe:</span>
+
+<span class="sd">    - Basic usage of `builds`</span>
+<span class="sd">    - Creating a partial config</span>
+<span class="sd">    - Auto-populating parameters</span>
+<span class="sd">    - Composing configs via inheritance</span>
+<span class="sd">    - Runtime validation performed by `builds`</span>
+<span class="sd">    - Using meta-fields</span>
+<span class="sd">    - Using zen-wrappers</span>
+<span class="sd">    - Creating a frozen config</span>
+<span class="sd">    - Support for partial&#39;d targets</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydra_zen import builds, instantiate, to_yaml</span>
+<span class="sd">    &gt;&gt;&gt; def pyaml(x):</span>
+<span class="sd">    ...     # for pretty printing configs</span>
+<span class="sd">    ...     print(to_yaml(x))</span>
+
 <span class="sd">    **Basic Usage**</span>
 
 <span class="sd">    Lets create a basic config that describes how to &#39;build&#39; a particular dictionary.</span>
 
-<span class="sd">    &gt;&gt;&gt; from hydra_zen import builds, instantiate</span>
 <span class="sd">    &gt;&gt;&gt; Conf = builds(dict, a=1, b=&#39;x&#39;)</span>
 
 <span class="sd">    The resulting config is a dataclass with the following signature and attributes:</span>
 
 <span class="sd">    &gt;&gt;&gt; Conf  # signature: Conf(a: Any = 1, b: Any = &#39;x&#39;)</span>
 <span class="sd">    &lt;class &#39;types.Builds_dict&#39;&gt;</span>
-<span class="sd">    &gt;&gt;&gt; Conf.a</span>
-<span class="sd">    1</span>
-<span class="sd">    &gt;&gt;&gt; Conf.b</span>
-<span class="sd">    &#39;x&#39;</span>
+<span class="sd">    &gt;&gt;&gt; pyaml(Conf)</span>
+<span class="sd">    _target_: builtins.dict</span>
+<span class="sd">    a: 1</span>
+<span class="sd">    b: x</span>
 
 <span class="sd">    The `instantiate` function is used to enact this build – to create the dictionary.</span>
 
@@ -1329,9 +1383,11 @@
 <span class="sd">    &gt;&gt;&gt; instantiate(new_conf)  # calls: `dict(a=10, b=&#39;hi&#39;)`</span>
 <span class="sd">    {&#39;a&#39;: 10, &#39;b&#39;: &#39;hi&#39;}</span>
 
-<span class="sd">    Positional arguments can be provided too.</span>
+<span class="sd">    Positional arguments are supported.</span>
 
-<span class="sd">    &gt;&gt;&gt; Conf = builds(len, [1, 2, 3])  # specifying positional arguments</span>
+<span class="sd">    &gt;&gt;&gt; Conf = builds(len, [1, 2, 3])</span>
+<span class="sd">    &gt;&gt;&gt; Conf._args_</span>
+<span class="sd">    [1, 2, 3]</span>
 <span class="sd">    &gt;&gt;&gt; instantiate(Conf)</span>
 <span class="sd">    3</span>
 
@@ -1345,8 +1401,12 @@
 <span class="sd">    such that we only configure the parameter ``x``.</span>
 
 <span class="sd">    &gt;&gt;&gt; PartialConf = builds(a_two_tuple, x=1, zen_partial=True)  # configures only `x`</span>
+<span class="sd">    &gt;&gt;&gt; pyaml(PartialConf)</span>
+<span class="sd">    _target_: __main__.a_two_tuple</span>
+<span class="sd">    _partial_: true</span>
+<span class="sd">    x: 1</span>
 
-<span class="sd">    Instantiating this conf will return ``functools.partial(a_two_tuple, x=1)``.</span>
+<span class="sd">    Instantiating this config will return ``functools.partial(a_two_tuple, x=1)``.</span>
 
 <span class="sd">    &gt;&gt;&gt; partial_func = instantiate(PartialConf)</span>
 <span class="sd">    &gt;&gt;&gt; partial_func</span>
@@ -1362,15 +1422,19 @@
 <span class="sd">    The configurable parameters of a target can be auto-populated in our config.</span>
 <span class="sd">    Suppose we want to configure the following function.</span>
 
-<span class="sd">    &gt;&gt;&gt; def f(x: bool, y: str = &#39;foo&#39;): return x, y</span>
+<span class="sd">    &gt;&gt;&gt; def func(x: bool, y: str = &#39;foo&#39;): return x, y</span>
 
 <span class="sd">    The following config will have a signature that matches ``f``; the</span>
 <span class="sd">    annotations and default values of the parameters of ``f`` are explicitly</span>
 <span class="sd">    incorporated into the config.</span>
 
-<span class="sd">    &gt;&gt;&gt; Conf = builds(f, populate_full_signature=True)  # signature: `Builds_f(x: bool, y: str = &#39;foo&#39;)`</span>
-<span class="sd">    &gt;&gt;&gt; Conf.y</span>
-<span class="sd">    &#39;foo&#39;</span>
+<span class="sd">    &gt;&gt;&gt; # signature: `Builds_func(x: bool, y: str = &#39;foo&#39;)`</span>
+<span class="sd">    &gt;&gt;&gt; Conf = builds(func, populate_full_signature=True)</span>
+<span class="sd">    &gt;&gt;&gt; pyaml(Conf)</span>
+<span class="sd">    _target_: __main__.func</span>
+<span class="sd">    x: ???</span>
+<span class="sd">    &#39;y&#39;: foo</span>
+
 
 <span class="sd">    Annotations will be used by Hydra to provide limited runtime type-checking during</span>
 <span class="sd">    instantiation. Here, we&#39;ll pass a float for ``x``, which expects a boolean value.</span>
@@ -1378,7 +1442,7 @@
 <span class="sd">    &gt;&gt;&gt; instantiate(Conf(x=10.0))</span>
 <span class="sd">    ValidationError: Value &#39;10.0&#39; is not a valid bool (type float)</span>
 <span class="sd">        full_key: x</span>
-<span class="sd">        object_type=Builds_f</span>
+<span class="sd">        object_type=Builds_func</span>
 
 <span class="sd">    **Composing configs via inheritance**</span>
 
@@ -1397,7 +1461,7 @@
 <span class="sd">    **Runtime validation perfomed by builds**</span>
 
 <span class="sd">    Misspelled parameter names and other invalid configurations for the target’s</span>
-<span class="sd">    signature will be caught by `builds`, so that such errors are caught prior to</span>
+<span class="sd">    signature will be caught by `builds` so that such errors are caught prior to</span>
 <span class="sd">    instantiation.</span>
 
 <span class="sd">    &gt;&gt;&gt; def func(a_number: int): pass</span>
@@ -1471,7 +1535,7 @@
 <span class="sd">    &gt;&gt;&gt; my_router.ip_address = &quot;148.109.37.2&quot;</span>
 <span class="sd">    FrozenInstanceError: cannot assign to field &#39;ip_address&#39;</span>
 
-<span class="sd">    **Support for partial&#39;d objects**</span>
+<span class="sd">    **Support for partial&#39;d targets**</span>
 
 <span class="sd">    Specifying ``builds(functools.partial(&lt;target&gt;, ...), ...)`` is supported; `builds`</span>
 <span class="sd">    will automatically &quot;unpack&quot; a partial&#39;d object that is passed as its target.</span>
@@ -1479,8 +1543,10 @@
 <span class="sd">    &gt;&gt;&gt; import functools</span>
 <span class="sd">    &gt;&gt;&gt; partiald_dict = functools.partial(dict, a=1, b=2)</span>
 <span class="sd">    &gt;&gt;&gt; Conf = builds(partiald_dict)  # signature: (a = 1, b = 2)</span>
-<span class="sd">    &gt;&gt;&gt; Conf.a, Conf.b</span>
-<span class="sd">    (1, 2)</span>
+<span class="sd">    &gt;&gt;&gt; pyaml(Conf)</span>
+<span class="sd">    _target_: builtins.dict</span>
+<span class="sd">    a: 1</span>
+<span class="sd">    b: 2</span>
 <span class="sd">    &gt;&gt;&gt; instantiate(Conf(a=-4))  # equivalent to calling: `partiald_dict(a=-4)`</span>
 <span class="sd">    {&#39;a&#39;: -4, &#39;b&#39;: 2}</span>
 <span class="sd">    &quot;&quot;&quot;</span>

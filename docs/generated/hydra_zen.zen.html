@@ -260,29 +260,32 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="hydra_zen.zen">
 <span class="sig-prename descclassname"><span class="pre">hydra_zen.</span></span><span class="sig-name descname"><span class="pre">zen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ZenWrapper</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/wrapper/_implementations.html#zen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.zen" title="Permalink to this definition">#</a></dt>
-<dd><p>A decorator that returns a function that will auto-extract, resolve, and
-instantiate fields from an input config based on the decorated function’s signature.</p>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Cfg</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">builds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">z</span><span class="o">=</span><span class="s2">"$</span><span class="si">{y}</span><span class="s2">"</span><span class="p">,</span> <span class="n">unused</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">zen</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="p">:</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="o">+</span><span class="n">z</span><span class="p">)(</span><span class="n">Cfg</span><span class="p">)</span>  <span class="c1"># x=1, y=4, z=4</span>
+<dd><p>A wrapper that returns a function that will auto-extract, resolve, and
+instantiate fields from an input config based on the wrapped function’s signature.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fn</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="p">:</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="o">+</span><span class="n">z</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wrapped_fn</span> <span class="o">=</span> <span class="n">zen</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">builds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">z</span><span class="o">=</span><span class="s2">"$</span><span class="si">{y}</span><span class="s2">"</span><span class="p">,</span> <span class="n">unused</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wrapped_fn</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>  <span class="c1"># x=1, y=4, z=4</span>
 <span class="go">9</span>
 </pre></div>
 </div>
 <p>The main purpose of <a class="reference internal" href="#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code></a> is to enable a user to write/use Hydra-agnostic functions
-as the task functions for their Hydra app.</p>
+as the task functions for their Hydra app. See “Notes” for more details.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>func</strong><span class="classifier">Callable[Sig, R]</span></dt><dd><p>The function being decorated. (This is a positional-only argument)</p>
+<dt><strong>func</strong><span class="classifier">Callable[Sig, R], positional-only</span></dt><dd><p>The function being wrapped.</p>
 </dd>
-<dt><strong>unpack_kwargs: bool, optional (default=False)</strong></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> a <code class="xref py py-obj docutils literal notranslate"><span class="pre">**kwargs</span></code> field in the decorated function’s signature will be
+<dt><strong>unpack_kwargs: bool, optional (default=False)</strong></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> a <code class="xref py py-obj docutils literal notranslate"><span class="pre">**kwargs</span></code> field in the wrapped function’s signature will be
 populated by all of the input config entries that are not specified by the rest
 of the signature (and that are not specified by the <code class="xref py py-obj docutils literal notranslate"><span class="pre">exclude</span></code> argument).</p>
 </dd>
 <dt><strong>pre_call</strong><span class="classifier">Optional[Callable[[Any], Any] | Iterable[Callable[[Any], Any]]]</span></dt><dd><p>One or more functions that will be called with the input config prior
-to the decorated functions. An iterable of pre-call functions are called
+to the wrapped function. An iterable of pre-call functions are called
 from left (low-index) to right (high-index).</p>
 <p>This is useful, e.g., for seeding a RNG prior to the instantiation phase
-that is triggered when calling the decorated function.</p>
+that is triggered when calling the wrapped function.</p>
 </dd>
 <dt><strong>exclude: Optional[str | Iterable[str]]</strong></dt><dd><p>Specifies one or more parameter names in the function’s signature
 that will not be extracted from input configs by the zen-wrapped function.</p>
@@ -294,53 +297,77 @@ that will not be extracted from input configs by the zen-wrapped function.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
-<dt>Zen[Sig, R]</dt><dd><p>A callable with signature <code class="xref py py-obj docutils literal notranslate"><span class="pre">(conf:</span> <span class="pre">ConfigLike,</span> <span class="pre">\)</span> <span class="pre">-&gt;</span> <span class="pre">R</span></code></p>
+<dt><strong>wrapped</strong><span class="classifier">Zen[Sig, R]</span></dt><dd><p>A callable with signature <code class="xref py py-obj docutils literal notranslate"><span class="pre">(conf:</span> <span class="pre">ConfigLike,</span> <span class="pre">\)</span> <span class="pre">-&gt;</span> <span class="pre">R</span></code></p>
 <p>The wrapped function is an instance of <a class="reference internal" href="hydra_zen.wrapper.Zen.html#hydra_zen.wrapper.Zen" title="hydra_zen.wrapper.Zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.wrapper.Zen</span></code></a> and accepts
 a single Hydra config (a dataclass, dictionary, or omegaconf container). The
-parameters of the decorated function’s signature determine the fields that are
+parameters of the wrapped function’s signature determine the fields that are
 extracted from the config; only those fields that are accessed will be resolved
 and instantiated.</p>
 </dd>
 </dl>
 </dd>
 </dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="hydra_zen.wrapper.Zen.html#hydra_zen.wrapper.Zen" title="hydra_zen.wrapper.Zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.wrapper.Zen</span></code></a></dt><dd><p>Implements the wrapping logic that is exposed by <a class="reference internal" href="#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.zen</span></code></a>.</p>
+</dd>
+</dl>
+</div>
 <p class="rubric">Notes</p>
-<p>ConfigLike is DataClass | dict[str, Any] | DictConfig</p>
-<p>The fields extracted from the input config are determined by the signature of the
-decorated function. There is an exception: including a parameter named “zen_cfg”
-in the function’s signature will signal to <a class="reference internal" href="#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code></a> to pass through the full config to
-that field (This specific parameter name can be overridden via <code class="xref py py-obj docutils literal notranslate"><span class="pre">Zen.CFG_NAME</span></code>).</p>
-<p>All values (extracted from the input config) of types belonging to ConfigLike will
-be instantiated before being passed to the wrapped function.</p>
-<p class="rubric">Examples</p>
-<p><strong>Basic Usage</strong></p>
-<p>Using <a class="reference internal" href="#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code></a> as a decorator</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a>
-<span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="nd">@zen</span></a>
-<span class="gp">... </span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span> <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+<p>The following pseudo code conveys the core functionality of <a class="reference internal" href="#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a> <span class="k">as</span> <span class="n">inst</span>
+
+<span class="k">def</span> <span class="nf">zen</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="n">sig</span> <span class="o">=</span> <span class="n">get_signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="n">resolve_interpolated_fields</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">p</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">inst</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#getattr" title="getattr"><span class="nb">getattr</span></a><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">sig</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wrapped</span>
 </pre></div>
 </div>
-<p>The resulting decorated function accepts a single argument: a Hydra-compatible config that has the attributes “x” and “y”:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span>
+<p>The presence of a parameter named “zen_cfg” in the wrapped function’s signature
+will cause <a class="reference internal" href="#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code></a> to pass the full, resolved config to that field. This specific
+parameter name can be overridden via <code class="xref py py-obj docutils literal notranslate"><span class="pre">Zen.CFG_NAME</span></code>.</p>
+<p class="rubric">Examples</p>
+<p><strong>Basic Usage</strong></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span> <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zen_f</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The wrapped function – <code class="xref py py-obj docutils literal notranslate"><span class="pre">zen_f</span></code> – accepts a single argument: a Hydra-compatible
+config that has the attributes “x” and “y”:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">zen_f</span>
 <span class="go">zen[f(x, y)](cfg, /)</span>
 </pre></div>
 </div>
 <p>“Configs” – dataclasses, dictionaries, and omegaconf containers – are acceptable
 inputs to zen-wrapped functions. Interpolated fields will be resolved and
 sub-configs will be instantiated. Excess fields in the config are unused.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="p">(</span><span class="n">make_config</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">999</span><span class="p">))</span>  <span class="c1"># z is not used</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">zen_f</span><span class="p">(</span><span class="n">make_config</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">999</span><span class="p">))</span>  <span class="c1"># z is not used</span>
 <span class="go">3</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"$</span><span class="si">{x}</span><span class="s2">"</span><span class="p">))</span>  <span class="c1"># y will resolve to 2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zen_f</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"$</span><span class="si">{x}</span><span class="s2">"</span><span class="p">))</span>  <span class="c1"># y will resolve to 2</span>
 <span class="go">4</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">builds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="mi">10</span><span class="p">)))</span>  <span class="c1"># y will instantiate to 10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zen_f</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">builds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="mi">10</span><span class="p">)))</span>  <span class="c1"># y will instantiate to 10</span>
 <span class="go">12</span>
 </pre></div>
 </div>
 <p>The wrapped function can be accessed directly</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">func</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">zen_f</span><span class="o">.</span><span class="n">func</span>
 <span class="go">&lt;function __main__.f(x, y)&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zen_f</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="go">0</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code></a> can be used as a decorator</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@zen</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">zen_f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zen_f</span><span class="p">({</span><span class="s1">'x'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'y'</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
+<span class="go">3</span>
 </pre></div>
 </div>
 <p><a class="reference internal" href="#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code></a> is compatible with partial’d functions.</p>
@@ -356,35 +383,34 @@ sub-configs will be instantiated. Excess fields in the config are unused.</p>
 <p>One can specify <code class="xref py py-obj docutils literal notranslate"><span class="pre">exclude</span></code> to prevent particular variables from being extracted from
 a config:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span> <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">zen</span><span class="p">(</span><span class="n">f</span><span class="p">)(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">x</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">y</span><span class="o">=-</span><span class="mi">20</span><span class="p">))</span>  <span class="c1"># extracts x &amp; y from config to call f</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="o">-</span><span class="mi">20</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zen</span><span class="p">(</span><span class="n">f</span><span class="p">)(</span><span class="n">cfg</span><span class="p">)</span>  <span class="c1"># extracts x &amp; y from config to call f</span>
 <span class="go">(-10, -20)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">zen</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="s2">"x"</span><span class="p">)(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">x</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">y</span><span class="o">=-</span><span class="mi">20</span><span class="p">))</span>  <span class="c1"># extracts y from config to call f(x=1, ...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zen</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="s2">"x"</span><span class="p">)(</span><span class="n">cfg</span><span class="p">)</span>  <span class="c1"># extracts y from config to call f(x=1, ...)</span>
 <span class="go">(1, -20)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">zen</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="s2">"x,y"</span><span class="p">)(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">x</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">y</span><span class="o">=-</span><span class="mi">20</span><span class="p">))</span>  <span class="c1"># defers to f's defaults</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zen</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="s2">"x,y"</span><span class="p">)(</span><span class="n">cfg</span><span class="p">)</span>  <span class="c1"># defers to f's defaults</span>
 <span class="go">(1, 2)</span>
 </pre></div>
 </div>
 <p>Populating a <code class="xref py py-obj docutils literal notranslate"><span class="pre">**kwargs</span></code> field via <code class="xref py py-obj docutils literal notranslate"><span class="pre">unpack_kwargs=True</span></code>:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">return</span> <span class="n">a</span><span class="p">,</span> <span class="n">kw</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">22</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">zen</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">unpack_kwargs</span><span class="o">=</span><span class="kc">False</span><span class="p">)(</span><span class="n">cfg</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">22</span><span class="p">,</span> <span class="n">foo</span><span class="o">=</span><span class="s2">"bar"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zen</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">unpack_kwargs</span><span class="o">=</span><span class="kc">False</span><span class="p">)(</span><span class="n">cfg</span><span class="p">)</span>
 <span class="go">(1, {})</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">zen</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">unpack_kwargs</span><span class="o">=</span><span class="kc">True</span><span class="p">)(</span><span class="n">cfg</span><span class="p">)</span>
-<span class="go">(1, {'b': 22})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zen</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">unpack_kwargs</span><span class="o">=</span><span class="kc">True</span><span class="p">)(</span><span class="n">cfg</span><span class="p">)</span>
+<span class="go">(1, {'b': 22, 'foo': 'bar'})</span>
 </pre></div>
 </div>
-<p><strong>Passing Through The Config</strong></p>
+<p><strong>Passing Through The Full Input Config</strong></p>
 <p>Some task functions require complete access to the full config to gain access to
 sub-configs. One can specify the field named <code class="xref py py-obj docutils literal notranslate"><span class="pre">zen_config</span></code> in their task function’s
 signature to signal <a class="reference internal" href="#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code></a> that it should pass the full config to that parameter .</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@zen</span>
-<span class="gp">... </span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">zen_cfg</span><span class="p">):</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">zf</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">zen_cfg</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">zen_cfg</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"$</span><span class="si">{x}</span><span class="s2">"</span><span class="p">))</span>
-<span class="go">(1, {'x': 1, 'y': 1})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zf</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"$</span><span class="si">{x}</span><span class="s2">"</span><span class="p">,</span> <span class="n">foo</span><span class="o">=</span><span class="s2">"bar"</span><span class="p">))</span>
+<span class="go">(1, {'x': 1, 'y': 1, 'foo': 'bar'})</span>
 </pre></div>
 </div>
 <p><strong>Including a pre-call function</strong></p>
@@ -393,34 +419,28 @@ fields upon being called, it can be necessary to include a pre-call step that
 occurs prior to any instantiation. <a class="reference internal" href="#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code></a> can be passed one or more pre-call
 functions that will be called with the input config as a precursor to calling the
 decorated function.</p>
-<p>Consider the following scenario where the config’s instantiation involves drawing a
-random value, which we want to be made deterministic with a configurable seed. We
-will use a pre-call function to seed the RNG prior to the subsequent instantiation.</p>
+<p>Consider the following scenario where the instantiating the input config involves
+drawing a random value, which we want to be made deterministic with a configurable
+seed. We will use a pre-call function to seed the RNG prior to the instantiation.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/random.html#module-random" title="random"><span class="nn">random</span></a>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Cfg</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span>
-<span class="gp">... </span>        <span class="c1"># `rand_val` will be instantiated and draw from randint upon</span>
-<span class="gp">... </span>        <span class="c1"># calling the zen-wrapped function, thus we need a pre-call</span>
-<span class="gp">... </span>        <span class="c1"># function to set the global RNG seed prior to instantiation</span>
-<span class="gp">... </span>        <span class="n">rand_val</span><span class="o">=</span><span class="n">builds</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">rand_val</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">):</span> <span class="k">return</span> <span class="n">rand_val</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span>
 <span class="gp">... </span>        <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="n">rand_val</span><span class="o">=</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/random.html#random.randint" title="random.randint"><span class="n">random</span><span class="o">.</span><span class="n">randint</span></a><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
 <span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wrapped</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">pre_call</span><span class="o">=</span><span class="k">lambda</span> <span class="n">cfg</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/random.html#random.seed" title="random.seed"><span class="n">random</span><span class="o">.</span><span class="n">seed</span></a><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">seed</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@zen</span><span class="p">(</span><span class="n">pre_call</span><span class="o">=</span><span class="k">lambda</span> <span class="n">cfg</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">seed</span><span class="p">))</span>
-<span class="gp">... </span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">rand_val</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">):</span>
-<span class="gp">... </span>    <span class="k">return</span> <span class="n">rand_val</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">f</span><span class="p">(</span><span class="n">Cfg</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#range" title="range"><span class="nb">range</span></a><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">wrapped</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#range" title="range"><span class="nb">range</span></a><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
 <span class="go">[6, 6, 6, 6, 6, 6, 6, 6, 6, 6]</span>
 </pre></div>
 </div>
-<p><strong>Using `@zen` instead of `@hydra.main`</strong></p>
-<p>The object returned by zen provides a convenience method – <code class="xref py py-obj docutils literal notranslate"><span class="pre">Zen.hydra_main</span></code> – so
-that users need not double-wrap with <code class="xref py py-obj docutils literal notranslate"><span class="pre">@hydra.main</span></code> to create a CLI:</p>
+<p><strong>Using `zen` instead of `@hydra.main`</strong></p>
+<p>The object returned by zen provides a convenience method – <code class="xref py py-obj docutils literal notranslate"><span class="pre">Zen.hydra_main</span></code> –
+to generate a CLI for a zen-wrapped task function:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># example.py</span>
 <span class="kn">from</span> <span class="nn">hydra.core.config_store</span> <span class="kn">import</span> <span class="n">ConfigStore</span>
 
@@ -441,7 +461,8 @@ that users need not double-wrap with <code class="xref py py-obj docutils litera
 </pre></div>
 </div>
 <p><strong>Validating input configs</strong></p>
-<p>An input config can be validated against a zen-wrapped function without calling said function via the <a class="reference internal" href="hydra_zen.wrapper.Zen.html#hydra_zen.wrapper.Zen.validate" title="hydra_zen.wrapper.Zen.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a> method.</p>
+<p>An input config can be validated against a zen-wrapped function – without calling
+said function – via the <a class="reference internal" href="hydra_zen.wrapper.Zen.html#hydra_zen.wrapper.Zen.validate" title="hydra_zen.wrapper.Zen.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a> method.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">):</span> <span class="o">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">zen_f</span> <span class="o">=</span> <span class="n">zen</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">zen_f</span><span class="o">.</span><span class="n">validate</span><span class="p">({</span><span class="s2">"x"</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>  <span class="c1"># OK</span>

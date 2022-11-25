@@ -271,10 +271,10 @@ Python function instead of from a commandline interface.</p>
 <td><p>Launch a Hydra job using a Python-based interface.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code></a>(func, /, pre_call, ZenWrapper)</p></td>
-<td><p>A decorator that returns a function that will auto-extract, resolve, and instantiate fields from an input config based on the decorated function's signature.</p></td>
+<td><p>A wrapper that returns a function that will auto-extract, resolve, and instantiate fields from an input config based on the wrapped function's signature.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.wrapper.Zen.html#hydra_zen.wrapper.Zen" title="hydra_zen.wrapper.Zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wrapper.Zen</span></code></a>(_Zen__func, *[, exclude, ...])</p></td>
-<td><p>Implements the decorator logic that is exposed by <a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.zen</span></code></a></p></td>
+<td><p>Implements the wrapping logic that is exposed by <a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.zen</span></code></a></p></td>
 </tr>
 </tbody>
 </table>
@@ -294,7 +294,7 @@ the data and class-instances that we need for our application.</p>
 <td><p>Returns a config with user-defined field names and, optionally, associated default values and/or type annotations.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>(hydra_target, /, *pos_args[, ...])</p></td>
-<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds(target,</span> <span class="pre">*args,</span> <span class="pre">**kw)</span></code> returns a config that, when instantiated, builds <code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code>.</p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds(target,</span> <span class="pre">*args,</span> <span class="pre">**kw)</span></code> returns a Hydra-compatible config that, when instantiated, returns <code class="xref py py-obj docutils literal notranslate"><span class="pre">target(*args,</span> <span class="pre">**kw)</span></code>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a>(obj, *[, zen_convert, hydra_recursive, ...])</p></td>
 <td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">just(obj)</span></code> returns a config that, when instantiated, just returns <code class="xref py py-obj docutils literal notranslate"><span class="pre">obj</span></code>.</p></td>

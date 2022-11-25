@@ -278,23 +278,27 @@ which is initialized as:</p>
 </div>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">ZenStore</span></a>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">pp</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">(</span><span class="n">x</span><span class="p">))</span>  <span class="c1"># for pretty printing configs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">pyaml</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="c1"># for pretty printing configs</span>
+<span class="gp">... </span>    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 </pre></div>
 </div>
 <p><strong>Basic usage</strong></p>
 <p>Let’s add a config to hydra-zen’s pre-instantiated <a class="reference internal" href="#hydra_zen.ZenStore" title="hydra_zen.ZenStore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenStore</span></code></a> instance. Each store
 entry must have an associated name. Optionally, a group, package, and/or provider
 may be specified for the entry as well.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">store</span><span class="p">({</span><span class="s2">"lr"</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span> <span class="s2">"momentum"</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">},</span> <span class="n">name</span><span class="o">=</span><span class="s2">"sgd"</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s2">"optim"</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">store</span><span class="p">({</span><span class="s2">"lr"</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">},</span> <span class="n">name</span><span class="o">=</span><span class="s2">"adam"</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s2">"optim"</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config1</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'name'</span><span class="p">:</span> <span class="s1">'Roger'</span><span class="p">,</span> <span class="s1">'age'</span><span class="p">:</span> <span class="mi">24</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config2</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'name'</span><span class="p">:</span> <span class="s1">'Rita'</span><span class="p">,</span> <span class="s1">'age'</span><span class="p">:</span> <span class="mi">27</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">store</span><span class="p">(</span><span class="n">config1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"roger"</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s2">"profiles"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">store</span><span class="p">(</span><span class="n">config2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"rita"</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s2">"profiles"</span><span class="p">)</span>
 <span class="go">zen_store</span>
-<span class="go">{'optim': ['sgd', 'adam']}</span>
+<span class="go">{'profiles': ['roger', 'rita']}</span>
 </pre></div>
 </div>
 <p>A store’s entries are keyed by their <code class="xref py py-obj docutils literal notranslate"><span class="pre">(group,</span> <span class="pre">name)</span></code> pairs (the default group is
 <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>).</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span><span class="p">[</span><span class="s2">"optim"</span><span class="p">,</span> <span class="s2">"sgd"</span><span class="p">]</span>  <span class="c1"># (group, name) -&gt; config node</span>
-<span class="go">{'lr': 0.01, 'momentum': 0.9}</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span><span class="p">[</span><span class="s2">"profiles"</span><span class="p">,</span> <span class="s2">"roger"</span><span class="p">]</span>  <span class="c1"># (group, name) -&gt; config node</span>
+<span class="go">{'name': 'Roger', age: 24}</span>
 </pre></div>
 </div>
 <p>By default, the stored config(s) will be “enqueued” for addition to Hydra’s config
@@ -308,8 +312,8 @@ configs to Hydra’s central store.</p>
 </pre></div>
 </div>
 <p>By default, attempting to overwrite an entry will result in an error.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span><span class="p">({},</span> <span class="n">name</span><span class="o">=</span><span class="s2">"sgd"</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s2">"optim"</span><span class="p">)</span>  <span class="c1"># same name and group as above</span>
-<span class="go">ValueError: (name=sgd group=optim): Hydra config store entry already exists.</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span><span class="p">({},</span> <span class="n">name</span><span class="o">=</span><span class="s2">"rita"</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s2">"profiles"</span><span class="p">)</span>  <span class="c1"># same name and group as above</span>
+<span class="go">ValueError: (name=rita group=profiles): Hydra config store entry already exists.</span>
 <span class="go">Specify `overwrite_ok=True` to enable replacing config store entries</span>
 </pre></div>
 </div>
@@ -321,7 +325,7 @@ configs.</p>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span>
 <span class="go">zen_store</span>
-<span class="go">{'optim': ['sgd', 'adam']}</span>
+<span class="go">{'profiles': ['roger', 'rita']}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">new_store</span>
 <span class="go">new_store</span>
 <span class="go">{None: ['backbone']}</span>
@@ -342,7 +346,7 @@ capabilities. Here, <code class="xref py py-obj docutils literal notranslate"><s
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">store2</span> <span class="o">=</span> <span class="n">ZenStore</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">store2</span><span class="p">(</span><span class="n">sum_it</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># entry name defaults to `sum_it.__name__`</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">store2</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">"sum_it"</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pp</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pyaml</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 <span class="go">_target_: __main__.sum_it</span>
 <span class="go">a: 1</span>
 <span class="go">b: 2</span>
@@ -364,11 +368,11 @@ store entries for <code class="xref py py-obj docutils literal notranslate"><spa
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">func</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>  <span class="c1"># the decorated function is left unchanged</span>
 <span class="go">7</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pp</span><span class="p">(</span><span class="n">store</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">"func1"</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pyaml</span><span class="p">(</span><span class="n">store</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">"func1"</span><span class="p">])</span>
 <span class="go">_target_: __main__.func</span>
 <span class="go">a: 1</span>
 <span class="go">b: 22</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pp</span><span class="p">(</span><span class="n">store</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">"func2"</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pyaml</span><span class="p">(</span><span class="n">store</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">"func2"</span><span class="p">])</span>
 <span class="go">_target_: __main__.func</span>
 <span class="go">b: ???</span>
 <span class="go">a: -10</span>
@@ -425,14 +429,14 @@ partial defaults for the <code class="xref py py-obj docutils literal notranslat
 <span class="gp">&gt;&gt;&gt; </span>    <span class="n">has_root</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#bool" title="bool"><span class="nb">bool</span></a>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pp</span><span class="p">(</span><span class="n">new_store</span><span class="p">[</span><span class="s2">"profile"</span><span class="p">,</span> <span class="s2">"admin"</span><span class="p">])</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pyaml</span><span class="p">(</span><span class="n">new_store</span><span class="p">[</span><span class="s2">"profile"</span><span class="p">,</span> <span class="s2">"admin"</span><span class="p">])</span>
 <span class="go">username: ???</span>
 <span class="go">schema: ???</span>
 <span class="go">has_root: true</span>
 <span class="go">_target_: __main__.Profile</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pp</span><span class="p">(</span><span class="n">new_store</span><span class="p">[</span><span class="s2">"profile"</span><span class="p">,</span> <span class="s2">"test_admin"</span><span class="p">])</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pyaml</span><span class="p">(</span><span class="n">new_store</span><span class="p">[</span><span class="s2">"profile"</span><span class="p">,</span> <span class="s2">"test_admin"</span><span class="p">])</span>
 <span class="go">username: ???</span>
 <span class="go">schema: &lt;none&gt;</span>
 <span class="go">has_root: true</span>
@@ -595,7 +599,7 @@ specified when initializing this store.</p>
 name, group, package, provider, and node.</p>
 <p class="rubric">Notes</p>
 <p>Mutating the returned mapping will not affect the store’s internal entry.
-Mutating node in the returned entry may have unintended consequences and
+Mutating a node in the returned entry may have unintended consequences and
 is not advised.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">store</span><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">ZenStore</span></a>
@@ -645,7 +649,7 @@ Hydra’s config store.</p>
 <dd><p>Yields all entries in this store.</p>
 <p class="rubric">Notes</p>
 <p>Mutating the returned mappings will not affect the store’s internal entries.
-Mutating node in an entry may have unintended consequences and is not advised.</p>
+Mutating a node in an entry may have unintended consequences and is not advised.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">store</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">store</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s2">"fruit"</span><span class="p">)</span>
