@@ -1216,12 +1216,12 @@ class ZenStore:
             provider = kw.get("provider", self._defaults["provider"])
 
             _name: NodeName = name(__target) if callable(name) else name
-            if not isinstance(_name, str):  # type: ignore
+            if not isinstance(_name, str):
                 raise TypeError(f"`name` must be a string, got {_name}")
             del name
 
             _group: GroupName = group(__target) if callable(group) else group
-            if _group is not None and not isinstance(_group, str):  # type: ignore
+            if _group is not None and not isinstance(_group, str):
                 raise TypeError(f"`group` must be a string or None, got {_group}")
             del group
 
