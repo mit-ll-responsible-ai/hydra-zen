@@ -871,7 +871,9 @@ class ZenStore:
     Examples
     --------
     >>> from hydra_zen import to_yaml, store, ZenStore
-    >>> def pp(x): print(to_yaml(x))  # for pretty printing configs
+    >>> def pyaml(x):
+    ...     # for pretty printing configs
+    ...     print(to_yaml(x))
 
     **Basic usage**
 
@@ -879,16 +881,18 @@ class ZenStore:
     entry must have an associated name. Optionally, a group, package, and/or provider
     may be specified for the entry as well.
 
-    >>> _ = store({"lr": 0.01, "momentum": 0.9}, name="sgd", group="optim")
-    >>> _ = store({"lr": 0.001}, name="adam", group="optim")
+    >>> config1 = {'name': 'Roger', 'age': 24}
+    >>> config2 = {'name': 'Rita', 'age': 27}
+    >>> _ = store(config1, name="roger", group="profiles")
+    >>> _ = store(config2, name="rita", group="profiles")
     zen_store
-    {'optim': ['sgd', 'adam']}
+    {'profiles': ['roger', 'rita']}
 
     A store's entries are keyed by their `(group, name)` pairs (the default group is
     `None`).
 
-    >>> store["optim", "sgd"]  # (group, name) -> config node
-    {'lr': 0.01, 'momentum': 0.9}
+    >>> store["profiles", "roger"]  # (group, name) -> config node
+    {'name': 'Roger', age: 24}
 
     By default, the stored config(s) will be "enqueued" for addition to Hydra's config
     store, and the method `.add_to_hydra_store()` must be called to add the enqueued
@@ -902,8 +906,8 @@ class ZenStore:
 
     By default, attempting to overwrite an entry will result in an error.
 
-    >>> store({}, name="sgd", group="optim")  # same name and group as above
-    ValueError: (name=sgd group=optim): Hydra config store entry already exists.
+    >>> store({}, name="rita", group="profiles")  # same name and group as above
+    ValueError: (name=rita group=profiles): Hydra config store entry already exists.
     Specify `overwrite_ok=True` to enable replacing config store entries
 
     We can create a distinct store that has an independent internal repository of
@@ -914,7 +918,7 @@ class ZenStore:
 
     >>> store
     zen_store
-    {'optim': ['sgd', 'adam']}
+    {'profiles': ['roger', 'rita']}
     >>> new_store
     new_store
     {None: ['backbone']}
@@ -937,7 +941,7 @@ class ZenStore:
     >>> store2 = ZenStore()
     >>> _ = store2(sum_it, a=1, b=2)  # entry name defaults to `sum_it.__name__`
     >>> config = store2[None, "sum_it"]
-    >>> pp(config)
+    >>> pyaml(config)
     _target_: __main__.sum_it
     a: 1
     b: 2
@@ -959,11 +963,11 @@ class ZenStore:
 
     >>> func(10, 3)  # the decorated function is left unchanged
     7
-    >>> pp(store[None, "func1"])
+    >>> pyaml(store[None, "func1"])
     _target_: __main__.func
     a: 1
     b: 22
-    >>> pp(store[None, "func2"])
+    >>> pyaml(store[None, "func2"])
     _target_: __main__.func
     b: ???
     a: -10
@@ -1022,13 +1026,13 @@ class ZenStore:
     >>>     schema: str
     >>>     has_root: bool
 
-    >>> pp(new_store["profile", "admin"])
+    >>> pyaml(new_store["profile", "admin"])
     username: ???
     schema: ???
     has_root: true
     _target_: __main__.Profile
 
-    >>> pp(new_store["profile", "test_admin"])
+    >>> pyaml(new_store["profile", "test_admin"])
     username: ???
     schema: <none>
     has_root: true
@@ -1397,7 +1401,7 @@ class ZenStore:
         Notes
         -----
         Mutating the returned mapping will not affect the store's internal entry.
-        Mutating node in the returned entry may have unintended consequences and
+        Mutating a node in the returned entry may have unintended consequences and
         is not advised.
 
         Examples
@@ -1433,7 +1437,7 @@ class ZenStore:
         Notes
         -----
         Mutating the returned mappings will not affect the store's internal entries.
-        Mutating node in an entry may have unintended consequences and is not advised.
+        Mutating a node in an entry may have unintended consequences and is not advised.
 
         Examples
         --------

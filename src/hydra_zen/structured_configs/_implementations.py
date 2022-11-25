@@ -1025,7 +1025,7 @@ def builds(
     - Creating a frozen config
     - Support for partial'd targets
 
-    >>> from hydra_zen import to_yaml
+    >>> from hydra_zen import builds, instantiate, to_yaml
     >>> def pyaml(x):
     ...     # for pretty printing configs
     ...     print(to_yaml(x))
@@ -1034,7 +1034,6 @@ def builds(
 
     Lets create a basic config that describes how to 'build' a particular dictionary.
 
-    >>> from hydra_zen import builds, instantiate
     >>> Conf = builds(dict, a=1, b='x')
 
     The resulting config is a dataclass with the following signature and attributes:
