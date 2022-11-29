@@ -1040,6 +1040,7 @@ def builds(
 
     >>> Conf  # signature: Conf(a: Any = 1, b: Any = 'x')
     <class 'types.Builds_dict'>
+
     >>> pyaml(Conf)
     _target_: builtins.dict
     a: 1
@@ -1059,7 +1060,7 @@ def builds(
     Positional arguments are supported.
 
     >>> Conf = builds(len, [1, 2, 3])
-    >>> Conf._args_
+    >>> Conf._args_  # type: ignore
     [1, 2, 3]
     >>> instantiate(Conf)
     3
@@ -1095,24 +1096,23 @@ def builds(
     The configurable parameters of a target can be auto-populated in our config.
     Suppose we want to configure the following function.
 
-    >>> def func(x: bool, y: str = 'foo'): return x, y
+    >>> def bar(x: bool, y: str = 'foo'): return x, y
 
     The following config will have a signature that matches ``f``; the
     annotations and default values of the parameters of ``f`` are explicitly
     incorporated into the config.
 
-    >>> # signature: `Builds_func(x: bool, y: str = 'foo')`
-    >>> Conf = builds(func, populate_full_signature=True)
+    >>> # signature: `Builds_bar(x: bool, y: str = 'foo')`
+    >>> Conf = builds(bar, populate_full_signature=True)
     >>> pyaml(Conf)
-    _target_: __main__.func
+    _target_: __main__.bar
     x: ???
     'y': foo
-
 
     Annotations will be used by Hydra to provide limited runtime type-checking during
     instantiation. Here, we'll pass a float for ``x``, which expects a boolean value.
 
-    >>> instantiate(Conf(x=10.0))
+    >>> instantiate(Conf(x=10.0))  # type: ignore
     ValidationError: Value '10.0' is not a valid bool (type float)
         full_key: x
         object_type=Builds_func
@@ -1149,7 +1149,8 @@ def builds(
     >>> builds(func, 1, builds_bases=(BaseConf,))  # too many args (via inheritance)
     TypeError: Building: func ..
 
-    >>> builds(int, (i for i in range(10)))  # value type not supported by Hydra
+    >>> # value type not supported by Hydra
+    >>> builds(int, (i for i in range(10)))  # type: ignore
     hydra_zen.errors.HydraZenUnsupportedPrimitiveError: Building: int ..
 
 
@@ -1216,10 +1217,8 @@ def builds(
     >>> import functools
     >>> partiald_dict = functools.partial(dict, a=1, b=2)
     >>> Conf = builds(partiald_dict)  # signature: (a = 1, b = 2)
-    >>> pyaml(Conf)
-    _target_: builtins.dict
-    a: 1
-    b: 2
+    >>> instantiate(Conf)  # equivalent to calling: `partiald_dict()`
+    {'a': 1, 'b': 2}
     >>> instantiate(Conf(a=-4))  # equivalent to calling: `partiald_dict(a=-4)`
     {'a': -4, 'b': 2}
     """
@@ -2070,7 +2069,7 @@ def get_target(obj: HasTarget) -> Any:
     Note that the target of ``loaded_conf`` can be accessed without
     instantiating the config.
 
-    >>> get_target(loaded_conf)
+    >>> get_target(loaded_conf)  # type: ignore
     __main__.B
     """
     if is_old_partial_builds(obj):

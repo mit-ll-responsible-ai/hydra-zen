@@ -301,7 +301,8 @@ class ZenConvert(TypedDict, total=False):
     {}
     >>> zc(dataclass=True)
     {"dataclass": True}
-    >>> zc(apple=1)  # static type-checker will raise, but runtime will not
+    >>> # static type-checker will raise, but runtime will not
+    >>> zc(apple=1)  # type: ignore
     {"apple": 1}
 
     **Configuring dataclass auto-config behaviors**
@@ -326,7 +327,7 @@ class ZenConvert(TypedDict, total=False):
 
     >>> I(make_config(y=b))  # returns omegaconf.DictConfig
     {'y': {'x': 1}}
-    >>> I(make_config(y=b, zen_convert=zc(dataclass=True, hydra_convert="all")))
+    >>> I(make_config(y=b, zen_convert=zc(dataclass=True), hydra_convert="all"))
     {'y': B(x=1)}
 
     Auto-config support does not work with dynamically-generated dataclass types

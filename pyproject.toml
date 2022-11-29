@@ -166,6 +166,7 @@ deps = {[testenv]deps}
        pydantic
        beartype
        cloudpickle
+       pyright
 commands = pytest --cov-report term-missing --cov-config=pyproject.toml --cov-fail-under=100 --cov=hydra_zen tests
 
 

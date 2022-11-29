@@ -227,7 +227,7 @@ def make_custom_builds_fn(
     >>> instantiate(Conf, x="a")  # satisfies annotation: Literal["a", "b"]
     "a"
 
-    >>> instantiate(conf, x="c")  # violates annotation: Literal["a", "b"]
+    >>> instantiate(Conf, x="c")  # violates annotation: Literal["a", "b"]
     <Validation error: "c" is not "a" or "b">
     """
 
