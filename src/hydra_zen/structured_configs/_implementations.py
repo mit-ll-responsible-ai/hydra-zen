@@ -986,9 +986,9 @@ def builds(
 
     >>> Conf  # signature: Conf(a: Any = 1, b: Any = 'x')
     <class 'types.Builds_dict'>
-    >>> Conf.a
+    >>> Conf().a
     1
-    >>> Conf.b
+    >>> Conf().b
     'x'
 
     The `instantiate` function is used to enact this build – to create the dictionary.
@@ -1042,13 +1042,13 @@ def builds(
     incorporated into the config.
 
     >>> Conf = builds(f, populate_full_signature=True)  # signature: `Builds_f(x: bool, y: str = 'foo')`
-    >>> Conf.y
+    >>> Conf(x=True).y
     'foo'
 
     Annotations will be used by Hydra to provide limited runtime type-checking during
     instantiation. Here, we'll pass a float for ``x``, which expects a boolean value.
 
-    >>> instantiate(Conf(x=10.0))
+    >>> instantiate(Conf(x=10.0))  # type: ignore
     ValidationError: Value '10.0' is not a valid bool (type float)
         full_key: x
         object_type=Builds_f
@@ -1085,7 +1085,8 @@ def builds(
     >>> builds(func, 1, builds_bases=(BaseConf,))  # too many args (via inheritance)
     TypeError: Building: func ..
 
-    >>> builds(int, (i for i in range(10)))  # value type not supported by Hydra
+    >>> # value type not supported by Hydra
+    >>> builds(int, (i for i in range(10)))  # type: ignore
     hydra_zen.errors.HydraZenUnsupportedPrimitiveError: Building: int ..
 
 
@@ -1152,8 +1153,8 @@ def builds(
     >>> import functools
     >>> partiald_dict = functools.partial(dict, a=1, b=2)
     >>> Conf = builds(partiald_dict)  # signature: (a = 1, b = 2)
-    >>> Conf.a, Conf.b
-    (1, 2)
+    >>> instantiate(Conf)  # equivalent to calling: `partiald_dict()`
+    {'a': 1, 'b': 2}
     >>> instantiate(Conf(a=-4))  # equivalent to calling: `partiald_dict(a=-4)`
     {'a': -4, 'b': 2}
     """
@@ -2004,7 +2005,7 @@ def get_target(obj: HasTarget) -> Any:
     Note that the target of ``loaded_conf`` can be accessed without
     instantiating the config.
 
-    >>> get_target(loaded_conf)
+    >>> get_target(loaded_conf)  # type: ignore
     __main__.B
     """
     if is_old_partial_builds(obj):

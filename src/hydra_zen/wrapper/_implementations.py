@@ -542,23 +542,23 @@ def zen(
     One can specify `exclude` to prevent particular variables from being extracted from
     a config:
 
-    >>> def f(x=1, y=2): return (x, y)
-    >>> zen(f)(dict(x=-10, y=-20))  # extracts x & y from config to call f
+    >>> def g(x=1, y=2): return (x, y)
+    >>> zen(g)(dict(x=-10, y=-20))  # extracts x & y from config to call f
     (-10, -20)
-    >>> zen(f, exclude="x")(dict(x=-10, y=-20))  # extracts y from config to call f(x=1, ...)
+    >>> zen(g, exclude="x")(dict(x=-10, y=-20))  # extracts y from config to call f(x=1, ...)
     (1, -20)
-    >>> zen(f, exclude="x,y")(dict(x=-10, y=-20))  # defers to f's defaults
+    >>> zen(g, exclude="x,y")(dict(x=-10, y=-20))  # defers to f's defaults
     (1, 2)
 
     Populating a `**kwargs` field via `unpack_kwargs=True`:
 
-    >>> def f(a, **kw):
+    >>> def h(a, **kw):
     ...     return a, kw
 
     >>> cfg = dict(a=1, b=22)
-    >>> zen(f, unpack_kwargs=False)(cfg)
+    >>> zen(h, unpack_kwargs=False)(cfg)
     (1, {})
-    >>> zen(f, unpack_kwargs=True)(cfg)
+    >>> zen(h, unpack_kwargs=True)(cfg)
     (1, {'b': 22})
 
 
@@ -569,9 +569,9 @@ def zen(
     signature to signal `zen` that it should pass the full config to that parameter .
 
     >>> @zen
-    ... def f(x: int, zen_cfg):
+    ... def k(x: int, zen_cfg):
     ...     return x, zen_cfg
-    >>> f(dict(x=1, y="${x}"))
+    >>> k(dict(x=1, y="${x}"))
     (1, {'x': 1, 'y': 1})
 
     **Including a pre-call function**
@@ -598,10 +598,10 @@ def zen(
     ... )
 
     >>> @zen(pre_call=lambda cfg: random.seed(cfg.seed))
-    ... def f(rand_val: int):
+    ... def f1(rand_val: int):
     ...     return rand_val
 
-    >>> [f(Cfg) for _ in range(10)]
+    >>> [f1(Cfg) for _ in range(10)]
     [6, 6, 6, 6, 6, 6, 6, 6, 6, 6]
 
 
@@ -637,15 +637,15 @@ def zen(
 
     An input config can be validated against a zen-wrapped function without calling said function via the `.validate` method.
 
-    >>> def f(x: int): ...
-    >>> zen_f = zen(f)
+    >>> def f2(x: int): ...
+    >>> zen_f = zen(f2)
     >>> zen_f.validate({"x": 1})  # OK
     >>> zen_f.validate({"y": 1})  # Missing x
     HydraZenValidationError: `cfg` is missing the following fields: x
 
     Validation propagates through zen-wrapped pre-call functions:
 
-    >>> zen_f = zen(f, pre_call=zen(lambda seed: None))
+    >>> zen_f = zen(f2, pre_call=zen(lambda seed: None))
     >>> zen_f.validate({"x": 1, "seed": 10})  # OK
     >>> zen_f.validate({"x": 1})  # Missing seed as required by pre-call
     HydraZenValidationError: `cfg` is missing the following fields: seed

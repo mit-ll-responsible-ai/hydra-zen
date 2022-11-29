@@ -308,7 +308,7 @@ def make_config(
       data:
       - -10
       - -20
-    >>> Conf3.c1.a
+    >>> Conf3().c1.a
     1
 
     Configurations can be composed via inheritance
@@ -323,7 +323,7 @@ def make_config(
     - -20
     c: 2
 
-    >>> issubclass(ConfInherit, Conf1) and issubclass(ConfInherit, Conf2)
+    >>> issubclass(ConfInherit, Conf1) and issubclass(ConfInherit, Conf2)  # type: ignore
     True
 
     **Support for Additional Types**
