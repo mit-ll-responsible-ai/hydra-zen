@@ -635,7 +635,7 @@
 <span class="sd">      data:</span>
 <span class="sd">      - -10</span>
 <span class="sd">      - -20</span>
-<span class="sd">    &gt;&gt;&gt; Conf3.c1.a</span>
+<span class="sd">    &gt;&gt;&gt; Conf3().c1.a</span>
 <span class="sd">    1</span>
 
 <span class="sd">    Configurations can be composed via inheritance</span>
@@ -650,7 +650,7 @@
 <span class="sd">    - -20</span>
 <span class="sd">    c: 2</span>
 
-<span class="sd">    &gt;&gt;&gt; issubclass(ConfInherit, Conf1) and issubclass(ConfInherit, Conf2)</span>
+<span class="sd">    &gt;&gt;&gt; issubclass(ConfInherit, Conf1) and issubclass(ConfInherit, Conf2)  # type: ignore</span>
 <span class="sd">    True</span>
 
 <span class="sd">    **Support for Additional Types**</span>

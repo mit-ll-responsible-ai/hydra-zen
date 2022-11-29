@@ -1367,6 +1367,7 @@
 
 <span class="sd">    &gt;&gt;&gt; Conf  # signature: Conf(a: Any = 1, b: Any = &#39;x&#39;)</span>
 <span class="sd">    &lt;class &#39;types.Builds_dict&#39;&gt;</span>
+
 <span class="sd">    &gt;&gt;&gt; pyaml(Conf)</span>
 <span class="sd">    _target_: builtins.dict</span>
 <span class="sd">    a: 1</span>
@@ -1386,7 +1387,7 @@
 <span class="sd">    Positional arguments are supported.</span>
 
 <span class="sd">    &gt;&gt;&gt; Conf = builds(len, [1, 2, 3])</span>
-<span class="sd">    &gt;&gt;&gt; Conf._args_</span>
+<span class="sd">    &gt;&gt;&gt; Conf._args_  # type: ignore</span>
 <span class="sd">    [1, 2, 3]</span>
 <span class="sd">    &gt;&gt;&gt; instantiate(Conf)</span>
 <span class="sd">    3</span>
@@ -1422,24 +1423,23 @@
 <span class="sd">    The configurable parameters of a target can be auto-populated in our config.</span>
 <span class="sd">    Suppose we want to configure the following function.</span>
 
-<span class="sd">    &gt;&gt;&gt; def func(x: bool, y: str = &#39;foo&#39;): return x, y</span>
+<span class="sd">    &gt;&gt;&gt; def bar(x: bool, y: str = &#39;foo&#39;): return x, y</span>
 
 <span class="sd">    The following config will have a signature that matches ``f``; the</span>
 <span class="sd">    annotations and default values of the parameters of ``f`` are explicitly</span>
 <span class="sd">    incorporated into the config.</span>
 
-<span class="sd">    &gt;&gt;&gt; # signature: `Builds_func(x: bool, y: str = &#39;foo&#39;)`</span>
-<span class="sd">    &gt;&gt;&gt; Conf = builds(func, populate_full_signature=True)</span>
+<span class="sd">    &gt;&gt;&gt; # signature: `Builds_bar(x: bool, y: str = &#39;foo&#39;)`</span>
+<span class="sd">    &gt;&gt;&gt; Conf = builds(bar, populate_full_signature=True)</span>
 <span class="sd">    &gt;&gt;&gt; pyaml(Conf)</span>
-<span class="sd">    _target_: __main__.func</span>
+<span class="sd">    _target_: __main__.bar</span>
 <span class="sd">    x: ???</span>
 <span class="sd">    &#39;y&#39;: foo</span>
-
 
 <span class="sd">    Annotations will be used by Hydra to provide limited runtime type-checking during</span>
 <span class="sd">    instantiation. Here, we&#39;ll pass a float for ``x``, which expects a boolean value.</span>
 
-<span class="sd">    &gt;&gt;&gt; instantiate(Conf(x=10.0))</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(Conf(x=10.0))  # type: ignore</span>
 <span class="sd">    ValidationError: Value &#39;10.0&#39; is not a valid bool (type float)</span>
 <span class="sd">        full_key: x</span>
 <span class="sd">        object_type=Builds_func</span>
@@ -1476,7 +1476,8 @@
 <span class="sd">    &gt;&gt;&gt; builds(func, 1, builds_bases=(BaseConf,))  # too many args (via inheritance)</span>
 <span class="sd">    TypeError: Building: func ..</span>
 
-<span class="sd">    &gt;&gt;&gt; builds(int, (i for i in range(10)))  # value type not supported by Hydra</span>
+<span class="sd">    &gt;&gt;&gt; # value type not supported by Hydra</span>
+<span class="sd">    &gt;&gt;&gt; builds(int, (i for i in range(10)))  # type: ignore</span>
 <span class="sd">    hydra_zen.errors.HydraZenUnsupportedPrimitiveError: Building: int ..</span>
 
 
@@ -1543,10 +1544,8 @@
 <span class="sd">    &gt;&gt;&gt; import functools</span>
 <span class="sd">    &gt;&gt;&gt; partiald_dict = functools.partial(dict, a=1, b=2)</span>
 <span class="sd">    &gt;&gt;&gt; Conf = builds(partiald_dict)  # signature: (a = 1, b = 2)</span>
-<span class="sd">    &gt;&gt;&gt; pyaml(Conf)</span>
-<span class="sd">    _target_: builtins.dict</span>
-<span class="sd">    a: 1</span>
-<span class="sd">    b: 2</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(Conf)  # equivalent to calling: `partiald_dict()`</span>
+<span class="sd">    {&#39;a&#39;: 1, &#39;b&#39;: 2}</span>
 <span class="sd">    &gt;&gt;&gt; instantiate(Conf(a=-4))  # equivalent to calling: `partiald_dict(a=-4)`</span>
 <span class="sd">    {&#39;a&#39;: -4, &#39;b&#39;: 2}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -2397,7 +2396,7 @@
 <span class="sd">    Note that the target of ``loaded_conf`` can be accessed without</span>
 <span class="sd">    instantiating the config.</span>
 
-<span class="sd">    &gt;&gt;&gt; get_target(loaded_conf)</span>
+<span class="sd">    &gt;&gt;&gt; get_target(loaded_conf)  # type: ignore</span>
 <span class="sd">    __main__.B</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">is_old_partial_builds</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>

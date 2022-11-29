@@ -289,7 +289,8 @@ compatible with a dataclass instance whose type possesses an <code class="xref p
 <span class="go">{}</span>
 <span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.typing.ZenConvert.html#hydra_zen.typing.ZenConvert" title="hydra_zen.typing._implementations.ZenConvert"><span class="n">zc</span></a><span class="p">(</span><span class="n">dataclass</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="go">{"dataclass": True}</span>
-<span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.typing.ZenConvert.html#hydra_zen.typing.ZenConvert" title="hydra_zen.typing._implementations.ZenConvert"><span class="n">zc</span></a><span class="p">(</span><span class="n">apple</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># static type-checker will raise, but runtime will not</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># static type-checker will raise, but runtime will not</span>
+<span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.typing.ZenConvert.html#hydra_zen.typing.ZenConvert" title="hydra_zen.typing._implementations.ZenConvert"><span class="n">zc</span></a><span class="p">(</span><span class="n">apple</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
 <span class="go">{"apple": 1}</span>
 </pre></div>
 </div>
@@ -317,7 +318,7 @@ compatible with a dataclass instance whose type possesses an <code class="xref p
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">I</span><span class="p">(</span><span class="n">make_config</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">b</span><span class="p">))</span>  <span class="c1"># returns omegaconf.DictConfig</span>
 <span class="go">{'y': {'x': 1}}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">I</span><span class="p">(</span><span class="n">make_config</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">zen_convert</span><span class="o">=</span><span class="n">zc</span><span class="p">(</span><span class="n">dataclass</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">hydra_convert</span><span class="o">=</span><span class="s2">"all"</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">I</span><span class="p">(</span><span class="n">make_config</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">zen_convert</span><span class="o">=</span><span class="n">zc</span><span class="p">(</span><span class="n">dataclass</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">hydra_convert</span><span class="o">=</span><span class="s2">"all"</span><span class="p">))</span>
 <span class="go">{'y': B(x=1)}</span>
 </pre></div>
 </div>

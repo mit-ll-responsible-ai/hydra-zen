@@ -554,7 +554,7 @@
 <span class="sd">    &gt;&gt;&gt; instantiate(Conf, x=&quot;a&quot;)  # satisfies annotation: Literal[&quot;a&quot;, &quot;b&quot;]</span>
 <span class="sd">    &quot;a&quot;</span>
 
-<span class="sd">    &gt;&gt;&gt; instantiate(conf, x=&quot;c&quot;)  # violates annotation: Literal[&quot;a&quot;, &quot;b&quot;]</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(Conf, x=&quot;c&quot;)  # violates annotation: Literal[&quot;a&quot;, &quot;b&quot;]</span>
 <span class="sd">    &lt;Validation error: &quot;c&quot; is not &quot;a&quot; or &quot;b&quot;&gt;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 

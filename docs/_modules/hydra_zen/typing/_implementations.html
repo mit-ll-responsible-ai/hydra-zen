@@ -628,7 +628,8 @@
 <span class="sd">    {}</span>
 <span class="sd">    &gt;&gt;&gt; zc(dataclass=True)</span>
 <span class="sd">    {&quot;dataclass&quot;: True}</span>
-<span class="sd">    &gt;&gt;&gt; zc(apple=1)  # static type-checker will raise, but runtime will not</span>
+<span class="sd">    &gt;&gt;&gt; # static type-checker will raise, but runtime will not</span>
+<span class="sd">    &gt;&gt;&gt; zc(apple=1)  # type: ignore</span>
 <span class="sd">    {&quot;apple&quot;: 1}</span>
 
 <span class="sd">    **Configuring dataclass auto-config behaviors**</span>
@@ -653,7 +654,7 @@
 
 <span class="sd">    &gt;&gt;&gt; I(make_config(y=b))  # returns omegaconf.DictConfig</span>
 <span class="sd">    {&#39;y&#39;: {&#39;x&#39;: 1}}</span>
-<span class="sd">    &gt;&gt;&gt; I(make_config(y=b, zen_convert=zc(dataclass=True, hydra_convert=&quot;all&quot;)))</span>
+<span class="sd">    &gt;&gt;&gt; I(make_config(y=b, zen_convert=zc(dataclass=True), hydra_convert=&quot;all&quot;))</span>
 <span class="sd">    {&#39;y&#39;: B(x=1)}</span>
 
 <span class="sd">    Auto-config support does not work with dynamically-generated dataclass types</span>

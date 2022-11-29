@@ -493,7 +493,9 @@ arguments will cause <a class="reference internal" href="#hydra_zen.builds" titl
 <p>The resulting config is a dataclass with the following signature and attributes:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span>  <span class="c1"># signature: Conf(a: Any = 1, b: Any = 'x')</span>
 <span class="go">&lt;class 'types.Builds_dict'&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pyaml</span><span class="p">(</span><span class="n">Conf</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pyaml</span><span class="p">(</span><span class="n">Conf</span><span class="p">)</span>
 <span class="go">_target_: builtins.dict</span>
 <span class="go">a: 1</span>
 <span class="go">b: x</span>
@@ -512,7 +514,7 @@ arguments will cause <a class="reference internal" href="#hydra_zen.builds" titl
 </div>
 <p>Positional arguments are supported.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#len" title="len"><span class="nb">len</span></a><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span><span class="o">.</span><span class="n">_args_</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span><span class="o">.</span><span class="n">_args_</span>  <span class="c1"># type: ignore</span>
 <span class="go">[1, 2, 3]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf</span><span class="p">)</span>
 <span class="go">3</span>
@@ -546,23 +548,23 @@ create a config for the following function</p>
 <p><strong>Auto-populating parameters</strong></p>
 <p>The configurable parameters of a target can be auto-populated in our config.
 Suppose we want to configure the following function.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#bool" title="bool"><span class="nb">bool</span></a><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a> <span class="o">=</span> <span class="s1">'foo'</span><span class="p">):</span> <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">bar</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#bool" title="bool"><span class="nb">bool</span></a><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a> <span class="o">=</span> <span class="s1">'foo'</span><span class="p">):</span> <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
 </pre></div>
 </div>
 <p>The following config will have a signature that matches <code class="docutils literal notranslate"><span class="pre">f</span></code>; the
 annotations and default values of the parameters of <code class="docutils literal notranslate"><span class="pre">f</span></code> are explicitly
 incorporated into the config.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># signature: `Builds_func(x: bool, y: str = 'foo')`</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># signature: `Builds_bar(x: bool, y: str = 'foo')`</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">bar</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pyaml</span><span class="p">(</span><span class="n">Conf</span><span class="p">)</span>
-<span class="go">_target_: __main__.func</span>
+<span class="go">_target_: __main__.bar</span>
 <span class="go">x: ???</span>
 <span class="go">'y': foo</span>
 </pre></div>
 </div>
 <p>Annotations will be used by Hydra to provide limited runtime type-checking during
 instantiation. Here, we’ll pass a float for <code class="docutils literal notranslate"><span class="pre">x</span></code>, which expects a boolean value.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">10.0</span><span class="p">))</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">10.0</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
 <span class="go">ValidationError: Value '10.0' is not a valid bool (type float)</span>
 <span class="go">    full_key: x</span>
 <span class="go">    object_type=Builds_func</span>
@@ -599,7 +601,8 @@ instantiation.</p>
 <span class="go">TypeError: Building: func ..</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">builds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="p">(</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#range" title="range"><span class="nb">range</span></a><span class="p">(</span><span class="mi">10</span><span class="p">)))</span>  <span class="c1"># value type not supported by Hydra</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># value type not supported by Hydra</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">builds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="p">(</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#range" title="range"><span class="nb">range</span></a><span class="p">(</span><span class="mi">10</span><span class="p">)))</span>  <span class="c1"># type: ignore</span>
 <span class="go">hydra_zen.errors.HydraZenUnsupportedPrimitiveError: Building: int ..</span>
 </pre></div>
 </div>
@@ -657,10 +660,8 @@ will automatically “unpack” a partial’d object that is passed as its targe
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functools.html#module-functools" title="functools"><span class="nn">functools</span></a>
 <span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functools.html#functools.partial" title="functools.partial"><span class="n">partiald_dict</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functools.html#functools.partial" title="functools.partial"><span class="n">functools</span><span class="o">.</span><span class="n">partial</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functools.html#functools.partial" title="functools.partial"><span class="n">partiald_dict</span></a><span class="p">)</span>  <span class="c1"># signature: (a = 1, b = 2)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pyaml</span><span class="p">(</span><span class="n">Conf</span><span class="p">)</span>
-<span class="go">_target_: builtins.dict</span>
-<span class="go">a: 1</span>
-<span class="go">b: 2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf</span><span class="p">)</span>  <span class="c1"># equivalent to calling: `partiald_dict()`</span>
+<span class="go">{'a': 1, 'b': 2}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf</span><span class="p">(</span><span class="n">a</span><span class="o">=-</span><span class="mi">4</span><span class="p">))</span>  <span class="c1"># equivalent to calling: `partiald_dict(a=-4)`</span>
 <span class="go">{'a': -4, 'b': 2}</span>
 </pre></div>
