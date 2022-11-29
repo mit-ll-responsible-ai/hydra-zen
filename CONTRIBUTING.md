@@ -24,6 +24,10 @@ the `-e` option ensures that any changes that you make to the project's source c
 
 If your contributions involve changes to our support for NumPy, PyTorch, PyTorch-Lightning, JAX, pydantic, or beartype then you will need to install those dependencies as well, in order for our tests-against-third-parties to run locally in your environment.
 
+## Adding New Features to the Public API
+All functions/classes that are part of the public API must have a docstring that adheres to the [numpy docstring style](https://numpydoc.readthedocs.io/en/latest/format.html), and the docstring must include and `Examples` section. The function's docstring must be scanned by pyright, by adding the function to [this test](https://github.com/mit-ll-responsible-ai/hydra-zen/blob/main/tests/test_docstrings.py).
+
+All publicly-facing interfaces must be type-annotated, and scan "clean" under pyright (under pyright-strict mode is preferred).
 
 ## Pre-Commit Hooks (Required)
 
