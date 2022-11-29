@@ -3,7 +3,8 @@
 
 from typing_extensions import assert_type
 
-from hydra_zen import builds, instantiate, make_custom_builds_fn
+from hydra_zen import builds, instantiate, just, make_custom_builds_fn, store
+from hydra_zen.wrapper import ZenStore
 
 
 def check_builds() -> None:
@@ -44,6 +45,56 @@ def check_make_custom_builds() -> None:
     assert_type(instantiate(partial_builds(f))(), str)
 
     full_builds(f)(y=2)  # type: ignore [call-arg]
+
+
+def check_store() -> None:
+    @store
+    def f(x: int, y: int) -> str:
+        ...
+
+    @store(name="hi")
+    def f2(x: int, y: int) -> str:
+        ...
+
+    # reveal_type(f)
+    # reveal_type(f2)
+
+    # reveal_type(store(f))
+    # reveal_type(store(f, name="bye"))
+    # reveal_type(store(name="bye")(f))
+
+    apple_store = store(group="apple")
+    assert_type(apple_store, ZenStore)
+
+    @apple_store
+    def a1(x: int) -> bool:
+        ...
+
+    @apple_store(name="hello")
+    def a2(x: int) -> bool:
+        ...
+
+    assert_type(a2(1), bool)
+    assert_type(store()(a1)(1), bool)
+    assert_type(store()(a1)("a"), bool)  # type: ignore [arg-type]
+    apple_store(name="bye")
+    apple_store(name=22)  # type: ignore [call-overload]
+
+    # reveal_type(apple_store(a1))
+    # reveal_type(apple_store(a1, name="bye"))
+    # reveal_type(apple_store(name="bye")(a1))
+
+    @store(f)  # type: ignore [arg-type, call-arg]
+    def bad(x: int, y: int) -> str:
+        ...
+
+    # checking that store type-checks against to_config
+    # mypy isn't as good as pyright here
+
+    # store(1)  # false negative
+    # store()(1, to_config=builds)  # false negative
+    store(1, to_config=just)
+    store()(1, to_config=just)
 
 
 # def check_just() -> None:

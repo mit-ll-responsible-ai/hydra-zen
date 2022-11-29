@@ -1,4 +1,4 @@
-﻿hydra\_zen.save\_as\_yaml
+hydra\_zen.save\_as\_yaml
 =========================
 
 .. currentmodule:: hydra_zen

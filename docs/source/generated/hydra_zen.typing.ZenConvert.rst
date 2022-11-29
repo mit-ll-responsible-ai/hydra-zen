@@ -1,4 +1,4 @@
-﻿Each of hydra-zen's :ref:`config-creation functions <create-config>` has a `zen_config` 
+Each of hydra-zen's :ref:`config-creation functions <create-config>` has a `zen_config` 
 parameter, which can be passed a dictionary to modify the function's value and type conversion behaviors. `hydra_zen.typing.ZenConfig` is a :py:class:`typing.TypedDict` 
 that can be used as a convenience function to view and override these options.
 

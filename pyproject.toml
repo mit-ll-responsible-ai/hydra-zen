@@ -14,7 +14,7 @@ dependencies=[
   "hydra-core >= 1.1.0",
   "typing-extensions >= 4.1.0",
 ]
-license = {file = "LICENSE.txt"}
+license = {text = "MIT"}
 keywords= [ "machine learning", "research", "configuration", "scalable", "reproducible", "yaml", "Hydra", "dataclass"]
 
 authors = [
@@ -81,6 +81,9 @@ combine_as_imports = true
 [tool.coverage.report]
 omit = ["src/hydra_zen/_version.py"]
 
+
+[tool.pytest.ini_options]
+xfail_strict=true
 
 
 [tool.pyright]

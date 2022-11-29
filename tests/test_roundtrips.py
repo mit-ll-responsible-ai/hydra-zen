@@ -4,6 +4,7 @@ import datetime
 import math
 import operator
 import os
+import pickle
 import random
 import re
 import statistics
@@ -17,7 +18,7 @@ import pytest
 from hypothesis import given
 from omegaconf import OmegaConf
 
-from hydra_zen import builds, get_target, instantiate, just, to_yaml
+from hydra_zen import builds, get_target, hydrated_dataclass, instantiate, just, to_yaml
 from hydra_zen.structured_configs._type_guards import is_builds
 from tests import is_same, valid_hydra_literals
 
@@ -201,3 +202,18 @@ def test_get_target_with_non_string_target():
 def test_recursive_just():
     x = {"a": [3 - 4j, 1 + 2j]}
     assert instantiate(just(x)) == x
+
+
+def fn_target(x: int, y: int):
+    return x + y
+
+
+@hydrated_dataclass(fn_target)
+class HydratedExample:
+    x: int
+    y: int = 3
+
+
+def test_hydrated_dataclass_pickles():
+    assert pickle.loads(pickle.dumps(HydratedExample)) is HydratedExample
+    assert pickle.loads(pickle.dumps(HydratedExample(x=2))) == HydratedExample(x=2)

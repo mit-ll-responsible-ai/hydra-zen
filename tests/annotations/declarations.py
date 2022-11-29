@@ -1,7 +1,7 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
-# These tests help to ensure that our typed interfaces have the desired behvarior, when
+# These tests help to ensure that our typed interfaces have the desired behavior, when
 # being processed by static type-checkers. Specifically we test using pyright.
 #
 # We perform contrapositive testing using lines with the pattern:
@@ -18,13 +18,25 @@ from dataclasses import dataclass
 from enum import Enum
 from functools import partial
 from pathlib import Path
-from typing import Any, Callable, List, Mapping, Optional, Tuple, Type, TypeVar, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
 
 from omegaconf import MISSING, DictConfig, ListConfig
 from typing_extensions import Literal, assert_type
 
 from hydra_zen import (
     ZenField,
+    ZenStore,
     builds,
     get_target,
     instantiate,
@@ -32,6 +44,7 @@ from hydra_zen import (
     make_config,
     make_custom_builds_fn,
     mutable_value,
+    store,
     zen,
 )
 from hydra_zen.structured_configs._value_conversion import ConfigComplex, ConfigPath
@@ -47,6 +60,7 @@ from hydra_zen.typing import (
 from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds, StdBuilds
 from hydra_zen.typing._implementations import DataClass_, HydraPartialBuilds
 from hydra_zen.wrapper import Zen
+from hydra_zen.wrapper._implementations import StoreEntry
 
 T = TypeVar("T")
 
@@ -1133,3 +1147,93 @@ def check_zen():
     @zen(exclude=1)  # type: ignore
     def p3():
         ...
+
+
+def check_store():
+    @store
+    def f(x: int, y: int) -> str:
+        ...
+
+    @store(name="hi")
+    def f2(x: int, y: int) -> str:
+        ...
+
+    reveal_type(f, expected_text="(x: int, y: int) -> str")
+    reveal_type(f2, expected_text="(x: int, y: int) -> str")
+
+    reveal_type(store(f), expected_text="(x: int, y: int) -> str")
+    reveal_type(store(f, name="bye"), expected_text="(x: int, y: int) -> str")
+    reveal_type(store(name="bye")(f), expected_text="(x: int, y: int) -> str")
+
+    apple_store = store(group="apple")
+
+    @apple_store
+    def a1(x: int) -> bool:
+        ...
+
+    @apple_store(name="hello")
+    def a2(x: int) -> bool:
+        ...
+
+    reveal_type(a1, expected_text="(x: int) -> bool")
+    reveal_type(a2, expected_text="(x: int) -> bool")
+
+    reveal_type(apple_store(a1), expected_text="(x: int) -> bool")
+    reveal_type(apple_store(a1, name="bye"), expected_text="(x: int) -> bool")
+    reveal_type(apple_store(name="bye")(a1), expected_text="(x: int) -> bool")
+
+    @store(f)  # type: ignore
+    def bad(x: int, y: int) -> str:
+        ...
+
+    # checking that store type-checks against to_config
+    store(1)  # type: ignore
+    store(1, to_config=just)
+
+    store()(1, to_config=builds)  # type: ignore
+    store()(1, to_config=just)
+    store()()(1, to_config=builds)  # type: ignore
+
+    @store
+    @dataclass
+    class A:
+        x: int
+
+    @store(name="hi")
+    @dataclass
+    class B:
+        y: str
+
+    assert_type(A(1).x, int)
+    assert_type(B("a").y, str)
+
+    store(A)
+    store(A(1))
+
+    class SubStore(ZenStore):
+        ...
+
+    substore = SubStore()
+    substore1 = substore(a=1)
+    x = substore1(dict(a=1))
+
+    # TODO: Enable when mypy supports Self
+    # assert_type(substore1, SubStore)
+
+    assert_type(x, Dict[str, int])
+
+    # check __getitem__
+    assert_type(store["group"], Dict[Tuple[Optional[str], str], Any])
+    assert_type(store[None, "name"], Any)
+    assert_type(store["group", "name"], Any)
+    store["name", "group", "bad"]  # type: ignore
+
+    # check __call__overrides
+    store({}, name=1)  # type: ignore
+    store({}, group=1)  # type: ignore
+    store(name=1)  # type: ignore
+    store(group=1)  # type: ignore
+
+    assert_type(list(store), List[StoreEntry])
+    assert_type("group" in store, bool)
+    assert_type(("group", "name") in store, bool)

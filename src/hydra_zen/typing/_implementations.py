@@ -261,6 +261,19 @@ class AllConvert(TypedDict, total=True):
 # used for runtime type-checking
 convert_types: Final = {"dataclass": bool}
 
+GroupName: TypeAlias = Optional[str]
+NodeName: TypeAlias = str
+Node: TypeAlias = Any
+
+
+# TODO: make immutable
+class StoreEntry(TypedDict):
+    name: NodeName
+    group: GroupName
+    package: Optional[str]
+    provider: Optional[str]
+    node: Node
+
 
 class ZenConvert(TypedDict, total=False):
     """A TypedDict that provides a type-checked interface for specifying zen-convert
