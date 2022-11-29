@@ -3,9 +3,6 @@
 import pytest
 
 from hydra_zen import (
-    launch,  # TODO: add after https://github.com/mit-ll-responsible-ai/hydra-zen/pull/313 is merged
-)
-from hydra_zen import (
     ZenField,
     ZenStore,
     builds,
@@ -59,7 +56,7 @@ from hydra_zen.typing import ZenConvert
         instantiate,
         is_partial_builds,
         just,
-        launch,  # TODO: add after https://github.com/mit-ll-responsible-ai/hydra-zen/pull/313 is merged
+        # launch,  # TODO: add after https://github.com/mit-ll-responsible-ai/hydra-zen/pull/313 is merged
         load_from_yaml,
         make_config,
         make_custom_builds_fn,
