@@ -813,12 +813,13 @@ def builds(
 ]:
     """builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, hydra_recursive=None, hydra_convert=None, hydra_defaults=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
 
-    `builds(target, *args, **kw)` returns a config that, when instantiated, builds `target`.
+    `builds(target, *args, **kw)` returns a Hydra-compatible config that, when
+    instantiated, returns `target(*args, **kw)`.
 
-    `instantiate(builds(target, *args, **kw)) == target(*args, **kw)`
+    I.e., `instantiate(builds(target, *args, **kw)) == target(*args, **kw)`
 
-    Consult the Examples section of the docstring to see the various features of
-    `builds` in action.
+    Consult the Notes section for more details, and the Examples section to see
+    the various features of `builds` in action.
 
     Parameters
     ----------
@@ -830,14 +831,14 @@ def builds(
         Positional arguments passed as ``<hydra_target>(*pos_args, ...)`` upon
         instantiation.
 
-        Arguments specified positionally are not included in the dataclass' signature
+        Arguments specified positionally are not included in the config's signature
         and are stored as a tuple bound to in the ``_args_`` field.
 
     **kwargs_for_target : SupportedPrimitive
         The keyword arguments passed as ``<hydra_target>(..., **kwargs_for_target)``
         upon instantiation.
 
-        The arguments specified here solely determine the signature of the resulting
+        The arguments specified here determine the signature of the resulting
         config, unless ``populate_full_signature=True`` is specified (see below).
 
         Named parameters of the forms that have the prefixes ``hydra_``, ``zen_`` or
@@ -925,7 +926,8 @@ def builds(
     Returns
     -------
     Config : Type[Builds[Type[T]]] | Type[PartialBuilds[Type[T]]]
-        A structured config that describes how to build ``hydra_target``.
+        A dynamically-generated structured config (i.e. a dataclass type) that
+        describes how to build ``hydra_target``.
 
     Raises
     ------
@@ -935,6 +937,42 @@ def builds(
 
     Notes
     -----
+    The following pseudo code conveys the core functionality of `builds`:
+
+    .. code-block:: python
+
+       from dataclasses import make_dataclass
+
+       def builds(target, populate_full_signature=False, **kw):
+           # Dynamically defines a Hydra-compatible dataclass type.
+           # Akin to doing:
+           #
+           # @dataclass
+           # class Builds_thing:
+           #     _target_: str = get_import_path(target)
+           #     # etc.
+
+           _target_ = get_import_path(target)
+
+           if populate_full_signature:
+               sig = get_signature(target)
+               kw = {**sig, **kw}  # merge w/ preference for kw
+
+           type_annots = [get_hints(target)[k] for k in kw]
+
+           fields = [("_target_", str, _target_)]
+           fields += [
+               (
+                   field_name,
+                   hydra_compat_type_annot(hint),
+                   hydra_compat_val(v),
+               )
+               for hint, (field_name, v) in zip(type_annots, kw.items())
+           ]
+
+           Config = make_dataclass(f"Builds_{target}", fields)
+           return Config
+
     The resulting "config" is a dynamically-generated dataclass type [5]_ with
     Hydra-specific attributes attached to it [1]_. It posseses a `_target_` attribute
     that indicates the import path to the configured target as a string.
@@ -967,7 +1005,7 @@ def builds(
     See Also
     --------
     instantiate: Instantiates a configuration created by `builds`, returning the instantiated target.
-    make_custom_builds_fn: Returns the `builds` function, but one with customized default values.
+    make_custom_builds_fn: Returns a new `builds` function with customized default values.
     make_config: Creates a general config with customized field names, default values, and annotations.
     get_target: Returns the target-object from a targeted structured config.
     just: Produces a config that, when instantiated by Hydra, "just" returns the un-instantiated target-object.
@@ -975,21 +1013,38 @@ def builds(
 
     Examples
     --------
+    These examples describe:
+
+    - Basic usage of `builds`
+    - Creating a partial config
+    - Auto-populating parameters
+    - Composing configs via inheritance
+    - Runtime validation performed by `builds`
+    - Using meta-fields
+    - Using zen-wrappers
+    - Creating a frozen config
+    - Support for partial'd targets
+
+    >>> from hydra_zen import builds, instantiate, to_yaml
+    >>> def pyaml(x):
+    ...     # for pretty printing configs
+    ...     print(to_yaml(x))
+
     **Basic Usage**
 
     Lets create a basic config that describes how to 'build' a particular dictionary.
 
-    >>> from hydra_zen import builds, instantiate
     >>> Conf = builds(dict, a=1, b='x')
 
     The resulting config is a dataclass with the following signature and attributes:
 
     >>> Conf  # signature: Conf(a: Any = 1, b: Any = 'x')
     <class 'types.Builds_dict'>
-    >>> Conf().a
-    1
-    >>> Conf().b
-    'x'
+
+    >>> pyaml(Conf)
+    _target_: builtins.dict
+    a: 1
+    b: x
 
     The `instantiate` function is used to enact this build – to create the dictionary.
 
@@ -1002,9 +1057,11 @@ def builds(
     >>> instantiate(new_conf)  # calls: `dict(a=10, b='hi')`
     {'a': 10, 'b': 'hi'}
 
-    Positional arguments can be provided too.
+    Positional arguments are supported.
 
-    >>> Conf = builds(len, [1, 2, 3])  # specifying positional arguments
+    >>> Conf = builds(len, [1, 2, 3])
+    >>> Conf._args_  # type: ignore
+    [1, 2, 3]
     >>> instantiate(Conf)
     3
 
@@ -1018,8 +1075,12 @@ def builds(
     such that we only configure the parameter ``x``.
 
     >>> PartialConf = builds(a_two_tuple, x=1, zen_partial=True)  # configures only `x`
+    >>> pyaml(PartialConf)
+    _target_: __main__.a_two_tuple
+    _partial_: true
+    x: 1
 
-    Instantiating this conf will return ``functools.partial(a_two_tuple, x=1)``.
+    Instantiating this config will return ``functools.partial(a_two_tuple, x=1)``.
 
     >>> partial_func = instantiate(PartialConf)
     >>> partial_func
@@ -1035,15 +1096,18 @@ def builds(
     The configurable parameters of a target can be auto-populated in our config.
     Suppose we want to configure the following function.
 
-    >>> def f(x: bool, y: str = 'foo'): return x, y
+    >>> def bar(x: bool, y: str = 'foo'): return x, y
 
     The following config will have a signature that matches ``f``; the
     annotations and default values of the parameters of ``f`` are explicitly
     incorporated into the config.
 
-    >>> Conf = builds(f, populate_full_signature=True)  # signature: `Builds_f(x: bool, y: str = 'foo')`
-    >>> Conf(x=True).y
-    'foo'
+    >>> # signature: `Builds_bar(x: bool, y: str = 'foo')`
+    >>> Conf = builds(bar, populate_full_signature=True)
+    >>> pyaml(Conf)
+    _target_: __main__.bar
+    x: ???
+    'y': foo
 
     Annotations will be used by Hydra to provide limited runtime type-checking during
     instantiation. Here, we'll pass a float for ``x``, which expects a boolean value.
@@ -1051,7 +1115,7 @@ def builds(
     >>> instantiate(Conf(x=10.0))  # type: ignore
     ValidationError: Value '10.0' is not a valid bool (type float)
         full_key: x
-        object_type=Builds_f
+        object_type=Builds_func
 
     **Composing configs via inheritance**
 
@@ -1070,7 +1134,7 @@ def builds(
     **Runtime validation perfomed by builds**
 
     Misspelled parameter names and other invalid configurations for the target’s
-    signature will be caught by `builds`, so that such errors are caught prior to
+    signature will be caught by `builds` so that such errors are caught prior to
     instantiation.
 
     >>> def func(a_number: int): pass
@@ -1145,7 +1209,7 @@ def builds(
     >>> my_router.ip_address = "148.109.37.2"
     FrozenInstanceError: cannot assign to field 'ip_address'
 
-    **Support for partial'd objects**
+    **Support for partial'd targets**
 
     Specifying ``builds(functools.partial(<target>, ...), ...)`` is supported; `builds`
     will automatically "unpack" a partial'd object that is passed as its target.
