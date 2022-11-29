@@ -146,16 +146,18 @@ def pyright_analyze(
 
     report_unnecessary_type_ignore_comment: Optional[bool], keyword-only
         If `True` specifying `# type: ignore` for an expression that would otherwise
-        not result in an error
+        not result in an error will cause pyright to report an error.
 
     type_checking_mode: Optional[Literal["basic", "strict"]], keyword-only
+        Modifies pyright's default settings for what it marks as a warning verses an
+        error.
 
     overwrite_config_ok : bool, optional (default=False)
         If `True`, and if pyright configuration options are specified, this function
-        will temporarily overwrite an existing pyrightconfig.json file, if necessary.
+        will temporarily overwrite an existing pyrightconfig.json file if necessary.
 
         This option should be used with caution if tests using `pyright_analyze` are
-        being used concurrently.
+        being run concurrently that impact the same config file.
 
     Returns
     -------
