@@ -27,7 +27,7 @@ If your contributions involve changes to our support for NumPy, PyTorch, PyTorch
 ## Adding New Features to the Public API
 All functions/classes that are part of the public API must have a docstring that adheres to the [numpy docstring style](https://numpydoc.readthedocs.io/en/latest/format.html), and the docstring must include and `Examples` section. The function's docstring must be scanned by pyright, by adding the function to [this test](https://github.com/mit-ll-responsible-ai/hydra-zen/blob/main/tests/test_docstrings.py).
 
-All publicly-facing interfaces must be type-annotated, and scan "clean" under pyright (under pyright-strict mode is preferred).
+All publicly-facing interfaces must be type-annotated and scan "clean" under pyright (under pyright-strict mode is preferred).
 
 ## Pre-Commit Hooks (Required)
 
