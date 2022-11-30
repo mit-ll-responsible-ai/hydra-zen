@@ -103,17 +103,27 @@ def get_docstring_examples(doc: str) -> str:
     return "\n".join(src_lines)
 
 
-rst_code_blocks_re = re.compile(r"(\.\. code-block:: py.+\n)((   +.*|\s)+)")
+rst_code_blocks_re = re.compile(
+    r"((?P<indent> [ ]*)?\.\. code-block:: py.+\n)((   +.*|\s)+)"
+)
 
 
 def rst_to_code(src: str):
     blocks: List[str] = []
     preamble = ""
-    for preamble, block, *_ in rst_code_blocks_re.findall(src):
+    for preamble, indentation, block, *_ in rst_code_blocks_re.findall(src):
         src_lines: List[str] = []
+        preamble: str
+        indentation_level = indentation + "   "
+
         for n, line in enumerate(block.splitlines()):
+            line: str
             if (n == 0 and line.strip()) or n < 2 and not line:
                 continue
+
+            if line.strip() and not line.startswith(indentation_level):
+                break
+
             src_lines.append(line)
 
         block = "\n".join(src_lines) + "\n"

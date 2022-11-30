@@ -83,14 +83,26 @@ def test_docstrings_scan_clean_via_pyright(func):
 docs_src = Path(hydra_zen.__file__).parents[2] / "docs" / "source"
 
 files = list(docs_src.glob("*.rst"))
+
 files = [
     pytest.param(f, {}, id=str(f.absolute()))
     for f in list(docs_src.glob("*.rst"))
     if f.name != "changes.rst"
 ]
+
 files += [
     pytest.param(f, {"reportMissingImports": False}, id=str(f.absolute()))
     for f in list(docs_src.glob("tutorials/*.rst"))
+]
+
+files += [
+    pytest.param(f, {"reportMissingImports": False}, id=str(f.absolute()))
+    for f in list(docs_src.glob("how_to/*.rst"))
+]
+
+files += [
+    pytest.param(f, {"reportMissingImports": False}, id=str(f.absolute()))
+    for f in list(docs_src.glob("explanation/*.rst"))
 ]
 
 
@@ -106,6 +118,7 @@ def test_rst_docs_scan_clean_via_pyright(func, pyright_config):
         report_unnecessary_type_ignore_comment=True,
         preamble=preamble,
         pyright_config=pyright_config,
+        python_version="3.9",
     )
     errors = [
         e
