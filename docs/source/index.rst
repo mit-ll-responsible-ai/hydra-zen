@@ -51,7 +51,7 @@ Hydra application.
      @dataclass
      class FooConf:
          _target_: str = "__main__.foo"
-         bar: int = 2
+         bar: int = "BLAH"
          baz: list[str] = field(default_factory=lambda: ["abc"])
          qux: float = 1.23
 
