@@ -231,7 +231,7 @@ script is as follows.
     
     
     @hydra.main(config_path=None, config_name="my_app")
-    def task_function(cfg: Config):
+    def task_function(cfg):
 
         player = instantiate(cfg.player) # an instance of `Character`
 

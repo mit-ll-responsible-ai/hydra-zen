@@ -367,7 +367,7 @@ in our Python console</p>
 application’s outputs in a time-stamped subdirectory of the form
 <code class="docutils literal notranslate"><span class="pre">outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}</span></code>. The particular subdirectory for our job is
 provided by <code class="docutils literal notranslate"><span class="pre">job.working_dir</span></code>.</p>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">job_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">job_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">job_dir</span>  <span class="c1"># output will vary based on reader's date/time/OS</span>
 <span class="go">WindowsPath('outputs/2021-10-21/10-36-23')</span>
 </pre></div>

@@ -24,10 +24,12 @@ configured fields, and flag bad inputs in our code. That this config is immutabl
        lr: float = 0.01
        momentum: float = 0.9
 
-   BuildsAdam(lr="a string")  # static type-checker flags as invalid (invalid type)
+   # static type-checker flags as invalid (invalid type)
+   BuildsAdam(lr="a string")  # type: ignore
 
    conf = BuildsAdam()
-   conf.lr = 10.0  # static type-checker flags as invalid (mutating "frozen" dataclass)
+   # static type-checker flags as invalid (mutating "frozen" dataclass)
+   conf.lr = 10.0  # type: ignore
 
 
 .. code-block:: pycon
