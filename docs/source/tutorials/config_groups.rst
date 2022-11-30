@@ -114,6 +114,8 @@ default config for that group. Let's specify the ``CharConf`` config, which we n
 .. code-block:: python
    :caption: Specifying the player-group item named ``base`` as the default player-profile
 
+   from hydra_zen import make_config
+
    Config = make_config("player", hydra_defaults=["_self_", {"player": "base"}])
    cs.store(name="my_app", node=Config)
 

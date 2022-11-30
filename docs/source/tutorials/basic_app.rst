@@ -112,13 +112,13 @@ the same directory as ``my_app.py``. First, we will import our config and our ta
 function.
 
 
-.. code:: pycon
+.. code-block:: pycon
     
     >>> from my_app import Config, task_function
 
 We will also need to import hydra-zen's :func:`~hydra_zen.launch` function.
 
-.. code:: pycon
+.. code-block:: pycon
     
     >>> from hydra_zen import launch
 
@@ -177,7 +177,7 @@ provided by ``job.working_dir``.
 
 .. code-block:: pycon
    
-   >>> job_dir = Path(job.working_dir)
+   >>> job_dir = Path(job.working_dir)  # type: ignore
    >>> job_dir  # output will vary based on reader's date/time/OS
    WindowsPath('outputs/2021-10-21/10-36-23')
 

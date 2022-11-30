@@ -64,7 +64,7 @@ Hydra application.
      def foo(bar: int, baz: list[str], qux: float = 1.23):
          ...
 
-     FooConf = builds(foo, bar=2, baz=["abc"], populate_full_signature=True)
+     ZenFooConf = builds(foo, bar=2, baz=["abc"], populate_full_signature=True)
   
   You can even write dataclasses that aren't natively compatible with Hydra and then use hydra-zen to dynamically convert them to Hydra-compatible structured configs.
 
