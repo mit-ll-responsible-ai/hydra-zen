@@ -91,6 +91,10 @@ def print_file(x: int):
 expected3 = expected2
 
 
+def strip_interspacing(x: str):
+    return "\n".join((s for s in x.splitlines() if s))
+
+
 @pytest.mark.parametrize(
     "src,expected",
     [
@@ -101,4 +105,4 @@ expected3 = expected2
     ],
 )
 def test_rst_parsing(src: str, expected: str):
-    assert rst_to_code(src) == expected
+    assert strip_interspacing(rst_to_code(src)) == strip_interspacing(expected)

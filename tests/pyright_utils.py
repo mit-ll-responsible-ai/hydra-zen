@@ -103,35 +103,51 @@ def get_docstring_examples(doc: str) -> str:
     return "\n".join(src_lines)
 
 
-rst_code_blocks_re = re.compile(
-    r"((?P<indent> [ ]*)?\.\. code-block:: py.+\n)((   +.*|\s)+)"
-)
-
-
 def rst_to_code(src: str):
-    blocks: List[str] = []
-    preamble = ""
-    for preamble, indentation, block, *_ in rst_code_blocks_re.findall(src):
-        src_lines: List[str] = []
-        preamble: str
-        indentation_level = indentation + "   "
+    block: Optional[List[str]] = None  # lines in code block
+    indentation: Optional[str] = None  # leading whitespace before .. code-block
+    preamble: Optional[str] = None  # python or pycon
+    n = -float("inf")  # line no in code block
+    blocks: List[str] = []  # respective code blocks, each ready for processing
 
-        for n, line in enumerate(block.splitlines()):
-            line: str
-            if (n == 0 and line.strip()) or n < 2 and not line:
-                continue
+    def add_block(block, preamble, blocks):
+        if block:
+            block_str = "\n".join(block) + "\n"
+            assert preamble
+            if "pycon" in preamble:
+                blocks.append(get_docstring_examples(block_str))
+            else:
+                blocks.append(textwrap.dedent(block_str))
 
-            if line.strip() and not line.startswith(indentation_level):
-                break
+    for line in src.splitlines():
+        n += 1
 
-            src_lines.append(line)
+        if line.strip().startswith(".. code-block:: py"):
+            # entering code block
+            add_block(block, preamble, blocks)
+            n = -1
+            block = []
+            indentation = line.split("..")[0] + " " * 3
+            preamble = line.split("::")[-1].strip()
+            continue
 
-        block = "\n".join(src_lines) + "\n"
+        if (n == 0 and line.strip()) or 0 < n < 2 and not line:
+            # skip :caption: or up to 2 blank lines
+            continue
 
-        if "pycon" in preamble:
-            blocks.append(get_docstring_examples(block))
-        else:
-            blocks.append(textwrap.dedent(block))
+        if indentation is not None and not (
+            line.startswith(indentation) or not line.strip()
+        ):
+            # leaving code block
+            add_block(block, preamble, blocks)
+            block = None
+            n = -float("inf")
+
+        if block is None:
+            # outside of code block
+            continue
+        block.append(line)
+    add_block(block, preamble, blocks)
     return "\n".join(blocks)
 
 
