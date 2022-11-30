@@ -295,7 +295,6 @@ def pyright_analyze(
             source = preamble + textwrap.dedent((inspect.getsource(code_or_path)))
         else:
             source = preamble + get_docstring_examples(code_or_path.__doc__)
-            print(source)
     elif Path(code_or_path).suffix == ".rst":
         source = rst_to_code(Path(code_or_path).read_text("utf-8"))
     else:
