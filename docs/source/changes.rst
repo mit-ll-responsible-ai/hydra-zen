@@ -121,7 +121,7 @@ New Features
 Improvements
 ------------
 - :func:`~hydra_zen.hydrated_dataclass` will now produce a pickle-compatible dataclass type. See :pull:`338`.
-- All docstring documentation examples are now scanned by pyright as part of our CI process. Several errors in the documentation were fixed. See :pull:`343` and :pull:`344`
+- All documentation code blocks are scanned by pyright as part of our CI process. Several errors in the documentation were fixed. See :pull:`343` and :pull:`344`.
 
 Compatibility-Breaking Changes
 ------------------------------
