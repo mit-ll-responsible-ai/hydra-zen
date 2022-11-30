@@ -1,7 +1,10 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+from pathlib import Path
+
 import pytest
 
+import hydra_zen
 from hydra_zen import (
     ZenField,
     ZenStore,
@@ -75,3 +78,38 @@ def test_docstrings_scan_clean_via_pyright(func):
         preamble=preamble,
     )
     assert results["summary"]["errorCount"] == 0, list_error_messages(results)
+
+
+docs_src = Path(hydra_zen.__file__).parents[2] / "docs" / "source"
+
+files = list(docs_src.glob("*.rst"))
+files = [
+    pytest.param(f, {}, id=str(f.absolute()))
+    for f in list(docs_src.glob("*.rst"))
+    if f.name != "changes.rst"
+]
+files += [
+    pytest.param(f, {"reportMissingImports": False}, id=str(f.absolute()))
+    for f in list(docs_src.glob("tutorials/*.rst"))
+]
+
+
+@pytest.mark.skipif(PYRIGHT_PATH is None, reason="pyright is not installed")
+@pytest.mark.skipif(not files, reason="docs not found")
+@pytest.mark.parametrize(
+    "func, pyright_config",
+    files,
+)
+def test_rst_docs_scan_clean_via_pyright(func, pyright_config):
+    results = pyright_analyze(
+        func,
+        report_unnecessary_type_ignore_comment=True,
+        preamble=preamble,
+        pyright_config=pyright_config,
+    )
+    errors = [
+        e
+        for e in list_error_messages(results)
+        if "is obscured by a declaration of the same name" not in e
+    ]
+    assert not errors

@@ -103,6 +103,28 @@ def get_docstring_examples(doc: str) -> str:
     return "\n".join(src_lines)
 
 
+rst_code_blocks_re = re.compile(r"(\.\. code-block:: py.+\n)((   +.*|\s)+)")
+
+
+def rst_to_code(src: str):
+    blocks: List[str] = []
+    preamble = ""
+    for preamble, block, *_ in rst_code_blocks_re.findall(src):
+        src_lines: List[str] = []
+        for n, line in enumerate(block.splitlines()):
+            if (n == 0 and line.strip()) or n < 2 and not line:
+                continue
+            src_lines.append(line)
+
+        block = "\n".join(src_lines) + "\n"
+
+        if "pycon" in preamble:
+            blocks.append(get_docstring_examples(block))
+        else:
+            blocks.append(textwrap.dedent(block))
+    return "\n".join(blocks)
+
+
 def pyright_analyze(
     code_or_path,
     pyright_config: Optional[Dict[str, Any]] = None,
@@ -264,6 +286,8 @@ def pyright_analyze(
         else:
             source = preamble + get_docstring_examples(code_or_path.__doc__)
             print(source)
+    elif Path(code_or_path).suffix == ".rst":
+        source = rst_to_code(Path(code_or_path).read_text("utf-8"))
     else:
         source = None
 
@@ -325,5 +349,7 @@ def pyright_analyze(
 def list_error_messages(results: PyrightOutput) -> List[str]:
     """A convenience function that returns a list of error messages reported by pyright."""
     return [
-        e["message"] for e in results["generalDiagnostics"] if e["severity"] == "error"
+        f"(line start) {e['range']['start']['line']}: {e['message']}"
+        for e in results["generalDiagnostics"]
+        if e["severity"] == "error"
     ]
