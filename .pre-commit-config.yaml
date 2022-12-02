@@ -1,14 +1,14 @@
 repos:
 -   repo: https://github.com/psf/black
-    rev: 22.6.0
+    rev: 22.10.0
     hooks:
     - id: black
--   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.9.2
+-   repo: https://github.com/PyCQA/flake8
+    rev: 6.0.0
     hooks:
     - id: flake8
       args: [--ignore, "F811,D1,D205,D209,D213,D400,D401,D999,D202,E203,E501,W503,E721,F403,F405",
-      --exclude, "versioneer.py,docs/*,tests/annotations/*, tests/test_py310.py"]
+      --exclude, "docs/*,tests/annotations/*, tests/test_py310.py"]
 -   repo: https://github.com/pre-commit/mirrors-isort
     rev: v5.10.1
     hooks:
