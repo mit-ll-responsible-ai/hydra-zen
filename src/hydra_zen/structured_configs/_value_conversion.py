@@ -35,7 +35,7 @@ class ConfigPath:
     _target_: str = field(default=get_obj_path(Path), init=False)
 
 
-if Path in ZEN_SUPPORTED_PRIMITIVES:  # pragma no cover
+if Path in ZEN_SUPPORTED_PRIMITIVES:  # pragma: no cover
 
     def convert_path(value: Path) -> Builds[Type[Path]]:
         return cast(Builds[Type[Path]], ConfigPath(_args_=(str(value),)))

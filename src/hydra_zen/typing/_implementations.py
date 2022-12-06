@@ -71,11 +71,11 @@ T4 = TypeVar("T4", bound=Callable[..., Any])
 InstOrType: TypeAlias = Union[T, Type[T]]
 
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from dataclasses import Field  # provided by typestub but not generic at runtime
 else:
 
-    class Field(Protocol[T2]):  # pragma: no cover
+    class Field(Protocol[T2]):
         name: str
         type: Type[T2]
         default: T2
@@ -88,7 +88,7 @@ else:
 
 
 @runtime_checkable
-class Partial(Protocol[T2]):  # pragma: no cover
+class Partial(Protocol[T2]):
     @property
     def func(self) -> Callable[..., T2]:
         ...
@@ -118,12 +118,12 @@ class Partial(Protocol[T2]):  # pragma: no cover
 InterpStr = NewType("InterpStr", str)
 
 
-class DataClass_(Protocol):  # pragma: no cover
+class DataClass_(Protocol):
     # doesn't provide __init__, __getattribute__, etc.
     __dataclass_fields__: ClassVar[Dict[str, Field[Any]]]
 
 
-class DataClass(DataClass_, Protocol):  # pragma: no cover
+class DataClass(DataClass_, Protocol):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         ...
 
@@ -135,41 +135,39 @@ class DataClass(DataClass_, Protocol):  # pragma: no cover
 
 
 @runtime_checkable
-class Builds(DataClass, Protocol[T]):  # pragma: no cover
+class Builds(DataClass, Protocol[T]):
     _target_: ClassVar[str]
 
 
-class BuildsWithSig(Builds[T], Protocol[T, P]):  # pragma: no cover
-    def __init__(self, *args: P.args, **kwds: P.kwargs):  # pragma: no cover
+class BuildsWithSig(Builds[T], Protocol[T, P]):
+    def __init__(self, *args: P.args, **kwds: P.kwargs):
         ...
 
 
 @runtime_checkable
-class Just(Builds[T], Protocol[T]):  # pragma: no cover
+class Just(Builds[T], Protocol[T]):
     path: ClassVar[str]  # interpolated string for importing obj
     _target_: ClassVar[Literal["hydra_zen.funcs.get_obj"]] = "hydra_zen.funcs.get_obj"
 
 
-class ZenPartialMixin(Protocol[T]):  # pragma: no cover
+class ZenPartialMixin(Protocol[T]):
     _zen_target: ClassVar[str]
     _zen_partial: ClassVar[Literal[True]] = True
 
 
-class HydraPartialMixin(Protocol[T]):  # pragma: no cover
+class HydraPartialMixin(Protocol[T]):
     _partial_: ClassVar[Literal[True]] = True
 
 
 @runtime_checkable
-class ZenPartialBuilds(Builds[T], ZenPartialMixin[T], Protocol[T]):  # pragma: no cover
+class ZenPartialBuilds(Builds[T], ZenPartialMixin[T], Protocol[T]):
     _target_: ClassVar[
         Literal["hydra_zen.funcs.zen_processing"]
     ] = "hydra_zen.funcs.zen_processing"
 
 
 @runtime_checkable
-class HydraPartialBuilds(
-    Builds[T], HydraPartialMixin[T], Protocol[T]
-):  # pragma: no cover
+class HydraPartialBuilds(Builds[T], HydraPartialMixin[T], Protocol[T]):
     ...
 
 
@@ -181,7 +179,7 @@ PartialBuilds: TypeAlias = Union[ZenPartialBuilds[T], HydraPartialBuilds[T]]
 
 
 @runtime_checkable
-class HasTarget(Protocol):  # pragma: no cover
+class HasTarget(Protocol):
     _target_: str
 
 
@@ -209,7 +207,7 @@ _SupportedPrimitive: TypeAlias = Union[
     EmptyDict,  # not covered by Mapping[..., ...]]
 ]
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     SupportedPrimitive: TypeAlias = Union[
         _SupportedPrimitive,
         FrozenSet["SupportedPrimitive"],
@@ -240,7 +238,7 @@ ZenWrapper: TypeAlias = Union[
     Callable[[T4], T4],
     str,
 ]
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     ZenWrappers: TypeAlias = Union[ZenWrapper[T4], Sequence[ZenWrapper[T4]]]
 else:
     # cleans up annotations for REPLs

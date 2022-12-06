@@ -33,7 +33,7 @@ def just(
     zen_convert: Optional[ZenConvert] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
-) -> TP:  # pragma: no cover
+) -> TP:
     ...
 
 
@@ -44,7 +44,7 @@ def just(
     zen_convert: Optional[ZenConvert] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
-) -> ConfigComplex:  # pragma: no cover
+) -> ConfigComplex:
     ...
 
 
@@ -55,7 +55,7 @@ def just(
     zen_convert: Optional[ZenConvert] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
-) -> Builds[Type[TB]]:  # pragma: no cover
+) -> Builds[Type[TB]]:
     ...
 
 
@@ -66,7 +66,7 @@ def just(
     zen_convert: Optional[ZenConvert] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
-) -> Type[Just[TC]]:  # pragma: no cover
+) -> Type[Just[TC]]:
     ...
 
 
@@ -77,7 +77,7 @@ def just(
     zen_convert: Literal[None] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
-) -> Type[Builds[Type[TD]]]:  # pragma: no cover
+) -> Type[Builds[Type[TD]]]:
     ...
 
 
@@ -88,7 +88,7 @@ def just(
     zen_convert: ZenConvert,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
-) -> Any:  # pragma: no cover
+) -> Any:
     ...
 
 
@@ -99,7 +99,7 @@ def just(
     zen_convert: Optional[ZenConvert] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
-) -> Any:  # pragma: no cover
+) -> Any:
     ...
 
 

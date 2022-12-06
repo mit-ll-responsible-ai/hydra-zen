@@ -37,7 +37,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
-) -> FullBuilds:  # pragma: no cover
+) -> FullBuilds:
     ...
 
 
@@ -53,7 +53,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
-) -> PBuilds:  # pragma: no cover
+) -> PBuilds:
     ...
 
 
@@ -69,7 +69,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
-) -> StdBuilds:  # pragma: no cover
+) -> StdBuilds:
     ...
 
 
@@ -85,7 +85,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
-) -> Union[FullBuilds, StdBuilds]:  # pragma: no cover
+) -> Union[FullBuilds, StdBuilds]:
     ...
 
 
@@ -101,7 +101,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
-) -> Union[PBuilds, StdBuilds]:  # pragma: no cover
+) -> Union[PBuilds, StdBuilds]:
     ...
 
 
@@ -117,7 +117,7 @@ def make_custom_builds_fn(
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
-) -> Union[FullBuilds, PBuilds, StdBuilds]:  # pragma: no cover
+) -> Union[FullBuilds, PBuilds, StdBuilds]:
     ...
 
 

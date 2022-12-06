@@ -80,7 +80,17 @@ combine_as_imports = true
 
 [tool.coverage.report]
 omit = ["src/hydra_zen/_version.py"]
-
+exclude_lines = [
+  'pragma: no cover',
+  'def __repr__',
+  'raise NotImplementedError',
+  'class .*\bProtocol(\[.+\])?\):',
+  '@(abc\.)?abstractmethod',
+  '@(typing\.)?overload',
+  'except ImportError:',
+  'except ModuleNotFoundError:',
+  'if (typing\.)?TYPE_CHECKING:',
+]
 
 [tool.pytest.ini_options]
 xfail_strict=true

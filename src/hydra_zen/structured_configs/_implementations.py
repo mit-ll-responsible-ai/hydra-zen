@@ -697,7 +697,7 @@ def builds(
     builds_bases: Tuple[()] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
-) -> Type[BuildsWithSig[Type[R], P]]:  # pragma: no cover
+) -> Type[BuildsWithSig[Type[R], P]]:
     ...
 
 
@@ -718,7 +718,7 @@ def builds(
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     **kwargs_for_target: SupportedPrimitive,
-) -> Type[Builds[Importable]]:  # pragma: no cover
+) -> Type[Builds[Importable]]:
     ...
 
 
@@ -739,7 +739,7 @@ def builds(
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     **kwargs_for_target: SupportedPrimitive,
-) -> Type[PartialBuilds[Importable]]:  # pragma: no cover
+) -> Type[PartialBuilds[Importable]]:
     ...
 
 
@@ -760,10 +760,7 @@ def builds(
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     **kwargs_for_target: SupportedPrimitive,
-) -> Union[
-    Type[Builds[Importable]],
-    Type[PartialBuilds[Importable]],
-]:  # pragma: no cover
+) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]],]:
     ...
 
 
@@ -788,7 +785,7 @@ def builds(
     Type[Builds[Importable]],
     Type[PartialBuilds[Importable]],
     Type[BuildsWithSig[Type[R], P]],
-]:  # pragma: no cover
+]:
     ...
 
 
@@ -2005,12 +2002,12 @@ def builds(
 
 
 @overload
-def get_target(obj: InstOrType[Builds[_T]]) -> _T:  # pragma: no cover
+def get_target(obj: InstOrType[Builds[_T]]) -> _T:
     ...
 
 
 @overload
-def get_target(obj: HasTarget) -> Any:  # pragma: no cover
+def get_target(obj: HasTarget) -> Any:
     ...
 
 
