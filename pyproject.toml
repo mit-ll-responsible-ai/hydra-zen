@@ -194,7 +194,7 @@ deps = {[testenv]deps}
        pydantic
        beartype
        pyright
-commands = pytest -n auto tests/test_docs_typecheck.py
+commands = pytest -n auto tests/test_docs_typecheck.py -vv
 
 
 [testenv:third-party]

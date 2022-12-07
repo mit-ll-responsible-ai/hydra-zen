@@ -48,7 +48,6 @@ from hydra_zen.typing import ZenConvert
 
 
 @pytest.mark.skipif(PYRIGHT_PATH is None, reason="pyright is not installed")
-@pytest.mark.no_cover
 @pytest.mark.parametrize(
     "func",
     [
@@ -109,7 +108,6 @@ files += [
 
 @pytest.mark.skipif(PYRIGHT_PATH is None, reason="pyright is not installed")
 @pytest.mark.skipif(not files, reason="docs not found")
-@pytest.mark.no_cover
 @pytest.mark.parametrize(
     "func, pyright_config",
     files,
