@@ -1607,13 +1607,15 @@ def builds(
         ):
             _params = tuple(inspect.signature(target.__init__).parameters.items())
 
-            if _params and _params[0][1].kind is not _VAR_POSITIONAL:
+            if (
+                _params and _params[0][1].kind is not _VAR_POSITIONAL
+            ):  # pragma: no cover
                 # Exclude self/cls
                 #
                 # There are weird edge cases, like in collections.Counter for Python 3.7
                 # where the first arg is *args, not self.
                 _params = _params[1:]
-            else:  # pragma: no cover:
+            else:  # pragma: no cover
                 pass
 
             signature_params = {k: v for k, v in _params}
