@@ -104,9 +104,9 @@ _VAR_KEYWORD: Final = inspect.Parameter.VAR_KEYWORD
 
 
 _builtin_function_or_method_type = type(len)
-_lru_cache_type = type(
-    functools.lru_cache(maxsize=128)(lambda: None)
-)  # pragma: no branch
+# fmt: off
+_lru_cache_type = type(functools.lru_cache(maxsize=128)(lambda: None))  # pragma: no branch
+# fmt: on
 
 _BUILTIN_TYPES: Final = (_builtin_function_or_method_type, _lru_cache_type)
 
@@ -1607,14 +1607,14 @@ def builds(
         ):
             _params = tuple(inspect.signature(target.__init__).parameters.items())
 
-            if (
-                _params and _params[0][1].kind is not _VAR_POSITIONAL
-            ):  # pragma: no branch
+            if _params and _params[0][1].kind is not _VAR_POSITIONAL:
                 # Exclude self/cls
                 #
                 # There are weird edge cases, like in collections.Counter for Python 3.7
                 # where the first arg is *args, not self.
                 _params = _params[1:]
+            else:  # pragma: no cover:
+                pass
 
             signature_params = {k: v for k, v in _params}
             del _params
