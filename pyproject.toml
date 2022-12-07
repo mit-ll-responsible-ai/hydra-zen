@@ -187,7 +187,6 @@ commands = pytest --cov-report term-missing --cov-config=pyproject.toml --cov-fa
 
 
 [testenv:pyright-scan-docs]
-setenv = NUMBA_DISABLE_JIT=1
 usedevelop = true
 basepython = python3.8
 deps = {[testenv]deps}
