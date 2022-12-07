@@ -80,6 +80,9 @@ combine_as_imports = true
 
 [tool.coverage.run]
 branch = true
+omit = [
+  "tests/test_docs_typecheck.py",
+]
 
 [tool.coverage.report]
 omit = ["src/hydra_zen/_version.py"]
@@ -180,8 +183,22 @@ deps = {[testenv]deps}
        pydantic
        beartype
        cloudpickle
-       pyright
 commands = pytest --cov-report term-missing --cov-config=pyproject.toml --cov-fail-under=100 --cov=hydra_zen -n auto tests
+
+
+[testenv:pyright-scan-docs]
+usedevelop = true
+basepython = python3.9
+deps = {[testenv]deps}
+       torch
+       pytorch-lightning
+       numpy
+       jaxlib
+       jax
+       pydantic
+       beartype
+       pyright
+commands = pytest -n auto tests/test_docs_typecheck.py -vv
 
 
 [testenv:third-party]
