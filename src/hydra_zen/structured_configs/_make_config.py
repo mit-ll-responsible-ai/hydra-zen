@@ -419,7 +419,7 @@ def make_config(
             )
         _defaults = fields_as_kwargs.pop("defaults")
 
-        if not isinstance(_defaults, ZenField):
+        if not isinstance(_defaults, ZenField):  # pragma: no branch
             hydra_defaults = _defaults  # type: ignore
 
     # validate hydra-args via `builds`

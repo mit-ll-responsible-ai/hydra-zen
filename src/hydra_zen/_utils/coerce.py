@@ -119,7 +119,7 @@ def coerce_sequences(obj: _T) -> _T:
     list_caster_by_name = {}  # by param-name in the signature
 
     sig = inspect.signature(obj)
-    for n, (name, param) in enumerate(sig.parameters.items()):
+    for n, (name, param) in enumerate(sig.parameters.items()):  # pragma: no branch
         if name not in hints or param.kind in {_VAR_KEYWORD, _VAR_POSITIONAL}:
             continue
 

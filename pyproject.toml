@@ -78,6 +78,9 @@ combine_as_imports = true
 
 
 
+[tool.coverage.run]
+branch = true
+
 [tool.coverage.report]
 omit = ["src/hydra_zen/_version.py"]
 exclude_lines = [
@@ -127,7 +130,8 @@ python =
 passenv = *
 deps = pytest
        hypothesis
-commands = pytest \
+       pytest-xdist
+commands = pytest -n auto \
            {posargs}
 
 
@@ -177,7 +181,7 @@ deps = {[testenv]deps}
        beartype
        cloudpickle
        pyright
-commands = pytest --cov-report term-missing --cov-config=pyproject.toml --cov-fail-under=100 --cov=hydra_zen tests
+commands = pytest --cov-report term-missing --cov-config=pyproject.toml --cov-fail-under=100 --cov=hydra_zen -n auto tests
 
 
 [testenv:third-party]
