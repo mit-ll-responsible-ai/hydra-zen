@@ -78,6 +78,12 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install tox
+    - name: Cache tox environments
+      id: cache-third-party
+      uses: actions/cache@v3
+      with:
+        path: .tox
+        key: tox-pyright-docs-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
     - name: Scan docs with pyright
       run: tox -e pyright-scan-docs
 

@@ -60,7 +60,7 @@ following code. Here, we define our single-layer neural network and the `lightni
    def single_layer_nn(num_neurons: int) -> nn.Module:
        """y = sum(V sigmoid(X W + b))"""
        return nn.Sequential(
-           nn.Linear(1, num_neurons),
+           nn.Linear(1,1,1,1,1,1,"apple"),  # TODO: FIX ME
            nn.Sigmoid(),
            nn.Linear(num_neurons, 1, bias=False),
        )

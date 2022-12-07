@@ -190,6 +190,13 @@ commands = pytest --cov-report term-missing --cov-config=pyproject.toml --cov-fa
 usedevelop = true
 basepython = python3.9
 deps = {[testenv]deps}
+       torch
+       pytorch-lightning
+       numpy
+       jaxlib
+       jax
+       pydantic
+       beartype
        pyright
 commands = pytest -n auto tests/test_docs_typecheck.py -vv
 
