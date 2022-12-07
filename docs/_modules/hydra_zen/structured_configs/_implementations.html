@@ -431,7 +431,9 @@
 
 
 <span class="n">_builtin_function_or_method_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="nb">len</span><span class="p">)</span>
-<span class="n">_lru_cache_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">128</span><span class="p">)(</span><span class="k">lambda</span><span class="p">:</span> <span class="kc">None</span><span class="p">))</span>
+<span class="c1"># fmt: off</span>
+<span class="n">_lru_cache_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">128</span><span class="p">)(</span><span class="k">lambda</span><span class="p">:</span> <span class="kc">None</span><span class="p">))</span>  <span class="c1"># pragma: no branch</span>
+<span class="c1"># fmt: on</span>
 
 <span class="n">_BUILTIN_TYPES</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="p">(</span><span class="n">_builtin_function_or_method_type</span><span class="p">,</span> <span class="n">_lru_cache_type</span><span class="p">)</span>
 
@@ -874,11 +876,10 @@
     <span class="c1"># primitives</span>
     <span class="k">if</span> <span class="n">allow_zen_conversion</span> <span class="ow">and</span> <span class="n">type_of_value</span> <span class="ow">in</span> <span class="n">ZEN_SUPPORTED_PRIMITIVES</span><span class="p">:</span>
         <span class="n">type_</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">resolved_value</span><span class="p">)</span>
-        <span class="n">conversion_fn</span> <span class="o">=</span> <span class="n">ZEN_VALUE_CONVERSION</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">type_</span><span class="p">)</span>
+        <span class="n">conversion_fn</span> <span class="o">=</span> <span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="n">type_</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">conversion_fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">resolved_value</span> <span class="o">=</span> <span class="n">conversion_fn</span><span class="p">(</span><span class="n">resolved_value</span><span class="p">)</span>
-            <span class="n">type_of_value</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">resolved_value</span><span class="p">)</span>
+        <span class="n">resolved_value</span> <span class="o">=</span> <span class="n">conversion_fn</span><span class="p">(</span><span class="n">resolved_value</span><span class="p">)</span>
+        <span class="n">type_of_value</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">resolved_value</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">type_of_value</span> <span class="ow">in</span> <span class="n">HYDRA_SUPPORTED_PRIMITIVES</span> <span class="ow">or</span> <span class="p">(</span>
         <span class="n">structured_conf_permitted</span>
@@ -914,8 +915,10 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="c1"># Supports pydantic.AnyURL</span>
         <span class="n">_v</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">_v</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">_v</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>  <span class="c1"># pragma: no branch</span>
             <span class="k">return</span> <span class="n">_v</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="k">del</span> <span class="n">_v</span>
 
     <span class="c1"># `value` could no be converted to Hydra-compatible representation.</span>
     <span class="c1"># Raise error</span>
@@ -1024,7 +1027,7 @@
     <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[()]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]]:</span>  <span class="c1"># pragma: no cover</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]]:</span>
     <span class="o">...</span>
 
 
@@ -1045,7 +1048,7 @@
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span>  <span class="c1"># pragma: no cover</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span>
     <span class="o">...</span>
 
 
@@ -1066,7 +1069,7 @@
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span>  <span class="c1"># pragma: no cover</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span>
     <span class="o">...</span>
 
 
@@ -1087,10 +1090,7 @@
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
-    <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
-    <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
-<span class="p">]:</span>  <span class="c1"># pragma: no cover</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],]:</span>
     <span class="o">...</span>
 
 
@@ -1115,7 +1115,7 @@
     <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
     <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
     <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]],</span>
-<span class="p">]:</span>  <span class="c1"># pragma: no cover</span>
+<span class="p">]:</span>
     <span class="o">...</span>
 
 
@@ -1934,12 +1934,16 @@
         <span class="p">):</span>
             <span class="n">_params</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
 
-            <span class="k">if</span> <span class="n">_params</span> <span class="ow">and</span> <span class="n">_params</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">kind</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_VAR_POSITIONAL</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">_params</span> <span class="ow">and</span> <span class="n">_params</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">kind</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_VAR_POSITIONAL</span>
+            <span class="p">):</span>  <span class="c1"># pragma: no cover</span>
                 <span class="c1"># Exclude self/cls</span>
                 <span class="c1">#</span>
                 <span class="c1"># There are weird edge cases, like in collections.Counter for Python 3.7</span>
                 <span class="c1"># where the first arg is *args, not self.</span>
                 <span class="n">_params</span> <span class="o">=</span> <span class="n">_params</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+                <span class="k">pass</span>
 
             <span class="n">signature_params</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_params</span><span class="p">}</span>
             <span class="k">del</span> <span class="n">_params</span>
@@ -2312,7 +2316,7 @@
         <span class="sa">f</span><span class="s2">&quot;A structured config designed to </span><span class="si">{</span><span class="s1">&#39;partially &#39;</span> <span class="k">if</span> <span class="n">zen_partial</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">initialize/call &quot;</span>
         <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">target_path</span><span class="si">}</span><span class="s2">` upon instantiation by hydra.&quot;</span>
     <span class="p">)</span>
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;__doc__&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;__doc__&quot;</span><span class="p">):</span>  <span class="c1"># pragma: no branch</span>
         <span class="n">target_doc</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="vm">__doc__</span>
         <span class="k">if</span> <span class="n">target_doc</span><span class="p">:</span>
             <span class="n">out</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="p">(</span>
@@ -2332,12 +2336,12 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">_T</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">_T</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
     <span class="o">...</span>
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">HasTarget</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">HasTarget</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
     <span class="o">...</span>
 
 
