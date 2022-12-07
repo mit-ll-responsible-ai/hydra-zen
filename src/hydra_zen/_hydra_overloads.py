@@ -45,44 +45,40 @@ class _TightBind:  # pragma: no cover
 
 
 @overload
-def instantiate(
-    config: _TightBind, *args: Any, **kwargs: Any
-) -> Any:  # pragma: no cover
+def instantiate(config: _TightBind, *args: Any, **kwargs: Any) -> Any:
     ...
 
 
 @overload
 def instantiate(
     config: InstOrType[ConfigPath], *args: Any, **kwargs: Any
-) -> pathlib.Path:  # pragma: no cover
+) -> pathlib.Path:
     ...
 
 
 @overload
 def instantiate(
     config: InstOrType[ConfigComplex], *args: Any, **kwargs: Any
-) -> complex:  # pragma: no cover
+) -> complex:
     ...
 
 
 @overload
-def instantiate(
-    config: InstOrType[Just[T]], *args: Any, **kwargs: Any
-) -> T:  # pragma: no cover
+def instantiate(config: InstOrType[Just[T]], *args: Any, **kwargs: Any) -> T:
     ...
 
 
 @overload
 def instantiate(
     config: InstOrType[IsPartial[Callable[..., T]]], *args: Any, **kwargs: Any
-) -> Partial[T]:  # pragma: no cover
+) -> Partial[T]:
     ...
 
 
 @overload
 def instantiate(
     config: InstOrType[Builds[Callable[..., T]]], *args: Any, **kwargs: Any
-) -> T:  # pragma: no cover
+) -> T:
     ...
 
 
@@ -99,7 +95,7 @@ def instantiate(
     ],
     *args: Any,
     **kwargs: Any
-) -> Any:  # pragma: no cover
+) -> Any:
     ...
 
 

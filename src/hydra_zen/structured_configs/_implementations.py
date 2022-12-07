@@ -104,7 +104,9 @@ _VAR_KEYWORD: Final = inspect.Parameter.VAR_KEYWORD
 
 
 _builtin_function_or_method_type = type(len)
-_lru_cache_type = type(functools.lru_cache(maxsize=128)(lambda: None))
+# fmt: off
+_lru_cache_type = type(functools.lru_cache(maxsize=128)(lambda: None))  # pragma: no branch
+# fmt: on
 
 _BUILTIN_TYPES: Final = (_builtin_function_or_method_type, _lru_cache_type)
 
@@ -547,11 +549,10 @@ def sanitized_default_value(
     # primitives
     if allow_zen_conversion and type_of_value in ZEN_SUPPORTED_PRIMITIVES:
         type_ = type(resolved_value)
-        conversion_fn = ZEN_VALUE_CONVERSION.get(type_)
+        conversion_fn = ZEN_VALUE_CONVERSION[type_]
 
-        if conversion_fn is not None:
-            resolved_value = conversion_fn(resolved_value)
-            type_of_value = type(resolved_value)
+        resolved_value = conversion_fn(resolved_value)
+        type_of_value = type(resolved_value)
 
     if type_of_value in HYDRA_SUPPORTED_PRIMITIVES or (
         structured_conf_permitted
@@ -587,8 +588,10 @@ def sanitized_default_value(
     if isinstance(value, str):
         # Supports pydantic.AnyURL
         _v = str(value)
-        if type(_v) is str:
+        if type(_v) is str:  # pragma: no branch
             return _v
+        else:  # pragma: no cover
+            del _v
 
     # `value` could no be converted to Hydra-compatible representation.
     # Raise error
@@ -697,7 +700,7 @@ def builds(
     builds_bases: Tuple[()] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
-) -> Type[BuildsWithSig[Type[R], P]]:  # pragma: no cover
+) -> Type[BuildsWithSig[Type[R], P]]:
     ...
 
 
@@ -718,7 +721,7 @@ def builds(
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     **kwargs_for_target: SupportedPrimitive,
-) -> Type[Builds[Importable]]:  # pragma: no cover
+) -> Type[Builds[Importable]]:
     ...
 
 
@@ -739,7 +742,7 @@ def builds(
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     **kwargs_for_target: SupportedPrimitive,
-) -> Type[PartialBuilds[Importable]]:  # pragma: no cover
+) -> Type[PartialBuilds[Importable]]:
     ...
 
 
@@ -760,10 +763,7 @@ def builds(
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     **kwargs_for_target: SupportedPrimitive,
-) -> Union[
-    Type[Builds[Importable]],
-    Type[PartialBuilds[Importable]],
-]:  # pragma: no cover
+) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]],]:
     ...
 
 
@@ -788,7 +788,7 @@ def builds(
     Type[Builds[Importable]],
     Type[PartialBuilds[Importable]],
     Type[BuildsWithSig[Type[R], P]],
-]:  # pragma: no cover
+]:
     ...
 
 
@@ -1607,12 +1607,16 @@ def builds(
         ):
             _params = tuple(inspect.signature(target.__init__).parameters.items())
 
-            if _params and _params[0][1].kind is not _VAR_POSITIONAL:
+            if (
+                _params and _params[0][1].kind is not _VAR_POSITIONAL
+            ):  # pragma: no cover
                 # Exclude self/cls
                 #
                 # There are weird edge cases, like in collections.Counter for Python 3.7
                 # where the first arg is *args, not self.
                 _params = _params[1:]
+            else:  # pragma: no cover
+                pass
 
             signature_params = {k: v for k, v in _params}
             del _params
@@ -1985,7 +1989,7 @@ def builds(
         f"A structured config designed to {'partially ' if zen_partial else ''}initialize/call "
         f"`{target_path}` upon instantiation by hydra."
     )
-    if hasattr(target, "__doc__"):
+    if hasattr(target, "__doc__"):  # pragma: no branch
         target_doc = target.__doc__
         if target_doc:
             out.__doc__ += (
@@ -2005,12 +2009,12 @@ def builds(
 
 
 @overload
-def get_target(obj: InstOrType[Builds[_T]]) -> _T:  # pragma: no cover
+def get_target(obj: InstOrType[Builds[_T]]) -> _T:
     ...
 
 
 @overload
-def get_target(obj: HasTarget) -> Any:  # pragma: no cover
+def get_target(obj: HasTarget) -> Any:
     ...
 
 

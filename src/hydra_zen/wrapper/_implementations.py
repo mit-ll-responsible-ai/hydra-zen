@@ -411,7 +411,7 @@ def zen(
     pre_call: PreCall = ...,
     ZenWrapper: Type[Zen[P, R]] = Zen,
     exclude: Optional[Union[str, Iterable[str]]] = None,
-) -> Zen[P, R]:  # pragma: no cover
+) -> Zen[P, R]:
     ...
 
 
@@ -423,7 +423,7 @@ def zen(
     pre_call: PreCall = ...,
     ZenWrapper: Type[Zen[Any, Any]] = ...,
     exclude: Optional[Union[str, Iterable[str]]] = None,
-) -> Callable[[Callable[P, R]], Zen[P, R]]:  # pragma: no cover
+) -> Callable[[Callable[P, R]], Zen[P, R]]:
     ...
 
 
@@ -1148,7 +1148,7 @@ class ZenStore:
         provider: Optional[str] = ...,
         to_config: Callable[[F], Node] = default_to_config,
         **to_config_kw: Any,
-    ) -> F:  # pragma: no cover
+    ) -> F:
         ...
 
     # TODO: ZenStore -> Self when mypy adds support for Self
@@ -1164,7 +1164,7 @@ class ZenStore:
         provider: Optional[str] = ...,
         to_config: Callable[[Any], Node] = ...,
         **to_config_kw: Any,
-    ) -> "ZenStore":  # pragma: no cover
+    ) -> "ZenStore":
         ...
 
     def __call__(self, __target: Optional[F] = None, **kw: Any) -> Union[F, "ZenStore"]:
@@ -1337,13 +1337,11 @@ class ZenStore:
         return bool(self._internal_repo)
 
     @overload
-    def __getitem__(self, key: Tuple[GroupName, NodeName]) -> Node:  # pragma: no cover
+    def __getitem__(self, key: Tuple[GroupName, NodeName]) -> Node:
         ...
 
     @overload
-    def __getitem__(
-        self, key: GroupName
-    ) -> Dict[Tuple[GroupName, NodeName], Node]:  # pragma: no cover
+    def __getitem__(self, key: GroupName) -> Dict[Tuple[GroupName, NodeName], Node]:
         ...
 
     def __getitem__(self, key: Union[GroupName, Tuple[GroupName, NodeName]]) -> Node:
@@ -1425,9 +1423,8 @@ class ZenStore:
     def __contains__(self, key: Union[GroupName, Tuple[GroupName, NodeName]]) -> bool:
         """Checks if group or (group, node-name) exists in zen-store."""
         if key is None:
-            return any(k[0] is None for k in self._internal_repo)
-
-        if isinstance(key, str):
+            return any(k[0] is None for k in self._internal_repo)  # pragma: no branch
+        elif isinstance(key, str):
             key_w_end: str = key + "/"
             return any(
                 key == group or group.startswith(key_w_end)

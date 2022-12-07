@@ -36,7 +36,7 @@ P = ParamSpec("P")
 __all__ = ["FullBuilds", "PBuilds", "StdBuilds"]
 
 
-class StdBuilds(Protocol):  # pragma: no cover
+class StdBuilds(Protocol):
 
     # partial=False, pop-sig=True; no *args, **kwargs, nor builds_bases
     @overload
@@ -55,7 +55,7 @@ class StdBuilds(Protocol):  # pragma: no cover
         builds_bases: Tuple[()] = ...,
         frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
-    ) -> Type[BuildsWithSig[Type[R], P]]:  # pragma: no cover
+    ) -> Type[BuildsWithSig[Type[R], P]]:
         ...
 
     # partial=False, pop-sig=bool
@@ -76,7 +76,7 @@ class StdBuilds(Protocol):  # pragma: no cover
         frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: SupportedPrimitive,
-    ) -> Type[Builds[Importable]]:  # pragma: no cover
+    ) -> Type[Builds[Importable]]:
         ...
 
     # partial=True, pop-sig=bool
@@ -97,7 +97,7 @@ class StdBuilds(Protocol):  # pragma: no cover
         frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: SupportedPrimitive,
-    ) -> Type[PartialBuilds[Importable]]:  # pragma: no cover
+    ) -> Type[PartialBuilds[Importable]]:
         ...
 
     # partial=bool, pop-sig=False
@@ -118,10 +118,7 @@ class StdBuilds(Protocol):  # pragma: no cover
         frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: SupportedPrimitive,
-    ) -> Union[
-        Type[Builds[Importable]],
-        Type[PartialBuilds[Importable]],
-    ]:  # pragma: no cover
+    ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]],]:
         ...
 
     # partial=bool, pop-sig=bool
@@ -146,7 +143,7 @@ class StdBuilds(Protocol):  # pragma: no cover
         Type[Builds[Importable]],
         Type[PartialBuilds[Importable]],
         Type[BuildsWithSig[Type[R], P]],
-    ]:  # pragma: no cover
+    ]:
         ...
 
     def __call__(
@@ -173,7 +170,7 @@ class StdBuilds(Protocol):  # pragma: no cover
         ...
 
 
-class FullBuilds(Protocol):  # pragma: no cover
+class FullBuilds(Protocol):
     # full_builds -> populate_full_signature=True  (new default value)
 
     # partial=False, pop_sig=True; no *args, **kwargs, nor builds_bases`
@@ -308,7 +305,7 @@ class FullBuilds(Protocol):  # pragma: no cover
         ...
 
 
-class PBuilds(Protocol):  # pragma: no cover
+class PBuilds(Protocol):
     # partial_builds -> zen_partial=True (new default value)
 
     # partial=True, pop-sig=bool
@@ -370,10 +367,7 @@ class PBuilds(Protocol):  # pragma: no cover
         frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: SupportedPrimitive,
-    ) -> Union[
-        Type[Builds[Importable]],
-        Type[PartialBuilds[Importable]],
-    ]:  # pragma: no cover
+    ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]],]:
         ...
 
     # partial=bool, pop-sig=bool
