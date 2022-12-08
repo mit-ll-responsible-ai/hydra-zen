@@ -5,6 +5,7 @@
 
 import sys
 import types
+import typing
 from enum import Enum
 from pathlib import Path, PosixPath, WindowsPath
 from typing import (
@@ -24,8 +25,8 @@ from typing import (
     Set,
     Tuple,
     Type,
-    Union,
     TypeVar,
+    Union,
 )
 
 from omegaconf import DictConfig, ListConfig
