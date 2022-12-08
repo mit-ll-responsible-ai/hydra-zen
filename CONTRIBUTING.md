@@ -2,14 +2,20 @@ Thanks for your interest in contributing to hydra-zen! Please read
 through the following resources before you begin working on any contributions to this 
 code base.
 
-
 - [Installing hydra-zen for development](#installing-hydra-zen-for-development)
-- [Pre-Commit Hooks (Required)](#pre-commit-hooks-required)
-  - [What does this do?](#what-does-this-do)
+- [Configuring Your IDE](#configuring-your-ide)
+- [Adding New Features to the Public API](#adding-new-features-to-the-public-api)
 - [Running Our Tests Manually](#running-our-tests-manually)
 - [Running Tests Using `tox`](#running-tests-using-tox)
   - [Measuring Code Coverage](#measuring-code-coverage)
-- [Validating Type Correctness](#validating-type-correctness)
+  - [Running Static Type Checking Tests](#running-static-type-checking-tests)
+- [Formatting](#formatting)
+  - [Pre-Commit Hooks](#pre-commit-hooks)
+    - [What does this do?](#what-does-this-do)
+- [Documentation](#documentation)
+  - [Building Our Documentation Locally](#building-our-documentation-locally)
+  - [Publishing Documentation](#publishing-documentation)
+- [Releasing a New Version of hydra-zen](#releasing-a-new-version-of-hydra-zen)
   
 
 ## Installing hydra-zen for development
@@ -26,9 +32,9 @@ If your contributions involve changes to our support for NumPy, PyTorch, PyTorch
 
 ## Configuring Your IDE
 
-hydra-zen utilizes pyright to validate its interfaces. Thus it is recommended that developers use [an IDE with pyright language server](https://github.com/microsoft/pyright#installation). VSCode's Pylance extension is built off of pyright, and thus is recommended.
+hydra-zen utilizes pyright to validate its interfaces. Thus it is recommended that developers use [an IDE with pyright language server](https://github.com/microsoft/pyright#installation). 
 
-If you use VSCode with the Pylance, then make sure that `Type Checking Mode` is set to `basic` for your hydra-zen workspace. Your IDE will then mark any problematic code.Other IDEs can leverage the pyright language server to a similar effect. 
+VSCode's Pylance extension is built off of pyright, and thus is recommended. If you use VSCode with the Pylance, then make sure that `Type Checking Mode` is set to `basic` for your hydra-zen workspace. Your IDE will then mark any problematic code.
 
 
 ## Adding New Features to the Public API
@@ -41,33 +47,6 @@ The CI for `hydra-zen` requires 100% code coverage, thus all new features will n
 
 See the section on tox for details.
 
-## Pre-Commit Hooks (Required)
-
-We provide contributors with pre-commit hooks, which will apply auto-formatters and 
-linters to your code before your commit takes effect. You must install these in order to contribute to the repo.
-
-First install pre-commit in your Python environment. Run:
-
-```console
-pip install pre-commit
-```
-
-Then, in the top-level of the `hydra_zen` repo, run:
-
-```console
-pre-commit install
-pre-commit run
-```
-
-Great! You can read more about pre-commit hooks in general here: https://pre-commit.com/
-
-### What does this do?
-
-Our pre-commit hooks run the following auto-formatters on all commits:
-- [black](https://black.readthedocs.io/en/stable/)
-- [isort](https://pycqa.github.io/isort/)
-
-It also runs [flake8](https://github.com/PyCQA/flake8) to enforce PEP8 standards.
 
 ## Running Our Tests Manually
 
@@ -130,6 +109,55 @@ You can run these static type checking tests locally using tox via:
 ```console
 tox -e typecheck
 ```
+
+## Formatting
+
+hydra-zen's CI requires that `black`, `isort`, and `flake8` can be run against `src/` and `tests/` without any diffs or errors. To run this test locally, use
+
+
+```console
+$ tox -e enforce-format
+```
+
+To locally format/fix code issues caught by this stage of our CI, run:
+
+
+```console
+$ tox -e format
+```
+
+That being said, it is recommended that you install pre-commit hooks that will apply these formatters to the diffs of each commit that you make.
+This is substantially faster and more streamlined that using the tox solution.
+
+### Pre-Commit Hooks
+
+We provide contributors with pre-commit hooks, which will apply auto-formatters and 
+linters to your code before your commit takes effect. You must install these in order to contribute to the repo.
+
+First install pre-commit in your Python environment. Run:
+
+```console
+pip install pre-commit
+```
+
+Then, in the top-level of the `hydra_zen` repo, run:
+
+```console
+pre-commit install
+pre-commit run
+```
+
+Great! You can read more about pre-commit hooks in general here: https://pre-commit.com/
+
+#### What does this do?
+
+Our pre-commit hooks run the following auto-formatters on all commits:
+- [black](https://black.readthedocs.io/en/stable/)
+- [isort](https://pycqa.github.io/isort/)
+
+It also runs [flake8](https://github.com/PyCQA/flake8) to enforce PEP8 standards.
+
+## Documentation
 
 ### Building Our Documentation Locally
 

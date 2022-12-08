@@ -229,9 +229,9 @@ deps =
     black
     isort
 commands =
-    autoflake --recursive --in-place --remove-duplicate-keys --remove-unused-variables .
-    isort .
-    black .
+    autoflake --recursive --in-place --remove-duplicate-keys --remove-unused-variables src/ tests/
+    isort src/ tests/
+    black src/ tests/
 
 [testenv:docs]
 basepython=python3.9
@@ -239,4 +239,15 @@ changedir=docs
 deps=-r{toxinidir}/docs/requirements.txt
 commands=
     sphinx-build -b html -d {envtmpdir}/doctrees ./source  {envdir}/build/html
+
+[testenv:enforce-format]
+skip_install=true
+basepython=python3.9
+deps=black
+     isort
+     flake8
+commands=
+    black src/ tests/ --diff --check
+    isort src/ tests/ --diff --check
+    flake8 src/ tests/
 """
