@@ -229,9 +229,9 @@ deps =
     black
     isort
 commands =
-    autoflake --recursive --in-place --remove-duplicate-keys --remove-unused-variables .
-    isort .
-    black .
+    autoflake --recursive --in-place --remove-duplicate-keys --remove-unused-variables src/ tests/
+    isort src/ tests/
+    black src/ tests/
 
 [testenv:docs]
 basepython=python3.9
