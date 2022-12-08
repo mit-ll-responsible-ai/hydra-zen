@@ -224,6 +224,7 @@ commands = pyright --lib tests/annotations/ src/
            mypy --warn-unused-ignores --non-interactive --install-types tests/annotations/mypy_checks.py
 
 [testenv:format]
+skip_install=true
 deps =
     autoflake
     black
