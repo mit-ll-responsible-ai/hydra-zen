@@ -5,7 +5,6 @@
 
 import sys
 import types
-import typing
 from enum import Enum
 from pathlib import Path, PosixPath, WindowsPath
 from typing import (
