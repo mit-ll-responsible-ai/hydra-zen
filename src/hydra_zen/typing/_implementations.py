@@ -68,7 +68,7 @@ T3 = TypeVar("T3")
 T4 = TypeVar("T4", bound=Callable[..., Any])
 
 
-InstOrType: TypeAlias = Union[T, Type[T]]
+InstOrType: TypeAlias = Union[T,    Type[T]]
 
 
 if TYPE_CHECKING:
