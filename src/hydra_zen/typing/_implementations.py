@@ -89,6 +89,8 @@ else:
 
 @runtime_checkable
 class Partial(Protocol[T2]):
+    __call__: Callable[..., T2]
+
     @property
     def func(self) -> Callable[..., T2]:
         ...
@@ -104,9 +106,6 @@ class Partial(Protocol[T2]):
     def __new__(
         cls: Type[Self], __func: Callable[..., T2], *args: Any, **kwargs: Any
     ) -> Self:
-        ...
-
-    def __call__(self, *args: Any, **kwargs: Any) -> T2:
         ...
 
     if sys.version_info >= (3, 9):  # pragma: no cover
