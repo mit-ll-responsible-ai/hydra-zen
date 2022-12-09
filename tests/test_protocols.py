@@ -146,3 +146,8 @@ def test_protocol_checkers(x, yes_builds, yes_just, yes_partial):
 def test_partial_protocol():
     assert isinstance(partial(int), Partial)
     assert not isinstance(print, Partial)
+
+
+def test_parameterized_partial_regression():
+    # https://github.com/mit-ll-responsible-ai/hydra-zen/issues/352
+    assert Partial[int].__origin__ is Partial  # type: ignore
