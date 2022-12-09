@@ -108,7 +108,7 @@ class Partial(Protocol[T2]):
     ) -> Self:
         ...
 
-    if sys.version_info >= (3, 9):  # pragma: no cover
+    if TYPE_CHECKING and sys.version_info >= (3, 9):  # pragma: no cover
 
         def __class_getitem__(cls, item: Any) -> types.GenericAlias:
             ...
