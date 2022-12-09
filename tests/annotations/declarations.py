@@ -478,6 +478,17 @@ def check_partial_protocol():
     assert x
 
 
+def check_partial_protocol_harder():
+    def f() -> int:
+        ...
+
+    def g(x: str) -> int:
+        ...
+
+    x: Partial[int] = partial(f)
+    y: Partial[int] = partial(g)
+
+
 def check_partiald_target():
     reveal_type(builds(partial(int)), expected_text="Type[Builds[partial[int]]]")
     reveal_type(
