@@ -1,12 +1,21 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
+from functools import partial
+from typing import Type
+
 import pytest
 from beartype.cave import RegexTypes
 from beartype.vale import Is
 from typing_extensions import Annotated
 
+from hydra_zen import builds
 from hydra_zen.third_party.beartype import validates_with_beartype
+from hydra_zen.typing import Builds, Partial
+
+
+def func(x: int) -> float:
+    ...
 
 
 @pytest.mark.parametrize(
@@ -14,6 +23,8 @@ from hydra_zen.third_party.beartype import validates_with_beartype
     [
         (RegexTypes, "abc+", 22),
         (Annotated[str, Is[lambda text: 2 == len(text)]], "hi", "bye"),
+        (Partial[float], partial(func), func),
+        (Builds[Type[float]], builds(func), func),
     ],
 )
 def test_beartype_specific_fields(custom_type, good_val, bad_val):
