@@ -11,7 +11,7 @@ chronological order. All previous releases should still be available on pip.
 .. _v0.9.0:
 
 ---------------------
-0.9.0rc4 - 2022-11-21
+0.9.0rc5 - 2022-12-09
 ---------------------
 
 .. note:: This is documentation for an unreleased version of hydra-zen. You can try out this pre-release version using `pip install --pre hydra-zen`
@@ -122,6 +122,10 @@ Improvements
 ------------
 - :func:`~hydra_zen.hydrated_dataclass` will now produce a pickle-compatible dataclass type. See :pull:`338`.
 - All documentation code blocks are scanned by pyright as part of our CI process. Several errors in the documentation were fixed. See :pull:`343` and :pull:`344`.
+
+Improvements
+------------
+- :pull:`355` fixes an issue where the parameterized generic `hydra_zen.typing.Partial[<...>]` would return `None` for Python versions 3.9+. This prevented this annotation from being used by runtime type checkers.
 
 Compatibility-Breaking Changes
 ------------------------------

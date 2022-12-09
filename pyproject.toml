@@ -203,7 +203,7 @@ commands = pytest -n auto tests/test_docs_typecheck.py -vv
 
 [testenv:third-party]
 install_command = pip install --upgrade --upgrade-strategy eager {opts} {packages}
-basepython = python3.8
+basepython = python3.9
 deps = {[testenv]deps}
        torch
        pytorch-lightning
