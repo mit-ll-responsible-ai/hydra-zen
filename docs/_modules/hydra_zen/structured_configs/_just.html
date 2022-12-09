@@ -342,6 +342,7 @@
 <span class="kn">from</span> <span class="nn">._value_conversion</span> <span class="kn">import</span> <span class="n">ConfigComplex</span>
 
 <span class="c1"># pyright: strict</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
 <span class="n">TD</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TD&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">DataClass_</span><span class="p">)</span>
 <span class="n">TC</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TC&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
 <span class="n">TP</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TP&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">_HydraPrimitive</span><span class="p">)</span>
@@ -377,23 +378,23 @@
 
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">just</span><span class="p">(</span>
-    <span class="n">obj</span><span class="p">:</span> <span class="n">TB</span><span class="p">,</span>
-    <span class="o">*</span><span class="p">,</span>
-    <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">TB</span><span class="p">]]:</span>
-    <span class="o">...</span>
-
-
-<span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">just</span><span class="p">(</span>
     <span class="n">obj</span><span class="p">:</span> <span class="n">TC</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">TC</span><span class="p">]]:</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">just</span><span class="p">(</span>
+    <span class="n">obj</span><span class="p">:</span> <span class="n">TB</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">TB</span><span class="p">]]:</span>
     <span class="o">...</span>
 
 
