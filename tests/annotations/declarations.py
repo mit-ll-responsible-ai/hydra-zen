@@ -482,11 +482,12 @@ def check_partial_protocol_harder():
     def f() -> int:
         ...
 
-    def g(x: str) -> int:
+    def g(x: str) -> bool:
         ...
 
     x: Partial[int] = partial(f)
-    y: Partial[int] = partial(g)
+    y: Partial[bool] = partial(g, x="a")
+    z: Partial[str] = partial(g, x="a")  # type: ignore
 
 
 def check_partiald_target():
