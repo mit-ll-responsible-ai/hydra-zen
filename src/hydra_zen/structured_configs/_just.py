@@ -15,6 +15,7 @@ from ._utils import merge_settings
 from ._value_conversion import ConfigComplex
 
 # pyright: strict
+T = TypeVar("T")
 TD = TypeVar("TD", bound=DataClass_)
 TC = TypeVar("TC", bound=Callable[..., Any])
 TP = TypeVar("TP", bound=_HydraPrimitive)
@@ -50,23 +51,23 @@ def just(
 
 @overload
 def just(
-    obj: TB,
-    *,
-    zen_convert: Optional[ZenConvert] = ...,
-    hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
-) -> Builds[Type[TB]]:
-    ...
-
-
-@overload
-def just(
     obj: TC,
     *,
     zen_convert: Optional[ZenConvert] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
 ) -> Type[Just[TC]]:
+    ...
+
+
+@overload
+def just(
+    obj: TB,
+    *,
+    zen_convert: Optional[ZenConvert] = ...,
+    hydra_recursive: Optional[bool] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+) -> Builds[Type[TB]]:
     ...
 
 
