@@ -42,11 +42,16 @@ from hydra_zen._compatibility import (
     PATCH_OMEGACONF_830,
     ZEN_SUPPORTED_PRIMITIVES,
 )
-from hydra_zen.errors import HydraZenUnsupportedPrimitiveError, HydraZenValidationError
+from hydra_zen.errors import (
+    HydraZenDeprecationWarning,
+    HydraZenUnsupportedPrimitiveError,
+    HydraZenValidationError,
+)
 from hydra_zen.funcs import get_obj
 from hydra_zen.structured_configs import _utils
 from hydra_zen.typing import (
     Builds,
+    DataclassOptions,
     Importable,
     Just,
     PartialBuilds,
@@ -698,6 +703,7 @@ def builds(
     hydra_defaults: Optional[DefaultsList] = ...,
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[()] = ...,
+    zen_dataclass: Optional[DataclassOptions] = None,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
 ) -> Type[BuildsWithSig[Type[R], P]]:
@@ -718,6 +724,7 @@ def builds(
     hydra_defaults: Optional[DefaultsList] = ...,
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
+    zen_dataclass: Optional[DataclassOptions] = None,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     **kwargs_for_target: SupportedPrimitive,
@@ -739,6 +746,7 @@ def builds(
     hydra_defaults: Optional[DefaultsList] = ...,
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
+    zen_dataclass: Optional[DataclassOptions] = None,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     **kwargs_for_target: SupportedPrimitive,
@@ -760,6 +768,7 @@ def builds(
     hydra_defaults: Optional[DefaultsList] = ...,
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
+    zen_dataclass: Optional[DataclassOptions] = None,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     **kwargs_for_target: SupportedPrimitive,
@@ -781,6 +790,7 @@ def builds(
     hydra_defaults: Optional[DefaultsList] = ...,
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
+    zen_dataclass: Optional[DataclassOptions] = None,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     **kwargs_for_target: SupportedPrimitive,
@@ -802,9 +812,8 @@ def builds(
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     hydra_defaults: Optional[DefaultsList] = None,
-    frozen: bool = False,
     builds_bases: Tuple[Type[DataClass_], ...] = (),
-    dataclass_name: Optional[str] = None,
+    zen_dataclass: Optional[DataclassOptions] = None,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Union[
     Type[Builds[Importable]],
@@ -1224,6 +1233,33 @@ def builds(
     """
 
     zen_convert_settings = _utils.merge_settings(zen_convert, _BUILDS_CONVERT_SETTINGS)
+    if zen_dataclass is None:
+        zen_dataclass = {}
+
+    if "frozen" in kwargs_for_target:
+        warnings.warn(
+            HydraZenDeprecationWarning(
+                "Specifying `builds(..., frozen=<...>)` is deprecated. Instead, specifying `builds(..., zen_dataclass={'frozen': <...>})"
+            ),
+            stacklevel=2,
+        )
+        zen_dataclass["frozen"] = kwargs_for_target.pop("frozen")  # type: ignore
+
+    if "dataclass_name" in kwargs_for_target:
+        warnings.warn(
+            HydraZenDeprecationWarning(
+                "Specifying `builds(..., dataclass_name=<...>)` is deprecated. Instead, specifying `builds(..., zen_dataclass={'cls_name': <...>})"
+            ),
+            stacklevel=2,
+        )
+        zen_dataclass["cls_name"] = kwargs_for_target.pop("dataclass_name")  # type: ignore
+    if not builds_bases:
+        builds_bases = zen_dataclass.get("bases", ())
+
+    dataclass_options = _utils.parse_dataclass_options(zen_dataclass)
+    dataclass_name = dataclass_options.pop("cls_name", None)
+    module = dataclass_options.pop("module", None)
+
     del zen_convert
 
     if not pos_args and not kwargs_for_target:
@@ -1269,14 +1305,6 @@ def builds(
     _utils.validate_hydra_options(
         hydra_recursive=hydra_recursive, hydra_convert=hydra_convert
     )
-
-    if not isinstance(frozen, bool):
-        raise TypeError(f"frozen must be a bool, got: {frozen}")
-
-    if dataclass_name is not None and not isinstance(dataclass_name, str):
-        raise TypeError(
-            f"`dataclass_name` must be a string or None, got: {dataclass_name}"
-        )
 
     if any(not (is_dataclass(_b) and isinstance(_b, type)) for _b in builds_bases):
         raise TypeError("All `build_bases` must be a tuple of dataclass types")
@@ -1981,13 +2009,18 @@ def builds(
             del _field
             del sanitized_value
 
-    out = make_dataclass(
-        dataclass_name, fields=sanitized_base_fields, bases=builds_bases, frozen=frozen
-    )
+    dataclass_options["cls_name"] = dataclass_name
+    dataclass_options["bases"] = builds_bases
+    assert _utils.parse_strict_dataclass_options(dataclass_options)
+
+    out = make_dataclass(fields=sanitized_base_fields, **dataclass_options)
+
+    if module is not None:
+        out.__module__ = module
 
     out.__doc__ = (
-        f"A structured config designed to {'partially ' if zen_partial else ''}initialize/call "
-        f"`{target_path}` upon instantiation by hydra."
+        f"A structured config designed to {'partially ' if zen_partial else ''}"
+        f"initialize/call `{target_path}` upon instantiation by hydra."
     )
     if hasattr(target, "__doc__"):  # pragma: no branch
         target_doc = target.__doc__

@@ -22,6 +22,9 @@ __BUILDS_DEFAULTS: Final[Dict[str, Any]] = {
     for name, p in _builds_sig.parameters.items()
     if p.kind is p.KEYWORD_ONLY
 }
+# TODO: Remove deprecated options once they are phased out
+__BUILDS_DEFAULTS["frozen"] = False
+__BUILDS_DEFAULTS["dataclass_name"] = None
 del _builds_sig
 
 
@@ -230,8 +233,10 @@ def make_custom_builds_fn(
     >>> instantiate(Conf, x="c")  # violates annotation: Literal["a", "b"]
     <Validation error: "c" is not "a" or "b">
     """
-
-    excluded_fields = frozenset({"dataclass_name", "hydra_defaults", "builds_bases"})
+    # TODO: remove zen_dataclass
+    excluded_fields = frozenset(
+        {"dataclass_name", "hydra_defaults", "builds_bases", "zen_dataclass"}
+    )
     LOCALS = locals()
 
     # Ensures that new defaults added to `builds` must be reflected
