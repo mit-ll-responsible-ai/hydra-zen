@@ -577,19 +577,19 @@ def check_populate_full_sig():
     # The following should be ok
     reveal_type(
         Conf_f(1, "hi"),
-        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = ...)]",
+        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = False)]",
     )
     reveal_type(
         Conf_f(1, "hi", True),
-        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = ...)]",
+        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = False)]",
     )
     reveal_type(
         Conf_f(1, y="hi"),
-        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = ...)]",
+        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = False)]",
     )
     reveal_type(
         Conf_f(x=1, y="hi", z=False),
-        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = ...)]",
+        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = False)]",
     )
 
     # check instantiation
@@ -740,7 +740,7 @@ def check_make_custom_builds_pop_sig():
 
     reveal_type(
         Conf,
-        expected_text="Type[BuildsWithSig[Type[int], (x: int, y: str, z: bool = ...)]]",
+        expected_text="Type[BuildsWithSig[Type[int], (x: int, y: str, z: bool = False)]]",
     )
 
 
