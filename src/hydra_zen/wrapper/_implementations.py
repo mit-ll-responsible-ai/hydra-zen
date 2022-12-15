@@ -1,5 +1,5 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
-# SPDX-License-Identifier: MIR
+# SPDX-License-Identifier: MIT
 # pyright: strict
 
 from collections import defaultdict, deque
