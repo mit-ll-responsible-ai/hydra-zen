@@ -23,15 +23,18 @@ expected_header = f"""
 # SPDX-License-Identifier: MIT
 """.lstrip()
 
-src_files = sorted(root.glob("**/*.py"))
-src_files += sorted(root.parent.glob("tests/**/*.py"))
+src_files = sorted(root.glob("hydra_zen/**/*.py"))
+test_files = sorted(root.parent.glob("tests/**/*.py"))
+
+assert src_files
+assert test_files
 
 
 @pytest.mark.skipif(
     sys.version_info[:2] != (3, 9),
     reason="Only test project structure for one version.",
 )
-@pytest.mark.parametrize("file", [param(f, id=str(f)) for f in src_files])
+@pytest.mark.parametrize("file", [param(f, id=str(f)) for f in src_files + test_files])
 def test_file_header(file: Path):
     src = file.read_text()[: len(expected_header)]
     if file.name == "__init__.py" and not src:
