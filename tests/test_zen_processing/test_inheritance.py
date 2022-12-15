@@ -1,3 +1,5 @@
+# Copyright (c) 2022 Massachusetts Institute of Technology
+# SPDX-License-Identifier: MIT
 from dataclasses import dataclass
 from functools import partial
 from typing import Tuple, Type
