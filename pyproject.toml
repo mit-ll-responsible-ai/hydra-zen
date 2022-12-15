@@ -247,8 +247,10 @@ basepython=python3.9
 deps=black
      isort
      flake8
+     pytest
 commands=
     black src/ tests/ --diff --check
     isort src/ tests/ --diff --check
     flake8 src/ tests/
+    pytest project_tooling/test_headers.py
 """
