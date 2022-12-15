@@ -1301,8 +1301,8 @@
 <span class="sd">           return Config</span>
 
 <span class="sd">    The resulting &quot;config&quot; is a dynamically-generated dataclass type [5]_ with</span>
-<span class="sd">    Hydra-specific attributes attached to it [1]_. It posseses a `_target_` attribute</span>
-<span class="sd">    that indicates the import path to the configured target as a string.</span>
+<span class="sd">    Hydra-specific attributes attached to it [1]_. It possesses a `_target_`</span>
+<span class="sd">    attribute that indicates the import path to the configured target as a string.</span>
 
 <span class="sd">    Using any of the ``zen_xx`` features will result in a config that depends</span>
 <span class="sd">    explicitly on hydra-zen. I.e. hydra-zen must be installed in order to</span>
@@ -1458,7 +1458,7 @@
 
 <span class="sd">    .. _builds-validation:</span>
 
-<span class="sd">    **Runtime validation perfomed by builds**</span>
+<span class="sd">    **Runtime validation performed by builds**</span>
 
 <span class="sd">    Misspelled parameter names and other invalid configurations for the target’s</span>
 <span class="sd">    signature will be caught by `builds` so that such errors are caught prior to</span>
@@ -1505,9 +1505,9 @@
 <span class="sd">    and/or its outputs during the instantiation process.</span>
 
 <span class="sd">    Let&#39;s use a wrapper to add a unit-conversion step to a config. We&#39;ll modify a</span>
-<span class="sd">    config that builds a function, which converts a temperature in Farenheit to</span>
-<span class="sd">    Celcius, and add a wrapper to it so that it will convert from Farenheit to Kelvin</span>
-<span class="sd">    instead.</span>
+<span class="sd">    config that builds a function, which converts a temperature in Fahrenheit to</span>
+<span class="sd">    Celsius, and add a wrapper to it so that it will convert from Fahrenheit to</span>
+<span class="sd">    Kelvin instead.</span>
 
 <span class="sd">    &gt;&gt;&gt; def faren_to_celsius(temp_f):  # our target</span>
 <span class="sd">    ...     return ((temp_f - 32) * 5) / 9</span>
@@ -1638,7 +1638,7 @@
                 <span class="c1"># then we should get the target of `wrapper` and make sure it is callable</span>
                 <span class="k">if</span> <span class="n">is_just</span><span class="p">(</span><span class="n">wrapper</span><span class="p">):</span>
                     <span class="c1"># `zen_wrappers` handles importing string; we can</span>
-                    <span class="c1"># elimintate the indirection of Just and &quot;flatten&quot; this</span>
+                    <span class="c1"># eliminate the indirection of Just and &quot;flatten&quot; this</span>
                     <span class="c1"># config</span>
                     <span class="n">validated_wrappers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">wrapper</span><span class="p">,</span> <span class="n">JUST_FIELD_NAME</span><span class="p">))</span>
                 <span class="k">else</span><span class="p">:</span>

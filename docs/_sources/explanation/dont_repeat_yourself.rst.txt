@@ -37,7 +37,7 @@ We'll compare the processes of configuring :class:`DNN` using a YAML-file, using
 Statically-Defined Configs are WET
 ==================================
 
-Manually writing a structured config for ``DNN`` entails hard-coding its current import-path as a string as wll as explicitly mirroring its signature:
+Manually writing a structured config for ``DNN`` entails hard-coding its current import-path as a string as well as explicitly mirroring its signature:
 
 
 .. tab-set::

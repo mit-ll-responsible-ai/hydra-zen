@@ -383,7 +383,7 @@ until that entry is actually accessed. This defers the runtime cost of construct
 configs for the decorated function so that it need not be paid until necessary.</p>
 <p id="self-partial"><strong>Customizable store defaults via ‘self-partialing’ patterns</strong></p>
 <p>The default values for a store’s <a class="reference internal" href="#hydra_zen.ZenStore.__call__" title="hydra_zen.ZenStore.__call__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code></a> parameters – <code class="xref py py-obj docutils literal notranslate"><span class="pre">group</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">to_config</span></code>, etc.
-– can easily be customized. Simpy call the store with those new values and
+– can easily be customized. Simply call the store with those new values and
 without specifying an object to be stored. This will return a “mirrored” store
 instance – with the same internal state as the original store – with updated
 defaults.</p>
