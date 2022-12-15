@@ -247,9 +247,11 @@ deps=black
      isort
      flake8
      pytest
+     codespell
 commands=
     black src/ tests/ --diff --check
     isort src/ tests/ --diff --check
     flake8 src/ tests/
+    codespell src/ docs/
     pytest project_tooling/test_headers.py
 """

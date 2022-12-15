@@ -84,7 +84,7 @@ def coerce_sequences(obj: _T) -> _T:
     -----
     The supported non-string sequence types are:
     - tuples
-    - deques
+    - dequeues
     - lists
     - named-tuples
 

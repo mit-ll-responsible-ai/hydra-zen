@@ -202,7 +202,7 @@ Compatibility-Breaking Changes
 ------------------------------
 This release drops support for Python 3.6. If you require Python 3.6, please restrict your hydra-zen installation dependency as `hydra-zen<0.8.0`.
 
-Specifing `make_custom_builds_fn([...], builds_bases=<...>)` was deprecated in 
+Specifying `make_custom_builds_fn([...], builds_bases=<...>)` was deprecated in 
 hydra-zen 0.7.0 (:pull:`263`). Accordingly, this option has now been removed from
 :func:`hydra_zen.make_custom_builds_fn`.
 
