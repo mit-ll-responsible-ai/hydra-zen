@@ -134,8 +134,7 @@ passenv = *
 deps = pytest
        hypothesis
        pytest-xdist
-commands = pytest -n auto \
-           {posargs}
+commands = pytest -n auto tests/ {posargs}
 
 
 [testenv:min-deps]  # test against minimum dependency versions
