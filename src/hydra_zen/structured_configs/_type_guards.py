@@ -49,7 +49,7 @@ def is_just(x: Any) -> TypeGuard[Just[Any]]:
         if attr == _get_target(Just) or attr is get_obj:
             return True
         else:
-            # ensures we conver this branch in tests
+            # ensures we convert this branch in tests
             return False
     return False
 
