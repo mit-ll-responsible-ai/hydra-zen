@@ -135,8 +135,7 @@ passenv = *
 deps = pytest
        hypothesis
        pytest-xdist
-commands = pytest -n auto \
-           {posargs}
+commands = pytest -n auto tests/ {posargs}
 
 
 [testenv:min-deps]  # test against minimum dependency versions
@@ -204,7 +203,7 @@ commands = pytest -n auto tests/test_docs_typecheck.py -vv
 
 [testenv:third-party]
 install_command = pip install --upgrade --upgrade-strategy eager {opts} {packages}
-basepython = python3.8
+basepython = python3.9
 deps = {[testenv]deps}
        torch
        pytorch-lightning
@@ -248,8 +247,12 @@ basepython=python3.9
 deps=black
      isort
      flake8
+     pytest
+     codespell
 commands=
     black src/ tests/ --diff --check
     isort src/ tests/ --diff --check
     flake8 src/ tests/
+    codespell src/ docs/
+    pytest project_tooling/test_headers.py
 """

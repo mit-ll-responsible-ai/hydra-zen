@@ -286,7 +286,7 @@ def get_obj_path(obj: Any) -> str:
         return f"{module}.{name}"
     else:
 
-        # __qualname__ reflects name of class that originaly defines classmethod.
+        # __qualname__ reflects name of class that originally defines classmethod.
         # Does not point to child in case of inheritance.
         #
         # obj.__self__ -> parent object
@@ -416,7 +416,7 @@ def sanitized_type(
             return Dict
 
         if (origin is tuple or origin is Tuple) and not nested:
-            # hydra silently supports tuples of homogenous types
+            # hydra silently supports tuples of homogeneous types
             # It has some weird behavior. It treats `Tuple[t1, t2, ...]` as `List[t1]`
             # It isn't clear that we want to perpetrate this on our end..
             # So we deal with inhomogeneous types as e.g. `Tuple[str, int]` -> `Tuple[Any, Any]`.

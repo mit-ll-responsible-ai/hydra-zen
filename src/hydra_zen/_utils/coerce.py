@@ -1,3 +1,6 @@
+# Copyright (c) 2022 Massachusetts Institute of Technology
+# SPDX-License-Identifier: MIT
+
 import sys
 
 if sys.version_info < (3, 7):  # pragma: no cover
@@ -81,7 +84,7 @@ def coerce_sequences(obj: _T) -> _T:
     -----
     The supported non-string sequence types are:
     - tuples
-    - deques
+    - dequeues
     - lists
     - named-tuples
 

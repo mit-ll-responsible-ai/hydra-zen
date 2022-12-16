@@ -1,5 +1,5 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
-# SPDX-License-Identifier: MIR
+# SPDX-License-Identifier: MIT
 # pyright: strict
 
 from collections import defaultdict, deque
@@ -986,7 +986,7 @@ class ZenStore:
     **Customizable store defaults via 'self-partialing' patterns**
 
     The default values for a store's `__call__` parameters – `group`, `to_config`, etc.
-    – can easily be customized. Simpy call the store with those new values and
+    – can easily be customized. Simply call the store with those new values and
     without specifying an object to be stored. This will return a "mirrored" store
     instance – with the same internal state as the original store – with updated
     defaults.

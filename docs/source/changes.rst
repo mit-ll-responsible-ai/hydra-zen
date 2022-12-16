@@ -11,7 +11,7 @@ chronological order. All previous releases should still be available on pip.
 .. _v0.9.0:
 
 ---------------------
-0.9.0rc4 - 2022-11-21
+0.9.0rc5 - 2022-12-09
 ---------------------
 
 .. note:: This is documentation for an unreleased version of hydra-zen. You can try out this pre-release version using `pip install --pre hydra-zen`
@@ -123,6 +123,10 @@ Improvements
 - :func:`~hydra_zen.hydrated_dataclass` will now produce a pickle-compatible dataclass type. See :pull:`338`.
 - All documentation code blocks are scanned by pyright as part of our CI process. Several errors in the documentation were fixed. See :pull:`343` and :pull:`344`.
 
+Bug Fixes
+---------
+- :pull:`355` fixes an issue where the parameterized generic `hydra_zen.typing.Partial[<...>]` would return `None` for Python versions 3.9+. This prevented this annotation from being used by runtime type checkers.
+
 Compatibility-Breaking Changes
 ------------------------------
 - Previously, any class decorated by :func:`~hydra_zen.hydrated_dataclass` would have a `__module__` attribute set to `typing`. Now the class's `__module__` will reflect the module where its static definition resides. This enables pickle-compatibility  (:pull:`338`). This is unlikely to cause any issues for users.
@@ -198,7 +202,7 @@ Compatibility-Breaking Changes
 ------------------------------
 This release drops support for Python 3.6. If you require Python 3.6, please restrict your hydra-zen installation dependency as `hydra-zen<0.8.0`.
 
-Specifing `make_custom_builds_fn([...], builds_bases=<...>)` was deprecated in 
+Specifying `make_custom_builds_fn([...], builds_bases=<...>)` was deprecated in 
 hydra-zen 0.7.0 (:pull:`263`). Accordingly, this option has now been removed from
 :func:`hydra_zen.make_custom_builds_fn`.
 

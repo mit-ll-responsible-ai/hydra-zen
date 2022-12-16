@@ -983,8 +983,8 @@ def builds(
            return Config
 
     The resulting "config" is a dynamically-generated dataclass type [5]_ with
-    Hydra-specific attributes attached to it [1]_. It posseses a `_target_` attribute
-    that indicates the import path to the configured target as a string.
+    Hydra-specific attributes attached to it [1]_. It possesses a `_target_`
+    attribute that indicates the import path to the configured target as a string.
 
     Using any of the ``zen_xx`` features will result in a config that depends
     explicitly on hydra-zen. I.e. hydra-zen must be installed in order to
@@ -1140,7 +1140,7 @@ def builds(
 
     .. _builds-validation:
 
-    **Runtime validation perfomed by builds**
+    **Runtime validation performed by builds**
 
     Misspelled parameter names and other invalid configurations for the target’s
     signature will be caught by `builds` so that such errors are caught prior to
@@ -1187,9 +1187,9 @@ def builds(
     and/or its outputs during the instantiation process.
 
     Let's use a wrapper to add a unit-conversion step to a config. We'll modify a
-    config that builds a function, which converts a temperature in Farenheit to
-    Celcius, and add a wrapper to it so that it will convert from Farenheit to Kelvin
-    instead.
+    config that builds a function, which converts a temperature in Fahrenheit to
+    Celsius, and add a wrapper to it so that it will convert from Fahrenheit to
+    Kelvin instead.
 
     >>> def faren_to_celsius(temp_f):  # our target
     ...     return ((temp_f - 32) * 5) / 9
@@ -1339,7 +1339,7 @@ def builds(
                 # then we should get the target of `wrapper` and make sure it is callable
                 if is_just(wrapper):
                     # `zen_wrappers` handles importing string; we can
-                    # elimintate the indirection of Just and "flatten" this
+                    # eliminate the indirection of Just and "flatten" this
                     # config
                     validated_wrappers.append(getattr(wrapper, JUST_FIELD_NAME))
                 else:
