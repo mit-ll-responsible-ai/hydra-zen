@@ -923,13 +923,28 @@ def builds(
         [6]_ [7]_. Each input config can have a Defaults List as a top level element. The
         Defaults List itself is not a part of output config.
 
+    zen_dataclass : Optional[DataclassOptions]
+        A dictionary can specify any option that is supported by
+        :py:func:`dataclasses.make_dataclass` other than `fields`.
+        The default value for `unsafe_hash` is `True`.
+
+        Additionally, the `module` field can be specified to enable pickle compatibilty.
+        See `hydra_zen.typing.DataclassOptions` for details.
+
     frozen : bool, optional (default=False)
+        .. deprecated:: 0.9.0
+            `frozen` will be removed in hydra-zen 0.10.0. It is replaced by
+            `zen_dataclass={'frozen': True}`.
+
         If ``True``, the resulting config will create frozen (i.e. immutable) instances.
         I.e. setting/deleting an attribute of an instance will raise
         :py:class:`dataclasses.FrozenInstanceError` at runtime.
 
-
     dataclass_name : Optional[str]
+            .. deprecated:: 0.9.0
+            `dataclass_name` will be removed in hydra-zen 0.10.0. It is replaced by
+            `zen_dataclass={'cls_name': <name>}`.
+
         If specified, determines the name of the returned class object.
 
     Returns
@@ -1206,11 +1221,29 @@ def builds(
     >>> instantiate(AsKelvin, temp_f=32)
     273.15
 
+    **Creating a pickle-compatible config**
+
+    The dynamically-generated classes created by `builds` can be made pickle-compatible
+    by specifying the name of the symbol that it is assigned to and the module in which
+    it was defined.
+
+    .. code-block:: python
+
+       # contents of mylib/foo.py
+       from pickle import dumps, loads
+
+       DictConf = builds(dict,
+                         zen_dataclass={'module': 'mylib.foo',
+                                       'cls_name': 'DictConf'})
+
+       assert DictConf is loads(dumps(DictConf))
+
+
     **Creating a frozen config**
 
     Let's create a config object whose instances will by "frozen" (i.e., immutable).
 
-    >>> RouterConfig = builds(dict, ip_address=None, frozen=True)
+    >>> RouterConfig = builds(dict, ip_address=None, zen_dataclass={'frozen': True})
     >>> my_router = RouterConfig(ip_address="192.168.56.1")  # an immutable instance
 
     Attempting to overwrite the attributes of ``my_router`` will raise.
@@ -1239,7 +1272,8 @@ def builds(
     if "frozen" in kwargs_for_target:
         warnings.warn(
             HydraZenDeprecationWarning(
-                "Specifying `builds(..., frozen=<...>)` is deprecated. Instead, specifying `builds(..., zen_dataclass={'frozen': <...>})"
+                "Specifying `builds(..., frozen=<...>)` is deprecated. Instead, "
+                "specify `builds(..., zen_dataclass={'frozen': <...>})"
             ),
             stacklevel=2,
         )
@@ -1248,7 +1282,8 @@ def builds(
     if "dataclass_name" in kwargs_for_target:
         warnings.warn(
             HydraZenDeprecationWarning(
-                "Specifying `builds(..., dataclass_name=<...>)` is deprecated. Instead, specifying `builds(..., zen_dataclass={'cls_name': <...>})"
+                "Specifying `builds(..., dataclass_name=<...>)` is deprecated. "
+                "Instead specify `builds(..., zen_dataclass={'cls_name': <...>})"
             ),
             stacklevel=2,
         )

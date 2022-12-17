@@ -1,6 +1,7 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import string
+from dataclasses import dataclass
 from typing import (
     Any,
     Deque,
@@ -18,6 +19,7 @@ import hypothesis.strategies as st
 
 from hydra_zen import ZenStore, builds
 from hydra_zen.structured_configs._utils import get_obj_path
+from hydra_zen.typing import DataclassOptions
 from hydra_zen.typing._implementations import ZenConvert
 
 __all__ = ["valid_builds_args", "partitions", "everything_except"]
@@ -30,6 +32,16 @@ def _wrapper(obj):
     return obj
 
 
+@dataclass
+class BaseA:
+    ...
+
+
+@dataclass
+class BaseB:
+    ...
+
+
 # strategies for drawing valid inputs to `zen_wrappers`
 single_wrapper_strat = (
     st.just(_wrapper)
@@ -38,6 +50,25 @@ single_wrapper_strat = (
 )
 wrapper_strat = single_wrapper_strat | st.lists(single_wrapper_strat)
 
+st.register_type_strategy(
+    DataclassOptions,
+    st.fixed_dictionaries(
+        {},
+        optional={
+            "cls_name": st.text("abcdefg_", min_size=1),
+            "init": st.booleans(),
+            "repr": st.booleans(),
+            "eq": st.just(True),
+            "order": st.booleans(),
+            "unsafe_hash": st.booleans(),
+            "frozen": st.booleans(),
+            "match_args": st.booleans(),
+            "kw_only": st.booleans(),
+            "slots": st.booleans(),
+            "weakref_slot": st.booleans(),
+        },
+    ),
+)
 
 _valid_builds_strats = dict(
     zen_partial=st.none() | st.booleans(),
@@ -49,11 +80,9 @@ _valid_builds_strats = dict(
     populate_full_signature=st.booleans(),
     hydra_recursive=st.booleans(),
     hydra_convert=st.sampled_from(["none", "partial", "all"]),
-    frozen=st.booleans(),
-    builds_bases=st.lists(
-        st.sampled_from([builds(x) for x in (int, len, dict)]), unique=True
-    ).map(tuple),
+    builds_bases=st.just(()),
     zen_convert=st.none() | st.from_type(ZenConvert),
+    zen_dataclass=st.none() | st.from_type(DataclassOptions),
 )
 
 
@@ -127,7 +156,7 @@ def f():
     pass
 
 
-f_Build = builds(f, dataclass_name="f_Build")
+f_Build = builds(f, zen_dataclass={"cls_name": "f_Build"})
 
 
 @st.composite

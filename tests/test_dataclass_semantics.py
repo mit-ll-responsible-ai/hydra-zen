@@ -96,7 +96,7 @@ def f_3(x):
 
 def test_frozen_via_builds():
 
-    conf_f = builds(f, x=2, frozen=True)()
+    conf_f = builds(f, x=2, zen_dataclass={"frozen": True})()
 
     with pytest.raises(FrozenInstanceError):
         conf_f.x = 3

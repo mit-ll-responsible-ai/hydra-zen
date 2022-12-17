@@ -1249,3 +1249,22 @@ def check_store():
     assert_type(list(store), List[StoreEntry])
     assert_type("group" in store, bool)
     assert_type(("group", "name") in store, bool)
+
+
+def test_zen_dataclass(ff: FullBuilds, ss: StdBuilds, pp: PBuilds):
+    ff(int, zen_dataclass={"eq": True})
+    ff(int, zen_dataclass={"blah": 2})  # type: ignore
+
+    ss(int, zen_dataclass={"eq": True})
+    ss(int, zen_dataclass={"blah": 2})  # type: ignore
+
+    pp(int, zen_dataclass={"eq": True})
+    pp(int, zen_dataclass={"blah": 2})  # type: ignore
+
+    builds(int, zen_dataclass={"eq": True})
+    builds(int, zen_dataclass={"blah": 2})  # type: ignore
+
+    bf = make_custom_builds_fn(zen_dataclass={"eq": True})
+    make_custom_builds_fn(zen_dataclass={"blah": 2})  # type: ignore
+    bf(int, zen_dataclass={"eq": True})
+    bf(int, zen_dataclass={"blah": 2})  # type: ignore

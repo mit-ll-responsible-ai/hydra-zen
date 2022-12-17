@@ -609,6 +609,41 @@ _STRICT_DATACLASS_OPTION_KEYS.copy()
 def parse_dataclass_options(
     options: Union[Mapping[str, Any], None]
 ) -> DataclassOptions:
+    """
+    Ensures `options` adheres to `DataclassOptions` and merges hydra-zen defaults
+    for missing options.
+
+    All valid `@dataclass`/`make_dataclass` options are supported, even for features
+    introduced in later versions of Python. This function will remove valid options
+    that are not supported for by the current Python version.
+
+    Parameters
+    ----------
+    options : Mapping[str, Any] | None
+        User-specified options for `zen_dataclass` to be validated.
+
+    Returns
+    -------
+    DataclassOptions
+
+    Examples
+    --------
+    >>> parse_dataclass_options({})
+    {'unsafe_hash': True}
+
+    >>> parse_dataclass_options({"unsafe_hash": False, "cls_name": "Foo"})
+    {'unsafe_hash': False, 'cls_name': 'Foo'}
+
+    >>> parse_dataclass_options({"moo": 1})
+    ValueError: moo is not a valid dataclass option.
+
+    Options that are supported by `make_dataclass` for later versions of
+    Python are ignored/removed automatically by this function. E.g. the following
+    Python 3.10+ option has the following behavior in Python 3.9:
+
+    >>> parse_dataclass_options({"slots": False})
+    {'unsafe_hash': True}
+    """
     if options is not None and not isinstance(options, Mapping):
         raise ValueError(
             f"`zen_dataclass_options` is expected to be `None` or dict[str, bool]. Got "

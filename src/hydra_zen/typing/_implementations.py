@@ -397,7 +397,7 @@ class DataclassOptions(_Py311Dataclass, total=False):
 
         This is a hydra-zen exclusive feature.
 
-    module : Optional[str], optional (default='typing')
+    module : str, default='typing'
         If specified, sets the `__module__` attribute of the resulting dataclass.
         Specifying the module name in which the dataclass was generated will enable
         pickle-compatibility for that dataclass. (This argument is exclusive to
@@ -469,7 +469,7 @@ class DataclassOptions(_Py311Dataclass, total=False):
     .. [1] https://docs.python.org/3/library/dataclasses.html
     """
 
-    module: Optional[str]  # zen-only
+    module: str  # zen-only
 
 
 def _permitted_keys(typed_dict: Any) -> FrozenSet[str]:
