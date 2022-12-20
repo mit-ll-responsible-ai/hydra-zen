@@ -1,6 +1,7 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
+import sys
 from copy import deepcopy
 from dataclasses import FrozenInstanceError, is_dataclass
 
@@ -43,7 +44,7 @@ def f_2(x, y, z):
 
 @pytest.mark.parametrize("full_sig", [True, False])
 @pytest.mark.parametrize("partial", [True, False, None])
-def test_chain_builds_of_targets_with_common_interfaces(full_sig, partial):
+def test_chain_builds_of_targets_with_common_interfaces(full_sig, partial: bool):
 
     # Note that conf_1 and conf_2 target `f` whereas conf_3 targets `f_three_vars`,
     # which have identical interfaces.
@@ -62,14 +63,15 @@ def test_chain_builds_of_targets_with_common_interfaces(full_sig, partial):
 
     out = instantiate(conf_3)
     if partial:
-        out = out()  # resolve partial
+        # resolve partial
+        out = out()  # type: ignore
 
     assert out == (1, 2, 3)
 
 
 @pytest.mark.parametrize("full_sig", [True, False])
 @pytest.mark.parametrize("partial", [True, False, None])
-def test_pos_args_with_inheritance(full_sig, partial):
+def test_pos_args_with_inheritance(full_sig, partial: bool):
 
     conf_1 = builds(f_three_vars, 1, 2)
     conf_2 = builds(
@@ -85,7 +87,8 @@ def test_pos_args_with_inheritance(full_sig, partial):
 
     out = instantiate(conf_2)
     if partial:
-        out = out()  # resolve partial
+        # resolve partial
+        out = out()  # type: ignore
 
     assert out == (1, 2, 3)
 
@@ -110,7 +113,7 @@ def test_frozen_via_hydrated_dataclass():
     conf_f = Conf_f()
 
     with pytest.raises(FrozenInstanceError):
-        conf_f.x = 3
+        conf_f.x = 3  # type: ignore
 
 
 @given(
@@ -157,8 +160,8 @@ def test_hydra_settings_can_be_inherited(recursive, convert, via_builds):
         kwargs["hydra_convert"] = convert
 
     if via_builds:
-        Base = builds(dict, **kwargs)
-        Child = builds(dict, builds_bases=(Base,))
+        Base = builds(dict, **kwargs)  # type: ignore
+        Child = builds(dict, builds_bases=(Base,))  # type: ignore
     else:
 
         @hydrated_dataclass(target=dict, **kwargs)
@@ -170,12 +173,12 @@ def test_hydra_settings_can_be_inherited(recursive, convert, via_builds):
             pass
 
     if recursive is not NotSet:
-        assert Child._recursive_ is Base._recursive_
+        assert Child._recursive_ is Base._recursive_  # type: ignore
     else:
         assert not hasattr(Child, "_recursive_")
 
     if convert is not NotSet:
-        assert Child._convert_ is Base._convert_
+        assert Child._convert_ is Base._convert_  # type: ignore
     else:
         assert not hasattr(Child, "_convert_")
 
@@ -183,10 +186,10 @@ def test_hydra_settings_can_be_inherited(recursive, convert, via_builds):
 @given(
     target=st.sampled_from([int, str]),
     zen_partial=st.none() | st.booleans(),
-    name=st.none() | st.just("CustomName"),
+    name=st.just("CustomName"),
 )
 def test_dataclass_name(target, zen_partial, name):
-    Conf = builds(target, zen_partial=zen_partial, dataclass_name=name)
+    Conf = builds(target, zen_partial=zen_partial, zen_dataclass={"cls_name": name})
     if name is not None:
         assert Conf.__name__ == "CustomName"
         return
@@ -195,3 +198,42 @@ def test_dataclass_name(target, zen_partial, name):
         assert Conf.__name__ == f"PartialBuilds_{target_name}"
     else:
         assert Conf.__name__ == f"Builds_{target_name}"
+
+
+PickleConf = builds(
+    dict,
+    x=2,
+    y="a",
+    zen_dataclass={
+        "module": "tests.test_dataclass_semantics",
+        "cls_name": "PickleConf",
+    },
+)
+
+
+def test_pickleable():
+    from pickle import dumps, loads
+
+    assert loads(dumps(PickleConf(y="b"))) != PickleConf()
+    assert loads(dumps(PickleConf())) == PickleConf()
+    assert loads(dumps(PickleConf)) is PickleConf
+
+
+@given(...)
+def test_hashable(unsafe_hash: bool):
+    Conf = builds(int, zen_dataclass={"unsafe_hash": unsafe_hash})
+    assert (Conf.__hash__ is None) is not unsafe_hash
+
+
+@given(...)
+def test_kwonly(kw_only: bool):
+
+    Conf = builds(dict, x=1, zen_dataclass={"kw_only": kw_only})
+
+    if sys.version_info < (3, 10):
+        _ = Conf(2)
+    else:
+        with pytest.raises(Exception):
+            _ = Conf(2)
+
+    _ = Conf(x=2)

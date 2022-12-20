@@ -183,6 +183,7 @@ def mutable_value(x: _T, *, zen_convert: Optional[ZenConvert] = None) -> _T:
     return field(default_factory=lambda: cast(x))
 
 
+# TODO: expose other dataclass options
 @dataclass_transform()
 def hydrated_dataclass(
     target: Callable[..., Any],
@@ -377,11 +378,14 @@ def hydrated_dataclass(
             zen_partial=zen_partial,
             zen_meta=zen_meta,
             builds_bases=(decorated_obj,),
-            dataclass_name=decorated_obj.__name__,
-            frozen=frozen,
+            zen_dataclass={
+                "cls_name": decorated_obj.__name__,
+                "module": decorated_obj.__module__,
+                "frozen": frozen,
+            },
             zen_convert=zen_convert,
         )
-        out.__module__ = decorated_obj.__module__
+
         return out
 
     return wrapper
