@@ -137,6 +137,7 @@ def _repack_zenfield(
 _MAKE_CONFIG_SETTINGS = AllConvert(dataclass=False)
 
 
+# TODO: add zen_dataclass
 def make_config(
     *fields_as_args: Union[str, ZenField],
     hydra_recursive: Optional[bool] = None,

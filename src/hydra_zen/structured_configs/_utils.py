@@ -606,9 +606,7 @@ _STRICT_DATACLASS_OPTION_KEYS: FrozenSet[str] = (
 _STRICT_DATACLASS_OPTION_KEYS.copy()
 
 
-def parse_dataclass_options(
-    options: Union[Mapping[str, Any], None]
-) -> DataclassOptions:
+def parse_dataclass_options(options: Mapping[str, Any]) -> DataclassOptions:
     """
     Ensures `options` adheres to `DataclassOptions` and merges hydra-zen defaults
     for missing options.
@@ -619,7 +617,7 @@ def parse_dataclass_options(
 
     Parameters
     ----------
-    options : Mapping[str, Any] | None
+    options : Mapping[str, Any]
         User-specified options for `zen_dataclass` to be validated.
 
     Returns
@@ -644,16 +642,13 @@ def parse_dataclass_options(
     >>> parse_dataclass_options({"slots": False})
     {'unsafe_hash': True}
     """
-    if options is not None and not isinstance(options, Mapping):
+    if not isinstance(options, Mapping):
         raise ValueError(
             f"`zen_dataclass_options` is expected to be `None` or dict[str, bool]. Got "
             f"{options} (type: {type(options)})."
         )
 
     merged = DEFAULT_DATACLASS_OPTIONS.copy()
-
-    if options is None:
-        return merged
 
     for name, val in options.items():
         if name in UNSUPPORTED_DATACLASS_OPTIONS:
@@ -674,18 +669,20 @@ def parse_dataclass_options(
                     f"dataclass option `{name}` must be a valid identifier, got {val}"
                 )
         elif name == "bases":
-            if any(not (is_dataclass(_b) and isinstance(_b, type)) for _b in val):
+            if not isinstance(val, Iterable) or any(
+                not (is_dataclass(_b) and isinstance(_b, type)) for _b in val
+            ):
                 raise TypeError(
                     f"dataclass option `{name}` must be a tuple of dataclass types"
                 )
-        elif name == "namespace" and (
-            not isinstance(val, Mapping)
-            or any(not isinstance(v, str) or not v.isidentifier() for v in val)
-        ):
-            raise ValueError(
-                f"dataclass option `{name}` must be a mapping with string-valued keys "
-                f"that are valid identifiers. Got {val}."
-            )
+        elif name == "namespace":
+            if not isinstance(val, Mapping) or any(
+                not isinstance(v, str) or not v.isidentifier() for v in val
+            ):
+                raise ValueError(
+                    f"dataclass option `{name}` must be a mapping with string-valued keys "
+                    f"that are valid identifiers. Got {val}."
+                )
         elif not isinstance(val, bool):
             raise TypeError(
                 f"dataclass option `{name}` must be of type `bool`. Got {val} "

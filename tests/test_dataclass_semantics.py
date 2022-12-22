@@ -9,7 +9,8 @@ import hypothesis.strategies as st
 import pytest
 from hypothesis import given
 
-from hydra_zen import builds, hydrated_dataclass, instantiate
+from hydra_zen import builds, hydrated_dataclass, instantiate, make_custom_builds_fn
+from hydra_zen.errors import HydraZenDeprecationWarning
 
 
 def f_three_vars(x, y, z):
@@ -97,9 +98,19 @@ def f_3(x):
     pass
 
 
-def test_frozen_via_builds():
+@pytest.mark.filterwarnings("ignore:Specifying")
+@pytest.mark.parametrize(
+    "fn",
+    [
+        lambda: builds(dict, x=2, zen_dataclass={"frozen": True})(),
+        lambda: builds(dict, x=2, frozen=True)(),
+        lambda: make_custom_builds_fn(zen_dataclass={"frozen": True})(dict, x=2)(),
+        lambda: make_custom_builds_fn(frozen=True)(dict, x=2)(),
+    ],
+)
+def test_frozen_via_builds(fn):
 
-    conf_f = builds(f, x=2, zen_dataclass={"frozen": True})()
+    conf_f = fn()
 
     with pytest.raises(FrozenInstanceError):
         conf_f.x = 3
@@ -212,7 +223,10 @@ PickleConf = builds(
 
 
 def test_pickleable():
-    from pickle import dumps, loads
+    from pickle import PicklingError, dumps, loads
+
+    with pytest.raises(PicklingError):
+        dumps(builds(int))
 
     assert loads(dumps(PickleConf(y="b"))) != PickleConf()
     assert loads(dumps(PickleConf())) == PickleConf()
@@ -223,6 +237,11 @@ def test_pickleable():
 def test_hashable(unsafe_hash: bool):
     Conf = builds(int, zen_dataclass={"unsafe_hash": unsafe_hash})
     assert (Conf.__hash__ is None) is not unsafe_hash
+
+
+def test_namespace():
+    conf = builds(int, zen_dataclass={"namespace": {"fn": lambda _, x: x + 2}})()
+    assert conf.fn(2) == 4
 
 
 @given(...)
@@ -237,3 +256,30 @@ def test_kwonly(kw_only: bool):
             _ = Conf(2)
 
     _ = Conf(x=2)
+
+
+def test_bases():
+    A = builds(int)
+    B = builds(int, zen_dataclass={"bases": (A,)})
+    C = builds(int, zen_dataclass={"bases": (B,), "eq": True})
+    assert issubclass(B, A)
+    assert issubclass(C, A)
+    assert issubclass(C, B)
+
+
+@pytest.mark.parametrize(
+    "fn",
+    [
+        lambda **kw: builds(dict, **kw),
+        lambda **kw: make_custom_builds_fn(**kw),
+        # make_config,
+    ],
+)
+def test_frozen_deprecated(fn):
+    with pytest.warns(HydraZenDeprecationWarning):
+        fn(frozen=True)
+
+
+def test_dataclassname_deprecated():
+    with pytest.warns(HydraZenDeprecationWarning):
+        builds(int, frozen=True)

@@ -1268,10 +1268,12 @@ def builds(
     >>> instantiate(Conf(a=-4))  # equivalent to calling: `partiald_dict(a=-4)`
     {'a': -4, 'b': 2}
     """
-
     zen_convert_settings = _utils.merge_settings(zen_convert, _BUILDS_CONVERT_SETTINGS)
     if zen_dataclass is None:
         zen_dataclass = {}
+
+    # initial validation
+    _utils.parse_dataclass_options(zen_dataclass)
 
     if "frozen" in kwargs_for_target:
         warnings.warn(

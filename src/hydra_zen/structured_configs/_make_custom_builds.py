@@ -2,11 +2,13 @@
 # SPDX-License-Identifier: MIT
 # pyright: strict
 import inspect
+import warnings
 from functools import wraps
 from typing import Any, Callable, Dict, Mapping, Optional, Union, cast, overload
 
 from typing_extensions import Final, Literal
 
+from hydra_zen.errors import HydraZenDeprecationWarning
 from hydra_zen.typing import DataclassOptions, ZenWrappers
 from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds, StdBuilds
 from hydra_zen.typing._implementations import ZenConvert
@@ -274,6 +276,14 @@ def make_custom_builds_fn(
         _zen_dataclass = {}
 
     if _frozen is True:
+        warnings.warn(
+            HydraZenDeprecationWarning(
+                "Specifying `builds(..., frozen=<...>)` is deprecated. Instead, "
+                "specify `builds(..., zen_dataclass={'frozen': <...>})"
+            ),
+            stacklevel=2,
+        )
+
         _zen_dataclass["frozen"] = _frozen
 
     _zen_dataclass = parse_dataclass_options(_zen_dataclass)
