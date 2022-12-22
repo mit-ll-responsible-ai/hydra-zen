@@ -307,7 +307,7 @@ def test_kwonly(kw_only: bool, fn):
 
     if sys.version_info < (3, 10):
         _ = Conf(2)
-    else:
+    elif kw_only is True:
         with pytest.raises(Exception):
             _ = Conf(2)
 
