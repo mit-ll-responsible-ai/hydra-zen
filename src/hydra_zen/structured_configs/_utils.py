@@ -451,7 +451,8 @@ def sanitized_type(
     if HYDRA_SUPPORTS_PARTIAL and isinstance(type_, type) and issubclass(type_, Path):
         type_ = Path
 
-    if isinstance(type_, (ParamSpecArgs, ParamSpecKwargs)):
+    if isinstance(type_, (ParamSpecArgs, ParamSpecKwargs)):  # pragma: no cover
+        # Python 3.7 - 3.9
         # these aren't hashable -- can't check for membership in set
         return Any
 
