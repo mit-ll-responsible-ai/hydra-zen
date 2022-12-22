@@ -34,6 +34,7 @@ from typing_extensions import (
     Literal,
     ParamSpec,
     Protocol,
+    Required,
     Self,
     TypeAlias,
     TypedDict,
@@ -373,11 +374,15 @@ class _Py311Dataclass(_Py310Dataclass, total=False):
 
 
 if sys.version_info < (3, 10):
-    StrictDataclassOptions = _AllPyDataclassOptions
+    _StrictDataclassOptions = _AllPyDataclassOptions
 elif sys.version_info < (3, 11):
-    StrictDataclassOptions = _Py310Dataclass
+    _StrictDataclassOptions = _Py310Dataclass
 else:  # pragma: no cover
-    StrictDataclassOptions = _Py311Dataclass
+    _StrictDataclassOptions = _Py311Dataclass
+
+
+class StrictDataclassOptions(_StrictDataclassOptions):
+    cls_name: Required[str]
 
 
 class DataclassOptions(_Py311Dataclass, total=False):
@@ -467,6 +472,11 @@ class DataclassOptions(_Py311Dataclass, total=False):
     References
     ----------
     .. [1] https://docs.python.org/3/library/dataclasses.html
+
+    Examples
+    --------
+    >>> from hydra_zen import builds, make_config, make_custom_builds_fn
+
     """
 
     module: str  # zen-only

@@ -1,15 +1,21 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-
 import sys
 from copy import deepcopy
 from dataclasses import FrozenInstanceError, is_dataclass
+from pickle import PicklingError, dumps, loads
 
 import hypothesis.strategies as st
 import pytest
 from hypothesis import given
 
-from hydra_zen import builds, hydrated_dataclass, instantiate, make_custom_builds_fn
+from hydra_zen import (
+    builds,
+    hydrated_dataclass,
+    instantiate,
+    make_config,
+    make_custom_builds_fn,
+)
 from hydra_zen.errors import HydraZenDeprecationWarning
 
 
@@ -211,43 +217,93 @@ def test_dataclass_name(target, zen_partial, name):
         assert Conf.__name__ == f"Builds_{target_name}"
 
 
-PickleConf = builds(
+PickleBuilds = builds(
     dict,
     x=2,
     y="a",
     zen_dataclass={
         "module": "tests.test_dataclass_semantics",
-        "cls_name": "PickleConf",
+        "cls_name": "PickleBuilds",
+    },
+)
+
+PickleCustomBuilds = make_custom_builds_fn(
+    zen_dataclass={
+        "module": "tests.test_dataclass_semantics",
+        "cls_name": "PickleCustomBuilds",
+    }
+)(dict, x=2, y="a")
+
+PickleMakeConfig = make_config(
+    x=2,
+    y="a",
+    zen_dataclass={
+        "module": "tests.test_dataclass_semantics",
+        "cls_name": "PickleMakeConfig",
     },
 )
 
 
-def test_pickleable():
-    from pickle import PicklingError, dumps, loads
+@pytest.mark.parametrize(
+    "Conf",
+    [
+        PickleBuilds,
+        PickleCustomBuilds,
+        PickleMakeConfig,
+        pytest.param(
+            builds(dict, x=2, y="a"),
+            marks=pytest.mark.xfail(
+                reason="not pickle compatible", raises=PicklingError
+            ),
+        ),
+    ],
+)
+def test_pickleable(Conf):
 
-    with pytest.raises(PicklingError):
-        dumps(builds(int))
-
-    assert loads(dumps(PickleConf(y="b"))) != PickleConf()
-    assert loads(dumps(PickleConf())) == PickleConf()
-    assert loads(dumps(PickleConf)) is PickleConf
+    assert loads(dumps(Conf(y="b"))) != Conf()
+    assert loads(dumps(Conf())) == Conf()
+    assert loads(dumps(Conf)) is Conf
 
 
-@given(...)
-def test_hashable(unsafe_hash: bool):
-    Conf = builds(int, zen_dataclass={"unsafe_hash": unsafe_hash})
+@given(unsafe_hash=...)
+@pytest.mark.parametrize(
+    "fn",
+    [
+        lambda **kw: builds(dict, **kw),
+        lambda **kw: make_custom_builds_fn(**kw)(dict),
+        make_config,
+    ],
+)
+def test_hashable(unsafe_hash: bool, fn):
+    Conf = fn(zen_dataclass={"unsafe_hash": unsafe_hash})
     assert (Conf.__hash__ is None) is not unsafe_hash
 
 
-def test_namespace():
-    conf = builds(int, zen_dataclass={"namespace": {"fn": lambda _, x: x + 2}})()
+@pytest.mark.parametrize(
+    "fn",
+    [
+        lambda **kw: builds(dict, **kw),
+        lambda **kw: make_custom_builds_fn(**kw)(dict),
+        make_config,
+    ],
+)
+def test_namespace(fn):
+    conf = fn(zen_dataclass={"namespace": {"fn": lambda _, x: x + 2}})()
     assert conf.fn(2) == 4
 
 
-@given(...)
-def test_kwonly(kw_only: bool):
+@given(kw_only=...)
+@pytest.mark.parametrize(
+    "fn",
+    [
+        lambda **kw: builds(dict, x=1, **kw),
+        lambda **kw: make_custom_builds_fn(**kw)(dict, x=1),
+        lambda **kw: make_config(x=1, **kw),
+    ],
+)
+def test_kwonly(kw_only: bool, fn):
 
-    Conf = builds(dict, x=1, zen_dataclass={"kw_only": kw_only})
+    Conf = fn(zen_dataclass={"kw_only": kw_only})
 
     if sys.version_info < (3, 10):
         _ = Conf(2)
@@ -258,10 +314,18 @@ def test_kwonly(kw_only: bool):
     _ = Conf(x=2)
 
 
-def test_bases():
-    A = builds(int)
-    B = builds(int, zen_dataclass={"bases": (A,)})
-    C = builds(int, zen_dataclass={"bases": (B,), "eq": True})
+@pytest.mark.parametrize(
+    "fn",
+    [
+        lambda **kw: builds(dict, **kw),
+        lambda **kw: make_custom_builds_fn(**kw)(dict),
+        make_config,
+    ],
+)
+def test_bases(fn):
+    A = fn()
+    B = fn(zen_dataclass={"bases": (A,)})
+    C = fn(zen_dataclass={"bases": (B,), "eq": True})
     assert issubclass(B, A)
     assert issubclass(C, A)
     assert issubclass(C, B)
@@ -272,7 +336,7 @@ def test_bases():
     [
         lambda **kw: builds(dict, **kw),
         lambda **kw: make_custom_builds_fn(**kw),
-        # make_config,
+        make_config,
     ],
 )
 def test_frozen_deprecated(fn):
@@ -280,6 +344,13 @@ def test_frozen_deprecated(fn):
         fn(frozen=True)
 
 
-def test_dataclassname_deprecated():
+@pytest.mark.parametrize(
+    "fn",
+    [
+        lambda **kw: builds(dict, **kw),
+        lambda **kw: make_config(config_name=kw["dataclass_name"]),
+    ],
+)
+def test_dataclassname_deprecated(fn):
     with pytest.warns(HydraZenDeprecationWarning):
-        builds(int, frozen=True)
+        fn(dataclass_name="hi")

@@ -1268,3 +1268,9 @@ def test_zen_dataclass(ff: FullBuilds, ss: StdBuilds, pp: PBuilds):
     make_custom_builds_fn(zen_dataclass={"blah": 2})  # type: ignore
     bf(int, zen_dataclass={"eq": True})
     bf(int, zen_dataclass={"blah": 2})  # type: ignore
+
+    make_config(zen_dataclass={"namespace": {"fn": lambda _: None}})
+    make_config(zen_dataclass={"namespace": {2: 2}})  # type: ignore
+
+    make_config(zen_dataclass={"eq": True})
+    make_config(zen_dataclass={"blah": 2})  # type: ignore

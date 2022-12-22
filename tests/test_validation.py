@@ -19,6 +19,7 @@ from hydra_zen import (
     hydrated_dataclass,
     instantiate,
     just,
+    make_config,
     make_custom_builds_fn,
     to_yaml,
 )
@@ -295,6 +296,7 @@ def test_builds_raises_on_non_callable_target(not_callable, partial, full_sig):
         builds(not_callable, populate_full_signature=full_sig, zen_partial=partial)
 
 
+@pytest.mark.filterwarnings("ignore:Specifying")
 @pytest.mark.parametrize(
     "param_name, value",
     [
@@ -428,6 +430,7 @@ def test_get_obj_path_raises_for_unknown_name():
         get_obj_path(1)
 
 
+@pytest.mark.filterwarnings("ignore:Specifying")
 @pytest.mark.parametrize(
     "dc_option, err_msg",
     [
@@ -454,6 +457,7 @@ def test_get_obj_path_raises_for_unknown_name():
     [
         lambda **kw: builds(int, **kw),
         lambda **kw: make_custom_builds_fn(**kw),
+        lambda **kw: make_config(**kw),
     ],
 )
 def test_bad_dataclass_input_raises(dc_option, err_msg, fn):

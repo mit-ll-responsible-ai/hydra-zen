@@ -945,7 +945,7 @@ def builds(
         :py:class:`dataclasses.FrozenInstanceError` at runtime.
 
     dataclass_name : Optional[str]
-            .. deprecated:: 0.9.0
+        .. deprecated:: 0.9.0
             `dataclass_name` will be removed in hydra-zen 0.10.0. It is replaced by
             `zen_dataclass={'cls_name': <name>}`.
 
@@ -1052,6 +1052,8 @@ def builds(
     - Using zen-wrappers
     - Creating a frozen config
     - Support for partial'd targets
+
+    A helpful utility for printing examples
 
     >>> from hydra_zen import builds, instantiate, to_yaml
     >>> def pyaml(x):
