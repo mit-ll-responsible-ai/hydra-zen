@@ -97,3 +97,5 @@ def test_safe_getattr_no_default():
 
     with pytest.raises(AttributeError):
         safe_getattr(conf, "x")
+
+    assert safe_getattr(conf, "x", 1) == 1

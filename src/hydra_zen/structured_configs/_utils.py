@@ -371,7 +371,7 @@ def sanitized_type(
 
         # Python 3.7-3.8
         # type_: Annotated[x, y]; origin -> x
-        if isinstance(type_, _AnnotatedAlias):
+        if isinstance(type_, _AnnotatedAlias):  # pragma: no cover
             return sanitized_type(
                 origin,
                 primitive_only=primitive_only,
