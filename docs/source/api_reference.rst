@@ -115,6 +115,7 @@ hydra_zen.typing
    :toctree: generated/
 
 
+   DataclassOptions
    ZenConvert
 
 
