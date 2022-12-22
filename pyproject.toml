@@ -177,7 +177,7 @@ basepython = python3.8
 [testenv:coverage]
 setenv = NUMBA_DISABLE_JIT=1
 usedevelop = true
-basepython = python3.8
+basepython = python3.10
 deps = {[testenv]deps}
        coverage[toml]
        pytest-cov

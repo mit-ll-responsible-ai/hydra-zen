@@ -43,6 +43,7 @@ from typing_extensions import (
 
 from hydra_zen import instantiate, just, make_custom_builds_fn
 from hydra_zen.errors import HydraZenValidationError
+from hydra_zen.structured_configs._type_guards import safe_getattr
 from hydra_zen.structured_configs._utils import get_obj_path
 from hydra_zen.typing._implementations import (
     DataClass_,
@@ -331,9 +332,9 @@ class Zen(Generic[P, R]):
 
         cfg_kwargs = {
             name: (
-                getattr(cfg, name, param.default)
+                safe_getattr(cfg, name, param.default)
                 if param.default is not param.empty
-                else getattr(cfg, name)
+                else safe_getattr(cfg, name)
             )
             for name, param in self.parameters.items()
             if param.kind not in SKIPPED_PARAM_KINDS and name not in self._exclude

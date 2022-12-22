@@ -40,7 +40,7 @@ from ._globals import (
     ZEN_TARGET_FIELD_NAME,
 )
 from ._implementations import _retain_type_info, builds, sanitized_field
-from ._type_guards import uses_zen_processing
+from ._type_guards import safe_getattr, uses_zen_processing
 
 __all__ = ["ZenField", "make_config"]
 
@@ -582,7 +582,7 @@ def make_config(
         )
     if (
         HYDRA_SUPPORTS_PARTIAL
-        and getattr(out, PARTIAL_FIELD_NAME, False)
+        and safe_getattr(out, PARTIAL_FIELD_NAME, False)
         and uses_zen_processing(out)
     ):
         raise ValueError(

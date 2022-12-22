@@ -49,6 +49,7 @@ from hydra_zen.errors import (
 )
 from hydra_zen.funcs import get_obj
 from hydra_zen.structured_configs import _utils
+from hydra_zen.structured_configs._type_guards import safe_getattr
 from hydra_zen.typing import (
     Builds,
     DataclassOptions,
@@ -85,7 +86,13 @@ from ._globals import (
     ZEN_TARGET_FIELD_NAME,
     ZEN_WRAPPERS_FIELD_NAME,
 )
-from ._type_guards import is_builds, is_just, is_old_partial_builds, uses_zen_processing
+from ._type_guards import (
+    is_builds,
+    is_just,
+    is_old_partial_builds,
+    safe_getattr,
+    uses_zen_processing,
+)
 
 _T = TypeVar("_T")
 
@@ -502,7 +509,7 @@ def sanitized_default_value(
         converted_fields = {}
         for _field in _val_fields:
             if _field.init and hasattr(value, _field.name):
-                _val = getattr(value, _field.name)
+                _val = safe_getattr(value, _field.name)
                 converted_fields[_field.name] = sanitized_default_value(
                     _val,
                     allow_zen_conversion=allow_zen_conversion,
@@ -517,7 +524,7 @@ def sanitized_default_value(
             hydra_convert=hydra_convert,
         )
         _check_for_dynamically_defined_dataclass_type(
-            getattr(out, TARGET_FIELD_NAME), value
+            safe_getattr(out, TARGET_FIELD_NAME), value
         )
         return out
 
@@ -545,7 +552,7 @@ def sanitized_default_value(
         out = _just(value)  # type: ignore
         if convert_dataclass and is_dataclass(value):
             _check_for_dynamically_defined_dataclass_type(
-                getattr(out, JUST_FIELD_NAME), value
+                safe_getattr(out, JUST_FIELD_NAME), value
             )
         return out
 
@@ -1385,7 +1392,7 @@ def builds(
                     # `zen_wrappers` handles importing string; we can
                     # eliminate the indirection of Just and "flatten" this
                     # config
-                    validated_wrappers.append(getattr(wrapper, JUST_FIELD_NAME))
+                    validated_wrappers.append(safe_getattr(wrapper, JUST_FIELD_NAME))
                 else:
                     if hydra_recursive is False:
                         warnings.warn(
@@ -1456,13 +1463,13 @@ def builds(
     for base in builds_bases:
         _set_this_iteration = False
         if HYDRA_SUPPORTS_PARTIAL and base_hydra_partial is None:
-            base_hydra_partial = getattr(base, PARTIAL_FIELD_NAME, None)
+            base_hydra_partial = safe_getattr(base, PARTIAL_FIELD_NAME, None)
             if parent_partial is None:
                 parent_partial = base_hydra_partial
                 _set_this_iteration = True
 
         if base_zen_partial is None:
-            base_zen_partial = getattr(base, ZEN_PARTIAL_FIELD_NAME, None)
+            base_zen_partial = safe_getattr(base, ZEN_PARTIAL_FIELD_NAME, None)
             if parent_partial is None or (
                 _set_this_iteration and base_zen_partial is not None
             ):
@@ -1490,7 +1497,7 @@ def builds(
 
     del base_zen_partial
 
-    if not requires_zen_processing and requires_partial_field:  # pragma: no cover
+    if not requires_zen_processing and requires_partial_field:
         # TODO: require test-coverage once Hydra publishes nightly builds
         target_field = [
             (
@@ -1771,7 +1778,7 @@ def builds(
     if not _pos_args and builds_bases:
         # pos_args is potentially inherited
         for _base in builds_bases:
-            _pos_args = getattr(_base, POS_ARG_FIELD_NAME, ())
+            _pos_args = safe_getattr(_base, POS_ARG_FIELD_NAME, ())
 
             # validates
             _pos_args = tuple(
@@ -2040,7 +2047,7 @@ def builds(
 
             # If `.default` is not set, then `value` is a Hydra-supported mutable
             # value, and thus it is "sanitized"
-            sanitized_value = getattr(_field, "default", value)
+            sanitized_value = safe_getattr(_field, "default", value)
             sanitized_type = (
                 _utils.sanitized_type(type_, wrap_optional=sanitized_value is None)
                 if _retain_type_info(
@@ -2079,7 +2086,7 @@ def builds(
     assert not (
         HYDRA_SUPPORTS_PARTIAL
         and requires_zen_processing
-        and getattr(out, PARTIAL_FIELD_NAME, False)
+        and safe_getattr(out, PARTIAL_FIELD_NAME, False)
     )
 
     return cast(Union[Type[Builds[Importable]], Type[BuildsWithSig[Type[R], P]]], out)
@@ -2168,7 +2175,7 @@ def get_target(obj: HasTarget) -> Any:
             f" {TARGET_FIELD_NAME} or named {ZEN_PARTIAL_FIELD_NAME} that"
             f" points to a target-object or target-string"
         )
-    target = getattr(obj, field_name)
+    target = safe_getattr(obj, field_name)
 
     if isinstance(target, str):
         target = get_obj(path=target)
