@@ -115,6 +115,8 @@ reportUnnecessaryTypeIgnoreComment = true
 reportUnnecessaryIsInstance = false
 
 
+[tool.codespell]
+skip = 'docs/build/*'
 
 [tool.tox]
 legacy_tox_ini = """

@@ -180,8 +180,8 @@ def make_custom_builds_fn(
         :py:func:`dataclasses.make_dataclass` other than `fields`.
         The default value for `unsafe_hash` is `True`.
 
-        Additionally, the `module` field can be specified to enable pickle compatibilty.
-        See `hydra_zen.typing.DataclassOptions` for details.
+        Additionally, the `module` field can be specified to enable pickle
+        compatibility. See `hydra_zen.typing.DataclassOptions` for details.
 
     hydra_recursive : Optional[bool], optional (default=True)
         Specifies a new the default value for ``builds(..., hydra_recursive=<..>)``
@@ -192,7 +192,7 @@ def make_custom_builds_fn(
     frozen : bool, optional (default=False)
         .. deprecated:: 0.9.0
             `frozen` will be removed in hydra-zen 0.10.0. It is replaced by
-            `zen_dataclass={'frozen': True}`.
+            `zen_dataclass={'frozen': <bool>}`.
 
         Specifies a new the default value for ``builds(..., frozen=<..>)``
 

@@ -207,15 +207,14 @@ def make_config(
     zen_dataclass : Optional[DataclassOptions]
         A dictionary can specify any option that is supported by
         :py:func:`dataclasses.make_dataclass` other than `fields`.
-        **Unlike std-lib dataclasses, the default value for `unsafe_hash` is `True`.**
 
-        Additionally, the `module` field can be specified to enable pickle compatibilty.
-        See `hydra_zen.typing.DataclassOptions` for details.
+        Additionally, a ``'module': <str>`` entry can be specified to enable pickle
+        compatibility. See `hydra_zen.typing.DataclassOptions` for details.
 
     frozen : bool, optional (default=False)
         .. deprecated:: 0.9.0
             `frozen` will be removed in hydra-zen 0.10.0. It is replaced by
-            `zen_dataclass={'frozen': True}`.
+            ``zen_dataclass={'frozen': <bool>}``.
 
         If ``True``, the resulting config class will produce 'frozen' (i.e. immutable)
         instances. I.e. setting/deleting an attribute of an instance of the config will
@@ -224,7 +223,7 @@ def make_config(
     config_name : str, optional (default="Config")
         .. deprecated:: 0.9.0
             `config_name` will be removed in hydra-zen 0.10.0. It is replaced by
-            `zen_dataclass={'cls_name': <name>}`.
+            ``zen_dataclass={'cls_name': <str>}``.
 
         The class name of the resulting config class.
 
@@ -243,7 +242,8 @@ def make_config(
     -----
     The resulting "config" is a dataclass-object [4]_ with Hydra-specific attributes
     attached to it, along with the attributes specified via ``fields_as_args`` and
-    ``fields_as_kwargs``.
+    ``fields_as_kwargs``. **Unlike std-lib dataclasses, the default value for
+    unsafe_hash is True.**
 
     Any field specified without a type-annotation is automatically annotated with
     :py:class:`typing.Any`. Hydra only supports a narrow subset of types [5]_;

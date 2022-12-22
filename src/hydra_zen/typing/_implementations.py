@@ -386,13 +386,14 @@ class StrictDataclassOptions(_StrictDataclassOptions):
 
 
 class DataclassOptions(_Py311Dataclass, total=False):
-    """Specifies the options for constructing a dataclass via `builds`, `just` et al.
+    """Specifies dataclass-creation options via `builds`, `just` et al.
 
     Note that, unlike :func:`dataclasses.make_dataclass`, the default value for
     `unsafe_hash` is `True` for hydra-zen's dataclass-generating functions.
-
     See the documentation for :func:`dataclasses.make_dataclass` for more details [1]_.
-    Options that are note supported by the local Python version will be ignored.
+
+    Options that are not supported by the local Python version will be ignored by
+    hydra-zen's config-creation functions.
 
     Parameters
     ----------
@@ -400,13 +401,15 @@ class DataclassOptions(_Py311Dataclass, total=False):
         If specified, determines the name of the returned class object. Otherwise the
         name is inferred by hydra-zen.
 
-        This is a hydra-zen exclusive feature.
-
     module : str, default='typing'
         If specified, sets the `__module__` attribute of the resulting dataclass.
-        Specifying the module name in which the dataclass was generated will enable
-        pickle-compatibility for that dataclass. (This argument is exclusive to
-        hydra-zen).
+
+        Specifying the module string-path in which the dataclass was generated, and
+        specifying `cls_name` as the symbol that references the dataclass, will enable
+        pickle-compatibility for that dataclass. See the Examples section for
+        clarification.
+
+        This is a hydra-zen exclusive feature.
 
     init : bool, optional (default=True)
         If true (the default), a __init__() method will be generated. If the class
@@ -472,11 +475,72 @@ class DataclassOptions(_Py311Dataclass, total=False):
     References
     ----------
     .. [1] https://docs.python.org/3/library/dataclasses.html
+    .. [2] https://docs.python.org/3/library/dataclasses.html#mutable-default-values
+
+    Notes
+    -----
+    This is a typed dictionary, which provides static type information (e.g. type
+    checking and auto completion options) to tooling. Note, however, that it provides
+    no runtime checking of its keys and values.
 
     Examples
     --------
+    >>> from hydra_zen.typing import DataclassOptions as Opts
     >>> from hydra_zen import builds, make_config, make_custom_builds_fn
 
+    Creating a frozen config.
+
+    >>> conf = make_config(x=1, zen_dataclass=Opts(frozen=True))()
+    >>> conf.x = 2
+    FrozenInstanceError: cannot assign to field 'x'
+
+    Creating a pickle-compatible config:
+
+    The dynamically-generated classes created by `builds`, `make_config`, and `just`
+    can be made pickle-compatible by specifying the name of the symbol that it is
+    assigned to and the module in which it was defined.
+
+    .. code-block:: python
+
+       # contents of mylib/foo.py
+       from pickle import dumps, loads
+       from hydra_zen import builds
+
+       DictConf = builds(dict,
+                         zen_dataclass={'module': 'mylib.foo',
+                                        'cls_name': 'DictConf'})
+
+       assert DictConf is loads(dumps(DictConf))
+
+    Using namespace to add a method to a config instance.
+
+    >>> conf = make_config(
+    ...     x=100,
+    ...     zen_dataclass=Opts(
+    ...         namespace=dict(add_x=lambda self, y: self.x + y),
+    ...     ),
+    ... )()
+    >>> conf.add_x(2)
+    102
+
+    Dataclasse objects created by hydra-zen's config-creation functions will be created
+    with `unsafe_hash=True` by default. This is in contrast with the default behavior of
+    :py:func:`dataclasses.dataclass`. This is to help ensure smooth compatibility
+    through Python 3.11, which changed the mutability checking rules for dataclasses
+    [2]_.
+
+    >>> from dataclasses import make_dataclass
+    >>> DataClass = make_dataclass(fields=[], cls_name="A")
+    >>> DataClass.__hash__
+    None
+
+    >>> Conf = make_config(x=2)
+    >>> Conf.__hash__
+    <function types.__create_fn__.<locals>.__hash__(self)>
+
+    >>> UnHashConf = make_config(x=2, zen_dataclass=Opts(unsafe_hash=False))
+    >>> UnHashConf.__hash__
+    None
     """
 
     module: str  # zen-only

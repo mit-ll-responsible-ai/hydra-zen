@@ -928,17 +928,17 @@ def builds(
         Defaults List itself is not a part of output config.
 
     zen_dataclass : Optional[DataclassOptions]
-        A dictionary can specify any option that is supported by
+        A dictionary that can specify any option that is supported by
         :py:func:`dataclasses.make_dataclass` other than `fields`.
         The default value for `unsafe_hash` is `True`.
 
-        Additionally, the `module` field can be specified to enable pickle compatibilty.
-        See `hydra_zen.typing.DataclassOptions` for details.
+        Additionally, the `module` field can be specified to enable pickle
+        compatibility. See `hydra_zen.typing.DataclassOptions` for details.
 
     frozen : bool, optional (default=False)
         .. deprecated:: 0.9.0
             `frozen` will be removed in hydra-zen 0.10.0. It is replaced by
-            `zen_dataclass={'frozen': True}`.
+            `zen_dataclass={'frozen': <bool>}`.
 
         If ``True``, the resulting config will create frozen (i.e. immutable) instances.
         I.e. setting/deleting an attribute of an instance will raise
@@ -947,7 +947,7 @@ def builds(
     dataclass_name : Optional[str]
         .. deprecated:: 0.9.0
             `dataclass_name` will be removed in hydra-zen 0.10.0. It is replaced by
-            `zen_dataclass={'cls_name': <name>}`.
+            `zen_dataclass={'cls_name': <str>}`.
 
         If specified, determines the name of the returned class object.
 
@@ -1043,13 +1043,14 @@ def builds(
     --------
     These examples describe:
 
-    - Basic usage of `builds`
+    - Basic usage
     - Creating a partial config
     - Auto-populating parameters
     - Composing configs via inheritance
-    - Runtime validation performed by `builds`
+    - Runtime validation performed by builds
     - Using meta-fields
     - Using zen-wrappers
+    - Creating a pickle-compatible config
     - Creating a frozen config
     - Support for partial'd targets
 
@@ -1240,7 +1241,7 @@ def builds(
 
        DictConf = builds(dict,
                          zen_dataclass={'module': 'mylib.foo',
-                                       'cls_name': 'DictConf'})
+                                        'cls_name': 'DictConf'})
 
        assert DictConf is loads(dumps(DictConf))
 
