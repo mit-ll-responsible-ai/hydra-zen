@@ -1,6 +1,7 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 # pyright: strict
+from dataclasses import MISSING
 from functools import partial
 from typing import TYPE_CHECKING, Any, Type, Union
 
@@ -42,10 +43,20 @@ def safe_getattr(obj: Any, field: str, *default: Any) -> Any:
     # descriptor
 
     assert len(default) < 2
-    if hasattr(obj, "__slots__") and isinstance(obj, type) and is_dataclass(obj):
+    if (
+        hasattr(obj, "__slots__")
+        and isinstance(obj, type)
+        and is_dataclass(obj)
+        and field in obj.__slots__  # type: ignore
+    ):
         try:
-            return obj.__dataclass_fields__[field].default
-        except KeyError:
+            _field = obj.__dataclass_fields__[field]
+            if _field.default_factory is not MISSING or _field.default is MISSING:
+                raise AttributeError
+
+            return _field.default
+
+        except (KeyError, AttributeError):
             if default:
                 return default[0]
 
