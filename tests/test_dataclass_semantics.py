@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 import sys
 from copy import deepcopy
-from dataclasses import FrozenInstanceError, is_dataclass
+from dataclasses import FrozenInstanceError, dataclass, is_dataclass
 from pickle import PicklingError, dumps, loads
 
 import hypothesis.strategies as st
@@ -13,6 +13,7 @@ from hydra_zen import (
     builds,
     hydrated_dataclass,
     instantiate,
+    just,
     make_config,
     make_custom_builds_fn,
 )
@@ -217,6 +218,12 @@ def test_dataclass_name(target, zen_partial, name):
         assert Conf.__name__ == f"Builds_{target_name}"
 
 
+@dataclass
+class VanillaDataClass:
+    x: int = 2
+    y: str = "a"
+
+
 PickleBuilds = builds(
     dict,
     x=2,
@@ -243,6 +250,22 @@ PickleMakeConfig = make_config(
     },
 )
 
+PickleJustInt = just(
+    int,
+    zen_dataclass={
+        "module": "tests.test_dataclass_semantics",
+        "cls_name": "PickleJustInt",
+    },
+)
+
+PickleJustDataclass = just(
+    VanillaDataClass(),
+    zen_dataclass={
+        "module": "tests.test_dataclass_semantics",
+        "cls_name": "PickleJustDataclass",
+    },
+)
+
 
 @pytest.mark.parametrize(
     "Conf",
@@ -250,6 +273,8 @@ PickleMakeConfig = make_config(
         PickleBuilds,
         PickleCustomBuilds,
         PickleMakeConfig,
+        PickleJustInt,
+        PickleJustDataclass,
         pytest.param(
             builds(dict, x=2, y="a"),
             marks=pytest.mark.xfail(
@@ -259,8 +284,10 @@ PickleMakeConfig = make_config(
     ],
 )
 def test_pickleable(Conf):
-
-    assert loads(dumps(Conf(y="b"))) != Conf()
+    try:
+        assert loads(dumps(Conf(y="b"))) != Conf()
+    except TypeError:
+        pass
     assert loads(dumps(Conf())) == Conf()
     assert loads(dumps(Conf)) is Conf
 
@@ -271,6 +298,8 @@ def test_pickleable(Conf):
     [
         lambda **kw: builds(dict, **kw),
         lambda **kw: make_custom_builds_fn(**kw)(dict),
+        lambda **kw: just(str, **kw),
+        lambda **kw: just(VanillaDataClass(), **kw),
         make_config,
     ],
 )
@@ -284,6 +313,8 @@ def test_hashable(unsafe_hash: bool, fn):
     [
         lambda **kw: builds(dict, **kw),
         lambda **kw: make_custom_builds_fn(**kw)(dict),
+        lambda **kw: just(str, **kw),
+        lambda **kw: just(VanillaDataClass(), **kw),
         make_config,
     ],
 )
@@ -299,6 +330,7 @@ def test_namespace(fn):
         lambda **kw: builds(dict, x=1, **kw),
         lambda **kw: make_custom_builds_fn(**kw)(dict, x=1),
         lambda **kw: make_config(x=1, **kw),
+        lambda **kw: just(VanillaDataClass(), **kw),
     ],
 )
 def test_kwonly(kw_only: bool, fn):
@@ -319,6 +351,8 @@ def test_kwonly(kw_only: bool, fn):
     [
         lambda **kw: builds(dict, **kw),
         lambda **kw: make_custom_builds_fn(**kw)(dict),
+        lambda **kw: just(str, **kw),
+        lambda **kw: just(VanillaDataClass(), **kw),
         make_config,
     ],
 )

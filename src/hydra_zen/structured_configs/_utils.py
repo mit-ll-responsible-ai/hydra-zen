@@ -696,7 +696,7 @@ def parse_dataclass_options(options: Mapping[str, Any]) -> DataclassOptions:
 def parse_strict_dataclass_options(
     options: Mapping[str, Any]
 ) -> TypeGuard[StrictDataclassOptions]:
-    return options.keys() <= _STRICT_DATACLASS_OPTION_KEYS
+    return options.keys() <= _STRICT_DATACLASS_OPTION_KEYS and StrictDataclassOptions.__required_keys__ <= options.keys()  # type: ignore
 
 
 def validate_hydra_options(

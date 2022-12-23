@@ -398,7 +398,7 @@ def hydrated_dataclass(
     return wrapper
 
 
-def _just(obj: Importable) -> Type[Just[Importable]]:
+def _just(obj: Importable, zen_dataclass: DataclassOptions) -> Type[Just[Importable]]:
     obj_path = _utils.get_obj_path(obj)
 
     entry: List[Tuple[Any, Any, Field[Any]]] = [
@@ -417,7 +417,15 @@ def _just(obj: Importable) -> Type[Just[Importable]]:
         ),
     ]
 
-    out_class = make_dataclass(("Just_" + _utils.safe_name(obj)), entry)
+    zen_dataclass.setdefault("cls_name", "Just_" + _utils.safe_name(obj))
+    module = zen_dataclass.pop("module", None)
+    assert _utils.parse_strict_dataclass_options(zen_dataclass), zen_dataclass
+
+    out_class = make_dataclass(fields=entry, **zen_dataclass)
+
+    if module is not None:
+        out_class.__module__ = module
+
     out_class.__doc__ = (
         f"A structured config designed to return {obj} when it is instantiated by hydra"
     )
@@ -469,6 +477,7 @@ def sanitized_default_value(
     convert_dataclass: bool,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    zen_dataclass: Optional[DataclassOptions] = None,
 ) -> Any:
     """Converts `value` to Hydra-supported type if necessary and possible. Otherwise
     raises `HydraZenUnsupportedPrimitiveError`"""
@@ -486,6 +495,9 @@ def sanitized_default_value(
             hydra_convert=hydra_convert,
             hydra_recursive=hydra_recursive,
         )
+
+    if zen_dataclass is None:
+        zen_dataclass = {}
 
     # non-targeted dataclass instance
     if (
@@ -522,6 +534,7 @@ def sanitized_default_value(
             **converted_fields,
             hydra_recursive=hydra_recursive,
             hydra_convert=hydra_convert,
+            zen_dataclass=zen_dataclass,
         )
         _check_for_dynamically_defined_dataclass_type(
             safe_getattr(out, TARGET_FIELD_NAME), value
@@ -549,7 +562,7 @@ def sanitized_default_value(
     ):
         # `value` is importable callable -- create config that will import
         # `value` upon instantiation
-        out = _just(value)  # type: ignore
+        out = _just(value, zen_dataclass)  # type: ignore
         if convert_dataclass and is_dataclass(value):
             _check_for_dynamically_defined_dataclass_type(
                 safe_getattr(out, JUST_FIELD_NAME), value
@@ -567,6 +580,7 @@ def sanitized_default_value(
         type_ = type(resolved_value)
         conversion_fn = ZEN_VALUE_CONVERSION[type_]
 
+        # TODO: expose zen_dataclass options
         resolved_value = conversion_fn(resolved_value)
         type_of_value = type(resolved_value)
 

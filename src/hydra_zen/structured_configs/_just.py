@@ -5,7 +5,7 @@ from typing import Any, Callable, FrozenSet, Optional, Type, TypeVar, Union, ove
 from typing_extensions import Literal
 
 from hydra_zen.structured_configs import _utils
-from hydra_zen.typing import Builds, Just
+from hydra_zen.typing import Builds, DataclassOptions, Just
 from hydra_zen.typing._implementations import _HydraPrimitive  # type: ignore
 from hydra_zen.typing._implementations import _SupportedViaBuilds  # type: ignore
 from hydra_zen.typing._implementations import AllConvert, DataClass_, ZenConvert
@@ -34,6 +34,7 @@ def just(
     zen_convert: Optional[ZenConvert] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    zen_dataclass: Optional[DataclassOptions] = ...,
 ) -> TP:
     ...
 
@@ -45,6 +46,7 @@ def just(
     zen_convert: Optional[ZenConvert] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    zen_dataclass: Optional[DataclassOptions] = ...,
 ) -> ConfigComplex:
     ...
 
@@ -56,6 +58,7 @@ def just(
     zen_convert: Optional[ZenConvert] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    zen_dataclass: Optional[DataclassOptions] = ...,
 ) -> Type[Just[TC]]:
     ...
 
@@ -67,6 +70,7 @@ def just(
     zen_convert: Optional[ZenConvert] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    zen_dataclass: Optional[DataclassOptions] = ...,
 ) -> Builds[Type[TB]]:
     ...
 
@@ -78,6 +82,7 @@ def just(
     zen_convert: Literal[None] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    zen_dataclass: Optional[DataclassOptions] = ...,
 ) -> Type[Builds[Type[TD]]]:
     ...
 
@@ -89,6 +94,7 @@ def just(
     zen_convert: ZenConvert,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    zen_dataclass: Optional[DataclassOptions] = ...,
 ) -> Any:
     ...
 
@@ -100,6 +106,7 @@ def just(
     zen_convert: Optional[ZenConvert] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    zen_dataclass: Optional[DataclassOptions] = ...,
 ) -> Any:
     ...
 
@@ -111,6 +118,7 @@ def just(
     zen_convert: Optional[ZenConvert] = None,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    zen_dataclass: Optional[DataclassOptions] = None,
 ) -> Any:
     """`just(obj)` returns a config that, when instantiated, just returns `obj`.
 
@@ -151,6 +159,14 @@ def just(
           a trace of OmegaConf containers.
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting config.
+
+    zen_dataclass : Optional[DataclassOptions]
+        A dictionary that can specify any option that is supported by
+        :py:func:`dataclasses.make_dataclass` other than `fields`.
+        The default value for `unsafe_hash` is `True`.
+
+        Additionally, the `module` field can be specified to enable pickle
+        compatibility. See `hydra_zen.typing.DataclassOptions` for details.
 
 
     Returns
@@ -288,6 +304,8 @@ def just(
     _utils.validate_hydra_options(
         hydra_recursive=hydra_recursive, hydra_convert=hydra_convert
     )
+    if zen_dataclass is None:
+        zen_dataclass = {}
 
     return sanitized_default_value(
         obj,
@@ -298,4 +316,5 @@ def just(
         convert_dataclass=convert_settings["dataclass"],
         hydra_convert=hydra_convert,
         hydra_recursive=hydra_recursive,
+        zen_dataclass=_utils.parse_dataclass_options(zen_dataclass),
     )
