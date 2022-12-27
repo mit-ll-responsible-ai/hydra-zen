@@ -111,7 +111,6 @@ def just(
     ...
 
 
-# TODO: add zen_dataclass
 def just(
     obj: Any,
     *,
