@@ -31,7 +31,7 @@ def test_runtime_checkability_of_protocols(fn, protocol):
     Conf = fn(dict)
     assert isinstance(Conf, protocol)
 
-    conf = Conf()
+    conf = Conf() if fn is not just else Conf
     assert isinstance(conf, protocol)
 
 

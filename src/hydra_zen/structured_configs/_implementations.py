@@ -54,7 +54,6 @@ from hydra_zen.typing import (
     Builds,
     DataclassOptions,
     Importable,
-    Just,
     PartialBuilds,
     SupportedPrimitive,
     ZenWrappers,
@@ -73,7 +72,6 @@ from hydra_zen.typing._implementations import (
 from ._globals import (
     CONVERT_FIELD_NAME,
     DEFAULTS_LIST_FIELD_NAME,
-    GET_OBJ_LOCATION,
     HYDRA_FIELD_NAMES,
     JUST_FIELD_NAME,
     META_FIELD_NAME,
@@ -491,39 +489,16 @@ def hydrated_dataclass(
     return wrapper
 
 
-def _just(obj: Importable, zen_dataclass: DataclassOptions) -> Type[Just[Importable]]:
-    obj_path = _utils.get_obj_path(obj)
+@dataclass(frozen=True)
+class Just:
+    """Just[T] is a config that returns T when instantiated."""
 
-    entry: List[Tuple[Any, Any, Field[Any]]] = [
-        (
-            TARGET_FIELD_NAME,
-            str,
-            _utils.field(default=GET_OBJ_LOCATION, init=False),
-        ),
-        (
-            JUST_FIELD_NAME,
-            str,
-            _utils.field(
-                default=obj_path,
-                init=False,
-            ),
-        ),
-    ]
+    path: str
+    _target_: str = field(default="hydra_zen.funcs.get_obj", init=False, repr=False)
 
-    zen_dataclass.setdefault("cls_name", "Just_" + _utils.safe_name(obj))
-    module = zen_dataclass.pop("module", None)
-    assert _utils.parse_strict_dataclass_options(zen_dataclass), zen_dataclass
 
-    out_class = make_dataclass(fields=entry, **zen_dataclass)
-
-    if module is not None:
-        out_class.__module__ = module
-
-    out_class.__doc__ = (
-        f"A structured config designed to return {obj} when it is instantiated by hydra"
-    )
-
-    return cast(Type[Just[Importable]], out_class)
+def _just(obj: Any) -> Just:
+    return Just(path=_utils.get_obj_path(obj))
 
 
 def _is_ufunc(value: Any) -> bool:
@@ -655,7 +630,7 @@ def sanitized_default_value(
     ):
         # `value` is importable callable -- create config that will import
         # `value` upon instantiation
-        out = _just(value, zen_dataclass)  # type: ignore
+        out = _just(value)
         if convert_dataclass and is_dataclass(value):
             _check_for_dynamically_defined_dataclass_type(
                 safe_getattr(out, JUST_FIELD_NAME), value

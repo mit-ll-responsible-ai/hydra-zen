@@ -74,16 +74,16 @@ def test_293_proposal(via_just: bool):
         == """\
 _target_: tests.test_dataclass_conversion.Stuff
 field1:
-  _target_: hydra_zen.funcs.get_obj
   path: tests.test_dataclass_conversion.foo
-field2:
   _target_: hydra_zen.funcs.get_obj
+field2:
   path: tests.test_dataclass_conversion.bar
+  _target_: hydra_zen.funcs.get_obj
 field3:
   _target_: tests.test_dataclass_conversion.Nested
   x:
-    _target_: hydra_zen.funcs.get_obj
     path: tests.test_dataclass_conversion.baz
+    _target_: hydra_zen.funcs.get_obj
 field4:
 - 1
 - 2

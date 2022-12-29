@@ -153,18 +153,17 @@ def check_just():
         ...
 
     # test just(...)
-    reveal_type(just(f), expected_text="Type[Just[(x: int) -> int]]")
-    reveal_type(just(A), expected_text="Type[Just[Type[A]]]")
+    reveal_type(just(f), expected_text="Just[(x: int) -> int]")
+    reveal_type(just(A), expected_text="Just[Type[A]]")
     reveal_type(instantiate(just(f)), expected_text="(x: int) -> int")
     reveal_type(instantiate(just(A)), expected_text="Type[A]")
-    reveal_type(instantiate(just(A)()), expected_text="Type[A]")  # instance of Just
 
     reveal_type(just(1), expected_text="int")
     reveal_type(just("hi"), expected_text="str")
     reveal_type(just(b"1234"), expected_text="bytes")
     reveal_type(just(1 + 2j), expected_text="ConfigComplex")
     reveal_type(just(Path.home()), expected_text="Path")
-    reveal_type(just(partial(f, 1)), expected_text="Type[Just[partial[int]]]")
+    reveal_type(just(partial(f, 1)), expected_text="Just[partial[int]]")
     reveal_type(just(set([1, 2, 3])), expected_text="Builds[Type[set[int]]]")
     reveal_type(just(range(10)), expected_text="Builds[Type[range]]")
 
@@ -177,7 +176,7 @@ def check_just():
     class B:
         ...
 
-    reveal_type(just(B), expected_text="Type[Just[Type[B]]]")
+    reveal_type(just(B), expected_text="Just[Type[B]]")
     reveal_type(just(B()), expected_text="Type[Builds[Type[B]]]")
     reveal_type(just(B(), zen_convert={"dataclass": False}), expected_text="Any")
 
@@ -214,7 +213,7 @@ def f7():
     reveal_type(get_target(builds(str)()), expected_text="Type[str]")
     reveal_type(get_target(builds(str, zen_partial=False)()), expected_text="Type[str]")
     reveal_type(get_target(builds(str, zen_partial=True)()), expected_text="Type[str]")
-    reveal_type(get_target(just(str)()), expected_text="Type[str]")
+    reveal_type(get_target(just(str)), expected_text="Type[str]")
 
 
 def f8():
@@ -543,9 +542,8 @@ def check_protocols():
     reveal_type(HPBuilds._partial_, expected_text="Literal[True]")
     reveal_type(HPBuilds()._partial_, expected_text="Literal[True]")
 
-    Just = just(int)
-    reveal_type(Just._target_, expected_text="Literal['hydra_zen.funcs.get_obj']")
-    reveal_type(Just()._target_, expected_text="Literal['hydra_zen.funcs.get_obj']")
+    just_ = just(int)
+    reveal_type(just_._target_, expected_text="Literal['hydra_zen.funcs.get_obj']")
 
 
 def check_populate_full_sig():

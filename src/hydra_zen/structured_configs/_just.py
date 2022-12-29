@@ -59,7 +59,7 @@ def just(
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
-) -> Type[Just[TC]]:
+) -> Just[TC]:
     ...
 
 

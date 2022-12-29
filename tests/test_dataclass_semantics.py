@@ -252,13 +252,6 @@ PickleMakeConfig = make_config(
     },
 )
 
-PickleJustInt = just(
-    int,
-    zen_dataclass={
-        "module": "tests.test_dataclass_semantics",
-        "cls_name": "PickleJustInt",
-    },
-)
 
 PickleJustDataclass = just(
     VanillaDataClass(),
@@ -275,7 +268,6 @@ PickleJustDataclass = just(
         PickleBuilds,
         PickleCustomBuilds,
         PickleMakeConfig,
-        PickleJustInt,
         PickleJustDataclass,
         PickleHydrated,
         pytest.param(
@@ -295,6 +287,16 @@ def test_pickleable(Conf):
     assert loads(dumps(Conf)) is Conf
 
 
+def test_pickle_just():
+    just_int = just(int)
+    assert loads(dumps(just_int)) == just_int
+
+
+def test_hashable_just():
+    just_int = just(int)
+    assert just_int.__hash__ is not None
+
+
 def hydrated_fn(zen_dataclass, target=dict):
     @hydrated_dataclass(target, **zen_dataclass)
     class A:
@@ -309,7 +311,6 @@ def hydrated_fn(zen_dataclass, target=dict):
     [
         lambda **kw: builds(dict, **kw),
         lambda **kw: make_custom_builds_fn(**kw)(dict),
-        lambda **kw: just(str, **kw),
         lambda **kw: just(VanillaDataClass(), **kw),
         lambda **kw: hydrated_fn(**kw),
         make_config,
@@ -327,7 +328,6 @@ def test_hashable(unsafe_hash: Optional[bool], fn):
     [
         lambda **kw: builds(dict, **kw),
         lambda **kw: make_custom_builds_fn(**kw)(dict),
-        lambda **kw: just(str, **kw),
         lambda **kw: just(VanillaDataClass(), **kw),
         make_config,
     ],
@@ -366,7 +366,6 @@ def test_kwonly(kw_only: bool, fn):
     [
         lambda **kw: builds(dict, **kw),
         lambda **kw: make_custom_builds_fn(**kw)(dict),
-        lambda **kw: just(str, **kw),
         lambda **kw: just(VanillaDataClass(), **kw),
         make_config,
     ],

@@ -146,7 +146,7 @@ class BuildsWithSig(Builds[T], Protocol[T, P]):
 
 @runtime_checkable
 class Just(Builds[T], Protocol[T]):
-    path: ClassVar[str]  # interpolated string for importing obj
+    path: str  # interpolated string for importing obj
     _target_: ClassVar[Literal["hydra_zen.funcs.get_obj"]] = "hydra_zen.funcs.get_obj"
 
 
