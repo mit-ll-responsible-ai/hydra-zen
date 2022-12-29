@@ -121,6 +121,7 @@ New Features
 Improvements
 ------------
 - :func:`~hydra_zen.hydrated_dataclass` will now produce a pickle-compatible dataclass type. See :pull:`338`.
+- All options available to :func:`dataclasses.dataclass` are now exposed by :func:`~hydra_zen.hydrated_dataclass`.
 - All documentation code blocks are scanned by pyright as part of our CI process. Several errors in the documentation were fixed. See :pull:`343` and :pull:`344`.
 
 Bug Fixes

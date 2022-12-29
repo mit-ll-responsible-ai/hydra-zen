@@ -4,6 +4,7 @@ import sys
 from copy import deepcopy
 from dataclasses import FrozenInstanceError, dataclass, is_dataclass
 from pickle import PicklingError, dumps, loads
+from typing import Optional
 
 import hypothesis.strategies as st
 import pytest
@@ -105,6 +106,11 @@ def f_3(x):
     pass
 
 
+@hydrated_dataclass(dict, frozen=True)
+class FrozenHydrated:
+    x: int = 2
+
+
 @pytest.mark.filterwarnings("ignore:Specifying")
 @pytest.mark.parametrize(
     "fn",
@@ -113,6 +119,7 @@ def f_3(x):
         lambda: builds(dict, x=2, frozen=True)(),
         lambda: make_custom_builds_fn(zen_dataclass={"frozen": True})(dict, x=2)(),
         lambda: make_custom_builds_fn(frozen=True)(dict, x=2)(),
+        lambda: FrozenHydrated(),
     ],
 )
 def test_frozen_via_builds(fn):
@@ -121,17 +128,6 @@ def test_frozen_via_builds(fn):
 
     with pytest.raises(FrozenInstanceError):
         conf_f.x = 3
-
-
-def test_frozen_via_hydrated_dataclass():
-    @hydrated_dataclass(f, frozen=True)
-    class Conf_f:
-        x: int = 2
-
-    conf_f = Conf_f()
-
-    with pytest.raises(FrozenInstanceError):
-        conf_f.x = 3  # type: ignore
 
 
 @given(
@@ -224,6 +220,12 @@ class VanillaDataClass:
     y: str = "a"
 
 
+@hydrated_dataclass(dict)
+class PickleHydrated:
+    x: int = 2
+    y: str = "a"
+
+
 PickleBuilds = builds(
     dict,
     x=2,
@@ -275,6 +277,7 @@ PickleJustDataclass = just(
         PickleMakeConfig,
         PickleJustInt,
         PickleJustDataclass,
+        PickleHydrated,
         pytest.param(
             builds(dict, x=2, y="a"),
             marks=pytest.mark.xfail(
@@ -292,6 +295,14 @@ def test_pickleable(Conf):
     assert loads(dumps(Conf)) is Conf
 
 
+def hydrated_fn(zen_dataclass, target=dict):
+    @hydrated_dataclass(target, **zen_dataclass)
+    class A:
+        x: int = 1
+
+    return A
+
+
 @given(unsafe_hash=...)
 @pytest.mark.parametrize(
     "fn",
@@ -300,12 +311,15 @@ def test_pickleable(Conf):
         lambda **kw: make_custom_builds_fn(**kw)(dict),
         lambda **kw: just(str, **kw),
         lambda **kw: just(VanillaDataClass(), **kw),
+        lambda **kw: hydrated_fn(**kw),
         make_config,
+        hydrated_fn,
     ],
 )
-def test_hashable(unsafe_hash: bool, fn):
-    Conf = fn(zen_dataclass={"unsafe_hash": unsafe_hash})
-    assert (Conf.__hash__ is None) is not unsafe_hash
+def test_hashable(unsafe_hash: Optional[bool], fn):
+    kw = {"unsafe_hash": unsafe_hash} if unsafe_hash is not None else {}
+    Conf = fn(zen_dataclass=kw)
+    assert (Conf.__hash__ is None) is (unsafe_hash is False)
 
 
 @pytest.mark.parametrize(
@@ -331,6 +345,7 @@ def test_namespace(fn):
         lambda **kw: make_custom_builds_fn(**kw)(dict, x=1),
         lambda **kw: make_config(x=1, **kw),
         lambda **kw: just(VanillaDataClass(), **kw),
+        lambda **kw: hydrated_fn(**kw),
     ],
 )
 def test_kwonly(kw_only: bool, fn):

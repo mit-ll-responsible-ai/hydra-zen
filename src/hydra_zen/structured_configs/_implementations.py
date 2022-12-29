@@ -190,7 +190,6 @@ def mutable_value(x: _T, *, zen_convert: Optional[ZenConvert] = None) -> _T:
     return field(default_factory=lambda: cast(x))
 
 
-# TODO: expose other dataclass options
 @dataclass_transform()
 def hydrated_dataclass(
     target: Callable[..., Any],
@@ -201,8 +200,17 @@ def hydrated_dataclass(
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
-    frozen: bool = False,
     zen_convert: Optional[ZenConvert] = None,
+    init: bool = True,
+    repr: bool = True,
+    eq: bool = True,
+    order: bool = False,
+    unsafe_hash: bool = True,
+    frozen: bool = False,
+    match_args: bool = True,
+    kw_only: bool = False,
+    slots: bool = False,
+    weakref_slot: bool = False,
 ) -> Callable[[Type[_T]], Type[_T]]:
     """A decorator that uses `builds` to create a dataclass with the appropriate
     Hydra-specific fields for specifying a targeted config [1]_.
@@ -279,10 +287,67 @@ def hydrated_dataclass(
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting config.
 
+    init : bool, optional (default=True)
+        If true (the default), a __init__() method will be generated. If the class
+        already defines __init__(), this parameter is ignored.
+
+    repr : bool, optional (default=True)
+        If true (the default), a `__repr__()` method will be generated. The generated
+        repr string will have the class name and the name and repr of each field, in
+        the order they are defined in the class. Fields that are marked as being
+        excluded from the repr are not included. For example:
+        `InventoryItem(name='widget', unit_price=3.0, quantity_on_hand=10)`.
+
+    eq : bool, optional (default=True)
+        If true (the default), an __eq__() method will be generated. This method
+        compares the class as if it were a tuple of its fields, in order. Both
+        instances in the comparison must be of the identical type.
+
+    order : bool, optional (default=False)
+        If true (the default is `False`), `__lt__()`, `__le__()`, `__gt__()`, and
+        `__ge__()` methods will be generated. These compare the class as if it were a
+        tuple of its fields, in order. Both instances in the comparison must be of the
+        identical type. If order is true and eq is false, a ValueError is raised.
+
+        If the class already defines any of `__lt__()`, `__le__()`, `__gt__()`, or
+        `__ge__()`, then `TypeError` is raised.
+
+    unsafe_hash : bool, optional (default=False)
+        If `False` (the default), a `__hash__()` method is generated according to how
+        `eq` and `frozen` are set.
+
+        If `eq` and `frozen` are both true, by default `dataclass()` will generate a
+        `__hash__()` method for you. If `eq` is true and `frozen` is false, `__hash__()
+        ` will be set to `None`, marking it unhashable. If `eq` is false, `__hash__()`
+        will be left untouched meaning the `__hash__()` method of the superclass will
+        be used (if the superclass is object, this means it will fall back to id-based
+        hashing).
+
     frozen : bool, optional (default=False)
-        If ``True``, the resulting config will create frozen (i.e. immutable) instances.
-        I.e. setting/deleting an attribute of an instance will raise
-        :py:class:`dataclasses.FrozenInstanceError` at runtime.
+        If true (the default is `False`), assigning to fields will generate an
+        exception. This emulates read-only frozen instances.
+
+    match_args : bool, optional (default=True)
+        (*New in version 3.10*) If true (the default is `True`), the `__match_args__`
+        tuple will be created from the list of parameters to the generated `__init__()`
+        method (even if `__init__()` is not generated, see above). If false, or if
+        `__match_args__` is already defined in the class, then `__match_args__` will
+        not be generated.
+
+    kw_only : bool, optional (default=False)
+        (*New in version 3.10*) If true (the default value is `False`), then all fields
+        will be marked as keyword-only.
+
+    slots : bool, optional (default=False)
+        (*New in version 3.10*) If true (the default is `False`), `__slots__` attribute
+        will be generated and new class will be returned instead of the original one.
+        If `__slots__` is already defined in the class, then `TypeError` is raised.
+
+    weakref_slot : bool, optional (default=False)
+        (*New in version 3.11*) If true (the default is `False`), add a slot named
+        “__weakref__”, which is required to make an instance weakref-able. It is an
+        error to specify `weakref_slot=True` without also specifying `slots=True`.
+
 
     See Also
     --------
@@ -319,13 +384,19 @@ def hydrated_dataclass(
     Here, we specify a config that is designed to "build" a dictionary
     upon instantiation
 
-    >>> @hydrated_dataclass(target=dict)
+    >>> @hydrated_dataclass(target=dict, frozen=True)
     ... class DictConf:
     ...     x: int = 2
     ...     y: str = 'hello'
 
     >>> instantiate(DictConf(x=10))  # override default `x`
     {'x': 10, 'y': 'hello'}
+
+    >>> d = DictConf()
+    >>> # Static type checker marks the following as
+    >>> # an error because `d` is frozen.
+    >>> d.x = 3  # type: ignore
+    FrozenInstanceError: cannot assign to field 'x'
 
     For more detailed examples, refer to `builds`.
     """
@@ -342,8 +413,21 @@ def hydrated_dataclass(
         #       from, which gets the job done for the most part but there are
         #       practical differences. E.g. you cannot delete an attribute that
         #       was declared in the definition of `decorated_obj`.
-        decorated_obj = cast(Any, decorated_obj)
-        decorated_obj = dataclass(frozen=frozen)(decorated_obj)
+        dc_options = _utils.parse_dataclass_options(
+            {
+                "init": init,
+                "repr": repr,
+                "eq": eq,
+                "order": order,
+                "unsafe_hash": unsafe_hash,
+                "frozen": frozen,
+                "match_args": match_args,
+                "kw_only": kw_only,
+                "slots": slots,
+                "weakref_slot": weakref_slot,
+            }
+        )
+        decorated_obj = dataclass(**dc_options)(decorated_obj)  # type: ignore
 
         if PATCH_OMEGACONF_830 and 2 < len(decorated_obj.__mro__):  # pragma: no cover
             parents = decorated_obj.__mro__[1:-1]
@@ -388,7 +472,16 @@ def hydrated_dataclass(
             zen_dataclass={
                 "cls_name": decorated_obj.__name__,
                 "module": decorated_obj.__module__,
+                "init": init,
+                "repr": repr,
+                "eq": eq,
+                "order": order,
+                "unsafe_hash": unsafe_hash,
                 "frozen": frozen,
+                "match_args": match_args,
+                "kw_only": kw_only,
+                "slots": slots,
+                "weakref_slot": weakref_slot,
             },
             zen_convert=zen_convert,
         )
