@@ -156,15 +156,6 @@ deps = {[testenv]deps}
        cloudpickle
 basepython = python3.8
 
-[testenv:hydra-1p1p2-pre-release]  # test against pre-releases of dependencies
-pip_pre = true
-deps = hydra-core==1.1.2
-       {[testenv]deps}
-       pydantic
-       beartype
-       cloudpickle
-basepython = python3.8
-
 [testenv:omegaconf-2p2p2]  # guard against regressions for type sanitization
 pip_pre = true
 deps = omegaconf==2.2.2
