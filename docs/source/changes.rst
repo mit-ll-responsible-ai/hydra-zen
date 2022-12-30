@@ -64,7 +64,7 @@ with a Hydra-agnostic task function that has an explicit signature:
 
 In effect, `~hydra_zen.zen` will automatically extract, resolve, and instantiate fields 
 from a config in order to call the function that it has wrapped, thus saving the user 
-from writing repetive, hydra-specific boilerplate code in their function.
+from writing repetitive, hydra-specific boilerplate code in their function.
 
 There are plenty more bells and whistles to :func:`~hydra_zen.zen`, refer to :pull:`310` and its reference documentation for more details.
 
