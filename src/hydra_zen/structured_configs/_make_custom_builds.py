@@ -40,7 +40,7 @@ def make_custom_builds_fn(
     zen_meta: Optional[Mapping[str, Any]] = ...,
     populate_full_signature: Literal[True],
     hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
@@ -57,7 +57,7 @@ def make_custom_builds_fn(
     zen_meta: Optional[Mapping[str, Any]] = ...,
     populate_full_signature: bool = ...,
     hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
@@ -74,7 +74,7 @@ def make_custom_builds_fn(
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
     hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
@@ -91,7 +91,7 @@ def make_custom_builds_fn(
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
     hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
@@ -108,7 +108,7 @@ def make_custom_builds_fn(
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
     hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
@@ -125,7 +125,7 @@ def make_custom_builds_fn(
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
     hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
@@ -140,7 +140,7 @@ def make_custom_builds_fn(
     zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
     zen_meta: Optional[Mapping[str, Any]] = None,
     hydra_recursive: Optional[bool] = None,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = None,
     zen_dataclass: Optional[DataclassOptions] = None,
     frozen: bool = False,
     zen_convert: Optional[ZenConvert] = None,
@@ -186,7 +186,7 @@ def make_custom_builds_fn(
     hydra_recursive : Optional[bool], optional (default=True)
         Specifies a new the default value for ``builds(..., hydra_recursive=<..>)``
 
-    hydra_convert : Optional[Literal["none", "partial", "all"]], optional (default="none")
+    hydra_convert : Optional[Literal["none", "partial", "all", "object"]], optional (default="none")
         Specifies a new the default value for ``builds(..., hydra_convert=<..>)``
 
     frozen : bool, optional (default=False)

@@ -41,6 +41,7 @@ from typing_extensions import (
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVE_TYPES,
     HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES,
+    HYDRA_SUPPORTS_OBJECT_CONVERT,
     HYDRA_SUPPORTS_PARTIAL,
     OMEGACONF_VERSION,
     PATCH_OMEGACONF_830,
@@ -699,16 +700,25 @@ def parse_strict_dataclass_options(
     return options.keys() <= _STRICT_DATACLASS_OPTION_KEYS and StrictDataclassOptions.__required_keys__ <= options.keys()  # type: ignore
 
 
+_HYDRA_CONVERT_OPTIONS = (
+    {"none", "partial", "all", "object"}
+    if HYDRA_SUPPORTS_OBJECT_CONVERT
+    else {"none", "partial", "all"}
+)
+
+
 def validate_hydra_options(
     hydra_recursive: Optional[bool] = None,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = None,
 ) -> None:
     if hydra_recursive is not None and not isinstance(hydra_recursive, bool):
         raise TypeError(
             f"`hydra_recursive` must be a boolean type, got {hydra_recursive}"
         )
 
-    if hydra_convert is not None and hydra_convert not in {"none", "partial", "all"}:
+    if hydra_convert is not None and hydra_convert not in _HYDRA_CONVERT_OPTIONS:
         raise ValueError(
-            f"`hydra_convert` must be 'none', 'partial', or 'all', got: {hydra_convert}"
+            f"`hydra_convert` must be 'none', 'partial',"
+            f"{' object' if HYDRA_SUPPORTS_OBJECT_CONVERT else ''} or 'all', got: "
+            f"{hydra_convert}"
         )

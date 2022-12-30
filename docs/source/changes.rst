@@ -118,6 +118,7 @@ New Features
 - Adds the :func:`~hydra_zen.wrapper.Zen` decorator-class (see :pull:`310`)
 - Adds the :class:`~hydra_zen.ZenStore` class (see :pull:`331`)
 - Adds `hyda_zen.store`, which is a pre-initialized instance of :class:`~hydra_zen.ZenStore` (see :pull:`331`)
+- The option `hydra_convert='object'` is now supported by all of hydra-zen's config-creation functions. So that an instantiated structured config can be converted to an instance of its backing dataclass. This feature was added by `Hydra 1.3.0 <https://github.com/facebookresearch/hydra/issues/1719>`_.
 
 Improvements
 ------------
