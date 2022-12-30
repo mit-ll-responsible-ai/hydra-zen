@@ -481,7 +481,7 @@
 <div class="viewcode-block" id="make_config"><a class="viewcode-back" href="../../../generated/hydra_zen.make_config.html#hydra_zen.make_config">[docs]</a><span class="k">def</span> <span class="nf">make_config</span><span class="p">(</span>
     <span class="o">*</span><span class="n">fields_as_args</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">],</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hydra_defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DefaultsList</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
@@ -528,15 +528,15 @@
 
 <span class="sd">        If ``None``, the ``_recursive_`` attribute is not set on the resulting config.</span>
 
-<span class="sd">    hydra_convert : Optional[Literal[&quot;none&quot;, &quot;partial&quot;, &quot;all&quot;]], optional (default=&quot;none&quot;)</span>
+<span class="sd">    hydra_convert : Optional[Literal[&quot;none&quot;, &quot;partial&quot;, &quot;all&quot;, &quot;object&quot;]], optional (default=&quot;none&quot;)</span>
 <span class="sd">        Determines how Hydra handles the non-primitive objects passed to configuration [3]_.</span>
 
 <span class="sd">        - ``&quot;none&quot;``: Passed objects are DictConfig and ListConfig, default</span>
 <span class="sd">        - ``&quot;partial&quot;``: Passed objects are converted to dict and list, with the exception of Structured Configs (and their fields).</span>
 <span class="sd">        - ``&quot;all&quot;``: Passed objects are dicts, lists and primitives without a trace of OmegaConf containers</span>
+<span class="sd">        - ``&quot;object&quot;``: Passed objects are converted to dict and list. Structured Configs are converted to instances of the backing dataclass / attr class.</span>
 
 <span class="sd">        If ``None``, the ``_convert_`` attribute is not set on the resulting config.</span>
-
 
 <span class="sd">    hydra_defaults : None | list[str | dict[str, str | list[str] | None ]], optional (default = None)</span>
 <span class="sd">        A list in an input config that instructs Hydra how to build the output config</span>

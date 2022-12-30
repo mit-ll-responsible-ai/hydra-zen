@@ -335,7 +335,7 @@ type/instance will be passed through as-is.</p>
 hydra-config objects nested within this config <a class="reference internal" href="#rbd228efbc5f2-3" id="id2">[3]</a>.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_recursive_</span></code> attribute is not set on the resulting config.</p>
 </dd>
-<dt><strong>hydra_convert</strong><span class="classifier">Optional[Literal[“none”, “partial”, “all”]], optional (default=”none”)</span></dt><dd><p>Determines how Hydra handles the non-primitive, omegaconf-specific objects passed to
+<dt><strong>hydra_convert</strong><span class="classifier">Optional[Literal[“none”, “partial”, “all”, “object”]], optional (default=”none”)</span></dt><dd><p>Determines how Hydra handles the non-primitive, omegaconf-specific objects passed to
 <code class="docutils literal notranslate"><span class="pre">&lt;hydra_target&gt;</span></code> <a class="reference internal" href="#rbd228efbc5f2-4" id="id3">[4]</a>.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">"none"</span></code>: No conversion occurs; omegaconf containers are passed through (Default)</p></li>
@@ -343,6 +343,7 @@ hydra-config objects nested within this config <a class="reference internal" hre
 <code class="docutils literal notranslate"><span class="pre">list</span></code>, respectively. Structured configs and their fields are passed without conversion.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">"all"</span></code>: All passed objects are converted to dicts, lists, and primitives, without
 a trace of OmegaConf containers.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">"object"</span></code>: Passed objects are converted to dict and list. Structured Configs are converted to instances of the backing dataclass / attr class.</p></li>
 </ul>
 <p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_convert_</span></code> attribute is not set on the resulting config.</p>
 </dd>

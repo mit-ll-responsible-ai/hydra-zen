@@ -331,6 +331,18 @@ hydra-config objects nested within this config <a class="reference internal" hre
 </ul>
 <p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_convert_</span></code> attribute is not set on the resulting config.</p>
 </dd>
+<dt><strong>hydra_convert</strong><span class="classifier">Optional[Literal[“none”, “partial”, “all”, “object”]], optional (default=”none”)</span></dt><dd><p>Determines how Hydra treats the non-primitive, omegaconf-specific objects
+during instantiateion <a class="reference internal" href="#r8dd265aa7612-3" id="id4">[3]</a>.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">"none"</span></code>: No conversion occurs; omegaconf containers are passed through (Default)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">"partial"</span></code>: <code class="docutils literal notranslate"><span class="pre">DictConfig</span></code> and <code class="docutils literal notranslate"><span class="pre">ListConfig</span></code> objects converted to <code class="docutils literal notranslate"><span class="pre">dict</span></code> and
+<code class="docutils literal notranslate"><span class="pre">list</span></code>, respectively. Structured configs and their fields are passed without conversion.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">"all"</span></code>: All passed objects are converted to dicts, lists, and primitives, without
+a trace of OmegaConf containers.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">"object"</span></code>: Passed objects are converted to dict and list. Structured Configs are converted to instances of the backing dataclass / attr class.</p></li>
+</ul>
+<p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_convert_</span></code> attribute is not set on the resulting config.</p>
+</dd>
 <dt><strong>init</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>If true (the default), a __init__() method will be generated. If the class
 already defines __init__(), this parameter is ignored.</p>
 </dd>
@@ -414,7 +426,8 @@ to running one’s code.</p>
 <p><a class="reference external" href="https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation">https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation</a></p>
 </div>
 <div class="citation" id="r8dd265aa7612-3" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a href="#id3" role="doc-backlink">3</a><span class="fn-bracket">]</span></span>
+<span class="label"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a href="#id3" role="doc-backlink">1</a>,<a href="#id4" role="doc-backlink">2</a>)</span>
 <p><a class="reference external" href="https://hydra.cc/docs/advanced/instantiate_objects/overview/#recursive-instantiation">https://hydra.cc/docs/advanced/instantiate_objects/overview/#recursive-instantiation</a></p>
 </div>
 <div class="citation" id="r8dd265aa7612-4" role="doc-biblioentry">

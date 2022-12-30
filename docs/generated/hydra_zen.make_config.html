@@ -300,11 +300,12 @@ type/instance will be passed through as-is.</p>
 hydra-config objects nested within this dataclass <a class="reference internal" href="#r9f8e996c6560-2" id="id2">[2]</a>.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_recursive_</span></code> attribute is not set on the resulting config.</p>
 </dd>
-<dt><strong>hydra_convert</strong><span class="classifier">Optional[Literal[“none”, “partial”, “all”]], optional (default=”none”)</span></dt><dd><p>Determines how Hydra handles the non-primitive objects passed to configuration <a class="reference internal" href="#r9f8e996c6560-3" id="id3">[3]</a>.</p>
+<dt><strong>hydra_convert</strong><span class="classifier">Optional[Literal[“none”, “partial”, “all”, “object”]], optional (default=”none”)</span></dt><dd><p>Determines how Hydra handles the non-primitive objects passed to configuration <a class="reference internal" href="#r9f8e996c6560-3" id="id3">[3]</a>.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">"none"</span></code>: Passed objects are DictConfig and ListConfig, default</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">"partial"</span></code>: Passed objects are converted to dict and list, with the exception of Structured Configs (and their fields).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">"all"</span></code>: Passed objects are dicts, lists and primitives without a trace of OmegaConf containers</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">"object"</span></code>: Passed objects are converted to dict and list. Structured Configs are converted to instances of the backing dataclass / attr class.</p></li>
 </ul>
 <p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_convert_</span></code> attribute is not set on the resulting config.</p>
 </dd>
