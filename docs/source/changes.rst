@@ -14,9 +14,6 @@ chronological order. All previous releases should still be available on pip.
 0.9.0 - 2022-12-30
 ------------------
 
-.. note:: This is documentation for an unreleased version of hydra-zen. You can try out this pre-release version using `pip install --pre hydra-zen`
-
-
 Release Highlights
 ------------------
 This release introduces :func:`~hydra_zen.zen` and :class:`~hydra_zen.ZenStore`, which enable hydra-zen users to eliminate Hydra-specific boilerplate code from their projects and to utilize new patterns and best practices for working with config stores.
