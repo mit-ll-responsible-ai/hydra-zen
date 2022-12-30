@@ -60,9 +60,6 @@ def func(x):
 @pytest.mark.filterwarnings("ignore:A structured config was supplied for")
 @given(kw=valid_builds_args(), as_inst=..., x=st.sampled_from(["", 1, [1, 2]]))
 def test_equiv_getattr(kw, as_inst: bool, x):
-    conf_fn = (
-        lambda **k: builds(func, x=x, **k) if x else lambda **k: mak(func, x=x, **k)
-    )
     obj = builds(func, x=x, **kw)
 
     if "zen_dataclass" in kw and kw["zen_dataclass"] is not None:
@@ -73,6 +70,7 @@ def test_equiv_getattr(kw, as_inst: bool, x):
             assume(False)
 
         kw["zen_dataclass"]["slots"] = False
+        kw["zen_dataclass"]["weakref_slot"] = False
 
     no_slot_obj = builds(func, x=x, **kw)
 

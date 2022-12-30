@@ -310,10 +310,10 @@ def test_zen_supported_primitives_arent_supported_by_hydra(type_, data: st.DataO
 
     @dataclass
     class C:
-        x: type_ = mutable_value(value) if isinstance(value, (set, dict)) else value
+        x: type_ = mutable_value(value) if value.__hash__ is None else value
 
     with pytest.raises((ValidationError, AssertionError)):
-        Conf = OmegaConf.create(C)
+        Conf = OmegaConf.create(C)  # type: ignore
         assert isinstance(Conf.x, type_)
 
 
