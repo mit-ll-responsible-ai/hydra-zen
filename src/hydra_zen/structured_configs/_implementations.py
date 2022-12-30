@@ -1501,6 +1501,9 @@ def builds(
                 continue
             # We are intentionally keeping each condition branched
             # so that test-coverage will be checked for each one
+            if isinstance(wrapper, functools.partial):
+                wrapper = ZEN_VALUE_CONVERSION[functools.partial](wrapper)
+
             if is_builds(wrapper):
                 # If Hydra's locate function starts supporting importing literals
                 # – or if we decide to ship our own locate function –
