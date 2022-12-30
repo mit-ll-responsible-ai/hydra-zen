@@ -1840,6 +1840,9 @@
                 <span class="k">continue</span>
             <span class="c1"># We are intentionally keeping each condition branched</span>
             <span class="c1"># so that test-coverage will be checked for each one</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">wrapper</span><span class="p">,</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">):</span>
+                <span class="n">wrapper</span> <span class="o">=</span> <span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">](</span><span class="n">wrapper</span><span class="p">)</span>
+
             <span class="k">if</span> <span class="n">is_builds</span><span class="p">(</span><span class="n">wrapper</span><span class="p">):</span>
                 <span class="c1"># If Hydra&#39;s locate function starts supporting importing literals</span>
                 <span class="c1"># – or if we decide to ship our own locate function –</span>
