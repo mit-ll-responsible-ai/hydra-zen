@@ -137,7 +137,7 @@ def test_hydra_convert(
 
 @pytest.mark.xfail(
     not HYDRA_SUPPORTS_OBJECT_CONVERT,
-    raises=TypeError,
+    raises=ValueError,
     reason="Hydra 1.3.0 required for _convert_ = 'object'",
 )
 def test_object_convert():
@@ -149,7 +149,7 @@ def test_object_convert():
 
 @pytest.mark.xfail(
     not HYDRA_SUPPORTS_OBJECT_CONVERT,
-    raises=TypeError,
+    raises=ValueError,
     reason="Hydra 1.3.0 required for _convert_ = 'object'",
 )
 def test_object_convert_hydrated():
