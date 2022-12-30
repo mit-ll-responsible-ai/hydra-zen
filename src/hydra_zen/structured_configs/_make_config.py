@@ -1,5 +1,6 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+import warnings
 from collections import Counter
 from dataclasses import (  # use this for runtime checks
     MISSING,
@@ -13,12 +14,13 @@ from typing import Any, Dict, List, Optional, Tuple, Type, Union, cast
 from typing_extensions import Literal
 
 from hydra_zen._compatibility import PATCH_OMEGACONF_830
+from hydra_zen.errors import HydraZenDeprecationWarning
 from hydra_zen.structured_configs import _utils
 from hydra_zen.structured_configs._implementations import (
     _BUILDS_CONVERT_SETTINGS,
     sanitize_collection,
 )
-from hydra_zen.typing import SupportedPrimitive
+from hydra_zen.typing import DataclassOptions, SupportedPrimitive
 from hydra_zen.typing._implementations import (
     AllConvert,
     DataClass,
@@ -38,7 +40,7 @@ from ._globals import (
     ZEN_TARGET_FIELD_NAME,
 )
 from ._implementations import _retain_type_info, builds, sanitized_field
-from ._type_guards import uses_zen_processing
+from ._type_guards import safe_getattr, uses_zen_processing
 
 __all__ = ["ZenField", "make_config"]
 
@@ -142,8 +144,7 @@ def make_config(
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
     hydra_defaults: Optional[DefaultsList] = None,
-    config_name: str = "Config",
-    frozen: bool = False,
+    zen_dataclass: Optional[DataclassOptions] = None,
     bases: Tuple[Type[DataClass_], ...] = (),
     zen_convert: Optional[ZenConvert] = None,
     **fields_as_kwargs: Union[SupportedPrimitive, ZenField],
@@ -203,12 +204,27 @@ def make_config(
         [7]_ [8]_. Each input config can have a Defaults List as a top level element. The
         Defaults List itself is not a part of output config.
 
+    zen_dataclass : Optional[DataclassOptions]
+        A dictionary can specify any option that is supported by
+        :py:func:`dataclasses.make_dataclass` other than `fields`.
+
+        Additionally, a ``'module': <str>`` entry can be specified to enable pickle
+        compatibility. See `hydra_zen.typing.DataclassOptions` for details.
+
     frozen : bool, optional (default=False)
-        If ``True``, the resulting config class will produce 'frozen' (i.e. immutable) instances.
-        I.e. setting/deleting an attribute of an instance of the config will raise
-        :py:class:`dataclasses.FrozenInstanceError` at runtime.
+        .. deprecated:: 0.9.0
+            `frozen` will be removed in hydra-zen 0.10.0. It is replaced by
+            ``zen_dataclass={'frozen': <bool>}``.
+
+        If ``True``, the resulting config class will produce 'frozen' (i.e. immutable)
+        instances. I.e. setting/deleting an attribute of an instance of the config will
+        raise :py:class:`dataclasses.FrozenInstanceError` at runtime.
 
     config_name : str, optional (default="Config")
+        .. deprecated:: 0.9.0
+            `config_name` will be removed in hydra-zen 0.10.0. It is replaced by
+            ``zen_dataclass={'cls_name': <str>}``.
+
         The class name of the resulting config class.
 
     Returns
@@ -226,7 +242,8 @@ def make_config(
     -----
     The resulting "config" is a dataclass-object [4]_ with Hydra-specific attributes
     attached to it, along with the attributes specified via ``fields_as_args`` and
-    ``fields_as_kwargs``.
+    ``fields_as_kwargs``. **Unlike std-lib dataclasses, the default value for
+    unsafe_hash is True.**
 
     Any field specified without a type-annotation is automatically annotated with
     :py:class:`typing.Any`. Hydra only supports a narrow subset of types [5]_;
@@ -372,6 +389,38 @@ def make_config(
     convert_settings = cast(ZenConvert, convert_settings)
     del zen_convert
 
+    if zen_dataclass is None:
+        zen_dataclass = {}
+
+    # initial validation
+    _utils.parse_dataclass_options(zen_dataclass)
+
+    if "frozen" in fields_as_kwargs:
+        warnings.warn(
+            HydraZenDeprecationWarning(
+                "Specifying `builds(frozen=<...>)` is deprecated. Instead, "
+                "specify `builds(zen_dataclass={'frozen': <...>})"
+            ),
+            stacklevel=2,
+        )
+        zen_dataclass["frozen"] = fields_as_kwargs.pop("frozen")  # type: ignore
+
+    if "config_name" in fields_as_kwargs:
+        warnings.warn(
+            HydraZenDeprecationWarning(
+                "Specifying `make_config(config_name=<...>)` is deprecated. "
+                "Instead specify `make_config(zen_dataclass={'cls_name': <...>})"
+            ),
+            stacklevel=2,
+        )
+        zen_dataclass["cls_name"] = fields_as_kwargs.pop("config_name")  # type: ignore
+
+    if not bases:
+        bases = zen_dataclass.get("bases", ())
+
+    zen_dataclass.setdefault("cls_name", "Config")
+    dataclass_options = _utils.parse_dataclass_options(zen_dataclass)
+
     for _field in fields_as_args:
         if not isinstance(_field, (str, ZenField)):
             raise TypeError(
@@ -516,9 +565,15 @@ def make_config(
             )
         )
 
-    out = make_dataclass(
-        cls_name=config_name, fields=config_fields, frozen=frozen, bases=bases
-    )
+    dataclass_options["bases"] = bases
+    module = dataclass_options.pop("module", None)
+    assert _utils.parse_strict_dataclass_options(dataclass_options), dataclass_options
+
+    out = make_dataclass(fields=config_fields, **dataclass_options)
+
+    if module is not None:
+        out.__module__ = module
+
     if hasattr(out, ZEN_TARGET_FIELD_NAME) and not uses_zen_processing(out):
         raise ValueError(
             f"{out.__name__} inherits from base classes that overwrite some fields "
@@ -527,7 +582,7 @@ def make_config(
         )
     if (
         HYDRA_SUPPORTS_PARTIAL
-        and getattr(out, PARTIAL_FIELD_NAME, False)
+        and safe_getattr(out, PARTIAL_FIELD_NAME, False)
         and uses_zen_processing(out)
     ):
         raise ValueError(

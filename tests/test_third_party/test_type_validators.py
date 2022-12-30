@@ -78,6 +78,7 @@ xf = _XFail()
 
 
 @skip_if_no_validators
+@pytest.mark.filterwarnings("ignore:PEP 484 type hint")
 @pytest.mark.parametrize("validator", all_validators)
 @given(num_compositions=st.integers(0, 4), x=st.integers(), as_named_arg=st.booleans())
 def test_multiple_wraps_on_func(
@@ -102,6 +103,7 @@ def test_multiple_wraps_on_func(
 
 
 @skip_if_no_validators
+@pytest.mark.filterwarnings("ignore:PEP 484 type hint")
 @pytest.mark.parametrize("validator", all_validators)
 @given(num_compositions=st.integers(0, 4), x=st.integers(), as_named_arg=st.booleans())
 def test_multiple_wraps_on_class(
@@ -133,6 +135,7 @@ class MyNamedTuple(NamedTuple):
 
 
 @skip_if_no_validators
+@pytest.mark.filterwarnings("ignore:PEP 484 type hint")
 @pytest.mark.parametrize("validator", all_validators)
 @pytest.mark.parametrize(
     "annotation, caster",
@@ -172,6 +175,7 @@ def test_coerces_lists_to_annotated_sequence_type(
 
 
 @skip_if_no_validators
+@pytest.mark.filterwarnings("ignore:PEP 484 type hint")
 @pytest.mark.parametrize("validator", all_validators)
 def test_on_custom_types(validator):
     class A:
@@ -203,6 +207,7 @@ class UserIdentity(TypedDict):
 
 
 @skip_if_no_validators
+@pytest.mark.filterwarnings("ignore:PEP 484 type hint")
 @pytest.mark.parametrize(
     "annotation, fools_hydra",
     [
@@ -283,6 +288,7 @@ ClassWithSig.__init__ = _detached_init_  # type: ignore
 
 
 @skip_if_no_validators
+@pytest.mark.filterwarnings("ignore:PEP 484 type hint")
 @pytest.mark.parametrize("validator", all_validators)
 @pytest.mark.parametrize(
     "args, kwargs, should_pass",

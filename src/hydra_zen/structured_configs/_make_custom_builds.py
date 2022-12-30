@@ -2,16 +2,19 @@
 # SPDX-License-Identifier: MIT
 # pyright: strict
 import inspect
+import warnings
 from functools import wraps
 from typing import Any, Callable, Dict, Mapping, Optional, Union, cast, overload
 
 from typing_extensions import Final, Literal
 
-from hydra_zen.typing import ZenWrappers
+from hydra_zen.errors import HydraZenDeprecationWarning
+from hydra_zen.typing import DataclassOptions, ZenWrappers
 from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds, StdBuilds
 from hydra_zen.typing._implementations import ZenConvert
 
 from ._implementations import builds
+from ._utils import parse_dataclass_options
 
 __all__ = ["make_custom_builds_fn"]
 
@@ -22,6 +25,9 @@ __BUILDS_DEFAULTS: Final[Dict[str, Any]] = {
     for name, p in _builds_sig.parameters.items()
     if p.kind is p.KEYWORD_ONLY
 }
+# TODO: Remove deprecated options once they are phased out
+__BUILDS_DEFAULTS["frozen"] = False
+__BUILDS_DEFAULTS["dataclass_name"] = None
 del _builds_sig
 
 
@@ -35,6 +41,7 @@ def make_custom_builds_fn(
     populate_full_signature: Literal[True],
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    zen_dataclass: Optional[DataclassOptions] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
 ) -> FullBuilds:
@@ -51,6 +58,7 @@ def make_custom_builds_fn(
     populate_full_signature: bool = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    zen_dataclass: Optional[DataclassOptions] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
 ) -> PBuilds:
@@ -67,6 +75,7 @@ def make_custom_builds_fn(
     zen_meta: Optional[Mapping[str, Any]] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    zen_dataclass: Optional[DataclassOptions] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
 ) -> StdBuilds:
@@ -83,6 +92,7 @@ def make_custom_builds_fn(
     zen_meta: Optional[Mapping[str, Any]] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    zen_dataclass: Optional[DataclassOptions] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
 ) -> Union[FullBuilds, StdBuilds]:
@@ -99,6 +109,7 @@ def make_custom_builds_fn(
     zen_meta: Optional[Mapping[str, Any]] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    zen_dataclass: Optional[DataclassOptions] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
 ) -> Union[PBuilds, StdBuilds]:
@@ -115,6 +126,7 @@ def make_custom_builds_fn(
     zen_meta: Optional[Mapping[str, Any]] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    zen_dataclass: Optional[DataclassOptions] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
 ) -> Union[FullBuilds, PBuilds, StdBuilds]:
@@ -129,6 +141,7 @@ def make_custom_builds_fn(
     zen_meta: Optional[Mapping[str, Any]] = None,
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    zen_dataclass: Optional[DataclassOptions] = None,
     frozen: bool = False,
     zen_convert: Optional[ZenConvert] = None,
 ) -> Union[FullBuilds, PBuilds, StdBuilds]:
@@ -162,6 +175,14 @@ def make_custom_builds_fn(
             that will instantiate to that type/instance. Otherwise the dataclass
             type/instance will be passed through as-is.
 
+    zen_dataclass : Optional[DataclassOptions]
+        A dictionary can specify any option that is supported by
+        :py:func:`dataclasses.make_dataclass` other than `fields`.
+        The default value for `unsafe_hash` is `True`.
+
+        Additionally, the `module` field can be specified to enable pickle
+        compatibility. See `hydra_zen.typing.DataclassOptions` for details.
+
     hydra_recursive : Optional[bool], optional (default=True)
         Specifies a new the default value for ``builds(..., hydra_recursive=<..>)``
 
@@ -169,6 +190,10 @@ def make_custom_builds_fn(
         Specifies a new the default value for ``builds(..., hydra_convert=<..>)``
 
     frozen : bool, optional (default=False)
+        .. deprecated:: 0.9.0
+            `frozen` will be removed in hydra-zen 0.10.0. It is replaced by
+            `zen_dataclass={'frozen': <bool>}`.
+
         Specifies a new the default value for ``builds(..., frozen=<..>)``
 
     Returns
@@ -230,7 +255,6 @@ def make_custom_builds_fn(
     >>> instantiate(Conf, x="c")  # violates annotation: Literal["a", "b"]
     <Validation error: "c" is not "a" or "b">
     """
-
     excluded_fields = frozenset({"dataclass_name", "hydra_defaults", "builds_bases"})
     LOCALS = locals()
 
@@ -242,15 +266,41 @@ def make_custom_builds_fn(
         name: LOCALS[name] for name in __BUILDS_DEFAULTS if name not in excluded_fields
     }
 
+    _frozen = _new_defaults.pop("frozen")
+
     # let `builds` validate the new defaults!
     builds(builds, **_new_defaults)
+
+    _zen_dataclass: Optional[DataclassOptions] = _new_defaults.pop("zen_dataclass")
+    if _zen_dataclass is None:
+        _zen_dataclass = {}
+
+    if _frozen is True:
+        warnings.warn(
+            HydraZenDeprecationWarning(
+                "Specifying `builds(..., frozen=<...>)` is deprecated. Instead, "
+                "specify `builds(..., zen_dataclass={'frozen': <...>})"
+            ),
+            stacklevel=2,
+        )
+
+        _zen_dataclass["frozen"] = _frozen
+
+    _zen_dataclass = parse_dataclass_options(_zen_dataclass)
 
     @wraps(builds)
     def wrapped(*args: Any, **kwargs: Any):
         merged_kwargs: Dict[str, Any] = {}
+        _dataclass: Optional[DataclassOptions] = kwargs.pop("zen_dataclass", None)
+
+        if _dataclass is None:
+            _new_defaults["zen_dataclass"] = _zen_dataclass
+        else:
+            _new_defaults["zen_dataclass"] = {**_zen_dataclass, **_dataclass}
+
         merged_kwargs.update(_new_defaults)
         merged_kwargs.update(kwargs)
+
         return builds(*args, **merged_kwargs)
 
-    setattr(wrapped, "_zen_convert", zen_convert)
     return cast(Union[FullBuilds, PBuilds, StdBuilds], wrapped)

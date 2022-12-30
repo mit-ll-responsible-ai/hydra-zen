@@ -42,7 +42,7 @@ def test_builds_sets_hydra_params(
         zen_partial=partial,
         zen_meta=meta,
         zen_wrappers=wrappers,
-        dataclass_name=name,
+        zen_dataclass={"cls_name": name},
         **kwargs,
     )
 

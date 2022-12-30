@@ -1,6 +1,7 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import inspect
+import pickle
 import string
 from collections import Counter, deque
 from dataclasses import dataclass, field
@@ -19,6 +20,7 @@ from hydra_zen import (
     get_target,
     instantiate,
     make_config,
+    make_custom_builds_fn,
     mutable_value,
     to_yaml,
 )
@@ -109,6 +111,87 @@ def test_value_supported_via_config_maker_functions(
             pass
         else:
             assert conf["a"] == value
+
+
+pik_blds = make_custom_builds_fn(
+    zen_dataclass={"module": "tests.test_value_conversion"}
+)
+
+Bint = pik_blds(dict, x=1, zen_dataclass={"cls_name": "Bint"})
+Bfloat = pik_blds(dict, x=1.0, zen_dataclass={"cls_name": "Bfloat"})
+Bbool = pik_blds(dict, x=True, zen_dataclass={"cls_name": "Bbool"})
+Bnone = pik_blds(dict, x=None, zen_dataclass={"cls_name": "Bnone"})
+Benum = pik_blds(dict, x=Shake(3), zen_dataclass={"cls_name": "Benum"})
+Blist = pik_blds(dict, x=[1, {"a": 2}], zen_dataclass={"cls_name": "Blist"})
+Blistconfig = pik_blds(
+    dict, x=ListConfig([1, {"a": 2}]), zen_dataclass={"cls_name": "Blistconfig"}
+)
+Bset = pik_blds(dict, x=set([1, 2]), zen_dataclass={"cls_name": "Bset"})
+Bfrozenset = pik_blds(
+    dict, x=frozenset([1j, 2j]), zen_dataclass={"cls_name": "Bfrozenset"}
+)
+Bcomplex = pik_blds(dict, x=1j, zen_dataclass={"cls_name": "Bcomplex"})
+Bpath = pik_blds(dict, x=Path.cwd(), zen_dataclass={"cls_name": "Bpath"})
+Bbytes = pik_blds(dict, x=b"123", zen_dataclass={"cls_name": "Bbytes"})
+Bbytearray = pik_blds(
+    dict, x=bytearray([1, 2]), zen_dataclass={"cls_name": "Bbytearray"}
+)
+Bdeque = pik_blds(dict, x=deque([1j, 2]), zen_dataclass={"cls_name": "Bdeque"})
+Brange = pik_blds(dict, x=range(1, 10, 3), zen_dataclass={"cls_name": "Brange"})
+Brange2 = pik_blds(dict, x=range(2), zen_dataclass={"cls_name": "Brange2"})
+Bcounter = pik_blds(dict, x=Counter("apple"), zen_dataclass={"cls_name": "Bcounter"})
+
+
+@pytest.mark.parametrize(
+    "Config",
+    [
+        Bint,
+        Bfloat,
+        Bbool,
+        Bnone,
+        Benum,
+        Blist,
+        Blistconfig,
+        Bset,
+        Bfrozenset,
+        Bcomplex,
+        Bpath,
+        Bbytes,
+        Bbytearray,
+        Bdeque,
+        Brange,
+        Brange2,
+        Bcounter,
+    ],
+)
+def test_pickle_compatibility(Config):
+    assert pickle.loads(pickle.dumps(Config)) is Config
+    assert pickle.loads(pickle.dumps(Config())) == Config()
+
+
+@pytest.mark.parametrize(
+    "Config",
+    [
+        Bint,
+        Bfloat,
+        Bbool,
+        Bnone,
+        Benum,
+        Blistconfig,
+        Bset,
+        Bfrozenset,
+        Bcomplex,
+        Bpath,
+        Bbytes,
+        Bbytearray,
+        Bdeque,
+        Brange,
+        Brange2,
+        Bcounter,
+    ],
+)
+def test_unsafe_hash_default(Config):
+    assert Config().x.__hash__ is not None
 
 
 @given(x=st.lists(st.integers(-2, 2)))

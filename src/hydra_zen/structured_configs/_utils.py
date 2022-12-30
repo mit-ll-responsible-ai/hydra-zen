@@ -5,11 +5,13 @@ import sys
 import warnings
 from dataclasses import MISSING, field as _field, is_dataclass
 from enum import Enum
+from keyword import iskeyword
 from pathlib import Path
 from typing import (
     Any,
     Callable,
     Dict,
+    FrozenSet,
     Iterable,
     List,
     Mapping,
@@ -45,12 +47,15 @@ from hydra_zen._compatibility import (
     Version,
 )
 from hydra_zen.errors import HydraZenValidationError
+from hydra_zen.typing import DataclassOptions, ZenConvert
 from hydra_zen.typing._implementations import (
+    DEFAULT_DATACLASS_OPTIONS,
+    UNSUPPORTED_DATACLASS_OPTIONS,
     AllConvert,
     DataClass_,
     Field,
     InterpStr,
-    ZenConvert,
+    StrictDataclassOptions,
     convert_types,
 )
 
@@ -366,7 +371,7 @@ def sanitized_type(
 
         # Python 3.7-3.8
         # type_: Annotated[x, y]; origin -> x
-        if isinstance(type_, _AnnotatedAlias):
+        if isinstance(type_, _AnnotatedAlias):  # pragma: no cover
             return sanitized_type(
                 origin,
                 primitive_only=primitive_only,
@@ -446,7 +451,8 @@ def sanitized_type(
     if HYDRA_SUPPORTS_PARTIAL and isinstance(type_, type) and issubclass(type_, Path):
         type_ = Path
 
-    if isinstance(type_, (ParamSpecArgs, ParamSpecKwargs)):
+    if isinstance(type_, (ParamSpecArgs, ParamSpecKwargs)):  # pragma: no cover
+        # Python 3.7 - 3.9
         # these aren't hashable -- can't check for membership in set
         return Any
 
@@ -589,6 +595,108 @@ def merge_settings(
                 )
             settings[k] = v
     return settings
+
+
+_DATACLASS_OPTION_KEYS: FrozenSet[str] = (
+    DataclassOptions.__required_keys__ | DataclassOptions.__optional_keys__  # type: ignore
+)
+
+_STRICT_DATACLASS_OPTION_KEYS: FrozenSet[str] = (
+    StrictDataclassOptions.__required_keys__ | StrictDataclassOptions.__optional_keys__  # type: ignore
+)
+_STRICT_DATACLASS_OPTION_KEYS.copy()
+
+
+def parse_dataclass_options(options: Mapping[str, Any]) -> DataclassOptions:
+    """
+    Ensures `options` adheres to `DataclassOptions` and merges hydra-zen defaults
+    for missing options.
+
+    All valid `@dataclass`/`make_dataclass` options are supported, even for features
+    introduced in later versions of Python. This function will remove valid options
+    that are not supported for by the current Python version.
+
+    Parameters
+    ----------
+    options : Mapping[str, Any]
+        User-specified options for `zen_dataclass` to be validated.
+
+    Returns
+    -------
+    DataclassOptions
+
+    Examples
+    --------
+    >>> parse_dataclass_options({})
+    {'unsafe_hash': True}
+
+    >>> parse_dataclass_options({"unsafe_hash": False, "cls_name": "Foo"})
+    {'unsafe_hash': False, 'cls_name': 'Foo'}
+
+    >>> parse_dataclass_options({"moo": 1})
+    ValueError: moo is not a valid dataclass option.
+
+    Options that are supported by `make_dataclass` for later versions of
+    Python are ignored/removed automatically by this function. E.g. the following
+    Python 3.10+ option has the following behavior in Python 3.9:
+
+    >>> parse_dataclass_options({"slots": False})
+    {'unsafe_hash': True}
+    """
+    if not isinstance(options, Mapping):
+        raise ValueError(
+            f"`zen_dataclass_options` is expected to be `None` or dict[str, bool]. Got "
+            f"{options} (type: {type(options)})."
+        )
+
+    merged = DEFAULT_DATACLASS_OPTIONS.copy()
+
+    for name, val in options.items():
+        if name in UNSUPPORTED_DATACLASS_OPTIONS:
+            continue
+        elif name not in _DATACLASS_OPTION_KEYS:
+            raise ValueError(f"{name} is not a valid dataclass option.")
+
+        if name == "module":
+            if not isinstance(val, str) or not all(
+                v.isidentifier() and not iskeyword(v) for v in val.split(".")
+            ):
+                raise ValueError(
+                    f"dataclass option `{name}` must be a valid module name, got {val}"
+                )
+        elif name == "cls_name":
+            if val is not None and (not isinstance(val, str) or not val.isidentifier()):
+                raise ValueError(
+                    f"dataclass option `{name}` must be a valid identifier, got {val}"
+                )
+        elif name == "bases":
+            if not isinstance(val, Iterable) or any(
+                not (is_dataclass(_b) and isinstance(_b, type)) for _b in val
+            ):
+                raise TypeError(
+                    f"dataclass option `{name}` must be a tuple of dataclass types"
+                )
+        elif name == "namespace":
+            if not isinstance(val, Mapping) or any(
+                not isinstance(v, str) or not v.isidentifier() for v in val
+            ):
+                raise ValueError(
+                    f"dataclass option `{name}` must be a mapping with string-valued keys "
+                    f"that are valid identifiers. Got {val}."
+                )
+        elif not isinstance(val, bool):
+            raise TypeError(
+                f"dataclass option `{name}` must be of type `bool`. Got {val} "
+                f"(type: {type(val)})"
+            )
+        merged[name] = val
+    return merged
+
+
+def parse_strict_dataclass_options(
+    options: Mapping[str, Any]
+) -> TypeGuard[StrictDataclassOptions]:
+    return options.keys() <= _STRICT_DATACLASS_OPTION_KEYS and StrictDataclassOptions.__required_keys__ <= options.keys()  # type: ignore
 
 
 def validate_hydra_options(

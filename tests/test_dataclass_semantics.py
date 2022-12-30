@@ -1,14 +1,24 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-
+import sys
 from copy import deepcopy
-from dataclasses import FrozenInstanceError, is_dataclass
+from dataclasses import FrozenInstanceError, dataclass, is_dataclass
+from pickle import PicklingError, dumps, loads
+from typing import Optional
 
 import hypothesis.strategies as st
 import pytest
 from hypothesis import given
 
-from hydra_zen import builds, hydrated_dataclass, instantiate
+from hydra_zen import (
+    builds,
+    hydrated_dataclass,
+    instantiate,
+    just,
+    make_config,
+    make_custom_builds_fn,
+)
+from hydra_zen.errors import HydraZenDeprecationWarning
 
 
 def f_three_vars(x, y, z):
@@ -43,7 +53,7 @@ def f_2(x, y, z):
 
 @pytest.mark.parametrize("full_sig", [True, False])
 @pytest.mark.parametrize("partial", [True, False, None])
-def test_chain_builds_of_targets_with_common_interfaces(full_sig, partial):
+def test_chain_builds_of_targets_with_common_interfaces(full_sig, partial: bool):
 
     # Note that conf_1 and conf_2 target `f` whereas conf_3 targets `f_three_vars`,
     # which have identical interfaces.
@@ -62,14 +72,15 @@ def test_chain_builds_of_targets_with_common_interfaces(full_sig, partial):
 
     out = instantiate(conf_3)
     if partial:
-        out = out()  # resolve partial
+        # resolve partial
+        out = out()  # type: ignore
 
     assert out == (1, 2, 3)
 
 
 @pytest.mark.parametrize("full_sig", [True, False])
 @pytest.mark.parametrize("partial", [True, False, None])
-def test_pos_args_with_inheritance(full_sig, partial):
+def test_pos_args_with_inheritance(full_sig, partial: bool):
 
     conf_1 = builds(f_three_vars, 1, 2)
     conf_2 = builds(
@@ -85,7 +96,8 @@ def test_pos_args_with_inheritance(full_sig, partial):
 
     out = instantiate(conf_2)
     if partial:
-        out = out()  # resolve partial
+        # resolve partial
+        out = out()  # type: ignore
 
     assert out == (1, 2, 3)
 
@@ -94,20 +106,25 @@ def f_3(x):
     pass
 
 
-def test_frozen_via_builds():
-
-    conf_f = builds(f, x=2, frozen=True)()
-
-    with pytest.raises(FrozenInstanceError):
-        conf_f.x = 3
+@hydrated_dataclass(dict, frozen=True)
+class FrozenHydrated:
+    x: int = 2
 
 
-def test_frozen_via_hydrated_dataclass():
-    @hydrated_dataclass(f, frozen=True)
-    class Conf_f:
-        x: int = 2
+@pytest.mark.filterwarnings("ignore:Specifying")
+@pytest.mark.parametrize(
+    "fn",
+    [
+        lambda: builds(dict, x=2, zen_dataclass={"frozen": True})(),
+        lambda: builds(dict, x=2, frozen=True)(),
+        lambda: make_custom_builds_fn(zen_dataclass={"frozen": True})(dict, x=2)(),
+        lambda: make_custom_builds_fn(frozen=True)(dict, x=2)(),
+        lambda: FrozenHydrated(),
+    ],
+)
+def test_frozen_via_builds(fn):
 
-    conf_f = Conf_f()
+    conf_f = fn()
 
     with pytest.raises(FrozenInstanceError):
         conf_f.x = 3
@@ -157,8 +174,8 @@ def test_hydra_settings_can_be_inherited(recursive, convert, via_builds):
         kwargs["hydra_convert"] = convert
 
     if via_builds:
-        Base = builds(dict, **kwargs)
-        Child = builds(dict, builds_bases=(Base,))
+        Base = builds(dict, **kwargs)  # type: ignore
+        Child = builds(dict, builds_bases=(Base,))  # type: ignore
     else:
 
         @hydrated_dataclass(target=dict, **kwargs)
@@ -170,12 +187,12 @@ def test_hydra_settings_can_be_inherited(recursive, convert, via_builds):
             pass
 
     if recursive is not NotSet:
-        assert Child._recursive_ is Base._recursive_
+        assert Child._recursive_ is Base._recursive_  # type: ignore
     else:
         assert not hasattr(Child, "_recursive_")
 
     if convert is not NotSet:
-        assert Child._convert_ is Base._convert_
+        assert Child._convert_ is Base._convert_  # type: ignore
     else:
         assert not hasattr(Child, "_convert_")
 
@@ -183,10 +200,10 @@ def test_hydra_settings_can_be_inherited(recursive, convert, via_builds):
 @given(
     target=st.sampled_from([int, str]),
     zen_partial=st.none() | st.booleans(),
-    name=st.none() | st.just("CustomName"),
+    name=st.just("CustomName"),
 )
 def test_dataclass_name(target, zen_partial, name):
-    Conf = builds(target, zen_partial=zen_partial, dataclass_name=name)
+    Conf = builds(target, zen_partial=zen_partial, zen_dataclass={"cls_name": name})
     if name is not None:
         assert Conf.__name__ == "CustomName"
         return
@@ -195,3 +212,193 @@ def test_dataclass_name(target, zen_partial, name):
         assert Conf.__name__ == f"PartialBuilds_{target_name}"
     else:
         assert Conf.__name__ == f"Builds_{target_name}"
+
+
+@dataclass
+class VanillaDataClass:
+    x: int = 2
+    y: str = "a"
+
+
+@hydrated_dataclass(dict)
+class PickleHydrated:
+    x: int = 2
+    y: str = "a"
+
+
+PickleBuilds = builds(
+    dict,
+    x=2,
+    y="a",
+    zen_dataclass={
+        "module": "tests.test_dataclass_semantics",
+        "cls_name": "PickleBuilds",
+    },
+)
+
+PickleCustomBuilds = make_custom_builds_fn(
+    zen_dataclass={
+        "module": "tests.test_dataclass_semantics",
+        "cls_name": "PickleCustomBuilds",
+    }
+)(dict, x=2, y="a")
+
+PickleMakeConfig = make_config(
+    x=2,
+    y="a",
+    zen_dataclass={
+        "module": "tests.test_dataclass_semantics",
+        "cls_name": "PickleMakeConfig",
+    },
+)
+
+
+PickleJustDataclass = just(
+    VanillaDataClass(),
+    zen_dataclass={
+        "module": "tests.test_dataclass_semantics",
+        "cls_name": "PickleJustDataclass",
+    },
+)
+
+
+@pytest.mark.parametrize(
+    "Conf",
+    [
+        PickleBuilds,
+        PickleCustomBuilds,
+        PickleMakeConfig,
+        PickleJustDataclass,
+        PickleHydrated,
+        pytest.param(
+            builds(dict, x=2, y="a"),
+            marks=pytest.mark.xfail(
+                reason="not pickle compatible", raises=PicklingError
+            ),
+        ),
+    ],
+)
+def test_pickleable(Conf):
+    try:
+        assert loads(dumps(Conf(y="b"))) != Conf()
+    except TypeError:
+        pass
+    assert loads(dumps(Conf())) == Conf()
+    assert loads(dumps(Conf)) is Conf
+
+
+def test_pickle_just():
+    just_int = just(int)
+    assert loads(dumps(just_int)) == just_int
+
+
+def test_hashable_just():
+    just_int = just(int)
+    assert just_int.__hash__ is not None
+
+
+def hydrated_fn(zen_dataclass, target=dict):
+    @hydrated_dataclass(target, **zen_dataclass)
+    class A:
+        x: int = 1
+
+    return A
+
+
+@given(unsafe_hash=...)
+@pytest.mark.parametrize(
+    "fn",
+    [
+        lambda **kw: builds(dict, **kw),
+        lambda **kw: make_custom_builds_fn(**kw)(dict),
+        lambda **kw: just(VanillaDataClass(), **kw),
+        lambda **kw: hydrated_fn(**kw),
+        make_config,
+        hydrated_fn,
+    ],
+)
+def test_hashable(unsafe_hash: Optional[bool], fn):
+    kw = {"unsafe_hash": unsafe_hash} if unsafe_hash is not None else {}
+    Conf = fn(zen_dataclass=kw)
+    assert (Conf.__hash__ is None) is (unsafe_hash is False)
+
+
+@pytest.mark.parametrize(
+    "fn",
+    [
+        lambda **kw: builds(dict, **kw),
+        lambda **kw: make_custom_builds_fn(**kw)(dict),
+        lambda **kw: just(VanillaDataClass(), **kw),
+        make_config,
+    ],
+)
+def test_namespace(fn):
+    conf = fn(zen_dataclass={"namespace": {"fn": lambda _, x: x + 2}})()
+    assert conf.fn(2) == 4
+
+
+@given(kw_only=...)
+@pytest.mark.parametrize(
+    "fn",
+    [
+        lambda **kw: builds(dict, x=1, **kw),
+        lambda **kw: make_custom_builds_fn(**kw)(dict, x=1),
+        lambda **kw: make_config(x=1, **kw),
+        lambda **kw: just(VanillaDataClass(), **kw),
+        lambda **kw: hydrated_fn(**kw),
+    ],
+)
+def test_kwonly(kw_only: bool, fn):
+
+    Conf = fn(zen_dataclass={"kw_only": kw_only})
+
+    if sys.version_info < (3, 10):
+        _ = Conf(2)
+    elif kw_only is True:
+        with pytest.raises(Exception):
+            _ = Conf(2)
+
+    _ = Conf(x=2)
+
+
+@pytest.mark.parametrize(
+    "fn",
+    [
+        lambda **kw: builds(dict, **kw),
+        lambda **kw: make_custom_builds_fn(**kw)(dict),
+        lambda **kw: just(VanillaDataClass(), **kw),
+        make_config,
+    ],
+)
+def test_bases(fn):
+    A = fn()
+    B = fn(zen_dataclass={"bases": (A,)})
+    C = fn(zen_dataclass={"bases": (B,), "eq": True})
+    assert issubclass(B, A)
+    assert issubclass(C, A)
+    assert issubclass(C, B)
+
+
+@pytest.mark.parametrize(
+    "fn",
+    [
+        lambda **kw: builds(dict, **kw),
+        lambda **kw: make_custom_builds_fn(**kw),
+        make_config,
+    ],
+)
+def test_frozen_deprecated(fn):
+    with pytest.warns(HydraZenDeprecationWarning):
+        fn(frozen=True)
+
+
+@pytest.mark.parametrize(
+    "fn",
+    [
+        lambda **kw: builds(dict, **kw),
+        lambda **kw: make_config(config_name=kw["dataclass_name"]),
+    ],
+)
+def test_dataclassname_deprecated(fn):
+    with pytest.warns(HydraZenDeprecationWarning):
+        fn(dataclass_name="hi")

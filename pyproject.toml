@@ -96,6 +96,7 @@ exclude_lines = [
   'except ImportError:',
   'except ModuleNotFoundError:',
   'if (typing\.)?TYPE_CHECKING:',
+  'if sys\.version_info',
 ]
 
 [tool.pytest.ini_options]
@@ -114,6 +115,8 @@ reportUnnecessaryTypeIgnoreComment = true
 reportUnnecessaryIsInstance = false
 
 
+[tool.codespell]
+skip = 'docs/build/*'
 
 [tool.tox]
 legacy_tox_ini = """
@@ -174,7 +177,7 @@ basepython = python3.8
 [testenv:coverage]
 setenv = NUMBA_DISABLE_JIT=1
 usedevelop = true
-basepython = python3.8
+basepython = python3.10
 deps = {[testenv]deps}
        coverage[toml]
        pytest-cov

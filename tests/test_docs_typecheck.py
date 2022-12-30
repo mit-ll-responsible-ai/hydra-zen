@@ -22,7 +22,7 @@ from hydra_zen import (
     uses_zen_processing,
     zen,
 )
-from hydra_zen.typing import ZenConvert
+from hydra_zen.typing import DataclassOptions, ZenConvert
 from tests.pyright_utils import PYRIGHT_PATH, list_error_messages, pyright_analyze
 
 preamble = """from hydra_zen import (
@@ -43,7 +43,7 @@ preamble = """from hydra_zen import (
     uses_zen_processing,
     zen,
 )
-from hydra_zen.typing import ZenConvert
+from hydra_zen.typing import ZenConvert, DataclassOptions
 """
 
 
@@ -68,6 +68,7 @@ from hydra_zen.typing import ZenConvert
         uses_zen_processing,
         zen,
         ZenConvert,
+        DataclassOptions,
     ],
 )
 def test_docstrings_scan_clean_via_pyright(func):

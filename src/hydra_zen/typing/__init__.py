@@ -3,6 +3,7 @@
 
 from ._implementations import (
     Builds,
+    DataclassOptions,
     HydraPartialBuilds,
     Importable,
     Just,
@@ -17,6 +18,7 @@ from ._implementations import (
 
 __all__ = [
     "Builds",
+    "DataclassOptions",
     "Importable",
     "Just",
     "Partial",

@@ -71,7 +71,7 @@ def f_with_bad_default_value(x=unsupported_instance):
 
 
 def test_omegaconf_doesnt_permit_dataclasses_as_dict_keys():
-    C = builds(int, 1, frozen=True)
+    C = builds(int, 1, zen_dataclass={"frozen": True})
     instantiate(OmegaConf.create({1: C}))  # should be OK
 
     with pytest.raises(KeyValidationError):

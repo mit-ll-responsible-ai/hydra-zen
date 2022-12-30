@@ -5,7 +5,8 @@ import enum
 import random
 import string
 import sys
-from dataclasses import dataclass, field as dataclass_field
+from dataclasses import dataclass, field as dataclass_field, make_dataclass
+from inspect import signature
 from pathlib import Path, PosixPath, WindowsPath
 from typing import (
     Any,
@@ -54,6 +55,7 @@ from hydra_zen._compatibility import (
     _get_version,
 )
 from hydra_zen.structured_configs._utils import (
+    StrictDataclassOptions,
     field,
     is_interpolated_string,
     merge_settings,
@@ -461,3 +463,10 @@ def test_merge_settings_retains_user_settings(
 def test_merge_settings_validation(bad_settings):
     with pytest.raises((TypeError, ValueError)):
         merge_settings(bad_settings, {"dataclass": True})
+
+
+def test_strict_dataclass_options_reflects_current_dataclass_ver():
+    strict_keys = set(StrictDataclassOptions.__required_keys__) | set(StrictDataclassOptions.__optional_keys__)  # type: ignore
+    actual_keys = set(signature(make_dataclass).parameters)
+    actual_keys.remove("fields")
+    assert strict_keys == actual_keys
