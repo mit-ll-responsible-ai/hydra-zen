@@ -229,7 +229,8 @@ hydra-zen also provides auto-config support for some third-pary libraries:
 
 - `pydantic.dataclasses.dataclass`
 - `pydantic.Field`
-
+- `pydantic.Field`
+- `torch.optim.optimizer.required` (i.e. the default parameter for `lr` in `Optimizer`)
 
 
 *********************

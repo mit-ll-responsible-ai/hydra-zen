@@ -538,6 +538,19 @@ def _is_jax_compiled_func(value: Any) -> bool:  # pragma: no cover
         return False
 
 
+def _is_torch_optim_required(value: Any) -> bool:
+    torch_optim_optimizer = sys.modules.get("torch.optim.optimizer")
+
+    if torch_optim_optimizer is None:
+        return False
+
+    try:
+        required = getattr(torch_optim_optimizer, "required")
+        return value is required
+    except AttributeError:
+        return False
+
+
 def _check_for_dynamically_defined_dataclass_type(target_path: str, value: Any) -> None:
     if target_path.startswith("types."):
         raise HydraZenUnsupportedPrimitiveError(
@@ -702,6 +715,10 @@ def sanitized_default_value(
             return _v
         else:  # pragma: no cover
             del _v
+
+    # support for torch objects
+    if _is_torch_optim_required(value):
+        return MISSING
 
     # `value` could no be converted to Hydra-compatible representation.
     # Raise error
