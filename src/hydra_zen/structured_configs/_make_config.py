@@ -50,7 +50,7 @@ class NOTHING:
         raise TypeError("`NOTHING` cannot be instantiated")
 
 
-@dataclass
+@dataclass(unsafe_hash=True)
 class ZenField:
     """
     ZenField(hint=Any, default=<class 'NOTHING'>, name=<class 'NOTHING'>)

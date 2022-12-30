@@ -114,6 +114,7 @@ This enables objects to be stored using a decorator pattern, e.g.
 
 New Features
 ------------
+- hydra-zen now supports Python 3.11
 - Adds the :func:`~hydra_zen.zen` decorator (see :pull:`310`)
 - Adds the :func:`~hydra_zen.wrapper.Zen` decorator-class (see :pull:`310`)
 - Adds the :class:`~hydra_zen.ZenStore` class (see :pull:`331`)

@@ -1,7 +1,6 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import string
-from dataclasses import dataclass
 from typing import (
     Any,
     Deque,
@@ -33,16 +32,6 @@ def _wrapper(obj):
     return obj
 
 
-@dataclass
-class BaseA:
-    ...
-
-
-@dataclass
-class BaseB:
-    ...
-
-
 # strategies for drawing valid inputs to `zen_wrappers`
 single_wrapper_strat = (
     st.just(_wrapper)
@@ -50,6 +39,18 @@ single_wrapper_strat = (
     | st.just(_wrapper).map(lambda x: builds(x, zen_partial=True))
 )
 wrapper_strat = single_wrapper_strat | st.lists(single_wrapper_strat)
+
+slots_strat = st.booleans()
+
+
+def _compat_slots(conf: Dict[str, Any]):
+    # dataclass has some hard rules about a frozen dataclass inheriting
+    # from a non-frozen one anf vice versa. Let's avoid this
+
+    if conf.get("weakref_slot", None) is True:
+        conf["slots"] = True
+    return conf
+
 
 st.register_type_strategy(
     DataclassOptions,
@@ -65,10 +66,10 @@ st.register_type_strategy(
             "frozen": st.booleans(),
             "match_args": st.booleans(),
             "kw_only": st.booleans(),
-            "slots": st.booleans(),
-            "weakref_slot": st.booleans(),
+            "slots": st.shared(st.booleans(), key="slot"),
+            "weakref_slot": st.shared(st.booleans(), key="slot"),
         },
-    ),
+    ).map(_compat_slots),
 )
 
 _valid_builds_strats = dict(
@@ -112,14 +113,18 @@ def valid_builds_args(*required: str, excluded: Sequence[str] = ()):
     assert _required <= set(_valid_builds_strats), _required - set(_valid_builds_strats)
     assert _excluded <= set(_valid_builds_strats), _excluded - set(_valid_builds_strats)
 
-    return st.fixed_dictionaries(
-        {k: _valid_builds_strats[k] for k in sorted(_required)},
-        optional={
-            k: v
-            for k, v in _valid_builds_strats.items()
-            if k not in _excluded and k not in _required
-        },
-    ).map(_compat_frozen)
+    return (
+        st.fixed_dictionaries(
+            {k: _valid_builds_strats[k] for k in sorted(_required)},
+            optional={
+                k: v
+                for k, v in _valid_builds_strats.items()
+                if k not in _excluded and k not in _required
+            },
+        )
+        .map(_compat_frozen)
+        .map(_compat_slots)
+    )
 
 
 @st.composite

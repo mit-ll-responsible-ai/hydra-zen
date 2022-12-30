@@ -184,8 +184,11 @@ def mutable_value(x: _T, *, zen_convert: Optional[ZenConvert] = None) -> _T:
     cast = type(x)  # ensure that we return a copy of the default value
     settings = _utils.merge_settings(zen_convert, _BUILDS_CONVERT_SETTINGS)
     del zen_convert
-    x = sanitize_collection(x, convert_dataclass=settings["dataclass"])
-    return field(default_factory=lambda: cast(x))
+
+    if cast in {list, tuple, dict}:
+        x = sanitize_collection(x, convert_dataclass=settings["dataclass"])
+        return field(default_factory=lambda: cast(x))
+    return field(default_factory=lambda: x)
 
 
 @dataclass_transform()
@@ -797,6 +800,8 @@ def sanitized_field(
     if (
         type_value in _utils.KNOWN_MUTABLE_TYPES
         and type_value in HYDRA_SUPPORTED_PRIMITIVES
+    ) or (
+        is_dataclass(value) and not isinstance(value, type) and value.__hash__ is None
     ):
         if _mutable_default_permitted:
             return cast(
