@@ -538,7 +538,7 @@ def _is_jax_compiled_func(value: Any) -> bool:  # pragma: no cover
         return False
 
 
-def _is_torch_optim_required(value: Any) -> bool:
+def _is_torch_optim_required(value: Any) -> bool:  # pragma: no cover
     torch_optim_optimizer = sys.modules.get("torch.optim.optimizer")
 
     if torch_optim_optimizer is None:
@@ -717,7 +717,7 @@ def sanitized_default_value(
             del _v
 
     # support for torch objects
-    if _is_torch_optim_required(value):
+    if _is_torch_optim_required(value):  # pragma: no cover
         return MISSING
 
     # `value` could no be converted to Hydra-compatible representation.
