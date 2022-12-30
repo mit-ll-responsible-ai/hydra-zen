@@ -119,6 +119,7 @@ New Features
 - Adds the :class:`~hydra_zen.ZenStore` class (see :pull:`331`)
 - Adds `hyda_zen.store`, which is a pre-initialized instance of :class:`~hydra_zen.ZenStore` (see :pull:`331`)
 - The option `hydra_convert='object'` is now supported by all of hydra-zen's config-creation functions. So that an instantiated structured config can be converted to an instance of its backing dataclass. This feature was added by `Hydra 1.3.0 <https://github.com/facebookresearch/hydra/issues/1719>`_.
+- Adds auto-config support for `torch.optim.optimizer.required` so that the common pattern `builds(<torch_optimizer_type>, populate_full_signature=True, zen_partial=True)` works and exposes `lr` as a required configurable parameter. Thanks to @addisonklinke for requesting this in :issue:`257`.
 
 Improvements
 ------------

@@ -877,6 +877,19 @@
         <span class="k">return</span> <span class="kc">False</span>
 
 
+<span class="k">def</span> <span class="nf">_is_torch_optim_required</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="n">torch_optim_optimizer</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;torch.optim.optimizer&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">torch_optim_optimizer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">required</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">torch_optim_optimizer</span><span class="p">,</span> <span class="s2">&quot;required&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">required</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+
 <span class="k">def</span> <span class="nf">_check_for_dynamically_defined_dataclass_type</span><span class="p">(</span><span class="n">target_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">target_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;types.&quot;</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">HydraZenUnsupportedPrimitiveError</span><span class="p">(</span>
@@ -1041,6 +1054,10 @@
             <span class="k">return</span> <span class="n">_v</span>
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="k">del</span> <span class="n">_v</span>
+
+    <span class="c1"># support for torch objects</span>
+    <span class="k">if</span> <span class="n">_is_torch_optim_required</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+        <span class="k">return</span> <span class="n">MISSING</span>
 
     <span class="c1"># `value` could no be converted to Hydra-compatible representation.</span>
     <span class="c1"># Raise error</span>
