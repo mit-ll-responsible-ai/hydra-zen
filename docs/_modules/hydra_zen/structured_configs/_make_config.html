@@ -339,6 +339,7 @@
   <h1>Source code for hydra_zen.structured_configs._make_config</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) 2022 Massachusetts Institute of Technology</span>
 <span class="c1"># SPDX-License-Identifier: MIT</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># use this for runtime checks</span>
     <span class="n">MISSING</span><span class="p">,</span>
@@ -352,12 +353,13 @@
 <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Literal</span>
 
 <span class="kn">from</span> <span class="nn">hydra_zen._compatibility</span> <span class="kn">import</span> <span class="n">PATCH_OMEGACONF_830</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.errors</span> <span class="kn">import</span> <span class="n">HydraZenDeprecationWarning</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.structured_configs</span> <span class="kn">import</span> <span class="n">_utils</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.structured_configs._implementations</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_BUILDS_CONVERT_SETTINGS</span><span class="p">,</span>
     <span class="n">sanitize_collection</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">SupportedPrimitive</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">DataclassOptions</span><span class="p">,</span> <span class="n">SupportedPrimitive</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AllConvert</span><span class="p">,</span>
     <span class="n">DataClass</span><span class="p">,</span>
@@ -377,7 +379,7 @@
     <span class="n">ZEN_TARGET_FIELD_NAME</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">._implementations</span> <span class="kn">import</span> <span class="n">_retain_type_info</span><span class="p">,</span> <span class="n">builds</span><span class="p">,</span> <span class="n">sanitized_field</span>
-<span class="kn">from</span> <span class="nn">._type_guards</span> <span class="kn">import</span> <span class="n">uses_zen_processing</span>
+<span class="kn">from</span> <span class="nn">._type_guards</span> <span class="kn">import</span> <span class="n">safe_getattr</span><span class="p">,</span> <span class="n">uses_zen_processing</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ZenField&quot;</span><span class="p">,</span> <span class="s2">&quot;make_config&quot;</span><span class="p">]</span>
 
@@ -481,8 +483,7 @@
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hydra_defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DefaultsList</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Config&quot;</span><span class="p">,</span>
-    <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">fields_as_kwargs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportedPrimitive</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">],</span>
@@ -542,12 +543,27 @@
 <span class="sd">        [7]_ [8]_. Each input config can have a Defaults List as a top level element. The</span>
 <span class="sd">        Defaults List itself is not a part of output config.</span>
 
+<span class="sd">    zen_dataclass : Optional[DataclassOptions]</span>
+<span class="sd">        A dictionary can specify any option that is supported by</span>
+<span class="sd">        :py:func:`dataclasses.make_dataclass` other than `fields`.</span>
+
+<span class="sd">        Additionally, a ``&#39;module&#39;: &lt;str&gt;`` entry can be specified to enable pickle</span>
+<span class="sd">        compatibility. See `hydra_zen.typing.DataclassOptions` for details.</span>
+
 <span class="sd">    frozen : bool, optional (default=False)</span>
-<span class="sd">        If ``True``, the resulting config class will produce &#39;frozen&#39; (i.e. immutable) instances.</span>
-<span class="sd">        I.e. setting/deleting an attribute of an instance of the config will raise</span>
-<span class="sd">        :py:class:`dataclasses.FrozenInstanceError` at runtime.</span>
+<span class="sd">        .. deprecated:: 0.9.0</span>
+<span class="sd">            `frozen` will be removed in hydra-zen 0.10.0. It is replaced by</span>
+<span class="sd">            ``zen_dataclass={&#39;frozen&#39;: &lt;bool&gt;}``.</span>
+
+<span class="sd">        If ``True``, the resulting config class will produce &#39;frozen&#39; (i.e. immutable)</span>
+<span class="sd">        instances. I.e. setting/deleting an attribute of an instance of the config will</span>
+<span class="sd">        raise :py:class:`dataclasses.FrozenInstanceError` at runtime.</span>
 
 <span class="sd">    config_name : str, optional (default=&quot;Config&quot;)</span>
+<span class="sd">        .. deprecated:: 0.9.0</span>
+<span class="sd">            `config_name` will be removed in hydra-zen 0.10.0. It is replaced by</span>
+<span class="sd">            ``zen_dataclass={&#39;cls_name&#39;: &lt;str&gt;}``.</span>
+
 <span class="sd">        The class name of the resulting config class.</span>
 
 <span class="sd">    Returns</span>
@@ -565,7 +581,8 @@
 <span class="sd">    -----</span>
 <span class="sd">    The resulting &quot;config&quot; is a dataclass-object [4]_ with Hydra-specific attributes</span>
 <span class="sd">    attached to it, along with the attributes specified via ``fields_as_args`` and</span>
-<span class="sd">    ``fields_as_kwargs``.</span>
+<span class="sd">    ``fields_as_kwargs``. **Unlike std-lib dataclasses, the default value for</span>
+<span class="sd">    unsafe_hash is True.**</span>
 
 <span class="sd">    Any field specified without a type-annotation is automatically annotated with</span>
 <span class="sd">    :py:class:`typing.Any`. Hydra only supports a narrow subset of types [5]_;</span>
@@ -711,6 +728,38 @@
     <span class="n">convert_settings</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">ZenConvert</span><span class="p">,</span> <span class="n">convert_settings</span><span class="p">)</span>
     <span class="k">del</span> <span class="n">zen_convert</span>
 
+    <span class="k">if</span> <span class="n">zen_dataclass</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">zen_dataclass</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># initial validation</span>
+    <span class="n">_utils</span><span class="o">.</span><span class="n">parse_dataclass_options</span><span class="p">(</span><span class="n">zen_dataclass</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s2">&quot;frozen&quot;</span> <span class="ow">in</span> <span class="n">fields_as_kwargs</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="n">HydraZenDeprecationWarning</span><span class="p">(</span>
+                <span class="s2">&quot;Specifying `builds(frozen=&lt;...&gt;)` is deprecated. Instead, &quot;</span>
+                <span class="s2">&quot;specify `builds(zen_dataclass={&#39;frozen&#39;: &lt;...&gt;})&quot;</span>
+            <span class="p">),</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">zen_dataclass</span><span class="p">[</span><span class="s2">&quot;frozen&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fields_as_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;frozen&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+
+    <span class="k">if</span> <span class="s2">&quot;config_name&quot;</span> <span class="ow">in</span> <span class="n">fields_as_kwargs</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="n">HydraZenDeprecationWarning</span><span class="p">(</span>
+                <span class="s2">&quot;Specifying `make_config(config_name=&lt;...&gt;)` is deprecated. &quot;</span>
+                <span class="s2">&quot;Instead specify `make_config(zen_dataclass={&#39;cls_name&#39;: &lt;...&gt;})&quot;</span>
+            <span class="p">),</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">zen_dataclass</span><span class="p">[</span><span class="s2">&quot;cls_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fields_as_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;config_name&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">bases</span><span class="p">:</span>
+        <span class="n">bases</span> <span class="o">=</span> <span class="n">zen_dataclass</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bases&quot;</span><span class="p">,</span> <span class="p">())</span>
+
+    <span class="n">zen_dataclass</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;cls_name&quot;</span><span class="p">,</span> <span class="s2">&quot;Config&quot;</span><span class="p">)</span>
+    <span class="n">dataclass_options</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">parse_dataclass_options</span><span class="p">(</span><span class="n">zen_dataclass</span><span class="p">)</span>
+
     <span class="k">for</span> <span class="n">_field</span> <span class="ow">in</span> <span class="n">fields_as_args</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_field</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
@@ -855,9 +904,15 @@
             <span class="p">)</span>
         <span class="p">)</span>
 
-    <span class="n">out</span> <span class="o">=</span> <span class="n">make_dataclass</span><span class="p">(</span>
-        <span class="n">cls_name</span><span class="o">=</span><span class="n">config_name</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">config_fields</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="n">frozen</span><span class="p">,</span> <span class="n">bases</span><span class="o">=</span><span class="n">bases</span>
-    <span class="p">)</span>
+    <span class="n">dataclass_options</span><span class="p">[</span><span class="s2">&quot;bases&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bases</span>
+    <span class="n">module</span> <span class="o">=</span> <span class="n">dataclass_options</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;module&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">_utils</span><span class="o">.</span><span class="n">parse_strict_dataclass_options</span><span class="p">(</span><span class="n">dataclass_options</span><span class="p">),</span> <span class="n">dataclass_options</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="n">make_dataclass</span><span class="p">(</span><span class="n">fields</span><span class="o">=</span><span class="n">config_fields</span><span class="p">,</span> <span class="o">**</span><span class="n">dataclass_options</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">module</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out</span><span class="o">.</span><span class="vm">__module__</span> <span class="o">=</span> <span class="n">module</span>
+
     <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">ZEN_TARGET_FIELD_NAME</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">uses_zen_processing</span><span class="p">(</span><span class="n">out</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">out</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> inherits from base classes that overwrite some fields &quot;</span>
@@ -866,7 +921,7 @@
         <span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="n">HYDRA_SUPPORTS_PARTIAL</span>
-        <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">PARTIAL_FIELD_NAME</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="n">safe_getattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">PARTIAL_FIELD_NAME</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="ow">and</span> <span class="n">uses_zen_processing</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>

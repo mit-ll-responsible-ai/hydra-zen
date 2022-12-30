@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="Docutils 0.19: https://docutils.sourceforge.io/" name="generator"/>
-<title>hydra_zen.hydrated_dataclass — hydra-zen  documentation</title>
+<title>hydra_zen.typing.DataclassOptions — hydra-zen  documentation</title>
 <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
@@ -38,11 +38,11 @@
 <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
 <script src="../_static/gtag.js"></script>
 <script src="../_static/design-tabs.js"></script>
-<script>DOCUMENTATION_OPTIONS.pagename = 'generated/hydra_zen.hydrated_dataclass';</script>
+<script>DOCUMENTATION_OPTIONS.pagename = 'generated/hydra_zen.typing.DataclassOptions';</script>
 <link href="../genindex.html" rel="index" title="Index">
 <link href="../search.html" rel="search" title="Search">
-<link href="hydra_zen.ZenStore.html" rel="next" title="hydra_zen.ZenStore">
-<link href="hydra_zen.just.html" rel="prev" title="hydra_zen.just"/>
+<link href="hydra_zen.typing.ZenConvert.html" rel="next" title="hydra_zen.typing.ZenConvert">
+<link href="hydra_zen.load_from_yaml.html" rel="prev" title="hydra_zen.load_from_yaml"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <meta content="en" name="docsearch:language"/>
 </link></link></link></link></link></link></link></link></link></head>
@@ -211,11 +211,11 @@
 <li class="toctree-l1"><a class="reference internal" href="hydra_zen.zen.html">hydra_zen.zen</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hydra_zen.wrapper.Zen.html">hydra_zen.wrapper.Zen</a></li>
 </ul>
-<ul class="current nav bd-sidenav">
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="hydra_zen.make_config.html">hydra_zen.make_config</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hydra_zen.builds.html">hydra_zen.builds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hydra_zen.just.html">hydra_zen.just</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">hydra_zen.hydrated_dataclass</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hydra_zen.hydrated_dataclass.html">hydra_zen.hydrated_dataclass</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="hydra_zen.ZenStore.html">hydra_zen.ZenStore</a></li>
@@ -236,8 +236,8 @@
 <li class="toctree-l1"><a class="reference internal" href="hydra_zen.save_as_yaml.html">hydra_zen.save_as_yaml</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hydra_zen.load_from_yaml.html">hydra_zen.load_from_yaml</a></li>
 </ul>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="hydra_zen.typing.DataclassOptions.html">hydra_zen.typing.DataclassOptions</a></li>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">hydra_zen.typing.DataclassOptions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hydra_zen.typing.ZenConvert.html">hydra_zen.typing.ZenConvert</a></li>
 </ul>
 <ul class="nav bd-sidenav">
@@ -260,76 +260,34 @@
 <div class="bd-header-article">
 </div>
 <article class="bd-article" role="main">
-<section id="hydra-zen-hydrated-dataclass">
-<h1>hydra_zen.hydrated_dataclass<a class="headerlink" href="#hydra-zen-hydrated-dataclass" title="Permalink to this heading">#</a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="hydra_zen.hydrated_dataclass">
-<span class="sig-prename descclassname"><span class="pre">hydra_zen.</span></span><span class="sig-name descname"><span class="pre">hydrated_dataclass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">pos_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_partial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_wrappers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">populate_full_signature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_recursive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsafe_hash</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frozen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kw_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weakref_slot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/structured_configs/_implementations.html#hydrated_dataclass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.hydrated_dataclass" title="Permalink to this definition">#</a></dt>
-<dd><p>A decorator that uses <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> to create a dataclass with the appropriate
-Hydra-specific fields for specifying a targeted config <a class="reference internal" href="#r8dd265aa7612-1" id="id1">[1]</a>.</p>
-<p>This provides similar functionality to <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>, but enables a user to define
-a config explicitly using the <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataclasses.dataclass()</span></code></a> syntax, which can
-enable enhanced static analysis of the resulting config.</p>
+<p>Each of hydra-zen’s <a class="reference internal" href="../api_reference.html#create-config"><span class="std std-ref">config-creation functions</span></a> has a
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">zen_dataclass</span></code> parameter, which exposes the full API for affecting the resulting
+dataclass’ properties, as exposed by <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.make_dataclass" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataclasses.make_dataclass()</span></code></a>.</p>
+<p>The following documentation details the available zen-dataclass options and shows
+example use cases.</p>
+<section id="hydra-zen-typing-dataclassoptions">
+<span id="zen-dataclass"></span><h1>hydra_zen.typing.DataclassOptions<a class="headerlink" href="#hydra-zen-typing-dataclassoptions" title="Permalink to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="hydra_zen.typing.DataclassOptions">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hydra_zen.typing.</span></span><span class="sig-name descname"><span class="pre">DataclassOptions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_typename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/typing/_implementations.html#DataclassOptions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.typing.DataclassOptions" title="Permalink to this definition">#</a></dt>
+<dd><p>Specifies dataclass-creation options via <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code> et al.</p>
+<p>Note that, unlike <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.make_dataclass" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataclasses.make_dataclass()</span></code></a>, the default value for
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">unsafe_hash</span></code> is <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> for hydra-zen’s dataclass-generating functions.
+See the documentation for <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.make_dataclass" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataclasses.make_dataclass()</span></code></a> for more details <a class="reference internal" href="#rbc753ead3e76-1" id="id1">[1]</a>.</p>
+<p>Options that are not supported by the local Python version will be ignored by
+hydra-zen’s config-creation functions.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>hydra_target</strong><span class="classifier">T (Callable)</span></dt><dd><p>The target-object to be configured. This is a required, positional-only argument.</p>
+<dt><strong>cls_name</strong><span class="classifier">str, optional</span></dt><dd><p>If specified, determines the name of the returned class object. Otherwise the
+name is inferred by hydra-zen.</p>
 </dd>
-<dt><strong>*pos_args</strong><span class="classifier">SupportedPrimitive</span></dt><dd><p>Positional arguments passed as <code class="docutils literal notranslate"><span class="pre">hydra_target(*pos_args,</span> <span class="pre">...)</span></code> upon instantiation.</p>
-<p>Arguments specified positionally are not included in the dataclass’ signature
-and are stored as a tuple bound to in the <code class="docutils literal notranslate"><span class="pre">_args_</span></code> field.</p>
-</dd>
-<dt><strong>zen_partial</strong><span class="classifier">Optional[bool]</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then the resulting config will instantiate as
-<code class="docutils literal notranslate"><span class="pre">functools.partial(hydra_target,</span> <span class="pre">*pos_args,</span> <span class="pre">**kwargs_for_target)</span></code> rather than
-<code class="docutils literal notranslate"><span class="pre">hydra_target(*pos_args,</span> <span class="pre">**kwargs_for_target)</span></code>. Thus this enables the
-partial-configuration of objects.</p>
-<p>Specifying <code class="docutils literal notranslate"><span class="pre">zen_partial=True</span></code> and <code class="docutils literal notranslate"><span class="pre">populate_full_signature=True</span></code> together
-will populate the config’s signature only with parameters that: are explicitly
-specified by the user, or that have default values specified in the target’s
-signature. I.e. it is presumed that un-specified parameters that have no
-default values are to be excluded from the config.</p>
-</dd>
-<dt><strong>zen_wrappers</strong><span class="classifier">None | Callable | Builds | InterpStr | Sequence[None | Callable | Builds | InterpStr]</span></dt><dd><p>One or more wrappers, which will wrap <code class="docutils literal notranslate"><span class="pre">hydra_target</span></code> prior to instantiation.
-E.g. specifying the wrappers <code class="docutils literal notranslate"><span class="pre">[f1,</span> <span class="pre">f2,</span> <span class="pre">f3]</span></code> will instantiate as:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f3</span><span class="p">(</span><span class="n">f2</span><span class="p">(</span><span class="n">f1</span><span class="p">(</span><span class="n">hydra_target</span><span class="p">)))(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Wrappers can also be specified as interpolated strings <a class="reference internal" href="#r8dd265aa7612-2" id="id2">[2]</a> or targeted
-configs.</p>
-</dd>
-<dt><strong>zen_meta</strong><span class="classifier">Optional[Mapping[str, SupportedPrimitive]]</span></dt><dd><p>Specifies field-names and corresponding values that will be included in the
-resulting config, but that will <em>not</em> be used to builds <code class="docutils literal notranslate"><span class="pre">&lt;hydra_target&gt;</span></code>
-via instantiation. These are called “meta” fields.</p>
-</dd>
-<dt><strong>populate_full_signature</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then the resulting config’s signature and fields will be populated
-according to the signature of <code class="docutils literal notranslate"><span class="pre">hydra_target</span></code>; values also specified in
-<code class="docutils literal notranslate"><span class="pre">**kwargs_for_target</span></code> take precedent.</p>
-<p>This option is not available for objects with inaccessible signatures, such as
-NumPy’s various ufuncs.</p>
-</dd>
-<dt><strong>zen_convert</strong><span class="classifier">Optional[ZenConvert]</span></dt><dd><p>A dictionary that modifies hydra-zen’s value and type conversion behavior.
-Consists of the following optional key-value pairs (<a class="reference internal" href="hydra_zen.typing.ZenConvert.html#zen-convert"><span class="std std-ref">hydra_zen.typing.ZenConvert</span></a>):</p>
-<ul>
-<li><dl>
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">dataclass</span></code><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a> (default=True):</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> any dataclass type/instance without a
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">_target_</span></code> field is automatically converted to a targeted config
-that will instantiate to that type/instance. Otherwise the dataclass
-type/instance will be passed through as-is.</p>
-</dd>
-</dl>
-</li>
-</ul>
-</dd>
-<dt><strong>hydra_recursive</strong><span class="classifier">Optional[bool], optional (default=True)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then Hydra will recursively instantiate all other
-hydra-config objects nested within this config <a class="reference internal" href="#r8dd265aa7612-3" id="id3">[3]</a>.</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_recursive_</span></code> attribute is not set on the resulting config.</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">"none"</span></code>: No conversion occurs; omegaconf containers are passed through (Default)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">"partial"</span></code>: <code class="docutils literal notranslate"><span class="pre">DictConfig</span></code> and <code class="docutils literal notranslate"><span class="pre">ListConfig</span></code> objects converted to <code class="docutils literal notranslate"><span class="pre">dict</span></code> and
-<code class="docutils literal notranslate"><span class="pre">list</span></code>, respectively. Structured configs and their fields are passed without conversion.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">"all"</span></code>: All passed objects are converted to dicts, lists, and primitives, without a trace of OmegaConf containers.</p></li>
-</ul>
-<p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_convert_</span></code> attribute is not set on the resulting config.</p>
+<dt><strong>module</strong><span class="classifier">str, default=’typing’</span></dt><dd><p>If specified, sets the <code class="xref py py-obj docutils literal notranslate"><span class="pre">__module__</span></code> attribute of the resulting dataclass.</p>
+<p>Specifying the module string-path in which the dataclass was generated, and
+specifying <code class="xref py py-obj docutils literal notranslate"><span class="pre">cls_name</span></code> as the symbol that references the dataclass, will enable
+pickle-compatibility for that dataclass. See the Examples section for
+clarification.</p>
+<p>This is a hydra-zen exclusive feature.</p>
 </dd>
 <dt><strong>init</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>If true (the default), a __init__() method will be generated. If the class
 already defines __init__(), this parameter is ignored.</p>
@@ -382,88 +340,97 @@ error to specify <code class="xref py py-obj docutils literal notranslate"><span
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt>hydra_zen.errors.HydraZenUnsupportedPrimitiveError</dt><dd><p>The provided configured value cannot be serialized by Hydra, nor does hydra-zen
-provide specialized support for it. See <a class="reference internal" href="../api_reference.html#valid-types"><span class="std std-ref">Configuration-Value Types Supported by Hydra and hydra-zen</span></a> for more details.</p>
-</dd>
 </dl>
-</dd>
-</dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<dl class="simple">
-<dt><a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a></dt><dd><p>Create a targeted structured config designed to “build” a particular object.</p>
-</dd>
-</dl>
-</div>
 <p class="rubric">Notes</p>
-<p>Unlike <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>, <a class="reference internal" href="#hydra_zen.hydrated_dataclass" title="hydra_zen.hydrated_dataclass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydrated_dataclass</span></code></a> enables config fields to be set explicitly
-with custom type annotations. Additionally, the resulting config’ attributes
-can be analyzed by static tooling, which can help to warn about errors prior
-to running one’s code.</p>
-<p>For details of the annotation <code class="xref py py-obj docutils literal notranslate"><span class="pre">SupportedPrimitive</span></code>, see <a class="reference internal" href="../api_reference.html#valid-types"><span class="std std-ref">Configuration-Value Types Supported by Hydra and hydra-zen</span></a>.</p>
+<p>This is a typed dictionary, which provides static type information (e.g. type
+checking and auto completion options) to tooling. Note, however, that it provides
+no runtime checking of its keys and values.</p>
 <p class="rubric">References</p>
 <div class="citation-list" role="list">
-<div class="citation" id="r8dd265aa7612-1" role="doc-biblioentry">
+<div class="citation" id="rbc753ead3e76-1" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a href="#id1" role="doc-backlink">1</a><span class="fn-bracket">]</span></span>
-<p><a class="reference external" href="https://hydra.cc/docs/tutorials/structured_config/intro/">https://hydra.cc/docs/tutorials/structured_config/intro/</a></p>
+<p><a class="reference external" href="https://docs.python.org/3/library/dataclasses.html">https://docs.python.org/3/library/dataclasses.html</a></p>
 </div>
-<div class="citation" id="r8dd265aa7612-2" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a href="#id2" role="doc-backlink">2</a><span class="fn-bracket">]</span></span>
-<p><a class="reference external" href="https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation">https://omegaconf.readthedocs.io/en/2.1_branch/usage.html#variable-interpolation</a></p>
-</div>
-<div class="citation" id="r8dd265aa7612-3" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a href="#id3" role="doc-backlink">3</a><span class="fn-bracket">]</span></span>
-<p><a class="reference external" href="https://hydra.cc/docs/advanced/instantiate_objects/overview/#recursive-instantiation">https://hydra.cc/docs/advanced/instantiate_objects/overview/#recursive-instantiation</a></p>
-</div>
-<div class="citation" id="r8dd265aa7612-4" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></span>
-<p><a class="reference external" href="https://hydra.cc/docs/advanced/instantiate_objects/overview/#parameter-conversion-strategies">https://hydra.cc/docs/advanced/instantiate_objects/overview/#parameter-conversion-strategies</a></p>
+<div class="citation" id="rbc753ead3e76-2" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a href="#id4" role="doc-backlink">2</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#mutable-default-values">https://docs.python.org/3/library/dataclasses.html#mutable-default-values</a></p>
 </div>
 </div>
 <p class="rubric">Examples</p>
-<p><strong>Basic usage</strong></p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.hydrated_dataclass.html#hydra_zen.hydrated_dataclass" title="hydra_zen.hydrated_dataclass"><span class="n">hydrated_dataclass</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.typing.DataclassOptions.html#hydra_zen.typing.DataclassOptions" title="hydra_zen.typing._implementations.DataclassOptions"><span class="n">DataclassOptions</span></a> <span class="k">as</span> <span class="n">Opts</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><span class="n">make_custom_builds_fn</span></a>
 </pre></div>
 </div>
-<p>Here, we specify a config that is designed to “build” a dictionary
-upon instantiation</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@hydrated_dataclass</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">... </span><span class="k">class</span> <span class="nc">DictConf</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a> <span class="o">=</span> <span class="mi">2</span>
-<span class="gp">... </span>    <span class="n">y</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a> <span class="o">=</span> <span class="s1">'hello'</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">DictConf</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>  <span class="c1"># override default `x`</span>
-<span class="go">{'x': 10, 'y': 'hello'}</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">DictConf</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Static type checker marks the following as</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># an error because `d` is frozen.</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># type: ignore</span>
+<p>Creating a frozen config.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">zen_dataclass</span><span class="o">=</span><span class="n">Opts</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">))()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="go">FrozenInstanceError: cannot assign to field 'x'</span>
 </pre></div>
 </div>
-<p>For more detailed examples, refer to <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>.</p>
+<p>Creating a pickle-compatible config:</p>
+<p>The dynamically-generated classes created by <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">make_config</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code>
+can be made pickle-compatible by specifying the name of the symbol that it is
+assigned to and the module in which it was defined.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># contents of mylib/foo.py</span>
+<span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pickle.html#module-pickle" title="pickle"><span class="nn">pickle</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pickle.html#pickle.dumps" title="pickle.dumps"><span class="n">dumps</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pickle.html#pickle.loads" title="pickle.loads"><span class="n">loads</span></a>
+<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a>
+
+<span class="n">DictConf</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">,</span>
+                  <span class="n">zen_dataclass</span><span class="o">=</span><span class="p">{</span><span class="s1">'module'</span><span class="p">:</span> <span class="s1">'mylib.foo'</span><span class="p">,</span>
+                                 <span class="s1">'cls_name'</span><span class="p">:</span> <span class="s1">'DictConf'</span><span class="p">})</span>
+
+<span class="k">assert</span> <span class="n">DictConf</span> <span class="ow">is</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pickle.html#pickle.loads" title="pickle.loads"><span class="n">loads</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pickle.html#pickle.dumps" title="pickle.dumps"><span class="n">dumps</span></a><span class="p">(</span><span class="n">DictConf</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Using namespace to add a method to a config instance.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">x</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">zen_dataclass</span><span class="o">=</span><span class="n">Opts</span><span class="p">(</span>
+<span class="gp">... </span>        <span class="n">namespace</span><span class="o">=</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">add_x</span><span class="o">=</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="p">),</span>
+<span class="gp">... </span><span class="p">)()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span><span class="o">.</span><span class="n">add_x</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">102</span>
+</pre></div>
+</div>
+<p>Dataclasse objects created by hydra-zen’s config-creation functions will be created
+with <code class="xref py py-obj docutils literal notranslate"><span class="pre">unsafe_hash=True</span></code> by default. This is in contrast with the default behavior of
+<a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataclasses.dataclass()</span></code></a>. This is to help ensure smooth compatibility
+through Python 3.11, which changed the mutability checking rules for dataclasses
+<a class="reference internal" href="#rbc753ead3e76-2" id="id4">[2]</a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.make_dataclass" title="dataclasses.make_dataclass"><span class="n">make_dataclass</span></a>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DataClass</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.make_dataclass" title="dataclasses.make_dataclass"><span class="n">make_dataclass</span></a><span class="p">(</span><span class="n">fields</span><span class="o">=</span><span class="p">[],</span> <span class="n">cls_name</span><span class="o">=</span><span class="s2">"A"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DataClass</span><span class="o">.</span><span class="fm">__hash__</span>
+<span class="go">None</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span><span class="o">.</span><span class="fm">__hash__</span>
+<span class="go">&lt;function types.__create_fn__.&lt;locals&gt;.__hash__(self)&gt;</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">UnHashConf</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">zen_dataclass</span><span class="o">=</span><span class="n">Opts</span><span class="p">(</span><span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">UnHashConf</span><span class="o">.</span><span class="fm">__hash__</span>
+<span class="go">None</span>
+</pre></div>
+</div>
 </dd></dl>
 </section>
 </article>
 <footer class="bd-footer-article">
 <!-- Previous / next buttons -->
 <div class="prev-next-area">
-<a class="left-prev" href="hydra_zen.just.html" id="prev-link" title="previous page">
+<a class="left-prev" href="hydra_zen.load_from_yaml.html" id="prev-link" title="previous page">
 <i class="fa-solid fa-angle-left"></i>
 <div class="prev-next-info">
 <p class="prev-next-subtitle">previous</p>
-<p class="prev-next-title">hydra_zen.just</p>
+<p class="prev-next-title">hydra_zen.load_from_yaml</p>
 </div>
 </a>
-<a class="right-next" href="hydra_zen.ZenStore.html" id="next-link" title="next page">
+<a class="right-next" href="hydra_zen.typing.ZenConvert.html" id="next-link" title="next page">
 <div class="prev-next-info">
 <p class="prev-next-subtitle">next</p>
-<p class="prev-next-title">hydra_zen.ZenStore</p>
+<p class="prev-next-title">hydra_zen.typing.ZenConvert</p>
 </div>
 <i class="fa-solid fa-angle-right"></i>
 </a>
@@ -478,10 +445,10 @@ upon instantiation</p>
 <nav class="page-toc" id="bd-toc-nav">
 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry">
-<a class="reference internal nav-link" href="#hydra_zen.hydrated_dataclass">
+<a class="reference internal nav-link" href="#hydra_zen.typing.DataclassOptions">
 <code class="docutils literal notranslate">
 <span class="pre">
-     hydrated_dataclass()
+     DataclassOptions
     </span>
 </code>
 </a>
@@ -496,7 +463,7 @@ upon instantiation</p>
 </div>
 <div class="toc-item">
 <div class="tocsection sourcelink">
-<a href="../_sources/generated/hydra_zen.hydrated_dataclass.rst.txt">
+<a href="../_sources/generated/hydra_zen.typing.DataclassOptions.rst.txt">
 <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
 </div>

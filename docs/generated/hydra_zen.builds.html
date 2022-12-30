@@ -237,6 +237,7 @@
 <li class="toctree-l1"><a class="reference internal" href="hydra_zen.load_from_yaml.html">hydra_zen.load_from_yaml</a></li>
 </ul>
 <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="hydra_zen.typing.DataclassOptions.html">hydra_zen.typing.DataclassOptions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hydra_zen.typing.ZenConvert.html">hydra_zen.typing.ZenConvert</a></li>
 </ul>
 <ul class="nav bd-sidenav">
@@ -349,11 +350,25 @@ a trace of OmegaConf containers.</p></li>
 <a class="reference internal" href="#rbd228efbc5f2-6" id="id4">[6]</a> <a class="reference internal" href="#rbd228efbc5f2-7" id="id5">[7]</a>. Each input config can have a Defaults List as a top level element. The
 Defaults List itself is not a part of output config.</p>
 </dd>
-<dt><strong>frozen</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the resulting config will create frozen (i.e. immutable) instances.
+<dt><strong>zen_dataclass</strong><span class="classifier">Optional[DataclassOptions]</span></dt><dd><p>A dictionary that can specify any option that is supported by
+<a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.make_dataclass" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataclasses.make_dataclass()</span></code></a> other than <code class="xref py py-obj docutils literal notranslate"><span class="pre">fields</span></code>.
+The default value for <code class="xref py py-obj docutils literal notranslate"><span class="pre">unsafe_hash</span></code> is <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>.</p>
+<p>Additionally, the <code class="xref py py-obj docutils literal notranslate"><span class="pre">module</span></code> field can be specified to enable pickle
+compatibility. See <a class="reference internal" href="hydra_zen.typing.DataclassOptions.html#hydra_zen.typing.DataclassOptions" title="hydra_zen.typing.DataclassOptions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.typing.DataclassOptions</span></code></a> for details.</p>
+</dd>
+<dt><strong>frozen</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.9.0: </span><code class="xref py py-obj docutils literal notranslate"><span class="pre">frozen</span></code> will be removed in hydra-zen 0.10.0. It is replaced by
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">zen_dataclass={'frozen':</span> <span class="pre">&lt;bool&gt;}</span></code>.</p>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the resulting config will create frozen (i.e. immutable) instances.
 I.e. setting/deleting an attribute of an instance will raise
 <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.FrozenInstanceError" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataclasses.FrozenInstanceError</span></code></a> at runtime.</p>
 </dd>
-<dt><strong>dataclass_name</strong><span class="classifier">Optional[str]</span></dt><dd><p>If specified, determines the name of the returned class object.</p>
+<dt><strong>dataclass_name</strong><span class="classifier">Optional[str]</span></dt><dd><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.9.0: </span><code class="xref py py-obj docutils literal notranslate"><span class="pre">dataclass_name</span></code> will be removed in hydra-zen 0.10.0. It is replaced by
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">zen_dataclass={'cls_name':</span> <span class="pre">&lt;str&gt;}</span></code>.</p>
+</div>
+<p>If specified, determines the name of the returned class object.</p>
 </dd>
 </dl>
 </dd>
@@ -473,16 +488,18 @@ arguments will cause <a class="reference internal" href="#hydra_zen.builds" titl
 <p class="rubric">Examples</p>
 <p>These examples describe:</p>
 <ul class="simple">
-<li><p>Basic usage of <a class="reference internal" href="#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a></p></li>
+<li><p>Basic usage</p></li>
 <li><p>Creating a partial config</p></li>
 <li><p>Auto-populating parameters</p></li>
 <li><p>Composing configs via inheritance</p></li>
-<li><p>Runtime validation performed by <a class="reference internal" href="#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a></p></li>
+<li><p>Runtime validation performed by builds</p></li>
 <li><p>Using meta-fields</p></li>
 <li><p>Using zen-wrappers</p></li>
+<li><p>Creating a pickle-compatible config</p></li>
 <li><p>Creating a frozen config</p></li>
 <li><p>Support for partial’d targets</p></li>
 </ul>
+<p>A helpful utility for printing examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">pyaml</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="c1"># for pretty printing configs</span>
@@ -647,9 +664,23 @@ Kelvin instead.</p>
 <span class="go">273.15</span>
 </pre></div>
 </div>
+<p><strong>Creating a pickle-compatible config</strong></p>
+<p>The dynamically-generated classes created by <a class="reference internal" href="#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> can be made pickle-compatible
+by specifying the name of the symbol that it is assigned to and the module in which
+it was defined.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># contents of mylib/foo.py</span>
+<span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pickle.html#module-pickle" title="pickle"><span class="nn">pickle</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pickle.html#pickle.dumps" title="pickle.dumps"><span class="n">dumps</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pickle.html#pickle.loads" title="pickle.loads"><span class="n">loads</span></a>
+
+<span class="n">DictConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">,</span>
+                  <span class="n">zen_dataclass</span><span class="o">=</span><span class="p">{</span><span class="s1">'module'</span><span class="p">:</span> <span class="s1">'mylib.foo'</span><span class="p">,</span>
+                                 <span class="s1">'cls_name'</span><span class="p">:</span> <span class="s1">'DictConf'</span><span class="p">})</span>
+
+<span class="k">assert</span> <span class="n">DictConf</span> <span class="ow">is</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pickle.html#pickle.loads" title="pickle.loads"><span class="n">loads</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pickle.html#pickle.dumps" title="pickle.dumps"><span class="n">dumps</span></a><span class="p">(</span><span class="n">DictConf</span><span class="p">))</span>
+</pre></div>
+</div>
 <p><strong>Creating a frozen config</strong></p>
 <p>Let’s create a config object whose instances will by “frozen” (i.e., immutable).</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">RouterConfig</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">,</span> <span class="n">ip_address</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">RouterConfig</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">,</span> <span class="n">ip_address</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">zen_dataclass</span><span class="o">=</span><span class="p">{</span><span class="s1">'frozen'</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">my_router</span> <span class="o">=</span> <span class="n">RouterConfig</span><span class="p">(</span><span class="n">ip_address</span><span class="o">=</span><span class="s2">"192.168.56.1"</span><span class="p">)</span>  <span class="c1"># an immutable instance</span>
 </pre></div>
 </div>

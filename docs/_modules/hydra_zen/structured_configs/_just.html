@@ -344,7 +344,7 @@
 <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Literal</span>
 
 <span class="kn">from</span> <span class="nn">hydra_zen.structured_configs</span> <span class="kn">import</span> <span class="n">_utils</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">Builds</span><span class="p">,</span> <span class="n">Just</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">Builds</span><span class="p">,</span> <span class="n">DataclassOptions</span><span class="p">,</span> <span class="n">Just</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">_HydraPrimitive</span>  <span class="c1"># type: ignore</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">_SupportedViaBuilds</span>  <span class="c1"># type: ignore</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">AllConvert</span><span class="p">,</span> <span class="n">DataClass_</span><span class="p">,</span> <span class="n">ZenConvert</span>
@@ -373,6 +373,7 @@
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TP</span><span class="p">:</span>
     <span class="o">...</span>
 
@@ -384,6 +385,7 @@
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigComplex</span><span class="p">:</span>
     <span class="o">...</span>
 
@@ -395,7 +397,8 @@
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">TC</span><span class="p">]]:</span>
+    <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Just</span><span class="p">[</span><span class="n">TC</span><span class="p">]:</span>
     <span class="o">...</span>
 
 
@@ -406,6 +409,7 @@
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">TB</span><span class="p">]]:</span>
     <span class="o">...</span>
 
@@ -417,6 +421,7 @@
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">TD</span><span class="p">]]]:</span>
     <span class="o">...</span>
 
@@ -428,6 +433,7 @@
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">ZenConvert</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
     <span class="o">...</span>
 
@@ -439,6 +445,7 @@
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
     <span class="o">...</span>
 
@@ -449,17 +456,19 @@
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;`just(obj)` returns a config that, when instantiated, just returns `obj`.</span>
 
 <span class="sd">    I.e., `instantiate(just(obj)) == obj`</span>
 
-<span class="sd">    `just` is designed to be idempotent: `just(obj) == just(just(obj))`</span>
+<span class="sd">    `just` is designed to be idempotent. I.e., `just(obj) == just(just(obj))`</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    obj : Callable[..., Any] | HydraSupportedPrimitive | ZenSupportedPrimitive</span>
-<span class="sd">        A value, type (e.g. a class-object), or function-object that is either supported by Hydra or has auto-config support via hydra-zen.</span>
+<span class="sd">        A type (e.g. a class-object), function-object, or a value that is either</span>
+<span class="sd">        supported by Hydra or has auto-config support via hydra-zen.</span>
 
 <span class="sd">    zen_convert : Optional[ZenConvert]</span>
 <span class="sd">        A dictionary that modifies hydra-zen&#39;s value and type conversion behavior.</span>
@@ -490,6 +499,17 @@
 
 <span class="sd">        If ``None``, the ``_convert_`` attribute is not set on the resulting config.</span>
 
+<span class="sd">    zen_dataclass : Optional[DataclassOptions]</span>
+<span class="sd">        A dictionary that can specify any option that is supported by</span>
+<span class="sd">        :py:func:`dataclasses.make_dataclass` other than `fields`.</span>
+<span class="sd">        The default value for `unsafe_hash` is `True`.</span>
+
+<span class="sd">        These options are only relevant when the input to `just` is a dataclass</span>
+<span class="sd">        instance. Otherwise, `just` does not utilize these options when auto-generating</span>
+<span class="sd">        configs.</span>
+
+<span class="sd">        Additionally, the `module` field can be specified to enable pickle</span>
+<span class="sd">        compatibility. See `hydra_zen.typing.DataclassOptions` for details.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -626,6 +646,8 @@
     <span class="n">_utils</span><span class="o">.</span><span class="n">validate_hydra_options</span><span class="p">(</span>
         <span class="n">hydra_recursive</span><span class="o">=</span><span class="n">hydra_recursive</span><span class="p">,</span> <span class="n">hydra_convert</span><span class="o">=</span><span class="n">hydra_convert</span>
     <span class="p">)</span>
+    <span class="k">if</span> <span class="n">zen_dataclass</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">zen_dataclass</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">return</span> <span class="n">sanitized_default_value</span><span class="p">(</span>
         <span class="n">obj</span><span class="p">,</span>
@@ -636,6 +658,7 @@
         <span class="n">convert_dataclass</span><span class="o">=</span><span class="n">convert_settings</span><span class="p">[</span><span class="s2">&quot;dataclass&quot;</span><span class="p">],</span>
         <span class="n">hydra_convert</span><span class="o">=</span><span class="n">hydra_convert</span><span class="p">,</span>
         <span class="n">hydra_recursive</span><span class="o">=</span><span class="n">hydra_recursive</span><span class="p">,</span>
+        <span class="n">zen_dataclass</span><span class="o">=</span><span class="n">_utils</span><span class="o">.</span><span class="n">parse_dataclass_options</span><span class="p">(</span><span class="n">zen_dataclass</span><span class="p">),</span>
     <span class="p">)</span></div>
 </pre></div>
 

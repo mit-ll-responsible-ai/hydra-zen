@@ -237,6 +237,7 @@
 <li class="toctree-l1"><a class="reference internal" href="hydra_zen.load_from_yaml.html">hydra_zen.load_from_yaml</a></li>
 </ul>
 <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="hydra_zen.typing.DataclassOptions.html">hydra_zen.typing.DataclassOptions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hydra_zen.typing.ZenConvert.html">hydra_zen.typing.ZenConvert</a></li>
 </ul>
 <ul class="nav bd-sidenav">
@@ -263,14 +264,15 @@
 <h1>hydra_zen.just<a class="headerlink" href="#hydra-zen-just" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="hydra_zen.just">
-<span class="sig-prename descclassname"><span class="pre">hydra_zen.</span></span><span class="sig-name descname"><span class="pre">just</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_recursive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/structured_configs/_just.html#just"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.just" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">hydra_zen.</span></span><span class="sig-name descname"><span class="pre">just</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_recursive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydra_convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_dataclass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/structured_configs/_just.html#just"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.just" title="Permalink to this definition">#</a></dt>
 <dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">just(obj)</span></code> returns a config that, when instantiated, just returns <code class="xref py py-obj docutils literal notranslate"><span class="pre">obj</span></code>.</p>
 <p>I.e., <code class="xref py py-obj docutils literal notranslate"><span class="pre">instantiate(just(obj))</span> <span class="pre">==</span> <span class="pre">obj</span></code></p>
-<p><a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> is designed to be idempotent: <code class="xref py py-obj docutils literal notranslate"><span class="pre">just(obj)</span> <span class="pre">==</span> <span class="pre">just(just(obj))</span></code></p>
+<p><a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> is designed to be idempotent. I.e., <code class="xref py py-obj docutils literal notranslate"><span class="pre">just(obj)</span> <span class="pre">==</span> <span class="pre">just(just(obj))</span></code></p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>obj</strong><span class="classifier">Callable[…, Any] | HydraSupportedPrimitive | ZenSupportedPrimitive</span></dt><dd><p>A value, type (e.g. a class-object), or function-object that is either supported by Hydra or has auto-config support via hydra-zen.</p>
+<dt><strong>obj</strong><span class="classifier">Callable[…, Any] | HydraSupportedPrimitive | ZenSupportedPrimitive</span></dt><dd><p>A type (e.g. a class-object), function-object, or a value that is either
+supported by Hydra or has auto-config support via hydra-zen.</p>
 </dd>
 <dt><strong>zen_convert</strong><span class="classifier">Optional[ZenConvert]</span></dt><dd><p>A dictionary that modifies hydra-zen’s value and type conversion behavior.
 Consists of the following optional key-value pairs (<a class="reference internal" href="hydra_zen.typing.ZenConvert.html#zen-convert"><span class="std std-ref">hydra_zen.typing.ZenConvert</span></a>):</p>
@@ -299,6 +301,15 @@ during instantiateion <a class="reference internal" href="#rcd3092d0866d-3" id="
 a trace of OmegaConf containers.</p></li>
 </ul>
 <p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the <code class="docutils literal notranslate"><span class="pre">_convert_</span></code> attribute is not set on the resulting config.</p>
+</dd>
+<dt><strong>zen_dataclass</strong><span class="classifier">Optional[DataclassOptions]</span></dt><dd><p>A dictionary that can specify any option that is supported by
+<a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.make_dataclass" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataclasses.make_dataclass()</span></code></a> other than <code class="xref py py-obj docutils literal notranslate"><span class="pre">fields</span></code>.
+The default value for <code class="xref py py-obj docutils literal notranslate"><span class="pre">unsafe_hash</span></code> is <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>.</p>
+<p>These options are only relevant when the input to <a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> is a dataclass
+instance. Otherwise, <a class="reference internal" href="#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a> does not utilize these options when auto-generating
+configs.</p>
+<p>Additionally, the <code class="xref py py-obj docutils literal notranslate"><span class="pre">module</span></code> field can be specified to enable pickle
+compatibility. See <a class="reference internal" href="hydra_zen.typing.DataclassOptions.html#hydra_zen.typing.DataclassOptions" title="hydra_zen.typing.DataclassOptions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.typing.DataclassOptions</span></code></a> for details.</p>
 </dd>
 </dl>
 </dd>
