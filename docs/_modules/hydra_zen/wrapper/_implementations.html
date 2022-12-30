@@ -1230,6 +1230,7 @@
 <span class="sd">    &gt;&gt;&gt; config2 = {&#39;name&#39;: &#39;Rita&#39;, &#39;age&#39;: 27}</span>
 <span class="sd">    &gt;&gt;&gt; _ = store(config1, name=&quot;roger&quot;, group=&quot;profiles&quot;)</span>
 <span class="sd">    &gt;&gt;&gt; _ = store(config2, name=&quot;rita&quot;, group=&quot;profiles&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; store</span>
 <span class="sd">    zen_store</span>
 <span class="sd">    {&#39;profiles&#39;: [&#39;roger&#39;, &#39;rita&#39;]}</span>
 
@@ -1240,7 +1241,7 @@
 <span class="sd">    {&#39;name&#39;: &#39;Roger&#39;, age: 24}</span>
 
 <span class="sd">    By default, the stored config(s) will be &quot;enqueued&quot; for addition to Hydra&#39;s config</span>
-<span class="sd">    store, and the method `.add_to_hydra_store()` must be called to add the enqueued</span>
+<span class="sd">    store. The method `.add_to_hydra_store()` must be called to add the enqueued</span>
 <span class="sd">    configs to Hydra&#39;s central store.</span>
 
 <span class="sd">    &gt;&gt;&gt; store.has_enqueued()</span>
@@ -1317,9 +1318,10 @@
 <span class="sd">    b: ???</span>
 <span class="sd">    a: -10</span>
 
-<span class="sd">    Note that, by default, the application of `to_config` via the store is deferred</span>
-<span class="sd">    until that entry is actually accessed. This defers the runtime cost of constructing</span>
-<span class="sd">    configs for the decorated function so that it need not be paid until necessary.</span>
+<span class="sd">    Note that, by default, the application of `to_config` via the store **is deferred</span>
+<span class="sd">    until that entry is actually accessed**. This offsets the runtime cost of</span>
+<span class="sd">    constructing configs for the decorated function so that it need not be paid until</span>
+<span class="sd">    the config is actually accessed by the store.</span>
 
 <span class="sd">    .. _self-partial:</span>
 
@@ -1810,12 +1812,31 @@
 <div class="viewcode-block" id="ZenStore.add_to_hydra_store"><a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.add_to_hydra_store">[docs]</a>    <span class="k">def</span> <span class="nf">add_to_hydra_store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">overwrite_ok</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Adds all of this store&#39;s enqueued entries to Hydra&#39;s global config store.</span>
 
+<span class="sd">        This method need not be called for a store initialized as</span>
+<span class="sd">        `ZenStore(deferred_hydra_store=False)`.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        overwrite_ok : Optional[bool]</span>
 <span class="sd">            If `False`, this method raises `ValueError` if an entry in Hydra&#39;s config</span>
 <span class="sd">            store will be overwritten. Defaults to the value of `overwrite_ok`</span>
-<span class="sd">            specified when initializing this store.&quot;&quot;&quot;</span>
+<span class="sd">            specified when initializing this store.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from hydra_zen import ZenStore</span>
+<span class="sd">        &gt;&gt;&gt; store1 = ZenStore()</span>
+<span class="sd">        &gt;&gt;&gt; store2 = ZenStore()</span>
+
+<span class="sd">        &gt;&gt;&gt; store1({&#39;a&#39;: 1}, name=&quot;x&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; store1.add_to_hydra_store()</span>
+<span class="sd">        &gt;&gt;&gt; store2({&#39;a&#39;: 2}, name=&quot;x&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; store2.add_to_hydra_store()</span>
+<span class="sd">        ValueError: (name=x group=None): Hydra config store entry already exists. Specify `overwrite_ok=True` to enable replacing config store entries</span>
+
+<span class="sd">        &gt;&gt;&gt; store2.add_to_hydra_store(overwrite_ok=True)  # successfully overwrites entry</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="p">:</span>
             <span class="n">entry</span> <span class="o">=</span> <span class="n">_resolve_node</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">popleft</span><span class="p">(),</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>

@@ -296,6 +296,7 @@ may be specified for the entry as well.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">config2</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'name'</span><span class="p">:</span> <span class="s1">'Rita'</span><span class="p">,</span> <span class="s1">'age'</span><span class="p">:</span> <span class="mi">27</span><span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">store</span><span class="p">(</span><span class="n">config1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"roger"</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s2">"profiles"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">store</span><span class="p">(</span><span class="n">config2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"rita"</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s2">"profiles"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">store</span>
 <span class="go">zen_store</span>
 <span class="go">{'profiles': ['roger', 'rita']}</span>
 </pre></div>
@@ -307,7 +308,7 @@ may be specified for the entry as well.</p>
 </pre></div>
 </div>
 <p>By default, the stored config(s) will be “enqueued” for addition to Hydra’s config
-store, and the method <a class="reference internal" href="#hydra_zen.ZenStore.add_to_hydra_store" title="hydra_zen.ZenStore.add_to_hydra_store"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_to_hydra_store()</span></code></a> must be called to add the enqueued
+store. The method <a class="reference internal" href="#hydra_zen.ZenStore.add_to_hydra_store" title="hydra_zen.ZenStore.add_to_hydra_store"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_to_hydra_store()</span></code></a> must be called to add the enqueued
 configs to Hydra’s central store.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span><span class="o">.</span><span class="n">has_enqueued</span><span class="p">()</span>
 <span class="go">True</span>
@@ -383,9 +384,10 @@ store entries for <code class="xref py py-obj docutils literal notranslate"><spa
 <span class="go">a: -10</span>
 </pre></div>
 </div>
-<p>Note that, by default, the application of <code class="xref py py-obj docutils literal notranslate"><span class="pre">to_config</span></code> via the store is deferred
-until that entry is actually accessed. This defers the runtime cost of constructing
-configs for the decorated function so that it need not be paid until necessary.</p>
+<p>Note that, by default, the application of <code class="xref py py-obj docutils literal notranslate"><span class="pre">to_config</span></code> via the store <strong>is deferred
+until that entry is actually accessed</strong>. This offsets the runtime cost of
+constructing configs for the decorated function so that it need not be paid until
+the config is actually accessed by the store.</p>
 <p id="self-partial"><strong>Customizable store defaults via ‘self-partialing’ patterns</strong></p>
 <p>The default values for a store’s <a class="reference internal" href="#hydra_zen.ZenStore.__call__" title="hydra_zen.ZenStore.__call__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code></a> parameters – <code class="xref py py-obj docutils literal notranslate"><span class="pre">group</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">to_config</span></code>, etc.
 – can easily be customized. Simply call the store with those new values and
@@ -586,6 +588,8 @@ including nodes within subgroups.</p>
 <dt class="sig sig-object py" id="hydra_zen.ZenStore.add_to_hydra_store">
 <span class="sig-name descname"><span class="pre">add_to_hydra_store</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">overwrite_ok</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/wrapper/_implementations.html#ZenStore.add_to_hydra_store"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.ZenStore.add_to_hydra_store" title="Permalink to this definition">#</a></dt>
 <dd><p>Adds all of this store’s enqueued entries to Hydra’s global config store.</p>
+<p>This method need not be called for a store initialized as
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenStore(deferred_hydra_store=False)</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
@@ -596,6 +600,22 @@ specified when initializing this store.</p>
 </dl>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">ZenStore</span></a>
+<span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">store1</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">ZenStore</span></a><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">store2</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">ZenStore</span></a><span class="p">()</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">store1</span><span class="p">({</span><span class="s1">'a'</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="n">name</span><span class="o">=</span><span class="s2">"x"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">store1</span><span class="o">.</span><span class="n">add_to_hydra_store</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">store2</span><span class="p">({</span><span class="s1">'a'</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="n">name</span><span class="o">=</span><span class="s2">"x"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">store2</span><span class="o">.</span><span class="n">add_to_hydra_store</span><span class="p">()</span>
+<span class="go">ValueError: (name=x group=None): Hydra config store entry already exists. Specify `overwrite_ok=True` to enable replacing config store entries</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">store2</span><span class="o">.</span><span class="n">add_to_hydra_store</span><span class="p">(</span><span class="n">overwrite_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># successfully overwrites entry</span>
+</pre></div>
+</div>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="hydra_zen.ZenStore.get_entry">
