@@ -142,7 +142,7 @@ _MAKE_CONFIG_SETTINGS = AllConvert(dataclass=False)
 def make_config(
     *fields_as_args: Union[str, ZenField],
     hydra_recursive: Optional[bool] = None,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = None,
     hydra_defaults: Optional[DefaultsList] = None,
     zen_dataclass: Optional[DataclassOptions] = None,
     bases: Tuple[Type[DataClass_], ...] = (),
@@ -189,15 +189,15 @@ def make_config(
 
         If ``None``, the ``_recursive_`` attribute is not set on the resulting config.
 
-    hydra_convert : Optional[Literal["none", "partial", "all"]], optional (default="none")
+    hydra_convert : Optional[Literal["none", "partial", "all", "object"]], optional (default="none")
         Determines how Hydra handles the non-primitive objects passed to configuration [3]_.
 
         - ``"none"``: Passed objects are DictConfig and ListConfig, default
         - ``"partial"``: Passed objects are converted to dict and list, with the exception of Structured Configs (and their fields).
         - ``"all"``: Passed objects are dicts, lists and primitives without a trace of OmegaConf containers
+        - ``"object"``: Passed objects are converted to dict and list. Structured Configs are converted to instances of the backing dataclass / attr class.
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting config.
-
 
     hydra_defaults : None | list[str | dict[str, str | list[str] | None ]], optional (default = None)
         A list in an input config that instructs Hydra how to build the output config

@@ -197,7 +197,7 @@ def hydrated_dataclass(
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = None,
     zen_convert: Optional[ZenConvert] = None,
     init: bool = True,
     repr: bool = True,
@@ -282,6 +282,19 @@ def hydrated_dataclass(
         - ``"partial"``: ``DictConfig`` and ``ListConfig`` objects converted to ``dict`` and
           ``list``, respectively. Structured configs and their fields are passed without conversion.
         - ``"all"``: All passed objects are converted to dicts, lists, and primitives, without a trace of OmegaConf containers.
+
+        If ``None``, the ``_convert_`` attribute is not set on the resulting config.
+
+    hydra_convert : Optional[Literal["none", "partial", "all", "object"]], optional (default="none")
+        Determines how Hydra treats the non-primitive, omegaconf-specific objects
+        during instantiateion [3]_.
+
+        - ``"none"``: No conversion occurs; omegaconf containers are passed through (Default)
+        - ``"partial"``: ``DictConfig`` and ``ListConfig`` objects converted to ``dict`` and
+          ``list``, respectively. Structured configs and their fields are passed without conversion.
+        - ``"all"``: All passed objects are converted to dicts, lists, and primitives, without
+          a trace of OmegaConf containers.
+        - ``"object"``: Passed objects are converted to dict and list. Structured Configs are converted to instances of the backing dataclass / attr class.
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting config.
 
@@ -544,7 +557,7 @@ def sanitized_default_value(
     structured_conf_permitted: bool = True,
     convert_dataclass: bool,
     hydra_recursive: Optional[bool] = None,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = None,
     zen_dataclass: Optional[DataclassOptions] = None,
 ) -> Any:
     """Converts `value` to Hydra-supported type if necessary and possible. Otherwise
@@ -715,7 +728,7 @@ def sanitize_collection(
     *,
     convert_dataclass: bool,
     hydra_recursive: Optional[bool] = None,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = None,
 ) -> _T:
     """Pass contents of lists, tuples, or dicts through sanitized_default_values"""
     type_x = type(x)
@@ -791,7 +804,7 @@ def builds(
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
     hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     hydra_defaults: Optional[DefaultsList] = ...,
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[()] = ...,
@@ -812,7 +825,7 @@ def builds(
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
     hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     hydra_defaults: Optional[DefaultsList] = ...,
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
@@ -834,7 +847,7 @@ def builds(
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
     hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     hydra_defaults: Optional[DefaultsList] = ...,
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
@@ -856,7 +869,7 @@ def builds(
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
     hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     hydra_defaults: Optional[DefaultsList] = ...,
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
@@ -878,7 +891,7 @@ def builds(
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
     hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     hydra_defaults: Optional[DefaultsList] = ...,
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
@@ -902,7 +915,7 @@ def builds(
     populate_full_signature: bool = False,
     zen_convert: Optional[ZenConvert] = None,
     hydra_recursive: Optional[bool] = None,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = None,
     hydra_defaults: Optional[DefaultsList] = None,
     builds_bases: Tuple[Type[DataClass_], ...] = (),
     zen_dataclass: Optional[DataclassOptions] = None,
@@ -998,7 +1011,7 @@ def builds(
 
         If ``None``, the ``_recursive_`` attribute is not set on the resulting config.
 
-    hydra_convert : Optional[Literal["none", "partial", "all"]], optional (default="none")
+    hydra_convert : Optional[Literal["none", "partial", "all", "object"]], optional (default="none")
         Determines how Hydra handles the non-primitive, omegaconf-specific objects passed to
         ``<hydra_target>`` [4]_.
 
@@ -1007,6 +1020,7 @@ def builds(
           ``list``, respectively. Structured configs and their fields are passed without conversion.
         - ``"all"``: All passed objects are converted to dicts, lists, and primitives, without
           a trace of OmegaConf containers.
+        - ``"object"``: Passed objects are converted to dict and list. Structured Configs are converted to instances of the backing dataclass / attr class.
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting config.
 

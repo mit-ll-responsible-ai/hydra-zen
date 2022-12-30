@@ -33,7 +33,7 @@ def just(
     *,
     zen_convert: Optional[ZenConvert] = ...,
     hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
 ) -> TP:
     ...
@@ -45,7 +45,7 @@ def just(
     *,
     zen_convert: Optional[ZenConvert] = ...,
     hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
 ) -> ConfigComplex:
     ...
@@ -57,7 +57,7 @@ def just(
     *,
     zen_convert: Optional[ZenConvert] = ...,
     hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
 ) -> Just[TC]:
     ...
@@ -69,7 +69,7 @@ def just(
     *,
     zen_convert: Optional[ZenConvert] = ...,
     hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
 ) -> Builds[Type[TB]]:
     ...
@@ -81,7 +81,7 @@ def just(
     *,
     zen_convert: Literal[None] = ...,
     hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
 ) -> Type[Builds[Type[TD]]]:
     ...
@@ -93,7 +93,7 @@ def just(
     *,
     zen_convert: ZenConvert,
     hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
 ) -> Any:
     ...
@@ -105,7 +105,7 @@ def just(
     *,
     zen_convert: Optional[ZenConvert] = ...,
     hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
 ) -> Any:
     ...
@@ -116,7 +116,7 @@ def just(
     *,
     zen_convert: Optional[ZenConvert] = None,
     hydra_recursive: Optional[bool] = None,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = None,
     zen_dataclass: Optional[DataclassOptions] = None,
 ) -> Any:
     """`just(obj)` returns a config that, when instantiated, just returns `obj`.
@@ -148,7 +148,7 @@ def just(
 
         If ``None``, the ``_recursive_`` attribute is not set on the resulting config.
 
-    hydra_convert : Optional[Literal["none", "partial", "all"]], optional (default="none")
+    hydra_convert : Optional[Literal["none", "partial", "all", "object"]], optional (default="none")
         Determines how Hydra treats the non-primitive, omegaconf-specific objects
         during instantiateion [3]_.
 
@@ -157,6 +157,7 @@ def just(
           ``list``, respectively. Structured configs and their fields are passed without conversion.
         - ``"all"``: All passed objects are converted to dicts, lists, and primitives, without
           a trace of OmegaConf containers.
+        - ``"object"``: Passed objects are converted to dict and list. Structured Configs are converted to instances of the backing dataclass / attr class.
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting config.
 

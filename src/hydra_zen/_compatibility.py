@@ -89,3 +89,5 @@ else:  # pragma: no cover
     ZEN_SUPPORTED_PRIMITIVES.update(_path_types)
 
 del _path_types
+
+HYDRA_SUPPORTS_OBJECT_CONVERT = HYDRA_VERSION >= Version(1, 3, 0)

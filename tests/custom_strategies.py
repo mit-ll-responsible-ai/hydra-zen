@@ -18,6 +18,7 @@ from typing import (
 import hypothesis.strategies as st
 
 from hydra_zen import ZenStore, builds
+from hydra_zen._compatibility import HYDRA_SUPPORTS_OBJECT_CONVERT
 from hydra_zen.structured_configs._utils import get_obj_path
 from hydra_zen.typing import DataclassOptions
 from hydra_zen.typing._implementations import ZenConvert
@@ -79,7 +80,14 @@ _valid_builds_strats = dict(
     ),
     populate_full_signature=st.booleans(),
     hydra_recursive=st.booleans(),
-    hydra_convert=st.sampled_from(["none", "partial", "all"]),
+    hydra_convert=st.sampled_from(
+        [
+            "none",
+            "partial",
+            "all",
+            *(("object",) if HYDRA_SUPPORTS_OBJECT_CONVERT else ()),
+        ]
+    ),
     builds_bases=st.just(()),
     zen_convert=st.none() | st.from_type(ZenConvert),
     zen_dataclass=st.none() | st.from_type(DataclassOptions),
