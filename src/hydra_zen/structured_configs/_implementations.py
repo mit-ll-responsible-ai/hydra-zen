@@ -648,7 +648,6 @@ def sanitized_default_value(
         type_ = type(resolved_value)
         conversion_fn = ZEN_VALUE_CONVERSION[type_]
 
-        # TODO: expose zen_dataclass options
         resolved_value = conversion_fn(resolved_value)
         type_of_value = type(resolved_value)
 

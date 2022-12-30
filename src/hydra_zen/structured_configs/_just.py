@@ -123,12 +123,13 @@ def just(
 
     I.e., `instantiate(just(obj)) == obj`
 
-    `just` is designed to be idempotent: `just(obj) == just(just(obj))`
+    `just` is designed to be idempotent. I.e., `just(obj) == just(just(obj))`
 
     Parameters
     ----------
     obj : Callable[..., Any] | HydraSupportedPrimitive | ZenSupportedPrimitive
-        A value, type (e.g. a class-object), or function-object that is either supported by Hydra or has auto-config support via hydra-zen.
+        A type (e.g. a class-object), function-object, or a value that is either
+        supported by Hydra or has auto-config support via hydra-zen.
 
     zen_convert : Optional[ZenConvert]
         A dictionary that modifies hydra-zen's value and type conversion behavior.
@@ -164,9 +165,12 @@ def just(
         :py:func:`dataclasses.make_dataclass` other than `fields`.
         The default value for `unsafe_hash` is `True`.
 
+        These options are only relevant when the input to `just` is a dataclass
+        instance. Otherwise, `just` does not utilize these options when auto-generating
+        configs.
+
         Additionally, the `module` field can be specified to enable pickle
         compatibility. See `hydra_zen.typing.DataclassOptions` for details.
-
 
     Returns
     -------
