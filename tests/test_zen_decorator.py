@@ -482,3 +482,17 @@ def test_unpack_kw_non_redundant():
     assert x == 1
     assert y == 2
     assert kw == {"z": 1}  # x should not be in kw
+
+
+def zen_extracts_factory_from_instance():
+    @dataclass
+    class A:
+        x: int = 1
+
+    Conf = builds(dict, y=A(), zen_convert={"dataclass": False})
+    assert not hasattr(Conf, "y")
+
+    def f(y):
+        return y.x
+
+    assert zen(f)(Conf) == 1

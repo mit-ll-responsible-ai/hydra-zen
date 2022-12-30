@@ -402,3 +402,16 @@ def test_frozen_deprecated(fn):
 def test_dataclassname_deprecated(fn):
     with pytest.warns(HydraZenDeprecationWarning):
         fn(dataclass_name="hi")
+
+
+def test_unhashable_dataclass_supported():
+    from dataclasses import dataclass
+
+    @dataclass(unsafe_hash=False)
+    class Unhash:
+        x: int
+
+    unhash = Unhash(1)
+    Conf = builds(dict, y=unhash, zen_convert={"dataclass": False})
+    assert not hasattr(Conf, "y")
+    assert Conf().y is unhash

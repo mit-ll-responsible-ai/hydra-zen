@@ -891,6 +891,7 @@ class ZenStore:
     >>> config2 = {'name': 'Rita', 'age': 27}
     >>> _ = store(config1, name="roger", group="profiles")
     >>> _ = store(config2, name="rita", group="profiles")
+    >>> store
     zen_store
     {'profiles': ['roger', 'rita']}
 
@@ -901,7 +902,7 @@ class ZenStore:
     {'name': 'Roger', age: 24}
 
     By default, the stored config(s) will be "enqueued" for addition to Hydra's config
-    store, and the method `.add_to_hydra_store()` must be called to add the enqueued
+    store. The method `.add_to_hydra_store()` must be called to add the enqueued
     configs to Hydra's central store.
 
     >>> store.has_enqueued()
@@ -978,9 +979,10 @@ class ZenStore:
     b: ???
     a: -10
 
-    Note that, by default, the application of `to_config` via the store is deferred
-    until that entry is actually accessed. This defers the runtime cost of constructing
-    configs for the decorated function so that it need not be paid until necessary.
+    Note that, by default, the application of `to_config` via the store **is deferred
+    until that entry is actually accessed**. This offsets the runtime cost of
+    constructing configs for the decorated function so that it need not be paid until
+    the config is actually accessed by the store.
 
     .. _self-partial:
 
@@ -1471,12 +1473,31 @@ class ZenStore:
     def add_to_hydra_store(self, overwrite_ok: Optional[bool] = None) -> None:
         """Adds all of this store's enqueued entries to Hydra's global config store.
 
+        This method need not be called for a store initialized as
+        `ZenStore(deferred_hydra_store=False)`.
+
         Parameters
         ----------
         overwrite_ok : Optional[bool]
             If `False`, this method raises `ValueError` if an entry in Hydra's config
             store will be overwritten. Defaults to the value of `overwrite_ok`
-            specified when initializing this store."""
+            specified when initializing this store.
+
+        Examples
+        --------
+        >>> from hydra_zen import ZenStore
+        >>> store1 = ZenStore()
+        >>> store2 = ZenStore()
+
+        >>> store1({'a': 1}, name="x")
+        >>> store1.add_to_hydra_store()
+        >>> store2({'a': 2}, name="x")
+        >>> store2.add_to_hydra_store()
+        ValueError: (name=x group=None): Hydra config store entry already exists. Specify `overwrite_ok=True` to enable replacing config store entries
+
+        >>> store2.add_to_hydra_store(overwrite_ok=True)  # successfully overwrites entry
+
+        """
 
         while self._queue:
             entry = _resolve_node(self._queue.popleft(), copy=False)
