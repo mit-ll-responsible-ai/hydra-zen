@@ -1618,7 +1618,6 @@ def builds(
     del base_zen_partial
 
     if not requires_zen_processing and requires_partial_field:
-        # TODO: require test-coverage once Hydra publishes nightly builds
         target_field = [
             (
                 TARGET_FIELD_NAME,
