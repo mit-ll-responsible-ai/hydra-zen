@@ -436,7 +436,7 @@ The <code class="docutils literal notranslate"><span class="pre">--help</span></
 parameters:</p>
 <div class="literal-block-wrapper docutils container" id="id7">
 <div class="code-block-caption"><span class="caption-text">Viewing the <code class="docutils literal notranslate"><span class="pre">--help</span></code> info for our application.</span><a class="headerlink" href="#id7" title="Permalink to this code">#</a></div>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python my_app.py --help
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span>--help
 <span class="go">my_app is powered by Hydra.</span>
 
 <span class="go">== Configuration groups ==</span>
@@ -464,35 +464,35 @@ parameters:</p>
 <p>Verify that you can reproduce the behavior shown below.</p>
 <div class="literal-block-wrapper docutils container" id="id8">
 <div class="code-block-caption"><span class="caption-text">Default inventory.</span><a class="headerlink" href="#id8" title="Permalink to this code">#</a></div>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python my_app.py player.name<span class="o">=</span>ivy
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span>player.name<span class="o">=</span>ivy
 <span class="go">ivy, lvl: 1, has: {'gold': 10, 'weapon': 'stick', 'costume': 'tunic'}</span>
 </pre></div>
 </div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id9">
 <div class="code-block-caption"><span class="caption-text">Give player ‘hard-mode’ load-out.</span><a class="headerlink" href="#id9" title="Permalink to this code">#</a></div>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python my_app.py player.name<span class="o">=</span>ivy +player/inventory<span class="o">=</span>hard_mode
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span>player.name<span class="o">=</span>ivy<span class="w"> </span>+player/inventory<span class="o">=</span>hard_mode
 <span class="go">ivy, lvl: 1, has: {'gold': 0, 'weapon': 'inner thoughts', 'costume': 'rags'}</span>
 </pre></div>
 </div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id10">
 <div class="code-block-caption"><span class="caption-text">Player-level 3. With ‘hard-mode’ load-out, but with 10 gold.</span><a class="headerlink" href="#id10" title="Permalink to this code">#</a></div>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python my_app.py player.name<span class="o">=</span>ivy player.level<span class="o">=</span><span class="m">3</span> +player/inventory<span class="o">=</span>hard_mode player.inventory.gold<span class="o">=</span><span class="m">10</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span>player.name<span class="o">=</span>ivy<span class="w"> </span>player.level<span class="o">=</span><span class="m">3</span><span class="w"> </span>+player/inventory<span class="o">=</span>hard_mode<span class="w"> </span>player.inventory.gold<span class="o">=</span><span class="m">10</span>
 <span class="go">ivy, lvl: 3, has: {'gold': 10, 'weapon': 'inner thoughts', 'costume': 'rags'}</span>
 </pre></div>
 </div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id11">
 <div class="code-block-caption"><span class="caption-text">Load Rakesh’s player-profile</span><a class="headerlink" href="#id11" title="Permalink to this code">#</a></div>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python my_app.py <span class="nv">player</span><span class="o">=</span>rakesh
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span><span class="nv">player</span><span class="o">=</span>rakesh
 <span class="go">rakesh, lvl: 300, has: {'gold': 41, 'weapon': 'pillow', 'costume': 'PJs'}</span>
 </pre></div>
 </div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id12">
 <div class="code-block-caption"><span class="caption-text">Load Brinda’s player-profile, and change their costume</span><a class="headerlink" href="#id12" title="Permalink to this code">#</a></div>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python my_app.py <span class="nv">player</span><span class="o">=</span>brinda player.inventory.costume<span class="o">=</span>armor
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span><span class="nv">player</span><span class="o">=</span>brinda<span class="w"> </span>player.inventory.costume<span class="o">=</span>armor
 <span class="go">brinda, lvl: 47, has: {'gold': 52, 'weapon': 'flute', 'costume': 'armor'}</span>
 </pre></div>
 </div>
@@ -620,7 +620,7 @@ upon launching our application.</p>
 <div class="footer-item">
 <p class="copyright">
 
-    © Copyright 2022 Massachusetts Institute of Technology.<br/>
+    © Copyright 2023 Massachusetts Institute of Technology.<br/>
 </p>
 </div>
 <div class="footer-item">

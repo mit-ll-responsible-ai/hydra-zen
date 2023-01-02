@@ -337,7 +337,7 @@
             <article class="bd-article" role="main">
               
   <h1>Source code for hydra_zen.structured_configs._implementations</h1><div class="highlight"><pre>
-<span></span><span class="c1"># Copyright (c) 2022 Massachusetts Institute of Technology</span>
+<span></span><span class="c1"># Copyright (c) 2023 Massachusetts Institute of Technology</span>
 <span class="c1"># SPDX-License-Identifier: MIT</span>
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
@@ -490,7 +490,7 @@
 
 
 <span class="k">def</span> <span class="nf">mutable_value</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Used to set a mutable object as a default value for a field</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Used to set a mutable object as a default value for a field</span>
 <span class="sd">    in a dataclass.</span>
 
 <span class="sd">    This is an alias for ``field(default_factory=lambda: type(x)(x))``</span>
@@ -552,7 +552,7 @@
     <span class="n">slots</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">weakref_slot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">]],</span> <span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">]]:</span>
-    <span class="sd">&quot;&quot;&quot;A decorator that uses `builds` to create a dataclass with the appropriate</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A decorator that uses `builds` to create a dataclass with the appropriate</span>
 <span class="sd">    Hydra-specific fields for specifying a targeted config [1]_.</span>
 
 <span class="sd">    This provides similar functionality to `builds`, but enables a user to define</span>
@@ -846,7 +846,7 @@
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">Just</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Just[T] is a config that returns T when instantiated.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Just[T] is a config that returns T when instantiated.&quot;&quot;&quot;</span>
 
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;hydra_zen.funcs.get_obj&quot;</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -915,7 +915,7 @@
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Converts `value` to Hydra-supported type if necessary and possible. Otherwise</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts `value` to Hydra-supported type if necessary and possible. Otherwise</span>
 <span class="sd">    raises `HydraZenUnsupportedPrimitiveError`&quot;&quot;&quot;</span>
     <span class="c1"># Common primitives supported by Hydra.</span>
     <span class="c1"># We check exhaustively for all Hydra-supported primitives below but seek to</span>
@@ -1089,7 +1089,7 @@
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Pass contents of lists, tuples, or dicts through sanitized_default_values&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pass contents of lists, tuples, or dicts through sanitized_default_values&quot;&quot;&quot;</span>
     <span class="n">type_x</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">type_x</span> <span class="ow">in</span> <span class="p">{</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">}:</span>
         <span class="k">return</span> <span class="n">type_x</span><span class="p">(</span><span class="n">sanitized_default_value</span><span class="p">(</span><span class="n">_x</span><span class="p">,</span> <span class="n">convert_dataclass</span><span class="o">=</span><span class="n">convert_dataclass</span><span class="p">,</span> <span class="n">hydra_convert</span><span class="o">=</span><span class="n">hydra_convert</span><span class="p">,</span> <span class="n">hydra_recursive</span><span class="o">=</span><span class="n">hydra_recursive</span><span class="p">)</span> <span class="k">for</span> <span class="n">_x</span> <span class="ow">in</span> <span class="n">x</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
@@ -1286,7 +1286,7 @@
     <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
     <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]],</span>
 <span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, hydra_recursive=None, hydra_convert=None, hydra_defaults=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, hydra_recursive=None, hydra_convert=None, hydra_defaults=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)</span>
 
 <span class="sd">    `builds(target, *args, **kw)` returns a Hydra-compatible config that, when</span>
 <span class="sd">    instantiated, returns `target(*args, **kw)`.</span>
@@ -1827,7 +1827,7 @@
     <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">_key</span> <span class="ow">in</span> <span class="n">zen_meta</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;`zen_meta` must be a mapping whose keys are strings, got key(s):&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">_key</span><span class="p">)</span> <span class="k">for</span> <span class="n">_key</span> <span class="ow">in</span> <span class="n">zen_meta</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">_key</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">_key</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">zen_meta</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">_key</span><span class="p">,</span><span class="w"> </span><span class="nb">str</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">zen_wrappers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1957,7 +1957,6 @@
     <span class="k">del</span> <span class="n">base_zen_partial</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">requires_zen_processing</span> <span class="ow">and</span> <span class="n">requires_partial_field</span><span class="p">:</span>
-        <span class="c1"># TODO: require test-coverage once Hydra publishes nightly builds</span>
         <span class="n">target_field</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">(</span>
                 <span class="n">TARGET_FIELD_NAME</span><span class="p">,</span>
@@ -2329,7 +2328,7 @@
                 <span class="n">_permissible</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_num_positional</span><span class="si">}</span><span class="s2">&quot;</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">_num_with_default</span>
-                    <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_num_positional</span> <span class="o">-</span> <span class="n">_num_with_default</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">_num_positional</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_num_positional</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">_num_with_default</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">_num_positional</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                     <span class="n">BUILDS_ERROR_PREFIX</span>
@@ -2422,14 +2421,14 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;`builds(..., zen_meta=&lt;...&gt;)`: `zen_meta` cannot not specify &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;names that exist in the target&#39;s signature: &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_meta_names</span> <span class="o">&amp;</span> <span class="n">nameable_params_in_sig</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_meta_names</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">nameable_params_in_sig</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">_meta_names</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">user_specified_named_params</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;`builds(..., zen_meta=&lt;...&gt;)`: `zen_meta` cannot not specify &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;names that are common with those specified in **kwargs_for_target: &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_meta_names</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">user_specified_named_params</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_meta_names</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="nb">set</span><span class="p">(</span><span class="n">user_specified_named_params</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
         <span class="c1"># We don&#39;t check for collisions between `zen_meta` names and the</span>
@@ -2529,7 +2528,7 @@
         <span class="n">out</span><span class="o">.</span><span class="vm">__module__</span> <span class="o">=</span> <span class="n">module</span>
 
     <span class="n">out</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;A structured config designed to </span><span class="si">{</span><span class="s1">&#39;partially &#39;</span> <span class="k">if</span> <span class="n">zen_partial</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;A structured config designed to </span><span class="si">{</span><span class="s1">&#39;partially &#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">zen_partial</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="sa">f</span><span class="s2">&quot;initialize/call `</span><span class="si">{</span><span class="n">target_path</span><span class="si">}</span><span class="s2">` upon instantiation by hydra.&quot;</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;__doc__&quot;</span><span class="p">):</span>  <span class="c1"># pragma: no branch</span>
@@ -2562,7 +2561,7 @@
 
 
 <div class="viewcode-block" id="get_target"><a class="viewcode-back" href="../../../generated/hydra_zen.get_target.html#hydra_zen.get_target">[docs]</a><span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">HasTarget</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the target-object from a targeted config.</span>
 
 <span class="sd">    Parameters</span>
@@ -2701,7 +2700,7 @@
     
 <p class="copyright">
 
-    &copy; Copyright 2022 Massachusetts Institute of Technology.<br>
+    &copy; Copyright 2023 Massachusetts Institute of Technology.<br>
 
 </p>
 

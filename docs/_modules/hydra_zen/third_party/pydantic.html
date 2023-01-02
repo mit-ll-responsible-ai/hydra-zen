@@ -337,7 +337,7 @@
             <article class="bd-article" role="main">
               
   <h1>Source code for hydra_zen.third_party.pydantic</h1><div class="highlight"><pre>
-<span></span><span class="c1"># Copyright (c) 2022 Massachusetts Institute of Technology</span>
+<span></span><span class="c1"># Copyright (c) 2023 Massachusetts Institute of Technology</span>
 <span class="c1"># SPDX-License-Identifier: MIT</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">cast</span>
@@ -355,7 +355,7 @@
 <div class="viewcode-block" id="validates_with_pydantic"><a class="viewcode-back" href="../../../generated/hydra_zen.third_party.pydantic.validates_with_pydantic.html#hydra_zen.third_party.pydantic.validates_with_pydantic">[docs]</a><span class="k">def</span> <span class="nf">validates_with_pydantic</span><span class="p">(</span>
     <span class="n">obj</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">validator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_T</span><span class="p">],</span> <span class="n">_T</span><span class="p">]</span> <span class="o">=</span> <span class="n">_default_validator</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Enables runtime type-checking of values, via the library ``pydantic``.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enables runtime type-checking of values, via the library ``pydantic``.</span>
 
 <span class="sd">    I.e. ``obj = validates_with_beartype(obj)`` adds runtime type-checking</span>
 <span class="sd">    to all calls of ``obj(*args, **kwargs)``, based on the type-annotations specified</span>
@@ -528,7 +528,7 @@
     
 <p class="copyright">
 
-    &copy; Copyright 2022 Massachusetts Institute of Technology.<br>
+    &copy; Copyright 2023 Massachusetts Institute of Technology.<br>
 
 </p>
 

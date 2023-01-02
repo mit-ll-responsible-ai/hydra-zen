@@ -478,7 +478,7 @@ its configurable interface. See that the only required value is <code class="doc
 that we can override any of the other default configured values.</p>
 <div class="literal-block-wrapper docutils container" id="id9">
 <div class="code-block-caption"><span class="caption-text">Checking the configurable components of our app. (We will add configuration groups in a later lesson.)</span><a class="headerlink" href="#id9" title="Permalink to this code">#</a></div>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python my_app.py --help
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span>--help
 <span class="go">my_app is powered by Hydra.</span>
 
 <span class="go">== Configuration groups ==</span>
@@ -504,21 +504,21 @@ that we can override any of the other default configured values.</p>
 <p>Now let’s run our application with various configurations.</p>
 <div class="literal-block-wrapper docutils container" id="id10">
 <div class="code-block-caption"><span class="caption-text">Configuring: name</span><a class="headerlink" href="#id10" title="Permalink to this code">#</a></div>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python my_app.py player.name<span class="o">=</span>frodo
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span>player.name<span class="o">=</span>frodo
 <span class="go">frodo, lvl: 1, has: {'gold': 10, 'weapon': 'stick', 'costume': 'tunic'}</span>
 </pre></div>
 </div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id11">
 <div class="code-block-caption"><span class="caption-text">Configuring: name and level</span><a class="headerlink" href="#id11" title="Permalink to this code">#</a></div>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python my_app.py player.name<span class="o">=</span>frodo player.level<span class="o">=</span><span class="m">5</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span>player.name<span class="o">=</span>frodo<span class="w"> </span>player.level<span class="o">=</span><span class="m">5</span>
 <span class="go">frodo, lvl: 5, has: {'gold': 10, 'weapon': 'stick', 'costume': 'tunic'}</span>
 </pre></div>
 </div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id12">
 <div class="code-block-caption"><span class="caption-text">Configuring: name, level, and costume</span><a class="headerlink" href="#id12" title="Permalink to this code">#</a></div>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python my_app.py player.name<span class="o">=</span>frodo player.level<span class="o">=</span><span class="m">2</span> player.inventory.costume<span class="o">=</span>robe
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span>player.name<span class="o">=</span>frodo<span class="w"> </span>player.level<span class="o">=</span><span class="m">2</span><span class="w"> </span>player.inventory.costume<span class="o">=</span>robe
 <span class="go">frodo, lvl: 2, has: {'gold': 10, 'weapon': 'stick', 'costume': 'robe'}</span>
 </pre></div>
 </div>
@@ -527,7 +527,7 @@ that we can override any of the other default configured values.</p>
 <p class="admonition-title">Note</p>
 <p>We can use <a class="reference internal" href="../generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.launch()</span></code></a> to launch our application, instead of using our
 application’s CLI. The following command line expression</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python my_app.py player.name<span class="o">=</span>frodo player.level<span class="o">=</span><span class="m">2</span> player.inventory.costume<span class="o">=</span>robe
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span>player.name<span class="o">=</span>frodo<span class="w"> </span>player.level<span class="o">=</span><span class="m">2</span><span class="w"> </span>player.inventory.costume<span class="o">=</span>robe
 <span class="go">frodo, lvl: 2, has: {'gold': 10, 'weapon': 'stick', 'costume': 'robe'}</span>
 </pre></div>
 </div>
@@ -722,7 +722,7 @@ upon launching our application.</p>
 <div class="footer-item">
 <p class="copyright">
 
-    © Copyright 2022 Massachusetts Institute of Technology.<br/>
+    © Copyright 2023 Massachusetts Institute of Technology.<br/>
 </p>
 </div>
 <div class="footer-item">
