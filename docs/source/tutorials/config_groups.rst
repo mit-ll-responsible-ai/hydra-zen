@@ -11,9 +11,10 @@
 Provide Swappable Configuration Groups
 ======================================
 
-In this tutorial we will create swappable configuration groups for our application; 
-this will enable us to create specific player profiles and inventory load-outs. These 
-config groups can then be specified by name when we launch our application.
+In this tutorial we will create swappable configuration groups for our application: we 
+will pre-configure specific player profiles and inventory load-outs. By storing these 
+configs in a config store, we will be able to load them and swap them out by group & 
+name from the command line.
 
 Modifying Our Application
 =========================
@@ -21,8 +22,8 @@ Modifying Our Application
 We will need to make three modifications to our code in ``my_app.py``:
 
 1. Create additional inventory configs and player-profile configs.
-2. Register these configs - by name - in Hydra's config store, under the appropriate respective groups.
-3. Update our application's top-level config to include a "defaults" list, which is a special field that Hydra uses to define the interface to our application.
+2. Register these configs - by group and name - in a config store.
+3. Update our application's top-level config to include a "Hydra defaults" list, which is a special field that Hydra uses to define the default inputs to our application.
 
 
 Creating Inventory-Config Groups
@@ -37,7 +38,7 @@ will use the following code in ``my_app.py``.
    tutorial-readers, created ourselves. See :ref:`game-library` for details.
 
 .. code-block:: python
-   :caption: Creating configs for new inventory load-outs
+   :caption: Creating configs for new inventory load-outs.
 
    from hydra_zen import make_custom_builds_fn
 
@@ -50,21 +51,21 @@ will use the following code in ``my_app.py``.
    advanced_gear = InventoryConf(gold=500, weapon="wand", costume="magic robe")
    hard_mode_gear = InventoryConf(gold=0, weapon="inner thoughts", costume="rags")
 
-Now we will register each of these configs in Hydra's config store. Each of these will 
-be stored with a distinct name, but under the same group: ``player/inventory``.
+Now we will register each of these configs using :class:`~hydra_zen.ZenStore`. Each of 
+these will be stored with a distinct name, but under the same group: 
+``player/inventory``.
 
 .. code-block:: python
-   :caption: Adding configs to the ``player/inventory`` group in Hydra's config store
+   :caption: Adding configs to the ``player/inventory`` group in hydra-zen's config store.
 
-   from hydra.core.config_store import ConfigStore
+   from hydra_zen import store
 
+   # pre-set the group name
+   inv_store = store(group="player/inventory")
 
-   cs = ConfigStore.instance()
-
-   cs.store(group="player/inventory", name="starter", node=starter_gear)
-   cs.store(group="player/inventory", name="advanced", node=advanced_gear)
-   cs.store(group="player/inventory", name="hard_mode", node=hard_mode_gear)
-
+   inv_store(starter_gear, name="starter")
+   inv_store(advanced_gear, name="advanced")
+   inv_store(hard_mode_gear, name="hard_mode")
 
 Creating Player-Config Groups
 -----------------------------
@@ -74,7 +75,7 @@ they can resume progress when they play our game. Let's mock-up these player con
 and then add them to the config store.
 
 .. code-block:: python
-   :caption: Creating player-profile configs
+   :caption: Creating player-profile configs.
    
    from game_library import Character
 
@@ -92,30 +93,37 @@ and then add them to the config store.
        inventory=InventoryConf(costume="PJs", weapon="pillow", gold=41),
    )
 
-We will add these to Hydra's config store under the ``player`` group, so that these 
-particular player-profiles can be used by-name when we launch our application.
+We will add these to the same config store, but under the ``player`` group. This will 
+enable us to load these particular player-profiles by-name when we launch our 
+application.
 
 
 .. code-block:: python
-   :caption: Adding configs to the ``player`` group in Hydra's config store
+   :caption: Adding configs to the ``player`` group in hydra-zen's config store.
 
-   cs.store(group="player", name="base", node=CharConf)
-   cs.store(group="player", name="brinda", node=brinda_conf)
-   cs.store(group="player", name="rakesh", node=rakesh_conf)
+   # pre-set the group name
+   player_store = store(group="player")
+
+   player_store(CharConf, name="base")
+   player_store(brinda_conf, name="brinda")
+   player_store(rakesh_conf, name="rakesh")
 
 
 Updating Our Top-Level Config 
 -----------------------------
 
 With these groups specified, we can tell Hydra to use a particular group-entry as a 
-default config for that group. Let's specify the ``CharConf`` config, which we named ``base`` in the config store, as the default player-profile.
+default config for that group by specifying a `hydra_defaults` in our task function's 
+config. For this example, let's specify the ``CharConf`` config, which we named 
+``base`` in the config store, as the default player-profile.
 
 
 .. code-block:: python
-   :caption: Specifying the player-group item named ``base`` as the default player-profile
+   :caption: Specifying the player-group item named ``base`` as the default player-profile.
 
-   Config = make_config("player", hydra_defaults=["_self_", {"player": "base"}])
-   cs.store(name="my_app", node=Config)
+   @store(name="my_app",  hydra_defaults=["_self_", {"player": "base"}])
+   def task_function(player: Character):
+       ...
 
 .. note:: 
 
@@ -135,17 +143,12 @@ over. Modify your ``my_app.py`` script to match the following code.
 .. code-block:: python
    :caption: Contents of ``my_app.py``
 
-   import hydra
-   from hydra.core.config_store import ConfigStore
-   
-   from hydra_zen import instantiate, make_config, make_custom_builds_fn
+   from hydra_zen import store, make_custom_builds_fn, zen
    
    from game_library import inventory, Character
    
    builds = make_custom_builds_fn(populate_full_signature=True)
    
-   cs = ConfigStore.instance()
-
    # Create inventory configs
    InventoryConf = builds(inventory)
    starter_gear = InventoryConf(gold=10, weapon="stick", costume="tunic")
@@ -153,13 +156,15 @@ over. Modify your ``my_app.py`` script to match the following code.
    hard_mode_gear = InventoryConf(gold=0, weapon="inner thoughts", costume="rags")
    
    # Register inventory configs under group: player/inventory
-   cs.store(group="player/inventory", name="starter", node=starter_gear)
-   cs.store(group="player/inventory", name="advanced", node=advanced_gear)
-   cs.store(group="player/inventory", name="hard_mode", node=hard_mode_gear)
+   inv_store = store(group="player/inventory")
+   
+   inv_store(starter_gear, name="starter")
+   inv_store(advanced_gear, name="advanced")
+   inv_store(hard_mode_gear, name="hard_mode")
    
    # Create player-profile configs
    CharConf = builds(Character, inventory=starter_gear)
-
+   
    brinda_conf = CharConf(
        name="brinda",
        level=47,
@@ -173,23 +178,21 @@ over. Modify your ``my_app.py`` script to match the following code.
    )
    
    # Register player-profile configs under group: player
-   cs.store(group="player", name="base", node=CharConf)
-   cs.store(group="player", name="brinda", node=brinda_conf)
-   cs.store(group="player", name="rakesh", node=rakesh_conf)
-   
-   # Specify default group for player to be: base
-   Config = make_config("player", hydra_defaults=["_self_", {"player": "base"}])
-   
-   cs.store(name="my_app", node=Config)
+   player_store = store(group="player")
+   player_store(CharConf, name="base")
+   player_store(brinda_conf, name="brinda")
+   player_store(rakesh_conf, name="rakesh")
    
    
-   @hydra.main(config_path=None, config_name="my_app")
-   def task_function(cfg):
-       # cfg: Config
-       player = instantiate(cfg.player)
+   # The `hydra_defaults` field is specified in our task function's config.
+   # It instructs Hydra to use the player config that named 'base' in our 
+   # config store as the default config for our app.
+   @store(name="my_app",  hydra_defaults=["_self_", {"player": "base"}])
+   def task_function(player: Character):
+   
        print(player)
    
-       with open("player_log.txt", "w") as f:
+       with open("player_log.txt", "a") as f:
            f.write("Game session log:\n")
            f.write(f"Player: {player}\n")
    
@@ -197,7 +200,17 @@ over. Modify your ``my_app.py`` script to match the following code.
    
    
    if __name__ == "__main__":
-       task_function()
+       # We need to add the configs from our local store to Hydra's
+       # global config store
+       store.add_to_hydra_store()
+   
+       # Our zen-wrapped task function is used to generate
+       # the CLI, and to specify which config we want to use
+       # to configure the app by default
+       zen(task_function).hydra_main(config_name="my_app",
+                                     version_base="1.1",
+                                     config_path=".",
+                                     )
 
 .. tip::
 

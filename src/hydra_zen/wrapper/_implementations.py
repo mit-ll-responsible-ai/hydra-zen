@@ -734,7 +734,7 @@ def default_to_config(
     """
     if is_dataclass(target):
         if isinstance(target, type):
-            if get_obj_path(target).startswith("types."):
+            if not kw and get_obj_path(target).startswith("types."):
                 # handles dataclasses returned by make_config()
                 return target
             return fbuilds(target, **kw, builds_bases=(target,))
