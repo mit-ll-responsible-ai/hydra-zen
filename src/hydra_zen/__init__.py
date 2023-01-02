@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Massachusetts Institute of Technology
+# Copyright (c) 2022 achusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 from typing import TYPE_CHECKING
 
