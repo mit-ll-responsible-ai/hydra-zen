@@ -179,6 +179,7 @@ over. Modify your ``my_app.py`` script to match the following code.
    
    # Register player-profile configs under group: player
    player_store = store(group="player")
+
    player_store(CharConf, name="base")
    player_store(brinda_conf, name="brinda")
    player_store(rakesh_conf, name="rakesh")

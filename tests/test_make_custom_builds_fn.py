@@ -1,11 +1,15 @@
+# Copyright (c) 2022 Massachusetts Institute of Technology
+# SPDX-License-Identifier: MIT
 import inspect
 import string
+from dataclasses import FrozenInstanceError
 
 import hypothesis.strategies as st
 import pytest
 from hypothesis import assume, example, given
 
 from hydra_zen import builds, make_custom_builds_fn, to_yaml
+from hydra_zen.typing import DataclassOptions
 from tests.custom_strategies import partitions, valid_builds_args
 
 _builds_sig = inspect.signature(builds)
@@ -63,7 +67,6 @@ def f2(x, y: str):
     return
 
 
-@pytest.mark.filterwarnings("ignore:Specifying")  # deprecated builds_bases
 @pytest.mark.filterwarnings(
     "ignore:A structured config was supplied for `zen_wrappers`"
 )
@@ -83,4 +86,27 @@ def test_make_builds_fn_produces_builds_with_expected_defaults_and_behaviors(
 
     # this should be the same as passing all of these args directly to vanilla builds
     via_builds = builds(target, **kwargs_passed_through, **kwargs_as_defaults)
+    assert (via_builds.__hash__ is not None) is (via_custom.__hash__ is not None)
+    assert hasattr(via_builds, "__slots__") is hasattr(via_custom, "__slots__")
     assert to_yaml(via_custom) == to_yaml(via_builds)
+
+
+@pytest.mark.filterwarnings("ignore:Specifying")
+@given(...)
+def test_frozen(kwargs: DataclassOptions, frozen: bool):
+    buildf = make_custom_builds_fn(zen_dataclass=kwargs)
+    if not kwargs.get("frozen", False) and frozen is False:
+        assume(False)
+
+    kw = dict(frozen=True) if frozen else {}
+    conf = buildf(dict, x=1, **kw)()
+
+    with pytest.raises(FrozenInstanceError):
+        conf.x = 1
+
+
+def test_zen_dataclass_defaults_merge():
+    bf = make_custom_builds_fn(zen_dataclass={"module": "a", "cls_name": "c"})
+    conf = bf(int, zen_dataclass={"cls_name": "b"})
+    assert conf.__module__ == "a"
+    assert conf.__name__ == "b"

@@ -153,18 +153,17 @@ def check_just():
         ...
 
     # test just(...)
-    reveal_type(just(f), expected_text="Type[Just[(x: int) -> int]]")
-    reveal_type(just(A), expected_text="Type[Just[Type[A]]]")
+    reveal_type(just(f), expected_text="Just[(x: int) -> int]")
+    reveal_type(just(A), expected_text="Just[Type[A]]")
     reveal_type(instantiate(just(f)), expected_text="(x: int) -> int")
     reveal_type(instantiate(just(A)), expected_text="Type[A]")
-    reveal_type(instantiate(just(A)()), expected_text="Type[A]")  # instance of Just
 
     reveal_type(just(1), expected_text="int")
     reveal_type(just("hi"), expected_text="str")
     reveal_type(just(b"1234"), expected_text="bytes")
     reveal_type(just(1 + 2j), expected_text="ConfigComplex")
     reveal_type(just(Path.home()), expected_text="Path")
-    reveal_type(just(partial(f, 1)), expected_text="Type[Just[partial[int]]]")
+    reveal_type(just(partial(f, 1)), expected_text="Just[partial[int]]")
     reveal_type(just(set([1, 2, 3])), expected_text="Builds[Type[set[int]]]")
     reveal_type(just(range(10)), expected_text="Builds[Type[range]]")
 
@@ -177,7 +176,7 @@ def check_just():
     class B:
         ...
 
-    reveal_type(just(B), expected_text="Type[Just[Type[B]]]")
+    reveal_type(just(B), expected_text="Just[Type[B]]")
     reveal_type(just(B()), expected_text="Type[Builds[Type[B]]]")
     reveal_type(just(B(), zen_convert={"dataclass": False}), expected_text="Any")
 
@@ -214,7 +213,7 @@ def f7():
     reveal_type(get_target(builds(str)()), expected_text="Type[str]")
     reveal_type(get_target(builds(str, zen_partial=False)()), expected_text="Type[str]")
     reveal_type(get_target(builds(str, zen_partial=True)()), expected_text="Type[str]")
-    reveal_type(get_target(just(str)()), expected_text="Type[str]")
+    reveal_type(get_target(just(str)), expected_text="Type[str]")
 
 
 def f8():
@@ -478,6 +477,18 @@ def check_partial_protocol():
     assert x
 
 
+def check_partial_protocol_harder():
+    def f() -> int:
+        ...
+
+    def g(x: str) -> bool:
+        ...
+
+    x: Partial[int] = partial(f)
+    y: Partial[bool] = partial(g, x="a")
+    z: Partial[str] = partial(g, x="a")  # type: ignore
+
+
 def check_partiald_target():
     reveal_type(builds(partial(int)), expected_text="Type[Builds[partial[int]]]")
     reveal_type(
@@ -531,9 +542,8 @@ def check_protocols():
     reveal_type(HPBuilds._partial_, expected_text="Literal[True]")
     reveal_type(HPBuilds()._partial_, expected_text="Literal[True]")
 
-    Just = just(int)
-    reveal_type(Just._target_, expected_text="Literal['hydra_zen.funcs.get_obj']")
-    reveal_type(Just()._target_, expected_text="Literal['hydra_zen.funcs.get_obj']")
+    just_ = just(int)
+    reveal_type(just_._target_, expected_text="Literal['hydra_zen.funcs.get_obj']")
 
 
 def check_populate_full_sig():
@@ -565,19 +575,19 @@ def check_populate_full_sig():
     # The following should be ok
     reveal_type(
         Conf_f(1, "hi"),
-        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = ...)]",
+        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = False)]",
     )
     reveal_type(
         Conf_f(1, "hi", True),
-        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = ...)]",
+        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = False)]",
     )
     reveal_type(
         Conf_f(1, y="hi"),
-        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = ...)]",
+        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = False)]",
     )
     reveal_type(
         Conf_f(x=1, y="hi", z=False),
-        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = ...)]",
+        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = False)]",
     )
 
     # check instantiation
@@ -728,7 +738,7 @@ def check_make_custom_builds_pop_sig():
 
     reveal_type(
         Conf,
-        expected_text="Type[BuildsWithSig[Type[int], (x: int, y: str, z: bool = ...)]]",
+        expected_text="Type[BuildsWithSig[Type[int], (x: int, y: str, z: bool = False)]]",
     )
 
 
@@ -1237,3 +1247,28 @@ def check_store():
     assert_type(list(store), List[StoreEntry])
     assert_type("group" in store, bool)
     assert_type(("group", "name") in store, bool)
+
+
+def test_zen_dataclass(ff: FullBuilds, ss: StdBuilds, pp: PBuilds):
+    ff(int, zen_dataclass={"eq": True})
+    ff(int, zen_dataclass={"blah": 2})  # type: ignore
+
+    ss(int, zen_dataclass={"eq": True})
+    ss(int, zen_dataclass={"blah": 2})  # type: ignore
+
+    pp(int, zen_dataclass={"eq": True})
+    pp(int, zen_dataclass={"blah": 2})  # type: ignore
+
+    builds(int, zen_dataclass={"eq": True})
+    builds(int, zen_dataclass={"blah": 2})  # type: ignore
+
+    bf = make_custom_builds_fn(zen_dataclass={"eq": True})
+    make_custom_builds_fn(zen_dataclass={"blah": 2})  # type: ignore
+    bf(int, zen_dataclass={"eq": True})
+    bf(int, zen_dataclass={"blah": 2})  # type: ignore
+
+    make_config(zen_dataclass={"namespace": {"fn": lambda _: None}})
+    make_config(zen_dataclass={"namespace": {2: 2}})  # type: ignore
+
+    make_config(zen_dataclass={"eq": True})
+    make_config(zen_dataclass={"blah": 2})  # type: ignore

@@ -2,14 +2,20 @@ Thanks for your interest in contributing to hydra-zen! Please read
 through the following resources before you begin working on any contributions to this 
 code base.
 
-
 - [Installing hydra-zen for development](#installing-hydra-zen-for-development)
-- [Pre-Commit Hooks (Required)](#pre-commit-hooks-required)
-  - [What does this do?](#what-does-this-do)
+- [Configuring Your IDE](#configuring-your-ide)
+- [Adding New Features to the Public API](#adding-new-features-to-the-public-api)
 - [Running Our Tests Manually](#running-our-tests-manually)
 - [Running Tests Using `tox`](#running-tests-using-tox)
   - [Measuring Code Coverage](#measuring-code-coverage)
-- [Validating Type Correctness](#validating-type-correctness)
+  - [Running Static Type Checking Tests](#running-static-type-checking-tests)
+- [Formatting](#formatting)
+  - [Pre-Commit Hooks](#pre-commit-hooks)
+    - [What does this do?](#what-does-this-do)
+- [Documentation](#documentation)
+  - [Building Our Documentation Locally](#building-our-documentation-locally)
+  - [Publishing Documentation](#publishing-documentation)
+- [Releasing a New Version of hydra-zen](#releasing-a-new-version-of-hydra-zen)
   
 
 ## Installing hydra-zen for development
@@ -24,34 +30,23 @@ the `-e` option ensures that any changes that you make to the project's source c
 
 If your contributions involve changes to our support for NumPy, PyTorch, PyTorch-Lightning, JAX, pydantic, or beartype then you will need to install those dependencies as well, in order for our tests-against-third-parties to run locally in your environment.
 
+## Configuring Your IDE
 
-## Pre-Commit Hooks (Required)
+hydra-zen utilizes pyright to validate its interfaces. Thus it is recommended that developers use [an IDE with pyright language server](https://github.com/microsoft/pyright#installation). 
 
-We provide contributors with pre-commit hooks, which will apply auto-formatters and 
-linters to your code before your commit takes effect. You must install these in order to contribute to the repo.
+VSCode's Pylance extension is built off of pyright, and thus is recommended. If you use VSCode with the Pylance, then make sure that `Type Checking Mode` is set to `basic` for your hydra-zen workspace. Your IDE will then mark any problematic code.
 
-First install pre-commit in your Python environment. Run:
 
-```console
-pip install pre-commit
-```
+## Adding New Features to the Public API
 
-Then, in the top-level of the `hydra_zen` repo, run:
+All functions/classes that are part of the public API must have a docstring that adheres to the [numpy docstring style](https://numpydoc.readthedocs.io/en/latest/format.html), and the docstring must include and `Examples` section. The function's docstring must be scanned by pyright, by adding the function to [this test](https://github.com/mit-ll-responsible-ai/hydra-zen/blob/main/tests/test_docstrings.py).
 
-```console
-pre-commit install
-pre-commit run
-```
+All publicly-facing interfaces must be type-annotated and scan "clean" using the pyright type checker.
 
-Great! You can read more about pre-commit hooks in general here: https://pre-commit.com/
+The CI for `hydra-zen` requires 100% code coverage, thus all new features will need to be tested appropriately. We use the [pytest framework](https://docs.pytest.org/en/7.2.x/) for collecting/running/reporting tests and are keen on using the [Hypothesis library](https://hypothesis.readthedocs.io/en/latest/) for writing property based tests where appropriate.
 
-### What does this do?
+See the section on tox for details.
 
-Our pre-commit hooks run the following auto-formatters on all commits:
-- [black](https://black.readthedocs.io/en/stable/)
-- [isort](https://pycqa.github.io/isort/)
-
-It also runs [flake8](https://github.com/PyCQA/flake8) to enforce PEP8 standards.
 
 ## Running Our Tests Manually
 
@@ -78,7 +73,7 @@ Install `tox`:
 pip install tox
 ```
 
-(if you like to use `conda` environments, you might also install `tox-conda`).
+(if you like to use `conda` environments you can instead install `tox-conda`).
 
 List the various tox-jobs that are defined for hydra-zen:
 
@@ -104,14 +99,93 @@ tox -e coverage
 
 This will produce a coverage report that indicates any lines of code that were note covered by tests.
 
-## Validating Type Correctness
 
-Our CI runs the `pyright` type-checker in basic mode against hydra-zen's entire code base and against specific test files; this ensures that our type-annotations are complete and accurate.
+### Running Static Type Checking Tests
 
-If you use VSCode with Pylance, then make sure that `Type Checking Mode` is set to `basic` for your hydra-zen workspace. Your IDE will then mark any problematic code.Other IDEs can leverage the pyright language server to a similar effect. 
+Our CI runs the `pyright` type-checker in basic mode against hydra-zen's entire code base and against specific test files. It also requires a [type completeness score](https://github.com/microsoft/pyright/blob/92b4028cd5fd483efcf3f1cdb8597b2d4edd8866/docs/typed-libraries.md#verifying-type-completeness) of 100%; this ensures that the type-annotations for our public API are complete and accurate. Lastly, we run some rudimentary tests to assess basic mypy compatibility. 
 
-While this is helpful for getting immediate feedback about your code, it is no substitute for running `pyright` from the commandline. To do so, [install pyright](https://github.com/microsoft/pyright#command-line) and, from the top-level hydra-zen directory, run:
+You can run these static type checking tests locally using tox via:
 
 ```console
-pyright --lib tests/annotations/ src/
+tox -e typecheck
 ```
+
+## Formatting
+
+hydra-zen's CI requires that `black`, `isort`, and `flake8` can be run against `src/` and `tests/` without any diffs or errors. To run this test locally, use
+
+
+```console
+$ tox -e enforce-format
+```
+
+To locally format/fix code issues caught by this stage of our CI, run:
+
+
+```console
+$ tox -e format
+```
+
+That being said, it is recommended that you install pre-commit hooks that will apply these formatters to the diffs of each commit that you make.
+This is substantially faster and more streamlined that using the tox solution.
+
+### Pre-Commit Hooks
+
+We provide contributors with pre-commit hooks, which will apply auto-formatters and 
+linters to your code before your commit takes effect. You must install these in order to contribute to the repo.
+
+First install pre-commit in your Python environment. Run:
+
+```console
+pip install pre-commit
+```
+
+Then, in the top-level of the `hydra_zen` repo, run:
+
+```console
+pre-commit install
+pre-commit run
+```
+
+Great! You can read more about pre-commit hooks in general here: https://pre-commit.com/
+
+#### What does this do?
+
+Our pre-commit hooks run the following auto-formatters on all commits:
+- [black](https://black.readthedocs.io/en/stable/)
+- [isort](https://pycqa.github.io/isort/)
+
+It also runs [flake8](https://github.com/PyCQA/flake8) to enforce PEP8 standards.
+
+## Documentation
+
+### Building Our Documentation Locally
+
+Running 
+
+```console
+tox -e docs
+```
+
+will build the docs as HTML locally, and store them in `hydra_zen/.tox/docs/html`. See the `docs/README.md` in this repo for details.
+
+### Publishing Documentation
+
+We use [GitHub Actions](https://github.com/mit-ll-responsible-ai/hydra-zen/blob/main/.github/workflows/publish_docs.yml) to handle building and publishing our docs. The job runs Sphinx and commits the resulting artifacts to the `gh-pages` branch, from which GitHub publishes the HTML pages.
+
+The documentation is updated by each push to `main`.
+
+## Releasing a New Version of hydra-zen
+
+`hydra-zen` uses [semantic versioning](https://semver.org/) and the Python package extracts its version from the latest git tag (by leveraging [setuptools-scm](https://pypi.org/project/setuptools-scm/)). Suppose we want to update hydra-zen's version to `1.3.0`; this would amount to tagging a commit:
+
+```console
+$ git tag -a v1.3.0 -m "Release 1.3.0"
+$ git push origin --tags
+```
+
+Nothing needs to be updated in the Python package itself.
+
+We utilize GitHub Actions to publish to PyPI. Once the tag has been pushed to GitHub, [draft a new release on GitHub](https://github.com/mit-ll-responsible-ai/hydra-zen/releases) with the correct associated tag, and the new version will automatically be published to PyPI.
+
+Before releasing a new version of hydra-zen, make sure to add a new section to [the changelog](https://github.com/mit-ll-responsible-ai/hydra-zen/blob/main/docs/source/changes.rst).

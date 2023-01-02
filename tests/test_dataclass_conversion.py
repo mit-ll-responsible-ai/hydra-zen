@@ -1,6 +1,6 @@
 # Copyright (c) 2022 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-from dataclasses import InitVar, dataclass, field
+from dataclasses import MISSING, InitVar, dataclass, field
 from pathlib import Path
 from typing import Any, Callable, List, Type, TypeVar
 
@@ -18,6 +18,7 @@ from hydra_zen import (
     just,
     make_config,
     make_custom_builds_fn,
+    mutable_value,
 )
 from hydra_zen.errors import HydraZenUnsupportedPrimitiveError
 from hydra_zen.structured_configs._type_guards import is_builds
@@ -53,7 +54,7 @@ def baz(f: float) -> float:
 class Stuff:
     field1: Interface1
     field2: Interface2
-    field3: Nested = Nested(baz)
+    field3: Nested = mutable_value(Nested(baz))
     field4: Any = field(default_factory=lambda: [1, 2, 3])
 
 
@@ -74,16 +75,16 @@ def test_293_proposal(via_just: bool):
         == """\
 _target_: tests.test_dataclass_conversion.Stuff
 field1:
-  _target_: hydra_zen.funcs.get_obj
   path: tests.test_dataclass_conversion.foo
-field2:
   _target_: hydra_zen.funcs.get_obj
+field2:
   path: tests.test_dataclass_conversion.bar
+  _target_: hydra_zen.funcs.get_obj
 field3:
   _target_: tests.test_dataclass_conversion.Nested
   x:
-    _target_: hydra_zen.funcs.get_obj
     path: tests.test_dataclass_conversion.baz
+    _target_: hydra_zen.funcs.get_obj
 field4:
 - 1
 - 2
@@ -205,6 +206,11 @@ def test_builds_with_initvar_field(dataclass_type):
     ) == dataclass_type(x=1)
 
 
+def _zen_get(obj):
+    x = obj.default.default
+    return x if x is not MISSING else obj.default.default_factory()
+
+
 @pytest.mark.parametrize(
     "dataclass_obj",
     [
@@ -231,9 +237,9 @@ def test_builds_with_initvar_field(dataclass_type):
             dict, x=x
         )().x,
         lambda x: just(x, zen_convert={"dataclass": False}),
-        lambda x: ZenField(
-            default=x, name="x", zen_convert={"dataclass": False}
-        ).default.default,  # type: ignore
+        lambda x: _zen_get(
+            ZenField(default=x, name="x", zen_convert={"dataclass": False})
+        ),
     ],
 )
 def test_no_dataclass_conversion(
@@ -264,10 +270,12 @@ def test_no_dataclass_conversion(
         lambda x: make_custom_builds_fn(zen_convert={"dataclass": True})(dict, x=x)().x,
         lambda x: builds(dict, x=x)().x,
         lambda x: just(x),
-        lambda x: ZenField(
-            default=x,
-            name="x",
-        ).default.default,  # type: ignore
+        lambda x: _zen_get(
+            ZenField(
+                default=x,
+                name="x",
+            )
+        ),
     ],
 )
 def test_yes_dataclass_conversion(

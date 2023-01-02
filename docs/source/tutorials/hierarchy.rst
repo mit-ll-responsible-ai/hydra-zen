@@ -34,6 +34,9 @@ function as follows. Populate ``game_library.py`` with the following code.
    
    # Note: type annotations are *not* required by hydra-zen
 
+   __all__ = ["inventory", "Character"]
+
+
    class Character:
        def __init__(self, name: str, level: int = 1, inventory=None):
            self.name = name

@@ -34,6 +34,7 @@ classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Topic :: Scientific/Engineering",
     "Programming Language :: Python :: 3 :: Only",
 ]
@@ -78,9 +79,26 @@ combine_as_imports = true
 
 
 
+[tool.coverage.run]
+branch = true
+omit = [
+  "tests/test_docs_typecheck.py",
+]
+
 [tool.coverage.report]
 omit = ["src/hydra_zen/_version.py"]
-
+exclude_lines = [
+  'pragma: no cover',
+  'def __repr__',
+  'raise NotImplementedError',
+  'class .*\bProtocol(\[.+\])?\):',
+  '@(abc\.)?abstractmethod',
+  '@(typing\.)?overload',
+  'except ImportError:',
+  'except ModuleNotFoundError:',
+  'if (typing\.)?TYPE_CHECKING:',
+  'if sys\.version_info',
+]
 
 [tool.pytest.ini_options]
 xfail_strict=true
@@ -98,6 +116,8 @@ reportUnnecessaryTypeIgnoreComment = true
 reportUnnecessaryIsInstance = false
 
 
+[tool.codespell]
+skip = 'docs/build/*'
 
 [tool.tox]
 legacy_tox_ini = """
@@ -111,14 +131,15 @@ python =
   3.8: py38
   3.9: py39
   3.10: py310
+  3.11: py311
 
 
 [testenv]
 passenv = *
 deps = pytest
        hypothesis
-commands = pytest \
-           {posargs}
+       pytest-xdist
+commands = pytest -n auto tests/ {posargs}
 
 
 [testenv:min-deps]  # test against minimum dependency versions
@@ -137,15 +158,6 @@ deps = {[testenv]deps}
        cloudpickle
 basepython = python3.8
 
-[testenv:hydra-1p1p2-pre-release]  # test against pre-releases of dependencies
-pip_pre = true
-deps = hydra-core==1.1.2
-       {[testenv]deps}
-       pydantic
-       beartype
-       cloudpickle
-basepython = python3.8
-
 [testenv:omegaconf-2p2p2]  # guard against regressions for type sanitization
 pip_pre = true
 deps = omegaconf==2.2.2
@@ -158,7 +170,7 @@ basepython = python3.8
 [testenv:coverage]
 setenv = NUMBA_DISABLE_JIT=1
 usedevelop = true
-basepython = python3.8
+basepython = python3.10
 deps = {[testenv]deps}
        coverage[toml]
        pytest-cov
@@ -166,12 +178,27 @@ deps = {[testenv]deps}
        pydantic
        beartype
        cloudpickle
-commands = pytest --cov-report term-missing --cov-config=pyproject.toml --cov-fail-under=100 --cov=hydra_zen tests
+commands = pytest --cov-report term-missing --cov-config=pyproject.toml --cov-fail-under=100 --cov=hydra_zen -n auto tests
+
+
+[testenv:pyright-scan-docs]
+usedevelop = true
+basepython = python3.9
+deps = {[testenv]deps}
+       torch
+       pytorch-lightning
+       numpy
+       jaxlib
+       jax
+       pydantic
+       beartype
+       pyright
+commands = pytest -n auto tests/test_docs_typecheck.py -vv
 
 
 [testenv:third-party]
 install_command = pip install --upgrade --upgrade-strategy eager {opts} {packages}
-basepython = python3.8
+basepython = python3.9
 deps = {[testenv]deps}
        torch
        pytorch-lightning
@@ -181,14 +208,46 @@ deps = {[testenv]deps}
        pydantic
        beartype
 
+[testenv:typecheck]
+usedevelop = true
+basepython = python3.9
+deps = pyright==1.1.282
+       mypy==0.982
+
+commands = pyright --lib tests/annotations/ src/
+           pyright --ignoreexternal --verifytypes hydra_zen
+           mypy --warn-unused-ignores --non-interactive --install-types tests/annotations/mypy_checks.py
 
 [testenv:format]
+skip_install=true
 deps =
     autoflake
     black
     isort
 commands =
-    autoflake --recursive --in-place --remove-duplicate-keys --remove-unused-variables .
-    isort .
-    black .
+    autoflake --recursive --in-place --remove-duplicate-keys --remove-unused-variables src/ tests/
+    isort src/ tests/
+    black src/ tests/
+
+[testenv:docs]
+basepython=python3.9
+changedir=docs
+deps=-r{toxinidir}/docs/requirements.txt
+commands=
+    sphinx-build -b html -d {envtmpdir}/doctrees ./source  {envdir}/build/html
+
+[testenv:enforce-format]
+skip_install=true
+basepython=python3.9
+deps=black
+     isort
+     flake8
+     pytest
+     codespell
+commands=
+    black src/ tests/ --diff --check
+    isort src/ tests/ --diff --check
+    flake8 src/ tests/
+    codespell src/ docs/
+    pytest project_tooling/test_headers.py
 """

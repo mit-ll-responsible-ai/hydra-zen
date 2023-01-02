@@ -42,13 +42,18 @@ from hydra_zen._compatibility import (
     PATCH_OMEGACONF_830,
     ZEN_SUPPORTED_PRIMITIVES,
 )
-from hydra_zen.errors import HydraZenUnsupportedPrimitiveError, HydraZenValidationError
+from hydra_zen.errors import (
+    HydraZenDeprecationWarning,
+    HydraZenUnsupportedPrimitiveError,
+    HydraZenValidationError,
+)
 from hydra_zen.funcs import get_obj
 from hydra_zen.structured_configs import _utils
+from hydra_zen.structured_configs._type_guards import safe_getattr
 from hydra_zen.typing import (
     Builds,
+    DataclassOptions,
     Importable,
-    Just,
     PartialBuilds,
     SupportedPrimitive,
     ZenWrappers,
@@ -67,7 +72,6 @@ from hydra_zen.typing._implementations import (
 from ._globals import (
     CONVERT_FIELD_NAME,
     DEFAULTS_LIST_FIELD_NAME,
-    GET_OBJ_LOCATION,
     HYDRA_FIELD_NAMES,
     JUST_FIELD_NAME,
     META_FIELD_NAME,
@@ -80,7 +84,13 @@ from ._globals import (
     ZEN_TARGET_FIELD_NAME,
     ZEN_WRAPPERS_FIELD_NAME,
 )
-from ._type_guards import is_builds, is_just, is_old_partial_builds, uses_zen_processing
+from ._type_guards import (
+    is_builds,
+    is_just,
+    is_old_partial_builds,
+    safe_getattr,
+    uses_zen_processing,
+)
 
 _T = TypeVar("_T")
 
@@ -104,7 +114,9 @@ _VAR_KEYWORD: Final = inspect.Parameter.VAR_KEYWORD
 
 
 _builtin_function_or_method_type = type(len)
-_lru_cache_type = type(functools.lru_cache(maxsize=128)(lambda: None))
+# fmt: off
+_lru_cache_type = type(functools.lru_cache(maxsize=128)(lambda: None))  # pragma: no branch
+# fmt: on
 
 _BUILTIN_TYPES: Final = (_builtin_function_or_method_type, _lru_cache_type)
 
@@ -172,8 +184,11 @@ def mutable_value(x: _T, *, zen_convert: Optional[ZenConvert] = None) -> _T:
     cast = type(x)  # ensure that we return a copy of the default value
     settings = _utils.merge_settings(zen_convert, _BUILDS_CONVERT_SETTINGS)
     del zen_convert
-    x = sanitize_collection(x, convert_dataclass=settings["dataclass"])
-    return field(default_factory=lambda: cast(x))
+
+    if cast in {list, tuple, dict}:
+        x = sanitize_collection(x, convert_dataclass=settings["dataclass"])
+        return field(default_factory=lambda: cast(x))
+    return field(default_factory=lambda: x)
 
 
 @dataclass_transform()
@@ -185,9 +200,18 @@ def hydrated_dataclass(
     zen_meta: Optional[Mapping[str, Any]] = None,
     populate_full_signature: bool = False,
     hydra_recursive: Optional[bool] = None,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
-    frozen: bool = False,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = None,
     zen_convert: Optional[ZenConvert] = None,
+    init: bool = True,
+    repr: bool = True,
+    eq: bool = True,
+    order: bool = False,
+    unsafe_hash: bool = True,
+    frozen: bool = False,
+    match_args: bool = True,
+    kw_only: bool = False,
+    slots: bool = False,
+    weakref_slot: bool = False,
 ) -> Callable[[Type[_T]], Type[_T]]:
     """A decorator that uses `builds` to create a dataclass with the appropriate
     Hydra-specific fields for specifying a targeted config [1]_.
@@ -264,10 +288,80 @@ def hydrated_dataclass(
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting config.
 
+    hydra_convert : Optional[Literal["none", "partial", "all", "object"]], optional (default="none")
+        Determines how Hydra treats the non-primitive, omegaconf-specific objects
+        during instantiateion [3]_.
+
+        - ``"none"``: No conversion occurs; omegaconf containers are passed through (Default)
+        - ``"partial"``: ``DictConfig`` and ``ListConfig`` objects converted to ``dict`` and
+          ``list``, respectively. Structured configs and their fields are passed without conversion.
+        - ``"all"``: All passed objects are converted to dicts, lists, and primitives, without
+          a trace of OmegaConf containers.
+        - ``"object"``: Passed objects are converted to dict and list. Structured Configs are converted to instances of the backing dataclass / attr class.
+
+        If ``None``, the ``_convert_`` attribute is not set on the resulting config.
+
+    init : bool, optional (default=True)
+        If true (the default), a __init__() method will be generated. If the class
+        already defines __init__(), this parameter is ignored.
+
+    repr : bool, optional (default=True)
+        If true (the default), a `__repr__()` method will be generated. The generated
+        repr string will have the class name and the name and repr of each field, in
+        the order they are defined in the class. Fields that are marked as being
+        excluded from the repr are not included. For example:
+        `InventoryItem(name='widget', unit_price=3.0, quantity_on_hand=10)`.
+
+    eq : bool, optional (default=True)
+        If true (the default), an __eq__() method will be generated. This method
+        compares the class as if it were a tuple of its fields, in order. Both
+        instances in the comparison must be of the identical type.
+
+    order : bool, optional (default=False)
+        If true (the default is `False`), `__lt__()`, `__le__()`, `__gt__()`, and
+        `__ge__()` methods will be generated. These compare the class as if it were a
+        tuple of its fields, in order. Both instances in the comparison must be of the
+        identical type. If order is true and eq is false, a ValueError is raised.
+
+        If the class already defines any of `__lt__()`, `__le__()`, `__gt__()`, or
+        `__ge__()`, then `TypeError` is raised.
+
+    unsafe_hash : bool, optional (default=False)
+        If `False` (the default), a `__hash__()` method is generated according to how
+        `eq` and `frozen` are set.
+
+        If `eq` and `frozen` are both true, by default `dataclass()` will generate a
+        `__hash__()` method for you. If `eq` is true and `frozen` is false, `__hash__()
+        ` will be set to `None`, marking it unhashable. If `eq` is false, `__hash__()`
+        will be left untouched meaning the `__hash__()` method of the superclass will
+        be used (if the superclass is object, this means it will fall back to id-based
+        hashing).
+
     frozen : bool, optional (default=False)
-        If ``True``, the resulting config will create frozen (i.e. immutable) instances.
-        I.e. setting/deleting an attribute of an instance will raise
-        :py:class:`dataclasses.FrozenInstanceError` at runtime.
+        If true (the default is `False`), assigning to fields will generate an
+        exception. This emulates read-only frozen instances.
+
+    match_args : bool, optional (default=True)
+        (*New in version 3.10*) If true (the default is `True`), the `__match_args__`
+        tuple will be created from the list of parameters to the generated `__init__()`
+        method (even if `__init__()` is not generated, see above). If false, or if
+        `__match_args__` is already defined in the class, then `__match_args__` will
+        not be generated.
+
+    kw_only : bool, optional (default=False)
+        (*New in version 3.10*) If true (the default value is `False`), then all fields
+        will be marked as keyword-only.
+
+    slots : bool, optional (default=False)
+        (*New in version 3.10*) If true (the default is `False`), `__slots__` attribute
+        will be generated and new class will be returned instead of the original one.
+        If `__slots__` is already defined in the class, then `TypeError` is raised.
+
+    weakref_slot : bool, optional (default=False)
+        (*New in version 3.11*) If true (the default is `False`), add a slot named
+        “__weakref__”, which is required to make an instance weakref-able. It is an
+        error to specify `weakref_slot=True` without also specifying `slots=True`.
+
 
     See Also
     --------
@@ -304,13 +398,19 @@ def hydrated_dataclass(
     Here, we specify a config that is designed to "build" a dictionary
     upon instantiation
 
-    >>> @hydrated_dataclass(target=dict)
+    >>> @hydrated_dataclass(target=dict, frozen=True)
     ... class DictConf:
     ...     x: int = 2
     ...     y: str = 'hello'
 
     >>> instantiate(DictConf(x=10))  # override default `x`
     {'x': 10, 'y': 'hello'}
+
+    >>> d = DictConf()
+    >>> # Static type checker marks the following as
+    >>> # an error because `d` is frozen.
+    >>> d.x = 3  # type: ignore
+    FrozenInstanceError: cannot assign to field 'x'
 
     For more detailed examples, refer to `builds`.
     """
@@ -327,8 +427,21 @@ def hydrated_dataclass(
         #       from, which gets the job done for the most part but there are
         #       practical differences. E.g. you cannot delete an attribute that
         #       was declared in the definition of `decorated_obj`.
-        decorated_obj = cast(Any, decorated_obj)
-        decorated_obj = dataclass(frozen=frozen)(decorated_obj)
+        dc_options = _utils.parse_dataclass_options(
+            {
+                "init": init,
+                "repr": repr,
+                "eq": eq,
+                "order": order,
+                "unsafe_hash": unsafe_hash,
+                "frozen": frozen,
+                "match_args": match_args,
+                "kw_only": kw_only,
+                "slots": slots,
+                "weakref_slot": weakref_slot,
+            }
+        )
+        decorated_obj = dataclass(**dc_options)(decorated_obj)  # type: ignore
 
         if PATCH_OMEGACONF_830 and 2 < len(decorated_obj.__mro__):  # pragma: no cover
             parents = decorated_obj.__mro__[1:-1]
@@ -370,41 +483,38 @@ def hydrated_dataclass(
             zen_partial=zen_partial,
             zen_meta=zen_meta,
             builds_bases=(decorated_obj,),
-            dataclass_name=decorated_obj.__name__,
-            frozen=frozen,
+            zen_dataclass={
+                "cls_name": decorated_obj.__name__,
+                "module": decorated_obj.__module__,
+                "init": init,
+                "repr": repr,
+                "eq": eq,
+                "order": order,
+                "unsafe_hash": unsafe_hash,
+                "frozen": frozen,
+                "match_args": match_args,
+                "kw_only": kw_only,
+                "slots": slots,
+                "weakref_slot": weakref_slot,
+            },
             zen_convert=zen_convert,
         )
-        out.__module__ = decorated_obj.__module__
+
         return out
 
     return wrapper
 
 
-def _just(obj: Importable) -> Type[Just[Importable]]:
-    obj_path = _utils.get_obj_path(obj)
+@dataclass(frozen=True)
+class Just:
+    """Just[T] is a config that returns T when instantiated."""
 
-    entry: List[Tuple[Any, Any, Field[Any]]] = [
-        (
-            TARGET_FIELD_NAME,
-            str,
-            _utils.field(default=GET_OBJ_LOCATION, init=False),
-        ),
-        (
-            JUST_FIELD_NAME,
-            str,
-            _utils.field(
-                default=obj_path,
-                init=False,
-            ),
-        ),
-    ]
+    path: str
+    _target_: str = field(default="hydra_zen.funcs.get_obj", init=False, repr=False)
 
-    out_class = make_dataclass(("Just_" + _utils.safe_name(obj)), entry)
-    out_class.__doc__ = (
-        f"A structured config designed to return {obj} when it is instantiated by hydra"
-    )
 
-    return cast(Type[Just[Importable]], out_class)
+def _just(obj: Any) -> Just:
+    return Just(path=_utils.get_obj_path(obj))
 
 
 def _is_ufunc(value: Any) -> bool:
@@ -431,6 +541,19 @@ def _is_jax_compiled_func(value: Any) -> bool:  # pragma: no cover
         return False
 
 
+def _is_torch_optim_required(value: Any) -> bool:  # pragma: no cover
+    torch_optim_optimizer = sys.modules.get("torch.optim.optimizer")
+
+    if torch_optim_optimizer is None:
+        return False
+
+    try:
+        required = getattr(torch_optim_optimizer, "required")
+        return value is required
+    except AttributeError:
+        return False
+
+
 def _check_for_dynamically_defined_dataclass_type(target_path: str, value: Any) -> None:
     if target_path.startswith("types."):
         raise HydraZenUnsupportedPrimitiveError(
@@ -450,7 +573,8 @@ def sanitized_default_value(
     structured_conf_permitted: bool = True,
     convert_dataclass: bool,
     hydra_recursive: Optional[bool] = None,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = None,
+    zen_dataclass: Optional[DataclassOptions] = None,
 ) -> Any:
     """Converts `value` to Hydra-supported type if necessary and possible. Otherwise
     raises `HydraZenUnsupportedPrimitiveError`"""
@@ -468,6 +592,9 @@ def sanitized_default_value(
             hydra_convert=hydra_convert,
             hydra_recursive=hydra_recursive,
         )
+
+    if zen_dataclass is None:
+        zen_dataclass = {}
 
     # non-targeted dataclass instance
     if (
@@ -491,7 +618,7 @@ def sanitized_default_value(
         converted_fields = {}
         for _field in _val_fields:
             if _field.init and hasattr(value, _field.name):
-                _val = getattr(value, _field.name)
+                _val = safe_getattr(value, _field.name)
                 converted_fields[_field.name] = sanitized_default_value(
                     _val,
                     allow_zen_conversion=allow_zen_conversion,
@@ -504,9 +631,10 @@ def sanitized_default_value(
             **converted_fields,
             hydra_recursive=hydra_recursive,
             hydra_convert=hydra_convert,
+            zen_dataclass=zen_dataclass,
         )
         _check_for_dynamically_defined_dataclass_type(
-            getattr(out, TARGET_FIELD_NAME), value
+            safe_getattr(out, TARGET_FIELD_NAME), value
         )
         return out
 
@@ -531,10 +659,10 @@ def sanitized_default_value(
     ):
         # `value` is importable callable -- create config that will import
         # `value` upon instantiation
-        out = _just(value)  # type: ignore
+        out = _just(value)
         if convert_dataclass and is_dataclass(value):
             _check_for_dynamically_defined_dataclass_type(
-                getattr(out, JUST_FIELD_NAME), value
+                safe_getattr(out, JUST_FIELD_NAME), value
             )
         return out
 
@@ -547,11 +675,10 @@ def sanitized_default_value(
     # primitives
     if allow_zen_conversion and type_of_value in ZEN_SUPPORTED_PRIMITIVES:
         type_ = type(resolved_value)
-        conversion_fn = ZEN_VALUE_CONVERSION.get(type_)
+        conversion_fn = ZEN_VALUE_CONVERSION[type_]
 
-        if conversion_fn is not None:
-            resolved_value = conversion_fn(resolved_value)
-            type_of_value = type(resolved_value)
+        resolved_value = conversion_fn(resolved_value)
+        type_of_value = type(resolved_value)
 
     if type_of_value in HYDRA_SUPPORTED_PRIMITIVES or (
         structured_conf_permitted
@@ -587,8 +714,14 @@ def sanitized_default_value(
     if isinstance(value, str):
         # Supports pydantic.AnyURL
         _v = str(value)
-        if type(_v) is str:
+        if type(_v) is str:  # pragma: no branch
             return _v
+        else:  # pragma: no cover
+            del _v
+
+    # support for torch objects
+    if _is_torch_optim_required(value):  # pragma: no cover
+        return MISSING
 
     # `value` could no be converted to Hydra-compatible representation.
     # Raise error
@@ -615,7 +748,7 @@ def sanitize_collection(
     *,
     convert_dataclass: bool,
     hydra_recursive: Optional[bool] = None,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = None,
 ) -> _T:
     """Pass contents of lists, tuples, or dicts through sanitized_default_values"""
     type_x = type(x)
@@ -667,6 +800,8 @@ def sanitized_field(
     if (
         type_value in _utils.KNOWN_MUTABLE_TYPES
         and type_value in HYDRA_SUPPORTED_PRIMITIVES
+    ) or (
+        is_dataclass(value) and not isinstance(value, type) and value.__hash__ is None
     ):
         if _mutable_default_permitted:
             return cast(
@@ -691,13 +826,14 @@ def builds(
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
     hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     hydra_defaults: Optional[DefaultsList] = ...,
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[()] = ...,
+    zen_dataclass: Optional[DataclassOptions] = None,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
-) -> Type[BuildsWithSig[Type[R], P]]:  # pragma: no cover
+) -> Type[BuildsWithSig[Type[R], P]]:
     ...
 
 
@@ -711,14 +847,15 @@ def builds(
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
     hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     hydra_defaults: Optional[DefaultsList] = ...,
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
+    zen_dataclass: Optional[DataclassOptions] = None,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     **kwargs_for_target: SupportedPrimitive,
-) -> Type[Builds[Importable]]:  # pragma: no cover
+) -> Type[Builds[Importable]]:
     ...
 
 
@@ -732,14 +869,15 @@ def builds(
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
     hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     hydra_defaults: Optional[DefaultsList] = ...,
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
+    zen_dataclass: Optional[DataclassOptions] = None,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     **kwargs_for_target: SupportedPrimitive,
-) -> Type[PartialBuilds[Importable]]:  # pragma: no cover
+) -> Type[PartialBuilds[Importable]]:
     ...
 
 
@@ -753,17 +891,15 @@ def builds(
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
     hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     hydra_defaults: Optional[DefaultsList] = ...,
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
+    zen_dataclass: Optional[DataclassOptions] = None,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     **kwargs_for_target: SupportedPrimitive,
-) -> Union[
-    Type[Builds[Importable]],
-    Type[PartialBuilds[Importable]],
-]:  # pragma: no cover
+) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]],]:
     ...
 
 
@@ -777,10 +913,11 @@ def builds(
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
     hydra_recursive: Optional[bool] = ...,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     hydra_defaults: Optional[DefaultsList] = ...,
     dataclass_name: Optional[str] = ...,
     builds_bases: Tuple[Type[DataClass_], ...] = ...,
+    zen_dataclass: Optional[DataclassOptions] = None,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     **kwargs_for_target: SupportedPrimitive,
@@ -788,7 +925,7 @@ def builds(
     Type[Builds[Importable]],
     Type[PartialBuilds[Importable]],
     Type[BuildsWithSig[Type[R], P]],
-]:  # pragma: no cover
+]:
     ...
 
 
@@ -800,11 +937,10 @@ def builds(
     populate_full_signature: bool = False,
     zen_convert: Optional[ZenConvert] = None,
     hydra_recursive: Optional[bool] = None,
-    hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
+    hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = None,
     hydra_defaults: Optional[DefaultsList] = None,
-    frozen: bool = False,
     builds_bases: Tuple[Type[DataClass_], ...] = (),
-    dataclass_name: Optional[str] = None,
+    zen_dataclass: Optional[DataclassOptions] = None,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Union[
     Type[Builds[Importable]],
@@ -813,12 +949,13 @@ def builds(
 ]:
     """builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, hydra_recursive=None, hydra_convert=None, hydra_defaults=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
 
-    `builds(target, *args, **kw)` returns a config that, when instantiated, builds `target`.
+    `builds(target, *args, **kw)` returns a Hydra-compatible config that, when
+    instantiated, returns `target(*args, **kw)`.
 
-    `instantiate(builds(target, *args, **kw)) == target(*args, **kw)`
+    I.e., `instantiate(builds(target, *args, **kw)) == target(*args, **kw)`
 
-    Consult the Examples section of the docstring to see the various features of
-    `builds` in action.
+    Consult the Notes section for more details, and the Examples section to see
+    the various features of `builds` in action.
 
     Parameters
     ----------
@@ -830,14 +967,14 @@ def builds(
         Positional arguments passed as ``<hydra_target>(*pos_args, ...)`` upon
         instantiation.
 
-        Arguments specified positionally are not included in the dataclass' signature
+        Arguments specified positionally are not included in the config's signature
         and are stored as a tuple bound to in the ``_args_`` field.
 
     **kwargs_for_target : SupportedPrimitive
         The keyword arguments passed as ``<hydra_target>(..., **kwargs_for_target)``
         upon instantiation.
 
-        The arguments specified here solely determine the signature of the resulting
+        The arguments specified here determine the signature of the resulting
         config, unless ``populate_full_signature=True`` is specified (see below).
 
         Named parameters of the forms that have the prefixes ``hydra_``, ``zen_`` or
@@ -896,7 +1033,7 @@ def builds(
 
         If ``None``, the ``_recursive_`` attribute is not set on the resulting config.
 
-    hydra_convert : Optional[Literal["none", "partial", "all"]], optional (default="none")
+    hydra_convert : Optional[Literal["none", "partial", "all", "object"]], optional (default="none")
         Determines how Hydra handles the non-primitive, omegaconf-specific objects passed to
         ``<hydra_target>`` [4]_.
 
@@ -905,6 +1042,7 @@ def builds(
           ``list``, respectively. Structured configs and their fields are passed without conversion.
         - ``"all"``: All passed objects are converted to dicts, lists, and primitives, without
           a trace of OmegaConf containers.
+        - ``"object"``: Passed objects are converted to dict and list. Structured Configs are converted to instances of the backing dataclass / attr class.
 
         If ``None``, the ``_convert_`` attribute is not set on the resulting config.
 
@@ -913,19 +1051,35 @@ def builds(
         [6]_ [7]_. Each input config can have a Defaults List as a top level element. The
         Defaults List itself is not a part of output config.
 
+    zen_dataclass : Optional[DataclassOptions]
+        A dictionary that can specify any option that is supported by
+        :py:func:`dataclasses.make_dataclass` other than `fields`.
+        The default value for `unsafe_hash` is `True`.
+
+        Additionally, the `module` field can be specified to enable pickle
+        compatibility. See `hydra_zen.typing.DataclassOptions` for details.
+
     frozen : bool, optional (default=False)
+        .. deprecated:: 0.9.0
+            `frozen` will be removed in hydra-zen 0.10.0. It is replaced by
+            `zen_dataclass={'frozen': <bool>}`.
+
         If ``True``, the resulting config will create frozen (i.e. immutable) instances.
         I.e. setting/deleting an attribute of an instance will raise
         :py:class:`dataclasses.FrozenInstanceError` at runtime.
 
-
     dataclass_name : Optional[str]
+        .. deprecated:: 0.9.0
+            `dataclass_name` will be removed in hydra-zen 0.10.0. It is replaced by
+            `zen_dataclass={'cls_name': <str>}`.
+
         If specified, determines the name of the returned class object.
 
     Returns
     -------
     Config : Type[Builds[Type[T]]] | Type[PartialBuilds[Type[T]]]
-        A structured config that describes how to build ``hydra_target``.
+        A dynamically-generated structured config (i.e. a dataclass type) that
+        describes how to build ``hydra_target``.
 
     Raises
     ------
@@ -935,9 +1089,45 @@ def builds(
 
     Notes
     -----
+    The following pseudo code conveys the core functionality of `builds`:
+
+    .. code-block:: python
+
+       from dataclasses import make_dataclass
+
+       def builds(target, populate_full_signature=False, **kw):
+           # Dynamically defines a Hydra-compatible dataclass type.
+           # Akin to doing:
+           #
+           # @dataclass
+           # class Builds_thing:
+           #     _target_: str = get_import_path(target)
+           #     # etc.
+
+           _target_ = get_import_path(target)
+
+           if populate_full_signature:
+               sig = get_signature(target)
+               kw = {**sig, **kw}  # merge w/ preference for kw
+
+           type_annots = [get_hints(target)[k] for k in kw]
+
+           fields = [("_target_", str, _target_)]
+           fields += [
+               (
+                   field_name,
+                   hydra_compat_type_annot(hint),
+                   hydra_compat_val(v),
+               )
+               for hint, (field_name, v) in zip(type_annots, kw.items())
+           ]
+
+           Config = make_dataclass(f"Builds_{target}", fields)
+           return Config
+
     The resulting "config" is a dynamically-generated dataclass type [5]_ with
-    Hydra-specific attributes attached to it [1]_. It posseses a `_target_` attribute
-    that indicates the import path to the configured target as a string.
+    Hydra-specific attributes attached to it [1]_. It possesses a `_target_`
+    attribute that indicates the import path to the configured target as a string.
 
     Using any of the ``zen_xx`` features will result in a config that depends
     explicitly on hydra-zen. I.e. hydra-zen must be installed in order to
@@ -967,7 +1157,7 @@ def builds(
     See Also
     --------
     instantiate: Instantiates a configuration created by `builds`, returning the instantiated target.
-    make_custom_builds_fn: Returns the `builds` function, but one with customized default values.
+    make_custom_builds_fn: Returns a new `builds` function with customized default values.
     make_config: Creates a general config with customized field names, default values, and annotations.
     get_target: Returns the target-object from a targeted structured config.
     just: Produces a config that, when instantiated by Hydra, "just" returns the un-instantiated target-object.
@@ -975,21 +1165,41 @@ def builds(
 
     Examples
     --------
+    These examples describe:
+
+    - Basic usage
+    - Creating a partial config
+    - Auto-populating parameters
+    - Composing configs via inheritance
+    - Runtime validation performed by builds
+    - Using meta-fields
+    - Using zen-wrappers
+    - Creating a pickle-compatible config
+    - Creating a frozen config
+    - Support for partial'd targets
+
+    A helpful utility for printing examples
+
+    >>> from hydra_zen import builds, instantiate, to_yaml
+    >>> def pyaml(x):
+    ...     # for pretty printing configs
+    ...     print(to_yaml(x))
+
     **Basic Usage**
 
     Lets create a basic config that describes how to 'build' a particular dictionary.
 
-    >>> from hydra_zen import builds, instantiate
     >>> Conf = builds(dict, a=1, b='x')
 
     The resulting config is a dataclass with the following signature and attributes:
 
     >>> Conf  # signature: Conf(a: Any = 1, b: Any = 'x')
     <class 'types.Builds_dict'>
-    >>> Conf.a
-    1
-    >>> Conf.b
-    'x'
+
+    >>> pyaml(Conf)
+    _target_: builtins.dict
+    a: 1
+    b: x
 
     The `instantiate` function is used to enact this build – to create the dictionary.
 
@@ -1002,9 +1212,11 @@ def builds(
     >>> instantiate(new_conf)  # calls: `dict(a=10, b='hi')`
     {'a': 10, 'b': 'hi'}
 
-    Positional arguments can be provided too.
+    Positional arguments are supported.
 
-    >>> Conf = builds(len, [1, 2, 3])  # specifying positional arguments
+    >>> Conf = builds(len, [1, 2, 3])
+    >>> Conf._args_  # type: ignore
+    [1, 2, 3]
     >>> instantiate(Conf)
     3
 
@@ -1018,8 +1230,12 @@ def builds(
     such that we only configure the parameter ``x``.
 
     >>> PartialConf = builds(a_two_tuple, x=1, zen_partial=True)  # configures only `x`
+    >>> pyaml(PartialConf)
+    _target_: __main__.a_two_tuple
+    _partial_: true
+    x: 1
 
-    Instantiating this conf will return ``functools.partial(a_two_tuple, x=1)``.
+    Instantiating this config will return ``functools.partial(a_two_tuple, x=1)``.
 
     >>> partial_func = instantiate(PartialConf)
     >>> partial_func
@@ -1035,23 +1251,26 @@ def builds(
     The configurable parameters of a target can be auto-populated in our config.
     Suppose we want to configure the following function.
 
-    >>> def f(x: bool, y: str = 'foo'): return x, y
+    >>> def bar(x: bool, y: str = 'foo'): return x, y
 
     The following config will have a signature that matches ``f``; the
     annotations and default values of the parameters of ``f`` are explicitly
     incorporated into the config.
 
-    >>> Conf = builds(f, populate_full_signature=True)  # signature: `Builds_f(x: bool, y: str = 'foo')`
-    >>> Conf.y
-    'foo'
+    >>> # signature: `Builds_bar(x: bool, y: str = 'foo')`
+    >>> Conf = builds(bar, populate_full_signature=True)
+    >>> pyaml(Conf)
+    _target_: __main__.bar
+    x: ???
+    'y': foo
 
     Annotations will be used by Hydra to provide limited runtime type-checking during
     instantiation. Here, we'll pass a float for ``x``, which expects a boolean value.
 
-    >>> instantiate(Conf(x=10.0))
+    >>> instantiate(Conf(x=10.0))  # type: ignore
     ValidationError: Value '10.0' is not a valid bool (type float)
         full_key: x
-        object_type=Builds_f
+        object_type=Builds_func
 
     **Composing configs via inheritance**
 
@@ -1067,10 +1286,10 @@ def builds(
 
     .. _builds-validation:
 
-    **Runtime validation perfomed by builds**
+    **Runtime validation performed by builds**
 
     Misspelled parameter names and other invalid configurations for the target’s
-    signature will be caught by `builds`, so that such errors are caught prior to
+    signature will be caught by `builds` so that such errors are caught prior to
     instantiation.
 
     >>> def func(a_number: int): pass
@@ -1085,7 +1304,8 @@ def builds(
     >>> builds(func, 1, builds_bases=(BaseConf,))  # too many args (via inheritance)
     TypeError: Building: func ..
 
-    >>> builds(int, (i for i in range(10)))  # value type not supported by Hydra
+    >>> # value type not supported by Hydra
+    >>> builds(int, (i for i in range(10)))  # type: ignore
     hydra_zen.errors.HydraZenUnsupportedPrimitiveError: Building: int ..
 
 
@@ -1113,9 +1333,9 @@ def builds(
     and/or its outputs during the instantiation process.
 
     Let's use a wrapper to add a unit-conversion step to a config. We'll modify a
-    config that builds a function, which converts a temperature in Farenheit to
-    Celcius, and add a wrapper to it so that it will convert from Farenheit to Kelvin
-    instead.
+    config that builds a function, which converts a temperature in Fahrenheit to
+    Celsius, and add a wrapper to it so that it will convert from Fahrenheit to
+    Kelvin instead.
 
     >>> def faren_to_celsius(temp_f):  # our target
     ...     return ((temp_f - 32) * 5) / 9
@@ -1132,11 +1352,29 @@ def builds(
     >>> instantiate(AsKelvin, temp_f=32)
     273.15
 
+    **Creating a pickle-compatible config**
+
+    The dynamically-generated classes created by `builds` can be made pickle-compatible
+    by specifying the name of the symbol that it is assigned to and the module in which
+    it was defined.
+
+    .. code-block:: python
+
+       # contents of mylib/foo.py
+       from pickle import dumps, loads
+
+       DictConf = builds(dict,
+                         zen_dataclass={'module': 'mylib.foo',
+                                        'cls_name': 'DictConf'})
+
+       assert DictConf is loads(dumps(DictConf))
+
+
     **Creating a frozen config**
 
     Let's create a config object whose instances will by "frozen" (i.e., immutable).
 
-    >>> RouterConfig = builds(dict, ip_address=None, frozen=True)
+    >>> RouterConfig = builds(dict, ip_address=None, zen_dataclass={'frozen': True})
     >>> my_router = RouterConfig(ip_address="192.168.56.1")  # an immutable instance
 
     Attempting to overwrite the attributes of ``my_router`` will raise.
@@ -1144,7 +1382,7 @@ def builds(
     >>> my_router.ip_address = "148.109.37.2"
     FrozenInstanceError: cannot assign to field 'ip_address'
 
-    **Support for partial'd objects**
+    **Support for partial'd targets**
 
     Specifying ``builds(functools.partial(<target>, ...), ...)`` is supported; `builds`
     will automatically "unpack" a partial'd object that is passed as its target.
@@ -1152,13 +1390,44 @@ def builds(
     >>> import functools
     >>> partiald_dict = functools.partial(dict, a=1, b=2)
     >>> Conf = builds(partiald_dict)  # signature: (a = 1, b = 2)
-    >>> Conf.a, Conf.b
-    (1, 2)
+    >>> instantiate(Conf)  # equivalent to calling: `partiald_dict()`
+    {'a': 1, 'b': 2}
     >>> instantiate(Conf(a=-4))  # equivalent to calling: `partiald_dict(a=-4)`
     {'a': -4, 'b': 2}
     """
-
     zen_convert_settings = _utils.merge_settings(zen_convert, _BUILDS_CONVERT_SETTINGS)
+    if zen_dataclass is None:
+        zen_dataclass = {}
+
+    # initial validation
+    _utils.parse_dataclass_options(zen_dataclass)
+
+    if "frozen" in kwargs_for_target:
+        warnings.warn(
+            HydraZenDeprecationWarning(
+                "Specifying `builds(..., frozen=<...>)` is deprecated. Instead, "
+                "specify `builds(..., zen_dataclass={'frozen': <...>})"
+            ),
+            stacklevel=2,
+        )
+        zen_dataclass["frozen"] = kwargs_for_target.pop("frozen")  # type: ignore
+
+    if "dataclass_name" in kwargs_for_target:
+        warnings.warn(
+            HydraZenDeprecationWarning(
+                "Specifying `builds(..., dataclass_name=<...>)` is deprecated. "
+                "Instead specify `builds(..., zen_dataclass={'cls_name': <...>})"
+            ),
+            stacklevel=2,
+        )
+        zen_dataclass["cls_name"] = kwargs_for_target.pop("dataclass_name")  # type: ignore
+    if not builds_bases:
+        builds_bases = zen_dataclass.get("bases", ())
+
+    dataclass_options = _utils.parse_dataclass_options(zen_dataclass)
+    dataclass_name = dataclass_options.pop("cls_name", None)
+    module = dataclass_options.pop("module", None)
+
     del zen_convert
 
     if not pos_args and not kwargs_for_target:
@@ -1205,14 +1474,6 @@ def builds(
         hydra_recursive=hydra_recursive, hydra_convert=hydra_convert
     )
 
-    if not isinstance(frozen, bool):
-        raise TypeError(f"frozen must be a bool, got: {frozen}")
-
-    if dataclass_name is not None and not isinstance(dataclass_name, str):
-        raise TypeError(
-            f"`dataclass_name` must be a string or None, got: {dataclass_name}"
-        )
-
     if any(not (is_dataclass(_b) and isinstance(_b, type)) for _b in builds_bases):
         raise TypeError("All `build_bases` must be a tuple of dataclass types")
 
@@ -1240,15 +1501,18 @@ def builds(
                 continue
             # We are intentionally keeping each condition branched
             # so that test-coverage will be checked for each one
+            if isinstance(wrapper, functools.partial):
+                wrapper = ZEN_VALUE_CONVERSION[functools.partial](wrapper)
+
             if is_builds(wrapper):
                 # If Hydra's locate function starts supporting importing literals
                 # – or if we decide to ship our own locate function –
                 # then we should get the target of `wrapper` and make sure it is callable
                 if is_just(wrapper):
                     # `zen_wrappers` handles importing string; we can
-                    # elimintate the indirection of Just and "flatten" this
+                    # eliminate the indirection of Just and "flatten" this
                     # config
-                    validated_wrappers.append(getattr(wrapper, JUST_FIELD_NAME))
+                    validated_wrappers.append(safe_getattr(wrapper, JUST_FIELD_NAME))
                 else:
                     if hydra_recursive is False:
                         warnings.warn(
@@ -1319,13 +1583,13 @@ def builds(
     for base in builds_bases:
         _set_this_iteration = False
         if HYDRA_SUPPORTS_PARTIAL and base_hydra_partial is None:
-            base_hydra_partial = getattr(base, PARTIAL_FIELD_NAME, None)
+            base_hydra_partial = safe_getattr(base, PARTIAL_FIELD_NAME, None)
             if parent_partial is None:
                 parent_partial = base_hydra_partial
                 _set_this_iteration = True
 
         if base_zen_partial is None:
-            base_zen_partial = getattr(base, ZEN_PARTIAL_FIELD_NAME, None)
+            base_zen_partial = safe_getattr(base, ZEN_PARTIAL_FIELD_NAME, None)
             if parent_partial is None or (
                 _set_this_iteration and base_zen_partial is not None
             ):
@@ -1353,8 +1617,7 @@ def builds(
 
     del base_zen_partial
 
-    if not requires_zen_processing and requires_partial_field:  # pragma: no cover
-        # TODO: require test-coverage once Hydra publishes nightly builds
+    if not requires_zen_processing and requires_partial_field:
         target_field = [
             (
                 TARGET_FIELD_NAME,
@@ -1542,12 +1805,16 @@ def builds(
         ):
             _params = tuple(inspect.signature(target.__init__).parameters.items())
 
-            if _params and _params[0][1].kind is not _VAR_POSITIONAL:
+            if (
+                _params and _params[0][1].kind is not _VAR_POSITIONAL
+            ):  # pragma: no cover
                 # Exclude self/cls
                 #
                 # There are weird edge cases, like in collections.Counter for Python 3.7
                 # where the first arg is *args, not self.
                 _params = _params[1:]
+            else:  # pragma: no cover
+                pass
 
             signature_params = {k: v for k, v in _params}
             del _params
@@ -1630,7 +1897,7 @@ def builds(
     if not _pos_args and builds_bases:
         # pos_args is potentially inherited
         for _base in builds_bases:
-            _pos_args = getattr(_base, POS_ARG_FIELD_NAME, ())
+            _pos_args = safe_getattr(_base, POS_ARG_FIELD_NAME, ())
 
             # validates
             _pos_args = tuple(
@@ -1899,7 +2166,7 @@ def builds(
 
             # If `.default` is not set, then `value` is a Hydra-supported mutable
             # value, and thus it is "sanitized"
-            sanitized_value = getattr(_field, "default", value)
+            sanitized_value = safe_getattr(_field, "default", value)
             sanitized_type = (
                 _utils.sanitized_type(type_, wrap_optional=sanitized_value is None)
                 if _retain_type_info(
@@ -1912,15 +2179,20 @@ def builds(
             del _field
             del sanitized_value
 
-    out = make_dataclass(
-        dataclass_name, fields=sanitized_base_fields, bases=builds_bases, frozen=frozen
-    )
+    dataclass_options["cls_name"] = dataclass_name
+    dataclass_options["bases"] = builds_bases
+    assert _utils.parse_strict_dataclass_options(dataclass_options)
+
+    out = make_dataclass(fields=sanitized_base_fields, **dataclass_options)
+
+    if module is not None:
+        out.__module__ = module
 
     out.__doc__ = (
-        f"A structured config designed to {'partially ' if zen_partial else ''}initialize/call "
-        f"`{target_path}` upon instantiation by hydra."
+        f"A structured config designed to {'partially ' if zen_partial else ''}"
+        f"initialize/call `{target_path}` upon instantiation by hydra."
     )
-    if hasattr(target, "__doc__"):
+    if hasattr(target, "__doc__"):  # pragma: no branch
         target_doc = target.__doc__
         if target_doc:
             out.__doc__ += (
@@ -1933,19 +2205,19 @@ def builds(
     assert not (
         HYDRA_SUPPORTS_PARTIAL
         and requires_zen_processing
-        and getattr(out, PARTIAL_FIELD_NAME, False)
+        and safe_getattr(out, PARTIAL_FIELD_NAME, False)
     )
 
     return cast(Union[Type[Builds[Importable]], Type[BuildsWithSig[Type[R], P]]], out)
 
 
 @overload
-def get_target(obj: InstOrType[Builds[_T]]) -> _T:  # pragma: no cover
+def get_target(obj: InstOrType[Builds[_T]]) -> _T:
     ...
 
 
 @overload
-def get_target(obj: HasTarget) -> Any:  # pragma: no cover
+def get_target(obj: HasTarget) -> Any:
     ...
 
 
@@ -2004,7 +2276,7 @@ def get_target(obj: HasTarget) -> Any:
     Note that the target of ``loaded_conf`` can be accessed without
     instantiating the config.
 
-    >>> get_target(loaded_conf)
+    >>> get_target(loaded_conf)  # type: ignore
     __main__.B
     """
     if is_old_partial_builds(obj):
@@ -2022,7 +2294,7 @@ def get_target(obj: HasTarget) -> Any:
             f" {TARGET_FIELD_NAME} or named {ZEN_PARTIAL_FIELD_NAME} that"
             f" points to a target-object or target-string"
         )
-    target = getattr(obj, field_name)
+    target = safe_getattr(obj, field_name)
 
     if isinstance(target, str):
         target = get_obj(path=target)

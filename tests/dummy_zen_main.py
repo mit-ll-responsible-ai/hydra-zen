@@ -1,3 +1,5 @@
+# Copyright (c) 2022 Massachusetts Institute of Technology
+# SPDX-License-Identifier: MIT
 import random
 
 from hydra.core.config_store import ConfigStore
