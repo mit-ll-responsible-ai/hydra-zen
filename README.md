@@ -85,7 +85,7 @@ Using `hydra-zen` for your research? Please cite the following publication:
 
 DISTRIBUTION STATEMENT A. Approved for public release: distribution unlimited.
 
-© 2022 MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+© 2023 MassACHUSETTS INSTITUTE OF TECHNOLOGY
     
     Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014)
     SPDX-License-Identifier: MIT
