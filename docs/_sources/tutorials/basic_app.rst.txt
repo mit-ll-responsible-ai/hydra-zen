@@ -71,6 +71,7 @@ Hydra-based application:
 1. A "config", which defines the configurable interface of our application.
 2. A task function, which accepts the populated config, and whose body specifies the code that will be executed when our application is launched.
 
+Once we create this typical Hydra app, we will iterate on it and simplify things by using how hydra-zen's :func:`hydra_zen.zen` wrapper.
 
 Writing the Application
 -----------------------
@@ -125,12 +126,14 @@ We will also need to import hydra-zen's :func:`~hydra_zen.launch` function.
 Next, we will launch our application by providing the :func:`~hydra_zen.launch` 
 function with: our config, our task function, and specific configured values for the 
 player's names. Here, we will use the names ``link`` and ``zelda`` for the names of 
-player 1 and player 2, respectively.
+player 1 and player 2, respectively. The ``version_base`` parameter controls some of the default behaviors of Hydra [1]_.
+
 
 .. code-block:: pycon
    :caption: Launching our application
 
-   >>> job = launch(Config, task_function, overrides=["player1=link", "player2=zelda"])
+   >>> job = launch(Config, task_function, overrides=["player1=link", "player2=zelda"], version_base="1.1")
+
 
 Let's inspect the completion status of this job by inspecting ``job.status``; it should
 indicate ``COMPLETED``.
@@ -224,6 +227,63 @@ we can inspect ``config.yaml``.
 We successfully designed, configured, and launched an application using hydra-zen and 
 Hydra! In the next tutorial, we will add a command line interface to this app.
 
+In the final section, let's see how we can simplify some of our code using special features provided by hydra-zen.
+
+Simplifying Things with :func:`hydra_zen.zen`
+---------------------------------------------
+
+.. note:: This part of the tutorial requires ``hydra-zen v0.9.0`` or later to be installed.
+
+We can simplify our task function, removing Hydra-specific logic from it, by using :func:`hydra_zen.zen`. 
+
+Let's update our task function in `my_app.py` to be a simple function whose signature determines the fields that will be extracted and instantiated from our config.
+Then we can use :func:`hydra_zen.builds`, instead of :func:`hydra_zen.make_config`, to generate our config based off of the task function's signature.
+
+
+.. code-block:: python
+   :caption: Simplified contents of my_app.py:
+    
+   from hydra_zen import builds
+    
+   def new_task_function(player1, player2):
+       # write the log with the names
+       with open("player_log.txt", "w") as f:
+           f.write("Game session log:\n")
+           f.write(f"Player 1: {player1}\n" f"Player 2: {player2}")
+
+       return player1, player2
+
+   # auto-populates the fields of our configs based on the signature of
+   # `task_function`
+   Config = builds(new_task_function, populate_full_signature=True)
+
+
+Wrapping this function as
+
+.. code-block:: python
+   :caption: Simplified contents of my_app.py:
+    
+   from hydra_zen import zen
+
+   hydra_compat_task_fn = zen(task_function)
+
+returns a Hydra-compatible task function, which accepts a single input config just like our original task function did. However, the `zen` wrapper adds the logic of extracting
+and instantiating the `player1` and `player2` fields from our config for us.
+
+Now we will supply a zen-wrapped version of our task function to :func:`hydra_zen.launch`; all other aspects of launching our app and inspecting its results are unchanged.
+
+.. code-block:: pycon
+   :caption: Launching our application
+
+   >>> from my_app import Config, new_task_function
+   >>> from hydra_zen import zen, launch
+   >>> wrapped_fn = zen(new_task_function)
+   >>> job = launch(Config, wrapped_fn, overrides=["player1=link", "player2=zelda"], version_base="1.1")
+
+See that we were able to launch the same app as before, but with some additional benefits:
+
+- Our task function does not have any Hydra-specific logic and can be used for other purposes.
+- We can utilize :func:`hydra_zen.builds` to auto-populate our config instead of hand-specifying the fields.
 
 Reference Documentation
 =======================
@@ -233,9 +293,14 @@ tutorial section.
 
 - :func:`~hydra_zen.make_config`
 - :func:`~hydra_zen.launch`
+- `Hydra's version_base <https://hydra.cc/docs/upgrades/version_base/#internaldocs-banner>`_
 
 
 .. attention:: **Cleaning Up**:
    To clean up after this tutorial, delete the ``outputs`` directory that Hydra created 
    upon launching our application. You can find this in the same directory as your 
    ``my_app.py`` file.
+
+Footnotes
+==========
+.. [1] Specifically, we want to ensure that Hydra will `change its working directory to its "jobdir" <https://hydra.cc/docs/upgrades/1.1_to_1.2/changes_to_job_working_dir/>`_ when we launch our app.

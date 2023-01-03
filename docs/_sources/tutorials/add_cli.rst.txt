@@ -16,7 +16,7 @@ Add a Command Line Interface to Our Application
 ===============================================
 
 In this tutorial we will update our project so that it can be configured and launched 
-from a command line interface, using Hydra.
+from a command line interface (CLI), using Hydra.
 
 
 Modifying Our Project
@@ -24,45 +24,41 @@ Modifying Our Project
 
 Open ``my_app.py`` in your editor. We will make the following modifications to it:
 
-1. Register our config in Hydra's "config store".
-2. Decorate our task function to tell Hydra what config to use to define its interface.
-3. Add a ``__main__`` clause to our ``my_app.py`` script so that the script runs our task function.
+1. User :func:`hydra_zen.store` to generate for our task function and to store it in Hydra's global config store.
+2. Add a ``__main__`` clause to our ``my_app.py`` script so that the script runs our task function.
+3. Use :func:`hydra_zen.zen` to wrap the task function and to generate the CLI.
 
 Modify your script to match this:
 
 .. code-block:: python
    :caption: Contents of my_app.py:
 
-   import hydra
-   from hydra.core.config_store import ConfigStore
+   from hydra_zen import store, zen
    
-   from hydra_zen import instantiate, make_config
-   
-   Config = make_config("player1", "player2")
-   
-   # 1) Register our config with Hydra's config store
-   cs = ConfigStore.instance()
-   cs.store(name="my_app", node=Config)
-   
-   
-   # 2) Tell Hydra what config to use for our task-function.
-   #    The name specified here - 'config' - must match the
-   #    name that we provided to `cs.store(name=<...>, node=Config)`
-   @hydra.main(config_path=None, config_name="my_app")
-   def task_function(cfg):
-       # cfg: Config
-       obj = instantiate(cfg)
-       p1 = obj.player1
-       p2 = obj.player2
-   
+   # 1) `hydra_zen.store generates a config for our task function
+   #    and stores it locally under the entry-name "my_app"
+   @store(name="my_app")
+   def task_function(player1, player2):
+       # write the log with the names
        with open("player_log.txt", "w") as f:
            f.write("Game session log:\n")
-           f.write(f"Player 1: {p1}\n" f"Player 2: {p2}")
-   
-   
-   # 3) Executing `python my_app.py [...]` will run our task function
+           f.write(f"Player 1: {player1}\n" f"Player 2: {player2}")
+
+       return player1, player2
+      
+   # 2) Executing `python my_app.py [...]` will run our task function
    if __name__ == "__main__":
-       task_function()
+       # 3) We need to add the configs from our local store to Hydra's
+       #    global config store 
+       store.add_to_hydra_store()
+       
+       # 4) Our zen-wrapped task function is used to generate
+       #    the CLI, and to specify which config we want to use
+       #    to configure the app by default
+       zen(task_function).hydra_main(config_name="my_app", 
+                                     version_base="1.1",
+                                     config_path=None,
+                                     )
 
 
 Launching Our Application from the Command Line
@@ -145,7 +141,7 @@ Want a deeper understanding of how hydra-zen and Hydra work?
 The following reference materials are especially relevant to this
 tutorial section.
 
-- `~hydra_zen.make_config`
+- `~hydra_zen.store`
 - :hydra:`Hydra's Config Store API <tutorials/structured_config/config_store>`
 - :hydra:`Hydra's command line override syntax <advanced/override_grammar/basic>`
 

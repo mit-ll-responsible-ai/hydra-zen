@@ -243,48 +243,44 @@ Click it to copy the contents of the code block.</p>
 <section id="add-a-command-line-interface-to-our-application">
 <span id="cli-app"></span><h1>Add a Command Line Interface to Our Application<a class="headerlink" href="#add-a-command-line-interface-to-our-application" title="Permalink to this heading">#</a></h1>
 <p>In this tutorial we will update our project so that it can be configured and launched
-from a command line interface, using Hydra.</p>
+from a command line interface (CLI), using Hydra.</p>
 <section id="modifying-our-project">
 <h2>Modifying Our Project<a class="headerlink" href="#modifying-our-project" title="Permalink to this heading">#</a></h2>
 <p>Open <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code> in your editor. We will make the following modifications to it:</p>
 <ol class="arabic simple">
-<li><p>Register our config in Hydra’s “config store”.</p></li>
-<li><p>Decorate our task function to tell Hydra what config to use to define its interface.</p></li>
+<li><p>User <code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.store()</span></code> to generate for our task function and to store it in Hydra’s global config store.</p></li>
 <li><p>Add a <code class="docutils literal notranslate"><span class="pre">__main__</span></code> clause to our <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code> script so that the script runs our task function.</p></li>
+<li><p>Use <a class="reference internal" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.zen()</span></code></a> to wrap the task function and to generate the CLI.</p></li>
 </ol>
 <p>Modify your script to match this:</p>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Contents of my_app.py:</span><a class="headerlink" href="#id1" title="Permalink to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hydra</span>
-<span class="kn">from</span> <span class="nn">hydra.core.config_store</span> <span class="kn">import</span> <span class="n">ConfigStore</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">store</span><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a>
 
-<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a>
-
-<span class="n">Config</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">(</span><span class="s2">"player1"</span><span class="p">,</span> <span class="s2">"player2"</span><span class="p">)</span>
-
-<span class="c1"># 1) Register our config with Hydra's config store</span>
-<span class="n">cs</span> <span class="o">=</span> <span class="n">ConfigStore</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
-<span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"my_app"</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">Config</span><span class="p">)</span>
-
-
-<span class="c1"># 2) Tell Hydra what config to use for our task-function.</span>
-<span class="c1">#    The name specified here - 'config' - must match the</span>
-<span class="c1">#    name that we provided to `cs.store(name=&lt;...&gt;, node=Config)`</span>
-<span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_name</span><span class="o">=</span><span class="s2">"my_app"</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
-    <span class="c1"># cfg: Config</span>
-    <span class="n">obj</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
-    <span class="n">p1</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">player1</span>
-    <span class="n">p2</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">player2</span>
-
+<span class="c1"># 1) `hydra_zen.store generates a config for our task function</span>
+<span class="c1">#    and stores it locally under the entry-name "my_app"</span>
+<span class="nd">@store</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"my_app"</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">player1</span><span class="p">,</span> <span class="n">player2</span><span class="p">):</span>
+    <span class="c1"># write the log with the names</span>
     <span class="k">with</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#open" title="open"><span class="nb">open</span></a><span class="p">(</span><span class="s2">"player_log.txt"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"Game session log:</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Player 1: </span><span class="si">{</span><span class="n">p1</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span> <span class="sa">f</span><span class="s2">"Player 2: </span><span class="si">{</span><span class="n">p2</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Player 1: </span><span class="si">{</span><span class="n">player1</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span> <span class="sa">f</span><span class="s2">"Player 2: </span><span class="si">{</span><span class="n">player2</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
+    <span class="k">return</span> <span class="n">player1</span><span class="p">,</span> <span class="n">player2</span>
 
-<span class="c1"># 3) Executing `python my_app.py [...]` will run our task function</span>
+<span class="c1"># 2) Executing `python my_app.py [...]` will run our task function</span>
 <span class="k">if</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/reference/import.html#name__" title="__name__"><span class="vm">__name__</span></a> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
-    <span class="n">task_function</span><span class="p">()</span>
+    <span class="c1"># 3) We need to add the configs from our local store to Hydra's</span>
+    <span class="c1">#    global config store</span>
+    <span class="n">store</span><span class="o">.</span><span class="n">add_to_hydra_store</span><span class="p">()</span>
+
+    <span class="c1"># 4) Our zen-wrapped task function is used to generate</span>
+    <span class="c1">#    the CLI, and to specify which config we want to use</span>
+    <span class="c1">#    to configure the app by default</span>
+    <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">(</span><span class="n">task_function</span><span class="p">)</span><span class="o">.</span><span class="n">hydra_main</span><span class="p">(</span><span class="n">config_name</span><span class="o">=</span><span class="s2">"my_app"</span><span class="p">,</span>
+                                  <span class="n">version_base</span><span class="o">=</span><span class="s2">"1.1"</span><span class="p">,</span>
+                                  <span class="n">config_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                  <span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -360,7 +356,7 @@ console, using <a class="reference internal" href="../generated/hydra_zen.launch
 The following reference materials are especially relevant to this
 tutorial section.</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_config</span></code></a></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">store</span></code></p></li>
 <li><p><a class="reference external" href="https://hydra.cc/docs/tutorials/structured_config/config_store">Hydra’s Config Store API</a></p></li>
 <li><p><a class="reference external" href="https://hydra.cc/docs/advanced/override_grammar/basic">Hydra’s command line override syntax</a></p></li>
 </ul>

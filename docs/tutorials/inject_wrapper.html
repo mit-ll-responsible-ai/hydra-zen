@@ -313,11 +313,11 @@ its costume updated for the holiday. Verify that you see the following behaviors
 <h3>Including the Wrapper in Our Config<a class="headerlink" href="#including-the-wrapper-in-our-config" title="Permalink to this heading">#</a></h3>
 <p>Incorporating this wrapper into our application simply involves specifying it as a
 “zen-wrapper” in our config for <code class="xref py py-class docutils literal notranslate"><span class="pre">game_library.Character</span></code>. I.e. we will update:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">CharConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">Character</span><span class="p">,</span> <span class="n">inventory</span><span class="o">=</span><span class="n">starter_gear</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">CharConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">Character</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>to be</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">CharConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">Character</span><span class="p">,</span> <span class="n">inventory</span><span class="o">=</span><span class="n">starter_gear</span><span class="p">,</span> <span class="n">zen_wrappers</span><span class="o">=</span><span class="n">halloween_update</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">CharConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">Character</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">zen_wrappers</span><span class="o">=</span><span class="n">halloween_update</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -327,12 +327,12 @@ its costume updated for the holiday. Verify that you see the following behaviors
 over. Modify your <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code> script to match the following code.</p>
 <div class="literal-block-wrapper docutils container" id="id3">
 <div class="code-block-caption"><span class="caption-text">Contents of <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code></span><a class="headerlink" href="#id3" title="Permalink to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hydra</span>
-<span class="kn">from</span> <span class="nn">hydra.core.config_store</span> <span class="kn">import</span> <span class="n">ConfigStore</span>
-
-<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><span class="n">make_custom_builds_fn</span></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">store</span><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><span class="n">make_custom_builds_fn</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a>
 
 <span class="kn">from</span> <span class="nn">game_library</span> <span class="kn">import</span> <span class="n">inventory</span><span class="p">,</span> <span class="n">Character</span>
+
+<span class="n">builds</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><span class="n">make_custom_builds_fn</span></a><span class="p">(</span><span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
 
 <span class="c1"># 1. Added our wrapper</span>
 <span class="k">def</span> <span class="nf">halloween_update</span><span class="p">(</span><span class="n">CharClass</span><span class="p">):</span>
@@ -349,18 +349,18 @@ over. Modify your <code class="docutils literal notranslate"><span class="pre">m
     <span class="k">return</span> <span class="n">wrapper</span>
 
 
-<span class="n">builds</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><span class="n">make_custom_builds_fn</span></a><span class="p">(</span><span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="n">cs</span> <span class="o">=</span> <span class="n">ConfigStore</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
-
+<span class="c1"># Create inventory configs</span>
 <span class="n">InventoryConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">inventory</span><span class="p">)</span>
 <span class="n">starter_gear</span> <span class="o">=</span> <span class="n">InventoryConf</span><span class="p">(</span><span class="n">gold</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">weapon</span><span class="o">=</span><span class="s2">"stick"</span><span class="p">,</span> <span class="n">costume</span><span class="o">=</span><span class="s2">"tunic"</span><span class="p">)</span>
 <span class="n">advanced_gear</span> <span class="o">=</span> <span class="n">InventoryConf</span><span class="p">(</span><span class="n">gold</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">weapon</span><span class="o">=</span><span class="s2">"wand"</span><span class="p">,</span> <span class="n">costume</span><span class="o">=</span><span class="s2">"magic robe"</span><span class="p">)</span>
 <span class="n">hard_mode_gear</span> <span class="o">=</span> <span class="n">InventoryConf</span><span class="p">(</span><span class="n">gold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">weapon</span><span class="o">=</span><span class="s2">"inner thoughts"</span><span class="p">,</span> <span class="n">costume</span><span class="o">=</span><span class="s2">"rags"</span><span class="p">)</span>
 
-<span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">"player/inventory"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"starter"</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">starter_gear</span><span class="p">)</span>
-<span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">"player/inventory"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"advanced"</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">advanced_gear</span><span class="p">)</span>
-<span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">"player/inventory"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"hard_mode"</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">hard_mode_gear</span><span class="p">)</span>
+<span class="c1"># Register inventory configs under group: player/inventory</span>
+<span class="n">inv_store</span> <span class="o">=</span> <span class="n">store</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">"player/inventory"</span><span class="p">)</span>
+
+<span class="n">inv_store</span><span class="p">(</span><span class="n">starter_gear</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"starter"</span><span class="p">)</span>
+<span class="n">inv_store</span><span class="p">(</span><span class="n">advanced_gear</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"advanced"</span><span class="p">)</span>
+<span class="n">inv_store</span><span class="p">(</span><span class="n">hard_mode_gear</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"hard_mode"</span><span class="p">)</span>
 
 <span class="c1"># 2. Included the wrapper in our config for `Character`</span>
 <span class="n">CharConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">Character</span><span class="p">,</span> <span class="n">inventory</span><span class="o">=</span><span class="n">starter_gear</span><span class="p">,</span> <span class="n">zen_wrappers</span><span class="o">=</span><span class="n">halloween_update</span><span class="p">)</span>
@@ -377,23 +377,23 @@ over. Modify your <code class="docutils literal notranslate"><span class="pre">m
     <span class="n">inventory</span><span class="o">=</span><span class="n">InventoryConf</span><span class="p">(</span><span class="n">costume</span><span class="o">=</span><span class="s2">"PJs"</span><span class="p">,</span> <span class="n">weapon</span><span class="o">=</span><span class="s2">"pillow"</span><span class="p">,</span> <span class="n">gold</span><span class="o">=</span><span class="mi">41</span><span class="p">),</span>
 <span class="p">)</span>
 
-<span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">"player"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"base"</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">CharConf</span><span class="p">)</span>
-<span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">"player"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"brinda"</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">brinda_conf</span><span class="p">)</span>
-<span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">"player"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"rakesh"</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">rakesh_conf</span><span class="p">)</span>
+<span class="c1"># Register player-profile configs under group: player</span>
+<span class="n">player_store</span> <span class="o">=</span> <span class="n">store</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">"player"</span><span class="p">)</span>
+
+<span class="n">player_store</span><span class="p">(</span><span class="n">CharConf</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"base"</span><span class="p">)</span>
+<span class="n">player_store</span><span class="p">(</span><span class="n">brinda_conf</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"brinda"</span><span class="p">)</span>
+<span class="n">player_store</span><span class="p">(</span><span class="n">rakesh_conf</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"rakesh"</span><span class="p">)</span>
 
 
-<span class="n">Config</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">(</span><span class="s2">"player"</span><span class="p">,</span> <span class="n">hydra_defaults</span><span class="o">=</span><span class="p">[</span><span class="s2">"_self_"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"player"</span><span class="p">:</span> <span class="s2">"base"</span><span class="p">}])</span>
+<span class="c1"># The `hydra_defaults` field is specified in our task function's config.</span>
+<span class="c1"># It instructs Hydra to use the player config that named 'base' in our</span>
+<span class="c1"># config store as the default config for our app.</span>
+<span class="nd">@store</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"my_app"</span><span class="p">,</span>  <span class="n">hydra_defaults</span><span class="o">=</span><span class="p">[</span><span class="s2">"_self_"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"player"</span><span class="p">:</span> <span class="s2">"base"</span><span class="p">}])</span>
+<span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">player</span><span class="p">:</span> <span class="n">Character</span><span class="p">):</span>
 
-<span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"my_app"</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">Config</span><span class="p">)</span>
-
-
-<span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_name</span><span class="o">=</span><span class="s2">"my_app"</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
-    <span class="c1"># cfg: Config</span>
-    <span class="n">player</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">player</span><span class="p">)</span>
     <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">player</span><span class="p">)</span>
 
-    <span class="k">with</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#open" title="open"><span class="nb">open</span></a><span class="p">(</span><span class="s2">"player_log.txt"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#open" title="open"><span class="nb">open</span></a><span class="p">(</span><span class="s2">"player_log.txt"</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"Game session log:</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Player: </span><span class="si">{</span><span class="n">player</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 
@@ -401,7 +401,17 @@ over. Modify your <code class="docutils literal notranslate"><span class="pre">m
 
 
 <span class="k">if</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/reference/import.html#name__" title="__name__"><span class="vm">__name__</span></a> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
-    <span class="n">task_function</span><span class="p">()</span>
+    <span class="c1"># We need to add the configs from our local store to Hydra's</span>
+    <span class="c1"># global config store</span>
+    <span class="n">store</span><span class="o">.</span><span class="n">add_to_hydra_store</span><span class="p">()</span>
+
+    <span class="c1"># Our zen-wrapped task function is used to generate</span>
+    <span class="c1"># the CLI, and to specify which config we want to use</span>
+    <span class="c1"># to configure the app by default</span>
+    <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">(</span><span class="n">task_function</span><span class="p">)</span><span class="o">.</span><span class="n">hydra_main</span><span class="p">(</span><span class="n">config_name</span><span class="o">=</span><span class="s2">"my_app"</span><span class="p">,</span>
+                                  <span class="n">version_base</span><span class="o">=</span><span class="s2">"1.1"</span><span class="p">,</span>
+                                  <span class="n">config_path</span><span class="o">=</span><span class="s2">"."</span><span class="p">,</span>
+                                  <span class="p">)</span>
 </pre></div>
 </div>
 </div>

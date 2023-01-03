@@ -243,7 +243,7 @@ has launched.</p>
 We will</p>
 <ol class="arabic simple">
 <li><p>Define toy examples of a class and a function, respectively.</p></li>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">builds(&lt;target&gt;,</span> <span class="pre">zen_partial=True)</span></code> to create their partial configurations.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">builds(&lt;target&gt;,</span> <span class="pre">zen_partial=True)</span></code> and <code class="docutils literal notranslate"><span class="pre">just(functools.partial(&lt;target&gt;))</span></code> to create their partial configurations.</p></li>
 <li><p>Check that <a class="reference internal" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><code class="xref py py-func docutils literal notranslate"><span class="pre">instantiate()</span></code></a> only partially-instantiates the targets of these two configs.</p></li>
 <li><p>Examine the YAML-config for one of these partial configs.</p></li>
 </ol>
@@ -263,14 +263,17 @@ both of these.</p>
 </div>
 <p>Suppose that the <code class="docutils literal notranslate"><span class="pre">model_weights</span></code> parameter in <code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code>, and the <code class="docutils literal notranslate"><span class="pre">message</span></code> parameter in <code class="xref py py-func docutils literal notranslate"><span class="pre">logger()</span></code> ought not be configured by our app’s interface.
 <a class="reference internal" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> provides the <code class="docutils literal notranslate"><span class="pre">zen_partial</span></code> feature, which makes it trivial
-to partially-configure a target. Let’s create configs for our toy class and toy
-function.</p>
+to partially-configure a target. We can also apply <a class="reference internal" href="../generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-func docutils literal notranslate"><span class="pre">just()</span></code></a> to a instance of <code class="xref py py-class docutils literal notranslate"><span class="pre">functools.partial</span></code> Let’s create configs for our toy class and
+toy function.</p>
 <div class="literal-block-wrapper docutils container" id="id2">
 <div class="code-block-caption"><span class="caption-text">2: Creating partial configs.</span><a class="headerlink" href="#id2" title="Permalink to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functools.html#module-functools" title="functools"><span class="nn">functools</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functools.html#functools.partial" title="functools.partial"><span class="n">partial</span></a>
+<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><span class="n">just</span></a>
 
 <span class="n">OptimConf</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">(</span><span class="n">Optimizer</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">LogConf</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">format_spec</span><span class="o">=</span><span class="s1">'</span><span class="si">{0:&gt;8s}</span><span class="s1">'</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functools.html#functools.partial" title="functools.partial"><span class="n">partial_logger</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functools.html#functools.partial" title="functools.partial"><span class="n">partial</span></a><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">format_spec</span><span class="o">=</span><span class="s1">'</span><span class="si">{0:&gt;8s}</span><span class="s1">'</span><span class="p">)</span>
+<span class="n">LogConf</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><span class="n">just</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functools.html#functools.partial" title="functools.partial"><span class="n">partial_logger</span></a><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -295,7 +298,7 @@ function.</p>
 </pre></div>
 </div>
 </div>
-<p>Lastly, let’s inspect the YAML-serialized config for <code class="xref py py-class docutils literal notranslate"><span class="pre">OptimConf</span></code>.</p>
+<p>Lastly, let’s inspect the YAML-serialized config for <code class="xref py py-class docutils literal notranslate"><span class="pre">OptimConf</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">LongConf</span></code>.</p>
 <div class="literal-block-wrapper docutils container" id="id4">
 <div class="code-block-caption"><span class="caption-text">4: Examining a YAML-serialized partial config.</span><a class="headerlink" href="#id4" title="Permalink to this code">#</a></div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a>
@@ -304,6 +307,11 @@ function.</p>
 <span class="go">_target_: __main__.Optimizer</span>
 <span class="go">_partial_: true</span>
 <span class="go">learning_rate: 0.1</span>
+
+<span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">(</span><span class="n">LogConf</span><span class="p">))</span>
+<span class="go">_target_: __main__.logger</span>
+<span class="go">_partial_: true</span>
+<span class="go">format_spec: '{0:&gt;8s}'</span>
 </pre></div>
 </div>
 </div>
