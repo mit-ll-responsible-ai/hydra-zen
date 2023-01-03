@@ -980,20 +980,17 @@
 
 <span class="sd">    .. code-block:: python</span>
 
-<span class="sd">        # example.py</span>
-<span class="sd">        from hydra.core.config_store import ConfigStore</span>
+<span class="sd">       # example.py</span>
+<span class="sd">       from hydra_zen import zen, store</span>
 
-<span class="sd">        from hydra_zen import builds, zen</span>
+<span class="sd">       @store(name=&quot;my_app&quot;)</span>
+<span class="sd">       def task(x: int, y: int):</span>
+<span class="sd">           print(x + y)</span>
 
-<span class="sd">        def task(x: int, y: int):</span>
-<span class="sd">            print(x + y)</span>
+<span class="sd">       if __name__ == &quot;__main__&quot;:</span>
+<span class="sd">           store.add_to_hydra_store()</span>
+<span class="sd">           zen(task).hydra_main(config_name=&quot;my_app&quot;, config_path=None, version_base=&quot;1.2&quot;)</span>
 
-<span class="sd">        cs = ConfigStore.instance()</span>
-<span class="sd">        cs.store(name=&quot;my_app&quot;, node=builds(task, populate_full_signature=True))</span>
-
-
-<span class="sd">        if __name__ == &quot;__main__&quot;:</span>
-<span class="sd">            zen(task).hydra_main(config_name=&quot;my_app&quot;, config_path=None)</span>
 
 <span class="sd">    .. code-block:: console</span>
 
