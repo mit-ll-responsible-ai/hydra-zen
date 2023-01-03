@@ -302,6 +302,7 @@ class Zen(Generic[P, R]):
                 f"`cfg` is missing the following fields: {', '.join(missing_params)}"
             )
 
+    # TODO: add "extract" option that enables returning dict of fields
     def __call__(self, __cfg: Union[ConfigLike, str]) -> R:
         """
         Extracts values from the input config based on the decorated function's
@@ -763,7 +764,7 @@ def default_to_config(
     """
     if is_dataclass(target):
         if isinstance(target, type):
-            if get_obj_path(target).startswith("types."):
+            if not kw and get_obj_path(target).startswith("types."):
                 # handles dataclasses returned by make_config()
                 return target
             return fbuilds(target, **kw, builds_bases=(target,))
