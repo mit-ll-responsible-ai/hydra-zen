@@ -83,7 +83,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: .tox
-        key: tox-pyright-docs-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
+        key: tox-pyright-docs-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
     - name: Scan docs with pyright
       run: tox -e pyright-scan-docs
 
@@ -104,7 +104,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: .tox
-        key: tox-third-party-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
+        key: tox-third-party-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
     - name: Test with tox
       run: tox -e third-party
 

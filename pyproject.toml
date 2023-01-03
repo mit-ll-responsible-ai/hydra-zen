@@ -123,7 +123,7 @@ skip = 'docs/build/*'
 legacy_tox_ini = """
 [tox]
 isolated_build = True
-envlist = py37, py38, py39, py310, ml-env
+envlist = py37, py38, py39, py310, py311
 
 [gh-actions]
 python =
