@@ -245,7 +245,7 @@ Then we can use :func:`hydra_zen.builds`, instead of :func:`hydra_zen.make_confi
     
    from hydra_zen import builds
     
-   def task_function(player1, player2):
+   def new_task_function(player1, player2):
        # write the log with the names
        with open("player_log.txt", "w") as f:
            f.write("Game session log:\n")
@@ -255,7 +255,7 @@ Then we can use :func:`hydra_zen.builds`, instead of :func:`hydra_zen.make_confi
 
    # auto-populates the fields of our configs based on the signature of
    # `task_function`
-   Config = builds(task_function, populate_full_signature=True)
+   Config = builds(new_task_function, populate_full_signature=True)
 
 
 Wrapping this function as
@@ -275,9 +275,9 @@ Now we will supply a zen-wrapped version of our task function to :func:`hydra_ze
 .. code-block:: pycon
    :caption: Launching our application
 
-   >>> from my_app import Config, task_function
+   >>> from my_app import Config, new_task_function
    >>> from hydra_zen import zen, launch
-   >>> wrapped_fn = zen(task_function)
+   >>> wrapped_fn = zen(new_task_function)
    >>> job = launch(Config, wrapped_fn, overrides=["player1=link", "player2=zelda"], version_base="1.1")
 
 See that we were able to launch the same app as before, but with some additional benefits:

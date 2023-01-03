@@ -383,7 +383,7 @@ module.
 
    >>> # convenience function for extracting and instantiating fields from config
    >>> extract = zen(lambda model, optim, target_fn, training_domain, dataloader: locals())
-   >>> loaded = LitModule.load_from_checkpoint(last_ckpt, **extract(cfg))
+   >>> loaded = LitModule.load_from_checkpoint(last_ckpt, **extract(cfg))  # type: ignore
 
 Finally, let's double check that this loaded model behaves as-expected. Evaluating it 
 at :math:`-\pi/2`, :math:`0`, and :math:`\pi/2` should return, approximately, :math:`0`, :math:`1`, and :math:`0`, respectively.

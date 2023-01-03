@@ -98,13 +98,13 @@ Incorporating this wrapper into our application simply involves specifying it as
 
 .. code:: python 
    
-   CharConf = builds(Character, inventory=starter_gear)
+   CharConf = builds(Character, ...)
 
 to be
 
 .. code:: python 
    
-   CharConf = builds(Character, inventory=starter_gear, zen_wrappers=halloween_update)
+   CharConf = builds(Character, ..., zen_wrappers=halloween_update)
 
 
 Putting It All Together
