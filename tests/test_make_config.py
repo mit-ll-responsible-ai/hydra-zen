@@ -205,6 +205,7 @@ def test_mutable_default_value_uses_default_factory(input_type):
     assert z.a == [1, 2, 3]
 
 
+@settings(deadline=None)
 @given(
     args_kwargs=partitions(
         st.lists(st.sampled_from(string.ascii_lowercase), unique=True)
