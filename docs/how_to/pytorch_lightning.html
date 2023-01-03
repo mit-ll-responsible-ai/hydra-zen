@@ -274,7 +274,7 @@ following code. Here, we define our single-layer neural network and the <a class
 
 <span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">Partial</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"UniversalFuncModule"</span><span class="p">,</span> <span class="s2">"single_layer_nn"</span><span class="p">,</span> <span class="s2">"eval_model"</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"UniversalFuncModule"</span><span class="p">,</span> <span class="s2">"single_layer_nn"</span><span class="p">,</span> <span class="s2">"train_and_eval"</span><span class="p">]</span>
 
 
 <span class="k">def</span> <span class="nf">single_layer_nn</span><span class="p">(</span><span class="n">num_neurons</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
@@ -322,7 +322,7 @@ following code. Here, we define our single-layer neural network and the <a class
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataloader</span><span class="p">(</span><span class="n">TensorDataset</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">eval_model</span><span class="p">(</span>
+<span class="k">def</span> <span class="nf">train_and_eval</span><span class="p">(</span>
     <span class="n">model</span><span class="p">:</span> <span class="n">tr</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
     <span class="n">optim</span><span class="p">:</span> <span class="n">Partial</span><span class="p">[</span><span class="n">Optimizer</span><span class="p">],</span>
     <span class="n">dataloader</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Type" title="typing.Type"><span class="n">Type</span></a><span class="p">[</span><span class="n">DataLoader</span><span class="p">],</span>
@@ -374,7 +374,7 @@ and trainer. We’ll also define the task function that trains and tests our mod
 <span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">Adam</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
 
-<span class="kn">from</span> <span class="nn">zen_model</span> <span class="kn">import</span> <span class="n">UniversalFuncModule</span><span class="p">,</span> <span class="n">eval_model</span><span class="p">,</span> <span class="n">single_layer_nn</span>
+<span class="kn">from</span> <span class="nn">zen_model</span> <span class="kn">import</span> <span class="n">UniversalFuncModule</span><span class="p">,</span> <span class="n">train_and_eval</span><span class="p">,</span> <span class="n">single_layer_nn</span>
 
 <span class="n">pbuilds</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><span class="n">make_custom_builds_fn</span></a><span class="p">(</span><span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -390,12 +390,12 @@ and trainer. We’ll also define the task function that trains and tests our mod
     <span class="n">training_domain</span><span class="o">=</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">linspace</span><span class="p">,</span> <span class="n">start</span><span class="o">=-</span><span class="mi">2</span> <span class="o">*</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/math.html#math.pi" title="math.pi"><span class="n">pi</span></a><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/math.html#math.pi" title="math.pi"><span class="n">pi</span></a><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">1000</span><span class="p">),</span>
 <span class="p">)</span>
 
-<span class="c1"># Wrapping `eval_model` with `zen` makes it compatible with Hydra as a task function</span>
+<span class="c1"># Wrapping `train_and_eval` with `zen` makes it compatible with Hydra as a task function</span>
 <span class="c1">#</span>
 <span class="c1"># We must specify `pre_call` to ensure that pytorch lightning seeds everything</span>
 <span class="c1"># *before* any of our configs are instantiated (which will initialize the pytorch</span>
 <span class="c1"># model whose weights depend on the seed)</span>
-<span class="n">task_function</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">(</span><span class="n">eval_model</span><span class="p">,</span> <span class="n">pre_call</span><span class="o">=</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">(</span><span class="k">lambda</span> <span class="n">seed</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">seed_everything</span><span class="p">(</span><span class="n">seed</span><span class="p">)))</span>
+<span class="n">task_function</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">(</span><span class="n">train_and_eval</span><span class="p">,</span> <span class="n">pre_call</span><span class="o">=</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">(</span><span class="k">lambda</span> <span class="n">seed</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">seed_everything</span><span class="p">(</span><span class="n">seed</span><span class="p">)))</span>
 
 <span class="k">if</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/reference/import.html#name__" title="__name__"><span class="vm">__name__</span></a> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="c1"># enables us to call</span>
@@ -414,7 +414,7 @@ and trainer. We’ll also define the task function that trains and tests our mod
 </div>
 <div class="admonition-be-mindful-of-what-your-task-function-returns admonition">
 <p class="admonition-title">Be Mindful of What Your Task Function Returns</p>
-<p>We <em>could</em> make this <code class="xref py py-obj docutils literal notranslate"><span class="pre">eval_model</span></code> return our trained neural network, which would enable
+<p>We <em>could</em> make this <code class="xref py py-obj docutils literal notranslate"><span class="pre">train_and_eval</span></code> return our trained neural network, which would enable
 convenient access to it, in-memory, after our Hydra job completes. However, launching this
 task function in a multirun fashion will train multiple models and thus would keep <em>all</em> of
 those models in-memory (and perhaps on-GPU) simultaneously!</p>
