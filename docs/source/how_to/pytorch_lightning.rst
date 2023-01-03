@@ -56,6 +56,8 @@ following code. Here, we define our single-layer neural network and the `lightni
    
    from hydra_zen.typing import Partial
    
+   __all__ = ["UniversalFuncModule", "single_layer_nn", "eval_model"]
+   
    
    def single_layer_nn(num_neurons: int) -> nn.Module:
        """y = sum(V sigmoid(X W + b))"""
@@ -102,6 +104,37 @@ following code. Here, we define our single-layer neural network and the `lightni
            return self.dataloader(TensorDataset(x, y))
 
 
+   def eval_model(
+       model: tr.nn.Module,
+       optim: Partial[Optimizer],
+       dataloader: Type[DataLoader],
+       target_fn: Callable[[tr.Tensor], tr.Tensor],
+       training_domain: tr.Tensor,
+       lit_module: Type[UniversalFuncModule],
+       trainer: pl.Trainer,
+   ):
+   
+       
+       lit = lit_module(
+           model=model,
+           optim=optim,
+           dataloader=dataloader,
+           target_fn=target_fn,
+           training_domain=training_domain,
+       )
+   
+       # train the model
+       trainer.fit(lit)
+   
+       # evaluate the model over the domain to assess the fit
+       final_eval = lit(training_domain.reshape(-1, 1))
+       final_eval = final_eval.detach().cpu().numpy().ravel()
+   
+       # return the final evaluation of our model:
+       # a shape-(N,) numpy-array
+       return final_eval
+
+
 .. attention::
 
    :plymi:`Type-annotations <Module5_OddsAndEnds/Writing_Good_Code.html#Type-Hinting>` are **not** required by hydra-zen. However, they do enable :ref:`runtime type-checking of configured values <type-support>` for our app.
@@ -118,69 +151,53 @@ and trainer. We'll also define the task function that trains and tests our model
 .. code-block:: python
    :caption: Contents of ``experiment.py``
 
-   import math
+   from math import pi
    
+   import pytorch_lightning as pl
+   from hydra_zen import builds, make_config, make_custom_builds_fn, zen
    import torch as tr
    from torch.optim import Adam
    from torch.utils.data import DataLoader
-   from zen_model import UniversalFuncModule, single_layer_nn
    
-   import pytorch_lightning as pl
-   from hydra_zen import builds, make_config, make_custom_builds_fn, instantiate
+   from zen_model import UniversalFuncModule, eval_model, single_layer_nn
    
    pbuilds = make_custom_builds_fn(zen_partial=True, populate_full_signature=True)
    
-   OptimConf = pbuilds(Adam)
-   
-   LoaderConf = pbuilds(DataLoader, batch_size=25, shuffle=True, drop_last=True)
-   
-   ModelConf = builds(single_layer_nn, num_neurons=10)
-
-   # configure our lightning module
-   LitConf = pbuilds(
-       UniversalFuncModule,
-       model=ModelConf,
-       target_fn=tr.cos,
-       training_domain=builds(
-           tr.linspace, start=-2 * math.pi, end=2 * math.pi, steps=1000
-       ),
-   )
-   
-   TrainerConf = builds(pl.Trainer, max_epochs=100)
    
    ExperimentConfig = make_config(
-       optim=OptimConf,
-       dataloader=LoaderConf,
-       lit_module=LitConf,
-       trainer=TrainerConf,
        seed=1,
+       lit_module=UniversalFuncModule,
+       trainer=builds(pl.Trainer, max_epochs=100),
+       model=builds(single_layer_nn, num_neurons=10),
+       optim=pbuilds(Adam),
+       dataloader=pbuilds(DataLoader, batch_size=25, shuffle=True, drop_last=True),
+       target_fn=tr.cos,
+       training_domain=builds(tr.linspace, start=-2 * pi, end=2 * pi, steps=1000),
    )
    
+   # Wrapping `eval_model` with `zen` makes it compatible with Hydra as a task function
+   #
+   # We must specify `pre_call` to ensure that pytorch lightning seeds everything
+   # *before* any of our configs are instantiated (which will initialize the pytorch
+   # model whose weights depend on the seed)
+   task_function = zen(eval_model, pre_call=zen(lambda seed: pl.seed_everything(seed)))
    
-   def task_function(cfg):
-       # cfg: ExperimentConfig
-       pl.seed_everything(cfg.seed)
+   if __name__ == "__main__":
+       # enables us to call 
+       from hydra_zen import ZenStore
    
-       obj = instantiate(cfg)
-       
-       # finish instantiating the lightning module, data-loader, and optimizer
-       lit_module = obj.lit_module(dataloader=obj.dataloader, optim=obj.optim)
+       store = ZenStore(deferred_hydra_store=False)
+       store(ExperimentConfig, name="lit_app")
    
-       # train the model
-       obj.trainer.fit(lit_module)
-   
-       # evaluate the model over the domain to assess the fit
-       data = lit_module.training_domain
-       final_eval = lit_module.forward(data.reshape(-1, 1))
-       final_eval = final_eval.detach().cpu().numpy().ravel()
-       
-       # return the final evaluation of our model:
-       # a shape-(N,) numpy-array
-       return final_eval
+       task_function.hydra_main(
+           config_name="lit_app",
+           version_base="1.1",
+           config_path=".",
+       )
 
 .. admonition:: Be Mindful of What Your Task Function Returns
 
-   We *could* make this task-function return our trained neural network, which would enable
+   We *could* make this `eval_model` return our trained neural network, which would enable
    convenient access to it, in-memory, after our Hydra job completes. However, launching this
    task function in a multirun fashion will train multiple models and thus would keep *all* of
    those models in-memory (and perhaps on-GPU) simultaneously! 
@@ -201,7 +218,7 @@ Open a Python console (or Jupyter notebook) in the same directory as ``experimen
 and run the following code.
 
 .. code-block:: pycon
-   :caption: Launching four jobs
+   :caption: Launching four jobs from a Python console.
 
    >>> from hydra_zen import launch
    >>> from experiment import ExperimentConfig, task_function
@@ -210,18 +227,31 @@ and run the following code.
    ...     task_function,
    ...     overrides=[
    ...         "dataloader.batch_size=20,200",
-   ...         "lit_module.model.num_neurons=10,100",
+   ...         "model.num_neurons=10,100",
    ...     ],
    ...     multirun=True,
    ... )
    [2021-10-24 21:23:32,556][HYDRA] Launching 4 jobs locally
-   [2021-10-24 21:23:32,558][HYDRA] 	#0 : dataloader.batch_size=20 lit_module.model.num_neurons=10
-   [2021-10-24 21:23:45,809][HYDRA] 	#1 : dataloader.batch_size=20 lit_module.model.num_neurons=100
-   [2021-10-24 21:23:58,656][HYDRA] 	#2 : dataloader.batch_size=200 lit_module.model.num_neurons=10
-   [2021-10-24 21:24:01,796][HYDRA] 	#3 : dataloader.batch_size=200 lit_module.model.num_neurons=100
+   [2021-10-24 21:23:32,558][HYDRA] 	#0 : dataloader.batch_size=20 model.num_neurons=10
+   [2021-10-24 21:23:45,809][HYDRA] 	#1 : dataloader.batch_size=20 model.num_neurons=100
+   [2021-10-24 21:23:58,656][HYDRA] 	#2 : dataloader.batch_size=200 model.num_neurons=10
+   [2021-10-24 21:24:01,796][HYDRA] 	#3 : dataloader.batch_size=200 model.num_neurons=100
 
 Keep this Python console open; we will be making use of ``jobs`` in order to inspect 
 our results.
+
+Note that this is equivalent to running the following from the CLI:
+
+.. code-block:: console
+   :caption: Launching four jobs from the CLI.
+
+   $ python experiment.py dataloader.batch_size=20,200 model.num_neurons=10,100 -m
+   [2021-10-24 21:23:32,556][HYDRA] Launching 4 jobs locally
+   [2021-10-24 21:23:32,558][HYDRA] 	#0 : dataloader.batch_size=20 model.num_neurons=10
+   [2021-10-24 21:23:45,809][HYDRA] 	#1 : dataloader.batch_size=20 model.num_neurons=100
+   [2021-10-24 21:23:58,656][HYDRA] 	#2 : dataloader.batch_size=200 model.num_neurons=10
+   [2021-10-24 21:24:01,796][HYDRA] 	#3 : dataloader.batch_size=200 model.num_neurons=100
+
 
 Inspecting Our Results
 =======================
@@ -239,8 +269,8 @@ the following code and verify that you see the plot shown below.
    >>> from hydra_zen import instantiate
    >>> import matplotlib.pyplot as plt
    
-   >>> x = instantiate(ExperimentConfig.lit_module.training_domain)
-   >>> target_fn = instantiate(ExperimentConfig.lit_module.target_fn)
+   >>> x = instantiate(ExperimentConfig.training_domain)
+   >>> target_fn = instantiate(ExperimentConfig.target_fn)
    
    >>> fig, ax = plt.subplots()
    >>> ax.plot(x, target_fn(x), ls="--", label="Target")
@@ -273,7 +303,7 @@ our desired model. Verify that you see the following outputs.
    >>> best = jobs[1]
    >>> best.cfg.dataloader.batch_size
    20
-   >>> best.cfg.lit_module.model.num_neurons
+   >>> best.cfg.model.num_neurons
    100
 
 Next, we'll load the config for this job. Recall that Hydra saves a ``.hydra/config.yaml`` file, which contains the complete configuration of this job -- we can reproduce 
@@ -294,10 +324,19 @@ it captures about this job.
 .. code-block:: pycon
    
    >>> print(to_yaml(cfg))  # fully details this job's config
+   seed: 1
+   lit_module:
+     path: zen_model.UniversalFuncModule
+     _target_: hydra_zen.funcs.get_obj
+   trainer:
+     _target_: pytorch_lightning.trainer.trainer.Trainer
+     max_epochs: 100
+   model:
+     _target_: zen_model.single_layer_nn
+     num_neurons: 100
    optim:
-     _target_: hydra_zen.funcs.zen_processing
-     _zen_target: torch.optim.adam.Adam
-     _zen_partial: true
+     _target_: torch.optim.adam.Adam
+     _partial_: true
      lr: 0.001
      betas:
      - 0.9
@@ -306,32 +345,30 @@ it captures about this job.
      weight_decay: 0
      amsgrad: false
    dataloader:
-     _target_: hydra_zen.funcs.zen_processing
-     _zen_target: torch.utils.data.dataloader.DataLoader
-     _zen_partial: true
+     _target_: torch.utils.data.dataloader.DataLoader
+     _partial_: true
      batch_size: 20
      shuffle: true
+     sampler: null
+     batch_sampler: null
+     num_workers: 0
+     collate_fn: null
+     pin_memory: false
      drop_last: true
-   lit_module:
-     _target_: hydra_zen.funcs.zen_processing
-     _zen_target: zen_model.UniversalFuncModule
-     _zen_partial: true
-     model:
-       _target_: zen_model.single_layer_nn
-       num_neurons: 100
-     target_fn:
-       _target_: hydra_zen.funcs.get_obj
-       path: torch.cos
-     training_domain:
-       _target_: torch.linspace
-       start: -6.283185307179586
-       end: 6.283185307179586
-       steps: 1000
-   trainer:
-     _target_: pytorch_lightning.trainer.trainer.Trainer
-     max_epochs: 100
-     progress_bar_refresh_rate: 0
-   seed: 1
+     timeout: 0.0
+     worker_init_fn: null
+     multiprocessing_context: null
+     generator: null
+     prefetch_factor: 2
+     persistent_workers: false
+   target_fn:
+     path: torch.cos
+     _target_: hydra_zen.funcs.get_obj
+   training_domain:
+     _target_: torch.linspace
+     start: -6.283185307179586
+     end: 6.283185307179586
+     steps: 1000
 
 PyTorch Lightning saved the model's trained weights as a ``.ckpt`` file in this job's 
 working directory. Let's load these weights and use them to instantiate our lighting 
@@ -340,17 +377,13 @@ module.
 .. code-block:: pycon
    :caption: Loading our lighting module with trained weights
 
+   >>> from hydra_zen import zen
    >>> *_, last_ckpt = sorted(outdir.glob("**/*.ckpt"))
    >>> LitModule = get_target(cfg.lit_module)
 
-   >>> loaded = LitModule.load_from_checkpoint(
-   ...     last_ckpt,
-   ...     model=instantiate(cfg.lit_module.model),
-   ...     target_fn=instantiate(cfg.lit_module.target_fn),
-   ...     training_domain=instantiate(cfg.lit_module.training_domain),
-   ...     optim=instantiate(cfg.optim),
-   ...     dataloader=instantiate(cfg.dataloader),
-   ... )
+   >>> # convenience function for extracting and instantiating fields from config
+   >>> extract = zen(lambda model, optim, target_fn, training_domain, dataloader: locals())
+   >>> loaded = LitModule.load_from_checkpoint(last_ckpt, **extract(cfg))
 
 Finally, let's double check that this loaded model behaves as-expected. Evaluating it 
 at :math:`-\pi/2`, :math:`0`, and :math:`\pi/2` should return, approximately, :math:`0`, :math:`1`, and :math:`0`, respectively.
@@ -360,9 +393,10 @@ at :math:`-\pi/2`, :math:`0`, and :math:`\pi/2` should return, approximately, :m
    
    >>> import torch as tr
    >>> loaded(tr.tensor([-3.1415 / 2, 0.0, 3.1415 / 2]).reshape(-1, 1))
-   tensor([[0.0218],
-           [0.9526],
-           [0.0125]], grad_fn=<MmBackward>
+   tensor([[0.0110],
+           [0.9633],
+           [0.0364]], grad_fn=<MmBackward>)
+
 
 
 
