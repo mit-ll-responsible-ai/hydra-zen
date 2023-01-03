@@ -137,8 +137,6 @@ over. Modify your ``my_app.py`` script to match the following code.
    
        return wrapper
    
-   # 2. Included the wrapper in our config for `Character`
-   CharConf = builds(Character, inventory=starter_gear, zen_wrappers=halloween_update)
 
    # Create inventory configs
    InventoryConf = builds(inventory)
@@ -153,6 +151,8 @@ over. Modify your ``my_app.py`` script to match the following code.
    inv_store(advanced_gear, name="advanced")
    inv_store(hard_mode_gear, name="hard_mode")
    
+   # 2. Included the wrapper in our config for `Character`
+   CharConf = builds(Character, inventory=starter_gear, zen_wrappers=halloween_update)
    
    brinda_conf = CharConf(
        name="brinda",
