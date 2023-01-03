@@ -56,7 +56,7 @@ following code. Here, we define our single-layer neural network and the `lightni
    
    from hydra_zen.typing import Partial
    
-   __all__ = ["UniversalFuncModule", "single_layer_nn", "eval_model"]
+   __all__ = ["UniversalFuncModule", "single_layer_nn", "train_and_eval"]
    
    
    def single_layer_nn(num_neurons: int) -> nn.Module:
@@ -104,7 +104,7 @@ following code. Here, we define our single-layer neural network and the `lightni
            return self.dataloader(TensorDataset(x, y))
 
 
-   def eval_model(
+   def train_and_eval(
        model: tr.nn.Module,
        optim: Partial[Optimizer],
        dataloader: Type[DataLoader],
@@ -159,7 +159,7 @@ and trainer. We'll also define the task function that trains and tests our model
    from torch.optim import Adam
    from torch.utils.data import DataLoader
    
-   from zen_model import UniversalFuncModule, eval_model, single_layer_nn
+   from zen_model import UniversalFuncModule, train_and_eval, single_layer_nn
    
    pbuilds = make_custom_builds_fn(zen_partial=True, populate_full_signature=True)
    
@@ -175,12 +175,12 @@ and trainer. We'll also define the task function that trains and tests our model
        training_domain=builds(tr.linspace, start=-2 * pi, end=2 * pi, steps=1000),
    )
    
-   # Wrapping `eval_model` with `zen` makes it compatible with Hydra as a task function
+   # Wrapping `train_and_eval` with `zen` makes it compatible with Hydra as a task function
    #
    # We must specify `pre_call` to ensure that pytorch lightning seeds everything
    # *before* any of our configs are instantiated (which will initialize the pytorch
    # model whose weights depend on the seed)
-   task_function = zen(eval_model, pre_call=zen(lambda seed: pl.seed_everything(seed)))
+   task_function = zen(train_and_eval, pre_call=zen(lambda seed: pl.seed_everything(seed)))
    
    if __name__ == "__main__":
        # enables us to call 
@@ -197,7 +197,7 @@ and trainer. We'll also define the task function that trains and tests our model
 
 .. admonition:: Be Mindful of What Your Task Function Returns
 
-   We *could* make this `eval_model` return our trained neural network, which would enable
+   We *could* make this `train_and_eval` return our trained neural network, which would enable
    convenient access to it, in-memory, after our Hydra job completes. However, launching this
    task function in a multirun fashion will train multiple models and thus would keep *all* of
    those models in-memory (and perhaps on-GPU) simultaneously! 
