@@ -249,5 +249,5 @@ commands=
     isort src/ tests/ --diff --check
     flake8 src/ tests/
     codespell src/ docs/
-    pytest project_tooling/test_headers.py
+    pytest project_tooling/test_headers.py 
 """

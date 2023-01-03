@@ -641,20 +641,17 @@ def zen(
 
     .. code-block:: python
 
-        # example.py
-        from hydra.core.config_store import ConfigStore
+       # example.py
+       from hydra_zen import zen, store
 
-        from hydra_zen import builds, zen
+       @store(name="my_app")
+       def task(x: int, y: int):
+           print(x + y)
 
-        def task(x: int, y: int):
-            print(x + y)
+       if __name__ == "__main__":
+           store.add_to_hydra_store()
+           zen(task).hydra_main(config_name="my_app", config_path=None, version_base="1.2")
 
-        cs = ConfigStore.instance()
-        cs.store(name="my_app", node=builds(task, populate_full_signature=True))
-
-
-        if __name__ == "__main__":
-            zen(task).hydra_main(config_name="my_app", config_path=None)
 
     .. code-block:: console
 
