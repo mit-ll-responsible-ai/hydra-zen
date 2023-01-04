@@ -171,49 +171,9 @@ jobs:
 
   run-pyright:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
-
-    - uses: actions/setup-node@v3.5.1
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-
-    - name: Cache node modules
-      id: cache-npm
-      uses: actions/cache@v3
-      env:
-        cache-name: cache-node-modules
-      with:
-        # npm cache files are stored in `~/.npm` on Linux/macOS
-        path: ~/.npm
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
-
-    - name: Install pyright
-      run: sudo npm install -g pyright@">1.1.283"
-    - uses: actions/checkout@v3
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.8
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -e .
-    - name: Run pyright basic on src
-      run: pyright --lib tests/annotations/ src/
-    - name: (pyright) verify type completeness
-      run: pyright --ignoreexternal --verifytypes hydra_zen
-
-  test-type-checking:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.0
+    - name: Set up Python 3.9
       uses: actions/setup-python@v4
       with:
         python-version: 3.9
@@ -222,7 +182,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install tox tox-gh-actions
     - name: Test with tox
-      run: tox -e typecheck
+      run: tox -e pyright
 
   test-docs-builds:
     runs-on: ubuntu-latest

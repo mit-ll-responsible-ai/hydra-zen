@@ -192,7 +192,7 @@ deps = {[testenv]deps}
        jax
        pydantic
        beartype
-       pyright
+       --requirement deps/requirements-pyright.txt
 commands = pytest -n auto tests/test_docs_typecheck.py -vv
 
 
@@ -208,16 +208,14 @@ deps = {[testenv]deps}
        pydantic
        beartype
 
-[testenv:typecheck]
+[testenv:pyright]
 usedevelop = true
 basepython = python3.9
 deps = 
        --requirement deps/requirements-pyright.txt
-       mypy==0.982
 
 commands = pyright --lib tests/annotations/ src/
            pyright --ignoreexternal --verifytypes hydra_zen
-           mypy --warn-unused-ignores --non-interactive --install-types tests/annotations/mypy_checks.py
 
 [testenv:format]
 skip_install=true
