@@ -4,9 +4,8 @@
 # These tests help to ensure that our typed interfaces have the desired behavior, when
 # being processed by static type-checkers. Specifically we test using pyright.
 #
-# We perform contrapositive testing using lines with the pattern:
-#
-#  builds(dict, a=M())  # type: ignore
+# We perform contrapositive testing by using type-ignore comments that will raise
+# if pyright deems them unnecessary.
 #
 # We are testing that the type-checker raises an error on that line of code.
 # We achieve this by configuring pyright to raise whenever `# type: ignore`
@@ -58,9 +57,8 @@ from hydra_zen.typing import (
     ZenWrappers,
 )
 from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds, StdBuilds
-from hydra_zen.typing._implementations import DataClass_, HydraPartialBuilds
+from hydra_zen.typing._implementations import DataClass_, HydraPartialBuilds, StoreEntry
 from hydra_zen.wrapper import Zen
-from hydra_zen.wrapper._implementations import StoreEntry
 
 T = TypeVar("T")
 

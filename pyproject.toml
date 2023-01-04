@@ -156,7 +156,7 @@ deps = {[testenv]deps}
        pydantic
        beartype
        cloudpickle
-basepython = python3.8
+basepython = python3.9
 
 [testenv:omegaconf-2p2p2]  # guard against regressions for type sanitization
 pip_pre = true
@@ -192,7 +192,7 @@ deps = {[testenv]deps}
        jax
        pydantic
        beartype
-       pyright
+       --requirement deps/requirements-pyright.txt
 commands = pytest -n auto tests/test_docs_typecheck.py -vv
 
 
@@ -208,15 +208,14 @@ deps = {[testenv]deps}
        pydantic
        beartype
 
-[testenv:typecheck]
+[testenv:pyright]
 usedevelop = true
 basepython = python3.9
-deps = pyright==1.1.282
-       mypy==0.982
+deps = 
+       --requirement deps/requirements-pyright.txt
 
 commands = pyright --lib tests/annotations/ src/
            pyright --ignoreexternal --verifytypes hydra_zen
-           mypy --warn-unused-ignores --non-interactive --install-types tests/annotations/mypy_checks.py
 
 [testenv:format]
 skip_install=true
