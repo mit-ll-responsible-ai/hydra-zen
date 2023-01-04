@@ -156,7 +156,7 @@ deps = {[testenv]deps}
        pydantic
        beartype
        cloudpickle
-basepython = python3.8
+basepython = python3.9
 
 [testenv:omegaconf-2p2p2]  # guard against regressions for type sanitization
 pip_pre = true
@@ -211,7 +211,8 @@ deps = {[testenv]deps}
 [testenv:typecheck]
 usedevelop = true
 basepython = python3.9
-deps = pyright==1.1.282
+deps = 
+       --requirement deps/requirements-pyright.txt
        mypy==0.982
 
 commands = pyright --lib tests/annotations/ src/
