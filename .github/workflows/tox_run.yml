@@ -83,7 +83,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: .tox
-        key: tox-pyright-docs-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
+        key: tox-pyright-docs-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('deps/requirements-pyright.txt') }}-${{ hashFiles('.github/workflows/tox.yml') }}
     - name: Scan docs with pyright
       run: tox -e pyright-scan-docs
 
