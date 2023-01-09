@@ -161,7 +161,9 @@ class Zen(Generic[P, R]):
         self.func: Callable[P, R] = __func
 
         try:
-            self.parameters: Mapping[str, Parameter] = signature(self.func).parameters
+            self.parameters: Mapping[str, Parameter] = dict(
+                signature(self.func).parameters
+            )
         except (ValueError, TypeError):
             raise HydraZenValidationError(
                 "hydra_zen.zen can only wrap callables that possess inspectable signatures."
