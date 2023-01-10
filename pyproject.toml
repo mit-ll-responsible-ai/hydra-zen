@@ -135,14 +135,19 @@ python =
 
 
 [testenv]
+description = Runs test suite parallelized in the specified python enviornment and 
+              against number of available processes (up to 4). 
+              Run `tox -e py39 -- -n 0` to run tests in a python 3.9 with 
+              parallelization disabled.
 passenv = *
 deps = pytest
        hypothesis
        pytest-xdist
-commands = pytest -n auto tests/ {posargs}
+commands = pytest tests/ {posargs: -n auto --maxprocesses=4}
 
 
-[testenv:min-deps]  # test against minimum dependency versions
+[testenv:min-deps]
+description = Runs test suite against minimum supported versions of dependencies.
 deps = hydra-core==1.1.0
        omegaconf==2.1.1
        typing-extensions==4.1.0
@@ -150,7 +155,8 @@ deps = hydra-core==1.1.0
 basepython = python3.7
 
 
-[testenv:pre-release]  # test against pre-releases of dependencies
+[testenv:pre-release]
+description = Runs test suite against pre-release versions of dependencies.
 pip_pre = true
 deps = {[testenv]deps}
        pydantic
@@ -158,7 +164,8 @@ deps = {[testenv]deps}
        cloudpickle
 basepython = python3.9
 
-[testenv:omegaconf-2p2p2]  # guard against regressions for type sanitization
+[testenv:omegaconf-2p2p2]
+description = Test againse OmegaConf 2.2.2 to guard against type-sanitization regressions.
 pip_pre = true
 deps = omegaconf==2.2.2
        {[testenv]deps}
@@ -168,6 +175,8 @@ deps = omegaconf==2.2.2
 basepython = python3.8
 
 [testenv:coverage]
+description = Runs test suite and measures test-coverage. Fails if coverage is 
+              below 100%. Run `tox -e coverage -- -n 0` to disable parallelization.
 setenv = NUMBA_DISABLE_JIT=1
 usedevelop = true
 basepython = python3.10
@@ -178,10 +187,13 @@ deps = {[testenv]deps}
        pydantic
        beartype
        cloudpickle
-commands = pytest --cov-report term-missing --cov-config=pyproject.toml --cov-fail-under=100 --cov=hydra_zen -n auto tests
+commands = pytest --cov-report term-missing --cov-config=pyproject.toml --cov-fail-under=100 --cov=hydra_zen tests {posargs: -n auto --maxprocesses=4}
 
 
 [testenv:pyright-scan-docs]
+description = Installs pyright and scans hydra-zen docs & docstrings. Note that this can 
+              be slow. Runs in parallel by default. Run 
+              `tox -e pyright-scan-docs -- -n 0` to disable parallelization.
 usedevelop = true
 basepython = python3.9
 deps = {[testenv]deps}
@@ -193,10 +205,12 @@ deps = {[testenv]deps}
        pydantic
        beartype
        --requirement deps/requirements-pyright.txt
-commands = pytest -n auto tests/test_docs_typecheck.py -vv
+commands = pytest tests/test_docs_typecheck.py -vv {posargs: -n auto --maxprocesses=4}
 
 
 [testenv:third-party]
+description = Runs test suite against optional 3rd party packages that hydra-zen 
+              provides specialized support for.
 install_command = pip install --upgrade --upgrade-strategy eager {opts} {packages}
 basepython = python3.9
 deps = {[testenv]deps}
@@ -209,6 +223,9 @@ deps = {[testenv]deps}
        beartype
 
 [testenv:pyright]
+description = Ensure that hydra-zen's source code and test suite scan clean
+              under pyright, and that hydra-zen's public API has a 100%
+              type-completeness score.
 usedevelop = true
 basepython = python3.9
 deps = 
@@ -218,6 +235,9 @@ commands = pyright --lib tests/annotations/ src/
            pyright --ignoreexternal --verifytypes hydra_zen
 
 [testenv:format]
+description = Applies auto-flake (e.g. remove unsused imports), black, and isort 
+              in-place on source files and test suite. Running this can help fix a 
+              failing `enforce-format` run.
 skip_install=true
 deps =
     autoflake
@@ -228,14 +248,9 @@ commands =
     isort src/ tests/
     black src/ tests/
 
-[testenv:docs]
-basepython=python3.9
-changedir=docs
-deps=-r{toxinidir}/docs/requirements.txt
-commands=
-    sphinx-build -b html -d {envtmpdir}/doctrees ./source  {envdir}/build/html
-
 [testenv:enforce-format]
+description = Ensures that source materials (code & docs) and test suite adhere to 
+              formatting and code-quality standards.
 skip_install=true
 basepython=python3.9
 deps=black
@@ -249,4 +264,13 @@ commands=
     flake8 src/ tests/
     codespell src/ docs/
     pytest project_tooling/test_headers.py 
+
+[testenv:docs]
+description = Uses Sphinx to generate html for the jatic-toolbox's docs. Stores the
+              results in `.tox/docs/build/html/`.
+basepython=python3.9
+changedir=docs
+deps=-r{toxinidir}/docs/requirements.txt
+commands=
+    sphinx-build -b html -d {envtmpdir}/doctrees ./source  {envdir}/build/html
 """
