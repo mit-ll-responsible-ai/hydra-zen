@@ -404,18 +404,24 @@ class Zen(Generic[P, R]):
 
         kw = dict(config_name=config_name)
 
-        if (
-            config_path is _UNSPECIFIED_
-            and HYDRA_VERSION < Version(1, 2, 0)
-            or isinstance(config_path, str)
-            and HYDRA_VERSION < Version(1, 3, 0)
+        # For relative config paths, Hydra looks in the directory relative to the file
+        # in which the task function is defined. Unfortunately, it is only able to
+        # follow wrappers starting in Hydra 1.3.0. Thus `Zen.hydra_main` cannot
+        # handle string config_path entries until Hydra 1.3.0
+        if (config_path is _UNSPECIFIED_ and HYDRA_VERSION < Version(1, 2, 0)) or (
+            isinstance(config_path, str) and HYDRA_VERSION < Version(1, 3, 0)
         ):  # pragma: no cover
             warnings.warn(
                 "Specifying config_path via hydra_zen.zen(...).hydra_main "
                 "is only supported for Hydra 1.3.0+"
             )
         if Version(1, 3, 0) <= HYDRA_VERSION and isinstance(config_path, str):
-
+            # Here we create an on-the-fly wrapper so that Hydra can trace
+            # back through the wrapper to the original task function
+            # We could give `Zen` as `__wrapped__` attr, but this messes with
+            # things like `inspect.signature`.
+            #
+            # A downside of this is that `wrapper` is not pickle-able.
             @wraps(self.func)
             def wrapper(cfg: Any):
                 return self(cfg)
@@ -580,14 +586,6 @@ def zen(
     <function __main__.f(x, y)>
     >>> zen_f.func(-1, 1)
     0
-
-    `zen` can be used as a decorator
-
-    >>> @zen
-    ... def zen_g(x, y):
-    ...     return x + y
-    >>> zen_g({'x': 1, 'y': 2})
-    3
 
     `zen` is compatible with partial'd functions.
 

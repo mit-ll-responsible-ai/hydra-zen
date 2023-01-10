@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import os
+import pickle
 import random
 import sys
 from dataclasses import dataclass
@@ -456,7 +457,8 @@ def test_hydra_main():
 
 @pytest.mark.xfail(
     HYDRA_VERSION < (1, 3, 0),
-    reason="hydra_main(config_path=...) only supports wrapped task functions starting in ",
+    reason="hydra_main(config_path=...) only supports wrapped task functions starting "
+    "in Hydra 1.3.0",
 )
 @pytest.mark.skipif(
     sys.platform.startswith("win") and bool(os.environ.get("CI")),
@@ -545,3 +547,15 @@ def zen_extracts_factory_from_instance():
         return y.x
 
     assert zen(f)(Conf) == 1
+
+
+def pikl(x):
+    return x * 2
+
+
+zpikl = zen(pikl)
+
+
+def test_pickle_compatible():
+    loaded = pickle.loads(pickle.dumps(zpikl))
+    assert loaded({"x": 3}) == pikl(3)
