@@ -2,7 +2,9 @@
 # SPDX-License-Identifier: MIT
 # pyright: strict
 
+import warnings
 from collections import defaultdict, deque
+from functools import wraps
 from inspect import Parameter, signature
 from typing import (
     Any,
@@ -42,6 +44,7 @@ from typing_extensions import (
 )
 
 from hydra_zen import instantiate, just, make_custom_builds_fn
+from hydra_zen._compatibility import HYDRA_VERSION, Version
 from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.structured_configs._type_guards import safe_getattr
 from hydra_zen.structured_configs._utils import get_obj_path
@@ -374,15 +377,20 @@ class Zen(Generic[P, R]):
         Parameters
         ----------
         config_path : Optional[str]
-            The config path, a directory relative to the declaring python file.
+            The config path, an absolute path to a directory or a directory relative to
+            the declaring python file. If `config_path` is not specified no directory is
+            added to the config search path.
 
-            If config_path is not specified no directory is added to the Config search path.
+            Specifying `config_path` via `Zen.hydra_main` is only supported for
+            Hydra 1.3.0+.
 
         config_name : Optional[str]
             The name of the config (usually the file name without the .yaml extension)
 
         version_base : Optional[str]
-            There are three classes of values that the version_base parameter supports, given new and existing users greater control of the default behaviors to use.
+            There are three classes of values that the version_base parameter supports,
+            given new and existing users greater control of the default behaviors to
+            use.
 
             - If the version_base parameter is not specified, Hydra 1.x will use defaults compatible with version 1.1. Also in this case, a warning is issued to indicate an explicit version_base is preferred.
             - If the version_base parameter is None, then the defaults are chosen for the current minor Hydra version. For example for Hydra 1.2, then would imply config_path=None and hydra.job.chdir=False.
@@ -396,6 +404,26 @@ class Zen(Generic[P, R]):
 
         kw = dict(config_name=config_name)
 
+        if (
+            config_path is _UNSPECIFIED_
+            and HYDRA_VERSION < Version(1, 2, 0)
+            or isinstance(config_path, str)
+            and HYDRA_VERSION < Version(1, 3, 0)
+        ):  # pragma: no cover
+            warnings.warn(
+                "Specifying config_path via hydra_zen.zen(...).hydra_main "
+                "is only supported for Hydra 1.3.0+"
+            )
+        if Version(1, 3, 0) <= HYDRA_VERSION and isinstance(config_path, str):
+
+            @wraps(self.func)
+            def wrapper(cfg: Any):
+                return self(cfg)
+
+            target = wrapper
+        else:
+            target = self
+
         if config_path is not _UNSPECIFIED_:
             kw["config_path"] = config_path
 
@@ -404,7 +432,7 @@ class Zen(Generic[P, R]):
         ):  # pragma: no cover
             kw["version_base"] = version_base
 
-        return hydra.main(**kw)(self)()
+        return hydra.main(**kw)(target)()
 
 
 @overload
@@ -518,6 +546,8 @@ def zen(
     The presence of a parameter named "zen_cfg" in the wrapped function's signature
     will cause `zen` to pass the full, resolved config to that field. This specific
     parameter name can be overridden via `Zen.CFG_NAME`.
+
+    Specifying `config_path` via `Zen.hydra_main` is only supported for Hydra 1.3.0+.
 
     Examples
     --------

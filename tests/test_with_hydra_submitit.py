@@ -18,7 +18,7 @@ def test_pickling_with_hydra_main():
     import subprocess
     from pathlib import Path
 
-    path = (Path(__file__).parent / "dummy_zen_main.py").absolute()
+    path = (Path(__file__).parent / "example_app" / "dummy_zen_main.py").absolute()
     assert not (Path.cwd() / "multirun").is_dir()
     subprocess.run(
         ["python", path, "x=1", "y=2", "hydra/launcher=submitit_local", "--multirun"]
