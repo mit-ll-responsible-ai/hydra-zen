@@ -164,6 +164,7 @@ class Zen(Generic[P, R]):
         self.func: Callable[P, R] = __func
 
         try:
+            # Must cast to dict so that `self` is pickle-compatible.
             self.parameters: Mapping[str, Parameter] = dict(
                 signature(self.func).parameters
             )
