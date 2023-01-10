@@ -8,6 +8,22 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse 
 chronological order. All previous releases should still be available on pip.
 
+.. _v0.9.1:
+
+---------------------
+0.9.1rc1 - 2023-XX-XX
+---------------------
+
+.. note:: This is documentation for an unreleased version of hydra-zen. You can try out this pre-release version using `pip install --pre hydra-zen`
+
+Improvements
+------------
+- :func:`hydra_zen.zen` now returns pickle-compatible wrapped functions. See :pull:`384`.
+
+Bug Fixes
+---------
+- :func:`hydra_zen.zen`'s `hydra_main` method now handles string `config_path` entries properly (only for Hydra 1.3.0+). Previously Hydra could not find the path to the wrapped task function. hydra-zen will warn users that a string `config_path` is not supported via :func:`hydra_zen.zen` for Hydra 1.2 and earlier. See :pull:`384`.
+
 .. _v0.9.0:
 
 ------------------
