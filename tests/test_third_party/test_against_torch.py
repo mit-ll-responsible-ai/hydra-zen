@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Massachusetts Institute of Technology
+# Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
 import inspect
@@ -10,7 +10,7 @@ import pytest
 import torch as tr
 from hypothesis import assume, given
 from omegaconf import OmegaConf
-from torch.optim import Adam, AdamW
+from torch.optim import SGD, Adam, AdamW
 from torch.utils.data import DataLoader, Dataset
 
 from hydra_zen import builds, hydrated_dataclass, instantiate, just, to_yaml
@@ -145,3 +145,10 @@ def test_dataloader_sig_doesnt_have_self():
     assert "self" not in {f.name for f in _fields}
     assert len(_fields) > 2
     assert list(instantiate(Conf)) == [tr.tensor(float(i)) for i in range(5)]
+
+
+def test_auto_config_support_for_optim_required():
+    Opt = instantiate(
+        builds(SGD, populate_full_signature=True, zen_partial=True)(lr=1.0)
+    )
+    assert isinstance(Opt(tr.nn.Linear(1, 1).parameters()), SGD)

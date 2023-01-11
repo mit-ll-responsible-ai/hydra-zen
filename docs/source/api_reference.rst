@@ -115,6 +115,7 @@ hydra_zen.typing
    :toctree: generated/
 
 
+   DataclassOptions
    ZenConvert
 
 
@@ -151,8 +152,10 @@ Auto-Config Support for Additional Types via hydra-zen
 
 Values of additional types can be specified directly via hydra-zen's 
 :ref:`config-creation functions <create-config>` (and other utility functions like :func:`~hydra_zen.to_yaml`) and those functions will automatically 
-create targeted configs to represent those values in a way that is compatible 
-with Hydra. For example, a :py:class:`complex` value can be specified directly via :func:`~hydra_zen.make_config`, and a targeted config will be created for that value.
+create dataclass instances to represent those values in a way that is compatible 
+with Hydra. For example, a :py:class:`complex` value can be passed directly to 
+:func:`~hydra_zen.make_config`, and hydra-zen will generate a dataclass instance that 
+represents that complex value in a Hydra-compatible way.
 
 .. code-block:: pycon
    :caption: Demonstrating auto-config support for `complex`, `functools.partial` and `dataclasses.dataclass`
@@ -213,20 +216,21 @@ hydra-zen provides specialized auto-config support for values of the following t
 - :py:class:`complex`
 - :py:class:`collections.Counter`
 - :py:class:`collections.deque`
-- :py:func:`functools.partial`
+- :py:func:`functools.partial` (note: not compatible with pickling)
 - :py:class:`pathlib.Path` (*support provided for OmegaConf < 2.2.1*)
 - :py:class:`pathlib.PosixPath`
 - :py:class:`pathlib.WindowsPath`
 - :py:class:`range`
 - :py:class:`set`
 - :py:class:`frozenset`
-- :py:func:`dataclasses.dataclass`
+- :py:func:`dataclasses.dataclass` (note: not compatible with pickling)
 
 hydra-zen also provides auto-config support for some third-pary libraries:
 
 - `pydantic.dataclasses.dataclass`
 - `pydantic.Field`
-
+- `pydantic.Field`
+- `torch.optim.optimizer.required` (i.e. the default parameter for `lr` in `Optimizer`)
 
 
 *********************

@@ -34,6 +34,9 @@ function as follows. Populate ``game_library.py`` with the following code.
    
    # Note: type annotations are *not* required by hydra-zen
 
+   __all__ = ["inventory", "Character"]
+
+
    class Character:
        def __init__(self, name: str, level: int = 1, inventory=None):
            self.name = name
@@ -155,16 +158,6 @@ inventory. We will use the following code in ``my_app.py``.
    # config for `Character`.
    CharConf = builds(Character, inventory=starter_gear)
 
-Finally, the top-level config for our application will simply specify that ``player`` 
-is described by this character config:
-
-.. code-block:: python
-   :caption: The top-level config for our application
-
-   from hydra_zen import make_config
-
-   Config = make_config(player=CharConf)
-
 
 Updating the Task Function
 --------------------------
@@ -172,30 +165,20 @@ Updating the Task Function
 We'll make some modifications to our task function.
 
 - We're only dealing with one player now, not two, so we adjust accordingly.
-- We need to make use of the :func:`~hydra_zen.instantiate` function to create the ``Character``-instance based on our config. 
 - Let's print ``Character``-instance for ``player`` so that we get instant feedback when we run our application from the CLI.
 
 .. code-block:: python
    :caption: A revised task function (single-player only)
 
-   def task_function(cfg):      
-       # `instantiate(cfg.player)` calls:
-       #
-       # Character(
-       #    name=cfg.player.name,
-       #    level=cfg.player.level,
-       #    inventory=inventory(gold=cfg.player.inventory.gold,
-       #                        weapon=cfg.player.inventory.weapon,
-       #                        costume=cfg.player.inventory.costume                        
-       # )
-       player = instantiate(cfg.player) # an instance of `Character`
-       print(player)
+   def task_function(player: Character):
 
-       with open("player_log.txt", "w") as f:
-           f.write("Game session log:\n")
-           f.write(f"Player: {player}\n")
-       
-       return player
+      print(player)
+
+      with open("player_log.txt", "a") as f:
+         f.write("Game session log:\n")
+         f.write(f"Player: {player}\n")
+
+      return player
 
 
 Piecing It All Together
@@ -206,45 +189,38 @@ needed to :ref:`create a command line interface <cli-app>` - our updated ``my_ap
 script is as follows.
 
 .. code-block:: python
-    :caption: Contents of my_app.py:
+   :caption: Contents of my_app.py:
 
-    import hydra
-    from hydra.core.config_store import ConfigStore
-    
-    from hydra_zen import instantiate, make_config, make_custom_builds_fn
-    
-    from game_library import inventory, Character
-    
-    builds = make_custom_builds_fn(populate_full_signature=True)
-    
-    # generating configs
-    InventoryConf = builds(inventory)
-    starter_gear = InventoryConf(gold=10, weapon="stick", costume="tunic")
-    
-    CharConf = builds(Character, inventory=starter_gear)
-    
-    # creating the top-level config for our application
-    Config = make_config(player=CharConf)
-    
-    cs = ConfigStore.instance()
-    cs.store(name="my_app", node=Config)
-    
-    
-    @hydra.main(config_path=None, config_name="my_app")
-    def task_function(cfg: Config):
-
-        player = instantiate(cfg.player) # an instance of `Character`
-
-        print(player)
-        
-        with open("player_log.txt", "w") as f:
-            f.write("Game session log:\n")
-            f.write(f"Player: {player}\n")
-
-        return player
-    
-    if __name__ == "__main__":
-        task_function()
+   from hydra_zen import make_custom_builds_fn, store, zen
+   
+   from game_library import inventory, Character
+   
+   builds = make_custom_builds_fn(populate_full_signature=True)
+   
+   # generating configs
+   starter_gear = builds(inventory, gold=10, weapon="stick", costume="tunic")
+   
+   CharConf = builds(Character, inventory=starter_gear)
+   
+   # Generate and store a top-level config specifying `CharConf` as the
+   # default config for `player`
+   @store(name="my_app", player=CharConf)
+   def task_function(player: Character):
+   
+       print(player)
+   
+       with open("player_log.txt", "a") as f:
+           f.write("Game session log:\n")
+           f.write(f"Player: {player}\n")
+   
+       return player
+   
+   if __name__ == "__main__":
+       store.add_to_hydra_store()
+       zen(task_function).hydra_main(config_name="my_app", 
+                                     version_base="1.1",
+                                     config_path=".",
+                                     )
 
 
 Running Our Application

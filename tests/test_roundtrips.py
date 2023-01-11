@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Massachusetts Institute of Technology
+# Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import datetime
 import math
@@ -15,12 +15,13 @@ from typing import Any, Dict, List, Optional
 
 import hypothesis.strategies as st
 import pytest
-from hypothesis import given
+from hypothesis import given, settings
 from omegaconf import OmegaConf
 
 from hydra_zen import builds, get_target, hydrated_dataclass, instantiate, just, to_yaml
 from hydra_zen.structured_configs._type_guards import is_builds
 from tests import is_same, valid_hydra_literals
+from tests.custom_strategies import valid_builds_args
 
 arbitrary_kwargs = st.dictionaries(
     keys=st.text(alphabet=string.ascii_letters, min_size=1, max_size=1),
@@ -188,6 +189,23 @@ def test_get_target_roundtrip(x, fn):
     loaded = OmegaConf.create(to_yaml(conf))
     assert is_builds(loaded)
     assert is_same(x, get_target(loaded))
+
+
+def f_get_target_roundtrip2():
+    ...
+
+
+@pytest.mark.filterwarnings("ignore:A structured config was supplied for")
+@settings(max_examples=500)
+@given(kw=valid_builds_args())
+def test_get_target_roundtrip2(kw: dict):
+    f = f_get_target_roundtrip2
+    conf = builds(f, **kw)
+    assert is_same(f, get_target(conf))
+
+    loaded = OmegaConf.create(to_yaml(conf))
+    assert is_builds(loaded)
+    assert is_same(f, get_target(loaded))
 
 
 @dataclass

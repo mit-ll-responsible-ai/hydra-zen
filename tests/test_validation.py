@@ -1,6 +1,7 @@
-# Copyright (c) 2022 Massachusetts Institute of Technology
+# Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import inspect
+import re
 from collections import Counter
 from collections.abc import Mapping
 from dataclasses import dataclass, is_dataclass
@@ -12,7 +13,16 @@ from hydra import __version__ as HYDRA_VERSION
 from hypothesis import assume, given, settings
 from omegaconf import OmegaConf
 
-from hydra_zen import builds, get_target, hydrated_dataclass, instantiate, just, to_yaml
+from hydra_zen import (
+    builds,
+    get_target,
+    hydrated_dataclass,
+    instantiate,
+    just,
+    make_config,
+    make_custom_builds_fn,
+    to_yaml,
+)
 from hydra_zen.errors import HydraZenUnsupportedPrimitiveError
 from hydra_zen.structured_configs._globals import (
     HYDRA_FIELD_NAMES,
@@ -286,6 +296,7 @@ def test_builds_raises_on_non_callable_target(not_callable, partial, full_sig):
         builds(not_callable, populate_full_signature=full_sig, zen_partial=partial)
 
 
+@pytest.mark.filterwarnings("ignore:Specifying")
 @pytest.mark.parametrize(
     "param_name, value",
     [
@@ -417,3 +428,38 @@ def test_meta_fields_colliding_with_user_provided_kwargs_raises(
 def test_get_obj_path_raises_for_unknown_name():
     with pytest.raises(AttributeError):
         get_obj_path(1)
+
+
+@pytest.mark.filterwarnings("ignore:Specifying")
+@pytest.mark.parametrize(
+    "dc_option, err_msg",
+    [
+        (22, "`zen_dataclass_options` is expected"),
+        ({"moo": True}, "moo is not a valid dataclass option"),
+        ({"module": 1}, "dataclass option `module` must be a valid module name, got 1"),
+        (
+            {"module": "2"},
+            "dataclass option `module` must be a valid module name, got 2",
+        ),
+        ({"bases": 1}, "dataclass option `bases` must be a tuple of dataclass types"),
+        (
+            {"bases": (1,)},
+            "dataclass option `bases` must be a tuple of dataclass types",
+        ),
+        ({"namespace": 1}, "dataclass option `namespace`"),
+        ({"namespace": {"1": lambda: None}}, "dataclass option `namespace`"),
+        ({"frozen": "apple"}, "dataclass option `frozen` must be of type `bool`."),
+        ({"eq": "apple"}, "dataclass option `eq` must be of type `bool`."),
+    ],
+)
+@pytest.mark.parametrize(
+    "fn",
+    [
+        lambda **kw: builds(int, **kw),
+        lambda **kw: make_custom_builds_fn(**kw),
+        lambda **kw: make_config(**kw),
+    ],
+)
+def test_bad_dataclass_input_raises(dc_option, err_msg, fn):
+    with pytest.raises((ValueError, TypeError), match=re.escape(err_msg)):
+        fn(zen_dataclass=dc_option)

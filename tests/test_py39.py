@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Massachusetts Institute of Technology
+# Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 from dataclasses import dataclass
 from typing import Any, Dict, List, Tuple
@@ -20,7 +20,8 @@ from hydra_zen.structured_configs._utils import sanitized_type
 )
 def test_sanitized_type_expected_behavior(in_type, expected_type):
     # tests collections-as-generics introduced in py39
-    assert sanitized_type(in_type) is expected_type
+    actual = sanitized_type(in_type)
+    assert actual is expected_type or actual == expected_type
 
     @dataclass
     class Tmp:

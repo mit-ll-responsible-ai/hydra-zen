@@ -1,6 +1,7 @@
-# Copyright (c) 2022 Massachusetts Institute of Technology
+# Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 # pyright: strict
+from dataclasses import MISSING
 from functools import partial
 from typing import TYPE_CHECKING, Any, Type, Union
 
@@ -8,6 +9,7 @@ from typing_extensions import TypeGuard
 
 from hydra_zen._compatibility import HYDRA_SUPPORTS_PARTIAL
 from hydra_zen.funcs import get_obj, zen_processing
+from hydra_zen.structured_configs._utils import safe_name
 from hydra_zen.typing import Builds, Just, PartialBuilds
 from hydra_zen.typing._implementations import DataClass_
 
@@ -35,8 +37,38 @@ __all__ = ["is_partial_builds", "uses_zen_processing", "is_dataclass"]
 # These are not part of the public API for now, but they may be in the future.
 
 
-def _get_target(x: Any):
-    return getattr(x, TARGET_FIELD_NAME)
+def safe_getattr(obj: Any, field: str, *default: Any) -> Any:
+    # We must access slotted class-attributes from a dataclass type
+    # via its `__dataclass_fields__`. Otherwise we will get a member
+    # descriptor
+
+    assert len(default) < 2
+    if (
+        hasattr(obj, "__slots__")
+        and isinstance(obj, type)
+        and is_dataclass(obj)
+        and field in obj.__slots__  # type: ignore
+    ):
+        try:
+            _field = obj.__dataclass_fields__[field]
+            if _field.default_factory is not MISSING or _field.default is MISSING:
+                raise AttributeError
+
+            return _field.default
+
+        except (KeyError, AttributeError):
+            if default:
+                return default[0]
+
+            raise AttributeError(
+                f"type object '{safe_name(obj)}' has no attribute '{field}'"
+            )
+
+    return getattr(obj, field, *default)
+
+
+def _get_target(x: Builds[Any]) -> Any:
+    return safe_getattr(x, TARGET_FIELD_NAME)
 
 
 def is_builds(x: Any) -> TypeGuard[Builds[Any]]:
@@ -49,7 +81,7 @@ def is_just(x: Any) -> TypeGuard[Just[Any]]:
         if attr == _get_target(Just) or attr is get_obj:
             return True
         else:
-            # ensures we conver this branch in tests
+            # ensures we convert this branch in tests
             return False
     return False
 
@@ -69,7 +101,7 @@ def is_old_partial_builds(x: Any) -> bool:  # pragma: no cover
     if is_builds(x) and hasattr(x, "_partial_target_"):
         attr = _get_target(x)
         if (attr == "hydra_zen.funcs.partial" or attr is partial) and is_just(
-            getattr(x, "_partial_target_")
+            safe_getattr(x, "_partial_target_")
         ):
             return True
         else:
@@ -130,6 +162,7 @@ def uses_zen_processing(x: Any) -> TypeGuard[Builds[Any]]:
     """
     if not is_builds(x) or not hasattr(x, ZEN_TARGET_FIELD_NAME):
         return False
+
     attr = _get_target(x)
     if attr != ZEN_PROCESSING_LOCATION and attr is not zen_processing:
         return False
@@ -190,10 +223,10 @@ def is_partial_builds(x: Any) -> TypeGuard[PartialBuilds[Any]]:
         return (
             # check if partial'd config via Hydra
             HYDRA_SUPPORTS_PARTIAL
-            and getattr(x, PARTIAL_FIELD_NAME, False) is True
+            and safe_getattr(x, PARTIAL_FIELD_NAME, False) is True
         ) or (
             # check if partial'd config via `zen_processing`
             uses_zen_processing(x)
-            and (getattr(x, ZEN_PARTIAL_FIELD_NAME, False) is True)
+            and (safe_getattr(x, ZEN_PARTIAL_FIELD_NAME, False) is True)
         )
     return False

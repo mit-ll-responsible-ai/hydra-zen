@@ -1,5 +1,5 @@
-# Copyright (c) 2022 Massachusetts Institute of Technology
-# SPDX-License-Identifier: MIR
+# Copyright (c) 2023 Massachusetts Institute of Technology
+# SPDX-License-Identifier: MIT
 # pyright: strict
 
 from collections import defaultdict, deque
@@ -43,6 +43,7 @@ from typing_extensions import (
 
 from hydra_zen import instantiate, just, make_custom_builds_fn
 from hydra_zen.errors import HydraZenValidationError
+from hydra_zen.structured_configs._type_guards import safe_getattr
 from hydra_zen.structured_configs._utils import get_obj_path
 from hydra_zen.typing._implementations import (
     DataClass_,
@@ -301,6 +302,7 @@ class Zen(Generic[P, R]):
                 f"`cfg` is missing the following fields: {', '.join(missing_params)}"
             )
 
+    # TODO: add "extract" option that enables returning dict of fields
     def __call__(self, __cfg: Union[ConfigLike, str]) -> R:
         """
         Extracts values from the input config based on the decorated function's
@@ -331,9 +333,9 @@ class Zen(Generic[P, R]):
 
         cfg_kwargs = {
             name: (
-                getattr(cfg, name, param.default)
+                safe_getattr(cfg, name, param.default)
                 if param.default is not param.empty
-                else getattr(cfg, name)
+                else safe_getattr(cfg, name)
             )
             for name, param in self.parameters.items()
             if param.kind not in SKIPPED_PARAM_KINDS and name not in self._exclude
@@ -411,7 +413,7 @@ def zen(
     pre_call: PreCall = ...,
     ZenWrapper: Type[Zen[P, R]] = Zen,
     exclude: Optional[Union[str, Iterable[str]]] = None,
-) -> Zen[P, R]:  # pragma: no cover
+) -> Zen[P, R]:
     ...
 
 
@@ -423,7 +425,7 @@ def zen(
     pre_call: PreCall = ...,
     ZenWrapper: Type[Zen[Any, Any]] = ...,
     exclude: Optional[Union[str, Iterable[str]]] = None,
-) -> Callable[[Callable[P, R]], Zen[P, R]]:  # pragma: no cover
+) -> Callable[[Callable[P, R]], Zen[P, R]]:
     ...
 
 
@@ -550,9 +552,9 @@ def zen(
     `zen` can be used as a decorator
 
     >>> @zen
-    ... def zen_f(x, y):
+    ... def zen_g(x, y):
     ...     return x + y
-    >>> zen_f({'x': 1, 'y': 2})
+    >>> zen_g({'x': 1, 'y': 2})
     3
 
     `zen` is compatible with partial'd functions.
@@ -568,24 +570,25 @@ def zen(
     One can specify `exclude` to prevent particular variables from being extracted from
     a config:
 
-    >>> def f(x=1, y=2): return (x, y)
+    >>> def g(x=1, y=2): return (x, y)
     >>> cfg = {"x": -10, "y": -20}
-    >>> zen(f)(cfg)  # extracts x & y from config to call f
+    >>> zen(g)(cfg)  # extracts x & y from config to call f
     (-10, -20)
-    >>> zen(f, exclude="x")(cfg)  # extracts y from config to call f(x=1, ...)
+    >>> zen(g, exclude="x")(cfg)  # extracts y from config to call f(x=1, ...)
     (1, -20)
-    >>> zen(f, exclude="x,y")(cfg)  # defers to f's defaults
+    >>> zen(g, exclude="x,y")(cfg)  # defers to f's defaults
     (1, 2)
 
     Populating a `**kwargs` field via `unpack_kwargs=True`:
 
-    >>> def g(a, **kw):
+    >>> def h(a, **kw):
     ...     return a, kw
-    >>> cfg = dict(a=1, b=22, foo="bar")
-    >>> zen(g, unpack_kwargs=False)(cfg)
+
+    >>> cfg = dict(a=1, b=22)
+    >>> zen(h, unpack_kwargs=False)(cfg)
     (1, {})
-    >>> zen(g, unpack_kwargs=True)(cfg)
-    (1, {'b': 22, 'foo': 'bar'})
+    >>> zen(h, unpack_kwargs=True)(cfg)
+    (1, {'b': 22})
 
 
     **Passing Through The Full Input Config**
@@ -623,7 +626,11 @@ def zen(
     ... )
     >>> wrapped = zen(func, pre_call=lambda cfg: random.seed(cfg.seed))
 
-    >>> [wrapped(cfg) for _ in range(10)]
+    >>> @zen(pre_call=lambda cfg: random.seed(cfg.seed))
+    ... def f1(rand_val: int):
+    ...     return rand_val
+
+    >>> [f1(cfg) for _ in range(10)]
     [6, 6, 6, 6, 6, 6, 6, 6, 6, 6]
 
 
@@ -634,20 +641,17 @@ def zen(
 
     .. code-block:: python
 
-        # example.py
-        from hydra.core.config_store import ConfigStore
+       # example.py
+       from hydra_zen import zen, store
 
-        from hydra_zen import builds, zen
+       @store(name="my_app")
+       def task(x: int, y: int):
+           print(x + y)
 
-        def task(x: int, y: int):
-            print(x + y)
+       if __name__ == "__main__":
+           store.add_to_hydra_store()
+           zen(task).hydra_main(config_name="my_app", config_path=None, version_base="1.2")
 
-        cs = ConfigStore.instance()
-        cs.store(name="my_app", node=builds(task, populate_full_signature=True))
-
-
-        if __name__ == "__main__":
-            zen(task).hydra_main(config_name="my_app", config_path=None)
 
     .. code-block:: console
 
@@ -660,17 +664,17 @@ def zen(
     An input config can be validated against a zen-wrapped function – without calling
     said function – via the `.validate` method.
 
-    >>> def f(x: int): ...
-    >>> zen_f = zen(f)
+    >>> def f2(x: int): ...
+    >>> zen_f = zen(f2)
     >>> zen_f.validate({"x": 1})  # OK
     >>> zen_f.validate({"y": 1})  # Missing x
     HydraZenValidationError: `cfg` is missing the following fields: x
 
     Validation propagates through zen-wrapped pre-call functions:
 
-    >>> zen_f = zen(f, pre_call=zen(lambda seed: None))
-    >>> zen_f.validate({"x": 1, "seed": 10})  # OK
-    >>> zen_f.validate({"x": 1})  # Missing seed as required by pre-call
+    >>> zen_f2 = zen(f2, pre_call=zen(lambda seed: None))
+    >>> zen_f2.validate({"x": 1, "seed": 10})  # OK
+    >>> zen_f2.validate({"x": 1})  # Missing seed as required by pre-call
     HydraZenValidationError: `cfg` is missing the following fields: seed
     """
     if __func is not None:
@@ -757,7 +761,7 @@ def default_to_config(
     """
     if is_dataclass(target):
         if isinstance(target, type):
-            if get_obj_path(target).startswith("types."):
+            if not kw and get_obj_path(target).startswith("types."):
                 # handles dataclasses returned by make_config()
                 return target
             return fbuilds(target, **kw, builds_bases=(target,))
@@ -885,6 +889,7 @@ class ZenStore:
     >>> config2 = {'name': 'Rita', 'age': 27}
     >>> _ = store(config1, name="roger", group="profiles")
     >>> _ = store(config2, name="rita", group="profiles")
+    >>> store
     zen_store
     {'profiles': ['roger', 'rita']}
 
@@ -895,7 +900,7 @@ class ZenStore:
     {'name': 'Roger', age: 24}
 
     By default, the stored config(s) will be "enqueued" for addition to Hydra's config
-    store, and the method `.add_to_hydra_store()` must be called to add the enqueued
+    store. The method `.add_to_hydra_store()` must be called to add the enqueued
     configs to Hydra's central store.
 
     >>> store.has_enqueued()
@@ -972,16 +977,17 @@ class ZenStore:
     b: ???
     a: -10
 
-    Note that, by default, the application of `to_config` via the store is deferred
-    until that entry is actually accessed. This defers the runtime cost of constructing
-    configs for the decorated function so that it need not be paid until necessary.
+    Note that, by default, the application of `to_config` via the store **is deferred
+    until that entry is actually accessed**. This offsets the runtime cost of
+    constructing configs for the decorated function so that it need not be paid until
+    the config is actually accessed by the store.
 
     .. _self-partial:
 
     **Customizable store defaults via 'self-partialing' patterns**
 
     The default values for a store's `__call__` parameters – `group`, `to_config`, etc.
-    – can easily be customized. Simpy call the store with those new values and
+    – can easily be customized. Simply call the store with those new values and
     without specifying an object to be stored. This will return a "mirrored" store
     instance – with the same internal state as the original store – with updated
     defaults.
@@ -1143,7 +1149,7 @@ class ZenStore:
         provider: Optional[str] = ...,
         to_config: Callable[[F], Node] = default_to_config,
         **to_config_kw: Any,
-    ) -> F:  # pragma: no cover
+    ) -> F:
         ...
 
     # TODO: ZenStore -> Self when mypy adds support for Self
@@ -1159,7 +1165,7 @@ class ZenStore:
         provider: Optional[str] = ...,
         to_config: Callable[[Any], Node] = ...,
         **to_config_kw: Any,
-    ) -> "ZenStore":  # pragma: no cover
+    ) -> "ZenStore":
         ...
 
     def __call__(self, __target: Optional[F] = None, **kw: Any) -> Union[F, "ZenStore"]:
@@ -1332,13 +1338,11 @@ class ZenStore:
         return bool(self._internal_repo)
 
     @overload
-    def __getitem__(self, key: Tuple[GroupName, NodeName]) -> Node:  # pragma: no cover
+    def __getitem__(self, key: Tuple[GroupName, NodeName]) -> Node:
         ...
 
     @overload
-    def __getitem__(
-        self, key: GroupName
-    ) -> Dict[Tuple[GroupName, NodeName], Node]:  # pragma: no cover
+    def __getitem__(self, key: GroupName) -> Dict[Tuple[GroupName, NodeName], Node]:
         ...
 
     def __getitem__(self, key: Union[GroupName, Tuple[GroupName, NodeName]]) -> Node:
@@ -1420,9 +1424,8 @@ class ZenStore:
     def __contains__(self, key: Union[GroupName, Tuple[GroupName, NodeName]]) -> bool:
         """Checks if group or (group, node-name) exists in zen-store."""
         if key is None:
-            return any(k[0] is None for k in self._internal_repo)
-
-        if isinstance(key, str):
+            return any(k[0] is None for k in self._internal_repo)  # pragma: no branch
+        elif isinstance(key, str):
             key_w_end: str = key + "/"
             return any(
                 key == group or group.startswith(key_w_end)
@@ -1468,12 +1471,31 @@ class ZenStore:
     def add_to_hydra_store(self, overwrite_ok: Optional[bool] = None) -> None:
         """Adds all of this store's enqueued entries to Hydra's global config store.
 
+        This method need not be called for a store initialized as
+        `ZenStore(deferred_hydra_store=False)`.
+
         Parameters
         ----------
         overwrite_ok : Optional[bool]
             If `False`, this method raises `ValueError` if an entry in Hydra's config
             store will be overwritten. Defaults to the value of `overwrite_ok`
-            specified when initializing this store."""
+            specified when initializing this store.
+
+        Examples
+        --------
+        >>> from hydra_zen import ZenStore
+        >>> store1 = ZenStore()
+        >>> store2 = ZenStore()
+
+        >>> store1({'a': 1}, name="x")
+        >>> store1.add_to_hydra_store()
+        >>> store2({'a': 2}, name="x")
+        >>> store2.add_to_hydra_store()
+        ValueError: (name=x group=None): Hydra config store entry already exists. Specify `overwrite_ok=True` to enable replacing config store entries
+
+        >>> store2.add_to_hydra_store(overwrite_ok=True)  # successfully overwrites entry
+
+        """
 
         while self._queue:
             entry = _resolve_node(self._queue.popleft(), copy=False)

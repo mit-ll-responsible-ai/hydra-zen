@@ -1,8 +1,9 @@
-# Copyright (c) 2022 Massachusetts Institute of Technology
+# Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
 from ._implementations import (
     Builds,
+    DataclassOptions,
     HydraPartialBuilds,
     Importable,
     Just,
@@ -17,6 +18,7 @@ from ._implementations import (
 
 __all__ = [
     "Builds",
+    "DataclassOptions",
     "Importable",
     "Just",
     "Partial",

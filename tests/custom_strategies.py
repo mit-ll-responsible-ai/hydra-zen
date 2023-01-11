@@ -1,3 +1,5 @@
+# Copyright (c) 2023 Massachusetts Institute of Technology
+# SPDX-License-Identifier: MIT
 import string
 from typing import (
     Any,
@@ -15,7 +17,9 @@ from typing import (
 import hypothesis.strategies as st
 
 from hydra_zen import ZenStore, builds
+from hydra_zen._compatibility import HYDRA_SUPPORTS_OBJECT_CONVERT
 from hydra_zen.structured_configs._utils import get_obj_path
+from hydra_zen.typing import DataclassOptions
 from hydra_zen.typing._implementations import ZenConvert
 
 __all__ = ["valid_builds_args", "partitions", "everything_except"]
@@ -36,6 +40,37 @@ single_wrapper_strat = (
 )
 wrapper_strat = single_wrapper_strat | st.lists(single_wrapper_strat)
 
+slots_strat = st.booleans()
+
+
+def _compat_slots(conf: Dict[str, Any]):
+    # dataclass has some hard rules about a frozen dataclass inheriting
+    # from a non-frozen one anf vice versa. Let's avoid this
+
+    if conf.get("weakref_slot", None) is True:
+        conf["slots"] = True
+    return conf
+
+
+st.register_type_strategy(
+    DataclassOptions,
+    st.fixed_dictionaries(
+        {},
+        optional={
+            "cls_name": st.text("abcdefg_", min_size=1),
+            "init": st.booleans(),
+            "repr": st.booleans(),
+            "eq": st.just(True),
+            "order": st.booleans(),
+            "unsafe_hash": st.booleans(),
+            "frozen": st.booleans(),
+            "match_args": st.booleans(),
+            "kw_only": st.booleans(),
+            "slots": st.shared(st.booleans(), key="slot"),
+            "weakref_slot": st.shared(st.booleans(), key="slot"),
+        },
+    ).map(_compat_slots),
+)
 
 _valid_builds_strats = dict(
     zen_partial=st.none() | st.booleans(),
@@ -46,12 +81,17 @@ _valid_builds_strats = dict(
     ),
     populate_full_signature=st.booleans(),
     hydra_recursive=st.booleans(),
-    hydra_convert=st.sampled_from(["none", "partial", "all"]),
-    frozen=st.booleans(),
-    builds_bases=st.lists(
-        st.sampled_from([builds(x) for x in (int, len, dict)]), unique=True
-    ).map(tuple),
+    hydra_convert=st.sampled_from(
+        [
+            "none",
+            "partial",
+            "all",
+            *(("object",) if HYDRA_SUPPORTS_OBJECT_CONVERT else ()),
+        ]
+    ),
+    builds_bases=st.just(()),
     zen_convert=st.none() | st.from_type(ZenConvert),
+    zen_dataclass=st.none() | st.from_type(DataclassOptions),
 )
 
 
@@ -73,14 +113,18 @@ def valid_builds_args(*required: str, excluded: Sequence[str] = ()):
     assert _required <= set(_valid_builds_strats), _required - set(_valid_builds_strats)
     assert _excluded <= set(_valid_builds_strats), _excluded - set(_valid_builds_strats)
 
-    return st.fixed_dictionaries(
-        {k: _valid_builds_strats[k] for k in sorted(_required)},
-        optional={
-            k: v
-            for k, v in _valid_builds_strats.items()
-            if k not in _excluded and k not in _required
-        },
-    ).map(_compat_frozen)
+    return (
+        st.fixed_dictionaries(
+            {k: _valid_builds_strats[k] for k in sorted(_required)},
+            optional={
+                k: v
+                for k, v in _valid_builds_strats.items()
+                if k not in _excluded and k not in _required
+            },
+        )
+        .map(_compat_frozen)
+        .map(_compat_slots)
+    )
 
 
 @st.composite
@@ -125,7 +169,7 @@ def f():
     pass
 
 
-f_Build = builds(f, dataclass_name="f_Build")
+f_Build = builds(f, zen_dataclass={"cls_name": "f_Build"})
 
 
 @st.composite

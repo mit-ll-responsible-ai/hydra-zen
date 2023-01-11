@@ -19,7 +19,7 @@ jobs:
     strategy:
       max-parallel: 5
       matrix:
-        python-version: [3.7, 3.8, 3.9, "3.10"]
+        python-version: [3.7, 3.8, 3.9, "3.10", 3.11]
       fail-fast: false
 
     steps:
@@ -55,25 +55,46 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.8
+    - name: Set up Python 3.10
       uses: actions/setup-python@v4
       with:
-        python-version: 3.8
+        python-version: "3.10"
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install tox
     - name: Measure coverage
       run: tox -e coverage
+  
+  pyright-scan-docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox
+    - name: Cache tox environments
+      id: cache-third-party
+      uses: actions/cache@v3
+      with:
+        path: .tox
+        key: tox-pyright-docs-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('deps/requirements-pyright.txt') }}-${{ hashFiles('.github/workflows/tox.yml') }}
+    - name: Scan docs with pyright
+      run: tox -e pyright-scan-docs
 
   test-third-party:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.8
+    - name: Set up Python 3.9
       uses: actions/setup-python@v4
       with:
-        python-version: 3.8
+        python-version: 3.9
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -83,7 +104,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: .tox
-        key: tox-third-party-${{ hashFiles('setup.cfg') }}-${{ hashFiles('setup.py') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
+        key: tox-third-party-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('tests/conftest.py') }}-${{ hashFiles('.github/workflows/tox.yml') }}
     - name: Test with tox
       run: tox -e third-party
 
@@ -107,31 +128,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.8
+    - name: Set up Python 3.9
       uses: actions/setup-python@v4
       with:
-        python-version: 3.8
+        python-version: 3.9
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install tox tox-gh-actions
     - name: Test with tox
       run: tox -e pre-release
-
-  test-against-hydra-1_1_2dev:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.8
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install tox tox-gh-actions
-    - name: Test with tox
-      run: tox -e hydra-1p1p2-pre-release
 
   test-against-omegaconf-2p2p2:
     runs-on: ubuntu-latest
@@ -148,41 +154,50 @@ jobs:
     - name: Test with tox
       run: tox -e omegaconf-2p2p2
 
-  run-pyright:
+  check-repo-format:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
-
-    - uses: actions/setup-node@v3.5.1
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-
-    - name: Get npm cache directory
-      id: npm-cache
-      run: |
-        echo "::set-output name=dir::$(npm config get cache)"
-    - uses: actions/cache@v3
-      with:
-        path: ${{ steps.npm-cache.outputs.dir }}
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
-    - name: Install pyright
-      run: sudo npm install -g pyright@">1.1.272"
-    - uses: actions/checkout@v3
-    - name: Set up Python
+    - name: Set up Python 3.9
       uses: actions/setup-python@v4
       with:
-        python-version: 3.8
+        python-version: 3.9
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -e .
-    - name: Run pyright basic on src
-      run: pyright --lib tests/annotations/ src/
-    - name: (pyright) verify type completeness
-      run: pyright --ignoreexternal --verifytypes hydra_zen
+        pip install tox tox-gh-actions
+    - name: Test with tox
+      run: tox -e enforce-format
+
+  run-pyright:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox tox-gh-actions
+    - name: Test with tox
+      run: tox -e pyright
+
+  test-docs-builds:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox tox-gh-actions
+    - name: Test with tox
+      run: tox -e docs
 
   run-mypy:
     runs-on: ubuntu-latest

@@ -1,7 +1,8 @@
-# Copyright (c) 2022 Massachusetts Institute of Technology
+# Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import string
 import warnings
+from functools import partial
 from typing import Any, Callable, Dict, List, TypeVar, Union
 
 import hypothesis.strategies as st
@@ -299,3 +300,19 @@ def test_bad_relative_interp_warns(wrappers, expected_match):
 def test_interp_doesnt_warn(wrappers):
     with warnings.catch_warnings():
         builds(dict, zen_wrappers=wrappers, zen_meta=dict(s=1))
+
+
+def pmy_wrapper(func, repeat):
+    def w(*a, **k):
+        return [func(*a, **k)] * repeat
+
+    return w
+
+
+def ptarget():
+    return "moo"
+
+
+def test_partial_zen_wrapper():
+    out = instantiate(builds(ptarget, zen_wrappers=partial(pmy_wrapper, repeat=3)))
+    assert out == ["moo"] * 3

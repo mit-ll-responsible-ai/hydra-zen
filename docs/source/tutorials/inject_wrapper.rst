@@ -98,13 +98,13 @@ Incorporating this wrapper into our application simply involves specifying it as
 
 .. code:: python 
    
-   CharConf = builds(Character, inventory=starter_gear)
+   CharConf = builds(Character, ...)
 
 to be
 
 .. code:: python 
    
-   CharConf = builds(Character, inventory=starter_gear, zen_wrappers=halloween_update)
+   CharConf = builds(Character, ..., zen_wrappers=halloween_update)
 
 
 Putting It All Together
@@ -116,12 +116,12 @@ over. Modify your ``my_app.py`` script to match the following code.
 .. code-block:: python
    :caption: Contents of ``my_app.py``
 
-   import hydra
-   from hydra.core.config_store import ConfigStore
-   
-   from hydra_zen import instantiate, make_config, make_custom_builds_fn
+   from hydra_zen import store, make_custom_builds_fn, zen
    
    from game_library import inventory, Character
+   
+   builds = make_custom_builds_fn(populate_full_signature=True)
+   
    
    # 1. Added our wrapper
    def halloween_update(CharClass):
@@ -137,19 +137,19 @@ over. Modify your ``my_app.py`` script to match the following code.
    
        return wrapper
    
-   
-   builds = make_custom_builds_fn(populate_full_signature=True)
-   
-   cs = ConfigStore.instance()
-   
+
+   # Create inventory configs
    InventoryConf = builds(inventory)
    starter_gear = InventoryConf(gold=10, weapon="stick", costume="tunic")
    advanced_gear = InventoryConf(gold=500, weapon="wand", costume="magic robe")
    hard_mode_gear = InventoryConf(gold=0, weapon="inner thoughts", costume="rags")
    
-   cs.store(group="player/inventory", name="starter", node=starter_gear)
-   cs.store(group="player/inventory", name="advanced", node=advanced_gear)
-   cs.store(group="player/inventory", name="hard_mode", node=hard_mode_gear)
+   # Register inventory configs under group: player/inventory
+   inv_store = store(group="player/inventory")
+   
+   inv_store(starter_gear, name="starter")
+   inv_store(advanced_gear, name="advanced")
+   inv_store(hard_mode_gear, name="hard_mode")
    
    # 2. Included the wrapper in our config for `Character`
    CharConf = builds(Character, inventory=starter_gear, zen_wrappers=halloween_update)
@@ -166,23 +166,23 @@ over. Modify your ``my_app.py`` script to match the following code.
        inventory=InventoryConf(costume="PJs", weapon="pillow", gold=41),
    )
    
-   cs.store(group="player", name="base", node=CharConf)
-   cs.store(group="player", name="brinda", node=brinda_conf)
-   cs.store(group="player", name="rakesh", node=rakesh_conf)
+   # Register player-profile configs under group: player
+   player_store = store(group="player")
+
+   player_store(CharConf, name="base")
+   player_store(brinda_conf, name="brinda")
+   player_store(rakesh_conf, name="rakesh")
    
    
-   Config = make_config("player", hydra_defaults=["_self_", {"player": "base"}])
+   # The `hydra_defaults` field is specified in our task function's config.
+   # It instructs Hydra to use the player config that named 'base' in our
+   # config store as the default config for our app.
+   @store(name="my_app",  hydra_defaults=["_self_", {"player": "base"}])
+   def task_function(player: Character):
    
-   cs.store(name="my_app", node=Config)
-   
-   
-   @hydra.main(config_path=None, config_name="my_app")
-   def task_function(cfg):
-       # cfg: Config
-       player = instantiate(cfg.player)
        print(player)
    
-       with open("player_log.txt", "w") as f:
+       with open("player_log.txt", "a") as f:
            f.write("Game session log:\n")
            f.write(f"Player: {player}\n")
    
@@ -190,7 +190,17 @@ over. Modify your ``my_app.py`` script to match the following code.
    
    
    if __name__ == "__main__":
-       task_function()
+       # We need to add the configs from our local store to Hydra's
+       # global config store
+       store.add_to_hydra_store()
+   
+       # Our zen-wrapped task function is used to generate
+       # the CLI, and to specify which config we want to use
+       # to configure the app by default
+       zen(task_function).hydra_main(config_name="my_app",
+                                     version_base="1.1",
+                                     config_path=".",
+                                     )
 
 Running Our Application
 =======================

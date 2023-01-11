@@ -37,7 +37,7 @@ We'll compare the processes of configuring :class:`DNN` using a YAML-file, using
 Statically-Defined Configs are WET
 ==================================
 
-Manually writing a structured config for ``DNN`` entails hard-coding its current import-path as a string as wll as explicitly mirroring its signature:
+Manually writing a structured config for ``DNN`` entails hard-coding its current import-path as a string as well as explicitly mirroring its signature:
 
 
 .. tab-set::
@@ -53,7 +53,7 @@ Manually writing a structured config for ``DNN`` entails hard-coding its current
          class Builds_DNN:
              input_size: int
              output_size: int
-             layer_widths: Tuple[int, ...] = (5, 10, 5)
+             layer_widths: tuple[int, ...] = (5, 10, 5)
              device: str = "cpu"
              _target_: str = "vision.model.DNN"
 
@@ -96,7 +96,7 @@ We can stay nice and DRY by dynamically generating our configurations with :func
    from hydra_zen import builds
    from vision.model import DNN
 
-   Builds_DNN = builds(DNN, populate_full_signature=True)
+   ZenBuilds_DNN = builds(DNN, populate_full_signature=True)
 
 
 Here we don't need to worry about repeating ourselves in order to keep our config in 

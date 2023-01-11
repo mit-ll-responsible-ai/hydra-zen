@@ -10,20 +10,18 @@ chronological order. All previous releases should still be available on pip.
 
 .. _v0.9.0:
 
----------------------
-0.9.0rc4 - 2022-11-21
----------------------
-
-.. note:: This is documentation for an unreleased version of hydra-zen. You can try out this pre-release version using `pip install --pre hydra-zen`
-
+------------------
+0.9.0 - 2022-12-30
+------------------
 
 Release Highlights
 ------------------
 This release introduces :func:`~hydra_zen.zen` and :class:`~hydra_zen.ZenStore`, which enable hydra-zen users to eliminate Hydra-specific boilerplate code from their projects and to utilize new patterns and best practices for working with config stores.
 
-The :func:`~hydra_zen.zen` decorator enables of use Hydra-agnostic task functions in Hydra apps; the decorator will automatically extract, resolve, and instantiate fields from an input config based on the function's signature. This encourages users to eliminate Hydra-specific boilerplate code from their projects and to instead opt for task functions with explicit signatures, which can include functions from third parties.
-
-E.g., :func:`~hydra_zen.zen` enables us to replace the following Hydra-specific task function:
+The wrapper `~hydra_zen.zen` will automatically extract, resolve, and instantiate 
+fields from a config in order to call the function that it has wrapped, thus saving the 
+user from writing repetitive, hydra-specific boilerplate code in their function.
+Thus this wrapper enables users to replace the following Hydra-specific task function:
 
 .. code-block:: python
    :caption: The "old school" way of designing a task function for a Hydra app
@@ -67,30 +65,11 @@ with a Hydra-agnostic task function that has an explicit signature:
 There are plenty more bells and whistles to :func:`~hydra_zen.zen`, refer to :pull:`310` and its reference documentation for more details.
 
 :class:`~hydra_zen.ZenStore` is an abstraction over Hydra's config store.
-It enables users to maintain multiple, isolated store instances before populating Hydra's global config store.
-It also protects users from accidentally overwriting  entries in Hydra's global store
-
-This enables objects to be stored using a decorator pattern, e.g.
-
-.. code-block:: python
-   :caption: Using `hydra_zen.store` as a decorator to auto-configure and store objects.
-
-   from dataclasses import dataclass
-   from hydra_zen import store
-
-   profile_store = store(group="profile")
-
-   # Adds two store entries under the "profile" group of the store
-   # with configured defaults for `has_root`
-   @profile_store(name="admin", has_root=True)
-   @profile_store(name="basic", has_root=False)
-   @dataclass
-   class Profile:
-       username: str
-       schema: str
-       has_root: bool
-
-:class:`~hydra_zen.ZenStore` also possesses auto-config capabilities: it will automatically apply :func:`~hyda_zen.builds` and :func:`~hyda_zen.just` in intuitive ways on inputs to generate the stored configs.
+It enables users to maintain multiple, isolated store instances before populating 
+Hydra's global config store. It also protects users from accidentally overwriting  
+entries in Hydra's global store. :class:`~hydra_zen.ZenStore` possesses auto-config 
+capabilities: it will automatically apply :func:`~hyda_zen.builds` and 
+:func:`~hyda_zen.just` in intuitive ways on inputs to generate the stored configs.
 
 .. code-block:: python
    :caption: Using `hydra_zen.store` auto-generate and store configs
@@ -110,22 +89,139 @@ This enables objects to be stored using a decorator pattern, e.g.
    optim_store(AdamW, name="adamw", betas=(0.1, 0.999))
    optim_store(RMSprop, name="rmsprop")
 
+   torch_store.add_to_hydra_store()  # populate Hydra's global store
+
+The store can also be populated using a decorator pattern [1]_, e.g.
+
+.. code-block:: python
+   :caption: Using `hydra_zen.store` as a decorator to auto-configure and store objects.
+
+   from dataclasses import dataclass
+   from hydra_zen import store
+
+   profile_store = store(group="profile")
+
+   # Adds two store entries under the "profile" group of the store
+   # with configured defaults for `has_root`
+   @profile_store(name="admin", has_root=True)
+   @profile_store(name="basic", has_root=False)
+   @dataclass
+   class Profile:
+       username: str
+       schema: str
+       has_root: bool
+
+   
+   db_store = store(group="database")
+
+   # calls `builds(profile_database, [...])` under the hood and
+   # adds the config to the store under the "profile" group
+   @db_store(name="database")
+   @db_store(name="test_database", size=1)
+   def profile_database(size):
+       ...
+
+
 New Features
 ------------
+- hydra-zen now supports Python 3.11
 - Adds the :func:`~hydra_zen.zen` decorator (see :pull:`310`)
 - Adds the :func:`~hydra_zen.wrapper.Zen` decorator-class (see :pull:`310`)
 - Adds the :class:`~hydra_zen.ZenStore` class (see :pull:`331`)
 - Adds `hyda_zen.store`, which is a pre-initialized instance of :class:`~hydra_zen.ZenStore` (see :pull:`331`)
-
+- The option `hydra_convert='object'` is now supported by all of hydra-zen's config-creation functions. So that an instantiated structured config can be converted to an instance of its backing dataclass. This feature was added by `Hydra 1.3.0 <https://github.com/facebookresearch/hydra/issues/1719>`_.
+- Adds auto-config support for `torch.optim.optimizer.required` so that the common pattern `builds(<torch_optimizer_type>, populate_full_signature=True, zen_partial=True)` works and exposes `lr` as a required configurable parameter. Thanks to @addisonklinke for requesting this in :issue:`257`.
+- :ref:`builds([...], zen_wrapper=...) <zen-wrapper>` can now accept a partial'd function as a wrapper.
 
 Improvements
 ------------
+- Updated the :ref:`Tutorials <tutorials>` and :ref:`How-To Guides <hydra-zen-how-to>` to reflect idomatic usage of :class:`~hydra_zen.ZenStore` and :func:`~hydra_zen.zen`.
 - :func:`~hydra_zen.hydrated_dataclass` will now produce a pickle-compatible dataclass type. See :pull:`338`.
+- hydra-zen's :ref:`auto-config support <additional-types>` has been enhanced so that it produces pickle-compatible configs. This excludes auto-config support for :py:func:`functools.partial` and :py:func:`dataclasses.dataclass`. See :pull:`360`.
+- All options available to :func:`dataclasses.dataclass` are now exposed by :func:`~hydra_zen.hydrated_dataclass`, :func:`~hydra_zen.builds`, :func:`~hydra_zen.make_custom_builds_fn`, :func:`~hydra_zen.make_config`, and :func:`~hydra_zen.just` via the :class:`hydra_zen.typing.DataclassOptions` API. See :pull:`360`.
+- All documentation code blocks are scanned by pyright as part of our CI process. Several errors in the documentation were fixed. See :pull:`343` and :pull:`344`.
+- Updated the `hydra_zen.typing.Partial` protocol to match against the output of `functools.partial` more reliably in the eyes of pyright (:pull:`354`).
 
+Bug Fixes
+---------
+- :pull:`355` fixes an issue where the parameterized generic `hydra_zen.typing.Partial[<...>]` would return `None` for Python versions 3.9+. This prevented this annotation from being used by runtime type checkers.
+
+Deprecations
+------------
+- Specifying `frozen=True` via :func:`~hydra_zen.builds` or :func:`~hydra_zen.make_config` is deprecated in favor of `zen_dataclass={'frozen': True}`. See :pull:`360`.
+- Specifying `config_name=<str>` via :func:`~hydra_zen.builds` or :func:`~hydra_zen.make_config` is deprecated in favor of `zen_dataclass={'cls_name': True}`. See :pull:`360`.
 
 Compatibility-Breaking Changes
 ------------------------------
+- Calling :func:`~hydra_zen.just` on a class-object or function will now return a frozen instance of a statically-defined dataclass. Previously it returned a dynamically-defined dataclass type. This change was made to improve pickle-compatibility and hashability of configs that are automatically generated by hydra-zen. This is unlikely to cause any issues for users.
 - Previously, any class decorated by :func:`~hydra_zen.hydrated_dataclass` would have a `__module__` attribute set to `typing`. Now the class's `__module__` will reflect the module where its static definition resides. This enables pickle-compatibility  (:pull:`338`). This is unlikely to cause any issues for users.
+
+Mutable Default Values for Dataclasses
+======================================
+Beginning in Python 3.11 :func:`dataclasses.dataclass` `checks for mutable default values <https://docs.python.org/3/library/dataclasses.html#mutable-default-values>`_ by assessing if an object possesses a `__hash__` attribute. Previously it only considered `set`, `dict`, and `list` types to be mutable. Accordingly, dataclass instances are now considered to be mutable unless they are frozen or if `unsafe_hash=True` was specified.
+
+.. code-block:: python
+   :caption: Demonstrating change in mutability rules for dataclasses starting in Python 3.11
+
+   from dataclasses import dataclass, field
+   
+   @dataclass
+   class A:
+      ...
+   
+   @dataclass
+   class NoLongerValid:
+      number: int = 1
+      nested: A = A()  # will raise at runtime due to mutable default
+
+   @dataclass
+   class IsOK:
+      number: int = 1
+      nested: A = field(default_factory=lambda: A())
+
+A ramification of the use of a default-factory in this example is that the field `nested` can only be accessed from an *instance* of ``IsOK``, whereas non-factory defaults can be accessed from the dataclass type itself.
+
+.. code-block:: pycon
+   :caption: Default factories require access from dataclass instances; they cannot be accessed from the dataclass type.
+
+   >>> hasattr(IsOK, "number")
+   True
+   >>> hasattr(IsOK, "nested")
+   False
+   >>> hasattr(IsOK(), "nested")
+   True
+
+Because hydra-zen users frequently nest dataclasses, hydra-zen's dataclass-creation functions (`builds` et al.) now specify `unsafe_hash=True` by default. Thus the following pattern is still valid:
+
+.. code-block:: python
+   :caption: The dataclasses produced by hydra-zen 0.9.0 are hashable by default so that existing patterns do not break in Python 3.11.
+
+   from dataclasses import dataclass, field
+   from typing import Any
+   
+   from hydra_zen import builds
+   from hydra_zen.typing import Builds
+
+   @dataclass
+   class Config:
+       # This is still OK
+       builds_dict: Builds[type[dict[Any, Any]]] = builds(dict)()
+
+That being said, hydra-zen will now treat dataclass instances whose `__hash__` attribute is `None` as mutable – *regardless of the Python version* – in order to ensure consistent behaviors across all supported Python versions. Thus the following pattern will now break
+
+.. code-block:: python
+   
+   @dataclass
+   class A:
+       ...
+
+   Conf = builds(dict, y=A(), zen_convert={'dataclass': False})
+   
+   Conf.y  # this will raise in hydra_zen 0.9.0+
+   Conf().y  # this is OK
+
+In general it is recommended that config fields be accessed from dataclass instances, not types. This will avoid all such default value/factory issues.
+
 
 .. _v0.8.0:
 
@@ -197,7 +293,7 @@ Compatibility-Breaking Changes
 ------------------------------
 This release drops support for Python 3.6. If you require Python 3.6, please restrict your hydra-zen installation dependency as `hydra-zen<0.8.0`.
 
-Specifing `make_custom_builds_fn([...], builds_bases=<...>)` was deprecated in 
+Specifying `make_custom_builds_fn([...], builds_bases=<...>)` was deprecated in 
 hydra-zen 0.7.0 (:pull:`263`). Accordingly, this option has now been removed from
 :func:`hydra_zen.make_custom_builds_fn`.
 
@@ -688,3 +784,10 @@ Furthermore, 100% code coverage is enforced on all commits into `main`.
 
 We plan to have an aggressive release schedule for compatibility-preserving patches of bug-fixes and quality-of-life improvements (e.g. improved type annotations).
 hydra-zen will maintain a wide window of compatibility with Hydra versions; we test against pre-releases of Hydra and will maintain compatibility with its future releases.
+
+
+---------
+Footnotes
+---------
+.. [1] The config creation process associated with the decorator is deferred until 
+   the config is actually accessed by the store. Thus this decorator pattern does not add substantial runtime overhead to library code until Hydra capabilities are actually utilized.

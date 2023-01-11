@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Massachusetts Institute of Technology
+# Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass
@@ -31,7 +31,7 @@ def test_runtime_checkability_of_protocols(fn, protocol):
     Conf = fn(dict)
     assert isinstance(Conf, protocol)
 
-    conf = Conf()
+    conf = Conf() if fn is not just else Conf
     assert isinstance(conf, protocol)
 
 
@@ -146,3 +146,8 @@ def test_protocol_checkers(x, yes_builds, yes_just, yes_partial):
 def test_partial_protocol():
     assert isinstance(partial(int), Partial)
     assert not isinstance(print, Partial)
+
+
+def test_parameterized_partial_regression():
+    # https://github.com/mit-ll-responsible-ai/hydra-zen/issues/352
+    assert Partial[int].__origin__ is Partial  # type: ignore

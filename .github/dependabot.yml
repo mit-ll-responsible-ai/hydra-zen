@@ -8,4 +8,8 @@ updates:
     directory: "/docs/"
     schedule:
       interval: "weekly"
-    target-branch: "docs"
+  - package-ecosystem: "pip"
+    directory: "/deps/"
+    schedule:
+      interval: "daily"
+    target-branch: "main"

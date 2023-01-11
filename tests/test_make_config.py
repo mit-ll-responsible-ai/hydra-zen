@@ -1,8 +1,7 @@
-# Copyright (c) 2022 Massachusetts Institute of Technology
+# Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import inspect
 import string
-from dataclasses import FrozenInstanceError
 from enum import Enum
 from itertools import chain
 from typing import Any, Callable, Tuple, Union, get_type_hints
@@ -206,6 +205,7 @@ def test_mutable_default_value_uses_default_factory(input_type):
     assert z.a == [1, 2, 3]
 
 
+@settings(deadline=None)
 @given(
     args_kwargs=partitions(
         st.lists(st.sampled_from(string.ascii_lowercase), unique=True)
@@ -256,7 +256,7 @@ def test_all_fields_get_set(args_kwargs, data: st.DataObject):
 
 @given(name=st.sampled_from(["foo", "bar"]))
 def test_named_config(name):
-    assert make_config(config_name=name).__name__ == name
+    assert make_config(zen_dataclass={"cls_name": name}).__name__ == name
 
 
 def test_bases():
@@ -265,17 +265,6 @@ def test_bases():
     C = make_config(bases=(A,))
     assert issubclass(C, A)
     assert not issubclass(C, B)
-
-
-def test_frozen():
-    a = make_config(x=1)()
-    b = make_config(x=1, frozen=True)()
-    a.x = 2
-
-    assert a.x == 2
-
-    with pytest.raises(FrozenInstanceError):
-        b.x = 2
 
 
 @given(

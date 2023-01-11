@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Massachusetts Institute of Technology
+# Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 from dataclasses import dataclass
 from typing import Any, List, Tuple
@@ -9,7 +9,14 @@ from hypothesis import given
 from omegaconf import DictConfig, ListConfig
 from omegaconf.errors import ValidationError
 
-from hydra_zen import builds, hydrated_dataclass, instantiate, mutable_value
+from hydra_zen import (
+    builds,
+    hydrated_dataclass,
+    instantiate,
+    make_config,
+    mutable_value,
+)
+from hydra_zen._compatibility import HYDRA_SUPPORTS_OBJECT_CONVERT
 from hydra_zen.structured_configs._utils import get_obj_path
 
 
@@ -42,7 +49,7 @@ def test_builds_sets_hydra_params(
         zen_partial=partial,
         zen_meta=meta,
         zen_wrappers=wrappers,
-        dataclass_name=name,
+        zen_dataclass={"cls_name": name},
         **kwargs,
     )
 
@@ -126,6 +133,31 @@ def test_hydra_convert(
         expected_field_type = list
 
     assert type(out["a_struct_config"]["x"]) is expected_field_type
+
+
+@pytest.mark.xfail(
+    not HYDRA_SUPPORTS_OBJECT_CONVERT,
+    raises=ValueError,
+    reason="Hydra 1.3.0 required for _convert_ = 'object'",
+)
+def test_object_convert():
+    Conf = make_config(
+        a=builds(dict, b=1), hydra_convert="object"
+    )  # should raise if local Hydra version is < 1.3.0
+    assert isinstance(instantiate(Conf), Conf)
+
+
+@pytest.mark.xfail(
+    not HYDRA_SUPPORTS_OBJECT_CONVERT,
+    raises=ValueError,
+    reason="Hydra 1.3.0 required for _convert_ = 'object'",
+)
+def test_object_convert_hydrated():
+    @hydrated_dataclass(dict, hydra_convert="object")
+    class A:
+        ...
+
+    assert A._convert_ == "object"  # type: ignore
 
 
 def f_for_recursive(**kwargs):

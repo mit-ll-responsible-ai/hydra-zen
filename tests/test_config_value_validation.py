@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Massachusetts Institute of Technology
+# Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
 import inspect
@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Any
 
 import pytest
-from hypothesis import HealthCheck, assume, example, given, settings
+from hypothesis import HealthCheck, assume, example, given, note, settings
 from omegaconf import DictConfig, ListConfig, OmegaConf
 from omegaconf.errors import KeyValidationError
 
@@ -21,7 +21,6 @@ from hydra_zen import (
 from hydra_zen._compatibility import ZEN_SUPPORTED_PRIMITIVES
 from hydra_zen.errors import HydraZenUnsupportedPrimitiveError
 from hydra_zen.structured_configs._implementations import HYDRA_SUPPORTED_PRIMITIVES
-from hydra_zen.structured_configs._utils import KNOWN_MUTABLE_TYPES
 from tests import everything_except
 
 
@@ -34,7 +33,7 @@ def f_with_kwargs(*args, **kwargs):
 
 
 def make_hydrated_dataclass(target, a):
-    assume(not isinstance(a, tuple(KNOWN_MUTABLE_TYPES)))
+    assume(a.__hash__ is not None)
 
     @hydrated_dataclass(target)
     class Config:
@@ -44,7 +43,7 @@ def make_hydrated_dataclass(target, a):
 
 
 def make_dataclass(a):
-    assume(not isinstance(a, tuple(KNOWN_MUTABLE_TYPES)))
+    assume(a.__hash__ is not None)
 
     @dataclass
     class C:
@@ -71,7 +70,7 @@ def f_with_bad_default_value(x=unsupported_instance):
 
 
 def test_omegaconf_doesnt_permit_dataclasses_as_dict_keys():
-    C = builds(int, 1, frozen=True)
+    C = builds(int, 1, zen_dataclass={"frozen": True})
     instantiate(OmegaConf.create({1: C}))  # should be OK
 
     with pytest.raises(KeyValidationError):
@@ -135,6 +134,7 @@ construction_fn_variations = [
 def test_unsupported_config_value_raises_while_making_config(
     config_construction_fn, unsupported
 ):
+    note(f"unsupported: {unsupported}")
     with pytest.raises((HydraZenUnsupportedPrimitiveError, ModuleNotFoundError)):
         config_construction_fn(unsupported)
 

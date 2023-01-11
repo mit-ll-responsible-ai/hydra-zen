@@ -18,7 +18,7 @@ import hydra_zen
 # -- Project information -----------------------------------------------------
 
 project = "hydra-zen"
-copyright = "2022 Massachusetts Institute of Technology"
+copyright = "2023 Massachusetts Institute of Technology"
 author = "Ryan Soklaski, Justin Goodwin"
 
 # The short X.Y version

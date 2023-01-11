@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Massachusetts Institute of Technology
+# SPDX-License-Identifier: MIT
+
 import sys
 
 if sys.version_info < (3, 7):  # pragma: no cover
@@ -81,7 +84,7 @@ def coerce_sequences(obj: _T) -> _T:
     -----
     The supported non-string sequence types are:
     - tuples
-    - deques
+    - dequeues
     - lists
     - named-tuples
 
@@ -119,7 +122,7 @@ def coerce_sequences(obj: _T) -> _T:
     list_caster_by_name = {}  # by param-name in the signature
 
     sig = inspect.signature(obj)
-    for n, (name, param) in enumerate(sig.parameters.items()):
+    for n, (name, param) in enumerate(sig.parameters.items()):  # pragma: no branch
         if name not in hints or param.kind in {_VAR_KEYWORD, _VAR_POSITIONAL}:
             continue
 
@@ -175,7 +178,7 @@ def coerce_sequences(obj: _T) -> _T:
 
             if param.kind is not _KEYWORD_ONLY:
                 list_caster_by_pos[n] = caster
-            if param.kind is not _POSITIONAL_ONLY:
+            if param.kind is not _POSITIONAL_ONLY:  # pragma: no branch
                 list_caster_by_name[name] = caster
 
     min_pos = min(list_caster_by_pos) if list_caster_by_pos else 0

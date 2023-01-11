@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Massachusetts Institute of Technology
+# Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 from collections import Counter, deque
 from enum import Enum
@@ -89,3 +89,5 @@ else:  # pragma: no cover
     ZEN_SUPPORTED_PRIMITIVES.update(_path_types)
 
 del _path_types
+
+HYDRA_SUPPORTS_OBJECT_CONVERT = HYDRA_VERSION >= Version(1, 3, 0)

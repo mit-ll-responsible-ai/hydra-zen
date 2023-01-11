@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Massachusetts Institute of Technology
+# Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 from typing import TYPE_CHECKING
 
@@ -50,7 +50,7 @@ __all__ = [
 if not TYPE_CHECKING:
     try:
         from ._version import version as __version__
-    except ImportError:  # pragma: no cover
+    except ImportError:
         __version__ = "unknown version"
 else:  # pragma: no cover
     __version__: str

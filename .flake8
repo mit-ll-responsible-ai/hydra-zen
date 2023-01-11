@@ -1,0 +1,3 @@
+[flake8]
+extend-ignore = F811,D1,D205,D209,D213,D400,D401,D999,D202,E203,E501,W503,E721,F403,F405
+exclude = .git,__pycache__,docs/*,old,build,dis,tests/annotations/*, tests/test_py310.py
