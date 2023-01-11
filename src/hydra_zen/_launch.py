@@ -110,19 +110,19 @@ OverrideDict: TypeAlias = Dict[str, OverrideValues]
 
 def _process_dict_overrides(overrides: OverrideDict) -> List[str]:
     launch_overrides = []
-    if overrides is not None:
-        for k, v in overrides.items():
-            if v is None:
-                v = "null"
-            value_check(
-                k,
-                v,
-                type_=(int, float, bool, str, dict, multirun, hydra_list),
-            )
-            if isinstance(v, multirun):
-                v = ",".join(str(item) for item in v)
+    for k, v in overrides.items():
+        if v is None:
+            v = "null"
 
-            launch_overrides.append(f"{k}={v}")
+        value_check(
+            k,
+            v,
+            type_=(int, float, bool, str, dict, multirun, hydra_list),
+        )
+        if isinstance(v, multirun):
+            v = ",".join(str(item) for item in v)
+
+        launch_overrides.append(f"{k}={v}")
     return launch_overrides
 
 
@@ -171,7 +171,8 @@ def launch(
     with_log_configuration: bool = True,
     **override_kwargs: OverrideValues,
 ) -> Union[JobReturn, Any]:
-    r"""Launch a Hydra job using a Python-based interface.
+    r"""
+    Launch a Hydra job using a Python-based interface.
 
     `launch` is designed to closely match the interface of the standard Hydra CLI.
     For example, launching a Hydra job from the CLI via::
@@ -191,7 +192,7 @@ def launch(
         The function that Hydra will execute. Its input will be ``config``, which
         has been modified via the specified ``overrides``
 
-    overrides : Optional[List[str]]
+    overrides : Optional[Union[OverrideDict, List[str]]] (default: None)
         If provided, sets/overrides values in ``config``. See [1]_ and [2]_
         for a detailed discussion of the "grammar" supported by ``overrides``.
 
@@ -204,7 +205,7 @@ def launch(
         - If the `version_base parameter` is `None`, then the defaults are chosen for the current minor Hydra version. For example for Hydra 1.2, then would imply `config_path=None` and `hydra.job.chdir=False`.
         - If the `version_base` parameter is an explicit version string like "1.1", then the defaults appropriate to that version are used.
 
-    to_dictconfig: bool (default: False)
+    to_dictconfig : bool (default: False)
         If ``True``, convert a ``dataclasses.dataclass`` to a ``omegaconf.DictConfig``. Note, this
         will remove Hydra's cabability for validation with structured configurations.
 
@@ -215,6 +216,10 @@ def launch(
 
     with_log_configuration : bool (default: True)
         If ``True``, enables the configuration of the logging subsystem from the loaded config.
+
+    **override_kwargs : OverrideValues
+        Keyword arguments to override existing configuration values.  Note, this only works when the configuration value,
+        i.e., this does not support adding (`+param`) or removing (`~param`) configuration values.
 
     Returns
     -------
@@ -320,6 +325,23 @@ def launch(
     ['multirun/2021-10-19/17-50-07\\0',
     'multirun/2021-10-19/17-50-07\\1',
     'multirun/2021-10-19/17-50-07\\2']
+
+    **Launching with dictionary override**
+
+    >>> job_out = launch(Conf, task_fn, overrides={"a": 1, "b":'foo'})
+    >>> job_out.overrides  # the overrides that we provides
+    ['a=1', "b='foo'"]
+
+    >>> from hydra_zen import multirun, hydra_list
+    >>> (outputs,) = launch(
+    ...     Conf,
+    ...     task_fn,
+    ...     overrides={"a": multirun([1,2,3]), "b": hydra_list(['bar', 'element'])},
+    ...     multirun=True,
+    ... )
+    >>> outputs[0].overrides
+    ['a=1', "b=['bar','element']"]
+
     """
 
     # used for check below
