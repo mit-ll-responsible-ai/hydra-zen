@@ -130,7 +130,7 @@ Additionally, :func:`hydra_zen.launch` supports dictionary overrides:
    # [1, 2, 3]
 
 
-One clear benefit of :func:`hydra_zen.launch` is the ability to programatically define the set of
+One clear benefit of :func:`hydra_zen.launch` is the ability to programmatically define the set of
 multirun values, e.g., creating a list of random seeds to execute an application with.
 
 
