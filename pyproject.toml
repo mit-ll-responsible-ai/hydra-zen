@@ -166,6 +166,7 @@ basepython = python3.9
 description = Test againse OmegaConf 2.2.2 to guard against type-sanitization regressions.
 pip_pre = true
 deps = omegaconf==2.2.2
+       hydra-core==1.2.0
        {[testenv]deps}
        pydantic
        beartype
