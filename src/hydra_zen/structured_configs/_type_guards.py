@@ -11,7 +11,7 @@ from hydra_zen._compatibility import HYDRA_SUPPORTS_PARTIAL
 from hydra_zen.funcs import get_obj, zen_processing
 from hydra_zen.structured_configs._utils import safe_name
 from hydra_zen.typing import Builds, Just, PartialBuilds
-from hydra_zen.typing._implementations import DataClass_
+from hydra_zen.typing._implementations import DataClass_, HasTarget
 
 from ._globals import (
     JUST_FIELD_NAME,
@@ -67,7 +67,7 @@ def safe_getattr(obj: Any, field: str, *default: Any) -> Any:
     return getattr(obj, field, *default)
 
 
-def _get_target(x: Builds[Any]) -> Any:
+def _get_target(x: HasTarget) -> Any:
     return safe_getattr(x, TARGET_FIELD_NAME)
 
 

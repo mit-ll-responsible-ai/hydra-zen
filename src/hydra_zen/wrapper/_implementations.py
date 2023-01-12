@@ -853,7 +853,9 @@ defaults: Final = _StoreCallSig(
     __kw={},
 )
 
-_DEFAULT_KEYS: Final[FrozenSet[str]] = frozenset(_StoreCallSig.__required_keys__ - {"__kw"})  # type: ignore
+_DEFAULT_KEYS: Final[FrozenSet[str]] = frozenset(
+    _StoreCallSig.__required_keys__ - {"__kw"}
+)
 
 
 class _Deferred:
