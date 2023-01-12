@@ -1161,7 +1161,9 @@
     <span class="n">__kw</span><span class="o">=</span><span class="p">{},</span>
 <span class="p">)</span>
 
-<span class="n">_DEFAULT_KEYS</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">FrozenSet</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">_StoreCallSig</span><span class="o">.</span><span class="n">__required_keys__</span> <span class="o">-</span> <span class="p">{</span><span class="s2">&quot;__kw&quot;</span><span class="p">})</span>  <span class="c1"># type: ignore</span>
+<span class="n">_DEFAULT_KEYS</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="n">FrozenSet</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span>
+    <span class="n">_StoreCallSig</span><span class="o">.</span><span class="n">__required_keys__</span> <span class="o">-</span> <span class="p">{</span><span class="s2">&quot;__kw&quot;</span><span class="p">}</span>
+<span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">_Deferred</span><span class="p">:</span>

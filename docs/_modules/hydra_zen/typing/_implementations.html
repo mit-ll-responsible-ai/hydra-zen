@@ -474,6 +474,11 @@
 
 
 <span class="nd">@runtime_checkable</span>
+<span class="k">class</span> <span class="nc">HasTarget</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span>
+
+
+<span class="nd">@runtime_checkable</span>
 <span class="k">class</span> <span class="nc">Builds</span><span class="p">(</span><span class="n">DataClass</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 
@@ -515,11 +520,6 @@
 <span class="n">IsPartial</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">ZenPartialMixin</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">HydraPartialMixin</span><span class="p">[</span><span class="n">T</span><span class="p">]]</span>
 
 <span class="n">PartialBuilds</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">ZenPartialBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">HydraPartialBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">]]</span>
-
-
-<span class="nd">@runtime_checkable</span>
-<span class="k">class</span> <span class="nc">HasTarget</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-    <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span>
 
 
 <span class="n">Importable</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Importable&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
