@@ -135,6 +135,11 @@ class DataClass(DataClass_, Protocol):
 
 
 @runtime_checkable
+class HasTarget(Protocol):
+    _target_: str
+
+
+@runtime_checkable
 class Builds(DataClass, Protocol[T]):
     _target_: ClassVar[str]
 
@@ -176,11 +181,6 @@ class HydraPartialBuilds(Builds[T], HydraPartialMixin[T], Protocol[T]):
 IsPartial: TypeAlias = Union[ZenPartialMixin[T], HydraPartialMixin[T]]
 
 PartialBuilds: TypeAlias = Union[ZenPartialBuilds[T], HydraPartialBuilds[T]]
-
-
-@runtime_checkable
-class HasTarget(Protocol):
-    _target_: str
 
 
 Importable = TypeVar("Importable", bound=Callable[..., Any])

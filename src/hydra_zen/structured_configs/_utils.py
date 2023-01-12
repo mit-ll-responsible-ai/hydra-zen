@@ -599,11 +599,11 @@ def merge_settings(
 
 
 _DATACLASS_OPTION_KEYS: FrozenSet[str] = (
-    DataclassOptions.__required_keys__ | DataclassOptions.__optional_keys__  # type: ignore
+    DataclassOptions.__required_keys__ | DataclassOptions.__optional_keys__
 )
 
 _STRICT_DATACLASS_OPTION_KEYS: FrozenSet[str] = (
-    StrictDataclassOptions.__required_keys__ | StrictDataclassOptions.__optional_keys__  # type: ignore
+    StrictDataclassOptions.__required_keys__ | StrictDataclassOptions.__optional_keys__
 )
 _STRICT_DATACLASS_OPTION_KEYS.copy()
 
@@ -697,7 +697,10 @@ def parse_dataclass_options(options: Mapping[str, Any]) -> DataclassOptions:
 def parse_strict_dataclass_options(
     options: Mapping[str, Any]
 ) -> TypeGuard[StrictDataclassOptions]:
-    return options.keys() <= _STRICT_DATACLASS_OPTION_KEYS and StrictDataclassOptions.__required_keys__ <= options.keys()  # type: ignore
+    return (
+        options.keys() <= _STRICT_DATACLASS_OPTION_KEYS
+        and StrictDataclassOptions.__required_keys__ <= options.keys()
+    )
 
 
 _HYDRA_CONVERT_OPTIONS = (
