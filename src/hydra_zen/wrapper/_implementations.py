@@ -410,7 +410,11 @@ class Zen(Generic[P, R]):
         # follow wrappers starting in Hydra 1.3.0. Thus `Zen.hydra_main` cannot
         # handle string config_path entries until Hydra 1.3.0
         if (config_path is _UNSPECIFIED_ and HYDRA_VERSION < Version(1, 2, 0)) or (
-            isinstance(config_path, str) and HYDRA_VERSION < Version(1, 3, 0)
+            (
+                isinstance(config_path, str)
+                or (config_path is _UNSPECIFIED_ and version_base == "1.1")
+            )
+            and HYDRA_VERSION < Version(1, 3, 0)
         ):  # pragma: no cover
             warnings.warn(
                 "Specifying config_path via hydra_zen.zen(...).hydra_main "
