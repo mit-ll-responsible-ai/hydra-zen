@@ -506,12 +506,17 @@ checked according to the signature of <code class="xref py py-obj docutils liter
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>config_path</strong><span class="classifier">Optional[str]</span></dt><dd><p>The config path, a directory relative to the declaring python file.</p>
-<p>If config_path is not specified no directory is added to the Config search path.</p>
+<dt><strong>config_path</strong><span class="classifier">Optional[str]</span></dt><dd><p>The config path, an absolute path to a directory or a directory relative to
+the declaring python file. If <code class="xref py py-obj docutils literal notranslate"><span class="pre">config_path</span></code> is not specified no directory is
+added to the config search path.</p>
+<p>Specifying <code class="xref py py-obj docutils literal notranslate"><span class="pre">config_path</span></code> via <a class="reference internal" href="#hydra_zen.wrapper.Zen.hydra_main" title="hydra_zen.wrapper.Zen.hydra_main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Zen.hydra_main</span></code></a> is only supported for
+Hydra 1.3.0+.</p>
 </dd>
 <dt><strong>config_name</strong><span class="classifier">Optional[str]</span></dt><dd><p>The name of the config (usually the file name without the .yaml extension)</p>
 </dd>
-<dt><strong>version_base</strong><span class="classifier">Optional[str]</span></dt><dd><p>There are three classes of values that the version_base parameter supports, given new and existing users greater control of the default behaviors to use.</p>
+<dt><strong>version_base</strong><span class="classifier">Optional[str]</span></dt><dd><p>There are three classes of values that the version_base parameter supports,
+given new and existing users greater control of the default behaviors to
+use.</p>
 <ul class="simple">
 <li><p>If the version_base parameter is not specified, Hydra 1.x will use defaults compatible with version 1.1. Also in this case, a warning is issued to indicate an explicit version_base is preferred.</p></li>
 <li><p>If the version_base parameter is None, then the defaults are chosen for the current minor Hydra version. For example for Hydra 1.2, then would imply config_path=None and hydra.job.chdir=False.</p></li>
