@@ -27,10 +27,10 @@ keywords = [
 ]
 
 authors = [
-       { name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" },
+       { name = "Ryan Soklaski", email = "rsoklaski@gmail.com" },
        { name = "Justin Goodwin", email = "jgoodwin@ll.mit.edu" },
 ]
-maintainers = [{ name = "Ryan Soklaski", email = "ryan.soklaski@ll.mit.edu" }]
+maintainers = [{ name = "Justin Goodwin", email = "jgoodwin@ll.mit.edu" }]
 
 classifiers = [
        "Development Status :: 4 - Beta",
