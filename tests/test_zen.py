@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import os
+import pickle
 import random
 import sys
 from dataclasses import dataclass
@@ -12,6 +13,7 @@ from hypothesis import example, given, strategies as st
 from omegaconf import DictConfig
 
 from hydra_zen import builds, make_config, to_yaml, zen
+from hydra_zen._compatibility import HYDRA_VERSION
 from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.wrapper import Zen
 from tests.custom_strategies import everything_except
@@ -438,7 +440,7 @@ def test_hydra_main():
 
     from hydra_zen import load_from_yaml
 
-    path = (Path(__file__).parent / "dummy_zen_main.py").absolute()
+    path = (Path(__file__).parent / "example_app" / "dummy_zen_main.py").absolute()
     assert not (Path.cwd() / "outputs").is_dir()
     subprocess.run(["python", path, "x=1", "y=2"]).check_returncode()
     assert (Path.cwd() / "outputs").is_dir()
@@ -450,6 +452,55 @@ def test_hydra_main():
         "y": 2,
         "z": "${y}",
         "seed": 12,
+    }
+
+
+@pytest.mark.xfail(
+    HYDRA_VERSION < (1, 3, 0),
+    reason="hydra_main(config_path=...) only supports wrapped task functions starting "
+    "in Hydra 1.3.0",
+)
+@pytest.mark.skipif(
+    sys.platform.startswith("win") and bool(os.environ.get("CI")),
+    reason="Things are weird on GitHub Actions and Windows",
+)
+@pytest.mark.parametrize(
+    "dir_, name",
+    [
+        ("dir1", "cfg1"),
+        ("dir1", "cfg2"),
+        ("dir2", "cfg1"),
+        ("dir2", "cfg2"),
+        (None, None),
+    ],
+)
+@pytest.mark.usefixtures("cleandir")
+def test_hydra_main_config_path(dir_, name):
+    # regression test for https://github.com/mit-ll-responsible-ai/hydra-zen/issues/381
+    import subprocess
+    from pathlib import Path
+
+    from hydra_zen import load_from_yaml
+
+    path = (
+        Path(__file__).parent / "example_app" / "zen_main_w_config_path.py"
+    ).absolute()
+    assert not (Path.cwd() / "outputs").is_dir()
+
+    run_in = ["python", path]
+
+    if dir_ is not None:
+        run_in.extend([f"--config-name={name}", f"--config-path={dir_}"])
+    else:
+        dir_, name = "default", "default"
+    subprocess.run(run_in).check_returncode()
+
+    assert (Path.cwd() / "outputs").is_dir()
+
+    *_, latest_job = sorted((Path.cwd() / "outputs").glob("*/*"))
+
+    assert load_from_yaml(latest_job / ".hydra" / "config.yaml") == {
+        f"{dir_}_{name}": 1
     }
 
 
@@ -496,3 +547,15 @@ def zen_extracts_factory_from_instance():
         return y.x
 
     assert zen(f)(Conf) == 1
+
+
+def pikl(x):
+    return x * 2
+
+
+zpikl = zen(pikl)
+
+
+def test_pickle_compatible():
+    loaded = pickle.loads(pickle.dumps(zpikl))
+    assert loaded({"x": 3}) == pikl(3)

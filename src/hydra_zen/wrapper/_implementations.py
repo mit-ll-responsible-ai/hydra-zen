@@ -2,7 +2,9 @@
 # SPDX-License-Identifier: MIT
 # pyright: strict
 
+import warnings
 from collections import defaultdict, deque
+from functools import wraps
 from inspect import Parameter, signature
 from typing import (
     Any,
@@ -42,6 +44,7 @@ from typing_extensions import (
 )
 
 from hydra_zen import instantiate, just, make_custom_builds_fn
+from hydra_zen._compatibility import HYDRA_VERSION, Version
 from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.structured_configs._type_guards import safe_getattr
 from hydra_zen.structured_configs._utils import get_obj_path
@@ -161,7 +164,10 @@ class Zen(Generic[P, R]):
         self.func: Callable[P, R] = __func
 
         try:
-            self.parameters: Mapping[str, Parameter] = signature(self.func).parameters
+            # Must cast to dict so that `self` is pickle-compatible.
+            self.parameters: Mapping[str, Parameter] = dict(
+                signature(self.func).parameters
+            )
         except (ValueError, TypeError):
             raise HydraZenValidationError(
                 "hydra_zen.zen can only wrap callables that possess inspectable signatures."
@@ -372,15 +378,20 @@ class Zen(Generic[P, R]):
         Parameters
         ----------
         config_path : Optional[str]
-            The config path, a directory relative to the declaring python file.
+            The config path, an absolute path to a directory or a directory relative to
+            the declaring python file. If `config_path` is not specified no directory is
+            added to the config search path.
 
-            If config_path is not specified no directory is added to the Config search path.
+            Specifying `config_path` via `Zen.hydra_main` is only supported for
+            Hydra 1.3.0+.
 
         config_name : Optional[str]
             The name of the config (usually the file name without the .yaml extension)
 
         version_base : Optional[str]
-            There are three classes of values that the version_base parameter supports, given new and existing users greater control of the default behaviors to use.
+            There are three classes of values that the version_base parameter supports,
+            given new and existing users greater control of the default behaviors to
+            use.
 
             - If the version_base parameter is not specified, Hydra 1.x will use defaults compatible with version 1.1. Also in this case, a warning is issued to indicate an explicit version_base is preferred.
             - If the version_base parameter is None, then the defaults are chosen for the current minor Hydra version. For example for Hydra 1.2, then would imply config_path=None and hydra.job.chdir=False.
@@ -394,6 +405,36 @@ class Zen(Generic[P, R]):
 
         kw = dict(config_name=config_name)
 
+        # For relative config paths, Hydra looks in the directory relative to the file
+        # in which the task function is defined. Unfortunately, it is only able to
+        # follow wrappers starting in Hydra 1.3.0. Thus `Zen.hydra_main` cannot
+        # handle string config_path entries until Hydra 1.3.0
+        if (config_path is _UNSPECIFIED_ and HYDRA_VERSION < Version(1, 2, 0)) or (
+            (
+                isinstance(config_path, str)
+                or (config_path is _UNSPECIFIED_ and version_base == "1.1")
+            )
+            and HYDRA_VERSION < Version(1, 3, 0)
+        ):  # pragma: no cover
+            warnings.warn(
+                "Specifying config_path via hydra_zen.zen(...).hydra_main "
+                "is only supported for Hydra 1.3.0+"
+            )
+        if Version(1, 3, 0) <= HYDRA_VERSION and isinstance(config_path, str):
+            # Here we create an on-the-fly wrapper so that Hydra can trace
+            # back through the wrapper to the original task function
+            # We could give `Zen` as `__wrapped__` attr, but this messes with
+            # things like `inspect.signature`.
+            #
+            # A downside of this is that `wrapper` is not pickle-able.
+            @wraps(self.func)
+            def wrapper(cfg: Any):
+                return self(cfg)
+
+            target = wrapper
+        else:
+            target = self
+
         if config_path is not _UNSPECIFIED_:
             kw["config_path"] = config_path
 
@@ -402,7 +443,7 @@ class Zen(Generic[P, R]):
         ):  # pragma: no cover
             kw["version_base"] = version_base
 
-        return hydra.main(**kw)(self)()
+        return hydra.main(**kw)(target)()
 
 
 @overload
@@ -517,6 +558,8 @@ def zen(
     will cause `zen` to pass the full, resolved config to that field. This specific
     parameter name can be overridden via `Zen.CFG_NAME`.
 
+    Specifying `config_path` via `Zen.hydra_main` is only supported for Hydra 1.3.0+.
+
     Examples
     --------
     **Basic Usage**
@@ -548,14 +591,6 @@ def zen(
     <function __main__.f(x, y)>
     >>> zen_f.func(-1, 1)
     0
-
-    `zen` can be used as a decorator
-
-    >>> @zen
-    ... def zen_g(x, y):
-    ...     return x + y
-    >>> zen_g({'x': 1, 'y': 2})
-    3
 
     `zen` is compatible with partial'd functions.
 
