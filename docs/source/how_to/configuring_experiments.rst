@@ -122,9 +122,12 @@ To do this we implement new experiment configurations that:
 .. code-block:: python
     :caption: 3: Experiment Configurations
 
+    from hydra_zen import store, make_config
+
     # the experiment configs:
     # - must inherit from `Config` 
     # - must set `package="_global_"`
+    experiment_store = store(group="experiment")
 
     experiment_store(
         make_config(
