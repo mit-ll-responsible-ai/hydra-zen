@@ -115,7 +115,7 @@ Our objective is to create experiment configurations that override the default u
 
 To do this we implement new experiment configurations that:
 
-- Are global configurations using `package="_global_"` and inherting from the default `Config`
+- Are global configurations using `package="_global_"` and inheriting from the default `Config`
 - Override defaults configuration values using absolute paths for `/db` and `/server`
 - Override parameter values
   
