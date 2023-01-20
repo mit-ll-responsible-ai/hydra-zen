@@ -302,5 +302,5 @@ tutorial section.
    ``my_app.py`` file.
 
 Footnotes
-==========
+=========
 .. [1] Specifically, we want to ensure that Hydra will `change its working directory to its "jobdir" <https://hydra.cc/docs/upgrades/1.1_to_1.2/changes_to_job_working_dir/>`_ when we launch our app.
