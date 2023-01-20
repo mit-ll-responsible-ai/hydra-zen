@@ -14,8 +14,8 @@ objectives.
    :maxdepth: 1
    :caption: Contents:
 
-   how_to/partial_config
    how_to/configuring_experiments
+   how_to/partial_config
    how_to/configure_hydra
    how_to/beartype
    how_to/pytorch_lightning

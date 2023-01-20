@@ -2,133 +2,158 @@
    :description: Configuring and maintaining multiple experiment configurations.
 
 
-==================================
-Configuring Multiple Experiments
-==================================
+******************************
+Configure Multiple Experiments
+******************************
 
-hydra-zen provides simple and efficient tools to generate multiple experiment configurations. You can easily create new configuration 
-instances that inherit other configurations while only specifying changes to different parameter values and defaults. 
-This approach can save a significant amount of time and reduce the potential for errors when setting up large-scale experiments.
-In this documentation, we will go through the process of using hydra-zen to generate multiple experiment configurations,
-and provide examples of how to use the module to streamline your workflow.
+This guide demonstrates how to elegantly maintain multiple configurations for an experiment, so that each experiment's config need only specify changes to some "master" config [1]_.  
 
-We will demonstrate how one can implement the solution shown in `Configurating Experiments <https://hydra.cc/docs/patterns/configuring_experiments/>`_.
-First lets build the default configurations and task function. To build and store configurations in the
-`Hydra ConfigStore <https://hydra.cc/docs/tutorials/structured_config/config_store/>`_ we will take advantage of :func:`~hydra_zen.store`. 
-Here we add two configurations to both the `db` and `server` groups.
 
+Suppose that we want to benchmark an application that is configured using various pairings of databases (MySQL and SQLite) and servers (Apache and NGINX).
+And, suppose that there are particular database-server configurations that we want to frequently experiment with. In this How-To we will:
+
+1. Create the basic server and database configurations for our application and add them to a config store.
+2. Define a simple task function that is executed when we configure and run our application from the CLI.
+3. Create specialized configurations for particular experiments that we want to run, so that it is trivial to run each experiment "by name" from the CLI.
+4. Run various configurations of our experiment.
+
+
+Configuring and Running our Basic Application
+=============================================
+
+First, we well create configs for our two servers and our two databases and we will add them to :class:`hydra-zen's config store <hydra_zen.ZenStore>`.
 
 .. code-block:: python
-    :caption: 1: Default Configurations
+   :caption: Contents of `my_app.py`
+
+   from dataclasses import dataclass
    
-    from dataclasses import dataclass
+   from hydra_zen import store, zen, builds
 
-    from hydra_zen import MISSING, make_config, store, zen
+   # 1. Creating and storing basic configs
 
-    # First create stores for each group
-    db_store = store(group="db")
-    server_store = store(group="server")
-
-    # add to named configurations for the `db` group
-    @db_store(name="mysql")
-    @dataclass
-    class MySQL:
-        name: str = "mysql"
-
-
-    @db_store(name="sqlite")
-    @dataclass
-    class SQLITE:
-        name: str = "sqlite"
-
-
-    # add to named configurations for the `server` group
-    @server_store(name="apache")
-    @dataclass
-    class Apache:
-        name: str = "apache"
-        port: int = 80
-
-
-    @server_store(name="nginx")
-    @dataclass
-    class NGINX:
-        name: str = "nginx"
-        port: int = 80
+   @dataclass
+   class Server:
+       name: str
+       port: int
+   
+   
+   @dataclass
+   class Database:
+       name: str
+   
+   # For convenience:
+   # Tell the store to automatically infer the entry-name from 
+   # the config's `.name` attribute.
+   auto_name_store = store(name=lambda cfg: cfg.name)
+   
+   # Pre-set the group for store's db entries
+   db_store = auto_name_store(group="db")
+   # Store database configs
+   db_store(Database(name="mysql"))
+   db_store(Database(name="sqlite"))
+   
+   # Pre-set the group for store's server entries
+   server_store = auto_name_store(group="server")
+   # Store server configs
+   server_store(Server(name="apache", port=80))
+   server_store(Server(name="nginx", port=80))
 
 
-    # utilize `make_config` to easily create configurations with
-    # hydra defaults
-    Config = make_config(
-        hydra_defaults=["_self_", {"db": "sqlite"}, {"server": "apache"}],
-        db=MISSING,
-        server=MISSING,
-    )
-
-    # put main configuration in the store
-    store(
-        Config,
-        name="config",
-    )
-
-Next define the task function for our application:
-
-.. code-block:: python
-    :caption: 2: Python Application `my_app.py`
-
-    from hydra_zen import MISSING, make_config, store, to_yaml, zen
-
-    # ... load configurations
-
-    def task(db, server):
-        print("db:")
-        print(to_yaml(db))
-
-        print("server:")
-        print(to_yaml(server))
+   # 2. Defining our app's task function and the top-level config
+   def task(db: Database, server: Server):
+       from hydra_zen import to_yaml
+   
+       print(f"db:\n{to_yaml(db)}")
+       print(f"server:\n{to_yaml(server)}")
 
 
-    if __name__ == "__main__":
-        store.add_to_hydra_store()
-        zen(task).hydra_main(config_path=None, config_name="config", version_base="1.2")
+   # The 'top-level' config for our app w/ a specified default
+   # database and server
+   Config = builds(
+       task,
+       populate_full_signature=True,
+       hydra_defaults=["_self_", {"db": "mysql"}, {"server": "apache"}],
+   )
+   
+   store(Config, name="config")
+
+   if __name__ == "__main__":
+       store.add_to_hydra_store()
+       zen(task).hydra_main(config_path=None, config_name="config", version_base="1.2")
 
 
 The application can then be executed using:
 
-.. code-block:: bash
+.. code-block:: console
+   :caption: Running our application using the default config.
 
-    $ python my_app.py
-    db:
-    name: mysql
+   $ python my_app.py
+   db:
+   name: mysql
     
-    server:
-    name: apache
-    port: 80
+   server:
+   name: apache
+   port: 80
 
 
-Our objective is to create experiment configurations that override the default using
 
-.. code-block:: bash
+Creating Configurations for Particular "Experiments"
+====================================================
 
-    $ python my_app.py +experiment=fast_mode
+Suppose that we frequently want to run our application using the following two configurations (which we will refer to as `aplite` and `nglite`, respectively)
+
+.. code-block:: console
+   :caption: Manually running the so-called `aplite` configuration
+
+   $ python my_app.py db=sqlite server.port=8080
+   db:
+   name: sqlite
+
+   server:
+   name: apache
+   port: 8080
+
+
+.. code-block:: console
+   :caption: Manually running the so-called `nglite` configuration
+   
+   $ python my_app.py db=sqlite server=nginx server.port=8080                                              
+   db:
+   name: sqlite
+
+   server:
+   name: nginx
+   port: 8080
+
+
+Our objective is to be able run these experiments more concisely, as:
+
+.. code-block:: console
+
+    $ python my_app.py +experiment=<aglite or nginx>
 
 
 To do this we implement new experiment configurations that:
 
-- Are global configurations using `package="_global_"` and inheriting from the default `Config`
-- Override defaults configuration values using absolute paths for `/db` and `/server`
-- Override parameter values
+- Inherit from `Config` – the default config for our app – so that Hydra will be able to compose it with each experiment's config.
+- Are stored under the `_global_` `package <https://hydra.cc/docs/advanced/overriding_packages/>`_, so that they are used to replace our top-level config, and under a group called "experiment", which will determine how we reference them from the CLI.
+- Override defaults configuration values using absolute paths for `/db` and `/server`. Using absolute paths is necessary given that we are not leveraging `Hydra's config search path logic <https://hydra.cc/docs/advanced/search_path/>`_ (which is typically reserved for yaml-based configs).
+- Override particular parameter values (i.e., the configured server port)
   
 .. code-block:: python
-    :caption: 3: Experiment Configurations
+    :caption: 3: Adding experiment configs (an addition to `my_app.py`)
 
-    from hydra_zen import store, make_config
+    # add the following before the __main__ clause of `my_app.py`
+
+    from hydra_zen import make_config
 
     # the experiment configs:
+    # - must be stored under the _global_ package
     # - must inherit from `Config` 
-    # - must set `package="_global_"`
-    experiment_store = store(group="experiment")
+    experiment_store = store(group="experiment",  package="_global_")
 
+    # equivalent to `python my_app.py db=sqlite server.port=8080`
     experiment_store(
         make_config(
             hydra_defaults=["_self_", {"override /db": "sqlite"}],
@@ -136,10 +161,10 @@ To do this we implement new experiment configurations that:
             bases=(Config,),
         ),
         name="aplite",
-        package="_global_",
     )
 
 
+    # equivalent to: `python my_app.py db=sqlite server=nginx server.port=8080`
     experiment_store(
         make_config(
             hydra_defaults=[
@@ -151,73 +176,88 @@ To do this we implement new experiment configurations that:
             bases=(Config,)
         ),
         name="nglite",
-        package="_global_"
     )
 
-Experiments can then be run from command line by prefixing the experiment choice with a `+` since the
-experiment config group is an addition and not an override. Here are couple examples:
+Each experiment can then be run from command line by prefixing the experiment choice with a `+` since the
+`experiment` config group is an addition and not an override (i.e. our top-level config does not contain an `experiment` group by default). Here are examples of ways that we can run our experiments from the CLI:
 
-.. code-block:: bash
+.. tab-set::
 
-    $ python my_app.py  +experiment=aplite
-    db:
-    name: sqlite
+   .. tab-item:: aplit
 
-    server:
-    name: apache
-    port: 8080
+      .. code-block:: console
+         :caption: 4 Running the `aplite` experiment
 
-    $ python my_app.py --multirun +experiment=aplite,nglite
-    [2023-01-17 10:45:25,609][HYDRA] Launching 2 jobs locally
-    [2023-01-17 10:45:25,609][HYDRA]        #0 : +experiment=aplite
-    db:
-    name: sqlite
-
-    server:
-    name: apache
-    port: 8080
-
-    [2023-01-17 10:45:25,713][HYDRA]        #1 : +experiment=nglite
-    db:
-    name: sqlite
-
-    server:
-    name: nginx
-    port: 8080
+         $ python my_app.py +experiment=aplite
+         db:
+         name: sqlite
+     
+         server:
+         name: apache
+         port: 8080
 
 
-Alternative Approaches
-======================
+   .. tab-item:: nglite
 
-In order to keep the concepts simple we focused on the use of :py:func:`dataclasses.dataclass`. 
-We could easily utilize :func:`~hydra_zen.make_config` as shown below
+      .. code-block:: console
+         :caption: 4 Running the `nglite` experiment
 
-.. code-block:: python
+         $ python my_app.py +experiment=nglite
+         db:
+         name: sqlite
+         
+         server:
+         name: nginx
+         port: 8080
 
-    db_store(make_config(name="mysql"), name="mysql")
-    ...
+   .. tab-item:: multi-run
 
-    server_store(make_config(name="apache", port=80), name="apache")
-    ...
+      .. code-block:: console
+         :caption: 4 Performing a multi-run over experiments
+      
+         $ python my_app.py --multirun +experiment=aplite,nglite
+         [2023-01-17 10:45:25,609][HYDRA] Launching 2 jobs locally
+         [2023-01-17 10:45:25,609][HYDRA]        #0 : +experiment=aplite
+         db:
+         name: sqlite
+     
+         server:
+         name: apache
+         port: 8080
+     
+         [2023-01-17 10:45:25,713][HYDRA]        #1 : +experiment=nglite
+         db:
+         name: sqlite
+     
+         server:
+         name: nginx
+         port: 8080
 
-Another neat trick that :func:`~hydra_zen.store` provides, which is a bit subtle, is that you can avoid having 
-to specify name twice by telling the store how to infer the store-entry's name from the config:
 
-.. code-block:: python
+   .. tab-item:: multi-run (via glob)
 
-    # will infer store-entry name from .name attr of config
-    auto_name_store = store(name=lambda cfg: cfg.name)
+      .. code-block:: console
+         :caption: 4 Running all experiments using the `glob <https://hydra.cc/docs/advanced/override_grammar/extended/#glob-choice-sweep>`_ syntax
 
-    # First create stores for each group
-    db_store = auto_name_store(group="db")
-    server_store = auto_name_store(group="server")
-    experiment_store = store(group="experiment")
+         $ python my_app.py --multirun '+experiment=glob(*)'
+         [2023-01-17 10:45:25,609][HYDRA] Launching 2 jobs locally
+         [2023-01-17 10:45:25,609][HYDRA]        #0 : +experiment=aplite
+         db:
+         name: sqlite
+     
+         server:
+         name: apache
+         port: 8080
+     
+         [2023-01-17 10:45:25,713][HYDRA]        #1 : +experiment=nglite
+         db:
+         name: sqlite
+     
+         server:
+         name: nginx
+         port: 8080
 
 
-    # add to named configurations for the `db` group
-    db_store(make_config(name="mysql"))
-    db_store(make_config(name="sqlite"))
-
-    # add to named configurations for the `server` group
-    server_store(make_config(name="apache", port=80))
-    server_store(make_config(name="nginx", port=80))
+Footnotes
+=========
+.. [1] This closely mirrors Hydra's  `Configuring Experiments <https://hydra.cc/docs/patterns/configuring_experiments/>`_ guide, which describes a YAML-based solution to the same problem. In contrast to this, we emphasis a dataclass-based approach that leverages hydra-zen's enhanced functionality.
