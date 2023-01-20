@@ -3,7 +3,7 @@
 
 
 ==================================
-Configurating Multiple Experiments
+Configuring Multiple Experiments
 ==================================
 
 hydra-zen provides simple and efficient tools to generate multiple experiment configurations. You can easily create new configuration 
