@@ -8,7 +8,7 @@ Using SciKit Learn
 
 This tutorial will show how to use hydra-zen with `SciKit-Learn <https://scikit-learn.org/stable/index.html>`_.  We
 will demonstrate reproducing the result for an example that utilizes multiple datasets
-and classifers 
+and classifiers 
 (`Classifier Comparison <https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html#sphx-glr-auto-examples-classification-plot-classifier-comparison-py>`_ )
 
 
@@ -194,11 +194,11 @@ directory.  Below is the directory structure of saved results.
       --<date>
           |
           result.png
-          --.hydra
-              |
-              overrides.yaml
-              config.yaml
-              hydra.yaml
+          .hydra
+            |
+            overrides.yaml
+            config.yaml
+            hydra.yaml
 
 To run over all configured datasets and models:
 
@@ -218,11 +218,11 @@ is stored in the following directory structure:
           --<job number: e.g., 0>
                 |
                 <dataset_name>_<classifier_name>.png
-                --.hydra
-                    |
-                    overrides.yaml
-                    config.yaml
-                    hydra.yaml
+                .hydra
+                  |
+                  overrides.yaml
+                  config.yaml
+                  hydra.yaml
 
 
 To load images and visualize the results simply load in all `png` files
