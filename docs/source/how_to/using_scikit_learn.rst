@@ -1,16 +1,26 @@
 .. meta::
-   :description: Using SciKit Learn.
+   :description: Experimenting with SciKit Learn.
 
 
 ===================
 Using SciKit Learn
 ===================
 
-This tutorial will show how to use hydra-zen with `SciKit-Learn <https://scikit-learn.org/stable/index.html>`_.  We
-will demonstrate reproducing the result for an example that utilizes multiple datasets
-and classifiers 
-(`Classifier Comparison <https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html#sphx-glr-auto-examples-classification-plot-classifier-comparison-py>`_ )
+This guid will demonstrate how to use hydra-zen with `SciKit-Learn <https://scikit-learn.org/stable/index.html>`_.  We will
+demonstrate how to configure multiple SciKit-Learn datasets and classifiers [1]_ using hydra-zen and launching multiple
+experiments using Hydra's CLI.  In this How-To we will:
 
+1. Configure multiple datasets and classifiers.
+2. Build a task function to load data, fit a classifier, and plot the result.
+3. Save the figure in the local experiment directory.
+4. Gather the saved figures after executing the experiments and plot the final result.
+
+
+Configuring and Building an Experiment
+======================================
+
+Below we create configs for three datasets and ten classifiers and add them to :class:`hydra-zen's config store <hydra_zen.ZenStore>`.
+After building the configs we define the task function for loading 
 
 .. code-block:: python
     :caption: Application: my_app.py
@@ -34,6 +44,8 @@ and classifiers
     from sklearn.inspection import DecisionBoundaryDisplay
 
     from hydra_zen import builds, make_config, store, zen, load_from_yaml
+
+    # 1. Configuring multiple datasets and classifiers
 
     #
     # Stores for classifier and dataset groups
@@ -67,9 +79,7 @@ and classifiers
     sklearn_store(QuadraticDiscriminantAnalysis, name="qda")
 
 
-    #
     # Build config and store datasets
-    #
     def linearly_separable_dataset():
         X, y = make_classification(
             n_features=2,
@@ -95,9 +105,7 @@ and classifiers
         name="circles",
     )
 
-    #
     # Task configuration
-    #
     store(
         make_config(
             hydra_defaults=["_self_", {"dataset": "moons"}, {"classifier": "knn"}],
@@ -107,21 +115,18 @@ and classifiers
         name="config",
     )
 
+    # 2. Build a task function to load data, fit a classifier, and plot the result.
 
     def task(dataset, classifier):
         fig, ax = plt.subplots()
 
-        #
         # split data for train and test
-        #
         X, y = dataset()
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.4, random_state=42
         )
 
-        #
         # plot the data
-        #
         x_min, x_max = X[:, 0].min() - 0.5, X[:, 0].max() + 0.5
         y_min, y_max = X[:, 1].min() - 0.5, X[:, 1].max() + 0.5
 
@@ -161,6 +166,8 @@ and classifiers
         # load overrides to set plot title   
         overrides = load_from_yaml(".hydra/overrides.yaml")
 
+
+        # 3. Save the figure in the local experiment directory.
         if len(overrides) == 2:
             dname = overrides[0].split("=")[1]
             cname = overrides[1].split("=")[1]
@@ -168,8 +175,8 @@ and classifiers
         else:
             fig.savefig("result.png", pad_inches=0.0, bbox_inches = 'tight')
 
-    # For hydra multirun, otherwise figures stay open until all runs
-    # are completed
+    # For hydra multirun figures will stay open until all runs are completed
+    # if we do not close the figure
     plt.close()
 
 
@@ -224,12 +231,14 @@ is stored in the following directory structure:
                   config.yaml
                   hydra.yaml
 
+Gathering and Visualizing the Results
+=====================================
 
 To load images and visualize the results simply load in all `png` files
 stored in job directories and plot the results.
 
 .. code-block:: python
-   :caption: Gathering and Plotting Results
+   :caption: 4. Gathering and Plotting Results
 
     import matplotlib.pyplot as plt
     import matplotlib.image as mpimg
@@ -272,3 +281,8 @@ stored in job directories and plot the results.
 The resulting figure should be:
 
 .. image:: scikit_learn.png 
+
+
+Footnotes
+=========
+.. [1] This closely mirrors SciKit-Learn's (`Classifier Comparison <https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html#sphx-glr-auto-examples-classification-plot-classifier-comparison-py>`_ ) example.  We emphasize the ability to configure multiple datasets and classifiers using hydra-zen and launching multiple experiments using Hydra CLI.
