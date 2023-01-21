@@ -49,13 +49,13 @@ First, we well create configs for our two servers and our two databases and we w
    
    # Pre-set the group for store's db entries
    db_store = auto_name_store(group="db")
-   # Store database configs
+   
    db_store(Database(name="mysql"))
    db_store(Database(name="sqlite"))
    
    # Pre-set the group for store's server entries
    server_store = auto_name_store(group="server")
-   # Store server configs
+   
    server_store(Server(name="apache", port=80))
    server_store(Server(name="nginx", port=80))
 
