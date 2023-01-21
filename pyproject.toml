@@ -203,6 +203,7 @@ deps = {[testenv]deps}
        jax
        pydantic
        beartype
+       scikit-learn
        --requirement deps/requirements-pyright.txt
 commands = pytest tests/test_docs_typecheck.py -vv {posargs: -n auto --maxprocesses=4}
 
