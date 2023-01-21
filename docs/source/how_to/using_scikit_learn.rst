@@ -212,7 +212,8 @@ After building the configs we define the task function that utilizes these datas
            alpha=0.6,
            edgecolors="k",
        )
-
+       
+       # Fit classifier on data
        clf = make_pipeline(StandardScaler(), classifier)
        clf.fit(X_train, y_train)
        score = clf.score(X_test, y_test)
@@ -235,10 +236,13 @@ After building the configs we define the task function that utilizes these datas
 
        # 3. Save the figure in the local experiment directory.
        if len(overrides) == 2:
+           # Running in multirun mode: save fig based 
+           # on dataset/classifier overrides
            dname = overrides[0].split("=")[1]
            cname = overrides[1].split("=")[1]
            fig.savefig(f"{dname}_{cname}.png", pad_inches=0.0, bbox_inches = 'tight')
        else:
+           # Not guaranteed to have overrides, just save as result.png
            fig.savefig("result.png", pad_inches=0.0, bbox_inches = 'tight')
 
        # For hydra multirun figures will stay open until all runs are completed
