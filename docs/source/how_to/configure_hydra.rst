@@ -9,7 +9,7 @@ Customize Hydra's Configuration
 Hydra is highly configurable. The way that Hydra runs jobs, logs information, manages job directories are among its many configurable components [1]_. This How-To guide demonstrates how to configure Hydra from within a Python module [2]_.
 
 
-To configure Hydra using hydra-zen we must update the default instances of :class:`hydra.conf.HydraConf` (which is a :py:func:`dataclasses.dataclass`) that is stored under the `group="hydra", name="config"` entry in Hydra's config store.
+To configure Hydra using hydra-zen we must update the default instance of :class:`hydra.conf.HydraConf` (which is a :py:func:`dataclasses.dataclass`) that is stored under the `group="hydra", name="config"` entry in Hydra's config store.
 Thus we can simply create our own :class:`hydra.conf.HydraConf` instance and overwrite store's entry. 
 
 In this example, we configure Hydra to automatically change the runtime working directory to that of the job's output directory. I.e., we set `hydra.job.chdir=True`:
