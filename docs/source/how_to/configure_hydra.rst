@@ -19,13 +19,15 @@ In this example, we configure Hydra to automatically change the runtime working 
    :caption: Contents of `my_app.py`
 
 
-   from hydra_zen import zen, store
+   from hydra_zen import zen, store, make_config
    from hydra.conf import HydraConf, JobConf
 
-
+   # Storing a new configuration Hydra (setting `hydra.job.chdir=True`)
    store(HydraConf(job=JobConf(chdir=True)), name="config", group="hydra")
 
-   @store  # makes & stores an empty config called 'task'
+   # An empty config for our trivial task function
+   store(make_config(), name="task")
+
    def task():
        import os
        print(f"working dir: {os.getcwd()}")
@@ -39,16 +41,20 @@ In this example, we configure Hydra to automatically change the runtime working 
 Take note that, because we must replace the current Hydra configuration in Hydra's `ConfigStore`, we must set the flag `overwrite_ok=True` in :func:`~hydra_zen.ZenStore.add_to_hydra_store`.
 
 
-Let's confirm that we have successfully changed Hydra's default configuration: 
+Let's confirm that we have successfully changed Hydra's configuration. By default,
+our app's working dir should be job's the time-stamped output directory.
 
 .. code-block:: console
    :caption: Running our application using the default config.
 
+   $ pwd
+   foo/
+
    $ python my_app.py
-   working dir: root/outputs/2023-01-20/17-48-19
+   working dir: foo/outputs/2023-01-20/17-48-19
 
    $ python my_app.py hydra.job.chdir=False
-   working dir: root
+   working dir: foo
 
 
 Footnotes
