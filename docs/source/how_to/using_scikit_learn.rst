@@ -338,7 +338,7 @@ stored in job directories and plot the results.
    from pathlib import Path
 
    images = sorted(
-       Path("multirun/2023-01-20/10-26-06").glob("**/*.png"),
+       Path("multirun/").glob("**/*.png"),
        # sort by dataset name
        key=lambda x: str(x.name).split(".png")[0].split("_")[0],
    )
