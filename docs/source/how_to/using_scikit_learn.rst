@@ -156,7 +156,9 @@ After building the configs we define the task function that utilizes these datas
    # Configure and store task function #
    #####################################
 
-   # Task configuration
+   # Task configuration:
+   #    Set the default dataset to be `moons` 
+   #    and the default classifier to be `knn`
    store(
        make_config(
            hydra_defaults=["_self_", {"dataset": "moons"}, {"classifier": "knn"}],
@@ -243,7 +245,7 @@ After building the configs we define the task function that utilizes these datas
        store.add_to_hydra_store(overwrite_ok=True)
        zen(task).hydra_main(config_path=None, config_name="config", version_base="1.2")
 
-We can view the default condifuration and available datasets & classifiers with:
+We can view the default configuration and available datasets & classifiers with:
 
 .. code-block:: console
 
