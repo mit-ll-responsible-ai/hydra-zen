@@ -8,13 +8,12 @@ Configure and Run scikit-learn's Classifier Comparison Example
 
 .. admonition:: Note
 
-   This How-To guide closely mirrors scikit-learn's `Classifier Comparison <https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html#sphx-glr-auto-examples-classification-plot-classifier-comparison-py>`_  example.  We emphasize the ability to configure multiple datasets and classifiers using hydra-zen, and launching multiple experiments using the Hydra CLI.
+   This How-To guide closely mirrors scikit-learn's `Classifier Comparison <https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html#sphx-glr-auto-examples-classification-plot-classifier-comparison-py>`_  example.
 
-This guide will demonstrate how to use hydra-zen with `scikit-learn <https://scikit-learn.org/stable/index.html>`_.  We will
-demonstrate how to configure multiple scikit-learn datasets and classifiers using hydra-zen and launching multiple
-experiments using Hydra's CLI.  
+This guide will demonstrate how to hydra-zen with `scikit-learn <https://scikit-learn.org/stable/index.html>`_ to configure and run reproducible experiments.
+Specifically, we will demonstrate how to configure multiple scikit-learn datasets and classifiers, and how to launch multiple classifer-fitting experiments using Hydra's CLI.
 
-In this How-To we will:
+This How-To consists of the following steps:
 
 1. Configure multiple scikit-learn datasets and classifiers.
 2. Create a task function to load data, fit a classifier, and visualize the fit.
@@ -122,7 +121,7 @@ After building the configs we define the task function that utilizes these datas
    def linearly_separable_dataset(**kw):
        X, y = make_classification(**kw)
        rng = np.random.RandomState(2)
-       X += 2 * rng.uniform(size=X.shape)  # type: ignore
+       X += 2 * rng.uniform(size=X.shape)
        return X, y
 
    dataset_store(
@@ -187,16 +186,16 @@ After building the configs we define the task function that utilizes these datas
        y_min, y_max = X[:, 1].min() - 0.5, X[:, 1].max() + 0.5
 
        # just plot the dataset first
-       cm = plt.cm.RdBu  # type: ignore
-       cm_bright = ListedColormap(["#FF0000", "#0000FF"])  # type: ignore
+       cm = plt.cm.RdBu
+       cm_bright = ListedColormap(["#FF0000", "#0000FF"])
 
        # Plot the training points
        ax.scatter(X_train[:, 0], X_train[:, 1], c=y_train, cmap=cm_bright, edgecolors="k")
 
        # Plot the testing points
        ax.scatter(
-           X_test[:, 0],  # type: ignore
-           X_test[:, 1],  # type: ignore
+           X_test[:, 0],
+           X_test[:, 1],
            c=y_test,
            cmap=cm_bright,
            alpha=0.6,
