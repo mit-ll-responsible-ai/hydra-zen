@@ -1,0 +1,592 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="Docutils 0.19: https://docutils.sourceforge.io/" name="generator"/>
+<meta content="Configuring and maintaining multiple experiment configurations." name="description"/>
+<title>Configure Multiple Experiments — hydra-zen  documentation</title>
+<script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+<!-- Loaded before other Sphinx assets -->
+<link href="../_static/styles/theme.css?digest=796348d33e8b1d947c94" rel="stylesheet"/>
+<link href="../_static/styles/bootstrap.css?digest=796348d33e8b1d947c94" rel="stylesheet"/>
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=796348d33e8b1d947c94" rel="stylesheet"/>
+<link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=796348d33e8b1d947c94" rel="stylesheet"/>
+<link as="font" crossorigin="" href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" rel="preload" type="font/woff2"/>
+<link as="font" crossorigin="" href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" rel="preload" type="font/woff2"/>
+<link as="font" crossorigin="" href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" rel="preload" type="font/woff2"/>
+<link href="../_static/pygments.css" rel="stylesheet" type="text/css">
+<link href="../_static/copybutton.css" rel="stylesheet" type="text/css">
+<link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css">
+<link href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" rel="stylesheet" type="text/css">
+<link href="../_static/hydra_zen_favicon_32x32.png" rel="icon" sizes="32x32" type="image/png">
+<link href="../_static/hydra_zen_favicon_64x64.png" rel="icon" sizes="64x64" type="image/png">
+<!-- Pre-loaded scripts that we'll load fully later -->
+<link as="script" href="../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94" rel="preload"/>
+<link as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94" rel="preload"/>
+<script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+<script src="../_static/jquery.js"></script>
+<script src="../_static/underscore.js"></script>
+<script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+<script src="../_static/doctools.js"></script>
+<script src="../_static/sphinx_highlight.js"></script>
+<script src="../_static/clipboard.min.js"></script>
+<script src="../_static/copybutton.js"></script>
+<script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
+<script src="../_static/gtag.js"></script>
+<script src="../_static/design-tabs.js"></script>
+<script>DOCUMENTATION_OPTIONS.pagename = 'how_to/configuring_experiments';</script>
+<link href="../genindex.html" rel="index" title="Index">
+<link href="../search.html" rel="search" title="Search">
+<link href="configure_hydra.html" rel="next" title="Customize Hydra’s Configuration">
+<link href="../how_tos.html" rel="prev" title="How-To Guides"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="en" name="docsearch:language"/>
+</link></link></link></link></link></link></link></link></link></head>
+<body data-default-mode="" data-offset="180" data-spy="scroll" data-target="#bd-toc-nav">
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<input class="sidebar-toggle" id="__primary" name="__primary" type="checkbox"/>
+<label class="overlay overlay-primary" for="__primary"></label>
+<input class="sidebar-toggle" id="__secondary" name="__secondary" type="checkbox"/>
+<label class="overlay overlay-secondary" for="__secondary"></label>
+<div class="search-button__wrapper">
+<div class="search-button__overlay"></div>
+<div class="search-button__search-container">
+<form action="../search.html" class="bd-search d-flex align-items-center" method="get">
+<i class="fa-solid fa-magnifying-glass"></i>
+<input aria-label="Search the docs ..." autocapitalize="off" autocomplete="off" autocorrect="off" class="form-control" id="search-input" name="q" placeholder="Search the docs ..." spellcheck="false" type="search"/>
+<span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+</div>
+</div>
+<nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+<label class="sidebar-toggle primary-toggle" for="__primary">
+<span class="fa-solid fa-bars"></span>
+</label>
+<div id="navbar-start">
+<a class="navbar-brand logo" href="../index.html">
+<img alt="Logo image" class="logo__image only-light" src="../_static/Hydra-Zen_logo_full_light_blue.png"/>
+<img alt="Logo image" class="logo__image only-dark" src="../_static/Hydra-Zen_logo_full_light_blue.png"/>
+</a>
+</div>
+<div class="col-lg-9 navbar-header-items">
+<div class="mr-auto" id="navbar-center">
+<div class="navbar-center-item">
+<nav class="navbar-nav">
+<p aria-label="Site Navigation" aria-level="1" class="sidebar-header-items__title" role="heading">
+        Site Navigation
+    </p>
+<ul class="navbar-nav" id="navbar-main-elements">
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../tutorials.html">
+                        Tutorials
+                      </a>
+</li>
+<li class="nav-item current active">
+<a class="nav-link nav-internal" href="../how_tos.html">
+                        How-To Guides
+                      </a>
+</li>
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../explanation.html">
+                        Explanation
+                      </a>
+</li>
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../api_reference.html">
+                        Reference
+                      </a>
+</li>
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../changes.html">
+                        Changelog
+                      </a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+<div id="navbar-end">
+<div class="navbar-end-item navbar-persistent--container">
+<button aria-label="Search" class="btn btn-sm navbar-btn search-button search-button__button" data-toggle="tooltip" title="Search">
+<i class="fa-solid fa-magnifying-glass"></i>
+</button>
+</div>
+<div class="navbar-end-item">
+<button aria-label="light/dark" class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" data-toggle="tooltip" title="light/dark">
+<span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+<span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+<span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+</div>
+<div class="navbar-end-item">
+<ul aria-label="Icon Links" class="navbar-nav" id="navbar-icon-links">
+<li class="nav-item">
+<a class="nav-link" data-toggle="tooltip" href="https://github.com/mit-ll-responsible-ai/hydra-zen" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+<label class="sr-only">GitHub</label></a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="navbar-persistent--mobile">
+<button aria-label="Search" class="btn btn-sm navbar-btn search-button search-button__button" data-toggle="tooltip" title="Search">
+<i class="fa-solid fa-magnifying-glass"></i>
+</button>
+</div>
+<label class="sidebar-toggle secondary-toggle" for="__secondary">
+<span class="fa-solid fa-outdent"></span>
+</label>
+</div>
+</nav>
+<div class="bd-container">
+<div class="bd-container__inner bd-page-width">
+<div class="bd-sidebar-primary bd-sidebar">
+<div class="sidebar-header-items sidebar-primary__section">
+<div class="sidebar-header-items__center">
+<div class="navbar-center-item">
+<nav class="navbar-nav">
+<p aria-label="Site Navigation" aria-level="1" class="sidebar-header-items__title" role="heading">
+        Site Navigation
+    </p>
+<ul class="navbar-nav" id="navbar-main-elements">
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../tutorials.html">
+                        Tutorials
+                      </a>
+</li>
+<li class="nav-item current active">
+<a class="nav-link nav-internal" href="../how_tos.html">
+                        How-To Guides
+                      </a>
+</li>
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../explanation.html">
+                        Explanation
+                      </a>
+</li>
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../api_reference.html">
+                        Reference
+                      </a>
+</li>
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../changes.html">
+                        Changelog
+                      </a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+<div class="sidebar-header-items__end">
+<div class="navbar-end-item">
+<button aria-label="light/dark" class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" data-toggle="tooltip" title="light/dark">
+<span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+<span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+<span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+</div>
+<div class="navbar-end-item">
+<ul aria-label="Icon Links" class="navbar-nav" id="navbar-icon-links">
+<li class="nav-item">
+<a class="nav-link" data-toggle="tooltip" href="https://github.com/mit-ll-responsible-ai/hydra-zen" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+<label class="sr-only">GitHub</label></a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sidebar-start-items sidebar-primary__section">
+<div class="sidebar-start-items__item"><nav aria-label="Section navigation" class="bd-links" id="bd-docs-nav">
+<p aria-level="1" class="bd-links__title" role="heading">
+    Section Navigation
+  </p>
+<div class="bd-toc-item navbar-nav">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Configure Multiple Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configure_hydra.html">Customize Hydra’s Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="partial_config.html">Partially Configure an Object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="beartype.html">Add Enhanced Runtime Type-Checking to a Hydra App</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using_scikit_learn.html">Configure and Run scikit-learn’s Classifier Comparison Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pytorch_lightning.html">Run Boilerplate-Free ML Experiments with PyTorch Lightning &amp; hydra-zen</a></li>
+</ul>
+</div>
+</nav>
+</div>
+</div>
+<div class="sidebar-end-items sidebar-primary__section">
+<div class="sidebar-end-items__item">
+</div>
+</div>
+<div id="rtd-footer-container"></div>
+</div>
+<main class="bd-main" id="main-content">
+<div class="bd-content">
+<div class="bd-article-container">
+<div class="bd-header-article">
+</div>
+<article class="bd-article" role="main">
+<section id="configure-multiple-experiments">
+<h1>Configure Multiple Experiments<a class="headerlink" href="#configure-multiple-experiments" title="Permalink to this heading">#</a></h1>
+<p>This guide demonstrates how to elegantly maintain multiple configurations for an experiment, so that each experiment’s config need only specify changes to some “master” config <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+<p>Suppose that we want to benchmark an application that is configured using various pairings of databases (MySQL and SQLite) and servers (Apache and NGINX).
+And, suppose that there are particular database-server configurations that we want to frequently experiment with. In this How-To we will:</p>
+<ol class="arabic simple">
+<li><p>Create the basic server and database configurations for our application and add them to a config store.</p></li>
+<li><p>Define a simple task function that is executed when we configure and run our application from the CLI.</p></li>
+<li><p>Create specialized configurations for particular experiments that we want to run, so that it is trivial to run each experiment “by name” from the CLI.</p></li>
+<li><p>Run various configurations of our experiment.</p></li>
+</ol>
+<section id="configuring-and-running-our-basic-application">
+<h2>Configuring and Running our Basic Application<a class="headerlink" href="#configuring-and-running-our-basic-application" title="Permalink to this heading">#</a></h2>
+<p>First, we well create configs for our two servers and our two databases and we will add them to <a class="reference internal" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.ZenStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">hydra-zen's</span> <span class="pre">config</span> <span class="pre">store</span></code></a>.</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Contents of <code class="xref py py-obj docutils literal notranslate"><span class="pre">my_app.py</span></code></span><a class="headerlink" href="#id3" title="Permalink to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a>
+
+<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">store</span><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a>
+
+<span class="c1"># 1. Creating and storing basic configs</span>
+
+<a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="nd">@dataclass</span></a>
+<span class="k">class</span> <span class="nc">Server</span><span class="p">:</span>
+    <span class="n">name</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a>
+    <span class="n">port</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a>
+
+
+<a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="nd">@dataclass</span></a>
+<span class="k">class</span> <span class="nc">Database</span><span class="p">:</span>
+    <span class="n">name</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a>
+
+<span class="c1"># For convenience:</span>
+<span class="c1"># Tell the store to automatically infer the entry-name from</span>
+<span class="c1"># the config's `.name` attribute.</span>
+<span class="n">auto_name_store</span> <span class="o">=</span> <span class="n">store</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="k">lambda</span> <span class="n">cfg</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+<span class="c1"># Pre-set the group for store's db entries</span>
+<span class="n">db_store</span> <span class="o">=</span> <span class="n">auto_name_store</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">"db"</span><span class="p">)</span>
+
+<span class="n">db_store</span><span class="p">(</span><span class="n">Database</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"mysql"</span><span class="p">))</span>
+<span class="n">db_store</span><span class="p">(</span><span class="n">Database</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"sqlite"</span><span class="p">))</span>
+
+<span class="c1"># Pre-set the group for store's server entries</span>
+<span class="n">server_store</span> <span class="o">=</span> <span class="n">auto_name_store</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">"server"</span><span class="p">)</span>
+
+<span class="n">server_store</span><span class="p">(</span><span class="n">Server</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"apache"</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">80</span><span class="p">))</span>
+<span class="n">server_store</span><span class="p">(</span><span class="n">Server</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"nginx"</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">80</span><span class="p">))</span>
+
+
+<span class="c1"># 2. Defining our app's task function and the top-level config</span>
+<span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="n">db</span><span class="p">:</span> <span class="n">Database</span><span class="p">,</span> <span class="n">server</span><span class="p">:</span> <span class="n">Server</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a>
+
+    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="sa">f</span><span class="s2">"db:</span><span class="se">\n</span><span class="si">{</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">(</span><span class="n">db</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="sa">f</span><span class="s2">"server:</span><span class="se">\n</span><span class="si">{</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">(</span><span class="n">server</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+
+<span class="c1"># The 'top-level' config for our app w/ a specified default</span>
+<span class="c1"># database and server</span>
+<span class="n">Config</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">(</span>
+    <span class="n">task</span><span class="p">,</span>
+    <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">hydra_defaults</span><span class="o">=</span><span class="p">[</span><span class="s2">"_self_"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"db"</span><span class="p">:</span> <span class="s2">"mysql"</span><span class="p">},</span> <span class="p">{</span><span class="s2">"server"</span><span class="p">:</span> <span class="s2">"apache"</span><span class="p">}],</span>
+<span class="p">)</span>
+
+<span class="n">store</span><span class="p">(</span><span class="n">Config</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"config"</span><span class="p">)</span>
+
+<span class="k">if</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/reference/import.html#name__" title="__name__"><span class="vm">__name__</span></a> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">store</span><span class="o">.</span><span class="n">add_to_hydra_store</span><span class="p">()</span>
+    <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">(</span><span class="n">task</span><span class="p">)</span><span class="o">.</span><span class="n">hydra_main</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_name</span><span class="o">=</span><span class="s2">"config"</span><span class="p">,</span> <span class="n">version_base</span><span class="o">=</span><span class="s2">"1.2"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The application can then be executed using:</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Running our application using the default config.</span><a class="headerlink" href="#id4" title="Permalink to this code">#</a></div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py
+<span class="go">db:</span>
+<span class="go">name: mysql</span>
+
+<span class="go">server:</span>
+<span class="go">name: apache</span>
+<span class="go">port: 80</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="creating-configurations-for-particular-experiments">
+<h2>Creating Configurations for Particular “Experiments”<a class="headerlink" href="#creating-configurations-for-particular-experiments" title="Permalink to this heading">#</a></h2>
+<p>Suppose that we frequently want to run our application using the following two configurations (which we will refer to as <code class="xref py py-obj docutils literal notranslate"><span class="pre">aplite</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">nglite</span></code>, respectively)</p>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">Manually running the so-called <code class="xref py py-obj docutils literal notranslate"><span class="pre">aplite</span></code> configuration</span><a class="headerlink" href="#id5" title="Permalink to this code">#</a></div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span><span class="nv">db</span><span class="o">=</span>sqlite<span class="w"> </span>server.port<span class="o">=</span><span class="m">8080</span>
+<span class="go">db:</span>
+<span class="go">name: sqlite</span>
+
+<span class="go">server:</span>
+<span class="go">name: apache</span>
+<span class="go">port: 8080</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">Manually running the so-called <code class="xref py py-obj docutils literal notranslate"><span class="pre">nglite</span></code> configuration</span><a class="headerlink" href="#id6" title="Permalink to this code">#</a></div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span><span class="nv">db</span><span class="o">=</span>sqlite<span class="w"> </span><span class="nv">server</span><span class="o">=</span>nginx<span class="w"> </span>server.port<span class="o">=</span><span class="m">8080</span>
+<span class="go">db:</span>
+<span class="go">name: sqlite</span>
+
+<span class="go">server:</span>
+<span class="go">name: nginx</span>
+<span class="go">port: 8080</span>
+</pre></div>
+</div>
+</div>
+<p>Our objective is to be able run these experiments more concisely, as:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span>+experiment<span class="o">=</span>&lt;aglite<span class="w"> </span>or<span class="w"> </span>nginx&gt;
+</pre></div>
+</div>
+<p>To do this we implement new experiment configurations that:</p>
+<ul class="simple">
+<li><p>Inherit from <code class="xref py py-obj docutils literal notranslate"><span class="pre">Config</span></code> – the default config for our app – so that Hydra will be able to compose it with each experiment’s config.</p></li>
+<li><p>Are stored under the <code class="xref py py-obj docutils literal notranslate"><span class="pre">_global_</span></code> <a class="reference external" href="https://hydra.cc/docs/advanced/overriding_packages/">package</a>, so that they are used to replace our top-level config, and under a group called “experiment”, which will determine how we reference them from the CLI.</p></li>
+<li><p>Override defaults configuration values using absolute paths for <code class="xref py py-obj docutils literal notranslate"><span class="pre">/db</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">/server</span></code>. Using absolute paths is necessary given that we are not leveraging <a class="reference external" href="https://hydra.cc/docs/advanced/search_path/">Hydra’s config search path logic</a> (which is typically reserved for yaml-based configs).</p></li>
+<li><p>Override particular parameter values (i.e., the configured server port)</p></li>
+</ul>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">3: Adding experiment configs (an addition to <code class="xref py py-obj docutils literal notranslate"><span class="pre">my_app.py</span></code>)</span><a class="headerlink" href="#id7" title="Permalink to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># add the following before the __main__ clause of `my_app.py`</span>
+
+<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a>
+
+<span class="c1"># the experiment configs:</span>
+<span class="c1"># - must be stored under the _global_ package</span>
+<span class="c1"># - must inherit from `Config`</span>
+<span class="n">experiment_store</span> <span class="o">=</span> <span class="n">store</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">"experiment"</span><span class="p">,</span>  <span class="n">package</span><span class="o">=</span><span class="s2">"_global_"</span><span class="p">)</span>
+
+<span class="c1"># equivalent to `python my_app.py db=sqlite server.port=8080`</span>
+<span class="n">experiment_store</span><span class="p">(</span>
+    <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">(</span>
+        <span class="n">hydra_defaults</span><span class="o">=</span><span class="p">[</span><span class="s2">"_self_"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"override /db"</span><span class="p">:</span> <span class="s2">"sqlite"</span><span class="p">}],</span>
+        <span class="n">server</span><span class="o">=</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">8080</span><span class="p">),</span>
+        <span class="n">bases</span><span class="o">=</span><span class="p">(</span><span class="n">Config</span><span class="p">,),</span>
+    <span class="p">),</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"aplite"</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="c1"># equivalent to: `python my_app.py db=sqlite server=nginx server.port=8080`</span>
+<span class="n">experiment_store</span><span class="p">(</span>
+    <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">(</span>
+        <span class="n">hydra_defaults</span><span class="o">=</span><span class="p">[</span>
+            <span class="s2">"_self_"</span><span class="p">,</span>
+            <span class="p">{</span><span class="s2">"override /db"</span><span class="p">:</span> <span class="s2">"sqlite"</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">"override /server"</span><span class="p">:</span> <span class="s2">"nginx"</span><span class="p">},</span>
+        <span class="p">],</span>
+        <span class="n">server</span><span class="o">=</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">8080</span><span class="p">),</span>
+        <span class="n">bases</span><span class="o">=</span><span class="p">(</span><span class="n">Config</span><span class="p">,)</span>
+    <span class="p">),</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"nglite"</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Each experiment can then be run from command line by prefixing the experiment choice with a <code class="xref py py-obj docutils literal notranslate"><span class="pre">+</span></code> since the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">experiment</span></code> config group is an addition and not an override (i.e. our top-level config does not contain an <code class="xref py py-obj docutils literal notranslate"><span class="pre">experiment</span></code> group by default). Here are examples of ways that we can run our experiments from the CLI:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio"/>
+<label class="sd-tab-label" for="sd-tab-item-0">
+aplit</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id8">
+<div class="code-block-caption"><span class="caption-text">4 Running the <code class="xref py py-obj docutils literal notranslate"><span class="pre">aplite</span></code> experiment</span><a class="headerlink" href="#id8" title="Permalink to this code">#</a></div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span>+experiment<span class="o">=</span>aplite
+<span class="go">db:</span>
+<span class="go">name: sqlite</span>
+
+<span class="go">server:</span>
+<span class="go">name: apache</span>
+<span class="go">port: 8080</span>
+</pre></div>
+</div>
+</div>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio"/>
+<label class="sd-tab-label" for="sd-tab-item-1">
+nglite</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id9">
+<div class="code-block-caption"><span class="caption-text">4 Running the <code class="xref py py-obj docutils literal notranslate"><span class="pre">nglite</span></code> experiment</span><a class="headerlink" href="#id9" title="Permalink to this code">#</a></div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span>+experiment<span class="o">=</span>nglite
+<span class="go">db:</span>
+<span class="go">name: sqlite</span>
+
+<span class="go">server:</span>
+<span class="go">name: nginx</span>
+<span class="go">port: 8080</span>
+</pre></div>
+</div>
+</div>
+</div>
+<input id="sd-tab-item-2" name="sd-tab-set-0" type="radio"/>
+<label class="sd-tab-label" for="sd-tab-item-2">
+multi-run</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id10">
+<div class="code-block-caption"><span class="caption-text">4 Performing a multi-run over experiments</span><a class="headerlink" href="#id10" title="Permalink to this code">#</a></div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span>--multirun<span class="w"> </span>+experiment<span class="o">=</span>aplite,nglite
+<span class="go">[2023-01-17 10:45:25,609][HYDRA] Launching 2 jobs locally</span>
+<span class="gp">[2023-01-17 10:45:25,609][HYDRA]        #</span><span class="m">0</span><span class="w"> </span>:<span class="w"> </span>+experiment<span class="o">=</span>aplite
+<span class="go">db:</span>
+<span class="go">name: sqlite</span>
+
+<span class="go">server:</span>
+<span class="go">name: apache</span>
+<span class="go">port: 8080</span>
+
+<span class="gp">[2023-01-17 10:45:25,713][HYDRA]        #</span><span class="m">1</span><span class="w"> </span>:<span class="w"> </span>+experiment<span class="o">=</span>nglite
+<span class="go">db:</span>
+<span class="go">name: sqlite</span>
+
+<span class="go">server:</span>
+<span class="go">name: nginx</span>
+<span class="go">port: 8080</span>
+</pre></div>
+</div>
+</div>
+</div>
+<input id="sd-tab-item-3" name="sd-tab-set-0" type="radio"/>
+<label class="sd-tab-label" for="sd-tab-item-3">
+multi-run (via glob)</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id11">
+<div class="code-block-caption"><span class="caption-text">4 Running all experiments using the <a class="reference external" href="https://hydra.cc/docs/advanced/override_grammar/extended/#glob-choice-sweep">glob</a> syntax</span><a class="headerlink" href="#id11" title="Permalink to this code">#</a></div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span>--multirun<span class="w"> </span><span class="s1">'+experiment=glob(*)'</span>
+<span class="go">[2023-01-17 10:45:25,609][HYDRA] Launching 2 jobs locally</span>
+<span class="gp">[2023-01-17 10:45:25,609][HYDRA]        #</span><span class="m">0</span><span class="w"> </span>:<span class="w"> </span>+experiment<span class="o">=</span>aplite
+<span class="go">db:</span>
+<span class="go">name: sqlite</span>
+
+<span class="go">server:</span>
+<span class="go">name: apache</span>
+<span class="go">port: 8080</span>
+
+<span class="gp">[2023-01-17 10:45:25,713][HYDRA]        #</span><span class="m">1</span><span class="w"> </span>:<span class="w"> </span>+experiment<span class="o">=</span>nglite
+<span class="go">db:</span>
+<span class="go">name: sqlite</span>
+
+<span class="go">server:</span>
+<span class="go">name: nginx</span>
+<span class="go">port: 8080</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="footnotes">
+<h2>Footnotes<a class="headerlink" href="#footnotes" title="Permalink to this heading">#</a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="note">
+<span class="label"><span class="fn-bracket">[</span><a href="#id1" role="doc-backlink">1</a><span class="fn-bracket">]</span></span>
+<p>This closely mirrors Hydra’s  <a class="reference external" href="https://hydra.cc/docs/patterns/configuring_experiments/">Configuring Experiments</a> guide, which describes a YAML-based solution to the same problem. In contrast to this, we emphasis a dataclass-based approach that leverages hydra-zen’s enhanced functionality.</p>
+</aside>
+</aside>
+</section>
+</section>
+</article>
+<footer class="bd-footer-article">
+<!-- Previous / next buttons -->
+<div class="prev-next-area">
+<a class="left-prev" href="../how_tos.html" id="prev-link" title="previous page">
+<i class="fa-solid fa-angle-left"></i>
+<div class="prev-next-info">
+<p class="prev-next-subtitle">previous</p>
+<p class="prev-next-title">How-To Guides</p>
+</div>
+</a>
+<a class="right-next" href="configure_hydra.html" id="next-link" title="next page">
+<div class="prev-next-info">
+<p class="prev-next-subtitle">next</p>
+<p class="prev-next-title">Customize Hydra’s Configuration</p>
+</div>
+<i class="fa-solid fa-angle-right"></i>
+</a>
+</div>
+</footer>
+</div>
+<div class="bd-sidebar-secondary bd-toc">
+<div class="toc-item">
+<div class="tocsection onthispage">
+<i class="fa-solid fa-list"></i> On this page
+</div>
+<nav class="page-toc" id="bd-toc-nav">
+<ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry">
+<a class="reference internal nav-link" href="#configuring-and-running-our-basic-application">
+   Configuring and Running our Basic Application
+  </a>
+</li>
+<li class="toc-h2 nav-item toc-entry">
+<a class="reference internal nav-link" href="#creating-configurations-for-particular-experiments">
+   Creating Configurations for Particular “Experiments”
+  </a>
+</li>
+<li class="toc-h2 nav-item toc-entry">
+<a class="reference internal nav-link" href="#footnotes">
+   Footnotes
+  </a>
+</li>
+</ul>
+</nav>
+</div>
+<div class="toc-item">
+<div id="searchbox"></div>
+</div>
+<div class="toc-item">
+</div>
+<div class="toc-item">
+<div class="tocsection sourcelink">
+<a href="../_sources/how_to/configuring_experiments.rst.txt">
+<i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+</div>
+</div>
+</div>
+</div>
+<footer class="bd-footer-content">
+<div class="bd-footer-content__inner">
+</div>
+</footer>
+</main>
+</div>
+</div>
+<!-- Scripts loaded after <body> so the DOM is not blocked -->
+<script src="../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94"></script>
+<footer class="bd-footer"><div class="bd-footer__inner container">
+<div class="footer-item">
+<p class="copyright">
+
+    © Copyright 2023 Massachusetts Institute of Technology.<br/>
+</p>
+</div>
+<div class="footer-item">
+<p class="theme-version">
+    Built with the
+    <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">
+        PyData Sphinx Theme
+    </a>
+    0.12.0.
+</p>
+</div>
+<div class="footer-item">
+<p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br/>
+</p>
+</div>
+</div>
+</footer>
+</body>
+</html>
