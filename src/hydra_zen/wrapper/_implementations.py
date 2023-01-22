@@ -965,6 +965,8 @@ class ZenStore:
     new_store
     {None: ['backbone']}
 
+    .. _store-autoconf:
+
     **Auto-config capabilities**
 
     The input to a store is processed by the store's `to_config` function prior to

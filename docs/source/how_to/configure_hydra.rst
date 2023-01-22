@@ -1,0 +1,63 @@
+.. meta::
+   :description: Configuring Hydra.
+
+
+===============================
+Customize Hydra's Configuration
+===============================
+
+Hydra is highly configurable. The way that Hydra runs jobs, logs information, manages job directories are among its many configurable components [1]_. This How-To guide demonstrates how to configure Hydra from within a Python module [2]_.
+
+
+To configure Hydra using hydra-zen we must update the default instance of :class:`hydra.conf.HydraConf` (which is a :py:func:`dataclasses.dataclass`) that is stored under the `group="hydra", name="config"` entry in Hydra's config store.
+Thus we can simply create our own :class:`hydra.conf.HydraConf` instance and overwrite store's entry. 
+
+In this example, we configure Hydra to automatically change the runtime working directory to that of the job's output directory. I.e., we set `hydra.job.chdir=True`:
+
+
+.. code-block:: python
+   :caption: Contents of `my_app.py`
+
+
+   from hydra_zen import zen, store, make_config
+   from hydra.conf import HydraConf, JobConf
+
+   # Storing a new configuration Hydra (setting `hydra.job.chdir=True`)
+   store(HydraConf(job=JobConf(chdir=True)), name="config", group="hydra")
+
+   # An empty config for our trivial task function
+   store(make_config(), name="task")
+
+   def task():
+       import os
+       print(f"working dir: {os.getcwd()}")
+
+
+   if __name__ == "__main__":
+       # notice the `overwite_ok` flag!
+       store.add_to_hydra_store(overwrite_ok=True)
+       zen(task).hydra_main(config_path=None, config_name="task", version_base="1.2")
+
+Take note that, because we must replace the current Hydra configuration in Hydra's `ConfigStore`, we must set the flag `overwrite_ok=True` in :func:`~hydra_zen.ZenStore.add_to_hydra_store`.
+
+
+Let's confirm that we have successfully changed Hydra's configuration. By default,
+our app's working dir should be job's the time-stamped output directory.
+
+.. code-block:: console
+   :caption: Running our application using the default config.
+
+   $ pwd
+   foo/
+
+   $ python my_app.py
+   working dir: foo/outputs/2023-01-20/17-48-19
+
+   $ python my_app.py hydra.job.chdir=False
+   working dir: foo
+
+
+Footnotes
+=========
+.. [1] See `this documentation <https://hydra.cc/docs/configure_hydra/intro/>`_ to learn about all of the ways that Hydra can be configured.
+.. [2] Hydra's documentation for configuring Hydra focuses on yaml-based and CLI-based approaches. hydra-zen promotes a pure-Python approach to Hydra and thus this guide follows suite.

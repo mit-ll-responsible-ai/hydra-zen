@@ -55,6 +55,11 @@ Creating Configs
 
 Storing Configs
 ***************
+
+.. toctree::
+
+   store
+
 .. currentmodule:: hydra_zen
 
 .. autosummary::
@@ -62,6 +67,7 @@ Storing Configs
 
    ZenStore
    wrapper.default_to_config
+   
 
 
 Instantiating and Resolving Configs
