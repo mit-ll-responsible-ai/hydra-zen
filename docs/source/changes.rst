@@ -8,6 +8,19 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse 
 chronological order. All previous releases should still be available on pip.
 
+
+--------------------------
+Documentation - 2023-01-22
+--------------------------
+
+The following How-To guides were added:
+
+- `How to configure multiple experiments <https://mit-ll-responsible-ai.github.io/hydra-zen/how_to/configuring_experiments.html>`_
+- `How to customize Hydra's configuration <https://mit-ll-responsible-ai.github.io/hydra-zen/how_to/configure_hydra.html>`_
+- `How to configure and run scikit-learn's "Classier Comparison" example <https://mit-ll-responsible-ai.github.io/hydra-zen/how_to/using_scikit_learn.html>`_
+
+
+
 .. _v0.9.1:
 
 ------------------
