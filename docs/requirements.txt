@@ -5,5 +5,5 @@ sphinx-copybutton==0.5.1
 sphinx-design==0.3.0
 sphinx-codeautolink==0.13.1
 # third-party utilities
-beartype==0.11.0
+beartype==0.12.0
 pydantic==1.10.4
