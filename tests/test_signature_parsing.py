@@ -325,9 +325,9 @@ def expects_int(x: int) -> int:
 @pytest.mark.parametrize(
     "builds_as_default",
     [
-        builds(returns_int),  # type
-        builds(returns_int)(),  # instance
-    ],
+        builds(returns_int),
+        builds(returns_int)(),
+    ],  # type  # instance
 )
 @pytest.mark.parametrize("hydra_recursive", [True, None])
 def test_setting_default_with_builds_widens_type(builds_as_default, hydra_recursive):

@@ -30,6 +30,7 @@ from typing import (
 )
 
 import hydra
+from hydra.conf import HydraConf
 from hydra.core.config_store import ConfigStore
 from hydra.utils import instantiate
 from omegaconf import DictConfig, ListConfig, OmegaConf
@@ -796,6 +797,10 @@ def default_to_config(
     """
     if is_dataclass(target):
         if isinstance(target, type):
+            if issubclass(target, HydraConf):
+                # don't auto-config HydraConf
+                return target
+
             if not kw and get_obj_path(target).startswith("types."):
                 # handles dataclasses returned by make_config()
                 return target
@@ -1302,6 +1307,23 @@ class ZenStore:
             package = kw.get("package", self._defaults["package"])
             provider = kw.get("provider", self._defaults["provider"])
 
+            if (
+                isinstance(__target, HydraConf)
+                or isinstance(__target, type)
+                and issubclass(__target, HydraConf)
+            ):
+                # User is re-configuring Hydra's config; we provide "smart" defaults
+                # for the entry's name, group, and package
+                if "name" not in kw and "group" not in kw:
+                    # only apply when neither name nor group are specified
+                    name = "config"
+                    group = "hydra"
+                    if "provider" not in kw:
+                        provider = "hydra_zen"
+
+                else:  # pragma: no cover
+                    pass
+
             _name: NodeName = name(__target) if callable(name) else name
             if not isinstance(_name, str):
                 raise TypeError(f"`name` must be a string, got {_name}")
@@ -1550,19 +1572,30 @@ class ZenStore:
         >>> store2.add_to_hydra_store(overwrite_ok=True)  # successfully overwrites entry
 
         """
-
+        _store = ConfigStore.instance().store
         while self._queue:
             entry = _resolve_node(self._queue.popleft(), copy=False)
             if (
-                overwrite_ok is False
-                or (overwrite_ok is None and not self._overwrite_ok)
-            ) and self._exists_in_hydra_store(name=entry["name"], group=entry["group"]):
+                (
+                    overwrite_ok is False
+                    or (overwrite_ok is None and not self._overwrite_ok)
+                )
+                and self._exists_in_hydra_store(
+                    name=entry["name"], group=entry["group"]
+                )
+                # It is okay if we are overwriting Hydra's default store
+                and not (
+                    (entry["name"], entry["group"]) == ("config", "hydra")
+                    and ConfigStore.instance().repo["hydra"]["config.yaml"].provider
+                    == "hydra"
+                )
+            ):
                 raise ValueError(
                     f"(name={entry['name']} group={entry['group']}): "
                     f"Hydra config store entry already exists. Specify "
                     f"`overwrite_ok=True` to enable replacing config store entries"
                 )
-            ConfigStore.instance().store(**entry)
+            _store(**entry)
 
     def _exists_in_hydra_store(
         self,
