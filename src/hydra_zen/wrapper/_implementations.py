@@ -1037,8 +1037,6 @@ class ZenStore:
 
     >>> from hydra_zen import builds
     >>>
-    >>> def func(a: int, b: int):
-    ...     return a - b
     >>> store(builds(func, a=1, b=22), name="func1")
     >>> store(builds(func, a=-10,
     ...              populate_full_signature=True
