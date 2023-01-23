@@ -1005,6 +1005,21 @@ class ZenStore:
     ... def func(a: int, b: int):
     ...     return a - b
 
+    Each application of `@store` utilizes the store's auto-config capability
+    to create and store a config inline. I.e. the above snippet is equivalent to
+
+    >>> from hydra_zen import builds
+    >>>
+    >>> def func(a: int, b: int):
+    ...     return a - b
+    >>> store(builds(func, a=1, b=22), name="func1")
+    >>> store(builds(func, a=-10,
+    ...              populate_full_signature=True
+    ...              ),
+    ...       name="func2",
+    ... )
+
+
     >>> func(10, 3)  # the decorated function is left unchanged
     7
     >>> pyaml(store[None, "func1"])
