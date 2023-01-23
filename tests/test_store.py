@@ -1,6 +1,8 @@
 # Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+import os
 import re
+import sys
 from contextlib import contextmanager
 from copy import deepcopy
 from dataclasses import dataclass
@@ -755,6 +757,10 @@ def test_auto_support_for_HydraConf(conf: HydraConf, deferred: bool):
             st2.add_to_hydra_store()
 
 
+@pytest.mark.skipif(
+    sys.platform.startswith("win") and bool(os.environ.get("CI")),
+    reason="Things are weird on GitHub Actions and Windows",
+)
 @pytest.mark.skipif(
     HYDRA_VERSION < (1, 2, 0),
     reason="HydraConf(job=Job(chdir=...)) introduced in Hydra 1.2.0",

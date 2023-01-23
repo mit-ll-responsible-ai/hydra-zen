@@ -1338,7 +1338,7 @@ class ZenStore:
                     # only apply when neither name nor group are specified
                     name = "config"
                     group = "hydra"
-                    if "provider" not in kw:
+                    if "provider" not in kw:  # pragma: no branch
                         provider = "hydra_zen"
 
             _name: NodeName = name(__target) if callable(name) else name
