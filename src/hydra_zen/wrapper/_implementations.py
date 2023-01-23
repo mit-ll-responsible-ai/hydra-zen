@@ -914,6 +914,28 @@ class ZenStore:
            deferred_hydra_store=True,
        )
 
+    Notes
+    -----
+    Special support is provided for overriding Hydra's configuration; the name and
+    group of the store entry is inferred to be 'config' and 'hydra', respectively,
+    when an instance/subclass of `HydraConf` is being stored. E.g., specifying
+
+    .. code-block:: python
+
+       from hydra.conf import HydraConf, JobConf
+       from hydra_zen import store
+
+       store(HydraConf(job=JobConf(chdir=True)))
+
+    is equivalent to writing the following manually
+
+    .. code-block:: python
+
+       store(HydraConf(job=JobConf(chdir=True)), name="config", group="hydra", provider="hydra_zen")
+
+    Additionally, overwriting the store entry for `HydraConf` will not raise an error
+    even if `ZenStore(overwrite_ok=False)` is specified.
+
     Examples
     --------
     >>> from hydra_zen import to_yaml, store, ZenStore
