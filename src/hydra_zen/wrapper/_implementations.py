@@ -1334,15 +1334,12 @@ class ZenStore:
             ):
                 # User is re-configuring Hydra's config; we provide "smart" defaults
                 # for the entry's name, group, and package
-                if "name" not in kw and "group" not in kw:
+                if "name" not in kw and "group" not in kw:  # pragma: no branch
                     # only apply when neither name nor group are specified
                     name = "config"
                     group = "hydra"
                     if "provider" not in kw:
                         provider = "hydra_zen"
-
-                else:  # pragma: no cover
-                    pass
 
             _name: NodeName = name(__target) if callable(name) else name
             if not isinstance(_name, str):
