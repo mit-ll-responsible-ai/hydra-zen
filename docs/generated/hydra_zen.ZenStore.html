@@ -284,6 +284,22 @@ which is initialized as:</p>
 <span class="p">)</span>
 </pre></div>
 </div>
+<p class="rubric">Notes</p>
+<p>Special support is provided for overriding Hydra’s configuration; the name and
+group of the store entry is inferred to be ‘config’ and ‘hydra’, respectively,
+when an instance/subclass of <code class="xref py py-obj docutils literal notranslate"><span class="pre">HydraConf</span></code> is being stored. E.g., specifying</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra.conf</span> <span class="kn">import</span> <span class="n">HydraConf</span><span class="p">,</span> <span class="n">JobConf</span>
+<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">store</span>
+
+<span class="n">store</span><span class="p">(</span><span class="n">HydraConf</span><span class="p">(</span><span class="n">job</span><span class="o">=</span><span class="n">JobConf</span><span class="p">(</span><span class="n">chdir</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
+</pre></div>
+</div>
+<p>is equivalent to writing the following manually</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">store</span><span class="p">(</span><span class="n">HydraConf</span><span class="p">(</span><span class="n">job</span><span class="o">=</span><span class="n">JobConf</span><span class="p">(</span><span class="n">chdir</span><span class="o">=</span><span class="kc">True</span><span class="p">)),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"config"</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s2">"hydra"</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">"hydra_zen"</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Additionally, overwriting the store entry for <code class="xref py py-obj docutils literal notranslate"><span class="pre">HydraConf</span></code> will not raise an error
+even if <code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenStore(overwrite_ok=False)</span></code> is specified.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">ZenStore</span></a>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">pyaml</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
@@ -373,6 +389,18 @@ store entries for <code class="xref py py-obj docutils literal notranslate"><spa
 <span class="gp">... </span><span class="nd">@store</span><span class="p">(</span><span class="n">a</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"func2"</span><span class="p">)</span>
 <span class="gp">... </span><span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">return</span> <span class="n">a</span> <span class="o">-</span> <span class="n">b</span>
+</pre></div>
+</div>
+<p>Each application of <code class="xref py py-obj docutils literal notranslate"><span class="pre">@store</span></code> utilizes the store’s auto-config capability
+to create and store a config inline. I.e. the above snippet is equivalent to</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">store</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">22</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"func1"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">store</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">a</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span>
+<span class="gp">... </span>             <span class="p">),</span>
+<span class="gp">... </span>      <span class="n">name</span><span class="o">=</span><span class="s2">"func2"</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">func</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>  <span class="c1"># the decorated function is left unchanged</span>
