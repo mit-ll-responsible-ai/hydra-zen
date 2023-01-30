@@ -80,7 +80,7 @@ The same tasks can be executed in a single script using :func:`hydra_zen.launch`
    # outputs:
    # 1
 
-   mulritun_job = launch(TestConfig, task_fn, overrides=["+foo=1,2,3"], multirun=True)
+   multirun_job = launch(TestConfig, task_fn, overrides=["+foo=1,2,3"], multirun=True)
    # outputs:
    # [2023-01-11 10:56:02,448][HYDRA] Launching 3 jobs locally
    # [2023-01-11 10:56:02,448][HYDRA]        #0 : +foo=1
@@ -113,7 +113,7 @@ Additionally, :func:`hydra_zen.launch` supports dictionary overrides:
    # 1
 
    # define a multirun list using `hydra_zen.multirun`
-   mulritun_job = launch(
+   multirun_job = launch(
       TestConfig, task_fn, overrides={"+foo": multirun([1, 2, 3])}, multirun=True
    )
    # outputs:
@@ -125,7 +125,7 @@ Additionally, :func:`hydra_zen.launch` supports dictionary overrides:
    # [2023-01-11 10:56:02,626][HYDRA]        #2 : +foo=3
 
    # define a standard Hydra list as a single parameter using `hydra_zen.hydra_list`
-   mulritun_job = launch(TestConfig, task_fn, overrides={"+foo": hydra_list([1, 2, 3])})
+   multirun_job = launch(TestConfig, task_fn, overrides={"+foo": hydra_list([1, 2, 3])})
    # outputs:
    # [1, 2, 3]
 
