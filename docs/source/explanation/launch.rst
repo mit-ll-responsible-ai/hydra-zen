@@ -67,7 +67,7 @@ The same tasks can be executed in a single script using :func:`hydra_zen.launch`
        print(foo)
 
    # Use of `zen` to make a Hydra-compatible task function.
-   zen_task = zen(task_fn)
+   zen_fn = zen(task_fn)
 
    # run two Hydra jobs within one script
    job = launch(TestConfig, zen_fn, overrides=["+foo=1"], version_base="1.2")
@@ -101,7 +101,7 @@ Additionally, :func:`hydra_zen.launch` supports dictionary overrides:
       print(foo)
 
    # Use of `zen` to make a Hydra-compatible task function.
-   zen_task = zen(task_fn)
+   zen_fn = zen(task_fn)
 
    # Run two Hydra jobs within one script.
    job = launch(TestConfig, zen_fn, overrides={"+foo": 1}, version_base="1.2")
