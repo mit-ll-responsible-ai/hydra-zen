@@ -4,40 +4,32 @@
 Python Interface for Launching Hydra Applications
 =================================================
 
-hydra-zen provides a function, :func:`hydra_zen.launch`, that is a python based interface for launching hydra jobs.  
+hydra-zen provides a function, :func:`hydra_zen.launch`, that is a Python-based interface for launching Hydra jobs.
 This function enables:
 
-- Fully launching Hydra `RUN` and `MULTIRUN` jobs in a python script or interactive environment
-- Python based approach to overrides of configuration values
-- Writing tests without using `subprocess`
+- Fully launching Hydra `RUN` and `MULTIRUN` jobs from a Python script or from within an interactive Python session.
+- A programmatic approach to overrides of configuration values (i.e. using code to construct a job's overrides).
+- Running / testing Hydra jobs without relying on `subprocess.run`.
 
-The main disadvantage to using :func:`hydra_zen.launch` is that it does not support Hydra CLI and therefore does 
-not automatically support being delivered as an application. 
-
-Those who may may benefit in using :func:`hydra_zen.launch` over Hydra CLI include:
-
-- Developers who have not finalized an API design and want to easily test and iterate in an interactive environment
-- Researchers who need to experiment with many different configuration options, a task that is often more easily done in a python script
-- Writing tests with :func:`hydra_zen.launch` will remove the need to execute Hydra CLI within a `subprocess`
 
 
 Comparing Hydra CLI and :func:`hydra_zen.launch`
-----------------------------------------------
+------------------------------------------------
 
 First lets create a Hydra application:
 
 .. code-block:: python
-   :caption: Example Hydra Application
+   :caption: Example Hydra Application (`my_app.py`)
 
    from hydra_zen import store, zen
 
    @store(name="my_app")
    def task_fn(foo):
-      print(foo)
+       print(foo)
 
    if __name__ == "__main__":
       store.add_to_hydra_store()
-      zen(task_fn).hydra_main(config_path=None)
+      zen(task_fn).hydra_main(config_path=None, version_base="1.2")
 
 The application can be executed using Hydra CLI:
 
@@ -51,7 +43,7 @@ Hydra multirun run list of values:
 
 .. code-block:: bash
 
-   $ python main.py +foo=1,2,3 --multrun
+   $ python my_app.py +foo=1,2,3 --multirun
    [2023-01-11 10:54:10,532][HYDRA] Launching 3 jobs locally
    [2023-01-11 10:54:10,532][HYDRA]        #0 : +foo=1
    1
@@ -67,20 +59,22 @@ The same tasks can be executed in a single script using :func:`hydra_zen.launch`
 
    from hydra_zen import launch, make_config, zen
 
+   # Just an empty config to demonstrate overrides
    TestConfig = make_config()
 
 
-   @zen
    def task_fn(foo):
-      print(foo)
+       print(foo)
 
+   # Use of `zen` to make a Hydra-compatible task function.
+   zen_task = zen(task_fn)
 
    # run two Hydra jobs within one script
-   job = launch(TestConfig, task_fn, overrides=["+foo=1"])
+   job = launch(TestConfig, zen_fn, overrides=["+foo=1"], version_base="1.2")
    # outputs:
    # 1
 
-   multirun_job = launch(TestConfig, task_fn, overrides=["+foo=1,2,3"], multirun=True)
+   multirun_job = launch(TestConfig, zen_fn, overrides=["+foo=1,2,3"], multirun=True, version_base="1.2")
    # outputs:
    # [2023-01-11 10:56:02,448][HYDRA] Launching 3 jobs locally
    # [2023-01-11 10:56:02,448][HYDRA]        #0 : +foo=1
@@ -99,22 +93,24 @@ Additionally, :func:`hydra_zen.launch` supports dictionary overrides:
 
    from hydra_zen import hydra_list, launch, make_config, multirun, zen
 
+   # Just an empty config to demonstrate overrides
    TestConfig = make_config()
 
 
-   @zen
    def task_fn(foo):
       print(foo)
 
+   # Use of `zen` to make a Hydra-compatible task function.
+   zen_task = zen(task_fn)
 
-   # run two Hydra jobs within one script
-   job = launch(TestConfig, task_fn, overrides={"+foo": 1})
+   # Run two Hydra jobs within one script.
+   job = launch(TestConfig, zen_fn, overrides={"+foo": 1}, version_base="1.2")
    # outputs:
    # 1
 
    # define a multirun list using `hydra_zen.multirun`
    multirun_job = launch(
-      TestConfig, task_fn, overrides={"+foo": multirun([1, 2, 3])}, multirun=True
+      TestConfig, zen_fn, overrides={"+foo": multirun([1, 2, 3])}, multirun=True, version_base="1.2"
    )
    # outputs:
    # [2023-01-11 10:56:02,448][HYDRA] Launching 3 jobs locally
@@ -125,13 +121,13 @@ Additionally, :func:`hydra_zen.launch` supports dictionary overrides:
    # [2023-01-11 10:56:02,626][HYDRA]        #2 : +foo=3
 
    # define a standard Hydra list as a single parameter using `hydra_zen.hydra_list`
-   multirun_job = launch(TestConfig, task_fn, overrides={"+foo": hydra_list([1, 2, 3])})
+   multirun_job = launch(TestConfig, zen_fn, overrides={"+foo": hydra_list([1, 2, 3])}, version_base="1.2")
    # outputs:
    # [1, 2, 3]
 
 
 One clear benefit of :func:`hydra_zen.launch` is the ability to programmatically define the set of
-multirun values, e.g., creating a list of random seeds to execute an application with.
+multi-run values, e.g., creating a list of random seeds to execute an application with.
 
 
   
