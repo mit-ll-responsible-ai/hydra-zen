@@ -1,8 +1,8 @@
 .. _type-support:
 
-##############################################
-hydra-zen's Automatic Type Refinement Behavior
-##############################################
+############################################################
+Understanding hydra-zen's Automatic Type Refinement Behavior
+############################################################
 
 hydra-zen's :ref:`config-creation functions <create-config>` will automatically 
 refine user-supplied type annotations so that they are made compatible with Hydra's 
