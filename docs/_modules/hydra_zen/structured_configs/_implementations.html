@@ -755,7 +755,6 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">decorated_obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">decorated_obj</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
                 <span class="s2">&quot;Class instances are not supported by `hydrated_dataclass`.&quot;</span>
@@ -1126,7 +1125,6 @@
     <span class="n">_mutable_default_permitted</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">convert_dataclass</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Field</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-
     <span class="n">value</span> <span class="o">=</span> <span class="n">sanitized_default_value</span><span class="p">(</span>
         <span class="n">value</span><span class="p">,</span>
         <span class="n">allow_zen_conversion</span><span class="o">=</span><span class="n">allow_zen_conversion</span><span class="p">,</span>
@@ -2265,7 +2263,6 @@
     <span class="c1"># resulting dataclass will simply be inherited from and extended.</span>
     <span class="c1"># The issues we catch here cannot be fixed downstream.</span>
     <span class="k">if</span> <span class="n">target_has_valid_signature</span><span class="p">:</span>
-
         <span class="k">if</span> <span class="ow">not</span> <span class="n">sig_by_kind</span><span class="p">[</span><span class="n">_VAR_KEYWORD</span><span class="p">]:</span>
             <span class="c1"># check for unexpected kwargs</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs_for_target</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">nameable_params_in_sig</span><span class="p">:</span>
@@ -2486,7 +2483,6 @@
                 <span class="ow">and</span> <span class="n">builds_bases</span>
                 <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">default_factory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">MISSING</span>
             <span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-
                 <span class="c1"># Addresses omegaconf #830 https://github.com/omry/omegaconf/issues/830</span>
                 <span class="c1">#</span>
                 <span class="c1"># Value was passed as a field-with-default-factory, we&#39;ll</span>
