@@ -89,9 +89,11 @@ After building the configs we define the task function that utilizes these datas
 
    # 1. Configuring multiple datasets and classifiers
 
-   ###################################
-   # Configure and store classifiers #
-   ###################################
+   ###############
+   # Classifiers #
+   ###############
+   # Created configurations for various classifiers and store
+   # the configs in hydra-zen's config store.
    
    classifier_store = store(group="classifier")
 
@@ -116,10 +118,12 @@ After building the configs we define the task function that utilizes these datas
    classifier_store(GaussianNB, name="naive_bayes")
    classifier_store(QuadraticDiscriminantAnalysis, name="qda")
 
-   ################################
-   # Configure and store datasets #
-   ################################
-
+   ############
+   # Datasets #
+   ############
+   # Created configurations for various datasets and store
+   # the configs in hydra-zen's config store.
+       
    dataset_store = store(group="dataset")
    
    # For the linear dataset, add a wrapper that 
@@ -252,11 +256,16 @@ After building the configs we define the task function that utilizes these datas
 
    if __name__ == "__main__":
        from hydra.conf import HydraConf, JobConf
-       # Configure Hydra to change the working dir to
-       # match that of the output dir
+       # Configure Hydra to change the working dir to match that of the output dir
        store(HydraConf(job=JobConf(chdir=True)), name="config", group="hydra")
-   
+       
+       # Add all of the configs, that we put in hydra-zen's (local) config store,
+       # to Hydra's (global) config store.
        store.add_to_hydra_store(overwrite_ok=True)
+
+       # Use `zen()` to convert our Hydra-agnostic task function into one that is
+       # compatible with Hydra.
+       # Use `.hydra_main(...)` to generate the Hydra-compatible CLI for our program.
        zen(task).hydra_main(config_path=None, config_name="config", version_base="1.2")
 
 We can view the default configuration and available datasets & classifiers with:
