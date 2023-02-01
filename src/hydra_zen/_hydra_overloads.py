@@ -94,7 +94,7 @@ def instantiate(
         List[Any],
     ],
     *args: Any,
-    **kwargs: Any
+    **kwargs: Any,
 ) -> Any:
     ...
 

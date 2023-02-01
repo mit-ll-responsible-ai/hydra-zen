@@ -176,7 +176,7 @@ def test_zen_wrappers_expected_behavior(
         **kwargs,
         zen_wrappers=wrappers,
         zen_partial=zen_partial,
-        zen_meta=zen_meta
+        zen_meta=zen_meta,
     )
     if not as_yaml:
         instantiated = instantiate(conf)

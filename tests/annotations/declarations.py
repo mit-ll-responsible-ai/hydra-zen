@@ -811,9 +811,8 @@ def check_overloads_arent_too_restrictive():
         dataclass_name: Optional[str],
         fbuilds: FullBuilds = ...,
         pbuilds: PBuilds = ...,
-        **kwargs_for_target: SupportedPrimitive
+        **kwargs_for_target: SupportedPrimitive,
     ):
-
         bout = builds(
             int,
             zen_partial=zen_partial,
@@ -825,7 +824,7 @@ def check_overloads_arent_too_restrictive():
             frozen=frozen,
             builds_bases=builds_bases,
             dataclass_name=dataclass_name,
-            **kwargs_for_target
+            **kwargs_for_target,
         )
 
         reveal_type(
@@ -844,7 +843,7 @@ def check_overloads_arent_too_restrictive():
             frozen=frozen,
             builds_bases=builds_bases,
             dataclass_name=dataclass_name,
-            **kwargs_for_target
+            **kwargs_for_target,
         )
 
         reveal_type(
@@ -863,7 +862,7 @@ def check_overloads_arent_too_restrictive():
             frozen=frozen,
             builds_bases=builds_bases,
             dataclass_name=dataclass_name,
-            **kwargs_for_target
+            **kwargs_for_target,
         )
 
         reveal_type(
@@ -944,7 +943,6 @@ def check_partial_narrowing_full(
 
 
 def check_make_custom_builds_overloads(boolean: bool, optional_boolean: Optional[bool]):
-
     # partial = False, pop-sig = False
     reveal_type(make_custom_builds_fn(zen_partial=False), expected_text="StdBuilds")
 
@@ -1010,7 +1008,6 @@ def check_instantiate_overrides(
 def check_hydra_defaults(
     partial_builds: PBuilds, full_builds: FullBuilds, std_builds: StdBuilds
 ):
-
     builds(int, hydra_defaults=["_self_", {"a": "b"}])
     partial_builds(int, hydra_defaults=["_self_", {"a": "b"}])
     full_builds(int, hydra_defaults=["_self_", {"a": "b"}])

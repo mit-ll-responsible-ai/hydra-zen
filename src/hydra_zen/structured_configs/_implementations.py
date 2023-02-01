@@ -416,7 +416,6 @@ def hydrated_dataclass(
     """
 
     def wrapper(decorated_obj: Any) -> Any:
-
         if not isinstance(decorated_obj, type):
             raise NotImplementedError(
                 "Class instances are not supported by `hydrated_dataclass`."
@@ -787,7 +786,6 @@ def sanitized_field(
     _mutable_default_permitted: bool = True,
     convert_dataclass: bool,
 ) -> Field[Any]:
-
     value = sanitized_default_value(
         value,
         allow_zen_conversion=allow_zen_conversion,
@@ -1926,7 +1924,6 @@ def builds(
     # resulting dataclass will simply be inherited from and extended.
     # The issues we catch here cannot be fixed downstream.
     if target_has_valid_signature:
-
         if not sig_by_kind[_VAR_KEYWORD]:
             # check for unexpected kwargs
             if not set(kwargs_for_target) <= nameable_params_in_sig:
@@ -2147,7 +2144,6 @@ def builds(
                 and builds_bases
                 and value.default_factory is not MISSING
             ):  # pragma: no cover
-
                 # Addresses omegaconf #830 https://github.com/omry/omegaconf/issues/830
                 #
                 # Value was passed as a field-with-default-factory, we'll

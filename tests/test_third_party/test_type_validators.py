@@ -329,7 +329,6 @@ def test_signature_parsing(args, kwargs, should_pass, validator, target, as_yaml
             hydra_convert="all",
         )
         if as_yaml:
-
             try:
                 # omegaconf >= 2.2.0 no longer casts lists to strings
                 conf_with_val = OmegaConf.create(to_yaml(conf_with_val))

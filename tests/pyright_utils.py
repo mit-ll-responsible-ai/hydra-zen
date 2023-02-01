@@ -456,7 +456,6 @@ def pyright_analyze(
     with chdir():
         cwd = Path.cwd()
         if source is not None:
-
             file_ = cwd / "source.py"
             file_.write_text(source, encoding="utf-8")
         else:

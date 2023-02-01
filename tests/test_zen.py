@@ -360,7 +360,6 @@ def test_pre_call_validates_bad_param_name():
     unpack_kw=st.booleans(),
 )
 def test_zen_call(x: int, y: int, instantiate_cfg, func, unpack_kw):
-
     cfg = make_config(x=x, y=y)
     if instantiate_cfg:
         cfg = cfg()

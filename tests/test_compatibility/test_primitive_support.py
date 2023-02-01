@@ -23,7 +23,6 @@ class C_paths:
 
 
 def test_hydra_supports_bytes():
-
     if HYDRA_SUPPORTS_BYTES:
         OmegaConf.create(C_bytes)  # type: ignore
     else:
@@ -34,7 +33,6 @@ def test_hydra_supports_bytes():
 
 
 def test_hydra_supports_paths():
-
     if HYDRA_SUPPORTS_Path:
         out = OmegaConf.create(C_paths)  # type: ignore
         assert isinstance(out.x, Path)

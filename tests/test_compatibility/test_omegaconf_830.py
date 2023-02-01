@@ -131,7 +131,6 @@ def test_known_inheritance_issues_in_omegaconf_are_circumvented(
     not PATCH_OMEGACONF_830, reason="issue has been patched by omegaconf"
 )
 def test_hydrated_dataclass_raises_on_omegaconf_inheritance_issue():
-
     Parent = make_config(x=1)
 
     with pytest.raises(HydraZenValidationError):

@@ -37,7 +37,6 @@ def test_HydraPartialBuilds_protocol():
 
 
 def test_HYDRA_SUPPORTS_PARTIAL_is_set_properly():
-
     obj = instantiate(HydraPartialConf)
     if HYDRA_SUPPORTS_PARTIAL:
         # instantiation should produce `functools.partial(dict, x=1)`

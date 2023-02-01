@@ -276,7 +276,6 @@ vDict = Dict[Any, Any] if sys.version_info < (3, 8) else Dict
     ],
 )
 def test_sanitized_type_expected_behavior(in_type, expected_type):
-
     assert sanitized_type(in_type) == expected_type, in_type
 
     if in_type != expected_type:

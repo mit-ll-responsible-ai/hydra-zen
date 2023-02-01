@@ -223,7 +223,6 @@ def f(y):
 
 @given(partial=st.none() | st.booleans(), full_sig=st.booleans())
 def test_builds_raises_when_base_has_invalid_arg(full_sig, partial):
-
     with pytest.raises(TypeError):
         builds(
             f,
