@@ -129,7 +129,6 @@ def valid_builds_args(*required: str, excluded: Sequence[str] = ()):
 
 @st.composite
 def _partition(draw: st.DrawFn, collection: T, ordered: bool) -> Tuple[T, T]:
-
     if isinstance(collection, dict):
         keys = list(collection)
     else:

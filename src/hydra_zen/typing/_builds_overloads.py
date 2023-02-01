@@ -38,7 +38,6 @@ __all__ = ["FullBuilds", "PBuilds", "StdBuilds"]
 
 
 class StdBuilds(Protocol):
-
     # partial=False, pop-sig=True; no *args, **kwargs, nor builds_bases
     @overload
     def __call__(

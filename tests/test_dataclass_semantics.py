@@ -31,7 +31,6 @@ def f(x, y, z: int = 3):
 
 @given(full_sig=st.booleans(), partial=st.none() | st.booleans())
 def test_builds_produces_dataclass(full_sig: bool, partial: bool):
-
     if full_sig and not partial:
         Builds_f = builds(f, populate_full_signature=full_sig, zen_partial=partial)
     else:
@@ -54,7 +53,6 @@ def f_2(x, y, z):
 @pytest.mark.parametrize("full_sig", [True, False])
 @pytest.mark.parametrize("partial", [True, False, None])
 def test_chain_builds_of_targets_with_common_interfaces(full_sig, partial: bool):
-
     # Note that conf_1 and conf_2 target `f` whereas conf_3 targets `f_three_vars`,
     # which have identical interfaces.
     conf_1 = builds(f_2, x=1)
@@ -81,7 +79,6 @@ def test_chain_builds_of_targets_with_common_interfaces(full_sig, partial: bool)
 @pytest.mark.parametrize("full_sig", [True, False])
 @pytest.mark.parametrize("partial", [True, False, None])
 def test_pos_args_with_inheritance(full_sig, partial: bool):
-
     conf_1 = builds(f_three_vars, 1, 2)
     conf_2 = builds(
         f_three_vars,
@@ -123,7 +120,6 @@ class FrozenHydrated:
     ],
 )
 def test_frozen_via_builds(fn):
-
     conf_f = fn()
 
     with pytest.raises(FrozenInstanceError):
@@ -349,7 +345,6 @@ def test_namespace(fn):
     ],
 )
 def test_kwonly(kw_only: bool, fn):
-
     Conf = fn(zen_dataclass={"kw_only": kw_only})
 
     if sys.version_info < (3, 10):

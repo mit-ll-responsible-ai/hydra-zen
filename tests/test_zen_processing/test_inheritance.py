@@ -198,7 +198,6 @@ parents_strat = st.lists(
 def test_partial_via_inheritance(
     child_partial: bool, zen_meta: dict, parents: Tuple[Type[DataClass_], ...]
 ):
-
     expected_out = dict(child_field=2)
     if parents:
         expected_out["a"] = 1
@@ -251,7 +250,6 @@ def test_partial_via_inheritance(
 def test_instantiation_never_produces_partiald_zen_processing(
     child_partial: bool, zen_meta: dict, parents: Tuple[Type[DataClass_], ...]
 ):
-
     Conf = builds(
         dict, zen_partial=child_partial, zen_meta=zen_meta, builds_bases=parents
     )

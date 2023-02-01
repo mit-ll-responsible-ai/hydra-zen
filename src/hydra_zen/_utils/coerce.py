@@ -34,7 +34,6 @@ __all__ = ["coerce_sequences"]
 
 
 def _is_namedtuple_type(x) -> TypeGuard[Type[NamedTuple]]:  # pragma: no cover
-
     try:
         bases = x.__bases__
         fields = x._fields

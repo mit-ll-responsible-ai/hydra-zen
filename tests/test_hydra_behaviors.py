@@ -99,7 +99,6 @@ def test_hydra_convert(
     kwargs = dict(hydra_convert=convert) if convert is not NotSet else {}
 
     if not via_hydrated_dataclass:
-
         out = instantiate(
             builds(
                 f_for_convert,

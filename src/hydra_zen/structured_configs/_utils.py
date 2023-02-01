@@ -286,7 +286,6 @@ def get_obj_path(obj: Any) -> str:
     if not is_classmethod(obj):
         return f"{module}.{name}"
     else:
-
         # __qualname__ reflects name of class that originally defines classmethod.
         # Does not point to child in case of inheritance.
         #
@@ -358,7 +357,6 @@ def sanitized_type(
     no_nested_container = not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES
 
     if origin is not None:
-
         # Support for Annotated[x, y]
         # Python 3.9+
         # # type_: Annotated[x, y]; origin -> Annotated; args -> (x, y)
@@ -463,7 +461,6 @@ def sanitized_type(
         or is_dataclass(type_)
         or (isinstance(type_, type) and issubclass(type_, Enum))
     ):
-
         if sys.version_info[:2] == (3, 6) and type_ is Dict:  # pragma: no cover
             type_ = Dict[Any, Any]
 
@@ -539,7 +536,6 @@ def valid_defaults_list(hydra_defaults: Any) -> bool:
 
     has_self = False
     for item in hydra_defaults:
-
         if item == "_self_":
             if not has_self:
                 has_self = True

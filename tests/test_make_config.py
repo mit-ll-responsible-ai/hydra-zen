@@ -126,7 +126,6 @@ def test_types_are_sanitized(hint):
 
 
 def test_type_broadening_for_builds_default():
-
     instantiate(make_config(a=ZenField(hint=int, default=builds(int))))
 
     with pytest.raises(OmegaConfBaseException):

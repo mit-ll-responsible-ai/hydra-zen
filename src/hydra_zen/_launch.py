@@ -240,9 +240,8 @@ def launch(
             {}
             if (not SUPPORTS_VERSION_BASE or version_base is _NotSet)
             else {"version_base": version_base}
-        )
+        ),
     ):
-
         # taken from hydra.compose with support for MULTIRUN
         gh = GlobalHydra.instance()
         assert gh.hydra is not None

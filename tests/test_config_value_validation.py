@@ -152,6 +152,7 @@ def test_that_configs_passed_by_zen_validation_are_serializable(
     if isinstance(value, str):
         # avoid interpolation issues
         assume(not value.startswith("${"))
+        assume(value != "???")
 
     try:
         Conf = config_construction_fn(value)
