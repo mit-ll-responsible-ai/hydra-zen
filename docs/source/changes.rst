@@ -9,6 +9,17 @@ This is a record of all past hydra-zen releases and what went into them, in reve
 chronological order. All previous releases should still be available on pip.
 
 
+.. _v0.10.0:
+
+------------------
+0.10.0 - 2023-02-3
+------------------
+
+Improvements
+------------
+- :func:`hydra_zen.launch` now supports dictionary overrides. See :pull:`313`.
+
+
 --------------------------
 Documentation - 2023-01-22
 --------------------------
