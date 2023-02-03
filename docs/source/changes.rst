@@ -11,15 +11,16 @@ chronological order. All previous releases should still be available on pip.
 
 .. _v0.10.0rc1:
 
----------------------
-0.10.0rc1 - 2023-02-3
----------------------
+----------------------
+0.10.0rc1 - 2023-02-03
+----------------------
 
 .. note:: This is documentation for an unreleased version of hydra-zen. You can try out this pre-release version using `pip install --pre hydra-zen`
 
 Improvements
 ------------
 - :func:`hydra_zen.launch` now supports dictionary overrides. See :pull:`313`.
+- :class:`hydra_zen.ZenStore` now provides specialized support for storing instances/subclasses of `HydraConf`. See :issue:`395`.
 
 
 --------------------------
