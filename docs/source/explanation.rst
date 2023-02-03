@@ -13,4 +13,3 @@ Hydra.
    explanation/type_refinement
    explanation/dont_repeat_yourself
    explanation/hydrated_dataclass
-   explanation/launch
