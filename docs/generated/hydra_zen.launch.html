@@ -267,8 +267,8 @@
 <h1>hydra_zen.launch<a class="headerlink" href="#hydra-zen-launch" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="hydra_zen.launch">
-<span class="sig-prename descclassname"><span class="pre">hydra_zen.</span></span><span class="sig-name descname"><span class="pre">launch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overrides=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multirun=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version_base=&lt;class</span> <span class="pre">'hydra_zen._launch._NotSet'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_dictconfig=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_name='zen_launch'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">job_name='zen_launch'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_log_configuration=True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/_launch.html#launch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.launch" title="Permalink to this definition">#</a></dt>
-<dd><p>Launch a Hydra job using a Python-based interface.</p>
+<span class="sig-prename descclassname"><span class="pre">hydra_zen.</span></span><span class="sig-name descname"><span class="pre">launch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overrides=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multirun=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version_base=&lt;class</span> <span class="pre">'hydra_zen._launch._NotSet'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_dictconfig=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_name='zen_launch'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">job_name='zen_launch'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_log_configuration=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**override_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/_launch.html#launch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.launch" title="Permalink to this definition">#</a></dt>
+<dd><p>Launches a Hydra job from a Python function rather than a CLI.</p>
 <p><a class="reference internal" href="#hydra_zen.launch" title="hydra_zen.launch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">launch</span></code></a> is designed to closely match the interface of the standard Hydra CLI.
 For example, launching a Hydra job from the CLI via:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python my_task.py job/group=group_name job.group.param=1
@@ -278,7 +278,7 @@ For example, launching a Hydra job from the CLI via:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">job</span> <span class="o">=</span> <span class="n">launch</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">task_function</span><span class="p">,</span> <span class="n">overrides</span><span class="o">=</span><span class="p">[</span><span class="s2">"job/group=group_name"</span><span class="p">,</span> <span class="s2">"job.group.param=1"</span><span class="p">])</span>
 </pre></div>
 </div>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>config</strong><span class="classifier">DataClass | Type[DataClass] | Mapping[str, Any]</span></dt><dd><p>A config that will be passed to <code class="docutils literal notranslate"><span class="pre">task_function</span></code>.</p>
@@ -286,31 +286,39 @@ For example, launching a Hydra job from the CLI via:</p>
 <dt><strong>task_function</strong><span class="classifier">Callable[[DictConfig], Any]</span></dt><dd><p>The function that Hydra will execute. Its input will be <code class="docutils literal notranslate"><span class="pre">config</span></code>, which
 has been modified via the specified <code class="docutils literal notranslate"><span class="pre">overrides</span></code></p>
 </dd>
-<dt><strong>overrides</strong><span class="classifier">Optional[List[str]]</span></dt><dd><p>If provided, sets/overrides values in <code class="docutils literal notranslate"><span class="pre">config</span></code>. See <a class="reference internal" href="#r1d9be55900cb-1" id="id1">[1]</a> and <a class="reference internal" href="#r1d9be55900cb-2" id="id2">[2]</a>
+<dt><strong>overrides</strong><span class="classifier">Optional[Union[OverrideMapping, List[str]]] (default: None)</span></dt><dd><p>If provided, sets/overrides values in <code class="docutils literal notranslate"><span class="pre">config</span></code>. See <a class="reference internal" href="#r1d9be55900cb-1" id="id1">[1]</a> and <a class="reference internal" href="#r1d9be55900cb-2" id="id2">[2]</a>
 for a detailed discussion of the “grammar” supported by <code class="docutils literal notranslate"><span class="pre">overrides</span></code>.</p>
 </dd>
 <dt><strong>multirun</strong><span class="classifier">bool (default: False)</span></dt><dd><p>Launch a Hydra multi-run (<a class="reference internal" href="#r1d9be55900cb-3" id="id3">[3]</a>).</p>
 </dd>
-<dt><strong>version_base</strong><span class="classifier">Optional[str], optional (default=_NotSet)</span></dt><dd><p>Available starting with Hydra 1.2.0.
+<dt><strong>version_base</strong><span class="classifier">Optional[str], optional (default=not-specified)</span></dt><dd><p>Available starting with Hydra 1.2.0.
 - If the <code class="xref py py-obj docutils literal notranslate"><span class="pre">version_base</span> <span class="pre">parameter</span></code> is not specified, Hydra 1.x will use defaults compatible with version 1.1. Also in this case, a warning is issued to indicate an explicit version_base is preferred.
 - If the <code class="xref py py-obj docutils literal notranslate"><span class="pre">version_base</span> <span class="pre">parameter</span></code> is <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, then the defaults are chosen for the current minor Hydra version. For example for Hydra 1.2, then would imply <code class="xref py py-obj docutils literal notranslate"><span class="pre">config_path=None</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra.job.chdir=False</span></code>.
 - If the <code class="xref py py-obj docutils literal notranslate"><span class="pre">version_base</span></code> parameter is an explicit version string like “1.1”, then the defaults appropriate to that version are used.</p>
 </dd>
-<dt><strong>to_dictconfig: bool (default: False)</strong></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, convert a <code class="docutils literal notranslate"><span class="pre">dataclasses.dataclass</span></code> to a <code class="docutils literal notranslate"><span class="pre">omegaconf.DictConfig</span></code>. Note, this
-will remove Hydra’s cabability for validation with structured configurations.</p>
+<dt><strong>to_dictconfig</strong><span class="classifier">bool (default: False)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, convert a <code class="docutils literal notranslate"><span class="pre">dataclasses.dataclass</span></code> to a <code class="docutils literal notranslate"><span class="pre">omegaconf.DictConfig</span></code>.
+Note, this will remove Hydra’s cabability for validation with structured
+configurations.</p>
 </dd>
 <dt><strong>config_name</strong><span class="classifier">str (default: “zen_launch”)</span></dt><dd><p>Name of the stored configuration in Hydra’s ConfigStore API.</p>
 </dd>
 <dt><strong>job_name</strong><span class="classifier">str (default: “zen_launch”)</span></dt><dd></dd>
-<dt><strong>with_log_configuration</strong><span class="classifier">bool (default: True)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, enables the configuration of the logging subsystem from the loaded config.</p>
+<dt><strong>with_log_configuration</strong><span class="classifier">bool (default: True)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, enables the configuration of the logging subsystem from the loaded
+config.</p>
+</dd>
+<dt><strong>**override_kwargs</strong><span class="classifier">OverrideValues</span></dt><dd><p>Keyword arguments to override existing configuration values.  Note, this only
+works when the configuration value name is a valid Python identifier; e.g.,
+this does not support adding (<code class="xref py py-obj docutils literal notranslate"><span class="pre">+param</span></code>) values.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>result</strong><span class="classifier">JobReturn | Any</span></dt><dd><dl class="simple">
-<dt>If <code class="docutils literal notranslate"><span class="pre">multirun</span> <span class="pre">is</span> <span class="pre">False</span></code>:</dt><dd><dl class="simple">
-<dt>A <code class="docutils literal notranslate"><span class="pre">JobReturn</span></code> object storing the results of the Hydra experiment via the following attributes</dt><dd><ul class="simple">
+<dd class="field-even"><dl>
+<dt><strong>result</strong><span class="classifier">hydra.core.utils.JobReturn | Any</span></dt><dd><dl>
+<dt>If <code class="docutils literal notranslate"><span class="pre">multirun</span> <span class="pre">is</span> <span class="pre">False</span></code>:</dt><dd><p>A <code class="docutils literal notranslate"><span class="pre">JobReturn</span></code> object storing the results of the Hydra experiment via the
+following attributes</p>
+<blockquote>
+<div><ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">cfg</span></code>: Reflects <code class="docutils literal notranslate"><span class="pre">config</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">overrides</span></code>: Reflects <code class="docutils literal notranslate"><span class="pre">overrides</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">return_value</span></code>: The return value of the task function</p></li>
@@ -319,8 +327,7 @@ will remove Hydra’s cabability for validation with structured configurations.<
 <li><p><code class="docutils literal notranslate"><span class="pre">task_name</span></code>: The task name of the Hydra job</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">status</span></code>: A <code class="docutils literal notranslate"><span class="pre">JobStatus</span></code> enum reporting whether or not the job completed successfully</p></li>
 </ul>
-</dd>
-</dl>
+</div></blockquote>
 </dd>
 <dt>Else:</dt><dd><p>Return values of all launched jobs (depends on the Sweeper implementation).</p>
 </dd>
@@ -367,7 +374,7 @@ yaml-formatted string, print it, and then return the string.</p>
 </div>
 <p>Now, let’s use <a class="reference internal" href="#hydra_zen.launch" title="hydra_zen.launch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">launch</span></code></a> to run this task function via Hydra, using particular configured
 values (or, “overrides”) for <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code>.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">job_out</span> <span class="o">=</span> <span class="n">launch</span><span class="p">(</span><span class="n">Conf</span><span class="p">,</span> <span class="n">task_fn</span><span class="p">,</span> <span class="n">overrides</span><span class="o">=</span><span class="p">[</span><span class="s2">"a=1"</span><span class="p">,</span> <span class="s2">"b='foo'"</span><span class="p">])</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">job_out</span> <span class="o">=</span> <span class="n">launch</span><span class="p">(</span><span class="n">Conf</span><span class="p">,</span> <span class="n">task_fn</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="s1">'foo'</span><span class="p">)</span>
 <span class="go">a: 1</span>
 <span class="go">b: foo</span>
 </pre></div>
@@ -399,7 +406,8 @@ Let’s launch a multirun that sweeps over three configurations</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">outputs</span><span class="p">,)</span> <span class="o">=</span> <span class="n">launch</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">Conf</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">task_fn</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">overrides</span><span class="o">=</span><span class="p">[</span><span class="s2">"a=1,2,3"</span><span class="p">,</span> <span class="s2">"b='bar'"</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">a</span><span class="o">=</span><span class="s2">"1,2,3"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">b</span><span class="o">=</span><span class="s2">"bar"</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">multirun</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="go">[2021-10-19 17:50:07,334][HYDRA] Launching 3 jobs locally</span>
@@ -426,6 +434,22 @@ Let’s launch a multirun that sweeps over three configurations</p>
 <span class="go">['multirun/2021-10-19/17-50-07\\0',</span>
 <span class="go">'multirun/2021-10-19/17-50-07\\1',</span>
 <span class="go">'multirun/2021-10-19/17-50-07\\2']</span>
+</pre></div>
+</div>
+<p><strong>Launching with quoted overrides</strong></p>
+<p>Some of the Hydra CLI override syntax cannot be specified as keyword arguments. In such cases we can instead provide a list or a dict with quoted overrides.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">job_out</span> <span class="o">=</span> <span class="n">launch</span><span class="p">(</span><span class="n">Conf</span><span class="p">,</span> <span class="n">task_fn</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="s2">"foo"</span><span class="p">,</span> <span class="n">overrides</span><span class="o">=</span><span class="p">{</span><span class="s2">"+c"</span><span class="p">:</span> <span class="mi">22</span><span class="p">})</span>
+<span class="go">a: 1</span>
+<span class="go">b: foo</span>
+<span class="go">c: 22</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">job_out</span><span class="o">.</span><span class="n">overrides</span>  <span class="c1"># the overrides that we provides</span>
+<span class="go">['a=1', 'b=foo', '+c=22']</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">launch</span><span class="p">(</span><span class="n">Conf</span><span class="p">,</span> <span class="n">task_fn</span><span class="p">,</span> <span class="n">overrides</span><span class="o">=</span><span class="p">[</span><span class="s2">"a=1"</span><span class="p">,</span> <span class="s2">"b='foo'"</span><span class="p">,</span> <span class="s2">"+c=22"</span><span class="p">])</span>
+<span class="go">a: 1</span>
+<span class="go">b: foo</span>
+<span class="go">c: 22</span>
 </pre></div>
 </div>
 </dd></dl>

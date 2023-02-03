@@ -340,8 +340,24 @@
 <span></span><span class="c1"># Copyright (c) 2023 Massachusetts Institute of Technology</span>
 <span class="c1"># SPDX-License-Identifier: MIT</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">UserList</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">fields</span><span class="p">,</span> <span class="n">is_dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">TYPE_CHECKING</span><span class="p">,</span>
+    <span class="n">Any</span><span class="p">,</span>
+    <span class="n">Callable</span><span class="p">,</span>
+    <span class="n">Dict</span><span class="p">,</span>
+    <span class="n">Generic</span><span class="p">,</span>
+    <span class="n">List</span><span class="p">,</span>
+    <span class="n">Mapping</span><span class="p">,</span>
+    <span class="n">Optional</span><span class="p">,</span>
+    <span class="n">Tuple</span><span class="p">,</span>
+    <span class="n">Type</span><span class="p">,</span>
+    <span class="n">TypeVar</span><span class="p">,</span>
+    <span class="n">Union</span><span class="p">,</span>
+    <span class="n">cast</span><span class="p">,</span>
+    <span class="n">overload</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">hydra</span> <span class="kn">import</span> <span class="n">initialize</span>
 <span class="kn">from</span> <span class="nn">hydra._internal.callbacks</span> <span class="kn">import</span> <span class="n">Callbacks</span>
@@ -351,14 +367,104 @@
 <span class="kn">from</span> <span class="nn">hydra.plugins.sweeper</span> <span class="kn">import</span> <span class="n">Sweeper</span>
 <span class="kn">from</span> <span class="nn">hydra.types</span> <span class="kn">import</span> <span class="n">HydraContext</span><span class="p">,</span> <span class="n">RunMode</span>
 <span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">,</span> <span class="n">OmegaConf</span>
+<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">TypeAlias</span>
 
 <span class="kn">from</span> <span class="nn">hydra_zen._compatibility</span> <span class="kn">import</span> <span class="n">SUPPORTS_VERSION_BASE</span>
 <span class="kn">from</span> <span class="nn">hydra_zen._hydra_overloads</span> <span class="kn">import</span> <span class="n">instantiate</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass</span><span class="p">,</span> <span class="n">InstOrType</span>
 
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Any</span><span class="p">)</span>
+<span class="n">HydraPrimitives</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="c1"># branching needed to deal with pyright type-completeness complaints</span>
+    <span class="n">TUserList</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">UserList</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">TUserList</span> <span class="o">=</span> <span class="n">UserList</span>
+
 
 <span class="k">class</span> <span class="nc">_NotSet</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="k">pass</span>
+
+
+<span class="n">T1</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T1&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">HydraPrimitives</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">hydra_list</span><span class="p">(</span><span class="n">TUserList</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">T1</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Signals that a sequence is provided as a single configured value (i.e. it is not</span>
+<span class="sd">    to be iterated over during a multirun)&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span>
+
+
+<span class="n">T2</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T2&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Union</span><span class="p">[</span><span class="n">HydraPrimitives</span><span class="p">,</span> <span class="n">hydra_list</span><span class="p">[</span><span class="n">HydraPrimitives</span><span class="p">]])</span>
+
+
+<span class="k">class</span> <span class="nc">multirun</span><span class="p">(</span><span class="n">TUserList</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">T2</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Signals that a sequence is to be iterated over in a multirun&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span>
+
+
+<span class="k">def</span> <span class="nf">_safe_name</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;__name__&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">value_check</span><span class="p">(</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
+    <span class="n">type_</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="o">...</span><span class="p">]],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For internal use only.</span>
+
+<span class="sd">    Used to check the type of `value`. Numerical types can also be bound-checked.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; value_check(&quot;x&quot;, 1, type_=str)</span>
+<span class="sd">    TypeError: `x` must be of type(s) `str`, got 1 (type: int)</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    TypeError&quot;&quot;&quot;</span>
+    <span class="c1"># check internal params</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="n">name</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">type_</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">` must be of type(s) &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">_safe_name</span><span class="p">(</span><span class="n">type_</span><span class="p">)</span><span class="si">}</span><span class="s2">`, got </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2"> (type: </span><span class="si">{</span><span class="n">_safe_name</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">))</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+
+<span class="n">OverrideValues</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span>
+    <span class="n">HydraPrimitives</span><span class="p">,</span>
+    <span class="n">multirun</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">HydraPrimitives</span><span class="p">,</span> <span class="n">hydra_list</span><span class="p">[</span><span class="n">HydraPrimitives</span><span class="p">]]],</span>
+    <span class="n">hydra_list</span><span class="p">[</span><span class="n">HydraPrimitives</span><span class="p">],</span>
+<span class="p">]</span>
+<span class="n">OverrideDict</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">OverrideValues</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_process_dict_overrides</span><span class="p">(</span><span class="n">overrides</span><span class="p">:</span> <span class="n">OverrideDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert dict overrides to a list of Hydra CLI compatible args&quot;&quot;&quot;</span>
+    <span class="n">launch_overrides</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">overrides</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="s2">&quot;null&quot;</span>
+
+        <span class="n">value_check</span><span class="p">(</span>
+            <span class="n">k</span><span class="p">,</span>
+            <span class="n">v</span><span class="p">,</span>
+            <span class="n">type_</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">multirun</span><span class="p">,</span> <span class="n">hydra_list</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">multirun</span><span class="p">):</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">v</span><span class="p">)</span>
+
+        <span class="n">launch_overrides</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">launch_overrides</span>
 
 
 <span class="k">def</span> <span class="nf">_store_config</span><span class="p">(</span>
@@ -394,18 +500,52 @@
     <span class="k">return</span> <span class="n">config_name</span>
 
 
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">launch</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">InstOrType</span><span class="p">[</span><span class="n">DataClass</span><span class="p">],</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+    <span class="n">task_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">OverrideDict</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">multirun</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">version_base</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">_NotSet</span><span class="p">]]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">to_dictconfig</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">job_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">with_log_configuration</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">override_kwargs</span><span class="p">:</span> <span class="n">OverrideValues</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JobReturn</span><span class="p">:</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">launch</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">InstOrType</span><span class="p">[</span><span class="n">DataClass</span><span class="p">],</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+    <span class="n">task_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">OverrideDict</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">multirun</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">version_base</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">_NotSet</span><span class="p">]]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">to_dictconfig</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">job_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">with_log_configuration</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">override_kwargs</span><span class="p">:</span> <span class="n">OverrideValues</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="o">...</span>
+
+
 <div class="viewcode-block" id="launch"><a class="viewcode-back" href="../../generated/hydra_zen.launch.html#hydra_zen.launch">[docs]</a><span class="k">def</span> <span class="nf">launch</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">InstOrType</span><span class="p">[</span><span class="n">DataClass</span><span class="p">],</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
     <span class="n">task_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
-    <span class="n">overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">OverrideDict</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">multirun</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">version_base</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">_NotSet</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">_NotSet</span><span class="p">,</span>
     <span class="n">to_dictconfig</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;zen_launch&quot;</span><span class="p">,</span>
     <span class="n">job_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;zen_launch&quot;</span><span class="p">,</span>
     <span class="n">with_log_configuration</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">override_kwargs</span><span class="p">:</span> <span class="n">OverrideValues</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">JobReturn</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Launch a Hydra job using a Python-based interface.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Launches a Hydra job from a Python function rather than a CLI.</span>
 
 <span class="sd">    `launch` is designed to closely match the interface of the standard Hydra CLI.</span>
 <span class="sd">    For example, launching a Hydra job from the CLI via::</span>
@@ -425,22 +565,23 @@
 <span class="sd">        The function that Hydra will execute. Its input will be ``config``, which</span>
 <span class="sd">        has been modified via the specified ``overrides``</span>
 
-<span class="sd">    overrides : Optional[List[str]]</span>
+<span class="sd">    overrides : Optional[Union[OverrideMapping, List[str]]] (default: None)</span>
 <span class="sd">        If provided, sets/overrides values in ``config``. See [1]_ and [2]_</span>
 <span class="sd">        for a detailed discussion of the &quot;grammar&quot; supported by ``overrides``.</span>
 
 <span class="sd">    multirun : bool (default: False)</span>
 <span class="sd">        Launch a Hydra multi-run ([3]_).</span>
 
-<span class="sd">    version_base : Optional[str], optional (default=_NotSet)</span>
+<span class="sd">    version_base : Optional[str], optional (default=not-specified)</span>
 <span class="sd">        Available starting with Hydra 1.2.0.</span>
 <span class="sd">        - If the `version_base parameter` is not specified, Hydra 1.x will use defaults compatible with version 1.1. Also in this case, a warning is issued to indicate an explicit version_base is preferred.</span>
 <span class="sd">        - If the `version_base parameter` is `None`, then the defaults are chosen for the current minor Hydra version. For example for Hydra 1.2, then would imply `config_path=None` and `hydra.job.chdir=False`.</span>
 <span class="sd">        - If the `version_base` parameter is an explicit version string like &quot;1.1&quot;, then the defaults appropriate to that version are used.</span>
 
-<span class="sd">    to_dictconfig: bool (default: False)</span>
-<span class="sd">        If ``True``, convert a ``dataclasses.dataclass`` to a ``omegaconf.DictConfig``. Note, this</span>
-<span class="sd">        will remove Hydra&#39;s cabability for validation with structured configurations.</span>
+<span class="sd">    to_dictconfig : bool (default: False)</span>
+<span class="sd">        If ``True``, convert a ``dataclasses.dataclass`` to a ``omegaconf.DictConfig``.</span>
+<span class="sd">        Note, this will remove Hydra&#39;s cabability for validation with structured</span>
+<span class="sd">        configurations.</span>
 
 <span class="sd">    config_name : str (default: &quot;zen_launch&quot;)</span>
 <span class="sd">        Name of the stored configuration in Hydra&#39;s ConfigStore API.</span>
@@ -448,13 +589,20 @@
 <span class="sd">    job_name : str (default: &quot;zen_launch&quot;)</span>
 
 <span class="sd">    with_log_configuration : bool (default: True)</span>
-<span class="sd">        If ``True``, enables the configuration of the logging subsystem from the loaded config.</span>
+<span class="sd">        If ``True``, enables the configuration of the logging subsystem from the loaded</span>
+<span class="sd">        config.</span>
+
+<span class="sd">    **override_kwargs : OverrideValues</span>
+<span class="sd">        Keyword arguments to override existing configuration values.  Note, this only</span>
+<span class="sd">        works when the configuration value name is a valid Python identifier; e.g.,</span>
+<span class="sd">        this does not support adding (`+param`) values.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    result : JobReturn | Any</span>
+<span class="sd">    result : hydra.core.utils.JobReturn | Any</span>
 <span class="sd">        If ``multirun is False``:</span>
-<span class="sd">            A ``JobReturn`` object storing the results of the Hydra experiment via the following attributes</span>
+<span class="sd">            A ``JobReturn`` object storing the results of the Hydra experiment via the</span>
+<span class="sd">            following attributes</span>
 <span class="sd">                - ``cfg``: Reflects ``config``</span>
 <span class="sd">                - ``overrides``: Reflects ``overrides``</span>
 <span class="sd">                - ``return_value``: The return value of the task function</span>
@@ -498,7 +646,7 @@
 <span class="sd">    Now, let&#39;s use `launch` to run this task function via Hydra, using particular configured</span>
 <span class="sd">    values (or, &quot;overrides&quot;) for ``a`` and ``b``.</span>
 
-<span class="sd">    &gt;&gt;&gt; job_out = launch(Conf, task_fn, overrides=[&quot;a=1&quot;, &quot;b=&#39;foo&#39;&quot;])</span>
+<span class="sd">    &gt;&gt;&gt; job_out = launch(Conf, task_fn, a=1, b=&#39;foo&#39;)</span>
 <span class="sd">    a: 1</span>
 <span class="sd">    b: foo</span>
 
@@ -527,7 +675,8 @@
 <span class="sd">    &gt;&gt;&gt; (outputs,) = launch(</span>
 <span class="sd">    ...     Conf,</span>
 <span class="sd">    ...     task_fn,</span>
-<span class="sd">    ...     overrides=[&quot;a=1,2,3&quot;, &quot;b=&#39;bar&#39;&quot;],</span>
+<span class="sd">    ...     a=&quot;1,2,3&quot;,</span>
+<span class="sd">    ...     b=&quot;bar&quot;,</span>
 <span class="sd">    ...     multirun=True,</span>
 <span class="sd">    ... )</span>
 <span class="sd">    [2021-10-19 17:50:07,334][HYDRA] Launching 3 jobs locally</span>
@@ -554,6 +703,22 @@
 <span class="sd">    [&#39;multirun/2021-10-19/17-50-07\\0&#39;,</span>
 <span class="sd">    &#39;multirun/2021-10-19/17-50-07\\1&#39;,</span>
 <span class="sd">    &#39;multirun/2021-10-19/17-50-07\\2&#39;]</span>
+
+<span class="sd">    **Launching with quoted overrides**</span>
+
+<span class="sd">    Some of the Hydra CLI override syntax cannot be specified as keyword arguments. In such cases we can instead provide a list or a dict with quoted overrides.</span>
+
+<span class="sd">    &gt;&gt;&gt; job_out = launch(Conf, task_fn, a=1, b=&quot;foo&quot;, overrides={&quot;+c&quot;: 22})</span>
+<span class="sd">    a: 1</span>
+<span class="sd">    b: foo</span>
+<span class="sd">    c: 22</span>
+<span class="sd">    &gt;&gt;&gt; job_out.overrides  # the overrides that we provides</span>
+<span class="sd">    [&#39;a=1&#39;, &#39;b=foo&#39;, &#39;+c=22&#39;]</span>
+
+<span class="sd">    &gt;&gt;&gt; launch(Conf, task_fn, overrides=[&quot;a=1&quot;, &quot;b=&#39;foo&#39;&quot;, &quot;+c=22&quot;])</span>
+<span class="sd">    a: 1</span>
+<span class="sd">    b: foo</span>
+<span class="sd">    c: 22</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># used for check below</span>
@@ -570,6 +735,15 @@
         <span class="n">config_name</span> <span class="o">=</span> <span class="n">_store_config</span><span class="p">(</span><span class="n">dictconfig</span><span class="p">,</span> <span class="n">config_name</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">config_name</span> <span class="o">=</span> <span class="n">_store_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">config_name</span><span class="p">)</span>
+
+    <span class="c1"># allow user to provide a dictionary of override values</span>
+    <span class="c1"># instead of just a list of strings</span>
+    <span class="n">overrides</span> <span class="o">=</span> <span class="n">overrides</span> <span class="k">if</span> <span class="n">overrides</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">overrides</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
+        <span class="n">overrides</span> <span class="o">=</span> <span class="n">_process_dict_overrides</span><span class="p">(</span><span class="n">overrides</span><span class="p">)</span>
+
+    <span class="n">override_kwargs_list</span> <span class="o">=</span> <span class="n">_process_dict_overrides</span><span class="p">(</span><span class="n">override_kwargs</span><span class="p">)</span>
+    <span class="n">overrides</span> <span class="o">+=</span> <span class="n">override_kwargs_list</span>
 
     <span class="c1"># Initializes Hydra and add the config_path to the config search path</span>
     <span class="k">with</span> <span class="n">initialize</span><span class="p">(</span>
@@ -588,7 +762,7 @@
         <span class="c1"># Load configuration</span>
         <span class="n">cfg</span> <span class="o">=</span> <span class="n">gh</span><span class="o">.</span><span class="n">hydra</span><span class="o">.</span><span class="n">compose_config</span><span class="p">(</span>
             <span class="n">config_name</span><span class="o">=</span><span class="n">config_name</span><span class="p">,</span>
-            <span class="n">overrides</span><span class="o">=</span><span class="n">overrides</span> <span class="k">if</span> <span class="n">overrides</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[],</span>
+            <span class="n">overrides</span><span class="o">=</span><span class="n">overrides</span><span class="p">,</span>
             <span class="n">run_mode</span><span class="o">=</span><span class="n">RunMode</span><span class="o">.</span><span class="n">RUN</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">multirun</span> <span class="k">else</span> <span class="n">RunMode</span><span class="o">.</span><span class="n">MULTIRUN</span><span class="p">,</span>
             <span class="n">from_shell</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">with_log_configuration</span><span class="o">=</span><span class="n">with_log_configuration</span><span class="p">,</span>
@@ -641,11 +815,13 @@
             <span class="ow">and</span> <span class="n">_num_dataclass_fields_after</span> <span class="o">&lt;</span> <span class="n">_num_dataclass_fields</span>
         <span class="p">):</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;Your dataclass-based config was mutated by this run. If you just executed with a &quot;</span>
-                <span class="s2">&quot;`hydra/launcher` that utilizes cloudpickle (e.g., hydra-submitit-launcher), there is a known &quot;</span>
-                <span class="s2">&quot;issue with dataclasses (see: https://github.com/cloudpipe/cloudpickle/issues/386). You will have &quot;</span>
-                <span class="s2">&quot;to restart your interactive environment ro run `launch` again. To avoid this issue you can use the &quot;</span>
-                <span class="s2">&quot;`launch` option: `to_dictconfig=True`.&quot;</span>
+                <span class="s2">&quot;Your dataclass-based config was mutated by this run. If you just &quot;</span>
+                <span class="s2">&quot;executed with a `hydra/launcher` that utilizes cloudpickle (e.g., &quot;</span>
+                <span class="s2">&quot;hydra-submitit-launcher), there is a known issue with dataclasses &quot;</span>
+                <span class="s2">&quot;(see: https://github.com/cloudpipe/cloudpickle/issues/386). You will &quot;</span>
+                <span class="s2">&quot;have to restart your interactive environment ro run `launch` again. &quot;</span>
+                <span class="s2">&quot;To avoid this issue you can use the `launch` option: &quot;</span>
+                <span class="s2">&quot;`to_dictconfig=True`.&quot;</span>
             <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">job</span></div>
