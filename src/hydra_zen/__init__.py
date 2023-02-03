@@ -9,7 +9,7 @@ from ._hydra_overloads import (
     save_as_yaml,
     to_yaml,
 )
-from ._launch import launch
+from ._launch import hydra_list, launch, multirun
 from .structured_configs import (
     ZenField,
     builds,
@@ -41,6 +41,8 @@ __all__ = [
     "is_partial_builds",
     "uses_zen_processing",
     "zen",
+    "hydra_list",
+    "multirun",
     "store",
     "ZenStore",
 ]

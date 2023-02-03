@@ -222,7 +222,7 @@ and run the following code.
 
    >>> from hydra_zen import launch
    >>> from experiment import ExperimentConfig, task_function
-   >>> (jobs,) = launch(  # type: ignore
+   >>> (jobs,) = launch(
    ...     ExperimentConfig,
    ...     task_function,
    ...     overrides=[
