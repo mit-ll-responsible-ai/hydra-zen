@@ -105,10 +105,11 @@ OverrideValues: TypeAlias = Union[
     multirun[Union[HydraPrimitives, hydra_list[HydraPrimitives]]],
     hydra_list[HydraPrimitives],
 ]
-OverrideDict: TypeAlias = Dict[str, OverrideValues]
+OverrideDict: TypeAlias = Mapping[str, OverrideValues]
 
 
 def _process_dict_overrides(overrides: OverrideDict) -> List[str]:
+    """Convert dict overrides to a list of Hydra CLI compatible args"""
     launch_overrides = []
     for k, v in overrides.items():
         if v is None:
@@ -362,7 +363,7 @@ def launch(
     # allow user to provide a dictionary of override values
     # instead of just a list of strings
     overrides = overrides if overrides is not None else []
-    if isinstance(overrides, dict):
+    if isinstance(overrides, Mapping):
         overrides = _process_dict_overrides(overrides)
 
     override_kwargs_list = _process_dict_overrides(override_kwargs)
@@ -439,11 +440,13 @@ def launch(
             and _num_dataclass_fields_after < _num_dataclass_fields
         ):
             warnings.warn(
-                "Your dataclass-based config was mutated by this run. If you just executed with a "
-                "`hydra/launcher` that utilizes cloudpickle (e.g., hydra-submitit-launcher), there is a known "
-                "issue with dataclasses (see: https://github.com/cloudpipe/cloudpickle/issues/386). You will have "
-                "to restart your interactive environment ro run `launch` again. To avoid this issue you can use the "
-                "`launch` option: `to_dictconfig=True`."
+                "Your dataclass-based config was mutated by this run. If you just "
+                "executed with a `hydra/launcher` that utilizes cloudpickle (e.g., "
+                "hydra-submitit-launcher), there is a known issue with dataclasses "
+                "(see: https://github.com/cloudpipe/cloudpickle/issues/386). You will "
+                "have to restart your interactive environment ro run `launch` again. "
+                "To avoid this issue you can use the `launch` option: "
+                "`to_dictconfig=True`."
             )
 
     return job
