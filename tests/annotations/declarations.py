@@ -30,6 +30,7 @@ from typing import (
     Union,
 )
 
+from hydra.core.utils import JobReturn
 from omegaconf import MISSING, DictConfig, ListConfig
 from typing_extensions import Literal, assert_type
 
@@ -1054,7 +1055,15 @@ def check_launch():
         pass
 
     f(Xonf)
-    launch(Xonf, f)
+
+    job1 = launch(Xonf(), f)
+    assert_type(job1, JobReturn)
+
+    job2 = launch(Xonf, f, multirun=False)
+    assert_type(job2, JobReturn)
+
+    job3 = launch(Xonf, f, multirun=True)
+    assert_type(job3, Any)
 
 
 def check_instantiate():

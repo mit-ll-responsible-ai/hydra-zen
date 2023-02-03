@@ -17,6 +17,7 @@ from typing import (
     TypeVar,
     Union,
     cast,
+    overload,
 )
 
 from hydra import initialize
@@ -27,7 +28,7 @@ from hydra.core.utils import JobReturn, run_job
 from hydra.plugins.sweeper import Sweeper
 from hydra.types import HydraContext, RunMode
 from omegaconf import DictConfig, ListConfig, OmegaConf
-from typing_extensions import TypeAlias
+from typing_extensions import Literal, TypeAlias
 
 from hydra_zen._compatibility import SUPPORTS_VERSION_BASE
 from hydra_zen._hydra_overloads import instantiate
@@ -160,6 +161,38 @@ def _store_config(
     return config_name
 
 
+@overload
+def launch(
+    config: Union[InstOrType[DataClass], Mapping[str, Any]],
+    task_function: Callable[[Any], Any],
+    overrides: Optional[Union[OverrideDict, List[str]]] = ...,
+    multirun: Literal[False] = ...,
+    version_base: Optional[Union[str, Type[_NotSet]]] = ...,
+    to_dictconfig: bool = ...,
+    config_name: str = ...,
+    job_name: str = ...,
+    with_log_configuration: bool = ...,
+    **override_kwargs: OverrideValues,
+) -> JobReturn:
+    ...
+
+
+@overload
+def launch(
+    config: Union[InstOrType[DataClass], Mapping[str, Any]],
+    task_function: Callable[[Any], Any],
+    overrides: Optional[Union[OverrideDict, List[str]]] = ...,
+    multirun: Literal[True] = ...,
+    version_base: Optional[Union[str, Type[_NotSet]]] = ...,
+    to_dictconfig: bool = ...,
+    config_name: str = ...,
+    job_name: str = ...,
+    with_log_configuration: bool = ...,
+    **override_kwargs: OverrideValues,
+) -> Any:
+    ...
+
+
 def launch(
     config: Union[InstOrType[DataClass], Mapping[str, Any]],
     task_function: Callable[[Any], Any],
@@ -193,22 +226,23 @@ def launch(
         The function that Hydra will execute. Its input will be ``config``, which
         has been modified via the specified ``overrides``
 
-    overrides : Optional[Union[OverrideDict, List[str]]] (default: None)
+    overrides : Optional[Union[OverrideMapping, List[str]]] (default: None)
         If provided, sets/overrides values in ``config``. See [1]_ and [2]_
         for a detailed discussion of the "grammar" supported by ``overrides``.
 
     multirun : bool (default: False)
         Launch a Hydra multi-run ([3]_).
 
-    version_base : Optional[str], optional (default=_NotSet)
+    version_base : Optional[str], optional (default=not-specified)
         Available starting with Hydra 1.2.0.
         - If the `version_base parameter` is not specified, Hydra 1.x will use defaults compatible with version 1.1. Also in this case, a warning is issued to indicate an explicit version_base is preferred.
         - If the `version_base parameter` is `None`, then the defaults are chosen for the current minor Hydra version. For example for Hydra 1.2, then would imply `config_path=None` and `hydra.job.chdir=False`.
         - If the `version_base` parameter is an explicit version string like "1.1", then the defaults appropriate to that version are used.
 
     to_dictconfig : bool (default: False)
-        If ``True``, convert a ``dataclasses.dataclass`` to a ``omegaconf.DictConfig``. Note, this
-        will remove Hydra's cabability for validation with structured configurations.
+        If ``True``, convert a ``dataclasses.dataclass`` to a ``omegaconf.DictConfig``.
+        Note, this will remove Hydra's cabability for validation with structured
+        configurations.
 
     config_name : str (default: "zen_launch")
         Name of the stored configuration in Hydra's ConfigStore API.
@@ -216,17 +250,20 @@ def launch(
     job_name : str (default: "zen_launch")
 
     with_log_configuration : bool (default: True)
-        If ``True``, enables the configuration of the logging subsystem from the loaded config.
+        If ``True``, enables the configuration of the logging subsystem from the loaded
+        config.
 
     **override_kwargs : OverrideValues
-        Keyword arguments to override existing configuration values.  Note, this only works when the configuration value,
-        i.e., this does not support adding (`+param`) or removing (`~param`) configuration values.
+        Keyword arguments to override existing configuration values.  Note, this only
+        works when the configuration value name is a valid Python identifier; e.g.,
+        this does not support adding (`+param`) values.
 
     Returns
     -------
-    result : JobReturn | Any
+    result : hydra.core.utils.JobReturn | Any
         If ``multirun is False``:
-            A ``JobReturn`` object storing the results of the Hydra experiment via the following attributes
+            A ``JobReturn`` object storing the results of the Hydra experiment via the
+            following attributes
                 - ``cfg``: Reflects ``config``
                 - ``overrides``: Reflects ``overrides``
                 - ``return_value``: The return value of the task function
@@ -270,7 +307,7 @@ def launch(
     Now, let's use `launch` to run this task function via Hydra, using particular configured
     values (or, "overrides") for ``a`` and ``b``.
 
-    >>> job_out = launch(Conf, task_fn, overrides=["a=1", "b='foo'"])
+    >>> job_out = launch(Conf, task_fn, a=1, b='foo')
     a: 1
     b: foo
 
@@ -299,7 +336,8 @@ def launch(
     >>> (outputs,) = launch(
     ...     Conf,
     ...     task_fn,
-    ...     overrides=["a=1,2,3", "b='bar'"],
+    ...     a="1,2,3",
+    ...     b="bar",
     ...     multirun=True,
     ... )
     [2021-10-19 17:50:07,334][HYDRA] Launching 3 jobs locally
@@ -327,22 +365,21 @@ def launch(
     'multirun/2021-10-19/17-50-07\\1',
     'multirun/2021-10-19/17-50-07\\2']
 
-    **Launching with dictionary override**
+    **Launching with quoted overrides**
 
-    >>> job_out = launch(Conf, task_fn, overrides={"a": 1, "b":'foo'})
+    Some of the Hydra CLI override syntax cannot be specified as keyword arguments. In such cases we can instead provide a list or a dict with quoted overrides.
+
+    >>> job_out = launch(Conf, task_fn, a=1, b="foo", overrides={"+c": 22})
+    a: 1
+    b: foo
+    c: 22
     >>> job_out.overrides  # the overrides that we provides
-    ['a=1', "b='foo'"]
+    ['a=1', 'b=foo', '+c=22']
 
-    >>> from hydra_zen import multirun, hydra_list
-    >>> (outputs,) = launch(
-    ...     Conf,
-    ...     task_fn,
-    ...     overrides={"a": multirun([1,2,3]), "b": hydra_list(['bar', 'element'])},
-    ...     multirun=True,
-    ... )
-    >>> outputs[0].overrides
-    ['a=1', "b=['bar','element']"]
-
+    >>> launch(Conf, task_fn, overrides=["a=1", "b='foo'", "+c=22"])
+    a: 1
+    b: foo
+    c: 22
     """
 
     # used for check below
