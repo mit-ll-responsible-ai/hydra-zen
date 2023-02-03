@@ -9,11 +9,13 @@ This is a record of all past hydra-zen releases and what went into them, in reve
 chronological order. All previous releases should still be available on pip.
 
 
-.. _v0.10.0:
+.. _v0.10.0rc1:
 
-------------------
-0.10.0 - 2023-02-3
-------------------
+---------------------
+0.10.0rc1 - 2023-02-3
+---------------------
+
+.. note:: This is documentation for an unreleased version of hydra-zen. You can try out this pre-release version using `pip install --pre hydra-zen`
 
 Improvements
 ------------
