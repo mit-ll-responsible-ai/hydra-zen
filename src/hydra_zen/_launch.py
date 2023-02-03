@@ -206,7 +206,7 @@ def launch(
     **override_kwargs: OverrideValues,
 ) -> Union[JobReturn, Any]:
     r"""
-    Launch a Hydra job using a Python-based interface.
+    Launches a Hydra job from a Python function rather than a CLI.
 
     `launch` is designed to closely match the interface of the standard Hydra CLI.
     For example, launching a Hydra job from the CLI via::
