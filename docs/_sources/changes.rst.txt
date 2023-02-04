@@ -177,7 +177,7 @@ New Features
 
 Improvements
 ------------
-- Updated the :ref:`Tutorials <tutorials>` and :ref:`How-To Guides <hydra-zen-how-to>` to reflect idomatic usage of :class:`~hydra_zen.ZenStore` and :func:`~hydra_zen.zen`.
+- Updated the :ref:`Tutorials <tutorials>` and :ref:`How-To Guides <hydra-zen-how-to>` to reflect idiomatic usage of :class:`~hydra_zen.ZenStore` and :func:`~hydra_zen.zen`.
 - :func:`~hydra_zen.hydrated_dataclass` will now produce a pickle-compatible dataclass type. See :pull:`338`.
 - hydra-zen's :ref:`auto-config support <additional-types>` has been enhanced so that it produces pickle-compatible configs. This excludes auto-config support for :py:func:`functools.partial` and :py:func:`dataclasses.dataclass`. See :pull:`360`.
 - All options available to :func:`dataclasses.dataclass` are now exposed by :func:`~hydra_zen.hydrated_dataclass`, :func:`~hydra_zen.builds`, :func:`~hydra_zen.make_custom_builds_fn`, :func:`~hydra_zen.make_config`, and :func:`~hydra_zen.just` via the :class:`hydra_zen.typing.DataclassOptions` API. See :pull:`360`.
