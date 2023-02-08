@@ -1231,8 +1231,7 @@ def check_store():
     substore1 = substore(a=1)
     x = substore1(dict(a=1))
 
-    # TODO: Enable when mypy supports Self
-    # assert_type(substore1, SubStore)
+    assert_type(substore1, SubStore)
 
     assert_type(x, Dict[str, int])
 
