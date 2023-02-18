@@ -527,11 +527,12 @@ def _is_ufunc(value: Any) -> bool:
 
 
 def _check_instance(*target_types: str, value: "Any", module: str):
-    """Checks if value is an instance of any of the target types imported 
-    from the specified module. 
-    
+    """Checks if value is an instance of any of the target types imported
+    from the specified module.
+
     Returns `False` if module/target type doesn't exists (e.g. not installed).
-    This is useful for gracefully handling specialized logic for optional dependencies."""
+    This is useful for gracefully handling specialized logic for optional dependencies.
+    """
     mod = sys.modules.get(module)
     if mod is None:
         return False
@@ -541,9 +542,12 @@ def _check_instance(*target_types: str, value: "Any", module: str):
         type_ = getattr(mod, attr_name, None)
         if type_ is not None:
             types.append(type_)
-
-    if types:
-        return isinstance(value, tuple(types))
+    try:
+        if types:
+            return isinstance(value, tuple(types))
+    except TypeError:
+        # handle singleton checking
+        return any(value is t for t in types)
 
     return False
 
