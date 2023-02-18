@@ -1,5 +1,6 @@
 # Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+# mypy: disable-error-code=empty-body
 
 from typing_extensions import assert_type
 
@@ -95,6 +96,15 @@ def check_store() -> None:
     # store()(1, to_config=builds)  # false negative
     store(1, to_config=just)
     store()(1, to_config=just)
+
+
+def custom_store() -> None:
+    class MyStore(ZenStore):
+        ...
+
+    mstore = MyStore()
+    ss = mstore(name="foo")
+    assert_type(ss, MyStore)
 
 
 # def check_just() -> None:
