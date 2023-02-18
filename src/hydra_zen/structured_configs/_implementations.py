@@ -526,16 +526,18 @@ def _is_ufunc(value: Any) -> bool:
     return isinstance(value, numpy.ufunc)
 
 
-def _check_instance(*targets: str, value: "Any", module: str):
-    # we don't require jax to be installed for our coverage metrics
-
-    # checks without importing jaxlib
+def _check_instance(*target_types: str, value: "Any", module: str):
+    """Checks if value is an instance of any of the target types imported 
+    from the specified module. 
+    
+    Returns `False` if module/target type doesn't exists (e.g. not installed).
+    This is useful for gracefully handling specialized logic for optional dependencies."""
     mod = sys.modules.get(module)
     if mod is None:
         return False
 
     types = []
-    for attr_name in targets:
+    for attr_name in target_types:
         type_ = getattr(mod, attr_name, None)
         if type_ is not None:
             types.append(type_)
