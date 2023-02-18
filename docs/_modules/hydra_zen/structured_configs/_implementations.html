@@ -865,31 +865,43 @@
     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ufunc</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_is_jax_compiled_func</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-    <span class="c1"># we don&#39;t require jax to be installed for our coverage metrics</span>
+<span class="k">def</span> <span class="nf">_check_instance</span><span class="p">(</span><span class="o">*</span><span class="n">target_types</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="s2">&quot;Any&quot;</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks if value is an instance of any of the target types imported</span>
+<span class="sd">    from the specified module.</span>
 
-    <span class="c1"># checks without importing jaxlib</span>
-    <span class="n">jaxlib_xla_extension</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;jaxlib.xla_extension&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">jaxlib_xla_extension</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="sd">    Returns `False` if module/target type doesn&#39;t exists (e.g. not installed).</span>
+<span class="sd">    This is useful for gracefully handling specialized logic for optional dependencies.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mod</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">mod</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="n">types</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">attr_name</span> <span class="ow">in</span> <span class="n">target_types</span><span class="p">:</span>
+        <span class="n">type_</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">type_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">type_</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">CompiledFunction</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">jaxlib_xla_extension</span><span class="p">,</span> <span class="s2">&quot;CompiledFunction&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">CompiledFunction</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">types</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">types</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="c1"># handle singleton checking</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">value</span> <span class="ow">is</span> <span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">types</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">False</span>
 
 
-<span class="k">def</span> <span class="nf">_is_torch_optim_required</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-    <span class="n">torch_optim_optimizer</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;torch.optim.optimizer&quot;</span><span class="p">)</span>
+<span class="n">_is_jax_compiled_func</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
+    <span class="n">_check_instance</span><span class="p">,</span> <span class="s2">&quot;CompiledFunction&quot;</span><span class="p">,</span> <span class="s2">&quot;PjitFunction&quot;</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="s2">&quot;jaxlib.xla_extension&quot;</span>
+<span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">torch_optim_optimizer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">False</span>
+<span class="n">_is_jax_unspecified</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
+    <span class="n">_check_instance</span><span class="p">,</span> <span class="s2">&quot;UnspecifiedValue&quot;</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="s2">&quot;jax._src.interpreters.pxla&quot;</span>
+<span class="p">)</span>
 
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">required</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">torch_optim_optimizer</span><span class="p">,</span> <span class="s2">&quot;required&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">required</span>
-    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">False</span>
+<span class="n">_is_torch_optim_required</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
+    <span class="n">_check_instance</span><span class="p">,</span> <span class="s2">&quot;required&quot;</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="s2">&quot;torch.optim.optimizer&quot;</span>
+<span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_check_for_dynamically_defined_dataclass_type</span><span class="p">(</span><span class="n">target_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -992,7 +1004,7 @@
             <span class="ow">or</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
             <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">_BUILTIN_TYPES</span><span class="p">)</span>
             <span class="ow">or</span> <span class="n">_is_ufunc</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-            <span class="ow">or</span> <span class="n">_is_jax_compiled_func</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="n">_is_jax_compiled_func</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
         <span class="p">)</span>
     <span class="p">):</span>
         <span class="c1"># `value` is importable callable -- create config that will import</span>
@@ -1057,8 +1069,10 @@
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="k">del</span> <span class="n">_v</span>
 
-    <span class="c1"># support for torch objects</span>
-    <span class="k">if</span> <span class="n">_is_torch_optim_required</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+    <span class="c1"># support for torch/jax MISSING proxies</span>
+    <span class="k">if</span> <span class="n">_is_torch_optim_required</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span> <span class="ow">or</span> <span class="n">_is_jax_unspecified</span><span class="p">(</span>
+        <span class="n">value</span><span class="o">=</span><span class="n">value</span>
+    <span class="p">):</span>  <span class="c1"># pragma: no cover</span>
         <span class="k">return</span> <span class="n">MISSING</span>
 
     <span class="c1"># `value` could no be converted to Hydra-compatible representation.</span>
