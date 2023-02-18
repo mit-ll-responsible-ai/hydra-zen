@@ -542,14 +542,15 @@ def _check_instance(*target_types: str, value: "Any", module: str):  # pragma: n
         type_ = getattr(mod, attr_name, None)
         if type_ is not None:
             types.append(type_)
+
+    if not types:
+        return False
+
     try:
-        if types:
-            return isinstance(value, tuple(types))
+        return isinstance(value, tuple(types))
     except TypeError:
         # handle singleton checking
         return any(value is t for t in types)
-
-    return False
 
 
 _is_jax_compiled_func = functools.partial(
