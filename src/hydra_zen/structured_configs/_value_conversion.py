@@ -36,14 +36,16 @@ class ConfigPath:
     _target_: str = field(default=get_obj_path(Path), init=False)
 
 
-if Path in ZEN_SUPPORTED_PRIMITIVES:  # pragma: no cover
+_t = Path  # prevents unfortunate weird behavior in pyright
+if _t in ZEN_SUPPORTED_PRIMITIVES:  # pragma: no cover
 
-    def convert_path(value: Path) -> Builds[Type[Path]]:
+    def convert_path(value: Path):
         return cast(Builds[Type[Path]], ConfigPath(_args_=(str(value),)))
 
     ZEN_VALUE_CONVERSION[Path] = convert_path
     ZEN_VALUE_CONVERSION[PosixPath] = convert_path
     ZEN_VALUE_CONVERSION[WindowsPath] = convert_path
+del _t
 
 
 def _unpack_partial(value: Partial[_T]) -> PartialBuilds[Type[_T]]:

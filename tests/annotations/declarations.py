@@ -814,8 +814,11 @@ def check_overloads_arent_too_restrictive():
         pbuilds: PBuilds = ...,
         **kwargs_for_target: SupportedPrimitive,
     ):
+        def func(x: int) -> str:
+            ...
+
         bout = builds(
-            int,
+            func,
             zen_partial=zen_partial,
             zen_wrappers=zen_wrappers,
             zen_meta=zen_meta,
@@ -830,11 +833,11 @@ def check_overloads_arent_too_restrictive():
 
         reveal_type(
             bout,
-            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Unknown, (...)]]",
+            expected_text="Type[Builds[Unknown]] | Type[ZenPartialBuilds[Unknown]] | Type[HydraPartialBuilds[Unknown]] | Type[BuildsWithSig[Type[str], (x: int)]]",
         )
 
         fout = fbuilds(
-            int,
+            func,
             zen_partial=zen_partial,
             zen_wrappers=zen_wrappers,
             zen_meta=zen_meta,
@@ -849,11 +852,11 @@ def check_overloads_arent_too_restrictive():
 
         reveal_type(
             fout,
-            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Unknown, (...)]]",
+            expected_text="Type[Builds[Unknown]] | Type[ZenPartialBuilds[Unknown]] | Type[HydraPartialBuilds[Unknown]] | Type[BuildsWithSig[Type[str], (x: int)]]",
         )
 
         pout = pbuilds(
-            int,
+            func,
             zen_partial=zen_partial,
             zen_wrappers=zen_wrappers,
             zen_meta=zen_meta,
@@ -868,7 +871,7 @@ def check_overloads_arent_too_restrictive():
 
         reveal_type(
             pout,
-            expected_text="Type[Builds[Type[int]]] | Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]] | Type[BuildsWithSig[Unknown, (...)]]",
+            expected_text="Type[Builds[Unknown]] | Type[ZenPartialBuilds[Unknown]] | Type[HydraPartialBuilds[Unknown]] | Type[BuildsWithSig[Type[str], (x: int)]]",
         )
 
     assert caller

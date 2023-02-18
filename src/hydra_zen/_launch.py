@@ -32,7 +32,7 @@ from typing_extensions import Literal, TypeAlias
 
 from hydra_zen._compatibility import SUPPORTS_VERSION_BASE
 from hydra_zen._hydra_overloads import instantiate
-from hydra_zen.typing._implementations import DataClass, InstOrType
+from hydra_zen.typing._implementations import DataClass_, InstOrType
 
 T = TypeVar("T", bound=Any)
 HydraPrimitives: TypeAlias = Union[None, int, float, bool, str, Dict[str, str]]
@@ -129,7 +129,7 @@ def _process_dict_overrides(overrides: OverrideDict) -> List[str]:
 
 
 def _store_config(
-    cfg: Union[DataClass, Type[DataClass], DictConfig, ListConfig, Mapping[Any, Any]],
+    cfg: Union[DataClass_, Type[DataClass_], DictConfig, ListConfig, Mapping[Any, Any]],
     config_name: str = "hydra_launch",
 ) -> str:
     """Stores configuration object in Hydra's ConfigStore.
@@ -163,7 +163,7 @@ def _store_config(
 
 @overload
 def launch(
-    config: Union[InstOrType[DataClass], Mapping[str, Any]],
+    config: Union[InstOrType[DataClass_], Mapping[str, Any]],
     task_function: Callable[[Any], Any],
     overrides: Optional[Union[OverrideDict, List[str]]] = ...,
     multirun: Literal[False] = ...,
@@ -179,7 +179,7 @@ def launch(
 
 @overload
 def launch(
-    config: Union[InstOrType[DataClass], Mapping[str, Any]],
+    config: Union[InstOrType[DataClass_], Mapping[str, Any]],
     task_function: Callable[[Any], Any],
     overrides: Optional[Union[OverrideDict, List[str]]] = ...,
     multirun: Literal[True] = ...,
@@ -194,7 +194,7 @@ def launch(
 
 
 def launch(
-    config: Union[InstOrType[DataClass], Mapping[str, Any]],
+    config: Union[InstOrType[DataClass_], Mapping[str, Any]],
     task_function: Callable[[Any], Any],
     overrides: Optional[Union[OverrideDict, List[str]]] = None,
     multirun: bool = False,
