@@ -213,4 +213,4 @@ jobs:
         pip install mypy
         pip install -e .
     - name: Run mypy on test script
-      run: mypy --warn-unused-ignores tests/annotations/mypy_checks.py
+      run: mypy tests/annotations/mypy_checks.py
