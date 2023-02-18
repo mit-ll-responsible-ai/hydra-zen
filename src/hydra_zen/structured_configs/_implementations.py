@@ -533,11 +533,33 @@ def _is_jax_compiled_func(value: Any) -> bool:  # pragma: no cover
     jaxlib_xla_extension = sys.modules.get("jaxlib.xla_extension")
     if jaxlib_xla_extension is None:
         return False
-    try:
-        CompiledFunction = getattr(jaxlib_xla_extension, "CompiledFunction")
-        return isinstance(value, CompiledFunction)
-    except AttributeError:
+
+    types = []
+    for attr_name in ("CompiledFunction", "PjitFunction"):
+        type_ = getattr(jaxlib_xla_extension, attr_name, None)
+        if type_ is not None:
+            types.append(type_)
+    print(types, value, isinstance(value, tuple(types)))
+    if types:
+        return isinstance(value, tuple(types))
+
+    return False
+
+
+def _is_jax_unspecified(value: Any) -> bool:  # pragma: no cover
+    # we don't require jax to be installed for our coverage metrics
+
+    # checks without importing jaxlib
+    pxla = sys.modules.get("jax._src.interpreters.pxla")
+    if pxla is None:
         return False
+
+    type_ = getattr(pxla, "UnspecifiedValue", None)
+
+    if type_ is not None:
+        return isinstance(value, type_)
+
+    return False
 
 
 def _is_torch_optim_required(value: Any) -> bool:  # pragma: no cover
@@ -718,8 +740,10 @@ def sanitized_default_value(
         else:  # pragma: no cover
             del _v
 
-    # support for torch objects
-    if _is_torch_optim_required(value):  # pragma: no cover
+    # support for torch/jax MISSING proxies
+    if _is_torch_optim_required(value) or _is_jax_unspecified(
+        value
+    ):  # pragma: no cover
         return MISSING
 
     # `value` could no be converted to Hydra-compatible representation.
