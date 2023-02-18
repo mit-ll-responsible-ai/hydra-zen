@@ -526,7 +526,7 @@ def _is_ufunc(value: Any) -> bool:
     return isinstance(value, numpy.ufunc)
 
 
-def _check_instance(*target_types: str, value: "Any", module: str):
+def _check_instance(*target_types: str, value: "Any", module: str):  # pragma: no cover
     """Checks if value is an instance of any of the target types imported
     from the specified module.
 
