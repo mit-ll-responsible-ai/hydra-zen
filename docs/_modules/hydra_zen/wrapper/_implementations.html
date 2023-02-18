@@ -378,6 +378,7 @@
     <span class="n">Literal</span><span class="p">,</span>
     <span class="n">ParamSpec</span><span class="p">,</span>
     <span class="n">Protocol</span><span class="p">,</span>
+    <span class="n">Self</span><span class="p">,</span>
     <span class="n">TypeAlias</span><span class="p">,</span>
     <span class="n">TypedDict</span><span class="p">,</span>
     <span class="n">TypeGuard</span><span class="p">,</span>
@@ -510,7 +511,8 @@
             <span class="p">)</span>
         <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">HydraZenValidationError</span><span class="p">(</span>
-                <span class="s2">&quot;hydra_zen.zen can only wrap callables that possess inspectable signatures.&quot;</span>
+                <span class="s2">&quot;hydra_zen.zen can only wrap callables that possess inspectable &quot;</span>
+                <span class="s2">&quot;signatures.&quot;</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">unpack_kwargs</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>  <span class="c1"># type: ignore</span>
@@ -1574,7 +1576,7 @@
     <span class="c1">#       https://github.com/python/mypy/pull/11666</span>
     <span class="nd">@overload</span>
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">__target</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">NodeName</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">NodeName</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -1583,7 +1585,7 @@
         <span class="n">provider</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">to_config</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Node</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="o">**</span><span class="n">to_config_kw</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ZenStore&quot;</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
         <span class="o">...</span>
 
 <div class="viewcode-block" id="ZenStore.__call__"><a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">F</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">F</span><span class="p">,</span> <span class="s2">&quot;ZenStore&quot;</span><span class="p">]:</span>
