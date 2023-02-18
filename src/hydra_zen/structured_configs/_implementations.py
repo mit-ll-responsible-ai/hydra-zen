@@ -526,53 +526,37 @@ def _is_ufunc(value: Any) -> bool:
     return isinstance(value, numpy.ufunc)
 
 
-def _is_jax_compiled_func(value: Any) -> bool:  # pragma: no cover
+def _check_instance(*targets: str, value: "Any", module: str):
     # we don't require jax to be installed for our coverage metrics
 
     # checks without importing jaxlib
-    jaxlib_xla_extension = sys.modules.get("jaxlib.xla_extension")
-    if jaxlib_xla_extension is None:
+    mod = sys.modules.get(module)
+    if mod is None:
         return False
 
     types = []
-    for attr_name in ("CompiledFunction", "PjitFunction"):
-        type_ = getattr(jaxlib_xla_extension, attr_name, None)
+    for attr_name in targets:
+        type_ = getattr(mod, attr_name, None)
         if type_ is not None:
             types.append(type_)
-    print(types, value, isinstance(value, tuple(types)))
+
     if types:
         return isinstance(value, tuple(types))
 
     return False
 
 
-def _is_jax_unspecified(value: Any) -> bool:  # pragma: no cover
-    # we don't require jax to be installed for our coverage metrics
+_is_jax_compiled_func = functools.partial(
+    _check_instance, "CompiledFunction", "PjitFunction", module="jaxlib.xla_extension"
+)
 
-    # checks without importing jaxlib
-    pxla = sys.modules.get("jax._src.interpreters.pxla")
-    if pxla is None:
-        return False
+_is_jax_unspecified = functools.partial(
+    _check_instance, "UnspecifiedValue", module="jax._src.interpreters.pxla"
+)
 
-    type_ = getattr(pxla, "UnspecifiedValue", None)
-
-    if type_ is not None:
-        return isinstance(value, type_)
-
-    return False
-
-
-def _is_torch_optim_required(value: Any) -> bool:  # pragma: no cover
-    torch_optim_optimizer = sys.modules.get("torch.optim.optimizer")
-
-    if torch_optim_optimizer is None:
-        return False
-
-    try:
-        required = getattr(torch_optim_optimizer, "required")
-        return value is required
-    except AttributeError:
-        return False
+_is_torch_optim_required = functools.partial(
+    _check_instance, "required", module="torch.optim.optimizer"
+)
 
 
 def _check_for_dynamically_defined_dataclass_type(target_path: str, value: Any) -> None:
@@ -675,7 +659,7 @@ def sanitized_default_value(
             or inspect.ismethod(value)
             or isinstance(value, _BUILTIN_TYPES)
             or _is_ufunc(value)
-            or _is_jax_compiled_func(value)
+            or _is_jax_compiled_func(value=value)
         )
     ):
         # `value` is importable callable -- create config that will import
@@ -741,8 +725,8 @@ def sanitized_default_value(
             del _v
 
     # support for torch/jax MISSING proxies
-    if _is_torch_optim_required(value) or _is_jax_unspecified(
-        value
+    if _is_torch_optim_required(value=value) or _is_jax_unspecified(
+        value=value
     ):  # pragma: no cover
         return MISSING
 
