@@ -39,6 +39,7 @@ from typing_extensions import (
     Literal,
     ParamSpec,
     Protocol,
+    Self,
     TypeAlias,
     TypedDict,
     TypeGuard,
@@ -171,7 +172,8 @@ class Zen(Generic[P, R]):
             )
         except (ValueError, TypeError):
             raise HydraZenValidationError(
-                "hydra_zen.zen can only wrap callables that possess inspectable signatures."
+                "hydra_zen.zen can only wrap callables that possess inspectable "
+                "signatures."
             )
 
         if not isinstance(unpack_kwargs, bool):  # type: ignore
@@ -1235,7 +1237,7 @@ class ZenStore:
     #       https://github.com/python/mypy/pull/11666
     @overload
     def __call__(
-        self,
+        self: Self,
         __target: Literal[None] = None,
         *,
         name: Union[NodeName, Callable[[Any], NodeName]] = ...,
@@ -1244,7 +1246,7 @@ class ZenStore:
         provider: Optional[str] = ...,
         to_config: Callable[[Any], Node] = ...,
         **to_config_kw: Any,
-    ) -> "ZenStore":
+    ) -> Self:
         ...
 
     def __call__(self, __target: Optional[F] = None, **kw: Any) -> Union[F, "ZenStore"]:
