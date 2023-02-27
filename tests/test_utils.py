@@ -273,7 +273,7 @@ vDict = Dict[Any, Any] if sys.version_info < (3, 8) else Dict
         ),
         (Tuple[Tuple[int, ...], ...], Tuple[Any, ...]),
         (Optional[Tuple[Tuple[int, ...], ...]], Optional[Tuple[Any, ...]]),
-        (InitVar[List[frozenset]], List[Any]),
+        (InitVar[List[frozenset]], List[Any] if sys.version_info < (3, 8) else Any),
     ],
 )
 def test_sanitized_type_expected_behavior(in_type, expected_type):
