@@ -5,7 +5,7 @@ import enum
 import random
 import string
 import sys
-from dataclasses import dataclass, field as dataclass_field, make_dataclass
+from dataclasses import InitVar, dataclass, field as dataclass_field, make_dataclass
 from inspect import signature
 from pathlib import Path, PosixPath, WindowsPath
 from typing import (
@@ -273,6 +273,7 @@ vDict = Dict[Any, Any] if sys.version_info < (3, 8) else Dict
         ),
         (Tuple[Tuple[int, ...], ...], Tuple[Any, ...]),
         (Optional[Tuple[Tuple[int, ...], ...]], Optional[Tuple[Any, ...]]),
+        (InitVar[List[frozenset]], Any if sys.version_info < (3, 8) else List[Any]),
     ],
 )
 def test_sanitized_type_expected_behavior(in_type, expected_type):

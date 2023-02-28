@@ -3,7 +3,7 @@
 import inspect
 import sys
 import warnings
-from dataclasses import MISSING, field as _field, is_dataclass
+from dataclasses import MISSING, InitVar, field as _field, is_dataclass
 from enum import Enum
 from keyword import iskeyword
 from pathlib import Path
@@ -455,6 +455,13 @@ def sanitized_type(
         # these aren't hashable -- can't check for membership in set
         return Any
 
+    if isinstance(type_, InitVar):
+        return sanitized_type(
+            type_.type,
+            primitive_only=primitive_only,
+            wrap_optional=wrap_optional,
+            nested=nested,
+        )
     if (
         type_ is Any
         or type_ in _supported_types
