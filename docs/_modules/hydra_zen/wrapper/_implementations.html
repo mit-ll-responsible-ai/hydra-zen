@@ -1473,6 +1473,7 @@
         <span class="s2">&quot;_deferred_to_config&quot;</span><span class="p">,</span>
         <span class="s2">&quot;_deferred_store&quot;</span><span class="p">,</span>
         <span class="s2">&quot;_overwrite_ok&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;_warn_node_kwarg&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
 <div class="viewcode-block" id="ZenStore.__init__"><a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -1482,6 +1483,7 @@
         <span class="n">deferred_to_config</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">deferred_hydra_store</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">overwrite_ok</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">warn_node_kwarg</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
@@ -1489,18 +1491,26 @@
 <span class="sd">        name : Optional[str]</span>
 <span class="sd">            The name for this store.</span>
 
-<span class="sd">        deferred_to_config : bool, optional (default=True)</span>
+<span class="sd">        deferred_to_config : bool, default=True</span>
 <span class="sd">            If `True` (default), this store will a not apply `to_config` to the</span>
 <span class="sd">            target until that specific entry is accessed by the store.</span>
 
-<span class="sd">        deferred_hydra_store : bool, optional (default=True)</span>
+<span class="sd">        deferred_hydra_store : bool, default=True</span>
 <span class="sd">            If `True` (default), this store will not add entries to Hydra&#39;s global</span>
 <span class="sd">            config store until `store.add_to_hydra_store` is called explicitly.</span>
 
-<span class="sd">        overwrite_ok : bool, optional (default=False)</span>
+<span class="sd">        overwrite_ok : bool, default=False</span>
 <span class="sd">            If `False` (default), attempting to overwrite entries in this store and</span>
 <span class="sd">            trying to use this store to overwrite entries in Hydra&#39;s global store</span>
 <span class="sd">            will raise a `ValueError`.</span>
+
+<span class="sd">        warn_node_kwarg: bool, default=True</span>
+<span class="sd">            If `True` specifying a `node` kwarg in `ZenStore.__call__` will emit a</span>
+<span class="sd">            warning.</span>
+
+<span class="sd">            This helps to protect users from mistakenly self-partializing a store</span>
+<span class="sd">            with `store(node=Config)` instead of actually storing the node with</span>
+<span class="sd">            `store(Config)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">deferred_to_config</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>  <span class="c1"># type: ignore</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
@@ -1527,7 +1537,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_deferred_store</span> <span class="o">=</span> <span class="n">deferred_hydra_store</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_overwrite_ok</span> <span class="o">=</span> <span class="n">overwrite_ok</span>
         <span class="c1"># Contains the current default arguments for `self.__call__`</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_defaults</span><span class="p">:</span> <span class="n">_StoreCallSig</span> <span class="o">=</span> <span class="n">defaults</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_defaults</span><span class="p">:</span> <span class="n">_StoreCallSig</span> <span class="o">=</span> <span class="n">defaults</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warn_node_kwarg</span> <span class="o">=</span> <span class="n">warn_node_kwarg</span></div>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="c1"># TODO: nicer repr?</span>
@@ -1640,11 +1652,20 @@
 <span class="sd">            has updated default arguments.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">__target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warn_node_kwarg</span> <span class="ow">and</span> <span class="s2">&quot;node&quot;</span> <span class="ow">in</span> <span class="n">kw</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="s2">&quot;hydra-zen&#39;s store API does not use the `node` keyword. To store a config, specify it as a positional argument: `store(&lt;config&gt;)`.</span><span class="se">\n\n</span><span class="s2">If the use of `node` was intentional, you can suppress this warning by using a store that is initialized via `ZenStore(warn_node_kwarg=False).&quot;</span>
+                <span class="p">)</span>
+                <span class="c1"># warnings.warn(</span>
+                <span class="c1">#     f&quot;\nCalling `store(node=&lt;config&gt;, ...)` does not store a config. The appropriate syntax is to use a positional argument:\n\t`store(node=&lt;config&gt;)` -&gt; `store(&lt;config&gt;)`.\nIf this was intentional, you can suppress this warning by using a store initialized via `ZenStore(warn_node_kwarg=False).&quot;</span>
+                <span class="c1"># )</span>
+
             <span class="n">_s</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
                 <span class="n">deferred_to_config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_deferred_to_config</span><span class="p">,</span>
                 <span class="n">deferred_hydra_store</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_deferred_store</span><span class="p">,</span>
                 <span class="n">overwrite_ok</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_overwrite_ok</span><span class="p">,</span>
+                <span class="n">warn_node_kwarg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_warn_node_kwarg</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">_s</span><span class="o">.</span><span class="n">_defaults</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defaults</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
