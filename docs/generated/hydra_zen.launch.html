@@ -280,8 +280,8 @@ For example, launching a Hydra job from the CLI via:</p>
 </div>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>config</strong><span class="classifier">DataClass | Type[DataClass] | Mapping[str, Any]</span></dt><dd><p>A config that will be passed to <code class="docutils literal notranslate"><span class="pre">task_function</span></code>.</p>
+<dd class="field-odd"><dl>
+<dt><strong>config</strong><span class="classifier"><a href="#id7"><span class="problematic" id="id8">DataClass_</span></a> | Type[<a href="#id9"><span class="problematic" id="id10">DataClass_</span></a>] | Mapping[str, Any]</span></dt><dd><p>A config that will be passed to <code class="docutils literal notranslate"><span class="pre">task_function</span></code>.</p>
 </dd>
 <dt><strong>task_function</strong><span class="classifier">Callable[[DictConfig], Any]</span></dt><dd><p>The function that Hydra will execute. Its input will be <code class="docutils literal notranslate"><span class="pre">config</span></code>, which
 has been modified via the specified <code class="docutils literal notranslate"><span class="pre">overrides</span></code></p>
