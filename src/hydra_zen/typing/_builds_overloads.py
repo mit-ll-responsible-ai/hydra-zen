@@ -24,13 +24,13 @@ from ._implementations import (
     DataClass_,
     DataclassOptions,
     DefaultsList,
-    Importable,
     PartialBuilds,
     SupportedPrimitive,
     ZenConvert,
     ZenWrappers,
 )
 
+Importable = TypeVar("Importable", bound=Callable[..., Any])
 R = TypeVar("R")
 P = ParamSpec("P")
 

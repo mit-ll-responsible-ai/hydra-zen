@@ -402,7 +402,11 @@ def sanitized_type(
 
         if origin is list or origin is List:
             if args:
-                return List[sanitized_type(args[0], primitive_only=no_nested_container, nested=True)]  # type: ignore
+                return List[
+                    sanitized_type(
+                        args[0], primitive_only=no_nested_container, nested=True
+                    )
+                ]
             return List
 
         if origin is dict or origin is Dict:
@@ -411,7 +415,7 @@ def sanitized_type(
                 ValueType = sanitized_type(
                     args[1], primitive_only=no_nested_container, nested=True
                 )
-                return Dict[KeyType, ValueType]  # type: ignore
+                return Dict[KeyType, ValueType]
             return Dict
 
         if (origin is tuple or origin is Tuple) and not nested:
@@ -441,7 +445,7 @@ def sanitized_type(
             )
 
             if has_ellipses:
-                return Tuple[_unique_type, ...]  # type: ignore
+                return Tuple[_unique_type, ...]
             else:
                 return Tuple[(_unique_type,) * len(args)]  # type: ignore
 
@@ -477,7 +481,7 @@ def sanitized_type(
             # for some pytorch-lightning classes. So we just do it ourselves...
             # It might be worth removing this later since none of our standard tests
             # cover it.
-            type_ = Optional[type_]  # type: ignore
+            type_ = Optional[type_]
         return type_
 
     return Any

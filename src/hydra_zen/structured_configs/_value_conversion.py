@@ -39,7 +39,7 @@ class ConfigPath:
 if Path in ZEN_SUPPORTED_PRIMITIVES:  # pragma: no cover
 
     def convert_path(value: Path) -> Builds[Type[Path]]:
-        return cast(Builds[Type[Path]], ConfigPath(_args_=(str(value),)))
+        return cast(Builds[Type[Path]], ConfigPath(_args_=(str(value),)))  # type: ignore
 
     ZEN_VALUE_CONVERSION[Path] = convert_path
     ZEN_VALUE_CONVERSION[PosixPath] = convert_path

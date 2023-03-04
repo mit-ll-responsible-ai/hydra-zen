@@ -53,7 +53,6 @@ from hydra_zen.structured_configs._type_guards import safe_getattr
 from hydra_zen.typing import (
     Builds,
     DataclassOptions,
-    Importable,
     PartialBuilds,
     SupportedPrimitive,
     ZenWrappers,
@@ -93,7 +92,7 @@ from ._type_guards import (
 )
 
 _T = TypeVar("_T")
-
+Importable = TypeVar("Importable", bound=Callable[..., Any])
 P = ParamSpec("P")
 R = TypeVar("R")
 Field_Entry: TypeAlias = Tuple[str, type, Field[Any]]
