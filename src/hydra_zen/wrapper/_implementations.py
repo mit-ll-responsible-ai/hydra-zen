@@ -1134,6 +1134,7 @@ class ZenStore:
         "_deferred_to_config",
         "_deferred_store",
         "_overwrite_ok",
+        "_warn_node_kwarg",
     )
 
     def __init__(
@@ -1143,6 +1144,7 @@ class ZenStore:
         deferred_to_config: bool = True,
         deferred_hydra_store: bool = True,
         overwrite_ok: bool = False,
+        warn_node_kwarg: bool = True,
     ) -> None:
         """
         Parameters
@@ -1150,18 +1152,26 @@ class ZenStore:
         name : Optional[str]
             The name for this store.
 
-        deferred_to_config : bool, optional (default=True)
+        deferred_to_config : bool, default=True
             If `True` (default), this store will a not apply `to_config` to the
             target until that specific entry is accessed by the store.
 
-        deferred_hydra_store : bool, optional (default=True)
+        deferred_hydra_store : bool, default=True
             If `True` (default), this store will not add entries to Hydra's global
             config store until `store.add_to_hydra_store` is called explicitly.
 
-        overwrite_ok : bool, optional (default=False)
+        overwrite_ok : bool, default=False
             If `False` (default), attempting to overwrite entries in this store and
             trying to use this store to overwrite entries in Hydra's global store
             will raise a `ValueError`.
+
+        warn_node_kwarg: bool, default=True
+            If `True` specifying a `node` kwarg in `ZenStore.__call__` will emit a
+            warning.
+
+            This helps to protect users from mistakenly self-partializing a store
+            with `store(node=Config)` instead of actually storing the node with
+            `store(Config)`.
         """
         if not isinstance(deferred_to_config, bool):  # type: ignore
             raise TypeError(
@@ -1189,6 +1199,8 @@ class ZenStore:
         self._overwrite_ok = overwrite_ok
         # Contains the current default arguments for `self.__call__`
         self._defaults: _StoreCallSig = defaults.copy()
+
+        self._warn_node_kwarg = warn_node_kwarg
 
     def __repr__(self) -> str:
         # TODO: nicer repr?
@@ -1301,11 +1313,20 @@ class ZenStore:
             has updated default arguments.
         """
         if __target is None:
+            if self._warn_node_kwarg and "node" in kw:
+                warnings.warn(
+                    "hydra-zen's store API does not use the `node` keyword. To store a config, specify it as a positional argument: `store(<config>)`.\n\nIf the use of `node` was intentional, you can suppress this warning by using a store that is initialized via `ZenStore(warn_node_kwarg=False)."
+                )
+                # warnings.warn(
+                #     f"\nCalling `store(node=<config>, ...)` does not store a config. The appropriate syntax is to use a positional argument:\n\t`store(node=<config>)` -> `store(<config>)`.\nIf this was intentional, you can suppress this warning by using a store initialized via `ZenStore(warn_node_kwarg=False)."
+                # )
+
             _s = type(self)(
                 self.name,
                 deferred_to_config=self._deferred_to_config,
                 deferred_hydra_store=self._deferred_store,
                 overwrite_ok=self._overwrite_ok,
+                warn_node_kwarg=self._warn_node_kwarg,
             )
             _s._defaults = self._defaults.copy()
 

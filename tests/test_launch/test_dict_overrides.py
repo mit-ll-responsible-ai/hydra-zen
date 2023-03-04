@@ -17,6 +17,7 @@ from hydra_zen import (
     make_config,
     multirun,
 )
+from hydra_zen._compatibility import HYDRA_VERSION, Version
 from hydra_zen._launch import value_check
 
 any_types = st.from_type(type)
@@ -84,7 +85,9 @@ def test_overrides_roundtrip(
         "+list_": hydra_list(list_),
         "+mrun": multirun(mrun),
     }
-    (jobs,) = launch(make_config(), instantiate, overrides, multirun=True)
+    (jobs,) = launch(
+        make_config(), instantiate, overrides, multirun=True, version_base="1.2"
+    )
 
     assert len(jobs) == len(mrun)
     for i, job in enumerate(jobs):
@@ -132,8 +135,22 @@ def test_overrides_kwargs_roundtrip(
         "+list_": hydra_list(list_),
         "+mrun": multirun(mrun),
     }
-    jobs = launch(make_config(), instantiate, ["+foo=1"], multirun=True, **overrides)
-    jobs1 = launch(make_config(), instantiate, {"+foo": 2}, multirun=True, **overrides)
+    jobs = launch(
+        make_config(),
+        instantiate,
+        ["+foo=1"],
+        multirun=True,
+        **overrides,
+        version_base="1.2",
+    )
+    jobs1 = launch(
+        make_config(),
+        instantiate,
+        {"+foo": 2},
+        multirun=True,
+        **overrides,
+        version_base="1.2",
+    )
 
     assert len(jobs[0]) == len(mrun)
     assert len(jobs1[0]) == len(mrun)
@@ -180,7 +197,12 @@ def test_overrides_yaml(
         "+list_": hydra_list(list_),
         "+mrun": multirun(mrun),
     }
-    (jobs,) = launch(make_config(), instantiate, overrides, multirun=True)
+    if HYDRA_VERSION >= Version(1, 2, 0):
+        overrides["hydra.job.chdir"] = True
+
+    (jobs,) = launch(
+        make_config(), instantiate, overrides, multirun=True, version_base="1.2"
+    )
 
     assert len(jobs) == len(mrun)
     for i, job in enumerate(jobs):
