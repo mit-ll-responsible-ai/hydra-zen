@@ -789,3 +789,9 @@ def test_configure_hydra_chdir(inp: str):
     if inp:
         cli.append(inp)
     subprocess.run(cli).check_returncode()
+
+
+def test_node_warns():
+    store = ZenStore(warn_node_kwarg=True)
+    with pytest.warns(UserWarning):
+        store(node=builds(int))
