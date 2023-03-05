@@ -1654,11 +1654,12 @@
         <span class="k">if</span> <span class="n">__target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warn_node_kwarg</span> <span class="ow">and</span> <span class="s2">&quot;node&quot;</span> <span class="ow">in</span> <span class="n">kw</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="s2">&quot;hydra-zen&#39;s store API does not use the `node` keyword. To store a config, specify it as a positional argument: `store(&lt;config&gt;)`.</span><span class="se">\n\n</span><span class="s2">If the use of `node` was intentional, you can suppress this warning by using a store that is initialized via `ZenStore(warn_node_kwarg=False).&quot;</span>
+                    <span class="s2">&quot;hydra-zen&#39;s store API does not use the `node` keyword. To store a &quot;</span>
+                    <span class="s2">&quot;config, specify it as a positional argument: `store(&lt;config&gt;)`.&quot;</span>
+                    <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">If the use of `node` was intentional, you can suppress this &quot;</span>
+                    <span class="s2">&quot;warning by using a store that is initialized via `ZenStore&quot;</span>
+                    <span class="s2">&quot;(warn_node_kwarg=False).&quot;</span>
                 <span class="p">)</span>
-                <span class="c1"># warnings.warn(</span>
-                <span class="c1">#     f&quot;\nCalling `store(node=&lt;config&gt;, ...)` does not store a config. The appropriate syntax is to use a positional argument:\n\t`store(node=&lt;config&gt;)` -&gt; `store(&lt;config&gt;)`.\nIf this was intentional, you can suppress this warning by using a store initialized via `ZenStore(warn_node_kwarg=False).&quot;</span>
-                <span class="c1"># )</span>
 
             <span class="n">_s</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>

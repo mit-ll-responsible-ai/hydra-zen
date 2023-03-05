@@ -719,6 +719,26 @@
 <span class="sd">    a: 1</span>
 <span class="sd">    b: foo</span>
 <span class="sd">    c: 22</span>
+
+<span class="sd">    **Using hydra_zen.multirun**</span>
+
+<span class="sd">    Multi-run values can be specified directly, without having to form a quoted multi-run string, by using the `hydra_zen.multi_run` list to store the values.</span>
+
+<span class="sd">    &gt;&gt;&gt; import random</span>
+<span class="sd">    &gt;&gt;&gt; from hydra_zen import launch, instantiate, make_config, multirun</span>
+<span class="sd">    &gt;&gt;&gt; values_for_experiment = [random.uniform(0, 1) for i in range(10)]</span>
+
+<span class="sd">    &gt;&gt;&gt; jobs = launch(</span>
+<span class="sd">    ...     make_config(),</span>
+<span class="sd">    ...     instantiate,</span>
+<span class="sd">    ...     overrides={</span>
+<span class="sd">    ...          &quot;+param&quot;: multirun(values_for_experiment)</span>
+<span class="sd">    ...     },</span>
+<span class="sd">    ...     multirun=True</span>
+<span class="sd">    ... )</span>
+
+<span class="sd">    If, instead, you want to configure a list as a single value - not to be iterated</span>
+<span class="sd">    over in a multirun - you can instead use `hydra_zen.hydra_list`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># used for check below</span>

@@ -452,6 +452,25 @@ Let’s launch a multirun that sweeps over three configurations</p>
 <span class="go">c: 22</span>
 </pre></div>
 </div>
+<p><strong>Using hydra_zen.multirun</strong></p>
+<p>Multi-run values can be specified directly, without having to form a quoted multi-run string, by using the <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.multi_run</span></code> list to store the values.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/random.html#module-random" title="random"><span class="nn">random</span></a>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><span class="n">launch</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">,</span> <span class="n">multirun</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">values_for_experiment</span> <span class="o">=</span> <span class="p">[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/random.html#random.uniform" title="random.uniform"><span class="n">random</span><span class="o">.</span><span class="n">uniform</span></a><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#range" title="range"><span class="nb">range</span></a><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">jobs</span> <span class="o">=</span> <span class="n">launch</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">make_config</span><span class="p">(),</span>
+<span class="gp">... </span>    <span class="n">instantiate</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">overrides</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>         <span class="s2">"+param"</span><span class="p">:</span> <span class="n">multirun</span><span class="p">(</span><span class="n">values_for_experiment</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="p">},</span>
+<span class="gp">... </span>    <span class="n">multirun</span><span class="o">=</span><span class="kc">True</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If, instead, you want to configure a list as a single value - not to be iterated
+over in a multirun - you can instead use <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.hydra_list</span></code>.</p>
 </dd></dl>
 </section>
 </article>

@@ -235,33 +235,27 @@
 <section id="customize-hydra-s-configuration">
 <h1>Customize Hydra’s Configuration<a class="headerlink" href="#customize-hydra-s-configuration" title="Permalink to this heading">#</a></h1>
 <p>Hydra is highly configurable. The way that Hydra runs jobs, logs information, manages job directories are among its many configurable components <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. This How-To guide demonstrates how to configure Hydra from within a Python module <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
-<p>To configure Hydra using hydra-zen we must update the default instance of <code class="xref py py-class docutils literal notranslate"><span class="pre">hydra.conf.HydraConf</span></code> (which is a <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataclasses.dataclass()</span></code></a>) that is stored under the <code class="xref py py-obj docutils literal notranslate"><span class="pre">group="hydra",</span> <span class="pre">name="config"</span></code> entry in Hydra’s config store.
-Thus we can simply create our own <code class="xref py py-class docutils literal notranslate"><span class="pre">hydra.conf.HydraConf</span></code> instance and overwrite store’s entry.</p>
+<p>To configure Hydra using hydra-zen we must update the default instance of <code class="xref py py-class docutils literal notranslate"><span class="pre">hydra.conf.HydraConf</span></code> (which is a <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataclasses.dataclass()</span></code></a>).
+Thus we can simply create our own <code class="xref py py-class docutils literal notranslate"><span class="pre">hydra.conf.HydraConf</span></code> instance and overwrite store’s entry; <code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenStore</span></code> will automatically place this under the appropriate <code class="xref py py-obj docutils literal notranslate"><span class="pre">group="hydra",</span> <span class="pre">name="config"</span></code> entry in Hydra’s config store.</p>
 <p>In this example, we configure Hydra to automatically change the runtime working directory to that of the job’s output directory. I.e., we set <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra.job.chdir=True</span></code>:</p>
 <div class="literal-block-wrapper docutils container" id="id5">
 <div class="code-block-caption"><span class="caption-text">Contents of <code class="xref py py-obj docutils literal notranslate"><span class="pre">my_app.py</span></code></span><a class="headerlink" href="#id5" title="Permalink to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">,</span> <span class="n">store</span>
 <span class="kn">from</span> <span class="nn">hydra.conf</span> <span class="kn">import</span> <span class="n">HydraConf</span><span class="p">,</span> <span class="n">JobConf</span>
 
-<span class="c1"># Storing a new configuration Hydra (setting `hydra.job.chdir=True`)</span>
-<span class="n">store</span><span class="p">(</span><span class="n">HydraConf</span><span class="p">(</span><span class="n">job</span><span class="o">=</span><span class="n">JobConf</span><span class="p">(</span><span class="n">chdir</span><span class="o">=</span><span class="kc">True</span><span class="p">)),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"config"</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s2">"hydra"</span><span class="p">)</span>
-
-<span class="c1"># An empty config for our trivial task function</span>
-<span class="n">store</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"task"</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">task</span><span class="p">():</span>
+<span class="k">def</span> <span class="nf">task</span><span class="p">():</span>  <span class="c1"># just an example task function - no important details</span>
     <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/os.html#module-os" title="os"><span class="nn">os</span></a>
     <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="sa">f</span><span class="s2">"working dir: </span><span class="si">{</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/os.html#os.getcwd" title="os.getcwd"><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span></a><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-
 <span class="k">if</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/reference/import.html#name__" title="__name__"><span class="vm">__name__</span></a> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
-    <span class="c1"># notice the `overwite_ok` flag!</span>
-    <span class="n">store</span><span class="o">.</span><span class="n">add_to_hydra_store</span><span class="p">(</span><span class="n">overwrite_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">store</span><span class="p">(</span><span class="n">HydraConf</span><span class="p">(</span><span class="n">job</span><span class="o">=</span><span class="n">JobConf</span><span class="p">(</span><span class="n">chdir</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>  <span class="c1"># store `hydra.job.chdir=True`</span>
+    <span class="n">store</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>  <span class="c1"># create &amp; store config for our task fn</span>
+    <span class="n">store</span><span class="o">.</span><span class="n">add_to_hydra_store</span><span class="p">()</span>
+
     <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">(</span><span class="n">task</span><span class="p">)</span><span class="o">.</span><span class="n">hydra_main</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_name</span><span class="o">=</span><span class="s2">"task"</span><span class="p">,</span> <span class="n">version_base</span><span class="o">=</span><span class="s2">"1.2"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<p>Take note that, because we must replace the current Hydra configuration in Hydra’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">ConfigStore</span></code>, we must set the flag <code class="xref py py-obj docutils literal notranslate"><span class="pre">overwrite_ok=True</span></code> in <a class="reference internal" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.add_to_hydra_store" title="hydra_zen.ZenStore.add_to_hydra_store"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_to_hydra_store()</span></code></a>.</p>
 <p>Let’s confirm that we have successfully changed Hydra’s configuration. By default,
 our app’s working dir should be job’s the time-stamped output directory.</p>
 <div class="literal-block-wrapper docutils container" id="id6">
@@ -286,7 +280,7 @@ our app’s working dir should be job’s the time-stamped output directory.</p>
 </aside>
 <aside class="footnote brackets" id="id4" role="note">
 <span class="label"><span class="fn-bracket">[</span><a href="#id2" role="doc-backlink">2</a><span class="fn-bracket">]</span></span>
-<p>Hydra’s documentation for configuring Hydra focuses on yaml-based and CLI-based approaches. hydra-zen promotes a pure-Python approach to Hydra and thus this guide follows suite.</p>
+<p>Hydra’s documentation for configuring Hydra focuses on yaml-based and CLI-based approaches. In contrast, hydra-zen promotes a pure-Python approach to Hydra and thus this guide follows suite.</p>
 </aside>
 </aside>
 </section>
