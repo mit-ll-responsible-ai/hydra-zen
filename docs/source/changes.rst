@@ -68,7 +68,7 @@ CLI-compatible strings when calling `launch`, now overrides can be passed to the
 
 Improvements
 ------------
-- :func:`hydra_zen.launch` now supports dictionary overrides and will automatically convery basic Python types to CLI-compatible strings. See :pull:`313`.
+- :func:`hydra_zen.launch` now supports dictionary overrides and will automatically convert basic Python types to CLI-compatible strings. See :pull:`313`.
 - :class:`hydra_zen.ZenStore` now provides specialized support for storing instances/subclasses of `HydraConf`. See :issue:`395`.
 - Adds auto-config support for jax 0.4.0. See :pull:`414`.
 - Improved the type annotations of :class:`~hydra_zen.wrappers.ZenStore`. See :pull:`409`.
