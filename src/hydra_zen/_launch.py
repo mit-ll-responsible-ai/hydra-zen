@@ -380,6 +380,26 @@ def launch(
     a: 1
     b: foo
     c: 22
+
+    **Using hydra_zen.multirun**
+
+    Multi-run values can be specified directly, without having to form a quoted multi-run string, by using the `hydra_zen.multi_run` list to store the values.
+
+    >>> import random
+    >>> from hydra_zen import launch, instantiate, make_config, multirun
+    >>> values_for_experiment = [random.uniform(0, 1) for i in range(10)]
+
+    >>> jobs = launch(
+    ...     make_config(),
+    ...     instantiate,
+    ...     overrides={
+    ...          "+param": multirun(values_for_experiment)
+    ...     },
+    ...     multirun=True
+    ... )
+
+    If, instead, you want to configure a list as a single value - not to be iterated
+    over in a multirun - you can instead use `hydra_zen.hydra_list`.
     """
 
     # used for check below

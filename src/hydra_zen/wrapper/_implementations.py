@@ -1315,11 +1315,12 @@ class ZenStore:
         if __target is None:
             if self._warn_node_kwarg and "node" in kw:
                 warnings.warn(
-                    "hydra-zen's store API does not use the `node` keyword. To store a config, specify it as a positional argument: `store(<config>)`.\n\nIf the use of `node` was intentional, you can suppress this warning by using a store that is initialized via `ZenStore(warn_node_kwarg=False)."
+                    "hydra-zen's store API does not use the `node` keyword. To store a "
+                    "config, specify it as a positional argument: `store(<config>)`."
+                    "\n\nIf the use of `node` was intentional, you can suppress this "
+                    "warning by using a store that is initialized via `ZenStore"
+                    "(warn_node_kwarg=False)."
                 )
-                # warnings.warn(
-                #     f"\nCalling `store(node=<config>, ...)` does not store a config. The appropriate syntax is to use a positional argument:\n\t`store(node=<config>)` -> `store(<config>)`.\nIf this was intentional, you can suppress this warning by using a store initialized via `ZenStore(warn_node_kwarg=False)."
-                # )
 
             _s = type(self)(
                 self.name,

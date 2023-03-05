@@ -9,20 +9,70 @@ This is a record of all past hydra-zen releases and what went into them, in reve
 chronological order. All previous releases should still be available on pip.
 
 
-.. _v0.10.0rc1:
+.. _v0.10.0:
 
-----------------------
-0.10.0rc1 - 2023-02-03
-----------------------
+-------------------
+0.10.0 - 2023-03-05
+-------------------
 
-.. note:: This is documentation for an unreleased version of hydra-zen. You can try out this pre-release version using `pip install --pre hydra-zen`
+Release Highlights
+------------------
+:func:`hydra_zen.launch` now accepts non-string values for its overrides, and it 
+accepts a dictionary for improved ergonomics. Previously, users had to form Hydra 
+CLI-compatible strings when calling `launch`, now overrides can be passed to the 
+`launch` API as their native types. 
+
+
+.. tab-set::
+
+   .. tab-item:: old launch
+
+      .. code-block:: python
+         :caption: Manually forming CLI-compatible overrides
+      
+         from hydra_zen import launch, instantiate, make_config
+
+         values_for_experiment = [random.uniform(0, 1) for i in range(10)]
+
+         jobs = launch(
+            make_config(a=None, b=None),
+            instantiate,
+            overrides=[
+                  "a=1",
+                  "b=[1,2,3]",
+                  "+param=" + ",".join([str(i) for i in values_for_experiment])
+            ],
+            multirun=True
+         )
+
+   .. tab-item:: improved launch
+
+      .. code-block:: python
+         :caption: Specifying native Python values in launch API
+      
+         from hydra_zen import launch, instantiate, make_config, multirun, hydra_list
+
+         values_for_experiment = [random.uniform(0, 1) for i in range(10)]
+
+         jobs = launch(
+            make_config(a=None, b=None),
+            instantiate,
+            overrides={
+                  "a": 1,
+                  "b": hydra_list([1, 2, 3]),
+                  "+param": multirun(values_for_experiment)
+            },
+            multirun=True
+         )
+
 
 Improvements
 ------------
-- :func:`hydra_zen.launch` now supports dictionary overrides. See :pull:`313`.
+- :func:`hydra_zen.launch` now supports dictionary overrides and will automatically convert basic Python types to CLI-compatible strings. See :pull:`313`.
 - :class:`hydra_zen.ZenStore` now provides specialized support for storing instances/subclasses of `HydraConf`. See :issue:`395`.
 - Adds auto-config support for jax 0.4.0. See :pull:`414`.
 - Improved the type annotations of :class:`~hydra_zen.wrappers.ZenStore`. See :pull:`409`.
+- :func:`hydra_zen.builds` now has type-conversion support for `dataclasses.InitVar`. See :pull:`418`.
 
 
 --------------------------
