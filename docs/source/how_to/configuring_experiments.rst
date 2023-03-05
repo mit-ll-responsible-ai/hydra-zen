@@ -178,8 +178,7 @@ To do this we implement new experiment configurations that:
         name="nglite",
     )
 
-Each experiment can then be run from command line by prefixing the experiment choice with a `+` since the
-`experiment` config group is an addition and not an override (i.e. our top-level config does not contain an `experiment` group by default). Here are examples of ways that we can run our experiments from the CLI:
+Now the configuration for either "experiment" can be specified by-name from the CLI. Because the `experiment` group is not present in the original config, we must specify the group with a `+` prefix: `+experiment`. Here are examples of ways that we can run our experiments from the CLI:
 
 .. tab-set::
 
