@@ -959,6 +959,59 @@ class ZenStore:
     enables store-decorator patterns to be used within library code without slowing
     down import times.
 
+    **Self-partialing patterns**
+
+    A `ZenStore` instance can be called repeatedly - without a config target - with
+    different options to incrementally change the store's default configurations. E.g.
+    the following are effectively equivalent
+
+    .. tab-set::
+
+      .. tab-item:: Self-partialing pattern
+
+         .. code-block:: python
+
+               from hydra_zen import store
+
+               book_store = store(group="books")
+               romance_store = book_store(provider="genre: romance")
+               fantasy_store = book_store(provider="genre: fantasy")
+
+               romance_store({"title": "heartfelt"})
+               romance_store({"title": "lustfully longingness"})
+
+               fantasy_store({"title": "elvish cookbook"})
+               fantasy_store({"title": "dwarves can't jump"})
+
+
+      .. tab-item:: Manual pattern
+
+         .. code-block:: python
+
+            from hydra_zen import store
+
+            store(
+                {"title": "heartfelt"},
+                group="book",
+                provider="genre: romance",
+            )
+            store(
+                {"title": "lustfully longingness"},
+                group="book",
+                provider="genre: romance",
+            )
+
+            store(
+                {"title": "elvish cookbook"},
+                group="book",
+                provider="genre: fantasy",
+            )
+            store(
+                {"title": "dwarves can't jump"},
+                group="book",
+                provider="genre: fantasy",
+            )
+
     **Configuring Hydra itself**
 
     Special support is provided for overriding Hydra's configuration; the name and
@@ -1149,6 +1202,7 @@ class ZenStore:
     >>> schemaless = profile_store(schema="<none>")
 
     >>> from dataclasses import dataclass
+    >>>
     >>> @profile_store(name="admin", has_root=True)
     >>> @schemaless(name="test_admin", has_root=True)
     >>> @schemaless(name="test_user", has_root=False)
