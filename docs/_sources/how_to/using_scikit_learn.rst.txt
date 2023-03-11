@@ -41,7 +41,7 @@ Configuring and Building an Experiment
             def func(x, y): 
                ...
          
-            store(func, x=2, y=3, name="func")
+            store(func, x=2, y=3)
    
    
       .. tab-item:: Without auto-config

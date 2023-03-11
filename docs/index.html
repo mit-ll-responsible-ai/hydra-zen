@@ -22,8 +22,6 @@
 <link href="_static/copybutton.css" rel="stylesheet" type="text/css"/>
 <link href="_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css"/>
 <link href="_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" rel="stylesheet" type="text/css"/>
-<link href="_static/hydra_zen_favicon_32x32.png" rel="icon" sizes="32x32" type="image/png"/>
-<link href="_static/hydra_zen_favicon_64x64.png" rel="icon" sizes="64x64" type="image/png"/>
 <!-- Pre-loaded scripts that we'll load fully later -->
 <link as="script" href="_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d" rel="preload"/>
 <link as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d" rel="preload"/>
@@ -229,22 +227,208 @@ document.write(`
 <p>hydra-zen is a Python library that makes the <a class="reference external" href="https://hydra.cc/">Hydra framework</a>
 simpler and more elegant to use. Use hydra-zen to design your project to be:</p>
 <ul class="simple">
-<li><p><strong>Configurable</strong>: change deeply-nested parameters and swap out entire pieces of your program, all from the command line.</p></li>
+<li><p><strong>Configurable</strong>: Change deeply-nested parameters and swap out entire pieces of your program, all from the command line.</p></li>
 <li><p><strong>Repeatable</strong>: each run of your code will be self-documenting; the full configuration of your software is saved alongside your results.</p></li>
 <li><p><strong>Scalable</strong>: launch multiple runs of your software, be it on your local machine or across multiple nodes on a cluster.</p></li>
 </ul>
-<p>It provides functions that <a class="reference internal" href="api_reference.html#create-config"><span class="std std-ref">dynamically</span></a> and <a class="reference internal" href="api_reference.html#additional-types"><span class="std std-ref">automatically</span></a> generate configs for your code, which help to eliminate
+<p><strong>hydra-zen eliminates all hand-written yaml configs from your Hydra project</strong>. It does
+so by providing functions that <a class="reference internal" href="api_reference.html#create-config"><span class="std std-ref">dynamically</span></a> and
+<a class="reference internal" href="api_reference.html#additional-types"><span class="std std-ref">automatically</span></a> generate dataclass-based configs for your code.
+It also provides a <a class="reference internal" href="generated/hydra_zen.ZenStore.html#zenstore"><span class="std std-ref">custom config-store API</span></a> and
+<a class="reference internal" href="generated/hydra_zen.zen.html#zenwrap"><span class="std std-ref">task-function wrapper</span></a>, which help to eliminate most of the
 Hydra-specific boilerplate from your project.</p>
 <p>hydra-zen is fully compatible with Hydra, and is appropriate for use in both rapid
 prototypes and production-grade code. It is also great for designing your data science
 and machine learning research to be reproducible. hydra-zen provides specialized
 support for using NumPy, Jax, PyTorch, and Lightning (a.k.a PyTorch-Lightning) in your
 Hydra application.</p>
+<section id="hydra-zen-at-a-glance">
+<h2>hydra-zen at a glance<a class="headerlink" href="#hydra-zen-at-a-glance" title="Permalink to this heading">#</a></h2>
+<p>Suppose you have the following library code.</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Some library code that we want to be able to configure and run from the CLI.</span><a class="headerlink" href="#id1" title="Permalink to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Contents of baby_torch.py</span>
+
+<span class="c1"># Note: no Hydra/hydra-zen specific code here!</span>
+
+<span class="k">def</span> <span class="nf">relu</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="o">...</span>
+<span class="k">def</span> <span class="nf">sigmoid</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="o">...</span>
+
+<span class="k">class</span> <span class="nc">Model</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">activation</span><span class="p">,</span> <span class="n">nlayers</span><span class="p">,</span> <span class="n">logits</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">summary</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Model:</span><span class="se">\n</span><span class="s2">-</span><span class="si">{</span><span class="n">activation</span><span class="si">=}</span><span class="se">\n</span><span class="s2">-</span><span class="si">{</span><span class="n">nlayers</span><span class="si">=}</span><span class="se">\n</span><span class="s2">-</span><span class="si">{</span><span class="n">logits</span><span class="si">=}</span><span class="s2">"</span>
+
+<span class="k">class</span> <span class="nc">DataLoader</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">shuffle_batch</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">summary</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"DataLoader:</span><span class="se">\n</span><span class="s2">-</span><span class="si">{</span><span class="n">batch_size</span><span class="si">=}</span><span class="se">\n</span><span class="s2">-</span><span class="si">{</span><span class="n">shuffle_batch</span><span class="si">=}</span><span class="se">\n</span><span class="s2">"</span>
+
+<span class="k">def</span> <span class="nf">train_fn</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">Model</span><span class="p">,</span> <span class="n">dataloader</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">num_epochs</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="sa">f</span><span class="s2">"Training with </span><span class="si">{</span><span class="n">num_epochs</span><span class="si">=}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">summary</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"</span><span class="se">\n\n</span><span class="s2">"</span><span class="p">)</span>
+    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">dataloader</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>We want to be able to configure and run the <code class="xref py py-obj docutils literal notranslate"><span class="pre">train_fn</span></code> from the commandline, while being
+able to modify all aspects of its inputs, including nested parameters in <code class="xref py py-obj docutils literal notranslate"><span class="pre">Model</span></code> and
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">DataLoader</span></code>.</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen</span></code> makes short work of this: we can create and store custom configurations for
+all parts of this library code, and generate a CLI that reflects the resulting hierarchical config.</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Using hydra-zen to create a configurable CLI for running <code class="xref py py-obj docutils literal notranslate"><span class="pre">train_fn</span></code></span><a class="headerlink" href="#id2" title="Permalink to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Contents of train.py</span>
+
+<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><span class="n">just</span></a><span class="p">,</span> <span class="n">store</span>
+
+<span class="kn">from</span> <span class="nn">baby_torch</span> <span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">Model</span><span class="p">,</span> <span class="n">relu</span><span class="p">,</span> <span class="n">sigmoid</span>  <span class="c1"># pyright: ignore</span>
+
+<span class="c1"># Automatically generate and store configs for `Model`</span>
+<span class="n">model_store</span> <span class="o">=</span> <span class="n">store</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">"model"</span><span class="p">)</span>
+<span class="n">model_store</span><span class="p">(</span><span class="n">Model</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"generic"</span><span class="p">)</span>
+<span class="n">model_store</span><span class="p">(</span><span class="n">Model</span><span class="p">,</span> <span class="n">nlayers</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"big"</span><span class="p">)</span>
+<span class="n">model_store</span><span class="p">(</span><span class="n">Model</span><span class="p">,</span> <span class="n">nlayers</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"tiny"</span><span class="p">)</span>
+
+<span class="c1"># Configure that relu/sigmoid should "just" be imported,</span>
+<span class="c1"># not initialized during run.</span>
+<span class="n">activation_store</span> <span class="o">=</span> <span class="n">store</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">"model/activation"</span><span class="p">)</span>
+<span class="n">activation_store</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><span class="n">just</span></a><span class="p">(</span><span class="n">relu</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"relu"</span><span class="p">)</span>
+<span class="n">activation_store</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><span class="n">just</span></a><span class="p">(</span><span class="n">sigmoid</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"sigmoid"</span><span class="p">)</span>
+
+<span class="n">data_store</span> <span class="o">=</span> <span class="n">store</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">"dataloader"</span><span class="p">)</span>
+<span class="n">data_store</span><span class="p">(</span><span class="n">DataLoader</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"train"</span><span class="p">)</span>
+<span class="n">data_store</span><span class="p">(</span><span class="n">DataLoader</span><span class="p">,</span> <span class="n">shuffle_batch</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"test"</span><span class="p">)</span>
+
+<span class="c1"># Configure the top-level function that will be executed from</span>
+<span class="c1"># the CLI; provide the default model &amp; dataloader configs to</span>
+<span class="c1"># use.</span>
+<span class="n">store</span><span class="p">(</span>
+    <span class="n">train_fn</span><span class="p">,</span>
+    <span class="n">hydra_defaults</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">"_self_"</span><span class="p">,</span>
+        <span class="c1"># default config:</span>
+        <span class="c1">#    - 'big' model using relu activation</span>
+        <span class="c1">#    - train-mode dataloader</span>
+        <span class="p">{</span><span class="s2">"model"</span><span class="p">:</span> <span class="s2">"big"</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"model/activation"</span><span class="p">:</span> <span class="s2">"relu"</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"dataloader"</span><span class="p">:</span> <span class="s2">"train"</span><span class="p">},</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+
+<span class="k">if</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/reference/import.html#name__" title="__name__"><span class="vm">__name__</span></a> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a>
+
+    <span class="n">store</span><span class="o">.</span><span class="n">add_to_hydra_store</span><span class="p">()</span>
+
+    <span class="c1"># Generate the CLI For train_fn</span>
+    <a class="sphinx-codeautolink-a" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">(</span><span class="n">train_fn</span><span class="p">)</span><span class="o">.</span><span class="n">hydra_main</span><span class="p">(</span>
+        <span class="n">config_name</span><span class="o">=</span><span class="s2">"train_fn"</span><span class="p">,</span>
+        <span class="n">config_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">version_base</span><span class="o">=</span><span class="s2">"1.3"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># Hydra will accept configuration options from</span>
+    <span class="c1"># the CLI and merge them with the stored configs.</span>
+    <span class="c1">#</span>
+    <span class="c1"># hydra-zen then instantiates these configs</span>
+    <span class="c1"># -- creating the Model &amp; DataLoader instances --</span>
+    <span class="c1"># and passes them to train_fn, running the training code.</span>
+    <span class="c1">#</span>
+    <span class="c1"># Hydra records the exact, reproducible config</span>
+    <span class="c1"># for each run, and saves the results in an</span>
+    <span class="c1"># auto-generated, configurable output dir</span>
+</pre></div>
+</div>
+</div>
+<p>Now we can configure and run <code class="xref py py-obj docutils literal notranslate"><span class="pre">train_fn</span></code> from the CLI exposed by <code class="xref py py-obj docutils literal notranslate"><span class="pre">train.py</span></code>:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio"/>
+<label class="sd-tab-label" for="sd-tab-item-0">
+default</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Running the default config.</span><a class="headerlink" href="#id3" title="Permalink to this code">#</a></div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>train.py
+<span class="go">Training with num_epochs=-1</span>
+
+<span class="go">Model:</span>
+<span class="go">-activation=&lt;function relu at 0x0000016B9C10F280&gt;</span>
+<span class="go">-nlayers=100</span>
+<span class="go">-logits=False</span>
+
+<span class="go">DataLoader:</span>
+<span class="go">-batch_size=10</span>
+<span class="go">-shuffle_batch=True</span>
+</pre></div>
+</div>
+</div>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio"/>
+<label class="sd-tab-label" for="sd-tab-item-1">
+set epoch &amp; use sigmoid</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Training for 2 epochs using sigmoid activation.</span><a class="headerlink" href="#id4" title="Permalink to this code">#</a></div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>train.py<span class="w"> </span><span class="nv">num_epochs</span><span class="o">=</span><span class="m">2</span><span class="w"> </span>model/activation<span class="o">=</span>sigmoid
+<span class="go">Training with num_epochs=2</span>
+
+<span class="go">Model:</span>
+<span class="go">-activation=&lt;function sigmoid at 0x00000185640D4280&gt;</span>
+<span class="go">-nlayers=100</span>
+<span class="go">-logits=False</span>
+
+<span class="go">DataLoader:</span>
+<span class="go">-batch_size=10</span>
+<span class="go">-shuffle_batch=True</span>
+</pre></div>
+</div>
+</div>
+</div>
+<input id="sd-tab-item-2" name="sd-tab-set-0" type="radio"/>
+<label class="sd-tab-label" for="sd-tab-item-2">
+change model &amp; dataloader</label><div class="sd-tab-content docutils">
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">Using tiny model with logits, and use batch size of 22.</span><a class="headerlink" href="#id5" title="Permalink to this code">#</a></div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>train.py<span class="w"> </span><span class="nv">model</span><span class="o">=</span>tiny<span class="w"> </span>model.logits<span class="o">=</span>True<span class="w"> </span>dataloader.batch_size<span class="o">=</span><span class="m">22</span>
+<span class="go">Training with num_epochs=-1</span>
+
+<span class="go">Model:</span>
+<span class="go">-activation=&lt;function relu at 0x0000016B9C10F280&gt;</span>
+<span class="go">-nlayers=2</span>
+<span class="go">-logits=True</span>
+
+<span class="go">DataLoader:</span>
+<span class="go">-batch_size=22</span>
+<span class="go">-shuffle_batch=True</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<p>Each run’s reproducible configuration will be saved as a yaml file; by default Hydra
+places these in a time-stamped directory.</p>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">Viewing the serialized yaml file: training for 2 epochs w/ sigmoid.</span><a class="headerlink" href="#id6" title="Permalink to this code">#</a></div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>less<span class="w"> </span>outputs/2023-03-11/12-13-14/.hydra/config.yaml
+<span class="go">_target_: baby_torch.train_fn</span>
+<span class="go">model:</span>
+<span class="go">  _target_: baby_torch.Model</span>
+<span class="go">  activation:</span>
+<span class="go">    path: baby_torch.sigmoid</span>
+<span class="go">    _target_: hydra_zen.funcs.get_obj</span>
+<span class="go">  nlayers: 100</span>
+<span class="go">  logits: false</span>
+<span class="go">dataloader:</span>
+<span class="go">  _target_: baby_torch.DataLoader</span>
+<span class="go">  batch_size: 10</span>
+<span class="go">  shuffle_batch: true</span>
+<span class="go">num_epochs: 2</span>
+</pre></div>
+</div>
+</div>
+<p>hydra-zen works with arbitrary Python code bases; this example happens to mimic a
+machine learning application but hydra-zen is ultimately application agnostic.</p>
 <div class="admonition-attention-hydra-users admonition">
 <p class="admonition-title">Attention, Hydra users:</p>
 <p>If you are already use Hydra, let’s cut to the chase: <strong>the most important benefit of using hydra-zen is that it automatically and dynamically generates structured configs for you</strong>.</p>
-<div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">Creating a structured config <em>without hydra-zen</em></span><a class="headerlink" href="#id1" title="Permalink to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">Creating a structured config <em>without hydra-zen</em></span><a class="headerlink" href="#id7" title="Permalink to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.field" title="dataclasses.field"><span class="n">field</span></a>
 
 <span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="n">bar</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">baz</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#list" title="list"><span class="nb">list</span></a><span class="p">[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a><span class="p">],</span> <span class="n">qux</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#float" title="float"><span class="nb">float</span></a> <span class="o">=</span> <span class="mf">1.23</span><span class="p">):</span>
@@ -259,44 +443,14 @@ Hydra application.</p>
 </pre></div>
 </div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">Creating an equivalent structured config <em>with hydra-zen</em></span><a class="headerlink" href="#id2" title="Permalink to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id8">
+<div class="code-block-caption"><span class="caption-text">Creating an equivalent structured config <em>with hydra-zen</em></span><a class="headerlink" href="#id8" title="Permalink to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a>
 
 <span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="n">bar</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">baz</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#list" title="list"><span class="nb">list</span></a><span class="p">[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a><span class="p">],</span> <span class="n">qux</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#float" title="float"><span class="nb">float</span></a> <span class="o">=</span> <span class="mf">1.23</span><span class="p">):</span>
     <span class="o">...</span>
 
 <span class="n">ZenFooConf</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">(</span><span class="n">foo</span><span class="p">,</span> <span class="n">bar</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">baz</span><span class="o">=</span><span class="p">[</span><span class="s2">"abc"</span><span class="p">],</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<p>You can even write dataclasses that aren’t natively compatible with Hydra and then use hydra-zen to dynamically convert them to Hydra-compatible structured configs.</p>
-<div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">Converting a general dataclass to a Hydra-compatible structured config</span><a class="headerlink" href="#id3" title="Permalink to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a>
-<span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#module-typing" title="typing"><span class="nn">typing</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="typing.Callable"><span class="n">Callable</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="typing.Sequence"><span class="n">Sequence</span></a>
-
-<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><span class="n">just</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a>
-
-<a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="nd">@dataclass</span></a>
-<span class="k">class</span> <span class="nc">Bar</span><span class="p">:</span>
-   <span class="c1"># annotation not supported by Hydra</span>
-   <span class="n">reduce_fn</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="typing.Callable"><span class="n">Callable</span></a><span class="p">[[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="typing.Sequence"><span class="n">Sequence</span></a><span class="p">[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#float" title="float"><span class="nb">float</span></a><span class="p">]],</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#float" title="float"><span class="nb">float</span></a><span class="p">]</span>
-
-<span class="n">bar</span> <span class="o">=</span> <span class="n">Bar</span><span class="p">(</span><span class="n">reduce_fn</span><span class="o">=</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#sum" title="sum"><span class="nb">sum</span></a><span class="p">)</span>  <span class="c1"># value not supported by Hydra</span>
-
-<span class="n">compat_bar</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><span class="n">just</span></a><span class="p">(</span><span class="n">bar</span><span class="p">)</span>  <span class="c1"># returns a Hydra-compatible structured config!</span>
-
-<span class="k">assert</span> <a class="sphinx-codeautolink-a" href="generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">(</span><span class="n">compat_bar</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"""</span><span class="se">\</span>
-<span class="s2">_target_: __main__.Bar</span>
-<span class="s2">reduce_fn:</span>
-<span class="s2">  _target_: hydra_zen.funcs.get_obj</span>
-<span class="s2">  path: builtins.sum</span>
-<span class="s2">"""</span>
-
-<span class="n">inst_bar</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">(</span><span class="n">compat_bar</span><span class="p">)</span>
-<span class="k">assert</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#isinstance" title="isinstance"><span class="nb">isinstance</span></a><span class="p">(</span><span class="n">inst_bar</span><span class="p">,</span> <span class="n">Bar</span><span class="p">)</span>
-<span class="k">assert</span> <span class="n">inst_bar</span> <span class="o">==</span> <span class="n">bar</span>
 </pre></div>
 </div>
 </div>
@@ -316,6 +470,7 @@ Hydra application.</p>
 <li><p>Leverage a powerful <a class="reference internal" href="generated/hydra_zen.builds.html#zen-wrapper"><span class="std std-ref">functionality-injection framework</span></a> in our Hydra applications.</p></li>
 <li><p>Run static type-checkers on our config-creation code to catch incompatibilities with Hydra.</p></li>
 </ul>
+</section>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">#</a></h2>
 <p>hydra-zen is lightweight: its only dependencies are <code class="docutils literal notranslate"><span class="pre">hydra-core</span></code> and
@@ -373,6 +528,7 @@ will enrich their understanding of hydra-zen and Hydra.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="changes.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="changes.html#documentation-2023-03-11">Documentation - 2023-03-11</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes.html#v0-10-0">0.10.0 - 2023-03-05</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes.html#documentation-2023-01-22">Documentation - 2023-01-22</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changes.html#v0-9-1">0.9.1 - 2023-01-13</a></li>
@@ -424,6 +580,7 @@ will enrich their understanding of hydra-zen and Hydra.</p>
   </div>
 <nav class="bd-toc-nav page-toc">
 <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hydra-zen-at-a-glance">hydra-zen at a glance</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#learning-about-hydra-zen">Learning About hydra-zen</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#indices-and-tables">Indices and tables</a></li>

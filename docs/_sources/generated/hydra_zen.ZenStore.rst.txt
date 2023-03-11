@@ -1,3 +1,5 @@
+.. _zenstore:
+
 hydra\_zen.ZenStore
 ===================
 

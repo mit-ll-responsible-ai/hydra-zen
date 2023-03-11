@@ -32,8 +32,6 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-codeautolink.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
-    <link rel="icon" sizes="32x32" type="image/png" href="../../../_static/hydra_zen_favicon_32x32.png" />
-    <link rel="icon" sizes="64x64" type="image/png" href="../../../_static/hydra_zen_favicon_64x64.png" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d" />
@@ -1288,15 +1286,14 @@ document.write(`
 
 
 <div class="viewcode-block" id="ZenStore"><a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore">[docs]</a><span class="k">class</span> <span class="nc">ZenStore</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;An abstraction over Hydra&#39;s config store, which enables users to maintain</span>
-<span class="sd">    multiple, isolated store instances before populating Hydra&#39;s global config store.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An abstraction over Hydra&#39;s store, for creating multiple, isolated config stores.</span>
 
-<span class="sd">    `ZenStore` is also designed to consolidate the config-creation and storage process;</span>
-<span class="sd">    it can be used to decorate config-targets and dataclasses, enabling &quot;inline&quot; config</span>
-<span class="sd">    creation and storage patterns. This is also a &quot;self-partialing&quot; object, meaning a</span>
-<span class="sd">    store instance can overwrite its own default values. Please consult the</span>
-<span class="sd">    :ref:`examples &lt;self-partial&gt;` for more details.</span>
+<span class="sd">    Whereas Hydra exposes a single, global config store that provides no warnings when store entries are overwritted, `ZenStore` instances are isolated, do not populate</span>
+<span class="sd">    the global store unless instructed to, and they protect users from unwittingly overwriting store entries.</span>
 
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
 <span class="sd">    `hydra_zen.store` is available as a pre-instantiated, globally-available store,</span>
 <span class="sd">    which is initialized as:</span>
 
@@ -1308,8 +1305,105 @@ document.write(`
 <span class="sd">           deferred_hydra_store=True,</span>
 <span class="sd">       )</span>
 
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
+<span class="sd">    Internally, each `ZenStore` instance holds a mapping of::</span>
+
+<span class="sd">        tuple[group, name] -&gt;  {node: Dataclass | omegaconf.Container,</span>
+<span class="sd">                                name: str,</span>
+<span class="sd">                                group: str,</span>
+<span class="sd">                                package: Optional[str],</span>
+<span class="sd">                                provider: Optional[str]}</span>
+
+<span class="sd">    **Auto-config capabilities**</span>
+
+<span class="sd">    `ZenStore` is also designed to consolidate the config-creation and storage process;</span>
+<span class="sd">    it can be used to automatically create config-creation functions</span>
+<span class="sd">    (e.g., `~hydra_zen.builds`) to a target, to auto-generate a config for the target</span>
+<span class="sd">    that is then stored.</span>
+
+<span class="sd">    .. tab-set::</span>
+
+<span class="sd">      .. tab-item:: Via auto-config</span>
+
+<span class="sd">         .. code-block:: python</span>
+
+<span class="sd">            from hydra_zen import store</span>
+<span class="sd">            def func(x, y): ...</span>
+
+<span class="sd">            store(func, x=2, y=3)</span>
+
+
+<span class="sd">      .. tab-item:: Via manually-specified config</span>
+
+<span class="sd">         .. code-block:: python</span>
+
+<span class="sd">            from hydra_zen import builds, store</span>
+<span class="sd">            def func(x, y): ...</span>
+
+<span class="sd">            store(builds(func, x=2, y=3, populate_full_signature=True), name=&quot;func&quot;)</span>
+
+<span class="sd">    It can also be used to decorate config-targets and dataclasses, enabling &quot;inline&quot;</span>
+<span class="sd">    config creation and storage patterns.</span>
+
+<span class="sd">    These auto config-creation capabilities are designed to be deferred until a</span>
+<span class="sd">    config is actually accessed by users or added to Hydra&#39;s global config store. This</span>
+<span class="sd">    enables store-decorator patterns to be used within library code without slowing</span>
+<span class="sd">    down import times.</span>
+
+<span class="sd">    **Self-partialing patterns**</span>
+
+<span class="sd">    A `ZenStore` instance can be called repeatedly - without a config target - with</span>
+<span class="sd">    different options to incrementally change the store&#39;s default configurations. E.g.</span>
+<span class="sd">    the following are effectively equivalent</span>
+
+<span class="sd">    .. tab-set::</span>
+
+<span class="sd">      .. tab-item:: Self-partialing pattern</span>
+
+<span class="sd">         .. code-block:: python</span>
+
+<span class="sd">               from hydra_zen import store</span>
+
+<span class="sd">               book_store = store(group=&quot;books&quot;)</span>
+<span class="sd">               romance_store = book_store(provider=&quot;genre: romance&quot;)</span>
+<span class="sd">               fantasy_store = book_store(provider=&quot;genre: fantasy&quot;)</span>
+
+<span class="sd">               romance_store({&quot;title&quot;: &quot;heartfelt&quot;})</span>
+<span class="sd">               romance_store({&quot;title&quot;: &quot;lustfully longingness&quot;})</span>
+
+<span class="sd">               fantasy_store({&quot;title&quot;: &quot;elvish cookbook&quot;})</span>
+<span class="sd">               fantasy_store({&quot;title&quot;: &quot;dwarves can&#39;t jump&quot;})</span>
+
+
+<span class="sd">      .. tab-item:: Manual pattern</span>
+
+<span class="sd">         .. code-block:: python</span>
+
+<span class="sd">            from hydra_zen import store</span>
+
+<span class="sd">            store(</span>
+<span class="sd">                {&quot;title&quot;: &quot;heartfelt&quot;},</span>
+<span class="sd">                group=&quot;book&quot;,</span>
+<span class="sd">                provider=&quot;genre: romance&quot;,</span>
+<span class="sd">            )</span>
+<span class="sd">            store(</span>
+<span class="sd">                {&quot;title&quot;: &quot;lustfully longingness&quot;},</span>
+<span class="sd">                group=&quot;book&quot;,</span>
+<span class="sd">                provider=&quot;genre: romance&quot;,</span>
+<span class="sd">            )</span>
+
+<span class="sd">            store(</span>
+<span class="sd">                {&quot;title&quot;: &quot;elvish cookbook&quot;},</span>
+<span class="sd">                group=&quot;book&quot;,</span>
+<span class="sd">                provider=&quot;genre: fantasy&quot;,</span>
+<span class="sd">            )</span>
+<span class="sd">            store(</span>
+<span class="sd">                {&quot;title&quot;: &quot;dwarves can&#39;t jump&quot;},</span>
+<span class="sd">                group=&quot;book&quot;,</span>
+<span class="sd">                provider=&quot;genre: fantasy&quot;,</span>
+<span class="sd">            )</span>
+
+<span class="sd">    **Configuring Hydra itself**</span>
+
 <span class="sd">    Special support is provided for overriding Hydra&#39;s configuration; the name and</span>
 <span class="sd">    group of the store entry is inferred to be &#39;config&#39; and &#39;hydra&#39;, respectively,</span>
 <span class="sd">    when an instance/subclass of `HydraConf` is being stored. E.g., specifying</span>
@@ -1332,6 +1426,8 @@ document.write(`
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
+<span class="sd">    (Some helpful boilerplate code for these examples)</span>
+
 <span class="sd">    &gt;&gt;&gt; from hydra_zen import to_yaml, store, ZenStore</span>
 <span class="sd">    &gt;&gt;&gt; def pyaml(x):</span>
 <span class="sd">    ...     # for pretty printing configs</span>
@@ -1496,6 +1592,7 @@ document.write(`
 <span class="sd">    &gt;&gt;&gt; schemaless = profile_store(schema=&quot;&lt;none&gt;&quot;)</span>
 
 <span class="sd">    &gt;&gt;&gt; from dataclasses import dataclass</span>
+<span class="sd">    &gt;&gt;&gt;</span>
 <span class="sd">    &gt;&gt;&gt; @profile_store(name=&quot;admin&quot;, has_root=True)</span>
 <span class="sd">    &gt;&gt;&gt; @schemaless(name=&quot;test_admin&quot;, has_root=True)</span>
 <span class="sd">    &gt;&gt;&gt; @schemaless(name=&quot;test_user&quot;, has_root=False)</span>
@@ -1637,8 +1734,6 @@ document.write(`
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">F</span><span class="p">:</span>
         <span class="o">...</span>
 
-    <span class="c1"># TODO: ZenStore -&gt; Self when mypy adds support for Self</span>
-    <span class="c1">#       https://github.com/python/mypy/pull/11666</span>
     <span class="nd">@overload</span>
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
@@ -1670,6 +1765,7 @@ document.write(`
 <span class="sd">        name : NodeName | Callable[[T], NodeName]</span>
 <span class="sd">            The entry&#39;s name, or a callable that will be called as</span>
 <span class="sd">            `(obj) -&gt; entry-name`. The default is `lambda obj: obj.__name__`.</span>
+
 <span class="sd">            Store entries are keyed off of `(group, name)`.</span>
 
 <span class="sd">        group : Optional[GroupName | Callable[[T], GroupName]]</span>
