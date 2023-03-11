@@ -99,18 +99,6 @@ html_theme_options = {
     "navigation_depth": 4,
     "pygment_light_style": "default",
     "pygment_dark_style": "zenburn",
-    "favicons": [
-        {
-            "rel": "icon",
-            "sizes": "32x32",
-            "href": "hydra_zen_favicon_32x32.png",
-        },
-        {
-            "rel": "icon",
-            "sizes": "64x64",
-            "href": "hydra_zen_favicon_64x64.png",
-        },
-    ],
     "icon_links": [
         {
             "name": "GitHub",
@@ -119,6 +107,21 @@ html_theme_options = {
         },
     ],
 }
+
+html_static_path = ["_static"]
+
+favicons = [
+    {
+        "rel": "icon",
+        "sizes": "32x32",
+        "href": "hydra_zen_favicon_32x32.png",
+    },
+    {
+        "rel": "icon",
+        "sizes": "64x64",
+        "href": "hydra_zen_favicon_64x64.png",
+    },
+]
 
 
 def setup(app):
