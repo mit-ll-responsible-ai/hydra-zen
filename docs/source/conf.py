@@ -97,6 +97,8 @@ html_logo = "../../brand/Hydra-Zen_logo_full_light_blue.png"
 html_theme_options = {
     "collapse_navigation": True,
     "navigation_depth": 4,
+    "pygment_light_style": "default",
+    "pygment_dark_style": "zenburn",
     "favicons": [
         {
             "rel": "icon",
