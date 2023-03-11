@@ -82,7 +82,7 @@ all parts of this library code, and generate a CLI that reflects the resulting h
 
    from hydra_zen import just, store
 
-   from baby_torch import DataLoader, Model, relu, sigmoid
+   from baby_torch import DataLoader, Model, relu, sigmoid  # pyright: ignore
    
    # Automatically generate and store configs for `Model`
    model_store = store(group="model")
@@ -201,16 +201,16 @@ places these in a time-stamped directory.
    :caption: Viewing the serialized yaml file: training for 2 epochs w/ sigmoid.
 
    $ less outputs/2023-03-11/12-13-14/.hydra/config.yaml
-   _target_: __main__.train_fn
+   _target_: baby_torch.train_fn
    model:
-     _target_: __main__.Model
+     _target_: baby_torch.Model
      activation:
-       path: __main__.sigmoid
+       path: baby_torch.sigmoid
        _target_: hydra_zen.funcs.get_obj
      nlayers: 100
      logits: false
    dataloader:
-     _target_: __main__.DataLoader
+     _target_: baby_torch.DataLoader
      batch_size: 10
      shuffle_batch: true
    num_epochs: 2
