@@ -119,7 +119,7 @@ def test_rst_docs_scan_clean_via_pyright(func, pyright_config):
         report_unnecessary_type_ignore_comment=True,
         preamble=preamble,
         pyright_config=pyright_config,
-        python_version="3.9",
+        python_version="3.10",
     )
     errors = [
         e

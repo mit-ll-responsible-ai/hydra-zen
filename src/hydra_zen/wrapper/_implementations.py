@@ -896,15 +896,14 @@ def _resolve_node(entry: StoreEntry, copy: bool) -> StoreEntry:
 
 
 class ZenStore:
-    """An abstraction over Hydra's config store, which enables users to maintain
-    multiple, isolated store instances before populating Hydra's global config store.
+    """An abstraction over Hydra's store, for creating multiple, isolated config stores.
 
-    `ZenStore` is also designed to consolidate the config-creation and storage process;
-    it can be used to decorate config-targets and dataclasses, enabling "inline" config
-    creation and storage patterns. This is also a "self-partialing" object, meaning a
-    store instance can overwrite its own default values. Please consult the
-    :ref:`examples <self-partial>` for more details.
+    Whereas Hydra exposes a single, global config store that provides no warnings when store entries are overwritted, `ZenStore` instances are isolated, do not populate
+    the global store unless instructed to, and they protect users from unwittingly overwriting store entries.
 
+
+    Notes
+    -----
     `hydra_zen.store` is available as a pre-instantiated, globally-available store,
     which is initialized as:
 
@@ -916,8 +915,105 @@ class ZenStore:
            deferred_hydra_store=True,
        )
 
-    Notes
-    -----
+    Internally, each `ZenStore` instance holds a mapping of::
+
+        tuple[group, name] ->  {node: Dataclass | omegaconf.Container,
+                                name: str,
+                                group: str,
+                                package: Optional[str],
+                                provider: Optional[str]}
+
+    **Auto-config capabilities**
+
+    `ZenStore` is also designed to consolidate the config-creation and storage process;
+    it can be used to automatically create config-creation functions
+    (e.g., `~hydra_zen.builds`) to a target, to auto-generate a config for the target
+    that is then stored.
+
+    .. tab-set::
+
+      .. tab-item:: Via auto-config
+
+         .. code-block:: python
+
+            from hydra_zen import store
+            def func(x, y): ...
+
+            store(func, x=2, y=3)
+
+
+      .. tab-item:: Via manually-specified config
+
+         .. code-block:: python
+
+            from hydra_zen import builds, store
+            def func(x, y): ...
+
+            store(builds(func, x=2, y=3, populate_full_signature=True), name="func")
+
+    It can also be used to decorate config-targets and dataclasses, enabling "inline"
+    config creation and storage patterns.
+
+    These auto config-creation capabilities are designed to be deferred until a
+    config is actually accessed by users or added to Hydra's global config store. This
+    enables store-decorator patterns to be used within library code without slowing
+    down import times.
+
+    **Self-partialing patterns**
+
+    A `ZenStore` instance can be called repeatedly - without a config target - with
+    different options to incrementally change the store's default configurations. E.g.
+    the following are effectively equivalent
+
+    .. tab-set::
+
+      .. tab-item:: Self-partialing pattern
+
+         .. code-block:: python
+
+               from hydra_zen import store
+
+               book_store = store(group="books")
+               romance_store = book_store(provider="genre: romance")
+               fantasy_store = book_store(provider="genre: fantasy")
+
+               romance_store({"title": "heartfelt"})
+               romance_store({"title": "lustfully longingness"})
+
+               fantasy_store({"title": "elvish cookbook"})
+               fantasy_store({"title": "dwarves can't jump"})
+
+
+      .. tab-item:: Manual pattern
+
+         .. code-block:: python
+
+            from hydra_zen import store
+
+            store(
+                {"title": "heartfelt"},
+                group="book",
+                provider="genre: romance",
+            )
+            store(
+                {"title": "lustfully longingness"},
+                group="book",
+                provider="genre: romance",
+            )
+
+            store(
+                {"title": "elvish cookbook"},
+                group="book",
+                provider="genre: fantasy",
+            )
+            store(
+                {"title": "dwarves can't jump"},
+                group="book",
+                provider="genre: fantasy",
+            )
+
+    **Configuring Hydra itself**
+
     Special support is provided for overriding Hydra's configuration; the name and
     group of the store entry is inferred to be 'config' and 'hydra', respectively,
     when an instance/subclass of `HydraConf` is being stored. E.g., specifying
@@ -940,6 +1036,8 @@ class ZenStore:
 
     Examples
     --------
+    (Some helpful boilerplate code for these examples)
+
     >>> from hydra_zen import to_yaml, store, ZenStore
     >>> def pyaml(x):
     ...     # for pretty printing configs
@@ -1104,6 +1202,7 @@ class ZenStore:
     >>> schemaless = profile_store(schema="<none>")
 
     >>> from dataclasses import dataclass
+    >>>
     >>> @profile_store(name="admin", has_root=True)
     >>> @schemaless(name="test_admin", has_root=True)
     >>> @schemaless(name="test_user", has_root=False)
@@ -1245,8 +1344,6 @@ class ZenStore:
     ) -> F:
         ...
 
-    # TODO: ZenStore -> Self when mypy adds support for Self
-    #       https://github.com/python/mypy/pull/11666
     @overload
     def __call__(
         self: Self,
@@ -1278,6 +1375,7 @@ class ZenStore:
         name : NodeName | Callable[[T], NodeName]
             The entry's name, or a callable that will be called as
             `(obj) -> entry-name`. The default is `lambda obj: obj.__name__`.
+
             Store entries are keyed off of `(group, name)`.
 
         group : Optional[GroupName | Callable[[T], GroupName]]

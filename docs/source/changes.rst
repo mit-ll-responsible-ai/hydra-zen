@@ -8,6 +8,14 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse 
 chronological order. All previous releases should still be available on pip.
 
+--------------------------
+Documentation - 2023-03-11
+--------------------------
+
+The following parts of the documentation underwent significant revisions:
+
+- `The landing page <https://github.com/mit-ll-responsible-ai/hydra-zen>`_ now has a "hydra-zen at at glance" subsection.
+- The docs for `~hydra_zen.ZenStore` were revamped.
 
 .. _v0.10.0:
 

@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import tempfile
 import textwrap
+import time
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
@@ -478,6 +479,7 @@ def pyright_analyze(
             capture_output=True,
         )
         try:
+            time.sleep(0.1)  # maybe fixes JSONDecoder errors
             return json.loads(proc.stdout)
         except Exception as e:  # pragma: no cover
             print(proc.stdout)

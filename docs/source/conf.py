@@ -97,18 +97,8 @@ html_logo = "../../brand/Hydra-Zen_logo_full_light_blue.png"
 html_theme_options = {
     "collapse_navigation": True,
     "navigation_depth": 4,
-    "favicons": [
-        {
-            "rel": "icon",
-            "sizes": "32x32",
-            "href": "hydra_zen_favicon_32x32.png",
-        },
-        {
-            "rel": "icon",
-            "sizes": "64x64",
-            "href": "hydra_zen_favicon_64x64.png",
-        },
-    ],
+    "pygment_light_style": "default",
+    "pygment_dark_style": "zenburn",
     "icon_links": [
         {
             "name": "GitHub",
@@ -117,6 +107,21 @@ html_theme_options = {
         },
     ],
 }
+
+html_static_path = ["_static"]
+
+favicons = [
+    {
+        "rel": "icon",
+        "sizes": "32x32",
+        "href": "hydra_zen_favicon_32x32.png",
+    },
+    {
+        "rel": "icon",
+        "sizes": "64x64",
+        "href": "hydra_zen_favicon_64x64.png",
+    },
+]
 
 
 def setup(app):
