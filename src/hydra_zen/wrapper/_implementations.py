@@ -898,13 +898,14 @@ def _resolve_node(entry: StoreEntry, copy: bool) -> StoreEntry:
 class ZenStore:
     """An abstraction over Hydra's store, for creating multiple, isolated config stores.
 
-    Whereas Hydra exposes a single, global config store that provides no warnings when store entries are overwritted, `ZenStore` instances are isolated, do not populate
-    the global store unless instructed to, and they protect users from unwittingly overwriting store entries.
-
+    Whereas Hydra exposes a single global config store that provides no warnings when
+    store entries are overwritted, `ZenStore` instances are isolated, do not populate
+    the global store unless instructed to, and they protect users from unwittingly
+    overwriting store entries.
 
     Notes
     -----
-    `hydra_zen.store` is available as a pre-instantiated, globally-available store,
+    `hydra_zen.store` is available as a pre-instantiated globally-available store,
     which is initialized as:
 
     .. code-block:: python
@@ -926,9 +927,9 @@ class ZenStore:
     **Auto-config capabilities**
 
     `ZenStore` is also designed to consolidate the config-creation and storage process;
-    it can be used to automatically create config-creation functions
-    (e.g., `~hydra_zen.builds`) to a target, to auto-generate a config for the target
-    that is then stored.
+    it can be used to automatically apply config-creation a function (e.g.,
+    `~hydra_zen.builds`) to a target in order to auto-generate a config for the
+    target, which is then stored.
 
     .. tab-set::
 
