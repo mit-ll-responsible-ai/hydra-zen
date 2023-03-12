@@ -286,10 +286,12 @@ document.write(`
 <dt class="sig sig-object py" id="hydra_zen.ZenStore">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hydra_zen.</span></span><span class="sig-name descname"><span class="pre">ZenStore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deferred_to_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deferred_hydra_store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite_ok</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warn_node_kwarg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/wrapper/_implementations.html#ZenStore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.ZenStore" title="Permalink to this definition">#</a></dt>
 <dd><p>An abstraction over Hydra’s store, for creating multiple, isolated config stores.</p>
-<p>Whereas Hydra exposes a single, global config store that provides no warnings when store entries are overwritted, <a class="reference internal" href="#hydra_zen.ZenStore" title="hydra_zen.ZenStore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenStore</span></code></a> instances are isolated, do not populate
-the global store unless instructed to, and they protect users from unwittingly overwriting store entries.</p>
+<p>Whereas Hydra exposes a single global config store that provides no warnings when
+store entries are overwritted, <a class="reference internal" href="#hydra_zen.ZenStore" title="hydra_zen.ZenStore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenStore</span></code></a> instances are isolated, do not populate
+the global store unless instructed to, and they protect users from unwittingly
+overwriting store entries.</p>
 <p class="rubric">Notes</p>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.store</span></code> is available as a pre-instantiated, globally-available store,
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.store</span></code> is available as a pre-instantiated globally-available store,
 which is initialized as:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">store</span> <span class="o">=</span> <span class="n">ZenStore</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">"zen_store"</span><span class="p">,</span>
@@ -308,9 +310,9 @@ which is initialized as:</p>
 </div>
 <p><strong>Auto-config capabilities</strong></p>
 <p><a class="reference internal" href="#hydra_zen.ZenStore" title="hydra_zen.ZenStore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenStore</span></code></a> is also designed to consolidate the config-creation and storage process;
-it can be used to automatically create config-creation functions
-(e.g., <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>) to a target, to auto-generate a config for the target
-that is then stored.</p>
+it can be used to automatically apply config-creation a function (e.g.,
+<a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>) to a target in order to auto-generate a config for the
+target, which is then stored.</p>
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio"/>
 <label class="sd-tab-label" for="sd-tab-item-0">

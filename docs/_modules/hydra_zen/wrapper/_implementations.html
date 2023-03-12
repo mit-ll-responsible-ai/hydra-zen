@@ -1288,13 +1288,14 @@ document.write(`
 <div class="viewcode-block" id="ZenStore"><a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore">[docs]</a><span class="k">class</span> <span class="nc">ZenStore</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;An abstraction over Hydra&#39;s store, for creating multiple, isolated config stores.</span>
 
-<span class="sd">    Whereas Hydra exposes a single, global config store that provides no warnings when store entries are overwritted, `ZenStore` instances are isolated, do not populate</span>
-<span class="sd">    the global store unless instructed to, and they protect users from unwittingly overwriting store entries.</span>
-
+<span class="sd">    Whereas Hydra exposes a single global config store that provides no warnings when</span>
+<span class="sd">    store entries are overwritted, `ZenStore` instances are isolated, do not populate</span>
+<span class="sd">    the global store unless instructed to, and they protect users from unwittingly</span>
+<span class="sd">    overwriting store entries.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    `hydra_zen.store` is available as a pre-instantiated, globally-available store,</span>
+<span class="sd">    `hydra_zen.store` is available as a pre-instantiated globally-available store,</span>
 <span class="sd">    which is initialized as:</span>
 
 <span class="sd">    .. code-block:: python</span>
@@ -1316,9 +1317,9 @@ document.write(`
 <span class="sd">    **Auto-config capabilities**</span>
 
 <span class="sd">    `ZenStore` is also designed to consolidate the config-creation and storage process;</span>
-<span class="sd">    it can be used to automatically create config-creation functions</span>
-<span class="sd">    (e.g., `~hydra_zen.builds`) to a target, to auto-generate a config for the target</span>
-<span class="sd">    that is then stored.</span>
+<span class="sd">    it can be used to automatically apply config-creation a function (e.g.,</span>
+<span class="sd">    `~hydra_zen.builds`) to a target in order to auto-generate a config for the</span>
+<span class="sd">    target, which is then stored.</span>
 
 <span class="sd">    .. tab-set::</span>
 

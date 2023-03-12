@@ -69,11 +69,11 @@ Suppose you have the following library code.
 
 
 We want to be able to configure and run the `train_fn` from the commandline, while being
-able to modify all aspects of its inputs, including nested parameters in `Model` and 
+able to modify all aspects of its inputs, including parameters nested in `Model` and 
 `DataLoader`.
 
 `hydra_zen` makes short work of this: we can create and store custom configurations for
-all parts of this library code, and generate a CLI that reflects the resulting hierarchical config.
+all parts of this library code and generate a CLI that reflects the resulting hierarchical config.
 
 .. code-block:: python
    :caption: Using hydra-zen to create a configurable CLI for running `train_fn`

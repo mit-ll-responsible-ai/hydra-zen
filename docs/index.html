@@ -270,10 +270,10 @@ Hydra application.</p>
 </div>
 </div>
 <p>We want to be able to configure and run the <code class="xref py py-obj docutils literal notranslate"><span class="pre">train_fn</span></code> from the commandline, while being
-able to modify all aspects of its inputs, including nested parameters in <code class="xref py py-obj docutils literal notranslate"><span class="pre">Model</span></code> and
+able to modify all aspects of its inputs, including parameters nested in <code class="xref py py-obj docutils literal notranslate"><span class="pre">Model</span></code> and
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">DataLoader</span></code>.</p>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen</span></code> makes short work of this: we can create and store custom configurations for
-all parts of this library code, and generate a CLI that reflects the resulting hierarchical config.</p>
+all parts of this library code and generate a CLI that reflects the resulting hierarchical config.</p>
 <div class="literal-block-wrapper docutils container" id="id2">
 <div class="code-block-caption"><span class="caption-text">Using hydra-zen to create a configurable CLI for running <code class="xref py py-obj docutils literal notranslate"><span class="pre">train_fn</span></code></span><a class="headerlink" href="#id2" title="Permalink to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Contents of train.py</span>
