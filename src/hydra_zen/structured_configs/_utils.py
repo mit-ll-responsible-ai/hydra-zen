@@ -44,7 +44,6 @@ from hydra_zen._compatibility import (
     HYDRA_SUPPORTS_OBJECT_CONVERT,
     HYDRA_SUPPORTS_PARTIAL,
     OMEGACONF_VERSION,
-    PATCH_OMEGACONF_830,
     Version,
 )
 from hydra_zen.errors import HydraZenValidationError
@@ -53,7 +52,6 @@ from hydra_zen.typing._implementations import (
     DEFAULT_DATACLASS_OPTIONS,
     UNSUPPORTED_DATACLASS_OPTIONS,
     AllConvert,
-    DataClass_,
     Field,
     InterpStr,
     StrictDataclassOptions,
@@ -521,20 +519,6 @@ def check_suspicious_interpolations(
                     f"change {_w} to {_expected}"
                 )
                 yield _expected
-
-
-def mutable_default_permitted(bases: Iterable[DataClass_], field_name: str) -> bool:
-    if not PATCH_OMEGACONF_830:
-        return True
-    else:  # pragma: no cover
-        for base in bases:
-            if (
-                field_name in base.__dataclass_fields__
-                and base.__dataclass_fields__[field_name].default is not MISSING
-            ):
-                # see https://github.com/omry/omegaconf/issues/830
-                return False
-        return True
 
 
 def valid_defaults_list(hydra_defaults: Any) -> bool:

@@ -39,7 +39,6 @@ from typing_extensions import Final, Literal, ParamSpec, TypeAlias, dataclass_tr
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVES,
     HYDRA_SUPPORTS_PARTIAL,
-    PATCH_OMEGACONF_830,
     ZEN_SUPPORTED_PRIMITIVES,
 )
 from hydra_zen.errors import (
@@ -441,22 +440,6 @@ def hydrated_dataclass(
         )
         decorated_obj = dataclass(**dc_options)(decorated_obj)  # type: ignore
 
-        if PATCH_OMEGACONF_830 and 2 < len(decorated_obj.__mro__):  # pragma: no cover
-            parents = decorated_obj.__mro__[1:-1]
-            # this class inherits from a parent
-            for field_ in fields(decorated_obj):
-                if field_.default_factory is not MISSING and any(
-                    hasattr(p, field_.name) for p in parents
-                ):
-                    raise HydraZenValidationError(
-                        "This config will not instantiate properly.\nThis is due to a "
-                        "known bug in omegaconf: The config specifies a "
-                        f"default-factory for field {field_.name}, and inherits from a "
-                        "parent that specifies the same field with a non-factory value "
-                        "-- the parent's value will take precedence.\nTo circumvent "
-                        f"this upgrade to omegaconf 2.2.1 or higher."
-                    )
-
         if populate_full_signature:
             # we need to ensure that the fields specified via the class definition
             # take precedence over the fields that will be auto-populated by builds
@@ -797,7 +780,6 @@ def sanitized_field(
     *,
     error_prefix: str = "",
     field_name: str = "",
-    _mutable_default_permitted: bool = True,
     convert_dataclass: bool,
 ) -> Field[Any]:
     value = sanitized_default_value(
@@ -815,16 +797,10 @@ def sanitized_field(
     ) or (
         is_dataclass(value) and not isinstance(value, type) and value.__hash__ is None
     ):
-        if _mutable_default_permitted:
-            return cast(
-                Field[Any],
-                mutable_value(value, zen_convert={"dataclass": convert_dataclass}),
-            )
-        else:  # pragma: no cover
-            value = builds(
-                type(value), value, zen_convert={"dataclass": convert_dataclass}
-            )
-
+        return cast(
+            Field[Any],
+            mutable_value(value, zen_convert={"dataclass": convert_dataclass}),
+        )
     return _utils.field(default=value, init=init)
 
 
@@ -2148,27 +2124,6 @@ def builds(
                     value,
                     error_prefix=BUILDS_ERROR_PREFIX,
                     field_name=item[0],
-                    _mutable_default_permitted=_utils.mutable_default_permitted(
-                        builds_bases, name
-                    ),
-                    convert_dataclass=zen_convert_settings["dataclass"],
-                )
-            elif (
-                PATCH_OMEGACONF_830
-                and builds_bases
-                and value.default_factory is not MISSING
-            ):  # pragma: no cover
-                # Addresses omegaconf #830 https://github.com/omry/omegaconf/issues/830
-                #
-                # Value was passed as a field-with-default-factory, we'll
-                # access the default from the factory and will reconstruct the field
-                _field = sanitized_field(
-                    value.default_factory(),
-                    error_prefix=BUILDS_ERROR_PREFIX,
-                    field_name=item[0],
-                    _mutable_default_permitted=_utils.mutable_default_permitted(
-                        builds_bases, name
-                    ),
                     convert_dataclass=zen_convert_settings["dataclass"],
                 )
             else:
