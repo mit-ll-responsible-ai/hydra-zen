@@ -4,7 +4,7 @@ from collections import Counter, deque
 from enum import Enum
 from functools import partial
 from pathlib import Path, PosixPath, WindowsPath
-from typing import NamedTuple, Set
+from typing import FrozenSet, NamedTuple
 
 import hydra
 import omegaconf
@@ -38,23 +38,38 @@ HYDRA_VERSION: Final = _get_version(hydra.__version__)
 
 
 # Indicates primitive types permitted in type-hints of structured configs
-HYDRA_SUPPORTED_PRIMITIVE_TYPES: Final = {int, float, bool, str, Enum, bytes}
+HYDRA_SUPPORTED_PRIMITIVE_TYPES: Final = frozenset(
+    {int, float, bool, str, Enum, bytes, Path}
+)
 # Indicates types of primitive values permitted in configs
-HYDRA_SUPPORTED_PRIMITIVES = {int, float, bool, str, list, tuple, dict, NoneType, bytes}
-ZEN_SUPPORTED_PRIMITIVES: Set[type] = {
-    set,
-    frozenset,
-    complex,
-    partial,
-    bytearray,
-    deque,
-    Counter,
-    range,
-}
-
-
-HYDRA_SUPPORTED_PRIMITIVES.update({Path, PosixPath, WindowsPath})
-HYDRA_SUPPORTED_PRIMITIVE_TYPES.add(Path)
+HYDRA_SUPPORTED_PRIMITIVES = frozenset(
+    {
+        int,
+        float,
+        bool,
+        str,
+        list,
+        tuple,
+        dict,
+        NoneType,
+        bytes,
+        Path,
+        PosixPath,
+        WindowsPath,
+    }
+)
+ZEN_SUPPORTED_PRIMITIVES: FrozenSet[type] = frozenset(
+    {
+        set,
+        frozenset,
+        complex,
+        partial,
+        bytearray,
+        deque,
+        Counter,
+        range,
+    }
+)
 
 
 HYDRA_SUPPORTS_OBJECT_CONVERT = HYDRA_VERSION >= Version(1, 3, 0)

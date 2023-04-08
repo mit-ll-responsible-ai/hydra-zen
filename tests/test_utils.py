@@ -453,7 +453,9 @@ def test_merge_settings_validation(bad_settings):
 
 
 def test_strict_dataclass_options_reflects_current_dataclass_ver():
-    strict_keys = set(StrictDataclassOptions.__required_keys__) | set(StrictDataclassOptions.__optional_keys__)  # type: ignore
+    strict_keys = set(StrictDataclassOptions.__required_keys__) | set(
+        StrictDataclassOptions.__optional_keys__
+    )
     actual_keys = set(signature(make_dataclass).parameters)
     actual_keys.remove("fields")
     assert strict_keys == actual_keys
