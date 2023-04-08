@@ -30,7 +30,6 @@ from hydra.types import HydraContext, RunMode
 from omegaconf import DictConfig, ListConfig, OmegaConf
 from typing_extensions import Literal, TypeAlias
 
-from hydra_zen._compatibility import SUPPORTS_VERSION_BASE
 from hydra_zen._hydra_overloads import instantiate
 from hydra_zen.typing._implementations import DataClass_, InstOrType
 
@@ -430,11 +429,7 @@ def launch(
     with initialize(
         config_path=None,
         job_name=job_name,
-        **(
-            {}
-            if (not SUPPORTS_VERSION_BASE or version_base is _NotSet)
-            else {"version_base": version_base}
-        ),
+        **({} if version_base is _NotSet else {"version_base": version_base}),
     ):
         # taken from hydra.compose with support for MULTIRUN
         gh = GlobalHydra.instance()

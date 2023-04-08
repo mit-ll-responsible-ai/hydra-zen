@@ -36,8 +36,6 @@ def _get_version(ver_str: str) -> Version:
 OMEGACONF_VERSION: Final = _get_version(omegaconf.__version__)
 HYDRA_VERSION: Final = _get_version(hydra.__version__)
 
-SUPPORTS_VERSION_BASE = HYDRA_VERSION >= (1, 2, 0)
-
 
 # Hydra's instantiate API now supports partial-instantiation, indicated
 # by a `_partial_ = True` attribute.
