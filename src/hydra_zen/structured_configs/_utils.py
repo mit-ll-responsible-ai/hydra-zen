@@ -40,7 +40,6 @@ from typing_extensions import (
 
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVE_TYPES,
-    HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES,
     HYDRA_SUPPORTS_OBJECT_CONVERT,
     HYDRA_SUPPORTS_PARTIAL,
     OMEGACONF_VERSION,
@@ -352,8 +351,6 @@ def sanitized_type(
     # Even calling deepcopy(`type_`) silently fails to prevent this.
     origin = get_origin(type_)
 
-    no_nested_container = not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES
-
     if origin is not None:
         # Support for Annotated[x, y]
         # Python 3.9+
@@ -400,19 +397,13 @@ def sanitized_type(
 
         if origin is list or origin is List:
             if args:
-                return List[
-                    sanitized_type(
-                        args[0], primitive_only=no_nested_container, nested=True
-                    )
-                ]
+                return List[sanitized_type(args[0], primitive_only=False, nested=True)]
             return List
 
         if origin is dict or origin is Dict:
             if args:
                 KeyType = sanitized_type(args[0], primitive_only=True, nested=True)
-                ValueType = sanitized_type(
-                    args[1], primitive_only=no_nested_container, nested=True
-                )
+                ValueType = sanitized_type(args[1], primitive_only=False, nested=True)
                 return Dict[KeyType, ValueType]
             return Dict
 
@@ -437,7 +428,7 @@ def sanitized_type(
 
             # E.g. Tuple[int, int, int] or Tuple[int, ...]
             _unique_type = (
-                sanitized_type(args[0], primitive_only=no_nested_container, nested=True)
+                sanitized_type(args[0], primitive_only=False, nested=True)
                 if len(unique_args) == 1 or (len(unique_args) == 2 and has_ellipses)
                 else Any
             )

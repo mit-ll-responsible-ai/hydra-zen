@@ -42,8 +42,6 @@ HYDRA_VERSION: Final = _get_version(hydra.__version__)
 # https://github.com/facebookresearch/hydra/pull/1905
 HYDRA_SUPPORTS_PARTIAL: Final = Version(1, 1, 1) < HYDRA_VERSION
 
-HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES: Final = OMEGACONF_VERSION >= Version(2, 2, 0)
-
 # Indicates primitive types permitted in type-hints of structured configs
 HYDRA_SUPPORTED_PRIMITIVE_TYPES: Final = {int, float, bool, str, Enum, bytes}
 # Indicates types of primitive values permitted in configs

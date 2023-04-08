@@ -46,7 +46,6 @@ from typing_extensions import (
 
 from hydra_zen import builds, instantiate, mutable_value
 from hydra_zen._compatibility import (
-    HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES,
     HYDRA_VERSION,
     OMEGACONF_VERSION,
     Version,
@@ -224,15 +223,13 @@ vDict = Dict[Any, Any] if sys.version_info < (3, 8) else Dict
         (Optional[List[Color]], Optional[List[Color]]),
         (
             Optional[List[List[int]]],
-            Optional[List[Any]]
-            if not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES
-            else Optional[List[List[int]]],
+            Optional[List[List[int]]],
         ),
         (List[int], List[int]),  # supported containers
         (List[frozenset], List[Any]),
         (
             List[List[int]],
-            List[Any] if not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES else List[List[int]],
+            List[List[int]],
         ),
         (List[Tuple[int, int]], List[Any]),
         (List[T], List[Any]),
@@ -242,32 +239,24 @@ vDict = Dict[Any, Any] if sys.version_info < (3, 8) else Dict
         (Dict[C, C], Dict[Any, Any]),
         (
             Dict[str, List[int]],
-            Dict[str, Any]
-            if not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES
-            else Dict[str, List[int]],
+            Dict[str, List[int]],
         ),
         (Tuple[str], Tuple[str]),
         (Tuple[str, ...], Tuple[str, ...]),
         (Tuple[str, str, str], Tuple[str, str, str]),
         (
             Tuple[List[int]],
-            (
-                Tuple[Any]
-                if not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES
-                else Tuple[List[int]]
-            ),
+            (Tuple[List[int]]),
         ),
         (Union[NoneType, Tuple[int, int]], Optional[Tuple[int, int]]),
         (Union[Tuple[int, int], NoneType], Optional[Tuple[int, int]]),
         (
             List[Dict[str, List[int]]],
-            List[Any]
-            if not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES
-            else List[Dict[str, List[int]]],
+            List[Dict[str, List[int]]],
         ),
         (
             List[List[Type[int]]],
-            List[Any] if not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES else List[List[Any]],
+            List[List[Any]],
         ),
         (Tuple[Tuple[int, ...], ...], Tuple[Any, ...]),
         (Optional[Tuple[Tuple[int, ...], ...]], Optional[Tuple[Any, ...]]),
