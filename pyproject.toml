@@ -141,6 +141,7 @@ passenv = *
 deps = pytest
        hypothesis
        pytest-xdist
+       tzdata
 commands = pytest tests/ {posargs: -n auto --maxprocesses=4}
 
 
