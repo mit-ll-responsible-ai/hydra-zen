@@ -46,11 +46,9 @@ from typing_extensions import (
 
 from hydra_zen import builds, instantiate, mutable_value
 from hydra_zen._compatibility import (
-    HYDRA_SUPPORTS_BYTES,
     HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES,
     HYDRA_VERSION,
     OMEGACONF_VERSION,
-    HYDRA_SUPPORTS_Path,
     Version,
     _get_version,
 )
@@ -153,10 +151,10 @@ vDict = Dict[Any, Any] if sys.version_info < (3, 8) else Dict
         (float, float),
         (str, str),
         (bool, bool),
-        (bytes, bytes if HYDRA_SUPPORTS_BYTES else Any),
-        (Path, Path if HYDRA_SUPPORTS_Path else Any),
-        (PosixPath, Path if HYDRA_SUPPORTS_Path else Any),
-        (WindowsPath, Path if HYDRA_SUPPORTS_Path else Any),
+        (bytes, bytes),
+        (Path, Path),
+        (PosixPath, Path),
+        (WindowsPath, Path),
         (Color, Color),
         (C, Any),  # unsupported primitives
         (type(None), Any),

@@ -45,13 +45,11 @@ SUPPORTS_VERSION_BASE = HYDRA_VERSION >= (1, 2, 0)
 HYDRA_SUPPORTS_PARTIAL: Final = Version(1, 1, 1) < HYDRA_VERSION
 
 HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES: Final = OMEGACONF_VERSION >= Version(2, 2, 0)
-HYDRA_SUPPORTS_BYTES: Final = OMEGACONF_VERSION >= Version(2, 2, 0)
-HYDRA_SUPPORTS_Path: Final = OMEGACONF_VERSION >= Version(2, 2, 1)
 
 # Indicates primitive types permitted in type-hints of structured configs
-HYDRA_SUPPORTED_PRIMITIVE_TYPES: Final = {int, float, bool, str, Enum}
+HYDRA_SUPPORTED_PRIMITIVE_TYPES: Final = {int, float, bool, str, Enum, bytes}
 # Indicates types of primitive values permitted in configs
-HYDRA_SUPPORTED_PRIMITIVES = {int, float, bool, str, list, tuple, dict, NoneType}
+HYDRA_SUPPORTED_PRIMITIVES = {int, float, bool, str, list, tuple, dict, NoneType, bytes}
 ZEN_SUPPORTED_PRIMITIVES: Set[type] = {
     set,
     frozenset,
@@ -63,23 +61,11 @@ ZEN_SUPPORTED_PRIMITIVES: Set[type] = {
     range,
 }
 
+
+HYDRA_SUPPORTED_PRIMITIVES.update({Path, PosixPath, WindowsPath})
+HYDRA_SUPPORTED_PRIMITIVE_TYPES.add(Path)
+
 HYDRA_SUPPORTS_LIST_INSTANTIATION = HYDRA_VERSION >= Version(1, 1, 2)
 
-
-if HYDRA_SUPPORTS_BYTES:  # pragma: no cover
-    HYDRA_SUPPORTED_PRIMITIVES.add(bytes)
-    HYDRA_SUPPORTED_PRIMITIVE_TYPES.add(bytes)
-else:  # pragma: no cover
-    ZEN_SUPPORTED_PRIMITIVES.add(bytes)
-
-_path_types = {Path, PosixPath, WindowsPath}
-
-if HYDRA_SUPPORTS_Path:  # pragma: no cover
-    HYDRA_SUPPORTED_PRIMITIVES.update(_path_types)
-    HYDRA_SUPPORTED_PRIMITIVE_TYPES.add(Path)
-else:  # pragma: no cover
-    ZEN_SUPPORTED_PRIMITIVES.update(_path_types)
-
-del _path_types
 
 HYDRA_SUPPORTS_OBJECT_CONVERT = HYDRA_VERSION >= Version(1, 3, 0)
