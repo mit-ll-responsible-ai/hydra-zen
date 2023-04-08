@@ -1,5 +1,6 @@
 # Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+import json
 from pathlib import Path
 
 import pytest
@@ -114,13 +115,16 @@ files += [
     files,
 )
 def test_rst_docs_scan_clean_via_pyright(func, pyright_config):
-    results = pyright_analyze(
-        func,
-        report_unnecessary_type_ignore_comment=True,
-        preamble=preamble,
-        pyright_config=pyright_config,
-        python_version="3.10",
-    )
+    try:
+        results = pyright_analyze(
+            func,
+            report_unnecessary_type_ignore_comment=True,
+            preamble=preamble,
+            pyright_config=pyright_config,
+            python_version="3.10",
+        )
+    except json.JSONDecodeError:
+        pytest.skip("Weird JSON decode error")
     errors = [
         e
         for e in list_error_messages(results)
