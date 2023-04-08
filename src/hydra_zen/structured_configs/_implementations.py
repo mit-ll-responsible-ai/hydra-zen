@@ -38,7 +38,6 @@ from typing_extensions import Final, Literal, ParamSpec, TypeAlias, dataclass_tr
 
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVES,
-    HYDRA_SUPPORTS_PARTIAL,
     ZEN_SUPPORTED_PRIMITIVES,
 )
 from hydra_zen.errors import (
@@ -1570,7 +1569,7 @@ def builds(
 
     for base in builds_bases:
         _set_this_iteration = False
-        if HYDRA_SUPPORTS_PARTIAL and base_hydra_partial is None:
+        if base_hydra_partial is None:
             base_hydra_partial = safe_getattr(base, PARTIAL_FIELD_NAME, None)
             if parent_partial is None:
                 parent_partial = base_hydra_partial
@@ -1597,7 +1596,6 @@ def builds(
         bool(zen_meta)
         or bool(validated_wrappers)
         or any(uses_zen_processing(b) for b in builds_bases)
-        or (bool(requires_partial_field) and not HYDRA_SUPPORTS_PARTIAL)
     )
 
     if base_zen_partial:
@@ -1641,7 +1639,7 @@ def builds(
                     _utils.field(default=bool(zen_partial), init=False),
                 ),
             )
-            if HYDRA_SUPPORTS_PARTIAL and base_hydra_partial:
+            if base_hydra_partial:
                 # Must explicitly set _partial_=False to prevent inheritance
                 target_field.append(
                     (
@@ -2168,9 +2166,7 @@ def builds(
 
     # _partial_=True should never be relied on when zen-processing is being used.
     assert not (
-        HYDRA_SUPPORTS_PARTIAL
-        and requires_zen_processing
-        and safe_getattr(out, PARTIAL_FIELD_NAME, False)
+        requires_zen_processing and safe_getattr(out, PARTIAL_FIELD_NAME, False)
     )
 
     return cast(Union[Type[Builds[Importable]], Type[BuildsWithSig[Type[R], P]]], out)

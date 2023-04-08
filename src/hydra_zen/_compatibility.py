@@ -37,11 +37,6 @@ OMEGACONF_VERSION: Final = _get_version(omegaconf.__version__)
 HYDRA_VERSION: Final = _get_version(hydra.__version__)
 
 
-# Hydra's instantiate API now supports partial-instantiation, indicated
-# by a `_partial_ = True` attribute.
-# https://github.com/facebookresearch/hydra/pull/1905
-HYDRA_SUPPORTS_PARTIAL: Final = Version(1, 1, 1) < HYDRA_VERSION
-
 # Indicates primitive types permitted in type-hints of structured configs
 HYDRA_SUPPORTED_PRIMITIVE_TYPES: Final = {int, float, bool, str, Enum, bytes}
 # Indicates types of primitive values permitted in configs

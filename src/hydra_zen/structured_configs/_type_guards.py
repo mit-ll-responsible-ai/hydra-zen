@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, Any, Type, Union
 
 from typing_extensions import TypeGuard
 
-from hydra_zen._compatibility import HYDRA_SUPPORTS_PARTIAL
 from hydra_zen.funcs import get_obj, zen_processing
 from hydra_zen.structured_configs._utils import safe_name
 from hydra_zen.typing import Builds, Just, PartialBuilds
@@ -222,8 +221,8 @@ def is_partial_builds(x: Any) -> TypeGuard[PartialBuilds[Any]]:
     if is_builds(x):
         return (
             # check if partial'd config via Hydra
-            HYDRA_SUPPORTS_PARTIAL
-            and safe_getattr(x, PARTIAL_FIELD_NAME, False) is True
+            safe_getattr(x, PARTIAL_FIELD_NAME, False)
+            is True
         ) or (
             # check if partial'd config via `zen_processing`
             uses_zen_processing(x)

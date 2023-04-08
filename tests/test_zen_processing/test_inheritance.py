@@ -9,7 +9,6 @@ import pytest
 from hypothesis import given
 
 from hydra_zen import builds, instantiate, make_config, to_yaml
-from hydra_zen._compatibility import HYDRA_SUPPORTS_PARTIAL
 from hydra_zen.structured_configs._globals import (
     PARTIAL_FIELD_NAME,
     ZEN_PARTIAL_FIELD_NAME,
@@ -75,11 +74,11 @@ def test_partial_with_inherited_zen_processing(args, meta, wrappers):
 
     child = Child()
 
-    if HYDRA_SUPPORTS_PARTIAL or uses_zen_processing(parent):
+    if uses_zen_processing(parent):
         # ensure meta fields are retained by child
         assert yaml_lines(parent) <= yaml_lines(child)
 
-    if uses_zen_processing(parent) or not HYDRA_SUPPORTS_PARTIAL:
+    if uses_zen_processing(parent):
         assert uses_zen_processing(child)
         assert isinstance(child, ZenPartialBuilds)
         assert not isinstance(child, HydraPartialBuilds)
@@ -206,7 +205,7 @@ def test_partial_via_inheritance(
     if child_partial is None:
         # First parent with partial explicit partial field dictates inheritance
         for p in parents:
-            if HYDRA_SUPPORTS_PARTIAL and hasattr(p, PARTIAL_FIELD_NAME):
+            if hasattr(p, PARTIAL_FIELD_NAME):
                 parent_partial = getattr(p, PARTIAL_FIELD_NAME)
 
             if hasattr(p, ZEN_PARTIAL_FIELD_NAME):
@@ -228,9 +227,6 @@ def test_partial_via_inheritance(
     )
 
     assert is_partial_builds(Conf) is expected_partial
-
-    if hasattr(Conf, PARTIAL_FIELD_NAME) and not HYDRA_SUPPORTS_PARTIAL:
-        expected_out[PARTIAL_FIELD_NAME] = getattr(Conf, PARTIAL_FIELD_NAME)
 
     # check actual instantiation behavior
     out = instantiate(Conf)
@@ -288,22 +284,22 @@ def test_partial_field_set_only_when_necessary(
         ((), False),
         ((HydraNoPartial,), False),
         ((HydraPartialFalse,), False),
-        ((HydraPartialTrue,), HYDRA_SUPPORTS_PARTIAL),
+        ((HydraPartialTrue,), True),
         ((ZenNoPartial,), False),
         ((ZenPartialFalse,), False),
         ((ZenPartialTrue,), True),
         ((ZenFalseHydraFalse,), False),
-        ((ZenFalseHydraTrue,), HYDRA_SUPPORTS_PARTIAL),
+        ((ZenFalseHydraTrue,), True),
         ((ZenTrueHydraFalse,), True),
         ((ZenTrueHydraTrue,), True),
         ((HydraNoPartial, HydraPartialFalse), False),
-        ((HydraNoPartial, HydraPartialTrue), HYDRA_SUPPORTS_PARTIAL),
+        ((HydraNoPartial, HydraPartialTrue), True),
         ((HydraPartialFalse, HydraPartialTrue), False),
-        ((HydraPartialTrue, HydraPartialFalse), HYDRA_SUPPORTS_PARTIAL),
-        ((ZenNoPartial, HydraPartialTrue), HYDRA_SUPPORTS_PARTIAL),
-        ((HydraPartialTrue, ZenPartialFalse), HYDRA_SUPPORTS_PARTIAL),
+        ((HydraPartialTrue, HydraPartialFalse), True),
+        ((ZenNoPartial, HydraPartialTrue), True),
+        ((HydraPartialTrue, ZenPartialFalse), True),
         ((HydraPartialTrue, ZenPartialTrue), True),
-        ((HydraPartialFalse, ZenPartialTrue), not HYDRA_SUPPORTS_PARTIAL),
+        ((HydraPartialFalse, ZenPartialTrue), not True),
         ((ZenPartialFalse, HydraPartialTrue), False),
     ],
 )
@@ -319,9 +315,6 @@ def test_partial_via_inheritance_explicit_cases(
 
 @pytest.mark.parametrize("Parent", [ZenPartialFalse, HydraPartialFalse])
 def test_inherited_partial_false_fields(Parent):
-    if not HYDRA_SUPPORTS_PARTIAL and Parent is HydraPartialFalse:
-        pytest.mark.skip("Hydra version doesn't support instantiate API")
-
     Conf = builds(dict, builds_bases=(Parent,))  # should be OK
     assert instantiate(Conf) == instantiate(Parent)
 
@@ -339,7 +332,6 @@ def test_make_config_catches_multiple_inheritance_conflicting_with_zen_processin
         # leading to "corrupt" state
         _ = make_config(bases=(A, B))
 
-    if HYDRA_SUPPORTS_PARTIAL:
-        with pytest.raises(ValueError):
-            # Specifies _partial_=True and _zen_partial=True
-            _ = make_config(bases=(B, A))
+    with pytest.raises(ValueError):
+        # Specifies _partial_=True and _zen_partial=True
+        _ = make_config(bases=(B, A))

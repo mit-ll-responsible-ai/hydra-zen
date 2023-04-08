@@ -27,7 +27,6 @@ from hydra_zen.typing._implementations import (
     ZenConvert,
 )
 
-from .._compatibility import HYDRA_SUPPORTS_PARTIAL
 from ._globals import (
     CONVERT_FIELD_NAME,
     DEFAULTS_LIST_FIELD_NAME,
@@ -538,11 +537,7 @@ def make_config(
             f"associated with zen-processing features. As a result, this config will "
             f"not instantiate correctly."
         )
-    if (
-        HYDRA_SUPPORTS_PARTIAL
-        and safe_getattr(out, PARTIAL_FIELD_NAME, False)
-        and uses_zen_processing(out)
-    ):
+    if safe_getattr(out, PARTIAL_FIELD_NAME, False) and uses_zen_processing(out):
         raise ValueError(
             f"{out.__name__} specifies both `{PARTIAL_FIELD_NAME}=True` and `"
             f"{ZEN_PARTIAL_FIELD_NAME}=True`. This config will not instantiate "

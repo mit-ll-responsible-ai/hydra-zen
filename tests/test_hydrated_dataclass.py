@@ -6,7 +6,6 @@ from dataclasses import is_dataclass
 import pytest
 
 from hydra_zen import hydrated_dataclass, instantiate
-from hydra_zen._compatibility import HYDRA_SUPPORTS_PARTIAL
 from hydra_zen.structured_configs._globals import (
     PARTIAL_FIELD_NAME,
     ZEN_PARTIAL_FIELD_NAME,
@@ -69,7 +68,4 @@ def test_partial(zen_partial):
             Conf, ZEN_PARTIAL_FIELD_NAME
         )
     else:
-        if HYDRA_SUPPORTS_PARTIAL:
-            assert getattr(Conf, PARTIAL_FIELD_NAME) is zen_partial
-        else:
-            assert getattr(Conf, ZEN_PARTIAL_FIELD_NAME) is zen_partial
+        assert getattr(Conf, PARTIAL_FIELD_NAME) is zen_partial

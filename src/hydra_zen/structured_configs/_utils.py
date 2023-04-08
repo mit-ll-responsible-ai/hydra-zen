@@ -41,7 +41,6 @@ from typing_extensions import (
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVE_TYPES,
     HYDRA_SUPPORTS_OBJECT_CONVERT,
-    HYDRA_SUPPORTS_PARTIAL,
     OMEGACONF_VERSION,
     Version,
 )
@@ -440,7 +439,7 @@ def sanitized_type(
 
         return Any
 
-    if HYDRA_SUPPORTS_PARTIAL and isinstance(type_, type) and issubclass(type_, Path):
+    if isinstance(type_, type) and issubclass(type_, Path):
         type_ = Path
 
     if isinstance(type_, (ParamSpecArgs, ParamSpecKwargs)):  # pragma: no cover
