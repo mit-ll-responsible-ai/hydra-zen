@@ -311,6 +311,14 @@ class Zen(Generic[P, R]):
                 f"`cfg` is missing the following fields: {', '.join(missing_params)}"
             )
 
+    @staticmethod
+    def instantiate(x: Any) -> Any:
+        x = instantiate(x)
+        if isinstance(x, (ListConfig, DictConfig)):
+            return OmegaConf.to_object(x)
+        else:
+            return x
+
     # TODO: add "extract" option that enables returning dict of fields
     def __call__(self, __cfg: Union[ConfigLike, str]) -> R:
         """
@@ -349,7 +357,6 @@ class Zen(Generic[P, R]):
             for name, param in self.parameters.items()
             if param.kind not in SKIPPED_PARAM_KINDS and name not in self._exclude
         }
-
         extra_kwargs = {self.CFG_NAME: cfg} if self._has_zen_cfg else {}
         if self._unpack_kwargs:
             names = (
@@ -361,9 +368,9 @@ class Zen(Generic[P, R]):
             )
             cfg_kwargs.update({name: cfg[name] for name in names})
         return self.func(
-            *(instantiate(x) if is_instantiable(x) else x for x in args_),
+            *(self.instantiate(x) if is_instantiable(x) else x for x in args_),
             **{
-                name: instantiate(val) if is_instantiable(val) else val
+                name: self.instantiate(val) if is_instantiable(val) else val
                 for name, val in cfg_kwargs.items()
             },
             **extra_kwargs,

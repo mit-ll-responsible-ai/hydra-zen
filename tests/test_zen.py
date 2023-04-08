@@ -129,23 +129,47 @@ def test_zen_pre_call_precedes_instantiation(seed: int):
 
 @given(y=st.sampled_from(range(10)), as_dict_config=st.booleans())
 def test_interpolations_are_resolved(y: int, as_dict_config: bool):
+    @dataclass
+    class AA:
+        x: Any
+
     @zen(unpack_kwargs=True)
-    def f(dict_, list_, builds_, make_config_, direct, **kw):
-        return dict_, list_, builds_, make_config_, direct, kw["nested"]
+    def f(dict_, list_, builds_, make_config_, direct, list_of_dataclasses, **kw):
+        return (
+            dict_,
+            list_,
+            builds_,
+            make_config_,
+            direct,
+            list_of_dataclasses,
+            kw["nested"],
+        )
 
     cfg_maker = make_config if not as_dict_config else lambda **kw: DictConfig(kw)
+    B = make_config(b="${y}")
     out = f(
         cfg_maker(
             dict_={"x": "${y}"},
             list_=["${y}"],
             builds_=builds(dict, a="${y}"),
-            make_config_=make_config(b="${y}"),
+            make_config_=B,
             direct="${y}",
+            list_of_dataclasses=[AA(x=1), AA(x="${y}")],
             nested=dict(top=dict(bottom="${...y}")),
             y=y,
         )
     )
-    assert out == ({"x": y}, [y], {"a": y}, {"b": y}, y, {"top": {"bottom": y}})
+    assert out == (
+        {"x": y},
+        [y],
+        {"a": y},
+        B(b=y),
+        y,
+        [AA(1), AA(y)],
+        {"top": {"bottom": y}},
+    )
+    assert isinstance(out[3], B)
+    assert all(isinstance(x, AA) for x in out[-2])
 
 
 @pytest.mark.parametrize(
