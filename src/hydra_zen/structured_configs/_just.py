@@ -230,9 +230,9 @@ def just(
     `just` dynamically generates dataclass types, a.k.a structured configs, to describe
     ``obj``
 
-    >>> just(A)()
+    >>> just(A)
     Just_A(_target_='hydra_zen.funcs.get_obj', path='__main__.A')
-    >>> just(my_func)()
+    >>> just(my_func)
     Just_my_func(_target_='hydra_zen.funcs.get_obj', path='__main__.my_func')
 
     **Auto-config support**

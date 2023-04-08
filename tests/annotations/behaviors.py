@@ -60,18 +60,9 @@ def behaviors():
     just_f = instantiate(conf_just_f)
     yet_another_int: int = just_f(10)
 
-    conf_just_f_instance = just(f)()
-    just_f_2 = instantiate(conf_just_f_instance)
-    yet_another_int_2: int = just_f_2(10)
-
     conf_just_A = just(A)
     just_A = instantiate(conf_just_A)
     instance_of_a = just_A()
-    out3: Tuple[int, str] = instance_of_a.x
-
-    conf_just_A_instance = just(A)()
-    just_A_2 = instantiate(conf_just_A_instance)
-    instance_of_a = just_A_2()
     out3: Tuple[int, str] = instance_of_a.x
 
     @hydrated_dataclass(A)

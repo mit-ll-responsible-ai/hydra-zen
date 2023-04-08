@@ -141,6 +141,7 @@ passenv = *
 deps = pytest
        hypothesis
        pytest-xdist
+       tzdata
 commands = pytest tests/ {posargs: -n auto --maxprocesses=4}
 
 
@@ -157,21 +158,10 @@ basepython = python3.7
 description = Runs test suite against pre-release versions of dependencies.
 pip_pre = true
 deps = {[testenv]deps}
-       pydantic
+       pydantic<2.0.0
        beartype
        cloudpickle
-basepython = python3.9
-
-[testenv:omegaconf-2p2p2]
-description = Test againse OmegaConf 2.2.2 to guard against type-sanitization regressions.
-pip_pre = true
-deps = omegaconf==2.2.2
-       hydra-core==1.2.0
-       {[testenv]deps}
-       pydantic
-       beartype
-       cloudpickle
-basepython = python3.8
+basepython = python3.10
 
 [testenv:coverage]
 description = Runs test suite and measures test-coverage. Fails if coverage is 
@@ -194,7 +184,7 @@ description = Installs pyright and scans hydra-zen docs & docstrings. Note that 
               be slow. Runs in parallel by default. Run 
               `tox -e pyright-scan-docs -- -n 0` to disable parallelization.
 usedevelop = true
-basepython = python3.9
+basepython = python3.10
 deps = {[testenv]deps}
        torch
        pytorch-lightning
@@ -213,7 +203,7 @@ commands = pytest tests/test_docs_typecheck.py -vv {posargs: -n auto --maxproces
 description = Runs test suite against optional 3rd party packages that hydra-zen 
               provides specialized support for.
 install_command = pip install --upgrade --upgrade-strategy eager {opts} {packages}
-basepython = python3.9
+basepython = python3.10
 deps = {[testenv]deps}
        torch
        pytorch-lightning
@@ -228,7 +218,7 @@ description = Ensure that hydra-zen's source code and test suite scan clean
               under pyright, and that hydra-zen's public API has a 100 prcnt
               type-completeness score.
 usedevelop = true
-basepython = python3.9
+basepython = python3.10
 deps = 
        --requirement deps/requirements-pyright.txt
 
@@ -253,7 +243,7 @@ commands =
 description = Ensures that source materials code and docs and test suite adhere to 
               formatting and code-quality standards.
 skip_install=true
-basepython=python3.9
+basepython=python3.10
 deps=black
      isort
      flake8
@@ -269,7 +259,7 @@ commands=
 [testenv:docs]
 description = Uses Sphinx to generate html for the jatic-toolbox's docs. Stores the
               results in `.tox/docs/build/html/`.
-basepython=python3.9
+basepython=python3.10
 changedir=docs
 deps=-r{toxinidir}/docs/requirements.txt
 commands=

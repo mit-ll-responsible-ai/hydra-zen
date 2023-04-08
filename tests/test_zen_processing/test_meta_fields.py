@@ -5,7 +5,7 @@ import string
 
 import hypothesis.strategies as st
 import pytest
-from hypothesis import given
+from hypothesis import given, settings
 
 from hydra_zen import builds, hydrated_dataclass, instantiate
 from hydra_zen.structured_configs._type_guards import is_partial_builds
@@ -15,6 +15,7 @@ def f(*args, **kwargs):
     return args, kwargs
 
 
+@settings(deadline=None)
 @given(
     args=st.tuples(st.integers()),
     kwargs=st.dictionaries(
