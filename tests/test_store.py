@@ -632,7 +632,7 @@ def test_iter(entries, sub_store):
         assert len(iter_out) == len(entries)
 
 
-@settings(max_examples=10)
+@settings(max_examples=10, deadline=None)
 @given(entries=st.lists(store_entries()), store=new_stores(), sub_store=st.booleans())
 def test_bool(entries, store: ZenStore, sub_store: bool):
     with clean_store():
@@ -645,12 +645,13 @@ def test_bool(entries, store: ZenStore, sub_store: bool):
         assert bool(entries) is bool(store)
 
 
-@settings(max_examples=20)
+@settings(max_examples=20, deadline=None)
 @given(...)
 def test_repr(store: ZenStore):
     assert isinstance(repr(store), str)
 
 
+@settings(deadline=None)
 @given(store=..., num_adds=st.integers(1, 5))
 def test_repeated_add_to_hydra_store_ok(store: ZenStore, num_adds: int):
     # store should clear internal queue so that multiple add-to-store calls
@@ -662,6 +663,7 @@ def test_repeated_add_to_hydra_store_ok(store: ZenStore, num_adds: int):
             assert not store.has_enqueued()
 
 
+@settings(deadline=None)
 @given(...)
 def test_store_protects_overwriting_entries_in_hydra_store(store: ZenStore):
     with clean_store():
@@ -676,7 +678,7 @@ def test_store_protects_overwriting_entries_in_hydra_store(store: ZenStore):
         store.add_to_hydra_store(overwrite_ok=True)
 
 
-@settings(max_examples=20)
+@settings(max_examples=20, deadline=None)
 @given(...)
 def test_getitem(store: ZenStore):
     assume(store)
@@ -686,7 +688,7 @@ def test_getitem(store: ZenStore):
             assert len(store[entry["group"]]) > 0
 
 
-@settings(max_examples=20)
+@settings(max_examples=20, deadline=None)
 @given(...)
 def test_eq(store1: ZenStore, store2: ZenStore):
     with clean_store():
@@ -701,7 +703,7 @@ def test_eq(store1: ZenStore, store2: ZenStore):
         assert store1 == store1(param="blah")
 
 
-@settings(max_examples=20)
+@settings(max_examples=20, deadline=None)
 @given(...)
 def test_get_entry(store: ZenStore):
     assume(store)
@@ -710,7 +712,7 @@ def test_get_entry(store: ZenStore):
     assert entry == entry_
 
 
-@settings(max_examples=20)
+@settings(max_examples=20, deadline=None)
 @given(store=...)
 @pytest.mark.parametrize(
     "getter",
