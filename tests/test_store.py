@@ -24,7 +24,6 @@ from hydra_zen import (
     make_config,
     store as default_store,
 )
-from hydra_zen._compatibility import HYDRA_SUPPORTS_LIST_INSTANTIATION, HYDRA_VERSION
 from tests.custom_strategies import new_stores, store_entries
 
 cs = ConfigStore().instance()
@@ -456,8 +455,6 @@ def test_overwrite_ok(outer: bool, inner: bool, name, group):
 )
 @pytest.mark.usefixtures("clean_store")
 def test_default_to_config_produces_instantiable_configs(target):
-    if not HYDRA_SUPPORTS_LIST_INSTANTIATION and isinstance(target, (list, ListConfig)):
-        pytest.xfail("Hydra doesn't support list instantiation")
     default_store(target, name="target")
     default_store.add_to_hydra_store()
     instantiate_from_repo("target")
@@ -762,10 +759,6 @@ def test_auto_support_for_HydraConf(conf: HydraConf, deferred: bool):
 @pytest.mark.skipif(
     sys.platform.startswith("win") and bool(os.environ.get("CI")),
     reason="Things are weird on GitHub Actions and Windows",
-)
-@pytest.mark.skipif(
-    HYDRA_VERSION < (1, 2, 0),
-    reason="HydraConf(job=Job(chdir=...)) introduced in Hydra 1.2.0",
 )
 @pytest.mark.parametrize(
     "inp",
