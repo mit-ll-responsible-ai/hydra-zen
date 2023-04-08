@@ -4,6 +4,7 @@
 import inspect
 from dataclasses import dataclass
 from typing import Any
+from zoneinfo import ZoneInfo
 
 import pytest
 from hypothesis import HealthCheck, assume, example, given, note, settings
@@ -128,7 +129,7 @@ construction_fn_variations = [
 )
 @given(
     unsupported=everything_except(
-        *(HYDRA_SUPPORTED_PRIMITIVES | ZEN_SUPPORTED_PRIMITIVES)
+        *(HYDRA_SUPPORTED_PRIMITIVES | ZEN_SUPPORTED_PRIMITIVES), ZoneInfo
     ).filter(lambda x: not inspect.isfunction(x))
 )
 def test_unsupported_config_value_raises_while_making_config(
@@ -144,7 +145,7 @@ def test_unsupported_config_value_raises_while_making_config(
     suppress_health_check=(HealthCheck.data_too_large, HealthCheck.too_slow),
     deadline=None,
 )
-@given(value=everything_except())
+@given(value=everything_except(ZoneInfo))
 def test_that_configs_passed_by_zen_validation_are_serializable(
     config_construction_fn, value
 ):
