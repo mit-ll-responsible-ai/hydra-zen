@@ -157,21 +157,10 @@ basepython = python3.7
 description = Runs test suite against pre-release versions of dependencies.
 pip_pre = true
 deps = {[testenv]deps}
-       pydantic
+       pydantic<2.0.0
        beartype
        cloudpickle
 basepython = python3.9
-
-[testenv:omegaconf-2p2p2]
-description = Test againse OmegaConf 2.2.2 to guard against type-sanitization regressions.
-pip_pre = true
-deps = omegaconf==2.2.2
-       hydra-core==1.2.0
-       {[testenv]deps}
-       pydantic
-       beartype
-       cloudpickle
-basepython = python3.8
 
 [testenv:coverage]
 description = Runs test suite and measures test-coverage. Fails if coverage is 
