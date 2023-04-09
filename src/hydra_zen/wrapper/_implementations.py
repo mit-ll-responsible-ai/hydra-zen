@@ -309,12 +309,15 @@ class Zen(Generic[P, R]):
             )
 
     @staticmethod
-    def instantiate(x: Any) -> Any:
-        x = instantiate(x)
-        if isinstance(x, (ListConfig, DictConfig)):
-            return OmegaConf.to_object(x)
+    def instantiate(__c: Any) -> Any:
+        """Instantiates each config that is extracted by `zen` before calling the wrapped function.
+
+        Overwrite this to change `ZenWrapper`'s instantiation behavior."""
+        __c = instantiate(__c)
+        if isinstance(__c, (ListConfig, DictConfig)):
+            return OmegaConf.to_object(__c)
         else:
-            return x
+            return __c
 
     # TODO: add "extract" option that enables returning dict of fields
     def __call__(self, __cfg: Union[ConfigLike, str]) -> R:
