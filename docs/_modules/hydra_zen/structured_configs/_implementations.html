@@ -1042,7 +1042,7 @@ document.write(`
     <span class="c1"># importable callable (function, type, or method)</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="n">structured_conf_permitted</span>
-        <span class="ow">and</span> <span class="n">callable</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="nb">callable</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="ow">and</span> <span class="p">(</span>
             <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
             <span class="ow">or</span> <span class="p">(</span>
@@ -1858,7 +1858,7 @@ document.write(`
 
     <span class="k">del</span> <span class="n">pos_args</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
             <span class="n">BUILDS_ERROR_PREFIX</span>
             <span class="o">+</span> <span class="s2">&quot;In `builds(&lt;target&gt;, ...), `&lt;target&gt;` must be callable/instantiable&quot;</span>
@@ -1924,7 +1924,7 @@ document.write(`
                         <span class="p">)</span>
                     <span class="n">validated_wrappers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wrapper</span><span class="p">)</span>
 
-            <span class="k">elif</span> <span class="n">callable</span><span class="p">(</span><span class="n">wrapper</span><span class="p">):</span>
+            <span class="k">elif</span> <span class="nb">callable</span><span class="p">(</span><span class="n">wrapper</span><span class="p">):</span>
                 <span class="n">validated_wrappers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_utils</span><span class="o">.</span><span class="n">get_obj_path</span><span class="p">(</span><span class="n">wrapper</span><span class="p">))</span>
 
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">wrapper</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
