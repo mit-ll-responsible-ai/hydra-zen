@@ -5,7 +5,6 @@ from typing import FrozenSet
 
 from typing_extensions import Final
 
-from hydra_zen._compatibility import HYDRA_SUPPORTS_PARTIAL
 from hydra_zen.funcs import get_obj, zen_processing
 from hydra_zen.structured_configs import _utils
 
@@ -22,10 +21,9 @@ _names = [
     RECURSIVE_FIELD_NAME,
     CONVERT_FIELD_NAME,
     POS_ARG_FIELD_NAME,
+    PARTIAL_FIELD_NAME,
 ]
 
-if HYDRA_SUPPORTS_PARTIAL:  # pragma: no cover
-    _names.append(PARTIAL_FIELD_NAME)
 
 HYDRA_FIELD_NAMES: FrozenSet[str] = frozenset(_names)
 

@@ -58,7 +58,6 @@ from hydra_zen.typing._implementations import (
     StoreEntry,
 )
 
-from .._compatibility import HYDRA_SUPPORTS_LIST_INSTANTIATION, SUPPORTS_VERSION_BASE
 from ..structured_configs._type_guards import is_dataclass
 from ..structured_configs._utils import safe_name
 
@@ -72,10 +71,8 @@ F = TypeVar("F")
 
 _UNSPECIFIED_: Any = object()
 
-if HYDRA_SUPPORTS_LIST_INSTANTIATION:
-    _SUPPORTED_INSTANTIATION_TYPES: Tuple[Any, ...] = (dict, DictConfig, list, ListConfig)  # type: ignore
-else:  # pragma: no cover
-    _SUPPORTED_INSTANTIATION_TYPES: Tuple[Any, ...] = (dict, DictConfig)  # type: ignore
+
+_SUPPORTED_INSTANTIATION_TYPES: Tuple[Any, ...] = (dict, DictConfig, list, ListConfig)  # type: ignore
 
 ConfigLike: TypeAlias = Union[
     DataClass_,
@@ -311,6 +308,17 @@ class Zen(Generic[P, R]):
                 f"`cfg` is missing the following fields: {', '.join(missing_params)}"
             )
 
+    @staticmethod
+    def instantiate(__c: Any) -> Any:
+        """Instantiates each config that is extracted by `zen` before calling the wrapped function.
+
+        Overwrite this to change `ZenWrapper`'s instantiation behavior."""
+        __c = instantiate(__c)
+        if isinstance(__c, (ListConfig, DictConfig)):
+            return OmegaConf.to_object(__c)
+        else:
+            return __c
+
     # TODO: add "extract" option that enables returning dict of fields
     def __call__(self, __cfg: Union[ConfigLike, str]) -> R:
         """
@@ -349,7 +357,6 @@ class Zen(Generic[P, R]):
             for name, param in self.parameters.items()
             if param.kind not in SKIPPED_PARAM_KINDS and name not in self._exclude
         }
-
         extra_kwargs = {self.CFG_NAME: cfg} if self._has_zen_cfg else {}
         if self._unpack_kwargs:
             names = (
@@ -361,9 +368,9 @@ class Zen(Generic[P, R]):
             )
             cfg_kwargs.update({name: cfg[name] for name in names})
         return self.func(
-            *(instantiate(x) if is_instantiable(x) else x for x in args_),
+            *(self.instantiate(x) if is_instantiable(x) else x for x in args_),
             **{
-                name: instantiate(val) if is_instantiable(val) else val
+                name: self.instantiate(val) if is_instantiable(val) else val
                 for name, val in cfg_kwargs.items()
             },
             **extra_kwargs,
@@ -441,9 +448,7 @@ class Zen(Generic[P, R]):
         if config_path is not _UNSPECIFIED_:
             kw["config_path"] = config_path
 
-        if (
-            SUPPORTS_VERSION_BASE and version_base is not _UNSPECIFIED_
-        ):  # pragma: no cover
+        if version_base is not _UNSPECIFIED_:  # pragma: no cover
             kw["version_base"] = version_base
 
         return hydra.main(**kw)(target)()

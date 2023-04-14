@@ -13,7 +13,10 @@ dynamic = ["version"]
 description = "Configurable, reproducible, and scalable workflows in Python, via Hydra"
 readme = "README.md"
 requires-python = ">=3.7"
-dependencies = ["hydra-core >= 1.1.0", "typing-extensions >= 4.1.0"]
+dependencies = ["hydra-core >= 1.2.0", 
+       "omegaconf >= 2.2.1", 
+       "typing-extensions >= 4.1.0",
+       ]
 license = { text = "MIT" }
 keywords = [
        "machine learning",
@@ -147,8 +150,8 @@ commands = pytest tests/ {posargs: -n auto --maxprocesses=4}
 
 [testenv:min-deps]
 description = Runs test suite against minimum supported versions of dependencies.
-deps = hydra-core==1.1.0
-       omegaconf==2.1.1
+deps = hydra-core==1.2.0
+       omegaconf==2.2.1
        typing-extensions==4.1.0
        {[testenv]deps}
 basepython = python3.7

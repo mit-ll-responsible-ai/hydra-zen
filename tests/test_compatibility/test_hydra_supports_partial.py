@@ -6,12 +6,7 @@ from functools import partial
 import pytest
 
 from hydra_zen import builds, get_target, instantiate, make_custom_builds_fn
-from hydra_zen._compatibility import HYDRA_SUPPORTS_PARTIAL
 from hydra_zen.funcs import zen_processing
-from hydra_zen.structured_configs._type_guards import (
-    is_partial_builds,
-    uses_zen_processing,
-)
 from hydra_zen.structured_configs._utils import get_obj_path
 from hydra_zen.typing import HydraPartialBuilds, ZenPartialBuilds
 
@@ -38,12 +33,8 @@ def test_HydraPartialBuilds_protocol():
 
 def test_HYDRA_SUPPORTS_PARTIAL_is_set_properly():
     obj = instantiate(HydraPartialConf)
-    if HYDRA_SUPPORTS_PARTIAL:
-        # instantiation should produce `functools.partial(dict, x=1)`
-        assert callable(obj) and obj() == {"x": 1}
-    else:
-        # instantiation should product `dict(x=1, _partial_=True)`
-        assert obj == {"x": 1, "_partial_": True}
+    # instantiation should produce `functools.partial(dict, x=1)`
+    assert callable(obj) and obj() == {"x": 1}
 
 
 def test_partial_via_zen_processing():
@@ -52,10 +43,6 @@ def test_partial_via_zen_processing():
     obj = instantiate(ZenPartialConf)
     assert isinstance(obj, partial)
     assert obj() == {"x": 1}
-
-
-def test_is_partial_builds_on_hydra_partial_config():
-    assert is_partial_builds(HydraPartialConf) is HYDRA_SUPPORTS_PARTIAL
 
 
 def test_get_target_on_hydra_partial_config():
@@ -72,8 +59,6 @@ def test_builds_leverages_hydra_support_for_partial_when_no_other_zen_processing
         else make_custom_builds_fn(zen_partial=True)
     )
     Conf = builder(dict, x=1)
-    assert uses_zen_processing(Conf) is not HYDRA_SUPPORTS_PARTIAL
-    assert hasattr(Conf, "_partial_") is HYDRA_SUPPORTS_PARTIAL
     instance = instantiate(Conf)()
     assert instance == {"x": 1}
 

@@ -129,23 +129,69 @@ def test_zen_pre_call_precedes_instantiation(seed: int):
 
 @given(y=st.sampled_from(range(10)), as_dict_config=st.booleans())
 def test_interpolations_are_resolved(y: int, as_dict_config: bool):
+    @dataclass
+    class AA:
+        x: Any
+
     @zen(unpack_kwargs=True)
-    def f(dict_, list_, builds_, make_config_, direct, **kw):
-        return dict_, list_, builds_, make_config_, direct, kw["nested"]
+    def f(
+        dict_,
+        list_,
+        builds_,
+        make_config_,
+        direct,
+        list_of_dataclasses,
+        nested_dataclasses,
+        **kw,
+    ):
+        return (
+            dict_,
+            list_,
+            builds_,
+            make_config_,
+            direct,
+            list_of_dataclasses,
+            nested_dataclasses,
+            kw["nested"],
+        )
 
     cfg_maker = make_config if not as_dict_config else lambda **kw: DictConfig(kw)
-    out = f(
+    B = make_config(b="${y}")
+    (
+        dict_,
+        list_,
+        builds_,
+        make_config_,
+        direct,
+        list_of_dataclasses,
+        nested_dataclasses,
+        kw,
+    ) = f(
         cfg_maker(
             dict_={"x": "${y}"},
             list_=["${y}"],
             builds_=builds(dict, a="${y}"),
-            make_config_=make_config(b="${y}"),
+            make_config_=B,
             direct="${y}",
+            list_of_dataclasses=[AA(x=1), AA(x="${y}")],
+            nested_dataclasses=AA(x=AA(x="${y}")),
             nested=dict(top=dict(bottom="${...y}")),
             y=y,
         )
     )
-    assert out == ({"x": y}, [y], {"a": y}, {"b": y}, y, {"top": {"bottom": y}})
+
+    assert dict_ == {"x": y}
+    assert list_ == [y]
+    assert builds_ == {"a": y}
+    assert make_config_ == B(b=y)
+    assert direct == y
+    assert list_of_dataclasses == [AA(1), AA(y)]
+    assert kw == {"top": {"bottom": y}}
+    assert isinstance(nested_dataclasses, AA)
+    assert isinstance(nested_dataclasses.x, AA)
+    assert nested_dataclasses.x.x == y
+    assert isinstance(make_config_, B)
+    assert all(isinstance(x, AA) for x in list_of_dataclasses)
 
 
 @pytest.mark.parametrize(
