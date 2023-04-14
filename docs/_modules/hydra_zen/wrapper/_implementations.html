@@ -448,7 +448,6 @@ document.write(`
     <span class="n">StoreEntry</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">.._compatibility</span> <span class="kn">import</span> <span class="n">HYDRA_SUPPORTS_LIST_INSTANTIATION</span><span class="p">,</span> <span class="n">SUPPORTS_VERSION_BASE</span>
 <span class="kn">from</span> <span class="nn">..structured_configs._type_guards</span> <span class="kn">import</span> <span class="n">is_dataclass</span>
 <span class="kn">from</span> <span class="nn">..structured_configs._utils</span> <span class="kn">import</span> <span class="n">safe_name</span>
 
@@ -462,10 +461,8 @@ document.write(`
 
 <span class="n">_UNSPECIFIED_</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="nb">object</span><span class="p">()</span>
 
-<span class="k">if</span> <span class="n">HYDRA_SUPPORTS_LIST_INSTANTIATION</span><span class="p">:</span>
-    <span class="n">_SUPPORTED_INSTANTIATION_TYPES</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
-<span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-    <span class="n">_SUPPORTED_INSTANTIATION_TYPES</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+
+<span class="n">_SUPPORTED_INSTANTIATION_TYPES</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
 
 <span class="n">ConfigLike</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span>
     <span class="n">DataClass_</span><span class="p">,</span>
@@ -701,6 +698,17 @@ document.write(`
                 <span class="sa">f</span><span class="s2">&quot;`cfg` is missing the following fields: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing_params</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span></div>
 
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">instantiate</span><span class="p">(</span><span class="n">__c</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiates each config that is extracted by `zen` before calling the wrapped function.</span>
+
+<span class="sd">        Overwrite this to change `ZenWrapper`&#39;s instantiation behavior.&quot;&quot;&quot;</span>
+        <span class="n">__c</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">__c</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">__c</span><span class="p">,</span> <span class="p">(</span><span class="n">ListConfig</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">OmegaConf</span><span class="o">.</span><span class="n">to_object</span><span class="p">(</span><span class="n">__c</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">__c</span>
+
     <span class="c1"># TODO: add &quot;extract&quot; option that enables returning dict of fields</span>
 <div class="viewcode-block" id="Zen.__call__"><a class="viewcode-back" href="../../../generated/hydra_zen.wrapper.Zen.html#hydra_zen.Zen.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__cfg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ConfigLike</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">R</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -739,7 +747,6 @@ document.write(`
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">SKIPPED_PARAM_KINDS</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exclude</span>
         <span class="p">}</span>
-
         <span class="n">extra_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">CFG_NAME</span><span class="p">:</span> <span class="n">cfg</span><span class="p">}</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_zen_cfg</span> <span class="k">else</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_kwargs</span><span class="p">:</span>
             <span class="n">names</span> <span class="o">=</span> <span class="p">(</span>
@@ -751,9 +758,9 @@ document.write(`
             <span class="p">)</span>
             <span class="n">cfg_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">name</span><span class="p">:</span> <span class="n">cfg</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">})</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span>
-            <span class="o">*</span><span class="p">(</span><span class="n">instantiate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_instantiable</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">args_</span><span class="p">),</span>
+            <span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instantiate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_instantiable</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">args_</span><span class="p">),</span>
             <span class="o">**</span><span class="p">{</span>
-                <span class="n">name</span><span class="p">:</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_instantiable</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">else</span> <span class="n">val</span>
+                <span class="n">name</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">instantiate</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_instantiable</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">else</span> <span class="n">val</span>
                 <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">cfg_kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
             <span class="p">},</span>
             <span class="o">**</span><span class="n">extra_kwargs</span><span class="p">,</span>
@@ -831,9 +838,7 @@ document.write(`
         <span class="k">if</span> <span class="n">config_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_UNSPECIFIED_</span><span class="p">:</span>
             <span class="n">kw</span><span class="p">[</span><span class="s2">&quot;config_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config_path</span>
 
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="n">SUPPORTS_VERSION_BASE</span> <span class="ow">and</span> <span class="n">version_base</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_UNSPECIFIED_</span>
-        <span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+        <span class="k">if</span> <span class="n">version_base</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_UNSPECIFIED_</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="n">kw</span><span class="p">[</span><span class="s2">&quot;version_base&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">version_base</span>
 
         <span class="k">return</span> <span class="n">hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">)(</span><span class="n">target</span><span class="p">)()</span></div></div>

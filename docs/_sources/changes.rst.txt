@@ -17,6 +17,21 @@ The following parts of the documentation underwent significant revisions:
 - `The landing page <https://github.com/mit-ll-responsible-ai/hydra-zen>`_ now has a "hydra-zen at at glance" subsection.
 - The docs for `~hydra_zen.ZenStore` were revamped.
 
+.. _v0.11.0:
+
+---------------------
+0.11.0rc - 2023-04-09
+---------------------
+This release drops support for hydra-core 1.1 and for omegaconf 2.1; this enables hydra-zen to remove a lot of complex compatibility logic and to improve the behavior
+of :func:`~hydra_zen.zen`.
+
+
+Compatibility-Breaking Changes
+------------------------------
+- The auto-instantiation behavior of :class:`~hydra_zen.wrapper.Zen` and :func:`~hydra_zen.zen` have been updated so that nested dataclasses (nested within lists, dicts, and other dataclasses) will no longer be returned as omegaconf configs (see :pull:`448`).
+- hydra-core 1.2.0 and omegaconf 2.2.1 are now the minimum supported versions.
+
+
 .. _v0.10.0:
 
 -------------------
@@ -228,7 +243,7 @@ New Features
 ------------
 - hydra-zen now supports Python 3.11
 - Adds the :func:`~hydra_zen.zen` decorator (see :pull:`310`)
-- Adds the :func:`~hydra_zen.wrapper.Zen` decorator-class (see :pull:`310`)
+- Adds the :class:`~hydra_zen.wrapper.Zen` decorator-class (see :pull:`310`)
 - Adds the :class:`~hydra_zen.ZenStore` class (see :pull:`331`)
 - Adds `hyda_zen.store`, which is a pre-initialized instance of :class:`~hydra_zen.ZenStore` (see :pull:`331`)
 - The option `hydra_convert='object'` is now supported by all of hydra-zen's config-creation functions. So that an instantiated structured config can be converted to an instance of its backing dataclass. This feature was added by `Hydra 1.3.0 <https://github.com/facebookresearch/hydra/issues/1719>`_.

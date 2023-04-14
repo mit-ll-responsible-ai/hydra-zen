@@ -397,7 +397,6 @@ document.write(`
 
 <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">TypeGuard</span>
 
-<span class="kn">from</span> <span class="nn">hydra_zen._compatibility</span> <span class="kn">import</span> <span class="n">HYDRA_SUPPORTS_PARTIAL</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.funcs</span> <span class="kn">import</span> <span class="n">get_obj</span><span class="p">,</span> <span class="n">zen_processing</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.structured_configs._utils</span> <span class="kn">import</span> <span class="n">safe_name</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">Builds</span><span class="p">,</span> <span class="n">Just</span><span class="p">,</span> <span class="n">PartialBuilds</span>
@@ -612,8 +611,8 @@ document.write(`
     <span class="k">if</span> <span class="n">is_builds</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="c1"># check if partial&#39;d config via Hydra</span>
-            <span class="n">HYDRA_SUPPORTS_PARTIAL</span>
-            <span class="ow">and</span> <span class="n">safe_getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">PARTIAL_FIELD_NAME</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+            <span class="n">safe_getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">PARTIAL_FIELD_NAME</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="ow">is</span> <span class="kc">True</span>
         <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
             <span class="c1"># check if partial&#39;d config via `zen_processing`</span>
             <span class="n">uses_zen_processing</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>

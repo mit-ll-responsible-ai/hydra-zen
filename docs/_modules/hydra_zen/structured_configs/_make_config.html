@@ -393,8 +393,6 @@ document.write(`
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># use this for runtime checks</span>
-    <span class="n">MISSING</span><span class="p">,</span>
-    <span class="n">Field</span> <span class="k">as</span> <span class="n">_Field</span><span class="p">,</span>
     <span class="n">InitVar</span><span class="p">,</span>
     <span class="n">dataclass</span><span class="p">,</span>
     <span class="n">make_dataclass</span><span class="p">,</span>
@@ -403,7 +401,6 @@ document.write(`
 
 <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Literal</span>
 
-<span class="kn">from</span> <span class="nn">hydra_zen._compatibility</span> <span class="kn">import</span> <span class="n">PATCH_OMEGACONF_830</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.errors</span> <span class="kn">import</span> <span class="n">HydraZenDeprecationWarning</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.structured_configs</span> <span class="kn">import</span> <span class="n">_utils</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.structured_configs._implementations</span> <span class="kn">import</span> <span class="p">(</span>
@@ -420,7 +417,6 @@ document.write(`
     <span class="n">ZenConvert</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">.._compatibility</span> <span class="kn">import</span> <span class="n">HYDRA_SUPPORTS_PARTIAL</span>
 <span class="kn">from</span> <span class="nn">._globals</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CONVERT_FIELD_NAME</span><span class="p">,</span>
     <span class="n">DEFAULTS_LIST_FIELD_NAME</span><span class="p">,</span>
@@ -480,11 +476,8 @@ document.write(`
     <span class="n">default</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportedPrimitive</span><span class="p">,</span> <span class="n">Field</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">NOTHING</span><span class="p">)</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">NOTHING</span><span class="p">]]</span> <span class="o">=</span> <span class="n">NOTHING</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">_permit_default_factory</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">zen_convert</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]],</span> <span class="n">_permit_default_factory</span><span class="p">:</span> <span class="nb">bool</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NOTHING</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`ZenField.name` expects a string, got: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -496,34 +489,8 @@ document.write(`
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NOTHING</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">sanitized_field</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">,</span>
-                <span class="n">_mutable_default_permitted</span><span class="o">=</span><span class="n">_permit_default_factory</span><span class="p">,</span>
                 <span class="n">convert_dataclass</span><span class="o">=</span><span class="n">convert_settings</span><span class="p">[</span><span class="s2">&quot;dataclass&quot;</span><span class="p">],</span>
             <span class="p">)</span></div>
-
-
-<span class="k">def</span> <span class="nf">_repack_zenfield</span><span class="p">(</span>
-    <span class="n">value</span><span class="p">:</span> <span class="n">ZenField</span><span class="p">,</span>
-    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
-    <span class="n">zen_convert</span><span class="p">:</span> <span class="n">ZenConvert</span><span class="p">,</span>
-<span class="p">):</span>
-    <span class="n">default</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">default</span>
-
-    <span class="k">if</span> <span class="p">(</span>
-        <span class="n">PATCH_OMEGACONF_830</span>
-        <span class="ow">and</span> <span class="n">bases</span>
-        <span class="ow">and</span> <span class="ow">not</span> <span class="n">_utils</span><span class="o">.</span><span class="n">mutable_default_permitted</span><span class="p">(</span><span class="n">bases</span><span class="p">,</span> <span class="n">field_name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="n">_Field</span><span class="p">)</span>
-        <span class="ow">and</span> <span class="n">default</span><span class="o">.</span><span class="n">default_factory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">MISSING</span>
-    <span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="k">return</span> <span class="n">ZenField</span><span class="p">(</span>
-            <span class="n">hint</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">hint</span><span class="p">,</span>
-            <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="o">.</span><span class="n">default_factory</span><span class="p">(),</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">_permit_default_factory</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">zen_convert</span><span class="o">=</span><span class="n">zen_convert</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="k">return</span> <span class="n">value</span>
 
 
 <span class="n">_MAKE_CONFIG_SETTINGS</span> <span class="o">=</span> <span class="n">AllConvert</span><span class="p">(</span><span class="n">dataclass</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -880,27 +847,17 @@ document.write(`
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_field</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-            <span class="n">normalized_fields</span><span class="p">[</span><span class="n">_field</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_repack_zenfield</span><span class="p">(</span>
-                <span class="n">_field</span><span class="p">,</span> <span class="n">_field</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">convert_settings</span>
-            <span class="p">)</span>
+            <span class="n">normalized_fields</span><span class="p">[</span><span class="n">_field</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_field</span>
 
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">fields_as_kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">):</span>
-            <span class="n">default_factory_permitted</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="ow">not</span> <span class="n">bases</span> <span class="ow">or</span> <span class="n">_utils</span><span class="o">.</span><span class="n">mutable_default_permitted</span><span class="p">(</span><span class="n">bases</span><span class="p">,</span> <span class="n">field_name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">PATCH_OMEGACONF_830</span>
-                <span class="k">else</span> <span class="kc">True</span>
-            <span class="p">)</span>
             <span class="n">normalized_fields</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ZenField</span><span class="p">(</span>
                 <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
                 <span class="n">default</span><span class="o">=</span><span class="n">value</span><span class="p">,</span>
-                <span class="n">_permit_default_factory</span><span class="o">=</span><span class="n">default_factory_permitted</span><span class="p">,</span>
                 <span class="n">zen_convert</span><span class="o">=</span><span class="n">convert_settings</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">normalized_fields</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_repack_zenfield</span><span class="p">(</span>
-                <span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="o">=</span><span class="n">bases</span><span class="p">,</span> <span class="n">zen_convert</span><span class="o">=</span><span class="n">convert_settings</span>
-            <span class="p">)</span>
+            <span class="n">normalized_fields</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="c1"># fields without defaults must come first</span>
     <span class="n">config_fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[</span>
@@ -970,11 +927,7 @@ document.write(`
             <span class="sa">f</span><span class="s2">&quot;associated with zen-processing features. As a result, this config will &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;not instantiate correctly.&quot;</span>
         <span class="p">)</span>
-    <span class="k">if</span> <span class="p">(</span>
-        <span class="n">HYDRA_SUPPORTS_PARTIAL</span>
-        <span class="ow">and</span> <span class="n">safe_getattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">PARTIAL_FIELD_NAME</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-        <span class="ow">and</span> <span class="n">uses_zen_processing</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-    <span class="p">):</span>
+    <span class="k">if</span> <span class="n">safe_getattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">PARTIAL_FIELD_NAME</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="n">uses_zen_processing</span><span class="p">(</span><span class="n">out</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">out</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> specifies both `</span><span class="si">{</span><span class="n">PARTIAL_FIELD_NAME</span><span class="si">}</span><span class="s2">=True` and `&quot;</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ZEN_PARTIAL_FIELD_NAME</span><span class="si">}</span><span class="s2">=True`. This config will not instantiate &quot;</span>
