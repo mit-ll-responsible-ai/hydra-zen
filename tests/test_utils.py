@@ -449,7 +449,7 @@ def test_merge_settings_retains_user_settings(
 @pytest.mark.parametrize("bad_settings", [1, {"not a field": True}, {"dataclass": 1.0}])
 def test_merge_settings_validation(bad_settings):
     with pytest.raises((TypeError, ValueError)):
-        merge_settings(bad_settings, {"dataclass": True})
+        merge_settings(bad_settings, {"dataclass": True, "flat_target": True})
 
 
 def test_strict_dataclass_options_reflects_current_dataclass_ver():

@@ -19,6 +19,7 @@ from typing import (
 from typing_extensions import Literal, ParamSpec, Protocol
 
 from ._implementations import (
+    AnyBuilds,
     Builds,
     BuildsWithSig,
     DataClass_,
@@ -38,6 +39,27 @@ __all__ = ["FullBuilds", "PBuilds", "StdBuilds"]
 
 
 class StdBuilds(Protocol):
+    # partial=False, pop-sig=True; no *args, **kwargs, nor builds_bases
+    @overload
+    def __call__(
+        self,
+        __hydra_target: Type[BuildsWithSig[Type[R], P]],
+        *,
+        zen_partial: Literal[False, None] = ...,
+        populate_full_signature: Literal[True],
+        zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
+        zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+        hydra_recursive: Optional[bool] = ...,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+        hydra_defaults: Optional[DefaultsList] = ...,
+        dataclass_name: Optional[str] = ...,
+        builds_bases: Tuple[()] = ...,
+        frozen: bool = ...,
+        zen_dataclass: Optional[DataclassOptions] = ...,
+        zen_convert: Optional[ZenConvert] = ...,
+    ) -> Type[BuildsWithSig[Type[R], P]]:
+        ...
+
     # partial=False, pop-sig=True; no *args, **kwargs, nor builds_bases
     @overload
     def __call__(
@@ -63,6 +85,27 @@ class StdBuilds(Protocol):
     @overload
     def __call__(
         self,
+        __hydra_target: Type[AnyBuilds[Importable]],
+        *pos_args: SupportedPrimitive,
+        zen_partial: Literal[False, None] = ...,
+        populate_full_signature: bool = ...,
+        zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
+        zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+        hydra_recursive: Optional[bool] = ...,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+        hydra_defaults: Optional[DefaultsList] = ...,
+        dataclass_name: Optional[str] = ...,
+        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        frozen: bool = ...,
+        zen_dataclass: Optional[DataclassOptions] = ...,
+        zen_convert: Optional[ZenConvert] = ...,
+        **kwargs_for_target: SupportedPrimitive,
+    ) -> Type[Builds[Importable]]:
+        ...
+
+    @overload
+    def __call__(
+        self,
         __hydra_target: Importable,
         *pos_args: SupportedPrimitive,
         zen_partial: Literal[False, None] = ...,
@@ -82,6 +125,27 @@ class StdBuilds(Protocol):
         ...
 
     # partial=True, pop-sig=bool
+    @overload
+    def __call__(
+        self,
+        __hydra_target: Type[AnyBuilds[Importable]],
+        *pos_args: SupportedPrimitive,
+        zen_partial: Literal[True] = ...,
+        populate_full_signature: bool = ...,
+        zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
+        zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+        hydra_recursive: Optional[bool] = ...,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+        hydra_defaults: Optional[DefaultsList] = ...,
+        dataclass_name: Optional[str] = ...,
+        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        frozen: bool = ...,
+        zen_dataclass: Optional[DataclassOptions] = ...,
+        zen_convert: Optional[ZenConvert] = ...,
+        **kwargs_for_target: SupportedPrimitive,
+    ) -> Type[PartialBuilds[Importable]]:
+        ...
+
     @overload
     def __call__(
         self,
@@ -107,6 +171,27 @@ class StdBuilds(Protocol):
     @overload
     def __call__(
         self,
+        __hydra_target: Type[AnyBuilds[Importable]],
+        *pos_args: SupportedPrimitive,
+        zen_partial: Optional[bool] = ...,
+        populate_full_signature: Literal[False] = ...,
+        zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
+        zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+        hydra_recursive: Optional[bool] = ...,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+        hydra_defaults: Optional[DefaultsList] = ...,
+        dataclass_name: Optional[str] = ...,
+        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        frozen: bool = ...,
+        zen_dataclass: Optional[DataclassOptions] = ...,
+        zen_convert: Optional[ZenConvert] = ...,
+        **kwargs_for_target: SupportedPrimitive,
+    ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]],]:
+        ...
+
+    @overload
+    def __call__(
+        self,
         __hydra_target: Importable,
         *pos_args: SupportedPrimitive,
         zen_partial: Optional[bool] = ...,
@@ -129,7 +214,7 @@ class StdBuilds(Protocol):
     @overload
     def __call__(
         self,
-        __hydra_target: Union[Callable[P, R], Importable],
+        __hydra_target: Union[Callable[P, R], Type[AnyBuilds[Importable]], Importable],
         *pos_args: SupportedPrimitive,
         zen_partial: Optional[bool],
         populate_full_signature: bool = ...,
@@ -153,7 +238,7 @@ class StdBuilds(Protocol):
 
     def __call__(
         self,
-        __hydra_target: Union[Callable[P, R], Importable],
+        __hydra_target: Union[Callable[P, R], Type[Builds[Importable]], Importable],
         *pos_args: SupportedPrimitive,
         zen_partial: Optional[bool] = None,
         populate_full_signature: bool = False,
@@ -180,6 +265,47 @@ class FullBuilds(Protocol):
     # full_builds -> populate_full_signature=True  (new default value)
 
     # partial=False, pop_sig=True; no *args, **kwargs, nor builds_bases`
+
+    @overload
+    def __call__(
+        self,
+        __hydra_target: Type[BuildsWithSig[Type[R], P]],
+        *,
+        zen_partial: Literal[False, None] = ...,
+        populate_full_signature: Literal[True] = ...,
+        zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
+        zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+        hydra_recursive: Optional[bool] = ...,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+        hydra_defaults: Optional[DefaultsList] = ...,
+        dataclass_name: Optional[str] = ...,
+        builds_bases: Tuple[()] = ...,
+        frozen: bool = ...,
+        zen_dataclass: Optional[DataclassOptions] = ...,
+        zen_convert: Optional[ZenConvert] = ...,
+    ) -> Type[BuildsWithSig[Type[R], P]]:
+        ...
+
+    @overload
+    def __call__(
+        self,
+        __hydra_target: Type[AnyBuilds[Importable]],
+        *,
+        zen_partial: Literal[False, None] = ...,
+        populate_full_signature: Literal[True] = ...,
+        zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
+        zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+        hydra_recursive: Optional[bool] = ...,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+        hydra_defaults: Optional[DefaultsList] = ...,
+        dataclass_name: Optional[str] = ...,
+        builds_bases: Tuple[()] = ...,
+        frozen: bool = ...,
+        zen_dataclass: Optional[DataclassOptions] = ...,
+        zen_convert: Optional[ZenConvert] = ...,
+    ) -> Type[Builds[Importable]]:
+        ...
+
     @overload
     def __call__(
         self,
@@ -200,7 +326,27 @@ class FullBuilds(Protocol):
     ) -> Type[BuildsWithSig[Type[R], P]]:
         ...
 
-    # partial=False, pop_sig=bool; has *args, **kwargs, and/or `builds_bases`
+    @overload
+    def __call__(
+        self,
+        __hydra_target: Type[Union[AnyBuilds[Importable], PartialBuilds[Importable]]],
+        *pos_args: SupportedPrimitive,
+        zen_partial: Literal[False, None] = ...,
+        populate_full_signature: bool = ...,
+        zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
+        zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+        hydra_recursive: Optional[bool] = ...,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+        hydra_defaults: Optional[DefaultsList] = ...,
+        dataclass_name: Optional[str] = ...,
+        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        frozen: bool = ...,
+        zen_dataclass: Optional[DataclassOptions] = ...,
+        zen_convert: Optional[ZenConvert] = ...,
+        **kwargs_for_target: SupportedPrimitive,
+    ) -> Type[Builds[Importable]]:
+        ...
+
     @overload
     def __call__(
         self,
@@ -226,6 +372,27 @@ class FullBuilds(Protocol):
     @overload
     def __call__(
         self,
+        __hydra_target: Type[AnyBuilds[Importable]],
+        *pos_args: SupportedPrimitive,
+        zen_partial: Literal[True] = ...,
+        populate_full_signature: bool = ...,
+        zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
+        zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+        hydra_recursive: Optional[bool] = ...,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+        hydra_defaults: Optional[DefaultsList] = ...,
+        dataclass_name: Optional[str] = ...,
+        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        frozen: bool = ...,
+        zen_dataclass: Optional[DataclassOptions] = ...,
+        zen_convert: Optional[ZenConvert] = ...,
+        **kwargs_for_target: SupportedPrimitive,
+    ) -> Type[PartialBuilds[Importable]]:
+        ...
+
+    @overload
+    def __call__(
+        self,
         __hydra_target: Importable,
         *pos_args: SupportedPrimitive,
         zen_partial: Literal[True] = ...,
@@ -245,6 +412,27 @@ class FullBuilds(Protocol):
         ...
 
     # partial=bool, pop-sig=False
+    @overload
+    def __call__(
+        self,
+        __hydra_target: Type[AnyBuilds[Importable]],
+        *pos_args: SupportedPrimitive,
+        zen_partial: Optional[bool] = ...,
+        populate_full_signature: Literal[False],
+        zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
+        zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+        hydra_recursive: Optional[bool] = ...,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+        hydra_defaults: Optional[DefaultsList] = ...,
+        frozen: bool = ...,
+        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        dataclass_name: Optional[str] = ...,
+        zen_dataclass: Optional[DataclassOptions] = ...,
+        zen_convert: Optional[ZenConvert] = ...,
+        **kwargs_for_target: SupportedPrimitive,
+    ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]:
+        ...
+
     @overload
     def __call__(
         self,
@@ -270,7 +458,7 @@ class FullBuilds(Protocol):
     @overload
     def __call__(
         self,
-        __hydra_target: Union[Callable[P, R], Importable],
+        __hydra_target: Union[Callable[P, R], Type[AnyBuilds[Importable]], Importable],
         *pos_args: SupportedPrimitive,
         zen_partial: Optional[bool],
         populate_full_signature: bool = ...,
@@ -294,7 +482,12 @@ class FullBuilds(Protocol):
 
     def __call__(
         self,
-        __hydra_target: Union[Callable[P, R], Importable],
+        __hydra_target: Union[
+            Callable[P, R],
+            Importable,
+            Type[Builds[Importable]],
+            Type[PartialBuilds[Importable]],
+        ],
         *pos_args: SupportedPrimitive,
         zen_partial: Optional[bool] = None,
         populate_full_signature: bool = True,
@@ -324,6 +517,27 @@ class PBuilds(Protocol):
     @overload
     def __call__(
         self,
+        __hydra_target: Type[AnyBuilds[Importable]],
+        *pos_args: SupportedPrimitive,
+        zen_partial: Literal[True] = ...,
+        populate_full_signature: bool = ...,
+        zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
+        zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+        hydra_recursive: Optional[bool] = ...,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+        hydra_defaults: Optional[DefaultsList] = ...,
+        dataclass_name: Optional[str] = ...,
+        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        frozen: bool = ...,
+        zen_dataclass: Optional[DataclassOptions] = ...,
+        zen_convert: Optional[ZenConvert] = ...,
+        **kwargs_for_target: SupportedPrimitive,
+    ) -> Type[PartialBuilds[Importable]]:
+        ...
+
+    @overload
+    def __call__(
+        self,
         __hydra_target: Importable,
         *pos_args: SupportedPrimitive,
         zen_partial: Literal[True] = ...,
@@ -343,6 +557,26 @@ class PBuilds(Protocol):
         ...
 
     # partial=False, pop-sig=True; no *args, **kwargs, nor builds_bases
+    @overload
+    def __call__(
+        self,
+        __hydra_target: Type[BuildsWithSig[Type[R], P]],
+        *,
+        zen_partial: Literal[False, None],
+        populate_full_signature: Literal[True],
+        zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
+        zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+        hydra_recursive: Optional[bool] = ...,
+        hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
+        hydra_defaults: Optional[DefaultsList] = ...,
+        dataclass_name: Optional[str] = ...,
+        builds_bases: Tuple[()] = ...,
+        frozen: bool = ...,
+        zen_dataclass: Optional[DataclassOptions] = ...,
+        zen_convert: Optional[ZenConvert] = ...,
+    ) -> Type[BuildsWithSig[Type[R], P]]:
+        ...
+
     @overload
     def __call__(
         self,
@@ -367,7 +601,7 @@ class PBuilds(Protocol):
     @overload
     def __call__(
         self,
-        __hydra_target: Importable,
+        __hydra_target: Type[AnyBuilds[Importable]],
         *pos_args: SupportedPrimitive,
         zen_partial: Optional[bool] = ...,
         populate_full_signature: Literal[False] = ...,
@@ -385,17 +619,16 @@ class PBuilds(Protocol):
     ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]],]:
         ...
 
-    # partial=bool, pop-sig=bool
     @overload
     def __call__(
         self,
-        __hydra_target: Union[Callable[P, R], Importable],
+        __hydra_target: Importable,
         *pos_args: SupportedPrimitive,
-        zen_partial: Optional[bool],
-        populate_full_signature: bool = ...,
-        hydra_recursive: Optional[bool] = ...,
+        zen_partial: Optional[bool] = ...,
+        populate_full_signature: Literal[False] = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
         zen_meta: Optional[Mapping[str, SupportedPrimitive]] = ...,
+        hydra_recursive: Optional[bool] = ...,
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
@@ -404,11 +637,7 @@ class PBuilds(Protocol):
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: SupportedPrimitive,
-    ) -> Union[
-        Type[Builds[Importable]],
-        Type[PartialBuilds[Importable]],
-        Type[BuildsWithSig[Type[R], P]],
-    ]:
+    ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]],]:
         ...
 
     # partial=bool, pop-sig=bool
@@ -439,7 +668,7 @@ class PBuilds(Protocol):
 
     def __call__(
         self,
-        __hydra_target: Union[Callable[P, R], Importable],
+        __hydra_target: Union[Callable[P, R], Type[AnyBuilds[Importable]], Importable],
         *pos_args: SupportedPrimitive,
         zen_partial: Optional[bool] = True,
         populate_full_signature: bool = False,

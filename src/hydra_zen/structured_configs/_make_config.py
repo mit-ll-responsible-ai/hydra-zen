@@ -103,7 +103,7 @@ class ZenField:
             )
 
 
-_MAKE_CONFIG_SETTINGS = AllConvert(dataclass=False)
+_MAKE_CONFIG_SETTINGS = AllConvert(dataclass=False, flat_target=False)
 
 
 def make_config(

@@ -112,6 +112,9 @@ exclude = [
        "**/__pycache__",
        "src/hydra_zen/_version.py",
        "**/third_party",
+       "**/.hypothesis",
+       "**/docs",
+       "**/.tox",
 ]
 reportUnnecessaryTypeIgnoreComment = true
 reportUnnecessaryIsInstance = false
