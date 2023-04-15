@@ -48,7 +48,7 @@ from typing_extensions import (
 from hydra_zen import instantiate, just, make_custom_builds_fn
 from hydra_zen._compatibility import HYDRA_VERSION, Version
 from hydra_zen.errors import HydraZenValidationError
-from hydra_zen.structured_configs._type_guards import safe_getattr
+from hydra_zen.structured_configs._type_guards import is_builds, safe_getattr
 from hydra_zen.structured_configs._utils import get_obj_path
 from hydra_zen.typing._implementations import (
     DataClass_,
@@ -803,6 +803,9 @@ def default_to_config(
     'y': ???
     """
     if is_dataclass(target):
+        if is_builds(target):
+            return target
+
         if isinstance(target, type):
             if issubclass(target, HydraConf):
                 # don't auto-config HydraConf
