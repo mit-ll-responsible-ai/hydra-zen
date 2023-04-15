@@ -19,6 +19,7 @@ from omegaconf import DictConfig, ListConfig
 from hydra_zen import (
     ZenStore,
     builds,
+    hydrated_dataclass,
     instantiate,
     just,
     make_config,
@@ -790,3 +791,15 @@ def test_node_warns():
     store = ZenStore(warn_node_kwarg=True)
     with pytest.warns(UserWarning):
         store(node=builds(int))
+
+
+def test_store_hydrated_dataclass():
+    # regression test for: https://github.com/mit-ll-responsible-ai/hydra-zen/issues/453
+
+    @hydrated_dataclass(just)
+    class SomethingHydrated:
+        ...
+
+    store = ZenStore()
+    store(SomethingHydrated, name="foo")
+    assert store[None, "foo"] is SomethingHydrated
