@@ -33,3 +33,6 @@ def test_flat_target_manual_config():
         _target_: str = get_obj_path(foo)
         x: int = 1
         y: int = 2
+
+    c = builds(A, x=3, y=4, populate_full_signature=True)
+    assert instantiate(c) == (3, 4)
