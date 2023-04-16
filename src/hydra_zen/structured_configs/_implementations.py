@@ -1570,6 +1570,18 @@ def builds(
             f" {','.join(str(_key) for _key in zen_meta if not isinstance(_key, str))}"
         )
 
+    target_path: str
+    if (
+        zen_convert_settings["flat_target"]
+        and isinstance(target, type)
+        and is_dataclass(target)
+        and hasattr(target, TARGET_FIELD_NAME)
+    ):
+        # pass through _target_ field
+        target_path = safe_getattr(target, TARGET_FIELD_NAME)
+    else:
+        target_path = _utils.get_obj_path(target)
+
     if zen_wrappers is not None:
         if not isinstance(zen_wrappers, Sequence) or isinstance(zen_wrappers, str):
             zen_wrappers = (zen_wrappers,)
@@ -1638,18 +1650,6 @@ def builds(
             )
 
     target_field: List[Union[Tuple[str, Type[Any]], Tuple[str, Type[Any], Any]]]
-
-    target_path: str
-    if (
-        zen_convert_settings["flat_target"]
-        and isinstance(target, type)
-        and is_dataclass(target)
-        and hasattr(target, TARGET_FIELD_NAME)
-    ):
-        # pass through _target_ field
-        target_path = safe_getattr(target, TARGET_FIELD_NAME)
-    else:
-        target_path = _utils.get_obj_path(target)
 
     # zen_partial behavior:
     #
