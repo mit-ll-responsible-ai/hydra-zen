@@ -280,7 +280,8 @@ class ZenConvert(TypedDict, total=False):
     options that configure the hydra-zen config-creation functions (e.g., `builds`,
     `just`, and `make_config`).
 
-    Note that, at runtime, `ZenConvert` is simply a dictionary with type-annotations. There is no enforced runtime validation of its keys and values.
+    Note that, at runtime, `ZenConvert` is simply a dictionary with type-annotations.
+    There is no enforced runtime validation of its keys and values.
 
     Parameters
     ----------

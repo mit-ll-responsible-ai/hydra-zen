@@ -811,6 +811,10 @@ def default_to_config(
             if not kw and get_obj_path(target).startswith("types."):
                 # handles dataclasses returned by make_config()
                 return target
+
+            if hasattr(target, "_target_"):
+                # TODO: mirror _partial_ et al settings in kw here
+                pass
             return fbuilds(target, **kw, builds_bases=(target,))
         if kw:
             raise ValueError(
