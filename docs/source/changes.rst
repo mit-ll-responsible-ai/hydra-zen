@@ -13,18 +13,22 @@ chronological order. All previous releases should still be available on pip.
 ---------------------
 0.11.0rc - 2023-04-09
 ---------------------
-This release drops support for hydra-core 1.1 and for omegaconf 2.1; this enables hydra-zen to remove a lot of complex compatibility logic and to improve the behavior
-of :func:`~hydra_zen.zen`.
+
+.. note:: This is documentation for an unreleased version of hydra-zen. You can try out this pre-release version using `pip install --pre hydra-zen`
+
+This release drops support for hydra-core 1.1 and for omegaconf 2.1; this enabled the 
+removal of a lot of complex compatibility logic from hydra-zen's source code, and to 
+improve the behavior of :func:`~hydra_zen.zen`.
 
 Bug Fixes
 ---------
-- :pull:`355` configs produced by `~hydra_zen.just` can now 
+- Configs produced by `~hydra_zen.just` will no longer cause a `ReadonlyConfigError` during Hydra's config-composition process. See :pull:`459`
 
 Compatibility-Breaking Changes
 ------------------------------
 - The auto-instantiation behavior of :class:`~hydra_zen.wrapper.Zen` and :func:`~hydra_zen.zen` have been updated so that nested dataclasses (nested within lists, dicts, and other dataclasses) will no longer be returned as omegaconf configs (see :pull:`448`).
 - hydra-core 1.2.0 and omegaconf 2.2.1 are now the minimum supported versions.
-- :func:`~hydra_zen.just` not longer returns a frozen dataclass.
+- :func:`~hydra_zen.just` not longer returns a frozen dataclass (see :pull:`459`).
 
 --------------------------
 Documentation - 2023-03-11
