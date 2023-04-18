@@ -8,15 +8,6 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse 
 chronological order. All previous releases should still be available on pip.
 
---------------------------
-Documentation - 2023-03-11
---------------------------
-
-The following parts of the documentation underwent significant revisions:
-
-- `The landing page <https://github.com/mit-ll-responsible-ai/hydra-zen>`_ now has a "hydra-zen at at glance" subsection.
-- The docs for `~hydra_zen.ZenStore` were revamped.
-
 .. _v0.11.0:
 
 ---------------------
@@ -25,11 +16,24 @@ The following parts of the documentation underwent significant revisions:
 This release drops support for hydra-core 1.1 and for omegaconf 2.1; this enables hydra-zen to remove a lot of complex compatibility logic and to improve the behavior
 of :func:`~hydra_zen.zen`.
 
+Bug Fixes
+---------
+- :pull:`355` configs produced by `~hydra_zen.just` can now 
 
 Compatibility-Breaking Changes
 ------------------------------
 - The auto-instantiation behavior of :class:`~hydra_zen.wrapper.Zen` and :func:`~hydra_zen.zen` have been updated so that nested dataclasses (nested within lists, dicts, and other dataclasses) will no longer be returned as omegaconf configs (see :pull:`448`).
 - hydra-core 1.2.0 and omegaconf 2.2.1 are now the minimum supported versions.
+- :func:`~hydra_zen.just` not longer returns a frozen dataclass.
+
+--------------------------
+Documentation - 2023-03-11
+--------------------------
+
+The following parts of the documentation underwent significant revisions:
+
+- `The landing page <https://github.com/mit-ll-responsible-ai/hydra-zen>`_ now has a "hydra-zen at at glance" subsection.
+- The docs for `~hydra_zen.ZenStore` were revamped.
 
 
 .. _v0.10.0:
