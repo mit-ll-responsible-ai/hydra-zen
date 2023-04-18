@@ -4,7 +4,7 @@
 import pytest
 from omegaconf import DictConfig
 
-from hydra_zen import builds, launch, make_config, store, to_yaml, zen
+from hydra_zen import ZenStore, builds, launch, make_config, to_yaml, zen
 
 
 def relu():
@@ -24,12 +24,12 @@ def app(zen_cfg: DictConfig, model: Model) -> None:
     print(to_yaml(zen_cfg, resolve=True))
 
 
-store(Model, group="model")
-
-
 @pytest.mark.usefixtures("cleandir")
+@pytest.mark.usefixtures("clean_store")
 def test_merge_prevented_by_frozen_regression():
     # https://github.com/mit-ll-responsible-ai/hydra-zen/issues/449
+
+    store = ZenStore()
     Config = builds(
         app,
         populate_full_signature=True,
@@ -47,6 +47,6 @@ def test_merge_prevented_by_frozen_regression():
         ),
         name="selu",
     )
-
+    store(Model, group="model")
     store.add_to_hydra_store()
     launch(Config, zen(app), version_base="1.2")
