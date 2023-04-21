@@ -54,8 +54,8 @@ Release Highlights
 
 Improvements
 ------------
-- New transitive behavior of :func:`~hydra_zen.builds`. See :pull:`455`
-- 
+- :func:`~hydra_zen.builds` now has a transitive property that enables iterative build patterns. See :pull:`455`
+- :func:`~hydra_zen.zen`'s instantiation phase has been improved so that dataclass objects and stdlib containers are returned instead of omegaconf objects. See :pull:`#448`. 
 
 Bug Fixes
 ---------
@@ -64,10 +64,13 @@ Bug Fixes
 
 Compatibility-Breaking Changes
 ------------------------------
+Most of these changes will not have any impact on users, based on download statistics and the particular code patterns impacted by the following changes.
+
 - hydra-core 1.2.0 and omegaconf 2.2.1 are now the minimum supported versions of hydra-zen's dependencies.
 - The auto-instantiation behavior of :class:`~hydra_zen.wrapper.Zen` and :func:`~hydra_zen.zen` have been updated so that nested dataclasses (nested within lists, dicts, and other dataclasses) will no longer be returned as omegaconf configs (see :pull:`448`).
 - :func:`~hydra_zen.just` not longer returns a frozen dataclass (see :pull:`459`).
 - Users that relied on patterns like `builds(builds(...))` will find that :pull:`455` has changed their behaviors. This new behavior can be disabled via `builds(..., zen_convert={'flat_target': False})`
+- :func:`~hydra_zen.zen`'s instantiation behavior was changed by :pull:`448`. See that PR for instructions on restoring the old behavior.
 
 --------------------------
 Documentation - 2023-03-11
