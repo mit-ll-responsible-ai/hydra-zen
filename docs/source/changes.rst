@@ -20,15 +20,54 @@ This release drops support for hydra-core 1.1 and for omegaconf 2.1; this enable
 removal of a lot of complex compatibility logic from hydra-zen's source code, and to 
 improve the behavior of :func:`~hydra_zen.zen`.
 
+
+---------------------
+0.11.0rc - 2023-04-09
+---------------------
+This release drops support for hydra-core 1.1 and for omegaconf 2.1; this enables hydra-zen to remove a lot of complex compatibility logic and to improve the behavior
+of :func:`~hydra_zen.zen`.
+
+Release Highlights
+------------------
+:func:`~hydra_zen.builds` now has special behavior when it is passed a dataclass type that already possesses a `_target_` field: `_target_` is treated in a transitive way. E.g. `build(builds(int))` is equivalent to `builds(int)`. This enables a powerful "builder" pattern where configs can be populated in iterative, branching ways (with full type-checking support 😎). 
+
+.. code-block:: python
+   :caption: Basic 'builder' pattern
+
+   from hydra_zen import make_custom_builds_fn, instantiate
+
+   fbuilds = make_custom_builds_fn(populate_full_signature=True)
+
+   def foo(x, y, z): return x, y, z
+
+   base_cfg = fbuilds(foo, x=0, y=0, z=0)
+
+   c1 = fbuilds(base_cfg, x=1)
+   c2 = fbuilds(c1, y=2)
+   c3 = fbuilds(c2, z=3)
+
+.. code-block:: pycon
+
+   >>> [instantiate(c) for c in [c1, c2, c3]]
+   [(1, 0, 0), (1, 2, 0), (1, 2, 3)]
+
+
+Improvements
+------------
+- New transitive behavior of :func:`~hydra_zen.builds`. See :pull:`455`
+- 
+
 Bug Fixes
 ---------
 - Configs produced by `~hydra_zen.just` will no longer cause a `ReadonlyConfigError` during Hydra's config-composition process. See :pull:`459`
+- :class:`~hydra_zen.ZenStore` now works with :func:`~hydra_zen.hydrated_dataclass`. See :issue:`453` and :pull:`455`.
 
 Compatibility-Breaking Changes
 ------------------------------
+- hydra-core 1.2.0 and omegaconf 2.2.1 are now the minimum supported versions of hydra-zen's dependencies.
 - The auto-instantiation behavior of :class:`~hydra_zen.wrapper.Zen` and :func:`~hydra_zen.zen` have been updated so that nested dataclasses (nested within lists, dicts, and other dataclasses) will no longer be returned as omegaconf configs (see :pull:`448`).
-- hydra-core 1.2.0 and omegaconf 2.2.1 are now the minimum supported versions.
 - :func:`~hydra_zen.just` not longer returns a frozen dataclass (see :pull:`459`).
+- Users that relied on patterns like `builds(builds(...))` will find that :pull:`455` has changed their behaviors. This new behavior can be disabled via `builds(..., zen_convert={'flat_target': False})`
 
 --------------------------
 Documentation - 2023-03-11
