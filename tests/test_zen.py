@@ -232,7 +232,7 @@ def test_no_resolve():
     out2 = zen(
         lambda **kw: kw,
         unpack_kwargs=True,
-        resolve_configs=False,
+        resolve_pre_call=False,
         pre_call=not_resolved,
     )(Cfg2)
     assert out2 == dict(x=1, y=1)

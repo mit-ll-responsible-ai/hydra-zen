@@ -136,7 +136,7 @@ class Zen(Generic[P, R]):
         exclude: Optional[Union[str, Iterable[str]]] = None,
         pre_call: PreCall = None,
         unpack_kwargs: bool = False,
-        resolve_configs: bool = True,
+        resolve_pre_call: bool = True,
     ) -> None:
         """
         Parameters
@@ -177,11 +177,11 @@ class Zen(Generic[P, R]):
         if not isinstance(unpack_kwargs, bool):
             raise TypeError(f"`unpack_kwargs` must be type `bool` got {unpack_kwargs}")
 
-        if not isinstance(resolve_configs, bool):
+        if not isinstance(resolve_pre_call, bool):  # pragma: no cover
             raise TypeError(
-                f"`resolve_configs` must be type `bool` got {resolve_configs}"
+                f"`resolve_pre_call` must be type `bool` got {resolve_pre_call}"
             )
-        self._resolve = resolve_configs
+        self._resolve = resolve_pre_call
         self._unpack_kwargs: bool = unpack_kwargs and any(
             p.kind is p.VAR_KEYWORD for p in self.parameters.values()
         )
@@ -469,7 +469,7 @@ def zen(
     unpack_kwargs: bool = ...,
     pre_call: PreCall = ...,
     ZenWrapper: Type[Zen[P, R]] = Zen,
-    resolve_configs: bool = ...,
+    resolve_pre_call: bool = ...,
     exclude: Optional[Union[str, Iterable[str]]] = None,
 ) -> Zen[P, R]:
     ...
@@ -481,7 +481,7 @@ def zen(
     *,
     unpack_kwargs: bool = ...,
     pre_call: PreCall = ...,
-    resolve_configs: bool = ...,
+    resolve_pre_call: bool = ...,
     ZenWrapper: Type[Zen[Any, Any]] = ...,
     exclude: Optional[Union[str, Iterable[str]]] = None,
 ) -> Callable[[Callable[P, R]], Zen[P, R]]:
@@ -494,7 +494,7 @@ def zen(
     unpack_kwargs: bool = False,
     pre_call: PreCall = None,
     exclude: Optional[Union[str, Iterable[str]]] = None,
-    resolve_configs: bool = True,
+    resolve_pre_call: bool = True,
     ZenWrapper: Type[Zen[P, R]] = Zen,
 ) -> Union[Zen[P, R], Callable[[Callable[P, R]], Zen[P, R]]]:
     r"""zen(func, /, pre_call, ZenWrapper)
@@ -538,10 +538,9 @@ def zen(
 
         A single string of comma-separated names can be specified.
 
-    resolve_configs : bool, (default=True)
+    resolve_pre_call : bool, (default=True)
         If True, the config passed to the zen-wrapped function has its interpolated
-        fields resolved by OmegaConf prior to any pre-call/instantiation calls.
-        Otherwise, resolving must be performed by a `pre_call` function.
+        fields resolved to being passed to any pre-call functions.
 
     ZenWrapper : Type[hydra_zen.wrapper.Zen], optional (default=Zen)
         If specified, a subclass of `Zen` that customizes the behavior of the wrapper.
@@ -742,7 +741,7 @@ def zen(
             pre_call=pre_call,
             exclude=exclude,
             unpack_kwargs=unpack_kwargs,
-            resolve_configs=resolve_configs,
+            resolve_pre_call=resolve_pre_call,
         )
 
     def wrap(f: Callable[P, R]) -> Zen[P, R]:
@@ -751,7 +750,7 @@ def zen(
             pre_call=pre_call,
             exclude=exclude,
             unpack_kwargs=unpack_kwargs,
-            resolve_configs=resolve_configs,
+            resolve_pre_call=resolve_pre_call,
         )
 
     return wrap
