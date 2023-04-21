@@ -811,7 +811,6 @@ def default_to_config(
             if not kw and get_obj_path(target).startswith("types."):
                 # handles dataclasses returned by make_config()
                 return target
-
             return fbuilds(target, **kw, builds_bases=(target,))
         if kw:
             raise ValueError(
