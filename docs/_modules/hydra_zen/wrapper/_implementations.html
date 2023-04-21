@@ -387,7 +387,7 @@ document.write(`
   <h1>Source code for hydra_zen.wrapper._implementations</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) 2023 Massachusetts Institute of Technology</span>
 <span class="c1"># SPDX-License-Identifier: MIT</span>
-<span class="c1"># pyright: strict</span>
+<span class="c1"># pyright: strict, reportUnnecessaryTypeIgnoreComment = true, reportUnnecessaryIsInstance = false</span>
 
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">deque</span>
@@ -523,6 +523,7 @@ document.write(`
         <span class="n">exclude</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">pre_call</span><span class="p">:</span> <span class="n">PreCall</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">unpack_kwargs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">resolve_pre_call</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
@@ -560,9 +561,14 @@ document.write(`
                 <span class="s2">&quot;signatures.&quot;</span>
             <span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">unpack_kwargs</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>  <span class="c1"># type: ignore</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">unpack_kwargs</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`unpack_kwargs` must be type `bool` got </span><span class="si">{</span><span class="n">unpack_kwargs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resolve_pre_call</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;`resolve_pre_call` must be type `bool` got </span><span class="si">{</span><span class="n">resolve_pre_call</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_resolve</span> <span class="o">=</span> <span class="n">resolve_pre_call</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_kwargs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">unpack_kwargs</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span>
             <span class="n">p</span><span class="o">.</span><span class="n">kind</span> <span class="ow">is</span> <span class="n">p</span><span class="o">.</span><span class="n">VAR_KEYWORD</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
         <span class="p">)</span>
@@ -609,8 +615,8 @@ document.write(`
             <span class="n">pre_call</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pre_call</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">)</span> <span class="k">else</span> <span class="n">_flat_call</span><span class="p">(</span><span class="n">pre_call</span><span class="p">)</span>
         <span class="p">)</span></div>
 
-    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_normalize_cfg</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
         <span class="n">cfg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
             <span class="n">DataClass_</span><span class="p">,</span>
             <span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span>
@@ -727,8 +733,10 @@ document.write(`
 <span class="sd">            The result of `func(&lt;args extracted from cfg&gt;)`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_cfg</span><span class="p">(</span><span class="n">__cfg</span><span class="p">)</span>
-        <span class="c1"># resolves all interpolated values in-place</span>
-        <span class="n">OmegaConf</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve</span><span class="p">:</span>
+            <span class="c1"># resolves all interpolated values in-place</span>
+            <span class="n">OmegaConf</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_call</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pre_call</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
@@ -848,6 +856,7 @@ document.write(`
     <span class="n">unpack_kwargs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">pre_call</span><span class="p">:</span> <span class="n">PreCall</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">ZenWrapper</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Zen</span><span class="p">,</span>
+    <span class="n">resolve_pre_call</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">exclude</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]:</span>
     <span class="o">...</span>
@@ -859,6 +868,7 @@ document.write(`
     <span class="o">*</span><span class="p">,</span>
     <span class="n">unpack_kwargs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">pre_call</span><span class="p">:</span> <span class="n">PreCall</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">resolve_pre_call</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">ZenWrapper</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Zen</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">exclude</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]],</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]]:</span>
@@ -871,6 +881,7 @@ document.write(`
     <span class="n">unpack_kwargs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">pre_call</span><span class="p">:</span> <span class="n">PreCall</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">exclude</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">resolve_pre_call</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">ZenWrapper</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Zen</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]],</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]]]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;zen(func, /, pre_call, ZenWrapper)</span>
@@ -908,11 +919,15 @@ document.write(`
 <span class="sd">        This is useful, e.g., for seeding a RNG prior to the instantiation phase</span>
 <span class="sd">        that is triggered when calling the wrapped function.</span>
 
-<span class="sd">    exclude: Optional[str | Iterable[str]]</span>
+<span class="sd">    exclude : Optional[str | Iterable[str]]</span>
 <span class="sd">        Specifies one or more parameter names in the function&#39;s signature</span>
 <span class="sd">        that will not be extracted from input configs by the zen-wrapped function.</span>
 
 <span class="sd">        A single string of comma-separated names can be specified.</span>
+
+<span class="sd">    resolve_pre_call : bool, (default=True)</span>
+<span class="sd">        If True, the config passed to the zen-wrapped function has its interpolated</span>
+<span class="sd">        fields resolved to being passed to any pre-call functions.</span>
 
 <span class="sd">    ZenWrapper : Type[hydra_zen.wrapper.Zen], optional (default=Zen)</span>
 <span class="sd">        If specified, a subclass of `Zen` that customizes the behavior of the wrapper.</span>
@@ -1109,12 +1124,20 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">__func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">ZenWrapper</span><span class="p">(</span>
-            <span class="n">__func</span><span class="p">,</span> <span class="n">pre_call</span><span class="o">=</span><span class="n">pre_call</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">,</span> <span class="n">unpack_kwargs</span><span class="o">=</span><span class="n">unpack_kwargs</span>
+            <span class="n">__func</span><span class="p">,</span>
+            <span class="n">pre_call</span><span class="o">=</span><span class="n">pre_call</span><span class="p">,</span>
+            <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">,</span>
+            <span class="n">unpack_kwargs</span><span class="o">=</span><span class="n">unpack_kwargs</span><span class="p">,</span>
+            <span class="n">resolve_pre_call</span><span class="o">=</span><span class="n">resolve_pre_call</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]:</span>
         <span class="k">return</span> <span class="n">ZenWrapper</span><span class="p">(</span>
-            <span class="n">f</span><span class="p">,</span> <span class="n">pre_call</span><span class="o">=</span><span class="n">pre_call</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">,</span> <span class="n">unpack_kwargs</span><span class="o">=</span><span class="n">unpack_kwargs</span>
+            <span class="n">f</span><span class="p">,</span>
+            <span class="n">pre_call</span><span class="o">=</span><span class="n">pre_call</span><span class="p">,</span>
+            <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">,</span>
+            <span class="n">unpack_kwargs</span><span class="o">=</span><span class="n">unpack_kwargs</span><span class="p">,</span>
+            <span class="n">resolve_pre_call</span><span class="o">=</span><span class="n">resolve_pre_call</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">wrap</span></div>
@@ -1665,15 +1688,15 @@ document.write(`
 <span class="sd">            with `store(node=Config)` instead of actually storing the node with</span>
 <span class="sd">            `store(Config)`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">deferred_to_config</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>  <span class="c1"># type: ignore</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">deferred_to_config</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;deferred_to_config must be a bool, got </span><span class="si">{</span><span class="n">deferred_to_config</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">overwrite_ok</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>  <span class="c1"># type: ignore</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">overwrite_ok</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;overwrite_ok must be a bool, got </span><span class="si">{</span><span class="n">overwrite_ok</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">deferred_hydra_store</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>  <span class="c1"># type: ignore</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">deferred_hydra_store</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;deferred_hydra_store must be a bool, got </span><span class="si">{</span><span class="n">deferred_hydra_store</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>

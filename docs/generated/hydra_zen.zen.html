@@ -309,9 +309,12 @@ from left (low-index) to right (high-index).</p>
 <p>This is useful, e.g., for seeding a RNG prior to the instantiation phase
 that is triggered when calling the wrapped function.</p>
 </dd>
-<dt><strong>exclude: Optional[str | Iterable[str]]</strong></dt><dd><p>Specifies one or more parameter names in the function’s signature
+<dt><strong>exclude</strong><span class="classifier">Optional[str | Iterable[str]]</span></dt><dd><p>Specifies one or more parameter names in the function’s signature
 that will not be extracted from input configs by the zen-wrapped function.</p>
 <p>A single string of comma-separated names can be specified.</p>
+</dd>
+<dt><strong>resolve_pre_call</strong><span class="classifier">bool, (default=True)</span></dt><dd><p>If True, the config passed to the zen-wrapped function has its interpolated
+fields resolved to being passed to any pre-call functions.</p>
 </dd>
 <dt><strong>ZenWrapper</strong><span class="classifier">Type[hydra_zen.wrapper.Zen], optional (default=Zen)</span></dt><dd><p>If specified, a subclass of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Zen</span></code> that customizes the behavior of the wrapper.</p>
 </dd>
