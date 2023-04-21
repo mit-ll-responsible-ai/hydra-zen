@@ -217,6 +217,27 @@ def test_zen_resolves_default_factories():
     assert zen_identity(Cfg()) == [1, 2, 3]
 
 
+def test_no_resolve():
+    def not_resolved(x):
+        assert x == dict(x=1, y="${x}")
+
+    def is_resolved(x):
+        assert x == dict(x=1, y=1)
+
+    Cfg = make_config(x=1, y="${x}")
+    out = zen(lambda **kw: kw, unpack_kwargs=True, pre_call=is_resolved)(Cfg)
+    assert out == dict(x=1, y=1)
+
+    Cfg2 = make_config(x=1, y="${x}")
+    out2 = zen(
+        lambda **kw: kw,
+        unpack_kwargs=True,
+        resolve_pre_call=False,
+        pre_call=not_resolved,
+    )(Cfg2)
+    assert out2 == dict(x=1, y=1)
+
+
 def test_zen_works_on_partiald_funcs():
     from functools import partial
 
