@@ -290,11 +290,15 @@ example use cases.</p>
 <dd><p>A TypedDict that provides a type-checked interface for specifying zen-convert
 options that configure the hydra-zen config-creation functions (e.g., <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code>,
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">make_config</span></code>).</p>
-<p>Note that, at runtime, <a class="reference internal" href="#hydra_zen.typing.ZenConvert" title="hydra_zen.typing.ZenConvert"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenConvert</span></code></a> is simply a dictionary with type-annotations. There is no enforced runtime validation of its keys and values.</p>
+<p>Note that, at runtime, <a class="reference internal" href="#hydra_zen.typing.ZenConvert" title="hydra_zen.typing.ZenConvert"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenConvert</span></code></a> is simply a dictionary with type-annotations.
+There is no enforced runtime validation of its keys and values.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>dataclass</strong><span class="classifier">bool</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> any dataclass type/instance without a <code class="xref py py-obj docutils literal notranslate"><span class="pre">_target_</span></code> field is
+<dt><strong>flat_target: bool</strong></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> (default), <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds(builds(f))</span></code> is equivalent to <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds(f)</span></code>. I.e. the
+second <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code> call will use the <code class="xref py py-obj docutils literal notranslate"><span class="pre">_target_</span></code> field of its input, if it exists.</p>
+</dd>
+<dt><strong>dataclass</strong><span class="classifier">bool</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> (default) any dataclass type/instance without a <code class="xref py py-obj docutils literal notranslate"><span class="pre">_target_</span></code> field is
 automatically converted to a targeted config that will instantiate to that type/
 instance. Otherwise the dataclass type/instance will be passed through as-is.</p>
 <p>Note that this only works with statically-defined dataclass types, whereas

@@ -344,6 +344,11 @@ type/instance will be passed through as-is.</p>
 </dd>
 </dl>
 </li>
+<li><dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">flat_target</span></code>: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a> (default=True)</dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> (default), <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds(builds(f))</span></code> is equivalent to <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds(f)</span></code>. I.e. the second <a class="reference internal" href="#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> call will use the <code class="xref py py-obj docutils literal notranslate"><span class="pre">_target_</span></code> field of its input, if it exists.</p>
+</dd>
+</dl>
+</li>
 </ul>
 </dd>
 <dt><strong>builds_bases</strong><span class="classifier">Tuple[Type[DataClass], …]</span></dt><dd><p>Specifies a tuple of parent classes that the resulting config inherits from.</p>

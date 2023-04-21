@@ -569,6 +569,7 @@ document.write(`
 
 <span class="n">PartialBuilds</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">ZenPartialBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">HydraPartialBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">]]</span>
 
+<span class="n">AnyBuilds</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
 
 <span class="n">Importable</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Importable&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
 
@@ -641,10 +642,11 @@ document.write(`
 <span class="c1"># Lists all zen-convert settings and their types. Not part of public API</span>
 <span class="k">class</span> <span class="nc">AllConvert</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="n">dataclass</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">flat_target</span><span class="p">:</span> <span class="nb">bool</span>
 
 
 <span class="c1"># used for runtime type-checking</span>
-<span class="n">convert_types</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;dataclass&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">}</span>
+<span class="n">convert_types</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;dataclass&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="s2">&quot;flat_target&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">}</span>
 
 <span class="n">GroupName</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 <span class="n">NodeName</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="nb">str</span>
@@ -665,12 +667,17 @@ document.write(`
 <span class="sd">    options that configure the hydra-zen config-creation functions (e.g., `builds`,</span>
 <span class="sd">    `just`, and `make_config`).</span>
 
-<span class="sd">    Note that, at runtime, `ZenConvert` is simply a dictionary with type-annotations. There is no enforced runtime validation of its keys and values.</span>
+<span class="sd">    Note that, at runtime, `ZenConvert` is simply a dictionary with type-annotations.</span>
+<span class="sd">    There is no enforced runtime validation of its keys and values.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
+<span class="sd">    flat_target: bool</span>
+<span class="sd">        If `True` (default), `builds(builds(f))` is equivalent to `builds(f)`. I.e. the</span>
+<span class="sd">        second `builds` call will use the `_target_` field of its input, if it exists.</span>
+
 <span class="sd">    dataclass : bool</span>
-<span class="sd">        If `True` any dataclass type/instance without a `_target_` field is</span>
+<span class="sd">        If `True` (default) any dataclass type/instance without a `_target_` field is</span>
 <span class="sd">        automatically converted to a targeted config that will instantiate to that type/</span>
 <span class="sd">        instance. Otherwise the dataclass type/instance will be passed through as-is.</span>
 
@@ -734,6 +741,7 @@ document.write(`
 <span class="sd">    True</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">flat_target</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">dataclass</span><span class="p">:</span> <span class="nb">bool</span></div>
 
 
