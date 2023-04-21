@@ -1,6 +1,6 @@
 # Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-# pyright: strict
+# pyright: strict, reportUnnecessaryTypeIgnoreComment = true, reportUnnecessaryIsInstance = false
 
 import warnings
 from collections import defaultdict, deque
@@ -136,6 +136,7 @@ class Zen(Generic[P, R]):
         exclude: Optional[Union[str, Iterable[str]]] = None,
         pre_call: PreCall = None,
         unpack_kwargs: bool = False,
+        resolve_configs: bool = True,
     ) -> None:
         """
         Parameters
@@ -173,9 +174,14 @@ class Zen(Generic[P, R]):
                 "signatures."
             )
 
-        if not isinstance(unpack_kwargs, bool):  # type: ignore
+        if not isinstance(unpack_kwargs, bool):
             raise TypeError(f"`unpack_kwargs` must be type `bool` got {unpack_kwargs}")
 
+        if not isinstance(resolve_configs, bool):
+            raise TypeError(
+                f"`resolve_configs` must be type `bool` got {resolve_configs}"
+            )
+        self._resolve = resolve_configs
         self._unpack_kwargs: bool = unpack_kwargs and any(
             p.kind is p.VAR_KEYWORD for p in self.parameters.values()
         )
@@ -222,8 +228,8 @@ class Zen(Generic[P, R]):
             pre_call if not isinstance(pre_call, Iterable) else _flat_call(pre_call)
         )
 
-    @staticmethod
     def _normalize_cfg(
+        self,
         cfg: Union[
             DataClass_,
             Type[DataClass_],
@@ -340,8 +346,10 @@ class Zen(Generic[P, R]):
             The result of `func(<args extracted from cfg>)`
         """
         cfg = self._normalize_cfg(__cfg)
-        # resolves all interpolated values in-place
-        OmegaConf.resolve(cfg)
+
+        if self._resolve:
+            # resolves all interpolated values in-place
+            OmegaConf.resolve(cfg)
 
         if self.pre_call is not None:
             self.pre_call(cfg)
@@ -461,6 +469,7 @@ def zen(
     unpack_kwargs: bool = ...,
     pre_call: PreCall = ...,
     ZenWrapper: Type[Zen[P, R]] = Zen,
+    resolve_configs: bool = ...,
     exclude: Optional[Union[str, Iterable[str]]] = None,
 ) -> Zen[P, R]:
     ...
@@ -472,6 +481,7 @@ def zen(
     *,
     unpack_kwargs: bool = ...,
     pre_call: PreCall = ...,
+    resolve_configs: bool = ...,
     ZenWrapper: Type[Zen[Any, Any]] = ...,
     exclude: Optional[Union[str, Iterable[str]]] = None,
 ) -> Callable[[Callable[P, R]], Zen[P, R]]:
@@ -484,6 +494,7 @@ def zen(
     unpack_kwargs: bool = False,
     pre_call: PreCall = None,
     exclude: Optional[Union[str, Iterable[str]]] = None,
+    resolve_configs: bool = True,
     ZenWrapper: Type[Zen[P, R]] = Zen,
 ) -> Union[Zen[P, R], Callable[[Callable[P, R]], Zen[P, R]]]:
     r"""zen(func, /, pre_call, ZenWrapper)
@@ -521,11 +532,16 @@ def zen(
         This is useful, e.g., for seeding a RNG prior to the instantiation phase
         that is triggered when calling the wrapped function.
 
-    exclude: Optional[str | Iterable[str]]
+    exclude : Optional[str | Iterable[str]]
         Specifies one or more parameter names in the function's signature
         that will not be extracted from input configs by the zen-wrapped function.
 
         A single string of comma-separated names can be specified.
+
+    resolve_configs : bool, (default=True)
+        If True, the config passed to the zen-wrapped function has its interpolated
+        fields resolved by OmegaConf prior to any pre-call/instantiation calls.
+        Otherwise, resolving must be performed by a `pre_call` function.
 
     ZenWrapper : Type[hydra_zen.wrapper.Zen], optional (default=Zen)
         If specified, a subclass of `Zen` that customizes the behavior of the wrapper.
@@ -722,12 +738,20 @@ def zen(
     """
     if __func is not None:
         return ZenWrapper(
-            __func, pre_call=pre_call, exclude=exclude, unpack_kwargs=unpack_kwargs
+            __func,
+            pre_call=pre_call,
+            exclude=exclude,
+            unpack_kwargs=unpack_kwargs,
+            resolve_configs=resolve_configs,
         )
 
     def wrap(f: Callable[P, R]) -> Zen[P, R]:
         return ZenWrapper(
-            f, pre_call=pre_call, exclude=exclude, unpack_kwargs=unpack_kwargs
+            f,
+            pre_call=pre_call,
+            exclude=exclude,
+            unpack_kwargs=unpack_kwargs,
+            resolve_configs=resolve_configs,
         )
 
     return wrap
@@ -1278,15 +1302,15 @@ class ZenStore:
             with `store(node=Config)` instead of actually storing the node with
             `store(Config)`.
         """
-        if not isinstance(deferred_to_config, bool):  # type: ignore
+        if not isinstance(deferred_to_config, bool):
             raise TypeError(
                 f"deferred_to_config must be a bool, got {deferred_to_config}"
             )
 
-        if not isinstance(overwrite_ok, bool):  # type: ignore
+        if not isinstance(overwrite_ok, bool):
             raise TypeError(f"overwrite_ok must be a bool, got {overwrite_ok}")
 
-        if not isinstance(deferred_hydra_store, bool):  # type: ignore
+        if not isinstance(deferred_hydra_store, bool):
             raise TypeError(
                 f"deferred_hydra_store must be a bool, got {deferred_hydra_store}"
             )
