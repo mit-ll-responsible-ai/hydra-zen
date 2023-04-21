@@ -24,7 +24,7 @@ TB = TypeVar("TB", bound=Union[_SupportedViaBuilds, FrozenSet[Any]])
 __all__ = ["just"]
 
 
-_JUST_CONVERT_SETTINGS = AllConvert(dataclass=True)
+_JUST_CONVERT_SETTINGS = AllConvert(dataclass=True, flat_target=False)
 
 
 @overload
