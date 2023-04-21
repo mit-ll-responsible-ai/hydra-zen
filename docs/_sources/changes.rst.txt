@@ -11,7 +11,7 @@ chronological order. All previous releases should still be available on pip.
 .. _v0.11.0:
 
 ---------------------
-0.11.0rc - 2023-04-09
+0.11.0rc - 2023-04-21
 ---------------------
 
 .. note:: This is documentation for an unreleased version of hydra-zen. You can try out this pre-release version using `pip install --pre hydra-zen`
@@ -20,12 +20,6 @@ This release drops support for hydra-core 1.1 and for omegaconf 2.1; this enable
 removal of a lot of complex compatibility logic from hydra-zen's source code, and to 
 improve the behavior of :func:`~hydra_zen.zen`.
 
-
----------------------
-0.11.0rc - 2023-04-09
----------------------
-This release drops support for hydra-core 1.1 and for omegaconf 2.1; this enables hydra-zen to remove a lot of complex compatibility logic and to improve the behavior
-of :func:`~hydra_zen.zen`.
 
 Release Highlights
 ------------------
