@@ -486,7 +486,7 @@ def hydrated_dataclass(
     return wrapper
 
 
-@dataclass(frozen=True)
+@dataclass(unsafe_hash=True)
 class Just:
     """Just[T] is a config that returns T when instantiated."""
 
