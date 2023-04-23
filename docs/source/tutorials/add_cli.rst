@@ -24,7 +24,7 @@ Modifying Our Project
 
 Open ``my_app.py`` in your editor. We will make the following modifications to it:
 
-1. User :func:`hydra_zen.store` (`docs <https://mit-ll-responsible-ai.github.io/hydra-zen/generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore>`_) to generate for our task function and to store it in Hydra's global config store.
+1. Use :func:`hydra_zen.store` (`docs <https://mit-ll-responsible-ai.github.io/hydra-zen/generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore>`_) to generate for our task function and to store it in Hydra's global config store.
 2. Add a ``__main__`` clause to our ``my_app.py`` script so that the script runs our task function.
 3. Use :func:`hydra_zen.zen` to wrap the task function and to generate the CLI.
 
@@ -142,6 +142,7 @@ The following reference materials are especially relevant to this
 tutorial section.
 
 - `hydra_zen.store <https://mit-ll-responsible-ai.github.io/hydra-zen/generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore>`_
+- :func:`~hydra_zen.zen`
 - :hydra:`Hydra's Config Store API <tutorials/structured_config/config_store>`
 - :hydra:`Hydra's command line override syntax <advanced/override_grammar/basic>`
 

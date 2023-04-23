@@ -299,6 +299,8 @@ unique capabilities that are offered by hydra-zen. Finally, **Explanations** pro
 readers with taxonomies, design principles, recommendations, and other articles that 
 will enrich their understanding of hydra-zen and Hydra.
 
+Note that **each page in our reference documentation features extensive examples and explanations** of how the various components of hydra-zen work. Check it out!
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:

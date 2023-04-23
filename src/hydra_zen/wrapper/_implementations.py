@@ -532,15 +532,16 @@ def zen(
         This is useful, e.g., for seeding a RNG prior to the instantiation phase
         that is triggered when calling the wrapped function.
 
+    resolve_pre_call : bool, (default=True)
+        If `True`, the config passed to the zen-wrapped function has its interpolated
+        fields resolved prior to being passed to any pre-call functions. Otherwise, the
+        interpolation occurs after the pre-call functions are called.
+
     exclude : Optional[str | Iterable[str]]
         Specifies one or more parameter names in the function's signature
         that will not be extracted from input configs by the zen-wrapped function.
 
         A single string of comma-separated names can be specified.
-
-    resolve_pre_call : bool, (default=True)
-        If True, the config passed to the zen-wrapped function has its interpolated
-        fields resolved to being passed to any pre-call functions.
 
     ZenWrapper : Type[hydra_zen.wrapper.Zen], optional (default=Zen)
         If specified, a subclass of `Zen` that customizes the behavior of the wrapper.
@@ -655,10 +656,9 @@ def zen(
     sub-configs. One can specify the field named `zen_config` in their task function's
     signature to signal `zen` that it should pass the full config to that parameter .
 
-    >>> @zen
-    ... def zf(x: int, zen_cfg):
+    >>> def zf(x: int, zen_cfg):
     ...     return x, zen_cfg
-    >>> zf(dict(x=1, y="${x}", foo="bar"))
+    >>> zen(zf)(dict(x=1, y="${x}", foo="bar"))
     (1, {'x': 1, 'y': 1, 'foo': 'bar'})
 
     **Including a pre-call function**
@@ -684,11 +684,11 @@ def zen(
     ... )
     >>> wrapped = zen(func, pre_call=lambda cfg: random.seed(cfg.seed))
 
-    >>> @zen(pre_call=lambda cfg: random.seed(cfg.seed))
-    ... def f1(rand_val: int):
+    >>> def f1(rand_val: int):
     ...     return rand_val
+    >>> zf1 = zen(pre_call=lambda cfg: random.seed(cfg.seed))(f1)
 
-    >>> [f1(cfg) for _ in range(10)]
+    >>> [zf1(cfg) for _ in range(10)]
     [6, 6, 6, 6, 6, 6, 6, 6, 6, 6]
 
 

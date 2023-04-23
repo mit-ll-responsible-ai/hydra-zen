@@ -292,6 +292,8 @@ Want a deeper understanding of how hydra-zen and Hydra work?
 The following reference materials are especially relevant to this
 tutorial section.
 
+- :func:`~hydra_zen.zen`
+- :func:`~hydra_zen.builds`
 - :func:`~hydra_zen.make_config`
 - :func:`~hydra_zen.launch`
 - `Hydra's version_base <https://hydra.cc/docs/upgrades/version_base/#internaldocs-banner>`_
