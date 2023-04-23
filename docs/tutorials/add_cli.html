@@ -262,7 +262,7 @@ from a command line interface (CLI), using Hydra.</p>
 <h2>Modifying Our Project<a class="headerlink" href="#modifying-our-project" title="Permalink to this heading">#</a></h2>
 <p>Open <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code> in your editor. We will make the following modifications to it:</p>
 <ol class="arabic simple">
-<li><p>User <code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.store()</span></code> (<a class="reference external" href="https://mit-ll-responsible-ai.github.io/hydra-zen/generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore">docs</a>) to generate for our task function and to store it in Hydra’s global config store.</p></li>
+<li><p>Use <code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.store()</span></code> (<a class="reference external" href="https://mit-ll-responsible-ai.github.io/hydra-zen/generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore">docs</a>) to generate for our task function and to store it in Hydra’s global config store.</p></li>
 <li><p>Add a <code class="docutils literal notranslate"><span class="pre">__main__</span></code> clause to our <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code> script so that the script runs our task function.</p></li>
 <li><p>Use <a class="reference internal" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.zen()</span></code></a> to wrap the task function and to generate the CLI.</p></li>
 </ol>
@@ -371,6 +371,7 @@ The following reference materials are especially relevant to this
 tutorial section.</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://mit-ll-responsible-ai.github.io/hydra-zen/generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore">hydra_zen.store</a></p></li>
+<li><p><a class="reference internal" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-func docutils literal notranslate"><span class="pre">zen()</span></code></a></p></li>
 <li><p><a class="reference external" href="https://hydra.cc/docs/tutorials/structured_config/config_store">Hydra’s Config Store API</a></p></li>
 <li><p><a class="reference external" href="https://hydra.cc/docs/advanced/override_grammar/basic">Hydra’s command line override syntax</a></p></li>
 </ul>

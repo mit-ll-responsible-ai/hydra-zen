@@ -309,12 +309,13 @@ from left (low-index) to right (high-index).</p>
 <p>This is useful, e.g., for seeding a RNG prior to the instantiation phase
 that is triggered when calling the wrapped function.</p>
 </dd>
+<dt><strong>resolve_pre_call</strong><span class="classifier">bool, (default=True)</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>, the config passed to the zen-wrapped function has its interpolated
+fields resolved prior to being passed to any pre-call functions. Otherwise, the
+interpolation occurs after the pre-call functions are called.</p>
+</dd>
 <dt><strong>exclude</strong><span class="classifier">Optional[str | Iterable[str]]</span></dt><dd><p>Specifies one or more parameter names in the function’s signature
 that will not be extracted from input configs by the zen-wrapped function.</p>
 <p>A single string of comma-separated names can be specified.</p>
-</dd>
-<dt><strong>resolve_pre_call</strong><span class="classifier">bool, (default=True)</span></dt><dd><p>If True, the config passed to the zen-wrapped function has its interpolated
-fields resolved to being passed to any pre-call functions.</p>
 </dd>
 <dt><strong>ZenWrapper</strong><span class="classifier">Type[hydra_zen.wrapper.Zen], optional (default=Zen)</span></dt><dd><p>If specified, a subclass of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Zen</span></code> that customizes the behavior of the wrapper.</p>
 </dd>
@@ -426,10 +427,9 @@ a config:</p>
 <p>Some task functions require complete access to the full config to gain access to
 sub-configs. One can specify the field named <code class="xref py py-obj docutils literal notranslate"><span class="pre">zen_config</span></code> in their task function’s
 signature to signal <a class="reference internal" href="#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code></a> that it should pass the full config to that parameter .</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@zen</span>
-<span class="gp">... </span><span class="k">def</span> <span class="nf">zf</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">zen_cfg</span><span class="p">):</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">zf</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">zen_cfg</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">zen_cfg</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">zf</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"$</span><span class="si">{x}</span><span class="s2">"</span><span class="p">,</span> <span class="n">foo</span><span class="o">=</span><span class="s2">"bar"</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zen</span><span class="p">(</span><span class="n">zf</span><span class="p">)(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"$</span><span class="si">{x}</span><span class="s2">"</span><span class="p">,</span> <span class="n">foo</span><span class="o">=</span><span class="s2">"bar"</span><span class="p">))</span>
 <span class="go">(1, {'x': 1, 'y': 1, 'foo': 'bar'})</span>
 </pre></div>
 </div>
@@ -454,12 +454,12 @@ seed. We will use a pre-call function to seed the RNG prior to the instantiation
 <span class="gp">&gt;&gt;&gt; </span><span class="n">wrapped</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">pre_call</span><span class="o">=</span><span class="k">lambda</span> <span class="n">cfg</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/random.html#random.seed" title="random.seed"><span class="n">random</span><span class="o">.</span><span class="n">seed</span></a><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">seed</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@zen</span><span class="p">(</span><span class="n">pre_call</span><span class="o">=</span><span class="k">lambda</span> <span class="n">cfg</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">seed</span><span class="p">))</span>
-<span class="gp">... </span><span class="k">def</span> <span class="nf">f1</span><span class="p">(</span><span class="n">rand_val</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">):</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">f1</span><span class="p">(</span><span class="n">rand_val</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">return</span> <span class="n">rand_val</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zf1</span> <span class="o">=</span> <span class="n">zen</span><span class="p">(</span><span class="n">pre_call</span><span class="o">=</span><span class="k">lambda</span> <span class="n">cfg</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">seed</span><span class="p">))(</span><span class="n">f1</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">f1</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#range" title="range"><span class="nb">range</span></a><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">zf1</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#range" title="range"><span class="nb">range</span></a><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
 <span class="go">[6, 6, 6, 6, 6, 6, 6, 6, 6, 6]</span>
 </pre></div>
 </div>

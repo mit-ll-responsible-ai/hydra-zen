@@ -919,15 +919,16 @@ document.write(`
 <span class="sd">        This is useful, e.g., for seeding a RNG prior to the instantiation phase</span>
 <span class="sd">        that is triggered when calling the wrapped function.</span>
 
+<span class="sd">    resolve_pre_call : bool, (default=True)</span>
+<span class="sd">        If `True`, the config passed to the zen-wrapped function has its interpolated</span>
+<span class="sd">        fields resolved prior to being passed to any pre-call functions. Otherwise, the</span>
+<span class="sd">        interpolation occurs after the pre-call functions are called.</span>
+
 <span class="sd">    exclude : Optional[str | Iterable[str]]</span>
 <span class="sd">        Specifies one or more parameter names in the function&#39;s signature</span>
 <span class="sd">        that will not be extracted from input configs by the zen-wrapped function.</span>
 
 <span class="sd">        A single string of comma-separated names can be specified.</span>
-
-<span class="sd">    resolve_pre_call : bool, (default=True)</span>
-<span class="sd">        If True, the config passed to the zen-wrapped function has its interpolated</span>
-<span class="sd">        fields resolved to being passed to any pre-call functions.</span>
 
 <span class="sd">    ZenWrapper : Type[hydra_zen.wrapper.Zen], optional (default=Zen)</span>
 <span class="sd">        If specified, a subclass of `Zen` that customizes the behavior of the wrapper.</span>
@@ -1042,10 +1043,9 @@ document.write(`
 <span class="sd">    sub-configs. One can specify the field named `zen_config` in their task function&#39;s</span>
 <span class="sd">    signature to signal `zen` that it should pass the full config to that parameter .</span>
 
-<span class="sd">    &gt;&gt;&gt; @zen</span>
-<span class="sd">    ... def zf(x: int, zen_cfg):</span>
+<span class="sd">    &gt;&gt;&gt; def zf(x: int, zen_cfg):</span>
 <span class="sd">    ...     return x, zen_cfg</span>
-<span class="sd">    &gt;&gt;&gt; zf(dict(x=1, y=&quot;${x}&quot;, foo=&quot;bar&quot;))</span>
+<span class="sd">    &gt;&gt;&gt; zen(zf)(dict(x=1, y=&quot;${x}&quot;, foo=&quot;bar&quot;))</span>
 <span class="sd">    (1, {&#39;x&#39;: 1, &#39;y&#39;: 1, &#39;foo&#39;: &#39;bar&#39;})</span>
 
 <span class="sd">    **Including a pre-call function**</span>
@@ -1071,11 +1071,11 @@ document.write(`
 <span class="sd">    ... )</span>
 <span class="sd">    &gt;&gt;&gt; wrapped = zen(func, pre_call=lambda cfg: random.seed(cfg.seed))</span>
 
-<span class="sd">    &gt;&gt;&gt; @zen(pre_call=lambda cfg: random.seed(cfg.seed))</span>
-<span class="sd">    ... def f1(rand_val: int):</span>
+<span class="sd">    &gt;&gt;&gt; def f1(rand_val: int):</span>
 <span class="sd">    ...     return rand_val</span>
+<span class="sd">    &gt;&gt;&gt; zf1 = zen(pre_call=lambda cfg: random.seed(cfg.seed))(f1)</span>
 
-<span class="sd">    &gt;&gt;&gt; [f1(cfg) for _ in range(10)]</span>
+<span class="sd">    &gt;&gt;&gt; [zf1(cfg) for _ in range(10)]</span>
 <span class="sd">    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6]</span>
 
 
