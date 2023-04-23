@@ -12,31 +12,18 @@ Encyclopedia Hydrazennica.
 All reference documentation includes detailed Examples sections. Please scroll to the 
 bottom of any given reference page to see the examples.
 
-**************************************
-Creating and Launching Jobs with Hydra
-**************************************
 
-hydra-zen provides users the ability to launch a Hydra job via a 
-Python function instead of from a commandline interface.
+*******************************************
+Creating, Storing, and Working with Configs
+*******************************************
 
-.. currentmodule:: hydra_zen
-
-.. autosummary::
-   :toctree: generated/
-
-   launch
-   zen
-   wrapper.Zen
-
-*********************************
-Creating and Working with Configs
-*********************************
-
-hydra-zen provides us with some simple but powerful tools for creating and working with 
+hydra-zen provides us with tools for creating and working with 
 configs. Among these, the most essential functions for creating configs are 
-:func:`~hydra_zen.make_config` and :func:`~hydra_zen.builds`. Then, 
-:func:`~hydra_zen.instantiate` can be used to resolve these configs so that they return 
-the data and class-instances that we need for our application.
+:func:`~hydra_zen.make_config` and :func:`~hydra_zen.builds`. 
+`hydra_zen.store <https://mit-ll-responsible-ai.github.io/hydra-zen/generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore>`_ 
+is used to store configs so that we (and Hydra) can access them later. 
+Then, :func:`~hydra_zen.instantiate` can be used to resolve these configs so that they 
+return the data and class-instances that we need for our application.
 
 .. _create-config:
 
@@ -123,6 +110,22 @@ hydra_zen.typing
 
    DataclassOptions
    ZenConvert
+
+**************************************
+Creating and Launching Jobs with Hydra
+**************************************
+
+hydra-zen provides users the ability to launch a Hydra job via a 
+Python function instead of from a commandline interface.
+
+.. currentmodule:: hydra_zen
+
+.. autosummary::
+   :toctree: generated/
+
+   launch
+   zen
+   wrapper.Zen
 
 
 .. _valid-types:
