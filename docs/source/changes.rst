@@ -23,6 +23,8 @@ improve the behavior of :func:`~hydra_zen.zen`.
 
 Release Highlights
 ------------------
+hydra-zen now uses the `trusted publishers <https://blog.pypi.org/posts/2023-04-20-introducing-trusted-publishers/>`_ method for publishing its build artifacts to PyPI via a protected GitHub Actions environment. In short, this improves security for users by further reducing the surface area by which malicious 3rd parties could attempt to upload tainted versions of hydra-zen. Note that hydra-zen has always abided by the most rigorous methods for secure publishing - we adopted the Trusted Publishers method one day after it became available ❤️.
+
 :func:`~hydra_zen.builds` now has special behavior when it is passed a dataclass type that already possesses a `_target_` field: `_target_` is treated in a transitive way. E.g. `build(builds(int))` is equivalent to `builds(int)`. This enables a powerful "builder" pattern where configs can be populated in iterative, branching ways (with full type-checking support 😎). 
 
 .. code-block:: python
