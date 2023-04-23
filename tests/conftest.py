@@ -11,6 +11,7 @@ import hypothesis.strategies as st
 import pkg_resources
 import pytest
 from hydra.core.config_store import ConfigStore
+from hypothesis import settings
 from omegaconf import DictConfig, ListConfig
 
 from hydra_zen import store
@@ -93,3 +94,9 @@ st.register_type_strategy(ListConfig, st.lists(st.integers()).map(ListConfig))
 st.register_type_strategy(
     DictConfig, st.dictionaries(st.integers(), st.integers()).map(DictConfig)
 )
+
+
+settings.register_profile("ci", deadline=False)
+
+if bool(os.environ.get("CI")):
+    settings.load_profile("ci")
