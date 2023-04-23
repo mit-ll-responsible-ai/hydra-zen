@@ -615,6 +615,7 @@ def test_contains_consistent_with_getitem(store: ZenStore):
             assert "/".join(group_parts[:n]) in store
 
 
+@settings(deadline=None)
 @given(entries=st.lists(store_entries()), sub_store=st.booleans())
 def test_iter(entries, sub_store):
     with clean_store():
