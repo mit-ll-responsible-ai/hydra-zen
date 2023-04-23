@@ -141,7 +141,7 @@ Want a deeper understanding of how hydra-zen and Hydra work?
 The following reference materials are especially relevant to this
 tutorial section.
 
-- `~hydra_zen.store`
+- `hydra_zen.store <https://mit-ll-responsible-ai.github.io/hydra-zen/generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore>`_
 - :hydra:`Hydra's Config Store API <tutorials/structured_config/config_store>`
 - :hydra:`Hydra's command line override syntax <advanced/override_grammar/basic>`
 
