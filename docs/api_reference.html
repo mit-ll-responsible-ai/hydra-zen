@@ -37,7 +37,7 @@
 <script>DOCUMENTATION_OPTIONS.pagename = 'api_reference';</script>
 <link href="genindex.html" rel="index" title="Index"/>
 <link href="search.html" rel="search" title="Search"/>
-<link href="generated/hydra_zen.launch.html" rel="next" title="hydra_zen.launch"/>
+<link href="generated/hydra_zen.make_config.html" rel="next" title="hydra_zen.make_config"/>
 <link href="explanation/hydrated_dataclass.html" rel="prev" title="Combining Statically-Defined and Dynamically-Generated Configurations"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <meta content="en" name="docsearch:language"/>
@@ -207,11 +207,6 @@ document.write(`
 <div class="sidebar-primary-item"><nav aria-label="Section Navigation" class="bd-docs-nav bd-links">
 <p aria-level="1" class="bd-links__title" role="heading">Section Navigation</p>
 <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.launch.html">hydra_zen.launch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.zen.html">hydra_zen.zen</a></li>
-<li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.wrapper.Zen.html">hydra_zen.wrapper.Zen</a></li>
-</ul>
-<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.make_config.html">hydra_zen.make_config</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.builds.html">hydra_zen.builds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.just.html">hydra_zen.just</a></li>
@@ -242,6 +237,11 @@ document.write(`
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.typing.DataclassOptions.html">hydra_zen.typing.DataclassOptions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.typing.ZenConvert.html">hydra_zen.typing.ZenConvert</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.launch.html">hydra_zen.launch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.zen.html">hydra_zen.zen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.wrapper.Zen.html">hydra_zen.wrapper.Zen</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.third_party.beartype.validates_with_beartype.html">hydra_zen.third_party.beartype.validates_with_beartype</a></li>
@@ -282,31 +282,15 @@ document.write(`
 <p>Encyclopedia Hydrazennica.</p>
 <p>All reference documentation includes detailed Examples sections. Please scroll to the
 bottom of any given reference page to see the examples.</p>
-<section id="creating-and-launching-jobs-with-hydra">
-<h2>Creating and Launching Jobs with Hydra<a class="headerlink" href="#creating-and-launching-jobs-with-hydra" title="Permalink to this heading">#</a></h2>
-<p>hydra-zen provides users the ability to launch a Hydra job via a
-Python function instead of from a commandline interface.</p>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">launch</span></code></a>(config, task_function[, overrides, ...])</p></td>
-<td><p>Launches a Hydra job from a Python function rather than a CLI.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code></a>(func, /, pre_call, ZenWrapper)</p></td>
-<td><p>A wrapper that returns a function that will auto-extract, resolve, and instantiate fields from an input config based on the wrapped function's signature.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.wrapper.Zen.html#hydra_zen.wrapper.Zen" title="hydra_zen.wrapper.Zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wrapper.Zen</span></code></a>(_Zen__func, *[, exclude, ...])</p></td>
-<td><p>Implements the wrapping logic that is exposed by <a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.zen</span></code></a></p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="creating-and-working-with-configs">
-<h2>Creating and Working with Configs<a class="headerlink" href="#creating-and-working-with-configs" title="Permalink to this heading">#</a></h2>
-<p>hydra-zen provides us with some simple but powerful tools for creating and working with
+<section id="creating-storing-and-working-with-configs">
+<h2>Creating, Storing, and Working with Configs<a class="headerlink" href="#creating-storing-and-working-with-configs" title="Permalink to this heading">#</a></h2>
+<p>hydra-zen provides us with tools for creating and working with
 configs. Among these, the most essential functions for creating configs are
-<a class="reference internal" href="generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_config()</span></code></a> and <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a>. Then,
-<a class="reference internal" href="generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><code class="xref py py-func docutils literal notranslate"><span class="pre">instantiate()</span></code></a> can be used to resolve these configs so that they return
-the data and class-instances that we need for our application.</p>
+<a class="reference internal" href="generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_config()</span></code></a> and <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a>.
+<a class="reference external" href="https://mit-ll-responsible-ai.github.io/hydra-zen/generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore">hydra_zen.store</a>
+is used to store configs so that we (and Hydra) can access them later.
+Then, <a class="reference internal" href="generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><code class="xref py py-func docutils literal notranslate"><span class="pre">instantiate()</span></code></a> can be used to resolve these configs so that they
+return the data and class-instances that we need for our application.</p>
 <section id="creating-configs">
 <span id="create-config"></span><h3>Creating Configs<a class="headerlink" href="#creating-configs" title="Permalink to this heading">#</a></h3>
 <table class="autosummary longtable table autosummary">
@@ -407,6 +391,24 @@ The following utilities can be used to work with YAML-serialized configs.</p>
 </tbody>
 </table>
 </section>
+</section>
+<section id="creating-and-launching-jobs-with-hydra">
+<h2>Creating and Launching Jobs with Hydra<a class="headerlink" href="#creating-and-launching-jobs-with-hydra" title="Permalink to this heading">#</a></h2>
+<p>hydra-zen provides users the ability to launch a Hydra job via a
+Python function instead of from a commandline interface.</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">launch</span></code></a>(config, task_function[, overrides, ...])</p></td>
+<td><p>Launches a Hydra job from a Python function rather than a CLI.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code></a>(func, /, pre_call, ZenWrapper)</p></td>
+<td><p>A wrapper that returns a function that will auto-extract, resolve, and instantiate fields from an input config based on the wrapped function's signature.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.wrapper.Zen.html#hydra_zen.wrapper.Zen" title="hydra_zen.wrapper.Zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wrapper.Zen</span></code></a>(_Zen__func, *[, exclude, ...])</p></td>
+<td><p>Implements the wrapping logic that is exposed by <a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.zen</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="configuration-value-types-supported-by-hydra-and-hydra-zen">
 <span id="valid-types"></span><h2>Configuration-Value Types Supported by Hydra and hydra-zen<a class="headerlink" href="#configuration-value-types-supported-by-hydra-and-hydra-zen" title="Permalink to this heading">#</a></h2>
@@ -540,10 +542,10 @@ represents that complex value in a Hydra-compatible way.</p>
 <p class="prev-next-title">Combining Statically-Defined and Dynamically-Generated Configurations</p>
 </div>
 </a>
-<a class="right-next" href="generated/hydra_zen.launch.html" title="next page">
+<a class="right-next" href="generated/hydra_zen.make_config.html" title="next page">
 <div class="prev-next-info">
 <p class="prev-next-subtitle">next</p>
-<p class="prev-next-title">hydra_zen.launch</p>
+<p class="prev-next-title">hydra_zen.make_config</p>
 </div>
 <i class="fa-solid fa-angle-right"></i>
 </a>
@@ -558,8 +560,7 @@ represents that complex value in a Hydra-compatible way.</p>
   </div>
 <nav class="bd-toc-nav page-toc">
 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-and-launching-jobs-with-hydra">Creating and Launching Jobs with Hydra</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-and-working-with-configs">Creating and Working with Configs</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-storing-and-working-with-configs">Creating, Storing, and Working with Configs</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-configs">Creating Configs</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#storing-configs">Storing Configs</a><ul class="nav section-nav flex-column">
 </ul>
@@ -570,6 +571,7 @@ represents that complex value in a Hydra-compatible way.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hydra-zen-typing">hydra_zen.typing</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-and-launching-jobs-with-hydra">Creating and Launching Jobs with Hydra</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuration-value-types-supported-by-hydra-and-hydra-zen">Configuration-Value Types Supported by Hydra and hydra-zen</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#types-supported-natively-by-hydra">Types Supported Natively by Hydra</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#auto-config-support-for-additional-types-via-hydra-zen">Auto-Config Support for Additional Types via hydra-zen</a></li>
