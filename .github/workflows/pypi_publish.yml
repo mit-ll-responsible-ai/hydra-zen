@@ -38,6 +38,7 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: dist
+        path: dist
     # retrieve your distributions here
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
