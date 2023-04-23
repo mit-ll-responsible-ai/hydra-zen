@@ -96,7 +96,7 @@ st.register_type_strategy(
 )
 
 
-settings.register_profile("ci", deadline=False)
+settings.register_profile("ci", deadline=None)
 
 if bool(os.environ.get("CI")):
     settings.load_profile("ci")
