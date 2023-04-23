@@ -422,8 +422,3 @@ at :math:`-\pi/2`, :math:`0`, and :math:`\pi/2` should return, approximately, :m
    created upon launching our app. You can find this in the same directory as your 
    ``experiment.py`` file.
 
-More Examples of Using hydra-zen in ML Projects
-===============================================
-
-You can check out `this repository <https://github.com/mit-ll-responsible-ai/hydra-zen-examples>`_ for examples of larger-scale ML projects using hydra-zen.
-
