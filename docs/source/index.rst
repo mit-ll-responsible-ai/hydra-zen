@@ -218,6 +218,8 @@ places these in a time-stamped directory.
 hydra-zen works with arbitrary Python code bases; this example happens to mimic a 
 machine learning application but hydra-zen is ultimately application agnostic.
 
+You can read more about hydra-zen's config store and its auto-config capabilities `here <https://mit-ll-responsible-ai.github.io/hydra-zen/generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore>`_.
+
 .. admonition:: Attention, Hydra users:
 
   If you are already use Hydra, let's cut to the chase: **the most important benefit of using hydra-zen is that it automatically and dynamically generates structured configs for you**.
