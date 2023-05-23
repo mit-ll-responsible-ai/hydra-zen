@@ -1,6 +1,4 @@
-# This workflows will upload a Python Package using Twine when a release is created
-# For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
-
+# This workflows will upload a Python Package using PyPI's Trusted Publisher feature: https://docs.pypi.org/trusted-publishers/adding-a-publisher/
 name: Upload Python Package
 
 on:
@@ -8,24 +6,39 @@ on:
     types: [created]
 
 jobs:
-  deploy:
-
+  build-artifacts:
+    name: Builds wheel artifacts
     runs-on: ubuntu-latest
-
+    environment: pypi-publish
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.x'
-    - name: Install dependencies
+    - name: Build
       run: |
         python -m pip install --upgrade pip
-        pip install build twine
-    - name: Build and publish
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-      run: |
+        pip install build
         python -m build
-        twine upload dist/*
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: dist
+        path: dist
+        retention-days: 0
+  pypi-publish:
+    name: Upload release to PyPI
+    runs-on: ubuntu-latest
+    environment: pypi-publish
+    permissions:
+      id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: dist
+        path: dist
+    # retrieve your distributions here
+    - name: Publish package distributions to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
