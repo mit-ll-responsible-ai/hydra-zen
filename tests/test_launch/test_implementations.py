@@ -12,7 +12,6 @@ from hydra.plugins.sweeper import Sweeper
 from omegaconf.omegaconf import OmegaConf
 
 from hydra_zen import builds, instantiate, launch, make_config
-from hydra_zen._compatibility import SUPPORTS_VERSION_BASE
 from hydra_zen._launch import _store_config
 
 try:
@@ -208,7 +207,6 @@ def test_launch_with_multirun_plugin(plugin, version_base):
 @pytest.mark.filterwarnings(
     "ignore:Future Hydra versions will no longer change working directory"
 )
-@pytest.mark.skipif(not SUPPORTS_VERSION_BASE, reason="version_base not supported")
 @pytest.mark.parametrize("version_base", ["1.1", "1.2", None])
 @pytest.mark.usefixtures("cleandir")
 def test_version_base(version_base: Optional[str]):

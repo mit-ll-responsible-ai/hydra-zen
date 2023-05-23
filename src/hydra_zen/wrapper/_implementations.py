@@ -1,6 +1,6 @@
 # Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-# pyright: strict
+# pyright: strict, reportUnnecessaryTypeIgnoreComment = true, reportUnnecessaryIsInstance = false
 
 import warnings
 from collections import defaultdict, deque
@@ -58,7 +58,6 @@ from hydra_zen.typing._implementations import (
     StoreEntry,
 )
 
-from .._compatibility import HYDRA_SUPPORTS_LIST_INSTANTIATION, SUPPORTS_VERSION_BASE
 from ..structured_configs._type_guards import is_dataclass
 from ..structured_configs._utils import safe_name
 
@@ -72,10 +71,8 @@ F = TypeVar("F")
 
 _UNSPECIFIED_: Any = object()
 
-if HYDRA_SUPPORTS_LIST_INSTANTIATION:
-    _SUPPORTED_INSTANTIATION_TYPES: Tuple[Any, ...] = (dict, DictConfig, list, ListConfig)  # type: ignore
-else:  # pragma: no cover
-    _SUPPORTED_INSTANTIATION_TYPES: Tuple[Any, ...] = (dict, DictConfig)  # type: ignore
+
+_SUPPORTED_INSTANTIATION_TYPES: Tuple[Any, ...] = (dict, DictConfig, list, ListConfig)  # type: ignore
 
 ConfigLike: TypeAlias = Union[
     DataClass_,
@@ -139,6 +136,7 @@ class Zen(Generic[P, R]):
         exclude: Optional[Union[str, Iterable[str]]] = None,
         pre_call: PreCall = None,
         unpack_kwargs: bool = False,
+        resolve_pre_call: bool = True,
     ) -> None:
         """
         Parameters
@@ -176,9 +174,14 @@ class Zen(Generic[P, R]):
                 "signatures."
             )
 
-        if not isinstance(unpack_kwargs, bool):  # type: ignore
+        if not isinstance(unpack_kwargs, bool):
             raise TypeError(f"`unpack_kwargs` must be type `bool` got {unpack_kwargs}")
 
+        if not isinstance(resolve_pre_call, bool):  # pragma: no cover
+            raise TypeError(
+                f"`resolve_pre_call` must be type `bool` got {resolve_pre_call}"
+            )
+        self._resolve = resolve_pre_call
         self._unpack_kwargs: bool = unpack_kwargs and any(
             p.kind is p.VAR_KEYWORD for p in self.parameters.values()
         )
@@ -225,8 +228,8 @@ class Zen(Generic[P, R]):
             pre_call if not isinstance(pre_call, Iterable) else _flat_call(pre_call)
         )
 
-    @staticmethod
     def _normalize_cfg(
+        self,
         cfg: Union[
             DataClass_,
             Type[DataClass_],
@@ -311,6 +314,17 @@ class Zen(Generic[P, R]):
                 f"`cfg` is missing the following fields: {', '.join(missing_params)}"
             )
 
+    @staticmethod
+    def instantiate(__c: Any) -> Any:
+        """Instantiates each config that is extracted by `zen` before calling the wrapped function.
+
+        Overwrite this to change `ZenWrapper`'s instantiation behavior."""
+        __c = instantiate(__c)
+        if isinstance(__c, (ListConfig, DictConfig)):
+            return OmegaConf.to_object(__c)
+        else:
+            return __c
+
     # TODO: add "extract" option that enables returning dict of fields
     def __call__(self, __cfg: Union[ConfigLike, str]) -> R:
         """
@@ -332,8 +346,10 @@ class Zen(Generic[P, R]):
             The result of `func(<args extracted from cfg>)`
         """
         cfg = self._normalize_cfg(__cfg)
-        # resolves all interpolated values in-place
-        OmegaConf.resolve(cfg)
+
+        if self._resolve:
+            # resolves all interpolated values in-place
+            OmegaConf.resolve(cfg)
 
         if self.pre_call is not None:
             self.pre_call(cfg)
@@ -349,7 +365,6 @@ class Zen(Generic[P, R]):
             for name, param in self.parameters.items()
             if param.kind not in SKIPPED_PARAM_KINDS and name not in self._exclude
         }
-
         extra_kwargs = {self.CFG_NAME: cfg} if self._has_zen_cfg else {}
         if self._unpack_kwargs:
             names = (
@@ -361,9 +376,9 @@ class Zen(Generic[P, R]):
             )
             cfg_kwargs.update({name: cfg[name] for name in names})
         return self.func(
-            *(instantiate(x) if is_instantiable(x) else x for x in args_),
+            *(self.instantiate(x) if is_instantiable(x) else x for x in args_),
             **{
-                name: instantiate(val) if is_instantiable(val) else val
+                name: self.instantiate(val) if is_instantiable(val) else val
                 for name, val in cfg_kwargs.items()
             },
             **extra_kwargs,
@@ -441,9 +456,7 @@ class Zen(Generic[P, R]):
         if config_path is not _UNSPECIFIED_:
             kw["config_path"] = config_path
 
-        if (
-            SUPPORTS_VERSION_BASE and version_base is not _UNSPECIFIED_
-        ):  # pragma: no cover
+        if version_base is not _UNSPECIFIED_:  # pragma: no cover
             kw["version_base"] = version_base
 
         return hydra.main(**kw)(target)()
@@ -456,6 +469,7 @@ def zen(
     unpack_kwargs: bool = ...,
     pre_call: PreCall = ...,
     ZenWrapper: Type[Zen[P, R]] = Zen,
+    resolve_pre_call: bool = ...,
     exclude: Optional[Union[str, Iterable[str]]] = None,
 ) -> Zen[P, R]:
     ...
@@ -467,6 +481,7 @@ def zen(
     *,
     unpack_kwargs: bool = ...,
     pre_call: PreCall = ...,
+    resolve_pre_call: bool = ...,
     ZenWrapper: Type[Zen[Any, Any]] = ...,
     exclude: Optional[Union[str, Iterable[str]]] = None,
 ) -> Callable[[Callable[P, R]], Zen[P, R]]:
@@ -479,6 +494,7 @@ def zen(
     unpack_kwargs: bool = False,
     pre_call: PreCall = None,
     exclude: Optional[Union[str, Iterable[str]]] = None,
+    resolve_pre_call: bool = True,
     ZenWrapper: Type[Zen[P, R]] = Zen,
 ) -> Union[Zen[P, R], Callable[[Callable[P, R]], Zen[P, R]]]:
     r"""zen(func, /, pre_call, ZenWrapper)
@@ -516,7 +532,12 @@ def zen(
         This is useful, e.g., for seeding a RNG prior to the instantiation phase
         that is triggered when calling the wrapped function.
 
-    exclude: Optional[str | Iterable[str]]
+    resolve_pre_call : bool, (default=True)
+        If `True`, the config passed to the zen-wrapped function has its interpolated
+        fields resolved prior to being passed to any pre-call functions. Otherwise, the
+        interpolation occurs after the pre-call functions are called.
+
+    exclude : Optional[str | Iterable[str]]
         Specifies one or more parameter names in the function's signature
         that will not be extracted from input configs by the zen-wrapped function.
 
@@ -635,10 +656,9 @@ def zen(
     sub-configs. One can specify the field named `zen_config` in their task function's
     signature to signal `zen` that it should pass the full config to that parameter .
 
-    >>> @zen
-    ... def zf(x: int, zen_cfg):
+    >>> def zf(x: int, zen_cfg):
     ...     return x, zen_cfg
-    >>> zf(dict(x=1, y="${x}", foo="bar"))
+    >>> zen(zf)(dict(x=1, y="${x}", foo="bar"))
     (1, {'x': 1, 'y': 1, 'foo': 'bar'})
 
     **Including a pre-call function**
@@ -664,11 +684,11 @@ def zen(
     ... )
     >>> wrapped = zen(func, pre_call=lambda cfg: random.seed(cfg.seed))
 
-    >>> @zen(pre_call=lambda cfg: random.seed(cfg.seed))
-    ... def f1(rand_val: int):
+    >>> def f1(rand_val: int):
     ...     return rand_val
+    >>> zf1 = zen(pre_call=lambda cfg: random.seed(cfg.seed))(f1)
 
-    >>> [f1(cfg) for _ in range(10)]
+    >>> [zf1(cfg) for _ in range(10)]
     [6, 6, 6, 6, 6, 6, 6, 6, 6, 6]
 
 
@@ -717,12 +737,20 @@ def zen(
     """
     if __func is not None:
         return ZenWrapper(
-            __func, pre_call=pre_call, exclude=exclude, unpack_kwargs=unpack_kwargs
+            __func,
+            pre_call=pre_call,
+            exclude=exclude,
+            unpack_kwargs=unpack_kwargs,
+            resolve_pre_call=resolve_pre_call,
         )
 
     def wrap(f: Callable[P, R]) -> Zen[P, R]:
         return ZenWrapper(
-            f, pre_call=pre_call, exclude=exclude, unpack_kwargs=unpack_kwargs
+            f,
+            pre_call=pre_call,
+            exclude=exclude,
+            unpack_kwargs=unpack_kwargs,
+            resolve_pre_call=resolve_pre_call,
         )
 
     return wrap
@@ -896,16 +924,16 @@ def _resolve_node(entry: StoreEntry, copy: bool) -> StoreEntry:
 
 
 class ZenStore:
-    """An abstraction over Hydra's config store, which enables users to maintain
-    multiple, isolated store instances before populating Hydra's global config store.
+    """An abstraction over Hydra's store, for creating multiple, isolated config stores.
 
-    `ZenStore` is also designed to consolidate the config-creation and storage process;
-    it can be used to decorate config-targets and dataclasses, enabling "inline" config
-    creation and storage patterns. This is also a "self-partialing" object, meaning a
-    store instance can overwrite its own default values. Please consult the
-    :ref:`examples <self-partial>` for more details.
+    Whereas Hydra exposes a single global config store that provides no warnings when
+    store entries are overwritted, `ZenStore` instances are isolated, do not populate
+    the global store unless instructed to, and they protect users from unwittingly
+    overwriting store entries.
 
-    `hydra_zen.store` is available as a pre-instantiated, globally-available store,
+    Notes
+    -----
+    `hydra_zen.store` is available as a pre-instantiated globally-available store,
     which is initialized as:
 
     .. code-block:: python
@@ -916,8 +944,105 @@ class ZenStore:
            deferred_hydra_store=True,
        )
 
-    Notes
-    -----
+    Internally, each `ZenStore` instance holds a mapping of::
+
+        tuple[group, name] ->  {node: Dataclass | omegaconf.Container,
+                                name: str,
+                                group: str,
+                                package: Optional[str],
+                                provider: Optional[str]}
+
+    **Auto-config capabilities**
+
+    `ZenStore` is also designed to consolidate the config-creation and storage process;
+    it can be used to automatically apply config-creation a function (e.g.,
+    `~hydra_zen.builds`) to a target in order to auto-generate a config for the
+    target, which is then stored.
+
+    .. tab-set::
+
+      .. tab-item:: Via auto-config
+
+         .. code-block:: python
+
+            from hydra_zen import store
+            def func(x, y): ...
+
+            store(func, x=2, y=3)
+
+
+      .. tab-item:: Via manually-specified config
+
+         .. code-block:: python
+
+            from hydra_zen import builds, store
+            def func(x, y): ...
+
+            store(builds(func, x=2, y=3, populate_full_signature=True), name="func")
+
+    It can also be used to decorate config-targets and dataclasses, enabling "inline"
+    config creation and storage patterns.
+
+    These auto config-creation capabilities are designed to be deferred until a
+    config is actually accessed by users or added to Hydra's global config store. This
+    enables store-decorator patterns to be used within library code without slowing
+    down import times.
+
+    **Self-partialing patterns**
+
+    A `ZenStore` instance can be called repeatedly - without a config target - with
+    different options to incrementally change the store's default configurations. E.g.
+    the following are effectively equivalent
+
+    .. tab-set::
+
+      .. tab-item:: Self-partialing pattern
+
+         .. code-block:: python
+
+               from hydra_zen import store
+
+               book_store = store(group="books")
+               romance_store = book_store(provider="genre: romance")
+               fantasy_store = book_store(provider="genre: fantasy")
+
+               romance_store({"title": "heartfelt"})
+               romance_store({"title": "lustfully longingness"})
+
+               fantasy_store({"title": "elvish cookbook"})
+               fantasy_store({"title": "dwarves can't jump"})
+
+
+      .. tab-item:: Manual pattern
+
+         .. code-block:: python
+
+            from hydra_zen import store
+
+            store(
+                {"title": "heartfelt"},
+                group="book",
+                provider="genre: romance",
+            )
+            store(
+                {"title": "lustfully longingness"},
+                group="book",
+                provider="genre: romance",
+            )
+
+            store(
+                {"title": "elvish cookbook"},
+                group="book",
+                provider="genre: fantasy",
+            )
+            store(
+                {"title": "dwarves can't jump"},
+                group="book",
+                provider="genre: fantasy",
+            )
+
+    **Configuring Hydra itself**
+
     Special support is provided for overriding Hydra's configuration; the name and
     group of the store entry is inferred to be 'config' and 'hydra', respectively,
     when an instance/subclass of `HydraConf` is being stored. E.g., specifying
@@ -940,6 +1065,8 @@ class ZenStore:
 
     Examples
     --------
+    (Some helpful boilerplate code for these examples)
+
     >>> from hydra_zen import to_yaml, store, ZenStore
     >>> def pyaml(x):
     ...     # for pretty printing configs
@@ -1104,6 +1231,7 @@ class ZenStore:
     >>> schemaless = profile_store(schema="<none>")
 
     >>> from dataclasses import dataclass
+    >>>
     >>> @profile_store(name="admin", has_root=True)
     >>> @schemaless(name="test_admin", has_root=True)
     >>> @schemaless(name="test_user", has_root=False)
@@ -1173,15 +1301,15 @@ class ZenStore:
             with `store(node=Config)` instead of actually storing the node with
             `store(Config)`.
         """
-        if not isinstance(deferred_to_config, bool):  # type: ignore
+        if not isinstance(deferred_to_config, bool):
             raise TypeError(
                 f"deferred_to_config must be a bool, got {deferred_to_config}"
             )
 
-        if not isinstance(overwrite_ok, bool):  # type: ignore
+        if not isinstance(overwrite_ok, bool):
             raise TypeError(f"overwrite_ok must be a bool, got {overwrite_ok}")
 
-        if not isinstance(deferred_hydra_store, bool):  # type: ignore
+        if not isinstance(deferred_hydra_store, bool):
             raise TypeError(
                 f"deferred_hydra_store must be a bool, got {deferred_hydra_store}"
             )
@@ -1245,8 +1373,6 @@ class ZenStore:
     ) -> F:
         ...
 
-    # TODO: ZenStore -> Self when mypy adds support for Self
-    #       https://github.com/python/mypy/pull/11666
     @overload
     def __call__(
         self: Self,
@@ -1278,6 +1404,7 @@ class ZenStore:
         name : NodeName | Callable[[T], NodeName]
             The entry's name, or a callable that will be called as
             `(obj) -> entry-name`. The default is `lambda obj: obj.__name__`.
+
             Store entries are keyed off of `(group, name)`.
 
         group : Optional[GroupName | Callable[[T], GroupName]]

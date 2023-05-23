@@ -19,12 +19,12 @@ from omegaconf import DictConfig, ListConfig
 from hydra_zen import (
     ZenStore,
     builds,
+    hydrated_dataclass,
     instantiate,
     just,
     make_config,
     store as default_store,
 )
-from hydra_zen._compatibility import HYDRA_SUPPORTS_LIST_INSTANTIATION, HYDRA_VERSION
 from tests.custom_strategies import new_stores, store_entries
 
 cs = ConfigStore().instance()
@@ -456,8 +456,6 @@ def test_overwrite_ok(outer: bool, inner: bool, name, group):
 )
 @pytest.mark.usefixtures("clean_store")
 def test_default_to_config_produces_instantiable_configs(target):
-    if not HYDRA_SUPPORTS_LIST_INSTANTIATION and isinstance(target, (list, ListConfig)):
-        pytest.xfail("Hydra doesn't support list instantiation")
     default_store(target, name="target")
     default_store.add_to_hydra_store()
     instantiate_from_repo("target")
@@ -617,6 +615,7 @@ def test_contains_consistent_with_getitem(store: ZenStore):
             assert "/".join(group_parts[:n]) in store
 
 
+@settings(deadline=None)
 @given(entries=st.lists(store_entries()), sub_store=st.booleans())
 def test_iter(entries, sub_store):
     with clean_store():
@@ -632,7 +631,7 @@ def test_iter(entries, sub_store):
         assert len(iter_out) == len(entries)
 
 
-@settings(max_examples=10)
+@settings(max_examples=10, deadline=None)
 @given(entries=st.lists(store_entries()), store=new_stores(), sub_store=st.booleans())
 def test_bool(entries, store: ZenStore, sub_store: bool):
     with clean_store():
@@ -645,12 +644,13 @@ def test_bool(entries, store: ZenStore, sub_store: bool):
         assert bool(entries) is bool(store)
 
 
-@settings(max_examples=20)
+@settings(max_examples=20, deadline=None)
 @given(...)
 def test_repr(store: ZenStore):
     assert isinstance(repr(store), str)
 
 
+@settings(deadline=None)
 @given(store=..., num_adds=st.integers(1, 5))
 def test_repeated_add_to_hydra_store_ok(store: ZenStore, num_adds: int):
     # store should clear internal queue so that multiple add-to-store calls
@@ -662,6 +662,7 @@ def test_repeated_add_to_hydra_store_ok(store: ZenStore, num_adds: int):
             assert not store.has_enqueued()
 
 
+@settings(deadline=None)
 @given(...)
 def test_store_protects_overwriting_entries_in_hydra_store(store: ZenStore):
     with clean_store():
@@ -676,7 +677,7 @@ def test_store_protects_overwriting_entries_in_hydra_store(store: ZenStore):
         store.add_to_hydra_store(overwrite_ok=True)
 
 
-@settings(max_examples=20)
+@settings(max_examples=20, deadline=None)
 @given(...)
 def test_getitem(store: ZenStore):
     assume(store)
@@ -686,7 +687,7 @@ def test_getitem(store: ZenStore):
             assert len(store[entry["group"]]) > 0
 
 
-@settings(max_examples=20)
+@settings(max_examples=20, deadline=None)
 @given(...)
 def test_eq(store1: ZenStore, store2: ZenStore):
     with clean_store():
@@ -701,7 +702,7 @@ def test_eq(store1: ZenStore, store2: ZenStore):
         assert store1 == store1(param="blah")
 
 
-@settings(max_examples=20)
+@settings(max_examples=20, deadline=None)
 @given(...)
 def test_get_entry(store: ZenStore):
     assume(store)
@@ -710,7 +711,7 @@ def test_get_entry(store: ZenStore):
     assert entry == entry_
 
 
-@settings(max_examples=20)
+@settings(max_examples=20, deadline=None)
 @given(store=...)
 @pytest.mark.parametrize(
     "getter",
@@ -761,10 +762,6 @@ def test_auto_support_for_HydraConf(conf: HydraConf, deferred: bool):
     sys.platform.startswith("win") and bool(os.environ.get("CI")),
     reason="Things are weird on GitHub Actions and Windows",
 )
-@pytest.mark.skipif(
-    HYDRA_VERSION < (1, 2, 0),
-    reason="HydraConf(job=Job(chdir=...)) introduced in Hydra 1.2.0",
-)
 @pytest.mark.parametrize(
     "inp",
     [
@@ -795,3 +792,19 @@ def test_node_warns():
     store = ZenStore(warn_node_kwarg=True)
     with pytest.warns(UserWarning):
         store(node=builds(int))
+
+
+def foo(x: int):
+    return x
+
+
+def test_store_hydrated_dataclass():
+    # regression test for: https://github.com/mit-ll-responsible-ai/hydra-zen/issues/453
+
+    @hydrated_dataclass(foo)
+    class SomethingHydrated:
+        x: int = 1
+
+    store = ZenStore()
+    store(SomethingHydrated, name="foo", x=2)
+    assert instantiate(store[None, "foo"]) == 2

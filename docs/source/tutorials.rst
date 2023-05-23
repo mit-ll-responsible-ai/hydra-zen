@@ -11,6 +11,14 @@ and Hydra. They require no prior experience with these tools. Our tutorials guid
 with explicit, concrete steps through the process of creating and launching a Python 
 application that is configurable, reproducible, and scalable.
 
+.. note::
+
+   These tutorials focus solely on practical steps towards concrete 
+   outcomes, and thus they do not explain *how* Hydra and hydra-zen work. To gain a 
+   deeper understanding of the technical details here, please refer to the 
+   :ref:`hydra-zen-reference` section of our documentation. Each page includes extensive
+   examples and explanations.
+
 .. toctree::
    :maxdepth: 1
    :caption: Contents:
@@ -25,9 +33,3 @@ application that is configurable, reproducible, and scalable.
 .. tip::
 
    Did you enjoy these tutorials? Consider ⭐ `giving us a start on GitHub <https://github.com/mit-ll-responsible-ai/hydra-zen>`_ ⭐ to help others find this project.
-
-These tutorials are meant to only focus on practical steps towards concrete outcomes, 
-and thus they do not explain *how* Hydra and hydra-zen work. To gain a deeper 
-understanding of the technical details here, please refer to the 
-:ref:`hydra-zen-reference` and :ref:`hydra-zen-explanation` sections of our 
-documentation.

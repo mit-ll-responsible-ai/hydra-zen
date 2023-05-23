@@ -244,8 +244,9 @@ Then we can use :func:`hydra_zen.builds`, instead of :func:`hydra_zen.make_confi
    :caption: Simplified contents of my_app.py:
     
    from hydra_zen import builds
-    
-   def new_task_function(player1, player2):
+   
+   # note: type annotations are not required
+   def new_task_function(player1: str, player2: str):
        # write the log with the names
        with open("player_log.txt", "w") as f:
            f.write("Game session log:\n")
@@ -291,6 +292,8 @@ Want a deeper understanding of how hydra-zen and Hydra work?
 The following reference materials are especially relevant to this
 tutorial section.
 
+- :func:`~hydra_zen.zen`
+- :func:`~hydra_zen.builds`
 - :func:`~hydra_zen.make_config`
 - :func:`~hydra_zen.launch`
 - `Hydra's version_base <https://hydra.cc/docs/upgrades/version_base/#internaldocs-banner>`_

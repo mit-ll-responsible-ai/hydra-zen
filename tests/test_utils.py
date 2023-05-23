@@ -46,11 +46,8 @@ from typing_extensions import (
 
 from hydra_zen import builds, instantiate, mutable_value
 from hydra_zen._compatibility import (
-    HYDRA_SUPPORTS_BYTES,
-    HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES,
     HYDRA_VERSION,
     OMEGACONF_VERSION,
-    HYDRA_SUPPORTS_Path,
     Version,
     _get_version,
 )
@@ -153,10 +150,10 @@ vDict = Dict[Any, Any] if sys.version_info < (3, 8) else Dict
         (float, float),
         (str, str),
         (bool, bool),
-        (bytes, bytes if HYDRA_SUPPORTS_BYTES else Any),
-        (Path, Path if HYDRA_SUPPORTS_Path else Any),
-        (PosixPath, Path if HYDRA_SUPPORTS_Path else Any),
-        (WindowsPath, Path if HYDRA_SUPPORTS_Path else Any),
+        (bytes, bytes),
+        (Path, Path),
+        (PosixPath, Path),
+        (WindowsPath, Path),
         (Color, Color),
         (C, Any),  # unsupported primitives
         (type(None), Any),
@@ -226,15 +223,13 @@ vDict = Dict[Any, Any] if sys.version_info < (3, 8) else Dict
         (Optional[List[Color]], Optional[List[Color]]),
         (
             Optional[List[List[int]]],
-            Optional[List[Any]]
-            if not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES
-            else Optional[List[List[int]]],
+            Optional[List[List[int]]],
         ),
         (List[int], List[int]),  # supported containers
         (List[frozenset], List[Any]),
         (
             List[List[int]],
-            List[Any] if not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES else List[List[int]],
+            List[List[int]],
         ),
         (List[Tuple[int, int]], List[Any]),
         (List[T], List[Any]),
@@ -244,32 +239,24 @@ vDict = Dict[Any, Any] if sys.version_info < (3, 8) else Dict
         (Dict[C, C], Dict[Any, Any]),
         (
             Dict[str, List[int]],
-            Dict[str, Any]
-            if not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES
-            else Dict[str, List[int]],
+            Dict[str, List[int]],
         ),
         (Tuple[str], Tuple[str]),
         (Tuple[str, ...], Tuple[str, ...]),
         (Tuple[str, str, str], Tuple[str, str, str]),
         (
             Tuple[List[int]],
-            (
-                Tuple[Any]
-                if not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES
-                else Tuple[List[int]]
-            ),
+            (Tuple[List[int]]),
         ),
         (Union[NoneType, Tuple[int, int]], Optional[Tuple[int, int]]),
         (Union[Tuple[int, int], NoneType], Optional[Tuple[int, int]]),
         (
             List[Dict[str, List[int]]],
-            List[Any]
-            if not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES
-            else List[Dict[str, List[int]]],
+            List[Dict[str, List[int]]],
         ),
         (
             List[List[Type[int]]],
-            List[Any] if not HYDRA_SUPPORTS_NESTED_CONTAINER_TYPES else List[List[Any]],
+            List[List[Any]],
         ),
         (Tuple[Tuple[int, ...], ...], Tuple[Any, ...]),
         (Optional[Tuple[Tuple[int, ...], ...]], Optional[Tuple[Any, ...]]),
@@ -462,11 +449,13 @@ def test_merge_settings_retains_user_settings(
 @pytest.mark.parametrize("bad_settings", [1, {"not a field": True}, {"dataclass": 1.0}])
 def test_merge_settings_validation(bad_settings):
     with pytest.raises((TypeError, ValueError)):
-        merge_settings(bad_settings, {"dataclass": True})
+        merge_settings(bad_settings, {"dataclass": True, "flat_target": True})
 
 
 def test_strict_dataclass_options_reflects_current_dataclass_ver():
-    strict_keys = set(StrictDataclassOptions.__required_keys__) | set(StrictDataclassOptions.__optional_keys__)  # type: ignore
+    strict_keys = set(StrictDataclassOptions.__required_keys__) | set(
+        StrictDataclassOptions.__optional_keys__
+    )
     actual_keys = set(signature(make_dataclass).parameters)
     actual_keys.remove("fields")
     assert strict_keys == actual_keys

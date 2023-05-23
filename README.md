@@ -40,12 +40,9 @@ hydra-zen is a Python library that simplifies the process of writing code (resea
 - **Scalable**: launch multiple runs of your software, be it on your local machine or across multiple nodes on a cluster.
 
 
-It builds off – and is fully compatible with – [Hydra](https://hydra.cc/), a framework for elegantly 
-configuring complex applications. hydra-zen helps simplify the 
-process of using Hydra by providing specialized functions for creating configs and 
-launching Hydra jobs. Please refer to [our documentation](https://mit-ll-responsible-ai.github.io/hydra-zen/) for examples and more details.
+**hydra-zen eliminates all hand-written yaml configs from your Hydra project**. It does so by providing functions that [dynamically and automatically](https://mit-ll-responsible-ai.github.io/hydra-zen/api_reference.html#creating-and-working-with-configs) generate dataclass-based configs for your code. It also provides a [custom config-store API](https://mit-ll-responsible-ai.github.io/hydra-zen/api_reference.html#storing-configs) and [task-function wrapper](https://mit-ll-responsible-ai.github.io/hydra-zen/generated/hydra_zen.zen.html#hydra_zen.zen), which help to eliminate most of the Hydra-specific boilerplate from your project.
 
-
+Learn about hydra-zen [**at a glance**](https://mit-ll-responsible-ai.github.io/hydra-zen/index.html#hydra-zen-at-a-glance).
   
 ## Installation
 `hydra-zen` is lightweight: its only dependencies are `hydra-core` and `typing-extensions`.

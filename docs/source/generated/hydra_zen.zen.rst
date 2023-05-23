@@ -1,3 +1,5 @@
+.. _zenwrap:
+
 hydra\_zen.zen
 ==============
 

@@ -8,6 +8,76 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse 
 chronological order. All previous releases should still be available on pip.
 
+.. _v0.11.0:
+
+---------------------
+0.11.0rc - 2023-04-21
+---------------------
+
+.. note:: This is documentation for an unreleased version of hydra-zen. You can try out this pre-release version using `pip install --pre hydra-zen`
+
+This release drops support for hydra-core 1.1 and for omegaconf 2.1; this enabled the 
+removal of a lot of complex compatibility logic from hydra-zen's source code, and to 
+improve the behavior of :func:`~hydra_zen.zen`.
+
+
+Release Highlights
+------------------
+hydra-zen now uses the `trusted publishers <https://blog.pypi.org/posts/2023-04-20-introducing-trusted-publishers/>`_ method for publishing its build artifacts to PyPI via a protected GitHub Actions environment. In short, this improves security for users by further reducing the surface area by which malicious 3rd parties could attempt to upload tainted versions of hydra-zen. Note that hydra-zen has always abided by the most rigorous methods for secure publishing - we adopted the Trusted Publishers method one day after it became available ❤️.
+
+:func:`~hydra_zen.builds` now has special behavior when it is passed a dataclass type that already possesses a `_target_` field: `_target_` is treated in a transitive way. E.g. `build(builds(int))` is equivalent to `builds(int)`. This enables a powerful "builder" pattern where configs can be populated in iterative, branching ways (with full type-checking support 😎). 
+
+.. code-block:: python
+   :caption: Basic 'builder' pattern
+
+   from hydra_zen import make_custom_builds_fn, instantiate
+
+   fbuilds = make_custom_builds_fn(populate_full_signature=True)
+
+   def foo(x, y, z): return x, y, z
+
+   base_cfg = fbuilds(foo, x=0, y=0, z=0)
+
+   c1 = fbuilds(base_cfg, x=1)
+   c2 = fbuilds(c1, y=2)
+   c3 = fbuilds(c2, z=3)
+
+.. code-block:: pycon
+
+   >>> [instantiate(c) for c in [c1, c2, c3]]
+   [(1, 0, 0), (1, 2, 0), (1, 2, 3)]
+
+
+Improvements
+------------
+- :func:`~hydra_zen.builds` now has a transitive property that enables iterative build patterns. See :pull:`455`
+- :func:`~hydra_zen.zen`'s instantiation phase has been improved so that dataclass objects and stdlib containers are returned instead of omegaconf objects. See :pull:`#448`. 
+- :func:`~hydra_zen.zen` can now be passed `resolve_pre_call=False` to defer the resolution of interpolated fields until after `pre_call` functions are called. See :pull:`460`.
+
+Bug Fixes
+---------
+- Configs produced by `~hydra_zen.just` will no longer cause a `ReadonlyConfigError` during Hydra's config-composition process. See :pull:`459`
+- :class:`~hydra_zen.ZenStore` now works with :func:`~hydra_zen.hydrated_dataclass`. See :issue:`453` and :pull:`455`.
+
+Compatibility-Breaking Changes
+------------------------------
+Most of these changes will not have any impact on users, based on download statistics and the particular code patterns impacted by the following changes.
+
+- hydra-core 1.2.0 and omegaconf 2.2.1 are now the minimum supported versions of hydra-zen's dependencies.
+- The auto-instantiation behavior of :class:`~hydra_zen.wrapper.Zen` and :func:`~hydra_zen.zen` have been updated so that nested dataclasses (nested within lists, dicts, and other dataclasses) will no longer be returned as omegaconf configs (see :pull:`448`).
+- :func:`~hydra_zen.just` not longer returns a frozen dataclass (see :pull:`459`).
+- Users that relied on patterns like `builds(builds(...))` will find that :pull:`455` has changed their behaviors. This new behavior can be disabled via `builds(..., zen_convert={'flat_target': False})`
+- :func:`~hydra_zen.zen`'s instantiation behavior was changed by :pull:`448`. See that PR for instructions on restoring the old behavior.
+
+--------------------------
+Documentation - 2023-03-11
+--------------------------
+
+The following parts of the documentation underwent significant revisions:
+
+- `The landing page <https://github.com/mit-ll-responsible-ai/hydra-zen>`_ now has a "hydra-zen at at glance" subsection.
+- The docs for `~hydra_zen.ZenStore` were revamped.
+
 
 .. _v0.10.0:
 
@@ -228,7 +298,7 @@ New Features
 ------------
 - hydra-zen now supports Python 3.11
 - Adds the :func:`~hydra_zen.zen` decorator (see :pull:`310`)
-- Adds the :func:`~hydra_zen.wrapper.Zen` decorator-class (see :pull:`310`)
+- Adds the :class:`~hydra_zen.wrapper.Zen` decorator-class (see :pull:`310`)
 - Adds the :class:`~hydra_zen.ZenStore` class (see :pull:`331`)
 - Adds `hyda_zen.store`, which is a pre-initialized instance of :class:`~hydra_zen.ZenStore` (see :pull:`331`)
 - The option `hydra_convert='object'` is now supported by all of hydra-zen's config-creation functions. So that an instantiated structured config can be converted to an instance of its backing dataclass. This feature was added by `Hydra 1.3.0 <https://github.com/facebookresearch/hydra/issues/1719>`_.

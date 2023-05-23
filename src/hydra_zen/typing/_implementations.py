@@ -182,6 +182,7 @@ IsPartial: TypeAlias = Union[ZenPartialMixin[T], HydraPartialMixin[T]]
 
 PartialBuilds: TypeAlias = Union[ZenPartialBuilds[T], HydraPartialBuilds[T]]
 
+AnyBuilds: TypeAlias = Union[Builds[T], BuildsWithSig[T, Any]]
 
 Importable = TypeVar("Importable", bound=Callable[..., Any])
 
@@ -254,10 +255,11 @@ DefaultsList = List[
 # Lists all zen-convert settings and their types. Not part of public API
 class AllConvert(TypedDict, total=True):
     dataclass: bool
+    flat_target: bool
 
 
 # used for runtime type-checking
-convert_types: Final = {"dataclass": bool}
+convert_types: Final = {"dataclass": bool, "flat_target": bool}
 
 GroupName: TypeAlias = Optional[str]
 NodeName: TypeAlias = str
@@ -278,12 +280,17 @@ class ZenConvert(TypedDict, total=False):
     options that configure the hydra-zen config-creation functions (e.g., `builds`,
     `just`, and `make_config`).
 
-    Note that, at runtime, `ZenConvert` is simply a dictionary with type-annotations. There is no enforced runtime validation of its keys and values.
+    Note that, at runtime, `ZenConvert` is simply a dictionary with type-annotations.
+    There is no enforced runtime validation of its keys and values.
 
     Parameters
     ----------
+    flat_target: bool
+        If `True` (default), `builds(builds(f))` is equivalent to `builds(f)`. I.e. the
+        second `builds` call will use the `_target_` field of its input, if it exists.
+
     dataclass : bool
-        If `True` any dataclass type/instance without a `_target_` field is
+        If `True` (default) any dataclass type/instance without a `_target_` field is
         automatically converted to a targeted config that will instantiate to that type/
         instance. Otherwise the dataclass type/instance will be passed through as-is.
 
@@ -347,6 +354,7 @@ class ZenConvert(TypedDict, total=False):
     True
     """
 
+    flat_target: bool
     dataclass: bool
 
 

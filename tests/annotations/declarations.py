@@ -1278,3 +1278,120 @@ def test_zen_dataclass(ff: FullBuilds, ss: StdBuilds, pp: PBuilds):
 
     make_config(zen_dataclass={"eq": True})
     make_config(zen_dataclass={"blah": 2})  # type: ignore
+
+
+def builds_target_pass_through():
+    def foo(x: int) -> str:
+        ...
+
+    c1 = builds(builds(foo, x=1), x=2)
+    reveal_type(instantiate(c1), expected_text="str")
+
+    c2 = builds(builds(foo, populate_full_signature=True))
+    reveal_type(instantiate(c2), expected_text="str")
+    reveal_type(c2, expected_text="Type[Builds[Type[str]]]")
+
+    c3 = builds(builds(foo, zen_partial=True))
+    reveal_type(instantiate(c3), expected_text="str")
+
+    pc1 = builds(builds(foo, x=1), x=2, zen_partial=True)
+    reveal_type(instantiate(pc1), expected_text="Partial[str]")
+
+    pc2 = builds(builds(foo, populate_full_signature=True), zen_partial=True)
+    reveal_type(instantiate(pc2), expected_text="Partial[str]")
+
+    pc3 = builds(builds(foo, zen_partial=True), zen_partial=True)
+    reveal_type(instantiate(pc3), expected_text="Partial[str]")
+
+    fc = builds(builds(foo, populate_full_signature=True), populate_full_signature=True)
+    reveal_type(instantiate(fc), expected_text="str")
+    reveal_type(fc, expected_text="Type[BuildsWithSig[Type[str], (x: int)]]")
+
+
+def sbuilds_target_pass_through():
+    def foo(x: int) -> str:
+        ...
+
+    sbuilds = make_custom_builds_fn()
+    c1 = sbuilds(sbuilds(foo, x=1), x=2)
+    reveal_type(instantiate(c1), expected_text="str")
+
+    c2 = sbuilds(sbuilds(foo, populate_full_signature=True))
+    reveal_type(instantiate(c2), expected_text="str")
+    reveal_type(c2, expected_text="Type[Builds[Type[str]]]")
+
+    c3 = sbuilds(sbuilds(foo, zen_partial=True))
+    reveal_type(instantiate(c3), expected_text="str")
+
+    pc1 = sbuilds(sbuilds(foo, x=1), x=2, zen_partial=True)
+    reveal_type(instantiate(pc1), expected_text="Partial[str]")
+
+    pc2 = sbuilds(sbuilds(foo, populate_full_signature=True), zen_partial=True)
+    reveal_type(instantiate(pc2), expected_text="Partial[str]")
+
+    pc3 = sbuilds(sbuilds(foo, zen_partial=True), zen_partial=True)
+    reveal_type(instantiate(pc3), expected_text="Partial[str]")
+
+    fc = sbuilds(
+        sbuilds(foo, populate_full_signature=True), populate_full_signature=True
+    )
+    reveal_type(instantiate(fc), expected_text="str")
+    reveal_type(fc, expected_text="Type[BuildsWithSig[Type[str], (x: int)]]")
+
+
+def fbuilds_target_pass_through():
+    def foo(x: int) -> str:
+        ...
+
+    fbuilds = make_custom_builds_fn(populate_full_signature=True)
+    c1 = fbuilds(fbuilds(foo, x=1), x=2)
+    reveal_type(instantiate(c1), expected_text="str")
+
+    c2 = fbuilds(fbuilds(foo, populate_full_signature=True))
+    reveal_type(instantiate(c2), expected_text="str")
+    reveal_type(c2, expected_text="Type[BuildsWithSig[Type[str], (x: int)]]")
+
+    c3 = fbuilds(fbuilds(foo, zen_partial=True))
+    reveal_type(instantiate(c3), expected_text="str")
+
+    pc1 = fbuilds(fbuilds(foo, x=1), x=2, zen_partial=True)
+    reveal_type(instantiate(pc1), expected_text="Partial[str]")
+
+    pc2 = fbuilds(fbuilds(foo, populate_full_signature=True), zen_partial=True)
+    reveal_type(instantiate(pc2), expected_text="Partial[str]")
+
+    pc3 = fbuilds(fbuilds(foo, zen_partial=True), zen_partial=True)
+    reveal_type(instantiate(pc3), expected_text="Partial[str]")
+
+    fc = fbuilds(fbuilds(foo, populate_full_signature=False))
+    reveal_type(instantiate(fc), expected_text="str")
+    reveal_type(fc, expected_text="Type[Builds[(x: int) -> str]]")
+
+
+def pbuilds_target_pass_through():
+    def foo(x: int) -> str:
+        ...
+
+    pbuilds = make_custom_builds_fn(zen_partial=True)
+    pc1 = pbuilds(pbuilds(foo, x=1), x=2)
+    reveal_type(instantiate(pc1), expected_text="Partial[str]")
+
+    pc2 = pbuilds(builds(foo, populate_full_signature=True))
+    reveal_type(instantiate(pc2), expected_text="Partial[str]")
+
+    pc3 = pbuilds(pbuilds(foo, zen_partial=False))
+    reveal_type(instantiate(pc3), expected_text="Partial[str]")
+
+    c1 = pbuilds(pbuilds(foo, x=1), x=2, zen_partial=False)
+    reveal_type(instantiate(c1), expected_text="str")
+
+    fc = pbuilds(
+        builds(foo, populate_full_signature=True),
+        zen_partial=False,
+        populate_full_signature=True,
+    )
+    reveal_type(fc, expected_text="Type[BuildsWithSig[Type[str], (x: int)]]")
+    reveal_type(instantiate(fc), expected_text="str")
+
+    pc4 = pbuilds(pbuilds(foo, zen_partial=True), zen_partial=True)
+    reveal_type(instantiate(pc4), expected_text="Partial[str]")
