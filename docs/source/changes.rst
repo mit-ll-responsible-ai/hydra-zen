@@ -82,6 +82,14 @@ The following parts of the documentation underwent significant revisions:
 .. _v0.10.0:
 
 -------------------
+0.10.1 - 2023-05-23
+-------------------
+
+Bans ``typing-extension v4.6.0`` which has a breaking bug in it.
+
+.. _v0.10.0:
+
+-------------------
 0.10.0 - 2023-03-05
 -------------------
 
