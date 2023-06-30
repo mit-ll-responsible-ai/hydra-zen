@@ -51,7 +51,7 @@ hydra-zen now uses the `trusted publishers <https://blog.pypi.org/posts/2023-04-
 Improvements
 ------------
 - :func:`~hydra_zen.builds` now has a transitive property that enables iterative build patterns. See :pull:`455`
-- :func:`~hydra_zen.zen`'s instantiation phase has been improved so that dataclass objects and stdlib containers are returned instead of omegaconf objects. See :pull:`#448`. 
+- :func:`~hydra_zen.zen`'s instantiation phase has been improved so that dataclass objects and stdlib containers are returned instead of omegaconf objects. See :pull:`448`. 
 - :func:`~hydra_zen.zen` can now be passed `resolve_pre_call=False` to defer the resolution of interpolated fields until after `pre_call` functions are called. See :pull:`460`.
 
 Bug Fixes
@@ -68,6 +68,7 @@ Most of these changes will not have any impact on users, based on download stati
 - :func:`~hydra_zen.just` not longer returns a frozen dataclass (see :pull:`459`).
 - Users that relied on patterns like `builds(builds(...))` will find that :pull:`455` has changed their behaviors. This new behavior can be disabled via `builds(..., zen_convert={'flat_target': False})`
 - :func:`~hydra_zen.zen`'s instantiation behavior was changed by :pull:`448`. See that PR for instructions on restoring the old behavior.
+- The signature-inspection logic of :func:`~hydra_zen.builds` has been modified to adopt and backport a fix made to :py:func:`inspect.signature` in Python 3.11.4. See :pull:`497`.
 
 --------------------------
 Documentation - 2023-03-11
