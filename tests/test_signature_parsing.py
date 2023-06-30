@@ -510,32 +510,32 @@ def test_populate_annotated_enum_regression():
 class A:
     # Manually verified using `inspect.signature` after
     # the fix of https://bugs.python.org/issue40897
-    py_310_sig = (("a", int),)
+    expected_sig = (("a", int),)
 
     def __new__(cls, a: int):
         return object.__new__(cls)
 
 
 class B(A):
-    py_310_sig = (("b", float),)
+    expected_sig = (("b", float),)
 
     def __init__(self, b: float):
         pass
 
 
 class C(A):
-    py_310_sig = (("c", str),)
+    expected_sig = (("c", str),)
 
     def __new__(cls, c: str):
         return object.__new__(cls)
 
 
 class D(A):
-    py_310_sig = (("a", int),)
+    expected_sig = (("a", int),)
 
 
 class E(B):
-    py_310_sig = (("a", int),)
+    expected_sig = (("b", float),)
 
 
 @pytest.mark.parametrize("Obj", [A, B, C, D, E])
@@ -548,7 +548,7 @@ def test_parse_sig_with_new_vs_init(Obj):
         (p.name, p.annotation) for p in inspect.signature(Conf).parameters.values()
     )
 
-    assert sig_via_builds == Obj.py_310_sig
+    assert sig_via_builds == Obj.expected_sig
 
 
 def test_Counter():
