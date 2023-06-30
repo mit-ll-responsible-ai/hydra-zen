@@ -87,7 +87,7 @@ def check_version():
 def check_partial_builds_on_class():
     reveal_type(
         builds(A, zen_partial=True),
-        expected_text="Type[ZenPartialBuilds[Type[A]]] | Type[HydraPartialBuilds[Type[A]]]",
+        expected_text="type[ZenPartialBuilds[type[A]]] | type[HydraPartialBuilds[type[A]]]",
     )
     conf_a_partial = builds(A, zen_partial=True)
     reveal_type(instantiate(conf_a_partial), expected_text="Partial[A]")
@@ -100,7 +100,7 @@ f_sig = Callable[[int], int]
 def check_partial_builds_on_function():
     reveal_type(
         builds(f, zen_partial=True),
-        expected_text="Type[ZenPartialBuilds[(x: int) -> int]] | Type[HydraPartialBuilds[(x: int) -> int]]",
+        expected_text="type[ZenPartialBuilds[(x: int) -> int]] | type[HydraPartialBuilds[(x: int) -> int]]",
     )
 
     conf_f_partial = builds(f, zen_partial=True)
@@ -118,28 +118,28 @@ def check_partial_builds_on_function():
 
 def f3():
     # test builds(..., zen_partial=False)
-    reveal_type(builds(A, zen_partial=False), expected_text="Type[Builds[Type[A]]]")
+    reveal_type(builds(A, zen_partial=False), expected_text="type[Builds[type[A]]]")
     conf_A_1 = builds(A, zen_partial=False)
     reveal_type(instantiate(conf_A_1), expected_text="A")
 
     reveal_type(
-        builds(f, zen_partial=False, expected_text="Type[Builds[(x: int) -> int]]")
+        builds(f, zen_partial=False, expected_text="type[Builds[(x: int) -> int]]")
     )
-    conf_f_1: Type[Builds[f_sig]] = builds(f, zen_partial=False)
+    conf_f_1: type[Builds[f_sig]] = builds(f, zen_partial=False)
     reveal_type(instantiate(conf_f_1), expected_text="int")
 
 
 def f4():
     # test builds(...)
-    reveal_type(builds(A), expected_text="Type[Builds[Type[A]]]")
+    reveal_type(builds(A), expected_text="type[Builds[type[A]]]")
     conf_A_2 = builds(A)
     reveal_type(instantiate(conf_A_2), expected_text="A")
 
-    reveal_type(conf_A_2(), expected_text="Builds[Type[A]]")
+    reveal_type(conf_A_2(), expected_text="Builds[type[A]]")
     conf_a_instance = conf_A_2()
     reveal_type(instantiate(conf_a_instance), expected_text="A")
 
-    reveal_type(builds(f), expected_text="Type[Builds[(x: int) -> int]]")
+    reveal_type(builds(f), expected_text="type[Builds[(x: int) -> int]]")
     conf_f_2 = builds(f)
     reveal_type(instantiate(conf_f_2), expected_text="int")
 
@@ -153,9 +153,9 @@ def check_just():
 
     # test just(...)
     reveal_type(just(f), expected_text="Just[(x: int) -> int]")
-    reveal_type(just(A), expected_text="Just[Type[A]]")
+    reveal_type(just(A), expected_text="Just[type[A]]")
     reveal_type(instantiate(just(f)), expected_text="(x: int) -> int")
-    reveal_type(instantiate(just(A)), expected_text="Type[A]")
+    reveal_type(instantiate(just(A)), expected_text="type[A]")
 
     reveal_type(just(1), expected_text="int")
     reveal_type(just("hi"), expected_text="str")
@@ -163,8 +163,8 @@ def check_just():
     reveal_type(just(1 + 2j), expected_text="ConfigComplex")
     reveal_type(just(Path.home()), expected_text="Path")
     reveal_type(just(partial(f, 1)), expected_text="Just[partial[int]]")
-    reveal_type(just(set([1, 2, 3])), expected_text="Builds[Type[set[int]]]")
-    reveal_type(just(range(10)), expected_text="Builds[Type[range]]")
+    reveal_type(just(set([1, 2, 3])), expected_text="Builds[type[set[int]]]")
+    reveal_type(just(range(10)), expected_text="Builds[type[range]]")
 
     partiald_f = instantiate(just(partial(f, 1)))
     reveal_type(partiald_f, expected_text="partial[int]")
@@ -175,8 +175,8 @@ def check_just():
     class B:
         ...
 
-    reveal_type(just(B), expected_text="Just[Type[B]]")
-    reveal_type(just(B()), expected_text="Type[Builds[Type[B]]]")
+    reveal_type(just(B), expected_text="Just[type[B]]")
+    reveal_type(just(B()), expected_text="type[Builds[type[B]]]")
     reveal_type(just(B(), zen_convert={"dataclass": False}), expected_text="Any")
 
 
@@ -193,11 +193,11 @@ def f6():
 
 
 def f7():
-    # get_target(Type[Builds[T]]) -> T
-    reveal_type(get_target(builds(str)), expected_text="Type[str]")
-    reveal_type(get_target(builds(str, zen_partial=False)), expected_text="Type[str]")
-    reveal_type(get_target(builds(str, zen_partial=True)), expected_text="Type[str]")
-    reveal_type(get_target(just(str)), expected_text="Type[str]")
+    # get_target(type[Builds[T]]) -> T
+    reveal_type(get_target(builds(str)), expected_text="type[str]")
+    reveal_type(get_target(builds(str, zen_partial=False)), expected_text="type[str]")
+    reveal_type(get_target(builds(str, zen_partial=True)), expected_text="type[str]")
+    reveal_type(get_target(just(str)), expected_text="type[str]")
 
     # get_target(Builds[Callable[...]]) -> Callable[...]
     reveal_type(get_target(builds(f)), expected_text="(x: int) -> int")
@@ -209,10 +209,10 @@ def f7():
     )
     reveal_type(get_target(just(f)), expected_text="(x: int) -> int")
 
-    reveal_type(get_target(builds(str)()), expected_text="Type[str]")
-    reveal_type(get_target(builds(str, zen_partial=False)()), expected_text="Type[str]")
-    reveal_type(get_target(builds(str, zen_partial=True)()), expected_text="Type[str]")
-    reveal_type(get_target(just(str)), expected_text="Type[str]")
+    reveal_type(get_target(builds(str)()), expected_text="type[str]")
+    reveal_type(get_target(builds(str, zen_partial=False)()), expected_text="type[str]")
+    reveal_type(get_target(builds(str, zen_partial=True)()), expected_text="type[str]")
+    reveal_type(get_target(just(str)), expected_text="type[str]")
 
 
 def f8():
@@ -230,42 +230,42 @@ def zen_wrappers():
     J = just(f)
     B = builds(f, zen_partial=True)
     PB = builds(f, zen_partial=True)
-    reveal_type(builds(str, zen_wrappers=f), expected_text="Type[Builds[Type[str]]]")
-    reveal_type(builds(str, zen_wrappers=J), expected_text="Type[Builds[Type[str]]]")
-    reveal_type(builds(str, zen_wrappers=B), expected_text="Type[Builds[Type[str]]]")
-    reveal_type(builds(str, zen_wrappers=PB), expected_text="Type[Builds[Type[str]]]")
+    reveal_type(builds(str, zen_wrappers=f), expected_text="type[Builds[type[str]]]")
+    reveal_type(builds(str, zen_wrappers=J), expected_text="type[Builds[type[str]]]")
+    reveal_type(builds(str, zen_wrappers=B), expected_text="type[Builds[type[str]]]")
+    reveal_type(builds(str, zen_wrappers=PB), expected_text="type[Builds[type[str]]]")
     reveal_type(
-        builds(str, zen_wrappers=(None,), expected_text="Type[Builds[Type[str]]]")
+        builds(str, zen_wrappers=(None,), expected_text="type[Builds[type[str]]]")
     )
 
     reveal_type(
         builds(str, zen_wrappers=(f, J, B, PB, None)),
-        expected_text="Type[Builds[Type[str]]]",
+        expected_text="type[Builds[type[str]]]",
     )
 
     reveal_type(
         builds(str, zen_partial=True, zen_wrappers=f),
-        expected_text="Type[ZenPartialBuilds[Type[str]]] | Type[HydraPartialBuilds[Type[str]]]",
+        expected_text="type[ZenPartialBuilds[type[str]]] | type[HydraPartialBuilds[type[str]]]",
     )
     reveal_type(
         builds(str, zen_partial=True, zen_wrappers=J),
-        expected_text="Type[ZenPartialBuilds[Type[str]]] | Type[HydraPartialBuilds[Type[str]]]",
+        expected_text="type[ZenPartialBuilds[type[str]]] | type[HydraPartialBuilds[type[str]]]",
     )
     reveal_type(
         builds(str, zen_partial=True, zen_wrappers=B),
-        expected_text="Type[ZenPartialBuilds[Type[str]]] | Type[HydraPartialBuilds[Type[str]]]",
+        expected_text="type[ZenPartialBuilds[type[str]]] | type[HydraPartialBuilds[type[str]]]",
     )
     reveal_type(
         builds(str, zen_partial=True, zen_wrappers=PB),
-        expected_text="Type[ZenPartialBuilds[Type[str]]] | Type[HydraPartialBuilds[Type[str]]]",
+        expected_text="type[ZenPartialBuilds[type[str]]] | type[HydraPartialBuilds[type[str]]]",
     )
     reveal_type(
         builds(str, zen_partial=True, zen_wrappers=(None,)),
-        expected_text="Type[ZenPartialBuilds[Type[str]]] | Type[HydraPartialBuilds[Type[str]]]",
+        expected_text="type[ZenPartialBuilds[type[str]]] | type[HydraPartialBuilds[type[str]]]",
     )
     reveal_type(
         builds(str, zen_partial=True, zen_wrappers=(f, J, B, PB, None)),
-        expected_text="Type[ZenPartialBuilds[Type[str]]] | Type[HydraPartialBuilds[Type[str]]]",
+        expected_text="type[ZenPartialBuilds[type[str]]] | type[HydraPartialBuilds[type[str]]]",
     )
 
     # should fail
@@ -276,10 +276,10 @@ def zen_wrappers():
 def custom_builds_fn():
     _builds = make_custom_builds_fn()
 
-    reveal_type(_builds(int), expected_text="Type[Builds[Type[int]]]")
+    reveal_type(_builds(int), expected_text="type[Builds[type[int]]]")
     reveal_type(
         _builds(int, zen_partial=True),
-        expected_text="Type[ZenPartialBuilds[Type[int]]] | Type[HydraPartialBuilds[Type[int]]]",
+        expected_text="type[ZenPartialBuilds[type[int]]] | type[HydraPartialBuilds[type[int]]]",
     )
 
 
@@ -325,7 +325,7 @@ def supported_primitives():
             g=builds(int)(),  # dataclass instance
             h=builds(int, zen_partial=True)(),  # dataclass instance
         ),
-        expected_text="Type[DataClass]",
+        expected_text="type[DataClass]",
     )
     reveal_type(
         make_config(
@@ -335,7 +335,7 @@ def supported_primitives():
             d=ZenField(default=(1, "hi", 2.0, 1j, set(), M, Path.cwd())),
             e=ZenField(default=f),
         ),
-        expected_text="Type[DataClass]",
+        expected_text="type[DataClass]",
     )
 
     reveal_type(
@@ -347,7 +347,7 @@ def supported_primitives():
             d=[2.0 + 1j],
             e=f,
         ),
-        expected_text="Type[Builds[Type[dict[Unknown, Unknown]]]]",
+        expected_text="type[Builds[type[dict[_KT@dict, _VT@dict]]]]",
     )
 
     reveal_type(
@@ -360,7 +360,7 @@ def supported_primitives():
             e=f,
             zen_partial=True,
         ),
-        expected_text="Type[ZenPartialBuilds[Type[dict[Unknown, Unknown]]]] | Type[HydraPartialBuilds[Type[dict[Unknown, Unknown]]]]",
+        expected_text="type[ZenPartialBuilds[type[dict[_KT@dict, _VT@dict]]]] | type[HydraPartialBuilds[type[dict[_KT@dict, _VT@dict]]]]",
     )
 
     # check lists
@@ -384,7 +384,7 @@ def supported_primitives():
         builds(dict),
         Path.cwd(),
         set(),
-        frozenset(),
+        frozenset([]),
         {1, 1j, Path.cwd()},
         deque([1, 2]),
         Counter(),
@@ -424,10 +424,6 @@ def check_zen_field():
 
     ZenField(1.0)  # type: ignore
 
-    # this is a known limitation
-    # TODO: open pyright issue
-    ZenField(Union[int, str])  # type: ignore
-
 
 def check_base_annotations():
     P1 = make_config(x=1)
@@ -443,10 +439,10 @@ def check_base_annotations():
     P4 = builds(f, populate_full_signature=True)
 
     reveal_type(
-        make_config(x=1, bases=(P1, P2, P3, P4)), expected_text="Type[DataClass]"
+        make_config(x=1, bases=(P1, P2, P3, P4)), expected_text="type[DataClass]"
     )
     reveal_type(
-        builds(int, bases=(P1, P2, P3, P4)), expected_text="Type[Builds[Type[int]]]"
+        builds(int, bases=(P1, P2, P3, P4)), expected_text="type[Builds[type[int]]]"
     )
 
     # should fail
@@ -489,10 +485,10 @@ def check_partial_protocol_harder():
 
 
 def check_partiald_target():
-    reveal_type(builds(partial(int)), expected_text="Type[Builds[partial[int]]]")
+    reveal_type(builds(partial(int)), expected_text="type[Builds[partial[int]]]")
     reveal_type(
         builds(partial(int), zen_partial=True),
-        expected_text="Type[ZenPartialBuilds[partial[int]]] | Type[HydraPartialBuilds[partial[int]]]",
+        expected_text="type[ZenPartialBuilds[partial[int]]] | type[HydraPartialBuilds[partial[int]]]",
     )
     a = builds(partial(int))
     reveal_type(instantiate(a), expected_text="int")
@@ -574,19 +570,19 @@ def check_populate_full_sig():
     # The following should be ok
     reveal_type(
         Conf_f(1, "hi"),
-        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = False)]",
+        expected_text="BuildsWithSig[type[C], (x: int, y: str, z: bool = False)]",
     )
     reveal_type(
         Conf_f(1, "hi", True),
-        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = False)]",
+        expected_text="BuildsWithSig[type[C], (x: int, y: str, z: bool = False)]",
     )
     reveal_type(
         Conf_f(1, y="hi"),
-        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = False)]",
+        expected_text="BuildsWithSig[type[C], (x: int, y: str, z: bool = False)]",
     )
     reveal_type(
         Conf_f(x=1, y="hi", z=False),
-        expected_text="BuildsWithSig[Type[C], (x: int, y: str, z: bool = False)]",
+        expected_text="BuildsWithSig[type[C], (x: int, y: str, z: bool = False)]",
     )
 
     # check instantiation
@@ -654,7 +650,7 @@ def check_full_builds(full_builds: FullBuilds):
     Conf_f3 = full_builds(f, zen_partial=True)
     reveal_type(
         Conf_f3,
-        expected_text="Type[ZenPartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]] | Type[HydraPartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]]",
+        expected_text="type[ZenPartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]] | type[HydraPartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]]",
     )
     Conf_f3()
 
@@ -697,14 +693,14 @@ def check_partial_builds(partial_builds: PBuilds):
     Conf_f = partial_builds(f)
     reveal_type(
         Conf_f,
-        expected_text="Type[ZenPartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]] | Type[HydraPartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]]",
+        expected_text="type[ZenPartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]] | type[HydraPartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]]",
     )
 
     # type-checker should see default: `populate_full_signature=True`
     Conf_f2 = partial_builds(f, zen_partial=True)
     reveal_type(
         Conf_f2,
-        expected_text="Type[ZenPartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]] | Type[HydraPartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]]",
+        expected_text="type[ZenPartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]] | type[HydraPartialBuilds[(x: int, y: str, z: bool = False) -> Literal[1]]]",
     )
 
     # signature should be required
@@ -722,7 +718,7 @@ def check_make_custom_builds_no_args():
 
     reveal_type(
         Conf,
-        expected_text="Type[Builds[(x: int, y: str, z: bool = False) -> Literal[1]]]",
+        expected_text="type[Builds[(x: int, y: str, z: bool = False) -> Literal[1]]]",
     )
 
 
@@ -737,7 +733,7 @@ def check_make_custom_builds_pop_sig():
 
     reveal_type(
         Conf,
-        expected_text="Type[BuildsWithSig[Type[int], (x: int, y: str, z: bool = False)]]",
+        expected_text="type[BuildsWithSig[type[int], (x: int, y: str, z: bool = False)]]",
     )
 
 
@@ -751,7 +747,7 @@ def check_make_custom_builds_partial():
 
     reveal_type(
         Conf,
-        expected_text="Type[ZenPartialBuilds[(x: int, y: str, z: bool = False) -> int]] | Type[HydraPartialBuilds[(x: int, y: str, z: bool = False) -> int]]",
+        expected_text="type[ZenPartialBuilds[(x: int, y: str, z: bool = False) -> int]] | type[HydraPartialBuilds[(x: int, y: str, z: bool = False) -> int]]",
     )
 
     partial_builds2 = make_custom_builds_fn(
@@ -762,7 +758,7 @@ def check_make_custom_builds_partial():
 
     reveal_type(
         Conf2,
-        expected_text="Type[ZenPartialBuilds[(x: int, y: str, z: bool = False) -> int]] | Type[HydraPartialBuilds[(x: int, y: str, z: bool = False) -> int]]",
+        expected_text="type[ZenPartialBuilds[(x: int, y: str, z: bool = False) -> int]] | type[HydraPartialBuilds[(x: int, y: str, z: bool = False) -> int]]",
     )
 
 
@@ -812,7 +808,7 @@ def check_overloads_arent_too_restrictive():
         dataclass_name: Optional[str],
         fbuilds: FullBuilds = ...,
         pbuilds: PBuilds = ...,
-        **kwargs_for_target: SupportedPrimitive,
+        **kwargs_for_target: Any,
     ):
         def func(x: int) -> str:
             ...
@@ -833,7 +829,7 @@ def check_overloads_arent_too_restrictive():
 
         reveal_type(
             bout,
-            expected_text="Type[Builds[Unknown]] | Type[ZenPartialBuilds[Unknown]] | Type[HydraPartialBuilds[Unknown]] | Type[BuildsWithSig[Type[str], (x: int)]]",
+            expected_text="type[Builds[(x: int) -> str]] | type[ZenPartialBuilds[(x: int) -> str]] | type[HydraPartialBuilds[(x: int) -> str]] | type[BuildsWithSig[type[str], (x: int)]]",
         )
 
         fout = fbuilds(
@@ -852,7 +848,7 @@ def check_overloads_arent_too_restrictive():
 
         reveal_type(
             fout,
-            expected_text="Type[Builds[Unknown]] | Type[ZenPartialBuilds[Unknown]] | Type[HydraPartialBuilds[Unknown]] | Type[BuildsWithSig[Type[str], (x: int)]]",
+            expected_text="type[Builds[(x: int) -> str]] | type[ZenPartialBuilds[(x: int) -> str]] | type[HydraPartialBuilds[(x: int) -> str]] | type[BuildsWithSig[type[str], (x: int)]]",
         )
 
         pout = pbuilds(
@@ -871,7 +867,7 @@ def check_overloads_arent_too_restrictive():
 
         reveal_type(
             pout,
-            expected_text="Type[Builds[Unknown]] | Type[ZenPartialBuilds[Unknown]] | Type[HydraPartialBuilds[Unknown]] | Type[BuildsWithSig[Type[str], (x: int)]]",
+            expected_text="type[Builds[(x: int) -> str]] | type[ZenPartialBuilds[(x: int) -> str]] | type[HydraPartialBuilds[(x: int) -> str]] | type[BuildsWithSig[type[str], (x: int)]]",
         )
 
     assert caller
@@ -1098,6 +1094,7 @@ def check_zen():
     def zen_f2(x: int) -> str:
         ...
 
+    zen_f2
     assert_type(zen_f2({"a": 1}), str)
     assert_type(zen_f2(DictConfig({"a": 1})), str)
     assert_type(zen_f2("some yaml"), str)
@@ -1134,7 +1131,11 @@ def check_zen():
     def h2():
         ...
 
-    @zen(pre_call=zen(lambda x, y: None))
+    okay = zen(lambda x, y: None)
+
+    # This is ian issue with pyright. See that `okay` is valid
+    # but the inline expr is not
+    @zen(pre_call=zen(lambda x, y: None))  # type: ignore
     def h3():
         ...
 
@@ -1289,7 +1290,7 @@ def builds_target_pass_through():
 
     c2 = builds(builds(foo, populate_full_signature=True))
     reveal_type(instantiate(c2), expected_text="str")
-    reveal_type(c2, expected_text="Type[Builds[Type[str]]]")
+    reveal_type(c2, expected_text="type[Builds[type[str]]]")
 
     c3 = builds(builds(foo, zen_partial=True))
     reveal_type(instantiate(c3), expected_text="str")
@@ -1303,9 +1304,10 @@ def builds_target_pass_through():
     pc3 = builds(builds(foo, zen_partial=True), zen_partial=True)
     reveal_type(instantiate(pc3), expected_text="Partial[str]")
 
-    fc = builds(builds(foo, populate_full_signature=True), populate_full_signature=True)
+    tmp = builds(foo, populate_full_signature=True)
+    fc = builds(tmp, populate_full_signature=True)
     reveal_type(instantiate(fc), expected_text="str")
-    reveal_type(fc, expected_text="Type[BuildsWithSig[Type[str], (x: int)]]")
+    reveal_type(fc, expected_text="type[BuildsWithSig[type[str], (x: int)]]")
 
 
 def sbuilds_target_pass_through():
@@ -1313,30 +1315,35 @@ def sbuilds_target_pass_through():
         ...
 
     sbuilds = make_custom_builds_fn()
-    c1 = sbuilds(sbuilds(foo, x=1), x=2)
+    tmp1 = sbuilds(foo, x=1)  # pyright has bug when evaluating these inline
+    c1 = sbuilds(tmp1, x=2)
     reveal_type(instantiate(c1), expected_text="str")
 
-    c2 = sbuilds(sbuilds(foo, populate_full_signature=True))
+    tmp2 = sbuilds(foo, populate_full_signature=True)
+    c2 = sbuilds(tmp2)
     reveal_type(instantiate(c2), expected_text="str")
-    reveal_type(c2, expected_text="Type[Builds[Type[str]]]")
+    reveal_type(c2, expected_text="type[Builds[type[str]]]")
 
-    c3 = sbuilds(sbuilds(foo, zen_partial=True))
+    tmp3 = sbuilds(foo, zen_partial=True)
+    c3 = sbuilds(tmp3)
     reveal_type(instantiate(c3), expected_text="str")
 
-    pc1 = sbuilds(sbuilds(foo, x=1), x=2, zen_partial=True)
+    tmp4 = sbuilds(foo, x=1)
+    pc1 = sbuilds(tmp4, x=2, zen_partial=True)
     reveal_type(instantiate(pc1), expected_text="Partial[str]")
 
-    pc2 = sbuilds(sbuilds(foo, populate_full_signature=True), zen_partial=True)
+    tmp5 = sbuilds(foo, populate_full_signature=True)
+    pc2 = sbuilds(tmp5, zen_partial=True)
     reveal_type(instantiate(pc2), expected_text="Partial[str]")
 
-    pc3 = sbuilds(sbuilds(foo, zen_partial=True), zen_partial=True)
+    tmp6 = sbuilds(foo, zen_partial=True)
+    pc3 = sbuilds(tmp6, zen_partial=True)
     reveal_type(instantiate(pc3), expected_text="Partial[str]")
 
-    fc = sbuilds(
-        sbuilds(foo, populate_full_signature=True), populate_full_signature=True
-    )
+    tmp7 = sbuilds(foo, populate_full_signature=True)
+    fc = sbuilds(tmp7, populate_full_signature=True)
     reveal_type(instantiate(fc), expected_text="str")
-    reveal_type(fc, expected_text="Type[BuildsWithSig[Type[str], (x: int)]]")
+    reveal_type(fc, expected_text="type[BuildsWithSig[type[str], (x: int)]]")
 
 
 def fbuilds_target_pass_through():
@@ -1344,28 +1351,35 @@ def fbuilds_target_pass_through():
         ...
 
     fbuilds = make_custom_builds_fn(populate_full_signature=True)
-    c1 = fbuilds(fbuilds(foo, x=1), x=2)
+    tmp1 = fbuilds(foo, x=1)
+    c1 = fbuilds(tmp1, x=2)
     reveal_type(instantiate(c1), expected_text="str")
 
-    c2 = fbuilds(fbuilds(foo, populate_full_signature=True))
+    tmp2 = fbuilds(foo, populate_full_signature=True)
+    c2 = fbuilds(tmp2)
     reveal_type(instantiate(c2), expected_text="str")
-    reveal_type(c2, expected_text="Type[BuildsWithSig[Type[str], (x: int)]]")
+    reveal_type(c2, expected_text="type[BuildsWithSig[type[str], (x: int)]]")
 
-    c3 = fbuilds(fbuilds(foo, zen_partial=True))
+    tmp3 = fbuilds(foo, zen_partial=True)
+    c3 = fbuilds(tmp3)
     reveal_type(instantiate(c3), expected_text="str")
 
-    pc1 = fbuilds(fbuilds(foo, x=1), x=2, zen_partial=True)
+    tmp4 = fbuilds(foo, x=1)
+    pc1 = fbuilds(tmp4, x=2, zen_partial=True)
     reveal_type(instantiate(pc1), expected_text="Partial[str]")
 
-    pc2 = fbuilds(fbuilds(foo, populate_full_signature=True), zen_partial=True)
+    tmp5 = fbuilds(foo, populate_full_signature=True)
+    pc2 = fbuilds(tmp5, zen_partial=True)
     reveal_type(instantiate(pc2), expected_text="Partial[str]")
 
-    pc3 = fbuilds(fbuilds(foo, zen_partial=True), zen_partial=True)
+    tmp6 = fbuilds(foo, zen_partial=True)
+    pc3 = fbuilds(tmp6, zen_partial=True)
     reveal_type(instantiate(pc3), expected_text="Partial[str]")
 
-    fc = fbuilds(fbuilds(foo, populate_full_signature=False))
+    tmp7 = fbuilds(foo, populate_full_signature=False)
+    fc = fbuilds(tmp7)
     reveal_type(instantiate(fc), expected_text="str")
-    reveal_type(fc, expected_text="Type[Builds[(x: int) -> str]]")
+    reveal_type(fc, expected_text="type[Builds[(x: int) -> str]]")
 
 
 def pbuilds_target_pass_through():
@@ -1373,25 +1387,30 @@ def pbuilds_target_pass_through():
         ...
 
     pbuilds = make_custom_builds_fn(zen_partial=True)
-    pc1 = pbuilds(pbuilds(foo, x=1), x=2)
+    tmp1 = pbuilds(foo, x=1)
+    pc1 = pbuilds(tmp1, x=2)
     reveal_type(instantiate(pc1), expected_text="Partial[str]")
 
     pc2 = pbuilds(builds(foo, populate_full_signature=True))
     reveal_type(instantiate(pc2), expected_text="Partial[str]")
 
-    pc3 = pbuilds(pbuilds(foo, zen_partial=False))
+    tmp3 = pbuilds(foo, zen_partial=False)
+    pc3 = pbuilds(tmp3)
     reveal_type(instantiate(pc3), expected_text="Partial[str]")
 
-    c1 = pbuilds(pbuilds(foo, x=1), x=2, zen_partial=False)
+    tmp4 = pbuilds(foo, x=1)
+    c1 = pbuilds(tmp4, x=2, zen_partial=False)
     reveal_type(instantiate(c1), expected_text="str")
 
+    tmp5 = builds(foo, populate_full_signature=True)
     fc = pbuilds(
-        builds(foo, populate_full_signature=True),
+        tmp5,
         zen_partial=False,
         populate_full_signature=True,
     )
-    reveal_type(fc, expected_text="Type[BuildsWithSig[Type[str], (x: int)]]")
+    reveal_type(fc, expected_text="type[BuildsWithSig[type[str], (x: int)]]")
     reveal_type(instantiate(fc), expected_text="str")
 
-    pc4 = pbuilds(pbuilds(foo, zen_partial=True), zen_partial=True)
+    tmp6 = pbuilds(foo, zen_partial=True)
+    pc4 = pbuilds(tmp6, zen_partial=True)
     reveal_type(instantiate(pc4), expected_text="Partial[str]")

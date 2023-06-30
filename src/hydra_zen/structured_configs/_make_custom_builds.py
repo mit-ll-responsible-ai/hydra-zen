@@ -4,7 +4,17 @@
 import inspect
 import warnings
 from functools import wraps
-from typing import Any, Callable, Dict, Mapping, Optional, Union, cast, overload
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Mapping,
+    Optional,
+    Union,
+    cast,
+    overload,
+)
 
 from typing_extensions import Final, Literal
 
@@ -268,8 +278,11 @@ def make_custom_builds_fn(
 
     _frozen = _new_defaults.pop("frozen")
 
-    # let `builds` validate the new defaults!
-    builds(builds, **_new_defaults)
+    # This self-check was causing issues with type-checkers (pyright) -
+    # causing them to resolve the return type of this function as "unknown"
+    if not TYPE_CHECKING:
+        # let `builds` validate the new defaults!
+        builds(builds, **_new_defaults)
 
     _zen_dataclass: Optional[DataclassOptions] = _new_defaults.pop("zen_dataclass")
     if _zen_dataclass is None:
