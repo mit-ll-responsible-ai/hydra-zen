@@ -429,7 +429,7 @@ def launch(
     with initialize(
         config_path=None,
         job_name=job_name,
-        **({} if version_base is _NotSet else {"version_base": version_base}),
+        **({} if version_base is _NotSet else {"version_base": version_base}),  # type: ignore
     ):
         # taken from hydra.compose with support for MULTIRUN
         gh = GlobalHydra.instance()

@@ -289,7 +289,7 @@ def make_custom_builds_fn(
     _zen_dataclass = parse_dataclass_options(_zen_dataclass)
 
     @wraps(builds)
-    def wrapped(*args: Any, **kwargs: Any):
+    def wrapped(*args: Any, **kwargs: Any) -> Any:
         merged_kwargs: Dict[str, Any] = {}
         _dataclass: Optional[DataclassOptions] = kwargs.pop("zen_dataclass", None)
 
@@ -300,7 +300,6 @@ def make_custom_builds_fn(
 
         merged_kwargs.update(_new_defaults)
         merged_kwargs.update(kwargs)
-
-        return builds(*args, **merged_kwargs)
+        return cast(Any, builds(*args, **merged_kwargs))
 
     return cast(Union[FullBuilds, PBuilds, StdBuilds], wrapped)

@@ -440,12 +440,14 @@ def make_config(
 
     # validate hydra-args via `builds`
     # also check for use of reserved names
+    _tmp: Any = None
+
     builds(
         dict,
         hydra_convert=hydra_convert,
         hydra_recursive=hydra_recursive,
         hydra_defaults=hydra_defaults,
-        **{k: None for k in fields_as_kwargs},
+        **{k: _tmp for k in fields_as_kwargs},
     )
 
     normalized_fields: Dict[str, ZenField] = {}

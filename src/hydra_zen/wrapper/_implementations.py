@@ -470,7 +470,7 @@ def zen(
     pre_call: PreCall = ...,
     ZenWrapper: Type[Zen[P, R]] = Zen,
     resolve_pre_call: bool = ...,
-    exclude: Optional[Union[str, Iterable[str]]] = None,
+    exclude: Optional[Union[str, Iterable[str]]] = ...,
 ) -> Zen[P, R]:
     ...
 
@@ -482,8 +482,8 @@ def zen(
     unpack_kwargs: bool = ...,
     pre_call: PreCall = ...,
     resolve_pre_call: bool = ...,
-    ZenWrapper: Type[Zen[Any, Any]] = ...,
-    exclude: Optional[Union[str, Iterable[str]]] = None,
+    ZenWrapper: Type[Zen[P, R]] = Zen,
+    exclude: Optional[Union[str, Iterable[str]]] = ...,
 ) -> Callable[[Callable[P, R]], Zen[P, R]]:
     ...
 
@@ -849,7 +849,7 @@ def default_to_config(
         return target
     else:
         t = cast(Callable[..., Any], target)
-        return fbuilds(t, **kw)
+        return cast(Type[DataClass_], fbuilds(t, **kw))
 
 
 class _HasName(Protocol):

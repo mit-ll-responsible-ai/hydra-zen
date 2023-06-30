@@ -1802,7 +1802,7 @@ def builds(
                             Union[str, Builds[Any]], Tuple[Union[str, Builds[Any]], ...]
                         ],
                         _utils.field(default=validated_wrappers[0], init=False),
-                    ),  # type: ignore
+                    ),
                 )
             else:
                 target_field.append(
@@ -1812,7 +1812,7 @@ def builds(
                             Union[str, Builds[Any]], Tuple[Union[str, Builds[Any]], ...]
                         ],
                         _utils.field(default=validated_wrappers, init=False),
-                    ),  # type: ignore
+                    ),
                 )
     else:
         target_field = [
