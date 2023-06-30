@@ -280,7 +280,7 @@ def make_custom_builds_fn(
 
     # This self-check was causing issues with type-checkers (pyright) -
     # causing them to resolve the return type of this function as "unknown"
-    if not TYPE_CHECKING:
+    if not TYPE_CHECKING:  # pragma: no branch
         # let `builds` validate the new defaults!
         builds(builds, **_new_defaults)
 
