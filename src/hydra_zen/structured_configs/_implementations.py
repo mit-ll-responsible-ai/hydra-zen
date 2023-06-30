@@ -804,6 +804,26 @@ def sanitized_field(
     return _utils.field(default=value, init=init)
 
 
+def _get_sig_obj(target):
+    if not inspect.isclass(target):
+        return target
+
+    # This implements the same method prioritization as
+    # `inspect.signature` for Python >= 3.9.1
+    if "__new__" in target.__dict__:
+        return target.__new__
+    if "__init__" in target.__dict__:
+        return target.__init__
+
+    if len(target.__mro__) > 2:
+        for parent in target.__mro__[1:-1]:
+            if "__new__" in parent.__dict__:
+                return target.__new__
+            elif "__init__" in parent.__dict__:
+                return target.__init__
+    return getattr(target, "__init__", target)
+
+
 # partial=False, pop-sig=True; no *args, **kwargs, nor builds_bases
 @overload
 def builds(
@@ -1854,6 +1874,8 @@ def builds(
             )
         )
 
+    _sig_target = _get_sig_obj(target)
+
     try:
         # We want to rely on `inspect.signature` logic for raising
         # against an uninspectable sig, before we start inspecting
@@ -1884,14 +1906,9 @@ def builds(
         # This looks specifically for the scenario that the target
         # has inherited from a parent that implements __new__ and
         # the target implements only __init__.
-        if (
-            inspect.isclass(target)
-            and len(target.__mro__) > 2
-            and "__init__" in target.__dict__
-            and "__new__" not in target.__dict__
-            and any("__new__" in parent.__dict__ for parent in target.__mro__[1:-1])
-        ):
-            _params = tuple(inspect.signature(target.__init__).parameters.items())
+
+        if _sig_target is not target:
+            _params = tuple(inspect.signature(_sig_target).parameters.items())
 
             if (
                 _params and _params[0][1].kind is not _VAR_POSITIONAL
@@ -1940,25 +1957,9 @@ def builds(
     # `get_type_hints` properly resolves forward references, whereas annotations from
     # `inspect.signature` do not
     try:
-        if inspect.isclass(target):
-            # This implements the same method prioritization as
-            # `inspect.signature` for Python >= 3.9.1
-            if "__new__" in target.__dict__:
-                _annotation_target = target.__new__
-            elif "__init__" in target.__dict__:
-                _annotation_target = target.__init__
-            elif len(target.__mro__) > 2 and any(
-                "__new__" in parent.__dict__ for parent in target.__mro__[1:-1]
-            ):
-                _annotation_target = target.__new__
-            else:
-                _annotation_target = target.__init__
-        else:
-            _annotation_target = target
+        type_hints = get_type_hints(_sig_target)
 
-        type_hints = get_type_hints(_annotation_target)
-
-        del _annotation_target
+        del _sig_target
         # We don't need to pop self/class because we only make on-demand
         # requests from `type_hints`
 
