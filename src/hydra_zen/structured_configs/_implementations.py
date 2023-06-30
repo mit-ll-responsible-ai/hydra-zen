@@ -535,6 +535,10 @@ def _check_instance(*target_types: str, value: "Any", module: str):  # pragma: n
         return any(value is t for t in types)
 
 
+_is_numpy_array_func_dispatcher = functools.partial(
+    _check_instance, "_ArrayFunctionDispatcher", module="numpy.core._multiarray_umath"
+)
+
 _is_jax_compiled_func = functools.partial(
     _check_instance, "CompiledFunction", "PjitFunction", module="jaxlib.xla_extension"
 )
@@ -648,6 +652,7 @@ def sanitized_default_value(
             or inspect.ismethod(value)
             or isinstance(value, _BUILTIN_TYPES)
             or _is_ufunc(value)
+            or _is_numpy_array_func_dispatcher(value=value)
             or _is_jax_compiled_func(value=value)
         )
     ):

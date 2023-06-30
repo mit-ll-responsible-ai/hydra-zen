@@ -53,6 +53,7 @@ Improvements
 - :func:`~hydra_zen.builds` now has a transitive property that enables iterative build patterns. See :pull:`455`
 - :func:`~hydra_zen.zen`'s instantiation phase has been improved so that dataclass objects and stdlib containers are returned instead of omegaconf objects. See :pull:`448`. 
 - :func:`~hydra_zen.zen` can now be passed `resolve_pre_call=False` to defer the resolution of interpolated fields until after `pre_call` functions are called. See :pull:`460`.
+- Added support for NumPy 1.25.0
 
 Bug Fixes
 ---------
