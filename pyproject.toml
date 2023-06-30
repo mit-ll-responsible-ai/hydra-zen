@@ -228,7 +228,7 @@ basepython = python3.10
 deps = 
        --requirement deps/requirements-pyright.txt
 
-commands = pyright --lib tests/annotations/ src/
+commands = pyright tests/annotations/ src/ --level=error
            pyright --ignoreexternal --verifytypes hydra_zen
 
 [testenv:format]
