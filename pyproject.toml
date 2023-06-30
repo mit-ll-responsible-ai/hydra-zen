@@ -179,7 +179,7 @@ deps = {[testenv]deps}
        coverage[toml]
        pytest-cov
        numpy
-       pydantic
+       pydantic<2.0.0
        beartype
        cloudpickle
 commands = pytest --cov-report term-missing --cov-config=pyproject.toml --cov-fail-under=100 --cov=hydra_zen tests {posargs: -n auto --maxprocesses=4}
@@ -216,7 +216,7 @@ deps = {[testenv]deps}
        numpy
        jaxlib
        jax
-       pydantic
+       pydantic<2.0.0
        beartype
 
 [testenv:pyright]
