@@ -139,8 +139,8 @@ class SomeProtocol(Protocol[T]):  # type: ignore
 
 NoneType: TypeAlias = None
 
-vList = List[Any] if sys.version_info < (3, 8) else List
-vDict = Dict[Any, Any] if sys.version_info < (3, 8) else Dict
+vList = List[Any]
+vDict = Dict[Any, Any]
 
 
 @pytest.mark.parametrize(

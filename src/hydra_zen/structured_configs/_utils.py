@@ -23,6 +23,8 @@ from typing import (
     TypeVar,
     Union,
     cast,
+    get_args,
+    get_origin,
     overload,
 )
 
@@ -55,67 +57,6 @@ from hydra_zen.typing._implementations import (
     StrictDataclassOptions,
     convert_types,
 )
-
-try:
-    from typing import get_args, get_origin
-except ImportError:  # pragma: no cover
-    # remove at Python 3.7 end-of-life
-    from collections.abc import Callable as _Callable
-
-    def get_origin(tp: Any) -> Union[None, type]:
-        """Get the unsubscripted version of a type.
-
-        Parameters
-        ----------
-        tp : Any
-
-        Returns
-        -------
-        Union[None, type]
-            Return None for unsupported types.
-
-        Notes
-        -----
-        Bare `Generic` not supported by this hacked version of `get_origin`
-
-        Examples
-        --------
-        >>> assert get_origin(Literal[42]) is Literal
-        >>> assert get_origin(int) is None
-        >>> assert get_origin(ClassVar[int]) is ClassVar
-        >>> assert get_origin(Generic[T]) is Generic
-        >>> assert get_origin(Union[T, int]) is Union
-        >>> assert get_origin(List[Tuple[T, T]][int]) == list
-        """
-        return getattr(tp, "__origin__", None)
-
-    def get_args(tp: Any) -> Union[Tuple[type, ...], Tuple[List[type], type]]:
-        """Get type arguments with all substitutions performed.
-
-        Parameters
-        ----------
-        tp : Any
-
-        Returns
-        -------
-        Union[Tuple[type, ...], Tuple[List[type], type]]
-            Callable[[t1, ...], r] -> ([t1, ...], r)
-
-        Examples
-        --------
-        >>> assert get_args(Dict[str, int]) == (str, int)
-        >>> assert get_args(int) == ()
-        >>> assert get_args(Union[int, Union[T, int], str][int]) == (int, str)
-        >>> assert get_args(Union[int, Tuple[T, int]][str]) == (int, Tuple[str, int])
-        >>> assert get_args(Callable[[], T][int]) == ([], int)
-        """
-        if hasattr(tp, "__origin__") and hasattr(tp, "__args__"):
-            args = tp.__args__
-            if get_origin(tp) is _Callable and args and args[0] is not Ellipsis:
-                args = (list(args[:-1]), args[-1])
-            return args
-        return ()
-
 
 COMMON_MODULES_WITH_OBFUSCATED_IMPORTS: Tuple[str, ...] = (
     "random",

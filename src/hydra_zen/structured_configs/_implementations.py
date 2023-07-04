@@ -1920,7 +1920,7 @@ def builds(
             ):  # pragma: no cover
                 # Exclude self/cls
                 #
-                # There are weird edge cases, like in collections.Counter for Python 3.7
+                # There are weird edge cases
                 # where the first arg is *args, not self.
                 _params = _params[1:]
             else:  # pragma: no cover
