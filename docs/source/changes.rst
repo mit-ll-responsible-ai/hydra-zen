@@ -9,7 +9,16 @@ This is a record of all past hydra-zen releases and what went into them, in reve
 chronological order. All previous releases should still be available on pip.
 
 
-.. _v0.10.0:
+.. _v0.10.2:
+
+-------------------
+0.10.2 - 2023-07-04
+-------------------
+
+This patch circumvents an upstream bug in pyright, which was causing pyright 1.1.305+ to report the return type of :func:`hydra_zen.make_custom_builds_fn` as "Unknown".
+
+
+.. _v0.10.1:
 
 -------------------
 0.10.1 - 2023-05-23
