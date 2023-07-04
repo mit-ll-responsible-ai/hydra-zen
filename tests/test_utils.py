@@ -139,9 +139,6 @@ class SomeProtocol(Protocol[T]):  # type: ignore
 
 NoneType: TypeAlias = None
 
-vList = List[Any]
-vDict = Dict[Any, Any]
-
 
 @pytest.mark.parametrize(
     "in_type, expected_type",
@@ -158,14 +155,14 @@ vDict = Dict[Any, Any]
         (C, Any),  # unsupported primitives
         (type(None), Any),
         (set, Any),
-        (list, (vList if OMEGACONF_VERSION < Version(2, 2, 3) else list)),
+        (list, (List if OMEGACONF_VERSION < Version(2, 2, 3) else list)),
         (tuple, (Any if OMEGACONF_VERSION < Version(2, 2, 3) else tuple)),
-        (dict, (vDict if OMEGACONF_VERSION < Version(2, 2, 3) else dict)),
+        (dict, (Dict if OMEGACONF_VERSION < Version(2, 2, 3) else dict)),
         (callable, Any),
         (frozenset, Any),
-        (vList, vList),
+        (List, List),
         (Tuple, (Any if OMEGACONF_VERSION < Version(2, 2, 3) else Tuple)),
-        (Dict, vDict),
+        (Dict, Dict),
         (T, Any),
         (List[T], List[Any]),
         (Tuple[T, T], Tuple[Any, Any]),
