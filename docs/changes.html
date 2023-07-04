@@ -306,12 +306,16 @@ logic from hydra-zen’s source code, and to improve the behavior of
 <li><p>The docs for <a class="reference internal" href="generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.ZenStore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenStore</span></code></a> were revamped.</p></li>
 </ul>
 </section>
-<section id="v0-10-0">
-<span id="id1"></span><h2>0.10.1 - 2023-05-23<a class="headerlink" href="#v0-10-0" title="Permalink to this heading">#</a></h2>
+<section id="v0-10-2">
+<span id="id1"></span><h2>0.10.2 - 2023-07-04<a class="headerlink" href="#v0-10-2" title="Permalink to this heading">#</a></h2>
+<p>This patch circumvents an upstream bug in pyright, which was causing pyright 1.1.305+ to report the return type of <a class="reference internal" href="generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.make_custom_builds_fn()</span></code></a> as “Unknown”.</p>
+</section>
+<section id="v0-10-1">
+<span id="id2"></span><h2>0.10.1 - 2023-05-23<a class="headerlink" href="#v0-10-1" title="Permalink to this heading">#</a></h2>
 <p>Bans <code class="docutils literal notranslate"><span class="pre">typing-extension</span> <span class="pre">v4.6.0</span></code> which has a breaking bug in it.</p>
 </section>
-<section id="id2">
-<span id="id3"></span><h2>0.10.0 - 2023-03-05<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h2>
+<section id="v0-10-0">
+<span id="id3"></span><h2>0.10.0 - 2023-03-05<a class="headerlink" href="#v0-10-0" title="Permalink to this heading">#</a></h2>
 <section id="id4">
 <h3>Release Highlights<a class="headerlink" href="#id4" title="Permalink to this heading">#</a></h3>
 <p><a class="reference internal" href="generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.launch()</span></code></a> now accepts non-string values for its overrides, and it
@@ -1194,8 +1198,9 @@ the config is actually accessed by the store. Thus this decorator pattern does n
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation-2023-03-11">Documentation - 2023-03-11</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-10-0">0.10.1 - 2023-05-23</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">0.10.0 - 2023-03-05</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-10-2">0.10.2 - 2023-07-04</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-10-1">0.10.1 - 2023-05-23</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-10-0">0.10.0 - 2023-03-05</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">Release Highlights</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Improvements</a></li>
 </ul>
