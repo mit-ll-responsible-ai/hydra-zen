@@ -12,7 +12,7 @@ name = "hydra_zen"
 dynamic = ["version"]
 description = "Configurable, reproducible, and scalable workflows in Python, via Hydra"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 dependencies = ["hydra-core >= 1.2.0", 
        "omegaconf >= 2.2.1", 
        "typing-extensions >= 4.1.0, !=4.6.0",
@@ -127,11 +127,10 @@ skip = 'docs/build/*'
 legacy_tox_ini = """
 [tox]
 isolated_build = True
-envlist = py37, py38, py39, py310, py311
+envlist = py38, py39, py310, py311
 
 [gh-actions]
 python =
-  3.7: py37
   3.8: py38
   3.9: py39
   3.10: py310
@@ -157,7 +156,7 @@ deps = hydra-core==1.2.0
        omegaconf==2.2.1
        typing-extensions==4.1.0
        {[testenv]deps}
-basepython = python3.7
+basepython = python3.8
 
 
 [testenv:pre-release]

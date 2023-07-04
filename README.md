@@ -7,7 +7,7 @@
     <img src="https://img.shields.io/pypi/v/hydra-zen.svg" alt="PyPI" />
   </a>
   <a>
-    <img src="https://img.shields.io/badge/python-3.7%20&#8208;%203.11-blue.svg" alt="Python version support" />
+    <img src="https://img.shields.io/badge/python-3.8%20&#8208;%203.11-blue.svg" alt="Python version support" />
   </a>
   <a href="https://github.com/mit-ll-responsible-ai/hydra-zen/actions?query=workflow%3ATests+branch%3Amain">
     <img src="https://github.com/mit-ll-responsible-ai/hydra-zen/workflows/Tests/badge.svg" alt="GitHub Actions" />
