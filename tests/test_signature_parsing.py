@@ -553,8 +553,7 @@ def test_parse_sig_with_new_vs_init(Obj):
 
 def test_Counter():
     # Counter has an interesting signature
-    # Python 3.7: (*args, **kwds)                   -- no self!
-    #      >=3.8: (self, iterable=None, /, **kwds)  -- pos-only
+    # Python >=3.8: (self, iterable=None, /, **kwds)  -- pos-only
     assert instantiate(builds(Counter, [1, 1, 2, 1])) == Counter([1, 1, 2, 1])
     assert instantiate(builds(Counter, a=1, b=2)) == Counter(a=1, b=2)
 
