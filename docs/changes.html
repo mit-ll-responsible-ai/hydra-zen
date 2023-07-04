@@ -239,9 +239,10 @@ chronological order. All previous releases should still be available on pip.</p>
 <p class="admonition-title">Note</p>
 <p>This is documentation for an unreleased version of hydra-zen. You can try out this pre-release version using <code class="xref py py-obj docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--pre</span> <span class="pre">hydra-zen</span></code></p>
 </div>
-<p>This release drops support for hydra-core 1.1 and for omegaconf 2.1; this enabled the
-removal of a lot of complex compatibility logic from hydra-zen’s source code, and to
-improve the behavior of <a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-func docutils literal notranslate"><span class="pre">zen()</span></code></a>.</p>
+<p>This release drops support for Python 3.7 (which reached its end of life), hydra-core
+1.1 and for omegaconf 2.1; this enabled the removal of a lot of complex compatibility
+logic from hydra-zen’s source code, and to improve the behavior of
+<a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-func docutils literal notranslate"><span class="pre">zen()</span></code></a>.</p>
 <section id="release-highlights">
 <h3>Release Highlights<a class="headerlink" href="#release-highlights" title="Permalink to this heading">#</a></h3>
 <p>hydra-zen now uses the <a class="reference external" href="https://blog.pypi.org/posts/2023-04-20-introducing-trusted-publishers/">trusted publishers</a> method for publishing its build artifacts to PyPI via a protected GitHub Actions environment. In short, this improves security for users by further reducing the surface area by which malicious 3rd parties could attempt to upload tainted versions of hydra-zen. Note that hydra-zen has always abided by the most rigorous methods for secure publishing - we adopted the Trusted Publishers method one day after it became available ❤️.</p>
@@ -287,6 +288,7 @@ improve the behavior of <a class="reference internal" href="generated/hydra_zen.
 <h3>Compatibility-Breaking Changes<a class="headerlink" href="#compatibility-breaking-changes" title="Permalink to this heading">#</a></h3>
 <p>Most of these changes will not have any impact on users, based on download statistics and the particular code patterns impacted by the following changes.</p>
 <ul class="simple">
+<li><p>Python 3.8 is now the earliest supported version of Python supported by hydra-zen</p></li>
 <li><p>hydra-core 1.2.0 and omegaconf 2.2.1 are now the minimum supported versions of hydra-zen’s dependencies.</p></li>
 <li><p>The auto-instantiation behavior of <a class="reference internal" href="generated/hydra_zen.wrapper.Zen.html#hydra_zen.wrapper.Zen" title="hydra_zen.wrapper.Zen"><code class="xref py py-class docutils literal notranslate"><span class="pre">Zen</span></code></a> and <a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-func docutils literal notranslate"><span class="pre">zen()</span></code></a> have been updated so that nested dataclasses (nested within lists, dicts, and other dataclasses) will no longer be returned as omegaconf configs (see <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/448">pull request #448</a>).</p></li>
 <li><p><a class="reference internal" href="generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-func docutils literal notranslate"><span class="pre">just()</span></code></a> not longer returns a frozen dataclass (see <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/459">pull request #459</a>).</p></li>

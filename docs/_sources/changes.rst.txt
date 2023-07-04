@@ -16,9 +16,10 @@ chronological order. All previous releases should still be available on pip.
 
 .. note:: This is documentation for an unreleased version of hydra-zen. You can try out this pre-release version using `pip install --pre hydra-zen`
 
-This release drops support for hydra-core 1.1 and for omegaconf 2.1; this enabled the 
-removal of a lot of complex compatibility logic from hydra-zen's source code, and to 
-improve the behavior of :func:`~hydra_zen.zen`.
+This release drops support for Python 3.7 (which reached its end of life), hydra-core 
+1.1 and for omegaconf 2.1; this enabled the removal of a lot of complex compatibility 
+logic from hydra-zen's source code, and to improve the behavior of 
+:func:`~hydra_zen.zen`.
 
 
 Release Highlights
@@ -64,6 +65,7 @@ Compatibility-Breaking Changes
 ------------------------------
 Most of these changes will not have any impact on users, based on download statistics and the particular code patterns impacted by the following changes.
 
+- Python 3.8 is now the earliest supported version of Python supported by hydra-zen
 - hydra-core 1.2.0 and omegaconf 2.2.1 are now the minimum supported versions of hydra-zen's dependencies.
 - The auto-instantiation behavior of :class:`~hydra_zen.wrapper.Zen` and :func:`~hydra_zen.zen` have been updated so that nested dataclasses (nested within lists, dicts, and other dataclasses) will no longer be returned as omegaconf configs (see :pull:`448`).
 - :func:`~hydra_zen.just` not longer returns a frozen dataclass (see :pull:`459`).
