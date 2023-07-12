@@ -189,6 +189,7 @@ After building the configs we define the task function that utilizes these datas
        classifier: BaseEstimator,
    ):
        fig, ax = plt.subplots()
+       ax: plt.Axes
 
        # create and split dataset for train and test
        X, y = dataset()
@@ -201,7 +202,7 @@ After building the configs we define the task function that utilizes these datas
        y_min, y_max = X[:, 1].min() - 0.5, X[:, 1].max() + 0.5
 
        # just plot the dataset first
-       cm = plt.cm.RdBu
+       cm = plt.cm.RdBu  # type: ignore
        cm_bright = ListedColormap(["#FF0000", "#0000FF"])
 
        # Plot the training points
