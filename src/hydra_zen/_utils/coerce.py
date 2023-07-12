@@ -1,14 +1,6 @@
 # Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
-import sys
-
-if sys.version_info < (3, 7):  # pragma: no cover
-    raise NotImplementedError(
-        "Features that utilize `hydra_zen._utils.coerce` "
-        "(e.g. beartype-validation) require Python 3.7 or greater."
-    )
-
 import inspect
 from collections import deque
 from functools import wraps
