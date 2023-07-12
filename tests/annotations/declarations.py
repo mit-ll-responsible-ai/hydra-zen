@@ -1094,7 +1094,6 @@ def check_zen():
     def zen_f2(x: int) -> str:
         ...
 
-    zen_f2
     assert_type(zen_f2({"a": 1}), str)
     assert_type(zen_f2(DictConfig({"a": 1})), str)
     assert_type(zen_f2("some yaml"), str)
