@@ -180,7 +180,7 @@ and trainer. We'll also define the task function that trains and tests our model
    # We must specify `pre_call` to ensure that pytorch lightning seeds everything
    # *before* any of our configs are instantiated (which will initialize the pytorch
    # model whose weights depend on the seed)
-   pre_seed = zen(lambda seed: pl.seed_everything(seed)
+   pre_seed = zen(lambda seed: pl.seed_everything(seed))
    task_function = zen(train_and_eval, pre_call=pre_seed))
    
    if __name__ == "__main__":

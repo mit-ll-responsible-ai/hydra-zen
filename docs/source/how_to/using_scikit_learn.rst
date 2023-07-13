@@ -189,7 +189,9 @@ After building the configs we define the task function that utilizes these datas
        classifier: BaseEstimator,
    ):
        fig, ax = plt.subplots()
-       ax: plt.Axes
+
+       assert isinstance(ax, plt.Axes)
+       assert isinstance(fig, plt.Figure)
 
        # create and split dataset for train and test
        X, y = dataset()
