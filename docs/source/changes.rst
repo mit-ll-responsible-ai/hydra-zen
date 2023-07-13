@@ -10,11 +10,10 @@ chronological order. All previous releases should still be available on pip.
 
 .. _v0.11.0:
 
----------------------
-0.11.0rc - 2023-04-21
----------------------
+-------------------
+0.11.0 - 2023-07-13
+-------------------
 
-.. note:: This is documentation for an unreleased version of hydra-zen. You can try out this pre-release version using `pip install --pre hydra-zen`
 
 This release drops support for Python 3.7 (which reached its end of life), hydra-core 
 1.1 and for omegaconf 2.1; this enabled the removal of a lot of complex compatibility 
