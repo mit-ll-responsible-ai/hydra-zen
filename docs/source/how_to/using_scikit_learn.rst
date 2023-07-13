@@ -208,7 +208,7 @@ After building the configs we define the task function that utilizes these datas
        cm_bright = ListedColormap(["#FF0000", "#0000FF"])
 
        # Plot the training points
-       ax.scatter(X_train[:, 0], X_train[:, 1], c=y_train, cmap=cm_bright, edgecolors="k")
+       ax.scatter(X_train[:, 0], X_train[:, 1], c=y_train, cmap=cm_bright, edgecolors="k")  # type: ignore
 
        # Plot the testing points
        ax.scatter(
