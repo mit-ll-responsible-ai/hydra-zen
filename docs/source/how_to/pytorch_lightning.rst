@@ -274,7 +274,7 @@ the following code and verify that you see the plot shown below.
    >>> target_fn = instantiate(ExperimentConfig.target_fn)
    
    >>> fig, ax = plt.subplots()
-   >>> assert isinstance(ax, Axes)
+   >>> assert isinstance(ax, plt.Axes)
    >>> ax.plot(x, target_fn(x), ls="--", label="Target")
 
    >>> for j in jobs:
