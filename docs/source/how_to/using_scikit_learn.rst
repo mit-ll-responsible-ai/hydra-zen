@@ -200,8 +200,8 @@ After building the configs we define the task function that utilizes these datas
        )
 
        # plot the data
-       x_min, x_max = X[:, 0].min() - 0.5, X[:, 0].max() + 0.5
-       y_min, y_max = X[:, 1].min() - 0.5, X[:, 1].max() + 0.5
+       x_min, x_max = X[:, 0].min() - 0.5, X[:, 0].max() + 0.5  # type: ignore
+       y_min, y_max = X[:, 1].min() - 0.5, X[:, 1].max() + 0.5  # type: ignore
 
        # just plot the dataset first
        cm = plt.cm.RdBu  # type: ignore
@@ -212,8 +212,8 @@ After building the configs we define the task function that utilizes these datas
 
        # Plot the testing points
        ax.scatter(
-           X_test[:, 0],
-           X_test[:, 1],
+           X_test[:, 0],  # type: ignore
+           X_test[:, 1],  # type: ignore
            c=y_test,
            cmap=cm_bright,
            alpha=0.6,

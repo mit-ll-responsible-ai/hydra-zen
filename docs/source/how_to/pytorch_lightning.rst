@@ -181,7 +181,7 @@ and trainer. We'll also define the task function that trains and tests our model
    # *before* any of our configs are instantiated (which will initialize the pytorch
    # model whose weights depend on the seed)
    pre_seed = zen(lambda seed: pl.seed_everything(seed))
-   task_function = zen(train_and_eval, pre_call=pre_seed))
+   task_function = zen(train_and_eval, pre_call=pre_seed)
    
    if __name__ == "__main__":
        # enables us to call 
@@ -274,7 +274,7 @@ the following code and verify that you see the plot shown below.
    >>> target_fn = instantiate(ExperimentConfig.target_fn)
    
    >>> fig, ax = plt.subplots()
-   >>> ax: plt.Axes
+   >>> assert isinstance(ax, Axes)
    >>> ax.plot(x, target_fn(x), ls="--", label="Target")
 
    >>> for j in jobs:
