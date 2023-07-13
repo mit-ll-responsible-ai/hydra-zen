@@ -66,6 +66,8 @@ __all__ = ["zen", "store", "Zen"]
 
 R = TypeVar("R")
 P = ParamSpec("P")
+P2 = ParamSpec("P2")
+R2 = TypeVar("R2")
 F = TypeVar("F")
 
 
@@ -468,23 +470,23 @@ def zen(
     *,
     unpack_kwargs: bool = ...,
     pre_call: PreCall = ...,
-    ZenWrapper: Type[Zen[P, R]] = Zen,
+    ZenWrapper: Type[Zen[Any, Any]] = ...,
     resolve_pre_call: bool = ...,
-    exclude: Optional[Union[str, Iterable[str]]] = None,
+    exclude: Optional[Union[str, Iterable[str]]] = ...,
 ) -> Zen[P, R]:
     ...
 
 
 @overload
 def zen(
-    __func: Literal[None] = ...,
+    __func: Literal[None] = None,
     *,
     unpack_kwargs: bool = ...,
     pre_call: PreCall = ...,
     resolve_pre_call: bool = ...,
     ZenWrapper: Type[Zen[Any, Any]] = ...,
-    exclude: Optional[Union[str, Iterable[str]]] = None,
-) -> Callable[[Callable[P, R]], Zen[P, R]]:
+    exclude: Optional[Union[str, Iterable[str]]] = ...,
+) -> Callable[[Callable[P2, R2]], Zen[P2, R2]]:
     ...
 
 
@@ -495,8 +497,8 @@ def zen(
     pre_call: PreCall = None,
     exclude: Optional[Union[str, Iterable[str]]] = None,
     resolve_pre_call: bool = True,
-    ZenWrapper: Type[Zen[P, R]] = Zen,
-) -> Union[Zen[P, R], Callable[[Callable[P, R]], Zen[P, R]]]:
+    ZenWrapper: Type[Zen[Any, Any]] = Zen,
+) -> Union[Callable[[Callable[P2, R2]], Zen[P2, R2]], Zen[P, R]]:
     r"""zen(func, /, pre_call, ZenWrapper)
 
     A wrapper that returns a function that will auto-extract, resolve, and
@@ -730,28 +732,35 @@ def zen(
 
     Validation propagates through zen-wrapped pre-call functions:
 
-    >>> zen_f2 = zen(f2, pre_call=zen(lambda seed: None))
+    >>> zen_f2 = zen(f2, pre_call=zen(lambda seed: None))  # type: ignore
     >>> zen_f2.validate({"x": 1, "seed": 10})  # OK
     >>> zen_f2.validate({"x": 1})  # Missing seed as required by pre-call
     HydraZenValidationError: `cfg` is missing the following fields: seed
     """
     if __func is not None:
-        return ZenWrapper(
-            __func,
-            pre_call=pre_call,
-            exclude=exclude,
-            unpack_kwargs=unpack_kwargs,
-            resolve_pre_call=resolve_pre_call,
+        return cast(
+            Zen[P, R],
+            ZenWrapper(
+                __func,
+                pre_call=pre_call,
+                exclude=exclude,
+                unpack_kwargs=unpack_kwargs,
+                resolve_pre_call=resolve_pre_call,
+            ),
         )
 
-    def wrap(f: Callable[P, R]) -> Zen[P, R]:
-        return ZenWrapper(
-            f,
-            pre_call=pre_call,
-            exclude=exclude,
-            unpack_kwargs=unpack_kwargs,
-            resolve_pre_call=resolve_pre_call,
+    def wrap(f: Callable[P2, R2]) -> Zen[P2, R2]:
+        out = cast(
+            Zen[P2, R2],
+            ZenWrapper(
+                f,
+                pre_call=pre_call,
+                exclude=exclude,
+                unpack_kwargs=unpack_kwargs,
+                resolve_pre_call=resolve_pre_call,
+            ),
         )
+        return out
 
     return wrap
 
@@ -849,7 +858,7 @@ def default_to_config(
         return target
     else:
         t = cast(Callable[..., Any], target)
-        return fbuilds(t, **kw)
+        return cast(Type[DataClass_], fbuilds(t, **kw))
 
 
 class _HasName(Protocol):

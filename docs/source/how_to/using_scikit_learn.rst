@@ -190,6 +190,9 @@ After building the configs we define the task function that utilizes these datas
    ):
        fig, ax = plt.subplots()
 
+       assert isinstance(ax, plt.Axes)
+       assert isinstance(fig, plt.Figure)
+
        # create and split dataset for train and test
        X, y = dataset()
        X_train, X_test, y_train, y_test = train_test_split(
@@ -201,16 +204,16 @@ After building the configs we define the task function that utilizes these datas
        y_min, y_max = X[:, 1].min() - 0.5, X[:, 1].max() + 0.5
 
        # just plot the dataset first
-       cm = plt.cm.RdBu
+       cm = plt.cm.RdBu  # type: ignore
        cm_bright = ListedColormap(["#FF0000", "#0000FF"])
 
        # Plot the training points
-       ax.scatter(X_train[:, 0], X_train[:, 1], c=y_train, cmap=cm_bright, edgecolors="k")
+       ax.scatter(X_train[:, 0], X_train[:, 1], c=y_train, cmap=cm_bright, edgecolors="k")  # type: ignore
 
        # Plot the testing points
        ax.scatter(
-           X_test[:, 0],
-           X_test[:, 1],
+           X_test[:, 0],  # type: ignore
+           X_test[:, 1],  # type: ignore
            c=y_test,
            cmap=cm_bright,
            alpha=0.6,

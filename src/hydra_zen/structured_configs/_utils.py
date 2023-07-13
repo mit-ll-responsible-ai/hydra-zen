@@ -333,7 +333,7 @@ def sanitized_type(
 
             if optional_type is Any:  # Union[Any, T] is just Any
                 return Any
-            return Union[optional_type, NoneType]  # type: ignore
+            return Union[optional_type, NoneType]
 
         if origin is list or origin is List:
             if args:
