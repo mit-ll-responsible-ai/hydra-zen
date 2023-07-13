@@ -453,6 +453,8 @@ document.write(`
 
 <span class="n">R</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;R&quot;</span><span class="p">)</span>
 <span class="n">P</span> <span class="o">=</span> <span class="n">ParamSpec</span><span class="p">(</span><span class="s2">&quot;P&quot;</span><span class="p">)</span>
+<span class="n">P2</span> <span class="o">=</span> <span class="n">ParamSpec</span><span class="p">(</span><span class="s2">&quot;P2&quot;</span><span class="p">)</span>
+<span class="n">R2</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;R2&quot;</span><span class="p">)</span>
 <span class="n">F</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;F&quot;</span><span class="p">)</span>
 
 
@@ -855,23 +857,23 @@ document.write(`
     <span class="o">*</span><span class="p">,</span>
     <span class="n">unpack_kwargs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">pre_call</span><span class="p">:</span> <span class="n">PreCall</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">ZenWrapper</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Zen</span><span class="p">,</span>
+    <span class="n">ZenWrapper</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Zen</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">resolve_pre_call</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">exclude</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">exclude</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]:</span>
     <span class="o">...</span>
 
 
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">zen</span><span class="p">(</span>
-    <span class="n">__func</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">__func</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">unpack_kwargs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">pre_call</span><span class="p">:</span> <span class="n">PreCall</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">resolve_pre_call</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">ZenWrapper</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Zen</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">exclude</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]],</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]]:</span>
+    <span class="n">exclude</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Callable</span><span class="p">[</span><span class="n">P2</span><span class="p">,</span> <span class="n">R2</span><span class="p">]],</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P2</span><span class="p">,</span> <span class="n">R2</span><span class="p">]]:</span>
     <span class="o">...</span>
 
 
@@ -882,8 +884,8 @@ document.write(`
     <span class="n">pre_call</span><span class="p">:</span> <span class="n">PreCall</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">exclude</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">resolve_pre_call</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">ZenWrapper</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Zen</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]],</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]]]:</span>
+    <span class="n">ZenWrapper</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Zen</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Zen</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Callable</span><span class="p">[</span><span class="n">P2</span><span class="p">,</span> <span class="n">R2</span><span class="p">]],</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P2</span><span class="p">,</span> <span class="n">R2</span><span class="p">]],</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;zen(func, /, pre_call, ZenWrapper)</span>
 
 <span class="sd">    A wrapper that returns a function that will auto-extract, resolve, and</span>
@@ -1117,28 +1119,35 @@ document.write(`
 
 <span class="sd">    Validation propagates through zen-wrapped pre-call functions:</span>
 
-<span class="sd">    &gt;&gt;&gt; zen_f2 = zen(f2, pre_call=zen(lambda seed: None))</span>
+<span class="sd">    &gt;&gt;&gt; zen_f2 = zen(f2, pre_call=zen(lambda seed: None))  # type: ignore</span>
 <span class="sd">    &gt;&gt;&gt; zen_f2.validate({&quot;x&quot;: 1, &quot;seed&quot;: 10})  # OK</span>
 <span class="sd">    &gt;&gt;&gt; zen_f2.validate({&quot;x&quot;: 1})  # Missing seed as required by pre-call</span>
 <span class="sd">    HydraZenValidationError: `cfg` is missing the following fields: seed</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">__func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">ZenWrapper</span><span class="p">(</span>
-            <span class="n">__func</span><span class="p">,</span>
-            <span class="n">pre_call</span><span class="o">=</span><span class="n">pre_call</span><span class="p">,</span>
-            <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">,</span>
-            <span class="n">unpack_kwargs</span><span class="o">=</span><span class="n">unpack_kwargs</span><span class="p">,</span>
-            <span class="n">resolve_pre_call</span><span class="o">=</span><span class="n">resolve_pre_call</span><span class="p">,</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
+            <span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span>
+            <span class="n">ZenWrapper</span><span class="p">(</span>
+                <span class="n">__func</span><span class="p">,</span>
+                <span class="n">pre_call</span><span class="o">=</span><span class="n">pre_call</span><span class="p">,</span>
+                <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">,</span>
+                <span class="n">unpack_kwargs</span><span class="o">=</span><span class="n">unpack_kwargs</span><span class="p">,</span>
+                <span class="n">resolve_pre_call</span><span class="o">=</span><span class="n">resolve_pre_call</span><span class="p">,</span>
+            <span class="p">),</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="n">ZenWrapper</span><span class="p">(</span>
-            <span class="n">f</span><span class="p">,</span>
-            <span class="n">pre_call</span><span class="o">=</span><span class="n">pre_call</span><span class="p">,</span>
-            <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">,</span>
-            <span class="n">unpack_kwargs</span><span class="o">=</span><span class="n">unpack_kwargs</span><span class="p">,</span>
-            <span class="n">resolve_pre_call</span><span class="o">=</span><span class="n">resolve_pre_call</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P2</span><span class="p">,</span> <span class="n">R2</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P2</span><span class="p">,</span> <span class="n">R2</span><span class="p">]:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
+            <span class="n">Zen</span><span class="p">[</span><span class="n">P2</span><span class="p">,</span> <span class="n">R2</span><span class="p">],</span>
+            <span class="n">ZenWrapper</span><span class="p">(</span>
+                <span class="n">f</span><span class="p">,</span>
+                <span class="n">pre_call</span><span class="o">=</span><span class="n">pre_call</span><span class="p">,</span>
+                <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">,</span>
+                <span class="n">unpack_kwargs</span><span class="o">=</span><span class="n">unpack_kwargs</span><span class="p">,</span>
+                <span class="n">resolve_pre_call</span><span class="o">=</span><span class="n">resolve_pre_call</span><span class="p">,</span>
+            <span class="p">),</span>
         <span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
 
     <span class="k">return</span> <span class="n">wrap</span></div>
 
@@ -1236,7 +1245,7 @@ document.write(`
         <span class="k">return</span> <span class="n">target</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">t</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">target</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">fbuilds</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="n">fbuilds</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">))</span></div>
 
 
 <span class="k">class</span> <span class="nc">_HasName</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>

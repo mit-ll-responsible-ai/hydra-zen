@@ -827,12 +827,14 @@ document.write(`
 
     <span class="c1"># validate hydra-args via `builds`</span>
     <span class="c1"># also check for use of reserved names</span>
+    <span class="n">_tmp</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
+
     <span class="n">builds</span><span class="p">(</span>
         <span class="nb">dict</span><span class="p">,</span>
         <span class="n">hydra_convert</span><span class="o">=</span><span class="n">hydra_convert</span><span class="p">,</span>
         <span class="n">hydra_recursive</span><span class="o">=</span><span class="n">hydra_recursive</span><span class="p">,</span>
         <span class="n">hydra_defaults</span><span class="o">=</span><span class="n">hydra_defaults</span><span class="p">,</span>
-        <span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fields_as_kwargs</span><span class="p">},</span>
+        <span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_tmp</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fields_as_kwargs</span><span class="p">},</span>
     <span class="p">)</span>
 
     <span class="n">normalized_fields</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>

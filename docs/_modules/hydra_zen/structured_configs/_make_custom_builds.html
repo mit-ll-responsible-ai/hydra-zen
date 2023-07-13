@@ -665,6 +665,8 @@ document.write(`
 
     <span class="n">_frozen</span> <span class="o">=</span> <span class="n">_new_defaults</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;frozen&quot;</span><span class="p">)</span>
 
+    <span class="c1"># This self-check was causing issues with type-checkers (pyright) -</span>
+    <span class="c1"># causing them to resolve the return type of this function as &quot;unknown&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>  <span class="c1"># pragma: no branch</span>
         <span class="c1"># let `builds` validate the new defaults!</span>
         <span class="n">builds</span><span class="p">(</span><span class="n">builds</span><span class="p">,</span> <span class="o">**</span><span class="n">_new_defaults</span><span class="p">)</span>
@@ -687,7 +689,7 @@ document.write(`
     <span class="n">_zen_dataclass</span> <span class="o">=</span> <span class="n">parse_dataclass_options</span><span class="p">(</span><span class="n">_zen_dataclass</span><span class="p">)</span>
 
     <span class="nd">@wraps</span><span class="p">(</span><span class="n">builds</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="n">merged_kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;zen_dataclass&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
@@ -698,8 +700,7 @@ document.write(`
 
         <span class="n">merged_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_new_defaults</span><span class="p">)</span>
         <span class="n">merged_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">builds</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">merged_kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">builds</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">merged_kwargs</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Union</span><span class="p">[</span><span class="n">FullBuilds</span><span class="p">,</span> <span class="n">PBuilds</span><span class="p">,</span> <span class="n">StdBuilds</span><span class="p">],</span> <span class="n">wrapped</span><span class="p">)</span></div>
 </pre></div>

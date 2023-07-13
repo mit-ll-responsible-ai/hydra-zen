@@ -816,7 +816,7 @@ document.write(`
     <span class="k">with</span> <span class="n">initialize</span><span class="p">(</span>
         <span class="n">config_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">job_name</span><span class="o">=</span><span class="n">job_name</span><span class="p">,</span>
-        <span class="o">**</span><span class="p">({}</span> <span class="k">if</span> <span class="n">version_base</span> <span class="ow">is</span> <span class="n">_NotSet</span> <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;version_base&quot;</span><span class="p">:</span> <span class="n">version_base</span><span class="p">}),</span>
+        <span class="o">**</span><span class="p">({}</span> <span class="k">if</span> <span class="n">version_base</span> <span class="ow">is</span> <span class="n">_NotSet</span> <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;version_base&quot;</span><span class="p">:</span> <span class="n">version_base</span><span class="p">}),</span>  <span class="c1"># type: ignore</span>
     <span class="p">):</span>
         <span class="c1"># taken from hydra.compose with support for MULTIRUN</span>
         <span class="n">gh</span> <span class="o">=</span> <span class="n">GlobalHydra</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
