@@ -82,7 +82,7 @@ all parts of this library code and generate a CLI that reflects the resulting hi
 
    from hydra_zen import just, store
 
-   from baby_torch import DataLoader, Model, relu, sigmoid  # pyright: ignore
+   from baby_torch import DataLoader, Model, relu, sigmoid
    
    # Automatically generate and store configs for `Model`
    model_store = store(group="model")
