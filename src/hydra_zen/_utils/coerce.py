@@ -172,7 +172,7 @@ def coerce_sequences(obj: _T) -> _T:
             if param.kind is not _POSITIONAL_ONLY:  # pragma: no branch
                 list_caster_by_name[name] = caster
 
-    min_pos = min(list_caster_by_pos) if list_caster_by_pos else 0
+    min_pos: int = min(list_caster_by_pos) if list_caster_by_pos else 0
 
     if not list_caster_by_name and not list_caster_by_pos:
         # no annotations associated with sequences

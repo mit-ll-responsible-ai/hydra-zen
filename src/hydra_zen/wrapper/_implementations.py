@@ -732,7 +732,7 @@ def zen(
 
     Validation propagates through zen-wrapped pre-call functions:
 
-    >>> zen_f2 = zen(f2, pre_call=zen(lambda seed: None))  # type: ignore
+    >>> zen_f2 = zen(f2, pre_call=zen(lambda seed: None))
     >>> zen_f2.validate({"x": 1, "seed": 10})  # OK
     >>> zen_f2.validate({"x": 1})  # Missing seed as required by pre-call
     HydraZenValidationError: `cfg` is missing the following fields: seed
