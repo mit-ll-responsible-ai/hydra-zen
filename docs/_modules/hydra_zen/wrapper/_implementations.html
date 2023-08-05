@@ -1119,7 +1119,7 @@ document.write(`
 
 <span class="sd">    Validation propagates through zen-wrapped pre-call functions:</span>
 
-<span class="sd">    &gt;&gt;&gt; zen_f2 = zen(f2, pre_call=zen(lambda seed: None))  # type: ignore</span>
+<span class="sd">    &gt;&gt;&gt; zen_f2 = zen(f2, pre_call=zen(lambda seed: None))</span>
 <span class="sd">    &gt;&gt;&gt; zen_f2.validate({&quot;x&quot;: 1, &quot;seed&quot;: 10})  # OK</span>
 <span class="sd">    &gt;&gt;&gt; zen_f2.validate({&quot;x&quot;: 1})  # Missing seed as required by pre-call</span>
 <span class="sd">    HydraZenValidationError: `cfg` is missing the following fields: seed</span>
