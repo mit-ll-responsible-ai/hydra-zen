@@ -1132,9 +1132,7 @@ def check_zen():
 
     okay = zen(lambda x, y: None)
 
-    # This is ian issue with pyright. See that `okay` is valid
-    # but the inline expr is not
-    @zen(pre_call=zen(lambda x, y: None))  # type: ignore
+    @zen(pre_call=zen(lambda x, y: None))
     def h3():
         ...
 

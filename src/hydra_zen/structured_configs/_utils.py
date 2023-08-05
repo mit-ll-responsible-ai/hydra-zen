@@ -328,11 +328,12 @@ def sanitized_type(
             optional_type, none_type = args
             if none_type is not NoneType:
                 optional_type = none_type
-            optional_type: Optional[Any]
+
             optional_type = sanitized_type(optional_type)
 
             if optional_type is Any:  # Union[Any, T] is just Any
                 return Any
+
             return Union[optional_type, NoneType]
 
         if origin is list or origin is List:
