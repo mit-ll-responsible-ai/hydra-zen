@@ -36,9 +36,9 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=ccbe24c1"></script>
+    <script src="../../../_static/documentation_options.js?v=8a448e45"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=30646c52"></script>
     <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
@@ -492,7 +492,9 @@ document.write(`
     <span class="k">return</span> <span class="n">f</span>
 
 
-<div class="viewcode-block" id="Zen"><a class="viewcode-back" href="../../../generated/hydra_zen.wrapper.Zen.html#hydra_zen.Zen">[docs]</a><span class="k">class</span> <span class="nc">Zen</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]):</span>
+<div class="viewcode-block" id="Zen">
+<a class="viewcode-back" href="../../../generated/hydra_zen.wrapper.Zen.html#hydra_zen.Zen">[docs]</a>
+<span class="k">class</span> <span class="nc">Zen</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Implements the wrapping logic that is exposed by `hydra_zen.zen`</span>
 
 <span class="sd">    Attributes</span>
@@ -517,7 +519,9 @@ document.write(`
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;zen[</span><span class="si">{</span><span class="p">(</span><span class="n">safe_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">))</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span><span class="si">}</span><span class="s2">)](cfg, /)&quot;</span>
 
-<div class="viewcode-block" id="Zen.__init__"><a class="viewcode-back" href="../../../generated/hydra_zen.wrapper.Zen.html#hydra_zen.Zen.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="Zen.__init__">
+<a class="viewcode-back" href="../../../generated/hydra_zen.wrapper.Zen.html#hydra_zen.Zen.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">__func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -616,6 +620,7 @@ document.write(`
             <span class="n">pre_call</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pre_call</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">)</span> <span class="k">else</span> <span class="n">_flat_call</span><span class="p">(</span><span class="n">pre_call</span><span class="p">)</span>
         <span class="p">)</span></div>
 
+
     <span class="k">def</span> <span class="nf">_normalize_cfg</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">cfg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
@@ -648,7 +653,9 @@ document.write(`
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">cfg</span>
 
-<div class="viewcode-block" id="Zen.validate"><a class="viewcode-back" href="../../../generated/hydra_zen.wrapper.Zen.html#hydra_zen.Zen.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__cfg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ConfigLike</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="Zen.validate">
+<a class="viewcode-back" href="../../../generated/hydra_zen.wrapper.Zen.html#hydra_zen.Zen.validate">[docs]</a>
+    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__cfg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ConfigLike</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Validates the input config based on the decorated function without calling said function.</span>
 
 <span class="sd">        Parameters</span>
@@ -702,6 +709,7 @@ document.write(`
                 <span class="sa">f</span><span class="s2">&quot;`cfg` is missing the following fields: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing_params</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span></div>
 
+
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">instantiate</span><span class="p">(</span><span class="n">__c</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiates each config that is extracted by `zen` before calling the wrapped function.</span>
@@ -714,7 +722,9 @@ document.write(`
             <span class="k">return</span> <span class="n">__c</span>
 
     <span class="c1"># TODO: add &quot;extract&quot; option that enables returning dict of fields</span>
-<div class="viewcode-block" id="Zen.__call__"><a class="viewcode-back" href="../../../generated/hydra_zen.wrapper.Zen.html#hydra_zen.Zen.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__cfg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ConfigLike</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">R</span><span class="p">:</span>
+<div class="viewcode-block" id="Zen.__call__">
+<a class="viewcode-back" href="../../../generated/hydra_zen.wrapper.Zen.html#hydra_zen.Zen.__call__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__cfg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ConfigLike</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">R</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extracts values from the input config based on the decorated function&#39;s</span>
 <span class="sd">        signature, resolves &amp; instantiates them, and calls the function with them.</span>
@@ -772,7 +782,10 @@ document.write(`
             <span class="o">**</span><span class="n">extra_kwargs</span><span class="p">,</span>
         <span class="p">)</span>  <span class="c1"># type: ignore</span></div>
 
-<div class="viewcode-block" id="Zen.hydra_main"><a class="viewcode-back" href="../../../generated/hydra_zen.wrapper.Zen.html#hydra_zen.Zen.hydra_main">[docs]</a>    <span class="k">def</span> <span class="nf">hydra_main</span><span class="p">(</span>
+
+<div class="viewcode-block" id="Zen.hydra_main">
+<a class="viewcode-back" href="../../../generated/hydra_zen.wrapper.Zen.html#hydra_zen.Zen.hydra_main">[docs]</a>
+    <span class="k">def</span> <span class="nf">hydra_main</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">config_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">_UNSPECIFIED_</span><span class="p">,</span>
         <span class="n">config_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -847,7 +860,9 @@ document.write(`
         <span class="k">if</span> <span class="n">version_base</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_UNSPECIFIED_</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="n">kw</span><span class="p">[</span><span class="s2">&quot;version_base&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">version_base</span>
 
-        <span class="k">return</span> <span class="n">hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">)(</span><span class="n">target</span><span class="p">)()</span></div></div>
+        <span class="k">return</span> <span class="n">hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">)(</span><span class="n">target</span><span class="p">)()</span></div>
+</div>
+
 
 
 <span class="nd">@overload</span>
@@ -876,7 +891,9 @@ document.write(`
     <span class="o">...</span>
 
 
-<div class="viewcode-block" id="zen"><a class="viewcode-back" href="../../../generated/hydra_zen.zen.html#hydra_zen.zen">[docs]</a><span class="k">def</span> <span class="nf">zen</span><span class="p">(</span>
+<div class="viewcode-block" id="zen">
+<a class="viewcode-back" href="../../../generated/hydra_zen.zen.html#hydra_zen.zen">[docs]</a>
+<span class="k">def</span> <span class="nf">zen</span><span class="p">(</span>
     <span class="n">__func</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">unpack_kwargs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -1151,10 +1168,13 @@ document.write(`
     <span class="k">return</span> <span class="n">wrap</span></div>
 
 
+
 <span class="n">fbuilds</span> <span class="o">=</span> <span class="n">make_custom_builds_fn</span><span class="p">(</span><span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="default_to_config"><a class="viewcode-back" href="../../../generated/hydra_zen.wrapper.default_to_config.html#hydra_zen.default_to_config">[docs]</a><span class="k">def</span> <span class="nf">default_to_config</span><span class="p">(</span>
+<div class="viewcode-block" id="default_to_config">
+<a class="viewcode-back" href="../../../generated/hydra_zen.wrapper.default_to_config.html#hydra_zen.default_to_config">[docs]</a>
+<span class="k">def</span> <span class="nf">default_to_config</span><span class="p">(</span>
     <span class="n">target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
         <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="n">DataClass_</span><span class="p">,</span>
@@ -1247,6 +1267,7 @@ document.write(`
         <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="n">fbuilds</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">))</span></div>
 
 
+
 <span class="k">class</span> <span class="nc">_HasName</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
     <span class="vm">__name__</span><span class="p">:</span> <span class="nb">str</span>
 
@@ -1318,7 +1339,9 @@ document.write(`
     <span class="k">return</span> <span class="n">entry</span>
 
 
-<div class="viewcode-block" id="ZenStore"><a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore">[docs]</a><span class="k">class</span> <span class="nc">ZenStore</span><span class="p">:</span>
+<div class="viewcode-block" id="ZenStore">
+<a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore">[docs]</a>
+<span class="k">class</span> <span class="nc">ZenStore</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;An abstraction over Hydra&#39;s store, for creating multiple, isolated config stores.</span>
 
 <span class="sd">    Whereas Hydra exposes a single global config store that provides no warnings when</span>
@@ -1660,7 +1683,9 @@ document.write(`
         <span class="s2">&quot;_warn_node_kwarg&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
-<div class="viewcode-block" id="ZenStore.__init__"><a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="ZenStore.__init__">
+<a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1725,6 +1750,7 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_warn_node_kwarg</span> <span class="o">=</span> <span class="n">warn_node_kwarg</span></div>
 
+
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="c1"># TODO: nicer repr?</span>
         <span class="n">groups_contents</span><span class="p">:</span> <span class="n">DefaultDict</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
@@ -1733,7 +1759,9 @@ document.write(`
 
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">groups_contents</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
 
-<div class="viewcode-block" id="ZenStore.__eq__"><a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.__eq__">[docs]</a>    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__o</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<div class="viewcode-block" id="ZenStore.__eq__">
+<a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.__eq__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__o</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns `True` if two stores share identical internal repos and queues.</span>
 
 <span class="sd">        Examples</span>
@@ -1752,6 +1780,7 @@ document.write(`
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">__o</span><span class="p">,</span> <span class="n">ZenStore</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="n">__o</span><span class="o">.</span><span class="n">_internal_repo</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span> <span class="ow">and</span> <span class="n">__o</span><span class="o">.</span><span class="n">_queue</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span></div>
+
 
     <span class="c1"># TODO: support *to_config_pos_args</span>
     <span class="nd">@overload</span>
@@ -1782,7 +1811,9 @@ document.write(`
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
         <span class="o">...</span>
 
-<div class="viewcode-block" id="ZenStore.__call__"><a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">F</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">F</span><span class="p">,</span> <span class="s2">&quot;ZenStore&quot;</span><span class="p">]:</span>
+<div class="viewcode-block" id="ZenStore.__call__">
+<a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.__call__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">F</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">F</span><span class="p">,</span> <span class="s2">&quot;ZenStore&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;__call__(target : Optional[T] = None, /, name: NodeName | Callable[[Any], NodeName]] = ..., group: GroupName | Callable[[T], GroupName]] = None, package: Optional[str | Callable[[T], str]]] | None], provider: Optional[str], to_config: Callable[[T], Node] = ..., **to_config_kw: Any) -&gt; T | ZenStore</span>
 
 <span class="sd">        The interface to an initialized store. Can be used to store a config or to</span>
@@ -1934,6 +1965,7 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">add_to_hydra_store</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">__target</span></div>
 
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">groups</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">GroupName</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a sorted list of the groups registered with this store&quot;&quot;&quot;</span>
@@ -1946,7 +1978,9 @@ document.write(`
             <span class="n">no_none</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">set_</span><span class="p">)</span>
             <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">no_none</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ZenStore.has_enqueued"><a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.has_enqueued">[docs]</a>    <span class="k">def</span> <span class="nf">has_enqueued</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<div class="viewcode-block" id="ZenStore.has_enqueued">
+<a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.has_enqueued">[docs]</a>
+    <span class="k">def</span> <span class="nf">has_enqueued</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;`True` if this store has entries that have not yet been added to</span>
 <span class="sd">        Hydra&#39;s config store.</span>
 
@@ -1971,6 +2005,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="p">)</span></div>
 
+
     <span class="k">def</span> <span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;`True` if entries have been added to this store, regardless of whether or</span>
 <span class="sd">        not they have been added to Hydra&#39;s config store&quot;&quot;&quot;</span>
@@ -1984,7 +2019,9 @@ document.write(`
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">GroupName</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">NodeName</span><span class="p">],</span> <span class="n">Node</span><span class="p">]:</span>
         <span class="o">...</span>
 
-<div class="viewcode-block" id="ZenStore.__getitem__"><a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">NodeName</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Node</span><span class="p">:</span>
+<div class="viewcode-block" id="ZenStore.__getitem__">
+<a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.__getitem__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">NodeName</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Node</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Access a entry&#39;s config node by specifying `(group, name)`. Or, access a</span>
 <span class="sd">        mapping of `(group, name) -&gt; node` for all nodes in a specified group,</span>
 <span class="sd">        including nodes within subgroups.</span>
@@ -2037,7 +2074,10 @@ document.write(`
             <span class="p">}</span>
         <span class="k">return</span> <span class="n">_resolve_node</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="s2">&quot;node&quot;</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="ZenStore.get_entry"><a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.get_entry">[docs]</a>    <span class="k">def</span> <span class="nf">get_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">GroupName</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">NodeName</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StoreEntry</span><span class="p">:</span>
+
+<div class="viewcode-block" id="ZenStore.get_entry">
+<a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.get_entry">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">GroupName</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">NodeName</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StoreEntry</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Access a store entry, which is a mapping that specifies the entry&#39;s</span>
 <span class="sd">        name, group, package, provider, and node.</span>
 
@@ -2060,6 +2100,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_resolve_node</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">[(</span><span class="n">group</span><span class="p">,</span> <span class="n">name</span><span class="p">)],</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
+
     <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">NodeName</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks if group or (group, node-name) exists in zen-store.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -2073,7 +2114,9 @@ document.write(`
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span>
 
-<div class="viewcode-block" id="ZenStore.__iter__"><a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.__iter__">[docs]</a>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">StoreEntry</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<div class="viewcode-block" id="ZenStore.__iter__">
+<a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.__iter__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">StoreEntry</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Yields all entries in this store.</span>
 
 <span class="sd">        Notes</span>
@@ -2107,7 +2150,10 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">yield from</span> <span class="p">(</span><span class="n">_resolve_node</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
 
-<div class="viewcode-block" id="ZenStore.add_to_hydra_store"><a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.add_to_hydra_store">[docs]</a>    <span class="k">def</span> <span class="nf">add_to_hydra_store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">overwrite_ok</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+<div class="viewcode-block" id="ZenStore.add_to_hydra_store">
+<a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.add_to_hydra_store">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_to_hydra_store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">overwrite_ok</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds all of this store&#39;s enqueued entries to Hydra&#39;s global config store.</span>
 
 <span class="sd">        This method need not be called for a store initialized as</span>
@@ -2160,6 +2206,7 @@ document.write(`
                 <span class="p">)</span>
             <span class="n">_store</span><span class="p">(</span><span class="o">**</span><span class="n">entry</span><span class="p">)</span></div>
 
+
     <span class="k">def</span> <span class="nf">_exists_in_hydra_store</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2175,6 +2222,7 @@ document.write(`
                 <span class="k">if</span> <span class="n">repo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.yaml&quot;</span> <span class="ow">in</span> <span class="n">repo</span></div>
+
 
 
 <span class="n">store</span><span class="p">:</span> <span class="n">ZenStore</span> <span class="o">=</span> <span class="n">ZenStore</span><span class="p">(</span>
@@ -2234,7 +2282,7 @@ document.write(`
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     <br/>
   </p>
 </div>

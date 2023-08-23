@@ -36,9 +36,9 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=ccbe24c1"></script>
+    <script src="../../../_static/documentation_options.js?v=8a448e45"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=30646c52"></script>
     <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
@@ -495,7 +495,9 @@ document.write(`
     <span class="k">return</span> <span class="kc">False</span>
 
 
-<div class="viewcode-block" id="uses_zen_processing"><a class="viewcode-back" href="../../../generated/hydra_zen.uses_zen_processing.html#hydra_zen.uses_zen_processing">[docs]</a><span class="k">def</span> <span class="nf">uses_zen_processing</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
+<div class="viewcode-block" id="uses_zen_processing">
+<a class="viewcode-back" href="../../../generated/hydra_zen.uses_zen_processing.html#hydra_zen.uses_zen_processing">[docs]</a>
+<span class="k">def</span> <span class="nf">uses_zen_processing</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns `True` if the input is a targeted structured config that relies on</span>
 <span class="sd">    zen-processing features during its instantiation process. See notes for more details</span>
 
@@ -554,7 +556,10 @@ document.write(`
     <span class="k">return</span> <span class="kc">True</span></div>
 
 
-<div class="viewcode-block" id="is_partial_builds"><a class="viewcode-back" href="../../../generated/hydra_zen.is_partial_builds.html#hydra_zen.is_partial_builds">[docs]</a><span class="k">def</span> <span class="nf">is_partial_builds</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
+
+<div class="viewcode-block" id="is_partial_builds">
+<a class="viewcode-back" href="../../../generated/hydra_zen.is_partial_builds.html#hydra_zen.is_partial_builds">[docs]</a>
+<span class="k">def</span> <span class="nf">is_partial_builds</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns `True` if the input is a targeted structured config that entails partial</span>
 <span class="sd">    instantiation, either via `_partial_=True` [1]_ or via `_zen_partial=True`.</span>
@@ -615,6 +620,7 @@ document.write(`
             <span class="ow">and</span> <span class="p">(</span><span class="n">safe_getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ZEN_PARTIAL_FIELD_NAME</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="kc">False</span></div>
+
 </pre></div>
 
                 </article>
@@ -667,7 +673,7 @@ document.write(`
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     <br/>
   </p>
 </div>

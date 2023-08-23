@@ -36,9 +36,9 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=ccbe24c1"></script>
+    <script src="../../_static/documentation_options.js?v=8a448e45"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=30646c52"></script>
     <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
@@ -485,7 +485,9 @@ document.write(`
     <span class="o">...</span>
 
 
-<div class="viewcode-block" id="instantiate"><a class="viewcode-back" href="../../generated/hydra_zen.instantiate.html#hydra_zen.instantiate">[docs]</a><span class="k">def</span> <span class="nf">instantiate</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<div class="viewcode-block" id="instantiate">
+<a class="viewcode-back" href="../../generated/hydra_zen.instantiate.html#hydra_zen.instantiate">[docs]</a>
+<span class="k">def</span> <span class="nf">instantiate</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Instantiates the target of a targeted config.</span>
 
@@ -601,6 +603,7 @@ document.write(`
     <span class="k">return</span> <span class="n">hydra_instantiate</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
+
 <span class="k">def</span> <span class="nf">_apply_just</span><span class="p">(</span><span class="n">fn</span><span class="p">:</span> <span class="n">F</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">F</span><span class="p">:</span>
     <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
@@ -611,7 +614,9 @@ document.write(`
     <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">wrapper</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="to_yaml"><a class="viewcode-back" href="../../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml">[docs]</a><span class="nd">@_apply_just</span>
+<div class="viewcode-block" id="to_yaml">
+<a class="viewcode-back" href="../../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml">[docs]</a>
+<span class="nd">@_apply_just</span>
 <span class="k">def</span> <span class="nf">to_yaml</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">resolve</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">sort_keys</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Serialize a config as a yaml-formatted string.</span>
@@ -701,7 +706,10 @@ document.write(`
     <span class="k">return</span> <span class="n">OmegaConf</span><span class="o">.</span><span class="n">to_yaml</span><span class="p">(</span><span class="n">cfg</span><span class="o">=</span><span class="n">cfg</span><span class="p">,</span> <span class="n">resolve</span><span class="o">=</span><span class="n">resolve</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="n">sort_keys</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="save_as_yaml"><a class="viewcode-back" href="../../generated/hydra_zen.save_as_yaml.html#hydra_zen.save_as_yaml">[docs]</a><span class="nd">@_apply_just</span>
+
+<div class="viewcode-block" id="save_as_yaml">
+<a class="viewcode-back" href="../../generated/hydra_zen.save_as_yaml.html#hydra_zen.save_as_yaml">[docs]</a>
+<span class="nd">@_apply_just</span>
 <span class="k">def</span> <span class="nf">save_as_yaml</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="n">IO</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">resolve</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -746,7 +754,10 @@ document.write(`
     <span class="k">return</span> <span class="n">OmegaConf</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">resolve</span><span class="o">=</span><span class="n">resolve</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="load_from_yaml"><a class="viewcode-back" href="../../generated/hydra_zen.load_from_yaml.html#hydra_zen.load_from_yaml">[docs]</a><span class="k">def</span> <span class="nf">load_from_yaml</span><span class="p">(</span>
+
+<div class="viewcode-block" id="load_from_yaml">
+<a class="viewcode-back" href="../../generated/hydra_zen.load_from_yaml.html#hydra_zen.load_from_yaml">[docs]</a>
+<span class="k">def</span> <span class="nf">load_from_yaml</span><span class="p">(</span>
     <span class="n">file_</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="n">IO</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -785,6 +796,7 @@ document.write(`
 <span class="sd">    {&#39;a&#39;: 1, &#39;b&#39;: &#39;foo&#39;}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">OmegaConf</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_</span><span class="p">)</span></div>
+
 </pre></div>
 
                 </article>
@@ -837,7 +849,7 @@ document.write(`
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     <br/>
   </p>
 </div>

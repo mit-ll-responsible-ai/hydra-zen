@@ -26,9 +26,9 @@
 <!-- Pre-loaded scripts that we'll load fully later -->
 <link as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" rel="preload"/>
 <link as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" rel="preload"/>
-<script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=ccbe24c1"></script>
+<script src="../_static/documentation_options.js?v=8a448e45"></script>
 <script src="../_static/doctools.js?v=888ff710"></script>
-<script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+<script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
 <script src="../_static/copybutton.js?v=30646c52"></script>
 <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
@@ -255,11 +255,11 @@ Click it to copy the contents of the code block.</p>
 <p>This tutorial assumes that you have completed the earlier tutorial: <a class="reference internal" href="basic_app.html#basic-app"><span class="std std-ref">Create and Launch a Basic Application with Hydra</span></a></p>
 </div>
 <section id="add-a-command-line-interface-to-our-application">
-<span id="cli-app"></span><h1>Add a Command Line Interface to Our Application<a class="headerlink" href="#add-a-command-line-interface-to-our-application" title="Permalink to this heading">#</a></h1>
+<span id="cli-app"></span><h1>Add a Command Line Interface to Our Application<a class="headerlink" href="#add-a-command-line-interface-to-our-application" title="Link to this heading">#</a></h1>
 <p>In this tutorial we will update our project so that it can be configured and launched
 from a command line interface (CLI), using Hydra.</p>
 <section id="modifying-our-project">
-<h2>Modifying Our Project<a class="headerlink" href="#modifying-our-project" title="Permalink to this heading">#</a></h2>
+<h2>Modifying Our Project<a class="headerlink" href="#modifying-our-project" title="Link to this heading">#</a></h2>
 <p>Open <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code> in your editor. We will make the following modifications to it:</p>
 <ol class="arabic simple">
 <li><p>Use <code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.store()</span></code> (<a class="reference external" href="https://mit-ll-responsible-ai.github.io/hydra-zen/generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore">docs</a>) to generate for our task function and to store it in Hydra’s global config store.</p></li>
@@ -268,7 +268,7 @@ from a command line interface (CLI), using Hydra.</p>
 </ol>
 <p>Modify your script to match this:</p>
 <div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">Contents of my_app.py:</span><a class="headerlink" href="#id1" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Contents of my_app.py:</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">store</span><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a>
 
 <span class="c1"># 1) `hydra_zen.store generates a config for our task function</span>
@@ -300,14 +300,14 @@ from a command line interface (CLI), using Hydra.</p>
 </div>
 </section>
 <section id="launching-our-application-from-the-command-line">
-<h2>Launching Our Application from the Command Line<a class="headerlink" href="#launching-our-application-from-the-command-line" title="Permalink to this heading">#</a></h2>
+<h2>Launching Our Application from the Command Line<a class="headerlink" href="#launching-our-application-from-the-command-line" title="Link to this heading">#</a></h2>
 <p>With the above modifications to <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code> complete, we can launch our application
 from the command line. The following will launch a job with <code class="docutils literal notranslate"><span class="pre">mario</span></code> and <code class="docutils literal notranslate"><span class="pre">luigi</span></code> as
 the names for player 1 and player 2, respectively.</p>
 <p>Open your terminal in the same directory as <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code>.
 We can view the configurable aspects of our application using the <code class="docutils literal notranslate"><span class="pre">--help</span></code> command; run the following:</p>
 <div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">Checking the configurable components of our app. (We will add configuration groups in a later lesson.)</span><a class="headerlink" href="#id2" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Checking the configurable components of our app. (We will add configuration groups in a later lesson.)</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span>--help
 <span class="go">my_app is powered by Hydra.</span>
 
@@ -328,7 +328,7 @@ We can view the configurable aspects of our application using the <code class="d
 Let’s configure these fields with the string values <code class="docutils literal notranslate"><span class="pre">"mario"</span></code> and <code class="docutils literal notranslate"><span class="pre">"luigi"</span></code>, respectively.
 In your console execute the following command:</p>
 <div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">Launching our application from the command line</span><a class="headerlink" href="#id3" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Launching our application from the command line</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span><span class="nv">player1</span><span class="o">=</span>mario<span class="w"> </span><span class="nv">player2</span><span class="o">=</span>luigi
 </pre></div>
 </div>
@@ -365,7 +365,7 @@ command line. It should be noted that we can still launch our app from a Python
 console, using <a class="reference internal" href="../generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><code class="xref py py-func docutils literal notranslate"><span class="pre">launch()</span></code></a>, as we did <a class="reference internal" href="basic_app.html#launch-basic-app"><span class="std std-ref">in the previous tutorial</span></a>.</p>
 </section>
 <section id="reference-documentation">
-<h2>Reference Documentation<a class="headerlink" href="#reference-documentation" title="Permalink to this heading">#</a></h2>
+<h2>Reference Documentation<a class="headerlink" href="#reference-documentation" title="Link to this heading">#</a></h2>
 <p>Want a deeper understanding of how hydra-zen and Hydra work?
 The following reference materials are especially relevant to this
 tutorial section.</p>
@@ -447,7 +447,7 @@ upon launching our application.</p>
 </div>
 <div class="footer-item">
 <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     <br/>
 </p>
 </div>

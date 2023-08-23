@@ -26,9 +26,9 @@
 <!-- Pre-loaded scripts that we'll load fully later -->
 <link as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" rel="preload"/>
 <link as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" rel="preload"/>
-<script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=ccbe24c1"></script>
+<script src="../_static/documentation_options.js?v=8a448e45"></script>
 <script src="../_static/doctools.js?v=888ff710"></script>
-<script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+<script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
 <script src="../_static/copybutton.js?v=30646c52"></script>
 <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
@@ -247,13 +247,13 @@ document.write(`
 <div id="searchbox"></div>
 <article class="bd-article" role="main">
 <section id="customize-hydra-s-configuration">
-<h1>Customize Hydra’s Configuration<a class="headerlink" href="#customize-hydra-s-configuration" title="Permalink to this heading">#</a></h1>
+<h1>Customize Hydra’s Configuration<a class="headerlink" href="#customize-hydra-s-configuration" title="Link to this heading">#</a></h1>
 <p>Hydra is highly configurable. The way that Hydra runs jobs, logs information, manages job directories are among its many configurable components <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. This How-To guide demonstrates how to configure Hydra from within a Python module <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
 <p>To configure Hydra using hydra-zen we must update the default instance of <code class="xref py py-class docutils literal notranslate"><span class="pre">hydra.conf.HydraConf</span></code> (which is a <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataclasses.dataclass()</span></code></a>).
 Thus we can simply create our own <code class="xref py py-class docutils literal notranslate"><span class="pre">hydra.conf.HydraConf</span></code> instance and overwrite store’s entry; <code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenStore</span></code> will automatically place this under the appropriate <code class="xref py py-obj docutils literal notranslate"><span class="pre">group="hydra",</span> <span class="pre">name="config"</span></code> entry in Hydra’s config store.</p>
 <p>In this example, we configure Hydra to automatically change the runtime working directory to that of the job’s output directory. I.e., we set <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra.job.chdir=True</span></code>:</p>
 <div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-text">Contents of <code class="xref py py-obj docutils literal notranslate"><span class="pre">my_app.py</span></code></span><a class="headerlink" href="#id5" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Contents of <code class="xref py py-obj docutils literal notranslate"><span class="pre">my_app.py</span></code></span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">,</span> <span class="n">store</span>
 <span class="kn">from</span> <span class="nn">hydra.conf</span> <span class="kn">import</span> <span class="n">HydraConf</span><span class="p">,</span> <span class="n">JobConf</span>
 
@@ -273,7 +273,7 @@ Thus we can simply create our own <code class="xref py py-class docutils literal
 <p>Let’s confirm that we have successfully changed Hydra’s configuration. By default,
 our app’s working dir should be job’s the time-stamped output directory.</p>
 <div class="literal-block-wrapper docutils container" id="id6">
-<div class="code-block-caption"><span class="caption-text">Running our application using the default config.</span><a class="headerlink" href="#id6" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Running our application using the default config.</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">pwd</span>
 <span class="go">foo/</span>
 
@@ -286,7 +286,7 @@ our app’s working dir should be job’s the time-stamped output directory.</p>
 </div>
 </div>
 <section id="footnotes">
-<h2>Footnotes<a class="headerlink" href="#footnotes" title="Permalink to this heading">#</a></h2>
+<h2>Footnotes<a class="headerlink" href="#footnotes" title="Link to this heading">#</a></h2>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id3" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a href="#id1" role="doc-backlink">1</a><span class="fn-bracket">]</span></span>
@@ -361,7 +361,7 @@ our app’s working dir should be job’s the time-stamped output directory.</p>
 </div>
 <div class="footer-item">
 <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     <br/>
 </p>
 </div>

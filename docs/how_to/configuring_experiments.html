@@ -26,9 +26,9 @@
 <!-- Pre-loaded scripts that we'll load fully later -->
 <link as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" rel="preload"/>
 <link as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" rel="preload"/>
-<script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=ccbe24c1"></script>
+<script src="../_static/documentation_options.js?v=8a448e45"></script>
 <script src="../_static/doctools.js?v=888ff710"></script>
-<script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+<script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
 <script src="../_static/copybutton.js?v=30646c52"></script>
 <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
@@ -247,7 +247,7 @@ document.write(`
 <div id="searchbox"></div>
 <article class="bd-article" role="main">
 <section id="configure-multiple-experiments">
-<h1>Configure Multiple Experiments<a class="headerlink" href="#configure-multiple-experiments" title="Permalink to this heading">#</a></h1>
+<h1>Configure Multiple Experiments<a class="headerlink" href="#configure-multiple-experiments" title="Link to this heading">#</a></h1>
 <p>This guide demonstrates how to elegantly maintain multiple configurations for an experiment, so that each experiment’s config need only specify changes to some “master” config <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
 <p>Suppose that we want to benchmark an application that is configured using various pairings of databases (MySQL and SQLite) and servers (Apache and NGINX).
 And, suppose that there are particular database-server configurations that we want to frequently experiment with. In this How-To we will:</p>
@@ -258,10 +258,10 @@ And, suppose that there are particular database-server configurations that we wa
 <li><p>Run various configurations of our experiment.</p></li>
 </ol>
 <section id="configuring-and-running-our-basic-application">
-<h2>Configuring and Running our Basic Application<a class="headerlink" href="#configuring-and-running-our-basic-application" title="Permalink to this heading">#</a></h2>
+<h2>Configuring and Running our Basic Application<a class="headerlink" href="#configuring-and-running-our-basic-application" title="Link to this heading">#</a></h2>
 <p>First, we well create configs for our two servers and our two databases and we will add them to <a class="reference internal" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.ZenStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">hydra-zen's</span> <span class="pre">config</span> <span class="pre">store</span></code></a>.</p>
 <div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">Contents of <code class="xref py py-obj docutils literal notranslate"><span class="pre">my_app.py</span></code></span><a class="headerlink" href="#id3" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Contents of <code class="xref py py-obj docutils literal notranslate"><span class="pre">my_app.py</span></code></span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a>
 
 <span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">store</span><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a>
@@ -322,7 +322,7 @@ And, suppose that there are particular database-server configurations that we wa
 </div>
 <p>The application can then be executed using:</p>
 <div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text">Running our application using the default config.</span><a class="headerlink" href="#id4" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Running our application using the default config.</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py
 <span class="go">db:</span>
 <span class="go">name: mysql</span>
@@ -335,10 +335,10 @@ And, suppose that there are particular database-server configurations that we wa
 </div>
 </section>
 <section id="creating-configurations-for-particular-experiments">
-<h2>Creating Configurations for Particular “Experiments”<a class="headerlink" href="#creating-configurations-for-particular-experiments" title="Permalink to this heading">#</a></h2>
+<h2>Creating Configurations for Particular “Experiments”<a class="headerlink" href="#creating-configurations-for-particular-experiments" title="Link to this heading">#</a></h2>
 <p>Suppose that we frequently want to run our application using the following two configurations (which we will refer to as <code class="xref py py-obj docutils literal notranslate"><span class="pre">aplite</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">nglite</span></code>, respectively)</p>
 <div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-text">Manually running the so-called <code class="xref py py-obj docutils literal notranslate"><span class="pre">aplite</span></code> configuration</span><a class="headerlink" href="#id5" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Manually running the so-called <code class="xref py py-obj docutils literal notranslate"><span class="pre">aplite</span></code> configuration</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span><span class="nv">db</span><span class="o">=</span>sqlite<span class="w"> </span>server.port<span class="o">=</span><span class="m">8080</span>
 <span class="go">db:</span>
 <span class="go">name: sqlite</span>
@@ -350,7 +350,7 @@ And, suppose that there are particular database-server configurations that we wa
 </div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id6">
-<div class="code-block-caption"><span class="caption-text">Manually running the so-called <code class="xref py py-obj docutils literal notranslate"><span class="pre">nglite</span></code> configuration</span><a class="headerlink" href="#id6" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Manually running the so-called <code class="xref py py-obj docutils literal notranslate"><span class="pre">nglite</span></code> configuration</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span><span class="nv">db</span><span class="o">=</span>sqlite<span class="w"> </span><span class="nv">server</span><span class="o">=</span>nginx<span class="w"> </span>server.port<span class="o">=</span><span class="m">8080</span>
 <span class="go">db:</span>
 <span class="go">name: sqlite</span>
@@ -373,7 +373,7 @@ And, suppose that there are particular database-server configurations that we wa
 <li><p>Override particular parameter values (i.e., the configured server port)</p></li>
 </ul>
 <div class="literal-block-wrapper docutils container" id="id7">
-<div class="code-block-caption"><span class="caption-text">3: Adding experiment configs (an addition to <code class="xref py py-obj docutils literal notranslate"><span class="pre">my_app.py</span></code>)</span><a class="headerlink" href="#id7" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">3: Adding experiment configs (an addition to <code class="xref py py-obj docutils literal notranslate"><span class="pre">my_app.py</span></code>)</span><a class="headerlink" href="#id7" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># add the following before the __main__ clause of `my_app.py`</span>
 
 <span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a>
@@ -416,7 +416,7 @@ And, suppose that there are particular database-server configurations that we wa
 <label class="sd-tab-label" for="sd-tab-item-0">
 aplit</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id8">
-<div class="code-block-caption"><span class="caption-text">4 Running the <code class="xref py py-obj docutils literal notranslate"><span class="pre">aplite</span></code> experiment</span><a class="headerlink" href="#id8" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">4 Running the <code class="xref py py-obj docutils literal notranslate"><span class="pre">aplite</span></code> experiment</span><a class="headerlink" href="#id8" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span>+experiment<span class="o">=</span>aplite
 <span class="go">db:</span>
 <span class="go">name: sqlite</span>
@@ -432,7 +432,7 @@ aplit</label><div class="sd-tab-content docutils">
 <label class="sd-tab-label" for="sd-tab-item-1">
 nglite</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id9">
-<div class="code-block-caption"><span class="caption-text">4 Running the <code class="xref py py-obj docutils literal notranslate"><span class="pre">nglite</span></code> experiment</span><a class="headerlink" href="#id9" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">4 Running the <code class="xref py py-obj docutils literal notranslate"><span class="pre">nglite</span></code> experiment</span><a class="headerlink" href="#id9" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span>+experiment<span class="o">=</span>nglite
 <span class="go">db:</span>
 <span class="go">name: sqlite</span>
@@ -448,7 +448,7 @@ nglite</label><div class="sd-tab-content docutils">
 <label class="sd-tab-label" for="sd-tab-item-2">
 multi-run</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id10">
-<div class="code-block-caption"><span class="caption-text">4 Performing a multi-run over experiments</span><a class="headerlink" href="#id10" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">4 Performing a multi-run over experiments</span><a class="headerlink" href="#id10" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span>--multirun<span class="w"> </span>+experiment<span class="o">=</span>aplite,nglite
 <span class="go">[2023-01-17 10:45:25,609][HYDRA] Launching 2 jobs locally</span>
 <span class="gp">[2023-01-17 10:45:25,609][HYDRA]        #</span><span class="m">0</span><span class="w"> </span>:<span class="w"> </span>+experiment<span class="o">=</span>aplite
@@ -474,7 +474,7 @@ multi-run</label><div class="sd-tab-content docutils">
 <label class="sd-tab-label" for="sd-tab-item-3">
 multi-run (via glob)</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id11">
-<div class="code-block-caption"><span class="caption-text">4 Running all experiments using the <a class="reference external" href="https://hydra.cc/docs/advanced/override_grammar/extended/#glob-choice-sweep">glob</a> syntax</span><a class="headerlink" href="#id11" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">4 Running all experiments using the <a class="reference external" href="https://hydra.cc/docs/advanced/override_grammar/extended/#glob-choice-sweep">glob</a> syntax</span><a class="headerlink" href="#id11" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span>--multirun<span class="w"> </span><span class="s1">'+experiment=glob(*)'</span>
 <span class="go">[2023-01-17 10:45:25,609][HYDRA] Launching 2 jobs locally</span>
 <span class="gp">[2023-01-17 10:45:25,609][HYDRA]        #</span><span class="m">0</span><span class="w"> </span>:<span class="w"> </span>+experiment<span class="o">=</span>aplite
@@ -499,7 +499,7 @@ multi-run (via glob)</label><div class="sd-tab-content docutils">
 </div>
 </section>
 <section id="footnotes">
-<h2>Footnotes<a class="headerlink" href="#footnotes" title="Permalink to this heading">#</a></h2>
+<h2>Footnotes<a class="headerlink" href="#footnotes" title="Link to this heading">#</a></h2>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id2" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a href="#id1" role="doc-backlink">1</a><span class="fn-bracket">]</span></span>
@@ -572,7 +572,7 @@ multi-run (via glob)</label><div class="sd-tab-content docutils">
 </div>
 <div class="footer-item">
 <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     <br/>
 </p>
 </div>

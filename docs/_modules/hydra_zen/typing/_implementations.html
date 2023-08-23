@@ -36,9 +36,9 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=ccbe24c1"></script>
+    <script src="../../../_static/documentation_options.js?v=8a448e45"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=30646c52"></script>
     <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
@@ -661,7 +661,9 @@ document.write(`
     <span class="n">node</span><span class="p">:</span> <span class="n">Node</span>
 
 
-<div class="viewcode-block" id="ZenConvert"><a class="viewcode-back" href="../../../generated/hydra_zen.typing.ZenConvert.html#hydra_zen.typing.ZenConvert">[docs]</a><span class="k">class</span> <span class="nc">ZenConvert</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="ZenConvert">
+<a class="viewcode-back" href="../../../generated/hydra_zen.typing.ZenConvert.html#hydra_zen.typing.ZenConvert">[docs]</a>
+<span class="k">class</span> <span class="nc">ZenConvert</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A TypedDict that provides a type-checked interface for specifying zen-convert</span>
 <span class="sd">    options that configure the hydra-zen config-creation functions (e.g., `builds`,</span>
 <span class="sd">    `just`, and `make_config`).</span>
@@ -744,6 +746,7 @@ document.write(`
     <span class="n">dataclass</span><span class="p">:</span> <span class="nb">bool</span></div>
 
 
+
 <span class="k">class</span> <span class="nc">_AllPyDataclassOptions</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">cls_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">namespace</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
@@ -779,7 +782,9 @@ document.write(`
     <span class="n">cls_name</span><span class="p">:</span> <span class="n">Required</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="DataclassOptions"><a class="viewcode-back" href="../../../generated/hydra_zen.typing.DataclassOptions.html#hydra_zen.typing.DataclassOptions">[docs]</a><span class="k">class</span> <span class="nc">DataclassOptions</span><span class="p">(</span><span class="n">_Py311Dataclass</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="DataclassOptions">
+<a class="viewcode-back" href="../../../generated/hydra_zen.typing.DataclassOptions.html#hydra_zen.typing.DataclassOptions">[docs]</a>
+<span class="k">class</span> <span class="nc">DataclassOptions</span><span class="p">(</span><span class="n">_Py311Dataclass</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Specifies dataclass-creation options via `builds`, `just` et al.</span>
 
 <span class="sd">    Note that, unlike :func:`dataclasses.make_dataclass`, the default value for</span>
@@ -940,6 +945,7 @@ document.write(`
     <span class="n">module</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># zen-only</span></div>
 
 
+
 <span class="k">def</span> <span class="nf">_permitted_keys</span><span class="p">(</span><span class="n">typed_dict</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FrozenSet</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
     <span class="k">return</span> <span class="n">typed_dict</span><span class="o">.</span><span class="n">__required_keys__</span> <span class="o">|</span> <span class="n">typed_dict</span><span class="o">.</span><span class="n">__optional_keys__</span>
 
@@ -1002,7 +1008,7 @@ document.write(`
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     <br/>
   </p>
 </div>

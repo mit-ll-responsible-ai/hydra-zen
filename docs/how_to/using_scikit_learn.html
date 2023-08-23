@@ -26,9 +26,9 @@
 <!-- Pre-loaded scripts that we'll load fully later -->
 <link as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" rel="preload"/>
 <link as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" rel="preload"/>
-<script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=ccbe24c1"></script>
+<script src="../_static/documentation_options.js?v=8a448e45"></script>
 <script src="../_static/doctools.js?v=888ff710"></script>
-<script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+<script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
 <script src="../_static/copybutton.js?v=30646c52"></script>
 <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
@@ -247,7 +247,7 @@ document.write(`
 <div id="searchbox"></div>
 <article class="bd-article" role="main">
 <section id="configure-and-run-scikit-learn-s-classifier-comparison-example">
-<h1>Configure and Run scikit-learn’s Classifier Comparison Example<a class="headerlink" href="#configure-and-run-scikit-learn-s-classifier-comparison-example" title="Permalink to this heading">#</a></h1>
+<h1>Configure and Run scikit-learn’s Classifier Comparison Example<a class="headerlink" href="#configure-and-run-scikit-learn-s-classifier-comparison-example" title="Link to this heading">#</a></h1>
 <div class="admonition-note admonition">
 <p class="admonition-title">Note</p>
 <p>This How-To guide closely mirrors scikit-learn’s <a class="reference external" href="https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html#sphx-glr-auto-examples-classification-plot-classifier-comparison-py">Classifier Comparison</a>  example.</p>
@@ -262,7 +262,7 @@ Specifically, we will demonstrate how to configure multiple scikit-learn dataset
 <li><p>Gather the saved figures after executing the experiments and plot the final result.</p></li>
 </ol>
 <section id="configuring-and-building-an-experiment">
-<h2>Configuring and Building an Experiment<a class="headerlink" href="#configuring-and-building-an-experiment" title="Permalink to this heading">#</a></h2>
+<h2>Configuring and Building an Experiment<a class="headerlink" href="#configuring-and-building-an-experiment" title="Link to this heading">#</a></h2>
 <div class="admonition attention">
 <p class="admonition-title">Attention</p>
 <p>hydra-zen’s config store possesses <a class="reference internal" href="../generated/hydra_zen.ZenStore.html#store-autoconf"><span class="std std-ref">auto-config capabilities</span></a>, which we will utilize below.
@@ -298,7 +298,7 @@ Without auto-config</label><div class="sd-tab-content docutils">
 <p>Below we create configs for three datasets and ten classifiers and add them to <a class="reference internal" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.ZenStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">hydra-zen's</span> <span class="pre">config</span> <span class="pre">store</span></code></a>.</p>
 <p>After building the configs we define the task function that utilizes these datasets and classifiers.</p>
 <div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">Contents of <code class="xref py py-obj docutils literal notranslate"><span class="pre">my_app.py</span></code></span><a class="headerlink" href="#id1" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Contents of <code class="xref py py-obj docutils literal notranslate"><span class="pre">my_app.py</span></code></span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#module-typing" title="typing"><span class="nn">typing</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="typing.Callable"><span class="n">Callable</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="typing.Tuple"><span class="n">Tuple</span></a>
 
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -556,7 +556,7 @@ Without auto-config</label><div class="sd-tab-content docutils">
 </div>
 <p>Now let’s run over all possible pairs of datasets and models:</p>
 <div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">3: Using Hyda’s glob sweeper to find/run over all dataset/classifier pairs.</span><a class="headerlink" href="#id2" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">3: Using Hyda’s glob sweeper to find/run over all dataset/classifier pairs.</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span><span class="s2">"dataset=glob(*)"</span><span class="w"> </span><span class="s2">"classifier=glob(*)"</span><span class="w"> </span>--multirun
 <span class="go">[2023-01-21 11:53:56,839][HYDRA] Launching 30 jobs locally</span>
 <span class="gp">[2023-01-21 11:53:56,839][HYDRA]        #</span><span class="m">0</span><span class="w"> </span>:<span class="w"> </span><span class="nv">dataset</span><span class="o">=</span>circles<span class="w"> </span><span class="nv">classifier</span><span class="o">=</span>ada_boost
@@ -607,11 +607,11 @@ is stored in the following directory structure:</p>
 </div>
 </section>
 <section id="gathering-and-visualizing-the-results">
-<h2>Gathering and Visualizing the Results<a class="headerlink" href="#gathering-and-visualizing-the-results" title="Permalink to this heading">#</a></h2>
+<h2>Gathering and Visualizing the Results<a class="headerlink" href="#gathering-and-visualizing-the-results" title="Link to this heading">#</a></h2>
 <p>To load images and visualize the results simply load in all <code class="xref py py-obj docutils literal notranslate"><span class="pre">png</span></code> files
 stored in job directories and plot the results.</p>
 <div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">4 Gathering and Plotting Results</span><a class="headerlink" href="#id3" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">4 Gathering and Plotting Results</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">matplotlib.image</span> <span class="k">as</span> <span class="nn">mpimg</span>
 
@@ -719,7 +719,7 @@ stored in job directories and plot the results.</p>
 </div>
 <div class="footer-item">
 <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     <br/>
 </p>
 </div>

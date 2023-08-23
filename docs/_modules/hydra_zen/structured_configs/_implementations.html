@@ -36,9 +36,9 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=ccbe24c1"></script>
+    <script src="../../../_static/documentation_options.js?v=8a448e45"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=30646c52"></script>
     <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
@@ -575,7 +575,9 @@ document.write(`
     <span class="k">return</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">x</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="hydrated_dataclass"><a class="viewcode-back" href="../../../generated/hydra_zen.hydrated_dataclass.html#hydra_zen.hydrated_dataclass">[docs]</a><span class="nd">@dataclass_transform</span><span class="p">()</span>
+<div class="viewcode-block" id="hydrated_dataclass">
+<a class="viewcode-back" href="../../../generated/hydra_zen.hydrated_dataclass.html#hydra_zen.hydrated_dataclass">[docs]</a>
+<span class="nd">@dataclass_transform</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">hydrated_dataclass</span><span class="p">(</span>
     <span class="n">target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
     <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
@@ -870,6 +872,7 @@ document.write(`
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="k">return</span> <span class="n">wrapper</span></div>
+
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1414,7 +1417,9 @@ document.write(`
     <span class="o">...</span>
 
 
-<div class="viewcode-block" id="builds"><a class="viewcode-back" href="../../../generated/hydra_zen.builds.html#hydra_zen.builds">[docs]</a><span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
+<div class="viewcode-block" id="builds">
+<a class="viewcode-back" href="../../../generated/hydra_zen.builds.html#hydra_zen.builds">[docs]</a>
+<span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
     <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
         <span class="n">Importable</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="n">Type</span><span class="p">[</span><span class="n">AnyBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">SupportedPrimitive</span>
     <span class="p">],</span>
@@ -2671,6 +2676,7 @@ document.write(`
     <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]]],</span> <span class="n">out</span><span class="p">)</span></div>
 
 
+
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">_T</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
     <span class="o">...</span>
@@ -2681,7 +2687,9 @@ document.write(`
     <span class="o">...</span>
 
 
-<div class="viewcode-block" id="get_target"><a class="viewcode-back" href="../../../generated/hydra_zen.get_target.html#hydra_zen.get_target">[docs]</a><span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">HasTarget</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<div class="viewcode-block" id="get_target">
+<a class="viewcode-back" href="../../../generated/hydra_zen.get_target.html#hydra_zen.get_target">[docs]</a>
+<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">HasTarget</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the target-object from a targeted config.</span>
 
@@ -2764,6 +2772,7 @@ document.write(`
         <span class="k">pass</span>  <span class="c1"># makes sure we cover this branch in tests</span>
 
     <span class="k">return</span> <span class="n">target</span></div>
+
 </pre></div>
 
                 </article>
@@ -2816,7 +2825,7 @@ document.write(`
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     <br/>
   </p>
 </div>

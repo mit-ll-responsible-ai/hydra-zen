@@ -25,9 +25,9 @@
 <!-- Pre-loaded scripts that we'll load fully later -->
 <link as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" rel="preload"/>
 <link as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" rel="preload"/>
-<script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=ccbe24c1"></script>
+<script src="../_static/documentation_options.js?v=8a448e45"></script>
 <script src="../_static/doctools.js?v=888ff710"></script>
-<script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+<script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
 <script src="../_static/copybutton.js?v=30646c52"></script>
 <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
@@ -243,7 +243,7 @@ document.write(`
 <div id="searchbox"></div>
 <article class="bd-article" role="main">
 <section id="understanding-hydra-zen-s-automatic-type-refinement-behavior">
-<span id="type-support"></span><h1>Understanding hydra-zen’s Automatic Type Refinement Behavior<a class="headerlink" href="#understanding-hydra-zen-s-automatic-type-refinement-behavior" title="Permalink to this heading">#</a></h1>
+<span id="type-support"></span><h1>Understanding hydra-zen’s Automatic Type Refinement Behavior<a class="headerlink" href="#understanding-hydra-zen-s-automatic-type-refinement-behavior" title="Link to this heading">#</a></h1>
 <p>hydra-zen’s <a class="reference internal" href="../api_reference.html#create-config"><span class="std std-ref">config-creation functions</span></a> will automatically
 refine user-supplied type annotations so that they are made compatible with Hydra’s
 limited type support. This eliminates a friction that will otherwise force users to
@@ -251,7 +251,7 @@ modify their code’s type annotations. Furthermore, hydra-zen preserves
 type information such that third-party type checkers can be used to provide more
 robust support for more general type annotations.</p>
 <section id="hydra-s-limited-type-support">
-<h2>Hydra’s Limited Type Support<a class="headerlink" href="#hydra-s-limited-type-support" title="Permalink to this heading">#</a></h2>
+<h2>Hydra’s Limited Type Support<a class="headerlink" href="#hydra-s-limited-type-support" title="Link to this heading">#</a></h2>
 <p>Hydra permits only <a class="reference external" href="https://hydra.cc/docs/tutorials/structured_config/intro#structured-configs-supports">a narrow subset of type annotations</a> to be present in a
 config:</p>
 <blockquote>
@@ -285,7 +285,7 @@ unsupported type-annotation (<code class="docutils literal notranslate"><span cl
 use less-accurate type-annotations.</p>
 </section>
 <section id="leveraging-automatic-type-refinement-without-having-to-think-about-it">
-<h2>Leveraging Automatic Type-Refinement (without having to think about it)<a class="headerlink" href="#leveraging-automatic-type-refinement-without-having-to-think-about-it" title="Permalink to this heading">#</a></h2>
+<h2>Leveraging Automatic Type-Refinement (without having to think about it)<a class="headerlink" href="#leveraging-automatic-type-refinement-without-having-to-think-about-it" title="Link to this heading">#</a></h2>
 <p>To eliminate the friction that occurs here, hydra-zen’s <a class="reference internal" href="../api_reference.html#create-config"><span class="std std-ref">config-creation functions</span></a> will automatically-broaden the type annotations on the configs that they produce. This means that users will not need to change their
 type-annotations for the sake of Hydra.</p>
 <p>For example, to address the incompatibility seen in the previous example, we can use
@@ -327,7 +327,7 @@ configure the following function:</p>
 to lack of support for that type.</p>
 </section>
 <section id="using-third-party-runtime-type-checkers">
-<span id="pydantic-support"></span><h2>Using Third-Party Runtime Type-Checkers<a class="headerlink" href="#using-third-party-runtime-type-checkers" title="Permalink to this heading">#</a></h2>
+<span id="pydantic-support"></span><h2>Using Third-Party Runtime Type-Checkers<a class="headerlink" href="#using-third-party-runtime-type-checkers" title="Link to this heading">#</a></h2>
 <p>Although hydra-zen will broaden the types that get exposed to Hydra, the original
 type-information of a target that is provided to <a class="reference internal" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> is still
 preserved. This means that third-party type checkers like
@@ -427,7 +427,7 @@ directly, via the <code class="docutils literal notranslate"><span class="pre">z
 </div>
 <div class="footer-item">
 <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     <br/>
 </p>
 </div>

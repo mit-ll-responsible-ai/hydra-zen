@@ -26,9 +26,9 @@
 <!-- Pre-loaded scripts that we'll load fully later -->
 <link as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" rel="preload"/>
 <link as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" rel="preload"/>
-<script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=ccbe24c1"></script>
+<script src="../_static/documentation_options.js?v=8a448e45"></script>
 <script src="../_static/doctools.js?v=888ff710"></script>
-<script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+<script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
 <script src="../_static/copybutton.js?v=30646c52"></script>
 <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
@@ -257,7 +257,7 @@ How-To guide.</p>
 <p>Using hydra-zen for your research project? <a class="reference external" href="https://zenodo.org/record/5584711">Cite us</a>! 😊</p>
 </div>
 <section id="run-boilerplate-free-ml-experiments-with-pytorch-lightning-hydra-zen">
-<h1>Run Boilerplate-Free ML Experiments with PyTorch Lightning &amp; hydra-zen<a class="headerlink" href="#run-boilerplate-free-ml-experiments-with-pytorch-lightning-hydra-zen" title="Permalink to this heading">#</a></h1>
+<h1>Run Boilerplate-Free ML Experiments with PyTorch Lightning &amp; hydra-zen<a class="headerlink" href="#run-boilerplate-free-ml-experiments-with-pytorch-lightning-hydra-zen" title="Link to this heading">#</a></h1>
 <p><a class="reference external" href="https://www.pytorchlightning.ai/">PyTorch Lightning</a> is a library designed to
 eliminate the boilerplate code that is associated with training and testing neural
 networks in PyTorch. This is a natural bedfellow of Hydra and hydra-zen, which eliminate the boilerplate associated with designing software that is configurable, repeatable, and scalable.</p>
@@ -275,11 +275,11 @@ simplicity, we will train it to simply fit <span class="math notranslate nohighl
 <li><p>Load our best model using the checkpoints saved by PyTorch Lightning and the job-config saved by Hydra.</p></li>
 </ol>
 <section id="defining-our-model">
-<h2>Defining Our Model<a class="headerlink" href="#defining-our-model" title="Permalink to this heading">#</a></h2>
+<h2>Defining Our Model<a class="headerlink" href="#defining-our-model" title="Link to this heading">#</a></h2>
 <p>Create a script called <code class="docutils literal notranslate"><span class="pre">zen_model.py</span></code> (or, open a Jupyter notebook and include the
 following code. Here, we define our single-layer neural network and the <a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/latest/common/lightning_module.html">lightning module</a> that describes how to train and evaluate our model.</p>
 <div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">Contents of <code class="docutils literal notranslate"><span class="pre">zen_model.py</span></code></span><a class="headerlink" href="#id3" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Contents of <code class="docutils literal notranslate"><span class="pre">zen_model.py</span></code></span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#module-typing" title="typing"><span class="nn">typing</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="typing.Callable"><span class="n">Callable</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Type" title="typing.Type"><span class="n">Type</span></a>
 
 <span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
@@ -377,12 +377,12 @@ following code. Here, we define our single-layer neural network and the <a class
 </div>
 </section>
 <section id="creating-our-configs-and-task-function">
-<h2>Creating Our Configs and Task Function<a class="headerlink" href="#creating-our-configs-and-task-function" title="Permalink to this heading">#</a></h2>
+<h2>Creating Our Configs and Task Function<a class="headerlink" href="#creating-our-configs-and-task-function" title="Link to this heading">#</a></h2>
 <p>Create another script - named <code class="docutils literal notranslate"><span class="pre">experiment.py</span></code> - in the same directory as <code class="docutils literal notranslate"><span class="pre">zen_model.py</span></code>.
 Here, we will create the configs for our optimizer, model, data-loader, lightning module,
 and trainer. We’ll also define the task function that trains and tests our model.</p>
 <div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text">Contents of <code class="docutils literal notranslate"><span class="pre">experiment.py</span></code></span><a class="headerlink" href="#id4" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Contents of <code class="docutils literal notranslate"><span class="pre">experiment.py</span></code></span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/math.html#module-math" title="math"><span class="nn">math</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/math.html#math.pi" title="math.pi"><span class="n">pi</span></a>
 
 <span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
@@ -441,7 +441,7 @@ errors when training multiple large models.</p>
 </div>
 </section>
 <section id="running-our-experiments">
-<h2>Running Our Experiments<a class="headerlink" href="#running-our-experiments" title="Permalink to this heading">#</a></h2>
+<h2>Running Our Experiments<a class="headerlink" href="#running-our-experiments" title="Link to this heading">#</a></h2>
 <p>We will use <a class="reference internal" href="../generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.launch()</span></code></a> to run four jobs: training our model with all four combinations of:</p>
 <ul class="simple">
 <li><p>a batch-size of 20 and 200</p></li>
@@ -450,7 +450,7 @@ errors when training multiple large models.</p>
 <p>Open a Python console (or Jupyter notebook) in the same directory as <code class="docutils literal notranslate"><span class="pre">experiment.py</span></code>
 and run the following code.</p>
 <div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-text">Launching four jobs from a Python console.</span><a class="headerlink" href="#id5" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Launching four jobs from a Python console.</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><span class="n">launch</span></a>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">experiment</span> <span class="kn">import</span> <span class="n">ExperimentConfig</span><span class="p">,</span> <span class="n">task_function</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">jobs</span><span class="p">,)</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><span class="n">launch</span></a><span class="p">(</span>
@@ -474,7 +474,7 @@ and run the following code.</p>
 our results.</p>
 <p>Note that this is equivalent to running the following from the CLI:</p>
 <div class="literal-block-wrapper docutils container" id="id6">
-<div class="code-block-caption"><span class="caption-text">Launching four jobs from the CLI.</span><a class="headerlink" href="#id6" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Launching four jobs from the CLI.</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>experiment.py<span class="w"> </span>dataloader.batch_size<span class="o">=</span><span class="m">20</span>,200<span class="w"> </span>model.num_neurons<span class="o">=</span><span class="m">10</span>,100<span class="w"> </span>-m
 <span class="go">[2021-10-24 21:23:32,556][HYDRA] Launching 4 jobs locally</span>
 <span class="gp">[2021-10-24 21:23:32,558][HYDRA]     #</span><span class="m">0</span><span class="w"> </span>:<span class="w"> </span>dataloader.batch_size<span class="o">=</span><span class="m">20</span><span class="w"> </span>model.num_neurons<span class="o">=</span><span class="m">10</span>
@@ -486,14 +486,14 @@ our results.</p>
 </div>
 </section>
 <section id="inspecting-our-results">
-<h2>Inspecting Our Results<a class="headerlink" href="#inspecting-our-results" title="Permalink to this heading">#</a></h2>
+<h2>Inspecting Our Results<a class="headerlink" href="#inspecting-our-results" title="Link to this heading">#</a></h2>
 <section id="visualizing-our-results">
-<h3>Visualizing Our Results<a class="headerlink" href="#visualizing-our-results" title="Permalink to this heading">#</a></h3>
+<h3>Visualizing Our Results<a class="headerlink" href="#visualizing-our-results" title="Link to this heading">#</a></h3>
 <p>Let’s begin inspecting our results by plotting our four models on <span class="math notranslate nohighlight">\(x \in [-2\pi, 2\pi]\)</span>, alongside the
 target function: <span class="math notranslate nohighlight">\(\cos{x}\)</span>. Continuing to work in our current Python console (or Jupyter notebook), run
 the following code and verify that you see the plot shown below.</p>
 <div class="literal-block-wrapper docutils container" id="id7">
-<div class="code-block-caption"><span class="caption-text">Plotting our models</span><a class="headerlink" href="#id7" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Plotting our models</span><a class="headerlink" href="#id7" title="Link to this code">#</a></div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
@@ -517,13 +517,13 @@ the following code and verify that you see the plot shown below.</p>
 <a class="reference internal image-reference" href="https://user-images.githubusercontent.com/29104956/138622935-3a3a960f-301f-477e-b5ab-7f4c741b1f9e.png"><img alt="Plot of four trained models vs the target function" src="https://user-images.githubusercontent.com/29104956/138622935-3a3a960f-301f-477e-b5ab-7f4c741b1f9e.png" style="width: 800px;"/></a>
 </section>
 <section id="loading-the-model-of-best-fit">
-<h3>Loading the Model of Best-Fit<a class="headerlink" href="#loading-the-model-of-best-fit" title="Permalink to this heading">#</a></h3>
+<h3>Loading the Model of Best-Fit<a class="headerlink" href="#loading-the-model-of-best-fit" title="Link to this heading">#</a></h3>
 <p>The 100-neuron model trained with a batch-size of 20 best fits our target function.
 Let’s load the model weights that were saved by PyTorch Lightning during training.</p>
 <p>Continuing our work in the same Python console, let’s verify that job-1 corresponds to
 our desired model. Verify that you see the following outputs.</p>
 <div class="literal-block-wrapper docutils container" id="id8">
-<div class="code-block-caption"><span class="caption-text">Job 1 corresponds to the 100-neuron model trained with batch-size 20.</span><a class="headerlink" href="#id8" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Job 1 corresponds to the 100-neuron model trained with batch-size 20.</span><a class="headerlink" href="#id8" title="Link to this code">#</a></div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">best</span> <span class="o">=</span> <span class="n">jobs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">best</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">batch_size</span>
 <span class="go">20</span>
@@ -535,7 +535,7 @@ our desired model. Verify that you see the following outputs.</p>
 <p>Next, we’ll load the config for this job. Recall that Hydra saves a <code class="docutils literal notranslate"><span class="pre">.hydra/config.yaml</span></code> file, which contains the complete configuration of this job – we can reproduce
 all aspects of it from this YAML.</p>
 <div class="literal-block-wrapper docutils container" id="id9">
-<div class="code-block-caption"><span class="caption-text">Loading the complete config for this job</span><a class="headerlink" href="#id9" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Loading the complete config for this job</span><a class="headerlink" href="#id9" title="Link to this code">#</a></div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.load_from_yaml.html#hydra_zen.load_from_yaml" title="hydra_zen.load_from_yaml"><span class="n">load_from_yaml</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.get_target.html#hydra_zen.get_target" title="hydra_zen.get_target"><span class="n">get_target</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pathlib.html#module-pathlib" title="pathlib"><span class="nn">pathlib</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path"><span class="n">Path</span></a>
 
@@ -598,7 +598,7 @@ it captures about this job.</p>
 working directory. Let’s load these weights and use them to instantiate our lighting
 module.</p>
 <div class="literal-block-wrapper docutils container" id="id10">
-<div class="code-block-caption"><span class="caption-text">Loading our lighting module with trained weights</span><a class="headerlink" href="#id10" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Loading our lighting module with trained weights</span><a class="headerlink" href="#id10" title="Link to this code">#</a></div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functools.html#module-functools" title="functools"><span class="nn">functools</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functools.html#functools.partial" title="functools.partial"><span class="n">partial</span></a>
 <span class="gp">&gt;&gt;&gt; </span><span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="n">last_ckpt</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#sorted" title="sorted"><span class="nb">sorted</span></a><span class="p">(</span><span class="n">outdir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"**/*.ckpt"</span><span class="p">))</span>
@@ -613,7 +613,7 @@ module.</p>
 <p>Finally, let’s double check that this loaded model behaves as-expected. Evaluating it
 at <span class="math notranslate nohighlight">\(-\pi/2\)</span>, <span class="math notranslate nohighlight">\(0\)</span>, and <span class="math notranslate nohighlight">\(\pi/2\)</span> should return, approximately, <span class="math notranslate nohighlight">\(0\)</span>, <span class="math notranslate nohighlight">\(1\)</span>, and <span class="math notranslate nohighlight">\(0\)</span>, respectively.</p>
 <div class="literal-block-wrapper docutils container" id="id11">
-<div class="code-block-caption"><span class="caption-text">Checkout our loaded model’s behavior</span><a class="headerlink" href="#id11" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Checkout our loaded model’s behavior</span><a class="headerlink" href="#id11" title="Link to this code">#</a></div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">tr</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">loaded</span><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="o">-</span><span class="mf">3.1415</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">3.1415</span> <span class="o">/</span> <span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 <span class="go">tensor([[0.0110],</span>
@@ -710,7 +710,7 @@ created upon launching our app. You can find this in the same directory as your
 </div>
 <div class="footer-item">
 <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     <br/>
 </p>
 </div>

@@ -25,9 +25,9 @@
 <!-- Pre-loaded scripts that we'll load fully later -->
 <link as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" rel="preload"/>
 <link as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" rel="preload"/>
-<script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=ccbe24c1"></script>
+<script src="_static/documentation_options.js?v=8a448e45"></script>
 <script src="_static/doctools.js?v=888ff710"></script>
-<script src="_static/sphinx_highlight.js?v=4825356b"></script>
+<script src="_static/sphinx_highlight.js?v=dc90522c"></script>
 <script src="_static/clipboard.min.js?v=a7894cd8"></script>
 <script src="_static/copybutton.js?v=30646c52"></script>
 <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
@@ -220,7 +220,7 @@ document.write(`
 <p>🎓 Using hydra-zen for your research project? <a class="reference external" href="https://arxiv.org/abs/2201.05647">Cite us</a>!</p>
 </div>
 <section id="welcome-to-hydra-zen-s-documentation">
-<h1>Welcome to hydra-zen’s documentation!<a class="headerlink" href="#welcome-to-hydra-zen-s-documentation" title="Permalink to this heading">#</a></h1>
+<h1>Welcome to hydra-zen’s documentation!<a class="headerlink" href="#welcome-to-hydra-zen-s-documentation" title="Link to this heading">#</a></h1>
 <p>hydra-zen is a Python library that makes the <a class="reference external" href="https://hydra.cc/">Hydra framework</a>
 simpler and more elegant to use. Use hydra-zen to design your project to be:</p>
 <ul class="simple">
@@ -240,10 +240,10 @@ and machine learning research to be reproducible. hydra-zen provides specialized
 support for using NumPy, Jax, PyTorch, and Lightning (a.k.a PyTorch-Lightning) in your
 Hydra application.</p>
 <section id="hydra-zen-at-a-glance">
-<h2>hydra-zen at a glance<a class="headerlink" href="#hydra-zen-at-a-glance" title="Permalink to this heading">#</a></h2>
+<h2>hydra-zen at a glance<a class="headerlink" href="#hydra-zen-at-a-glance" title="Link to this heading">#</a></h2>
 <p>Suppose you have the following library code.</p>
 <div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">Some library code that we want to be able to configure and run from the CLI.</span><a class="headerlink" href="#id1" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Some library code that we want to be able to configure and run from the CLI.</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Contents of baby_torch.py</span>
 
 <span class="c1"># Note: no Hydra/hydra-zen specific code here!</span>
@@ -272,7 +272,7 @@ able to modify all aspects of its inputs, including parameters nested in <code c
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen</span></code> makes short work of this: we can create and store custom configurations for
 all parts of this library code and generate a CLI that reflects the resulting hierarchical config.</p>
 <div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">Using hydra-zen to create a configurable CLI for running <code class="xref py py-obj docutils literal notranslate"><span class="pre">train_fn</span></code></span><a class="headerlink" href="#id2" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Using hydra-zen to create a configurable CLI for running <code class="xref py py-obj docutils literal notranslate"><span class="pre">train_fn</span></code></span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Contents of train.py</span>
 
 <span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><span class="n">just</span></a><span class="p">,</span> <span class="n">store</span>
@@ -341,7 +341,7 @@ all parts of this library code and generate a CLI that reflects the resulting hi
 <label class="sd-tab-label" for="sd-tab-item-0">
 default</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">Running the default config.</span><a class="headerlink" href="#id3" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Running the default config.</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>train.py
 <span class="go">Training with num_epochs=-1</span>
 
@@ -361,7 +361,7 @@ default</label><div class="sd-tab-content docutils">
 <label class="sd-tab-label" for="sd-tab-item-1">
 set epoch &amp; use sigmoid</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text">Training for 2 epochs using sigmoid activation.</span><a class="headerlink" href="#id4" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Training for 2 epochs using sigmoid activation.</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>train.py<span class="w"> </span><span class="nv">num_epochs</span><span class="o">=</span><span class="m">2</span><span class="w"> </span>model/activation<span class="o">=</span>sigmoid
 <span class="go">Training with num_epochs=2</span>
 
@@ -381,7 +381,7 @@ set epoch &amp; use sigmoid</label><div class="sd-tab-content docutils">
 <label class="sd-tab-label" for="sd-tab-item-2">
 change model &amp; dataloader</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-text">Using tiny model with logits, and use batch size of 22.</span><a class="headerlink" href="#id5" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Using tiny model with logits, and use batch size of 22.</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>train.py<span class="w"> </span><span class="nv">model</span><span class="o">=</span>tiny<span class="w"> </span>model.logits<span class="o">=</span>True<span class="w"> </span>dataloader.batch_size<span class="o">=</span><span class="m">22</span>
 <span class="go">Training with num_epochs=-1</span>
 
@@ -401,7 +401,7 @@ change model &amp; dataloader</label><div class="sd-tab-content docutils">
 <p>Each run’s reproducible configuration will be saved as a yaml file; by default Hydra
 places these in a time-stamped directory.</p>
 <div class="literal-block-wrapper docutils container" id="id6">
-<div class="code-block-caption"><span class="caption-text">Viewing the serialized yaml file: training for 2 epochs w/ sigmoid.</span><a class="headerlink" href="#id6" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Viewing the serialized yaml file: training for 2 epochs w/ sigmoid.</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>less<span class="w"> </span>outputs/2023-03-11/12-13-14/.hydra/config.yaml
 <span class="go">_target_: baby_torch.train_fn</span>
 <span class="go">model:</span>
@@ -426,7 +426,7 @@ machine learning application but hydra-zen is ultimately application agnostic.</
 <p class="admonition-title">Attention, Hydra users:</p>
 <p>If you are already use Hydra, let’s cut to the chase: <strong>the most important benefit of using hydra-zen is that it automatically and dynamically generates structured configs for you</strong>.</p>
 <div class="literal-block-wrapper docutils container" id="id7">
-<div class="code-block-caption"><span class="caption-text">Creating a structured config <em>without hydra-zen</em></span><a class="headerlink" href="#id7" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Creating a structured config <em>without hydra-zen</em></span><a class="headerlink" href="#id7" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.field" title="dataclasses.field"><span class="n">field</span></a>
 
 <span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="n">bar</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">baz</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#list" title="list"><span class="nb">list</span></a><span class="p">[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a><span class="p">],</span> <span class="n">qux</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#float" title="float"><span class="nb">float</span></a> <span class="o">=</span> <span class="mf">1.23</span><span class="p">):</span>
@@ -442,7 +442,7 @@ machine learning application but hydra-zen is ultimately application agnostic.</
 </div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id8">
-<div class="code-block-caption"><span class="caption-text">Creating an equivalent structured config <em>with hydra-zen</em></span><a class="headerlink" href="#id8" title="Permalink to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Creating an equivalent structured config <em>with hydra-zen</em></span><a class="headerlink" href="#id8" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a>
 
 <span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="n">bar</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">baz</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#list" title="list"><span class="nb">list</span></a><span class="p">[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a><span class="p">],</span> <span class="n">qux</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#float" title="float"><span class="nb">float</span></a> <span class="o">=</span> <span class="mf">1.23</span><span class="p">):</span>
@@ -470,7 +470,7 @@ machine learning application but hydra-zen is ultimately application agnostic.</
 </ul>
 </section>
 <section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">#</a></h2>
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
 <p>hydra-zen is lightweight: its only dependencies are <code class="docutils literal notranslate"><span class="pre">hydra-core</span></code> and
 <code class="docutils literal notranslate"><span class="pre">typing-extensions</span></code>. To install it, run:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>hydra-zen
@@ -483,7 +483,7 @@ the latest pre-release of hydra-zen with:</p>
 </div>
 </section>
 <section id="learning-about-hydra-zen">
-<h2>Learning About hydra-zen<a class="headerlink" href="#learning-about-hydra-zen" title="Permalink to this heading">#</a></h2>
+<h2>Learning About hydra-zen<a class="headerlink" href="#learning-about-hydra-zen" title="Link to this heading">#</a></h2>
 <p>Our docs are divided into four sections: Tutorials, How-Tos, Explanations, and
 Reference.</p>
 <p>If you want to get a bird’s-eye view of what hydra-zen is all about, or if you are
@@ -553,7 +553,7 @@ will enrich their understanding of hydra-zen and Hydra.</p>
 </div>
 </section>
 <section id="indices-and-tables">
-<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading">#</a></h2>
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
@@ -619,7 +619,7 @@ will enrich their understanding of hydra-zen and Hydra.</p>
 </div>
 <div class="footer-item">
 <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     <br/>
 </p>
 </div>

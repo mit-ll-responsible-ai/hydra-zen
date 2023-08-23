@@ -36,9 +36,9 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=ccbe24c1"></script>
+    <script src="../../../_static/documentation_options.js?v=8a448e45"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=30646c52"></script>
     <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
@@ -398,7 +398,9 @@ document.write(`
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;validates_with_beartype&quot;</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="validates_with_beartype"><a class="viewcode-back" href="../../../generated/hydra_zen.third_party.beartype.validates_with_beartype.html#hydra_zen.third_party.beartype.validates_with_beartype">[docs]</a><span class="k">def</span> <span class="nf">validates_with_beartype</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">_T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
+<div class="viewcode-block" id="validates_with_beartype">
+<a class="viewcode-back" href="../../../generated/hydra_zen.third_party.beartype.validates_with_beartype.html#hydra_zen.third_party.beartype.validates_with_beartype">[docs]</a>
+<span class="k">def</span> <span class="nf">validates_with_beartype</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">_T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Enables runtime type-checking of values, via the library ``beartype``.</span>
 
 <span class="sd">    I.e. ``obj = validates_with_beartype(obj)`` adds runtime type-checking</span>
@@ -514,6 +516,7 @@ document.write(`
         <span class="n">target</span> <span class="o">=</span> <span class="n">bt</span><span class="o">.</span><span class="n">beartype</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
     <span class="n">target</span> <span class="o">=</span> <span class="n">coerce_sequences</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">_T</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span></div>
+
 </pre></div>
 
                 </article>
@@ -566,7 +569,7 @@ document.write(`
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     <br/>
   </p>
 </div>
