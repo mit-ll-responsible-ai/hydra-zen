@@ -125,7 +125,7 @@ def f3():
     reveal_type(
         builds(f, zen_partial=False, expected_text="type[Builds[(x: int) -> int]]")
     )
-    conf_f_1: type[Builds[f_sig]] = builds(f, zen_partial=False)
+    conf_f_1: Type[Builds[f_sig]] = builds(f, zen_partial=False)
     reveal_type(instantiate(conf_f_1), expected_text="int")
 
 
