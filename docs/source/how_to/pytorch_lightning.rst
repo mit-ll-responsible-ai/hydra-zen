@@ -269,12 +269,13 @@ the following code and verify that you see the plot shown below.
 
    >>> from hydra_zen import instantiate
    >>> import matplotlib.pyplot as plt
+   >>> from matplotlib.axes import Axes
    
    >>> x = instantiate(ExperimentConfig.training_domain)
    >>> target_fn = instantiate(ExperimentConfig.target_fn)
    
    >>> fig, ax = plt.subplots()
-   >>> assert isinstance(ax, plt.Axes)
+   >>> assert isinstance(ax, Axes)
    >>> ax.plot(x, target_fn(x), ls="--", label="Target")
 
    >>> for j in jobs:
