@@ -67,6 +67,9 @@ After building the configs we define the task function that utilizes these datas
    from typing import Callable, Tuple
 
    import matplotlib.pyplot as plt
+   from matplotlib.axes import Axes
+   from matplotlib.figure import Figure
+
    import numpy as np
    from matplotlib.colors import ListedColormap
    from sklearn.base import BaseEstimator
@@ -190,8 +193,8 @@ After building the configs we define the task function that utilizes these datas
    ):
        fig, ax = plt.subplots()
 
-       assert isinstance(ax, plt.Axes)
-       assert isinstance(fig, plt.Figure)
+       assert isinstance(ax, Axes)
+       assert isinstance(fig, Figure)
 
        # create and split dataset for train and test
        X, y = dataset()
