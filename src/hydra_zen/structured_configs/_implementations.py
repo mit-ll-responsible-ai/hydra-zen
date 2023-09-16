@@ -1040,7 +1040,7 @@ def builds(
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = None,
     hydra_defaults: Optional[DefaultsList] = None,
-    builds_bases: Tuple[Type[DataClass_], ...] = (),
+    builds_bases: Union[Tuple[Type[DataClass_], ...], Tuple[()]] = (),
     zen_dataclass: Optional[DataclassOptions] = None,
     **kwargs_for_target: SupportedPrimitive,
 ) -> Union[
