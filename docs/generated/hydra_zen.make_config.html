@@ -312,7 +312,7 @@ to express a field’s type-annotation and/or its default value.</p>
 Consists of the following optional key-value pairs (<a class="reference internal" href="hydra_zen.typing.ZenConvert.html#zen-convert"><span class="std std-ref">hydra_zen.typing.ZenConvert</span></a>):</p>
 <ul>
 <li><dl>
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">dataclass</span></code><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a> (default=False):</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> any dataclass type/instance without a
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">dataclass</span></code><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a> (default=False):</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> any dataclass type/instance without a
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">_target_</span></code> field is automatically converted to a targeted config
 that will instantiate to that type/instance. Otherwise the dataclass
 type/instance will be passed through as-is.</p>
@@ -341,7 +341,7 @@ hydra-config objects nested within this dataclass <a class="reference internal" 
 Defaults List itself is not a part of output config.</p>
 </dd>
 <dt><strong>zen_dataclass</strong><span class="classifier">Optional[DataclassOptions]</span></dt><dd><p>A dictionary can specify any option that is supported by
-<a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.make_dataclass" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataclasses.make_dataclass()</span></code></a> other than <code class="xref py py-obj docutils literal notranslate"><span class="pre">fields</span></code>.</p>
+<a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.make_dataclass" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataclasses.make_dataclass()</span></code></a> other than <code class="xref py py-obj docutils literal notranslate"><span class="pre">fields</span></code>.</p>
 <p>Additionally, a <code class="docutils literal notranslate"><span class="pre">'module':</span> <span class="pre">&lt;str&gt;</span></code> entry can be specified to enable pickle
 compatibility. See <a class="reference internal" href="hydra_zen.typing.DataclassOptions.html#hydra_zen.typing.DataclassOptions" title="hydra_zen.typing.DataclassOptions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.typing.DataclassOptions</span></code></a> for details.</p>
 </dd>
@@ -351,7 +351,7 @@ compatibility. See <a class="reference internal" href="hydra_zen.typing.Dataclas
 </div>
 <p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the resulting config class will produce ‘frozen’ (i.e. immutable)
 instances. I.e. setting/deleting an attribute of an instance of the config will
-raise <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.FrozenInstanceError" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataclasses.FrozenInstanceError</span></code></a> at runtime.</p>
+raise <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.FrozenInstanceError" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataclasses.FrozenInstanceError</span></code></a> at runtime.</p>
 </dd>
 <dt><strong>config_name</strong><span class="classifier">str, optional (default=”Config”)</span></dt><dd><div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 0.9.0: </span><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_name</span></code> will be removed in hydra-zen 0.10.0. It is replaced by
@@ -400,7 +400,7 @@ ensure that they can be utilized in the resulting config and by Hydra:</p>
 <li><p>A default value that is a class-object or function-object will automatically be wrapped by <a class="reference internal" href="hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a>, to ensure that the resulting config is serializable by Hydra.</p></li>
 </ul>
 <p>For finer-grain control over how type annotations and default values are managed,
-consider using <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.make_dataclass" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataclasses.make_dataclass()</span></code></a>.</p>
+consider using <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.make_dataclass" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataclasses.make_dataclass()</span></code></a>.</p>
 <p>For details of the annotation <code class="xref py py-obj docutils literal notranslate"><span class="pre">SupportedPrimitive</span></code>, see <a class="reference internal" href="../api_reference.html#valid-types"><span class="std std-ref">Configuration-Value Types Supported by Hydra and hydra-zen</span></a>.</p>
 <p class="rubric">References</p>
 <div class="citation-list" role="list">
@@ -505,7 +505,7 @@ for providing associated default values.</p>
 </pre></div>
 </div>
 <p><strong>Support for Additional Types</strong></p>
-<p>Types like <a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">complex</span></code></a> and <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a> are automatically
+<p>Types like <a class="reference external" href="https://docs.python.org/3/library/functions.html#complex" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">complex</span></code></a> and <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a> are automatically
 supported by hydra-zen.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ConfWithComplex</span> <span class="o">=</span> <span class="n">make_config</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="n">j</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pp</span><span class="p">(</span><span class="n">ConfWithComplex</span><span class="p">)</span>

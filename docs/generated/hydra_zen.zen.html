@@ -309,7 +309,7 @@ as the task functions for their Hydra app. See “Notes” for more details.</p>
 <dd class="field-odd"><dl>
 <dt><strong>func</strong><span class="classifier">Callable[Sig, R], positional-only</span></dt><dd><p>The function being wrapped.</p>
 </dd>
-<dt><strong>unpack_kwargs: bool, optional (default=False)</strong></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> a <code class="xref py py-obj docutils literal notranslate"><span class="pre">**kwargs</span></code> field in the wrapped function’s signature will be
+<dt><strong>unpack_kwargs: bool, optional (default=False)</strong></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> a <code class="xref py py-obj docutils literal notranslate"><span class="pre">**kwargs</span></code> field in the wrapped function’s signature will be
 populated by all of the input config entries that are not specified by the rest
 of the signature (and that are not specified by the <code class="xref py py-obj docutils literal notranslate"><span class="pre">exclude</span></code> argument).</p>
 </dd>
@@ -319,7 +319,7 @@ from left (low-index) to right (high-index).</p>
 <p>This is useful, e.g., for seeding a RNG prior to the instantiation phase
 that is triggered when calling the wrapped function.</p>
 </dd>
-<dt><strong>resolve_pre_call</strong><span class="classifier">bool, (default=True)</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>, the config passed to the zen-wrapped function has its interpolated
+<dt><strong>resolve_pre_call</strong><span class="classifier">bool, (default=True)</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>, the config passed to the zen-wrapped function has its interpolated
 fields resolved prior to being passed to any pre-call functions. Otherwise, the
 interpolation occurs after the pre-call functions are called.</p>
 </dd>
