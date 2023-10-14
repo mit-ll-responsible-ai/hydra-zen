@@ -520,12 +520,8 @@ def check_protocols():
 
     PBuilds = f()
 
-    reveal_type(
-        PBuilds._target_, expected_text="Literal['hydra_zen.funcs.zen_processing']"
-    )
-    reveal_type(
-        PBuilds()._target_, expected_text="Literal['hydra_zen.funcs.zen_processing']"
-    )
+    reveal_type(PBuilds._target_, expected_text="str")
+    reveal_type(PBuilds()._target_, expected_text="str")
 
     reveal_type(PBuilds._zen_target, expected_text="str")
     reveal_type(PBuilds()._zen_target, expected_text="str")
@@ -538,7 +534,7 @@ def check_protocols():
     reveal_type(HPBuilds()._partial_, expected_text="Literal[True]")
 
     just_ = just(int)
-    reveal_type(just_._target_, expected_text="Literal['hydra_zen.funcs.get_obj']")
+    reveal_type(just_._target_, expected_text="str")
 
 
 def check_populate_full_sig():
@@ -802,12 +798,12 @@ def check_overloads_arent_too_restrictive():
         zen_meta: Optional[Mapping[str, SupportedPrimitive]],
         populate_full_signature: bool,
         hydra_recursive: Optional[bool],
+        fbuilds: FullBuilds,
+        pbuilds: PBuilds,
         hydra_convert: Optional[Literal["none", "partial", "all"]],
         frozen: bool,
         builds_bases: Tuple[Type[DataClass_], ...],
         dataclass_name: Optional[str],
-        fbuilds: FullBuilds = ...,
-        pbuilds: PBuilds = ...,
         **kwargs_for_target: Any,
     ):
         def func(x: int) -> str:

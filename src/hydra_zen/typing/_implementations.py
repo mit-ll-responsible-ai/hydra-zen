@@ -152,7 +152,6 @@ class BuildsWithSig(Builds[T], Protocol[T, P]):
 @runtime_checkable
 class Just(Builds[T], Protocol[T]):
     path: str  # interpolated string for importing obj
-    _target_: ClassVar[Literal["hydra_zen.funcs.get_obj"]] = "hydra_zen.funcs.get_obj"
 
 
 class ZenPartialMixin(Protocol[T]):
@@ -166,9 +165,7 @@ class HydraPartialMixin(Protocol[T]):
 
 @runtime_checkable
 class ZenPartialBuilds(Builds[T], ZenPartialMixin[T], Protocol[T]):
-    _target_: ClassVar[
-        Literal["hydra_zen.funcs.zen_processing"]
-    ] = "hydra_zen.funcs.zen_processing"
+    ...
 
 
 @runtime_checkable
