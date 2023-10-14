@@ -77,7 +77,7 @@ def is_builds(x: Any) -> TypeGuard[Builds[Any]]:
 def is_just(x: Any) -> TypeGuard[Just[Any]]:
     if is_builds(x) and hasattr(x, JUST_FIELD_NAME):
         attr = _get_target(x)
-        if attr == _get_target(Just) or attr is get_obj:  # type: ignore
+        if attr == _get_target(Just) or attr is get_obj:
             return True
         else:
             # ensures we convert this branch in tests
