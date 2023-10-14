@@ -552,7 +552,7 @@ document.write(`
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span> <span class="nc">Just</span><span class="p">(</span><span class="n">Builds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">Protocol</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># interpolated string for importing obj</span>
-    <span class="n">_target_</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;hydra_zen.funcs.get_obj&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;hydra_zen.funcs.get_obj&quot;</span>
+    <span class="n">_target_</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;hydra_zen.funcs.get_obj&quot;</span>
 
 
 <span class="k">class</span> <span class="nc">ZenPartialMixin</span><span class="p">(</span><span class="n">Protocol</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
@@ -566,9 +566,7 @@ document.write(`
 
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span> <span class="nc">ZenPartialBuilds</span><span class="p">(</span><span class="n">Builds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">ZenPartialMixin</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">Protocol</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
-    <span class="n">_target_</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span>
-        <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;hydra_zen.funcs.zen_processing&quot;</span><span class="p">]</span>
-    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;hydra_zen.funcs.zen_processing&quot;</span>
+    <span class="n">_target_</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;hydra_zen.funcs.zen_processing&quot;</span>
 
 
 <span class="nd">@runtime_checkable</span>
