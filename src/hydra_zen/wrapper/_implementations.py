@@ -1396,7 +1396,7 @@ class ZenStore:
     ) -> Self:
         ...
 
-    def __call__(self, __target: Optional[F] = None, **kw: Any) -> Union[F, "ZenStore"]:
+    def __call__(self: Self, __target: Optional[F] = None, **kw: Any) -> Union[F, Self]:
         """__call__(target : Optional[T] = None, /, name: NodeName | Callable[[Any], NodeName]] = ..., group: GroupName | Callable[[T], GroupName]] = None, package: Optional[str | Callable[[T], str]]] | None], provider: Optional[str], to_config: Callable[[T], Node] = ..., **to_config_kw: Any) -> T | ZenStore
 
         The interface to an initialized store. Can be used to store a config or to
@@ -1546,7 +1546,7 @@ class ZenStore:
 
             if not self._deferred_store:
                 self.add_to_hydra_store()
-            return __target
+            return cast(Union[F, Self], __target)
 
     @property
     def groups(self) -> Sequence[GroupName]:
