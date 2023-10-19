@@ -145,7 +145,8 @@ description = Runs test suite parallelized in the specified python enviornment a
               Run `tox -e py39 -- -n 0` to run tests in a python 3.9 with 
               parallelization disabled.
 passenv = *
-deps = pytest
+deps = setuptools
+       pytest
        hypothesis
        pytest-xdist
        tzdata
