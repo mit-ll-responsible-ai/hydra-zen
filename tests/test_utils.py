@@ -57,7 +57,6 @@ from hydra_zen.structured_configs._utils import (
     is_interpolated_string,
     merge_settings,
     safe_name,
-    sanitized_type,
 )
 from hydra_zen.typing import Builds
 from hydra_zen.typing._implementations import AllConvert, ZenConvert
@@ -261,7 +260,7 @@ NoneType: TypeAlias = None
     ],
 )
 def test_sanitized_type_expected_behavior(in_type, expected_type):
-    assert sanitized_type(in_type) == expected_type, in_type
+    assert builds._sanitized_type(in_type) == expected_type, in_type
 
     if in_type != expected_type:
         # In cases where we change the type, it should be because omegaconf
@@ -295,7 +294,7 @@ def test_sanitized_type_expected_behavior(in_type, expected_type):
 
 
 def test_tuple_annotation_normalization():
-    assert sanitized_type(Tuple[int, str, int]) is Tuple[Any, Any, Any]
+    assert builds._sanitized_type(Tuple[int, str, int]) is Tuple[Any, Any, Any]
 
 
 def f_list(x: List):

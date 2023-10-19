@@ -1,6 +1,5 @@
 # Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-
 import functools
 import inspect
 import sys
@@ -8,6 +7,7 @@ import warnings
 from dataclasses import (  # use this for runtime checks
     MISSING,
     Field as _Field,
+    InitVar,
     dataclass,
     field,
     fields,
@@ -16,6 +16,7 @@ from dataclasses import (  # use this for runtime checks
 )
 from enum import Enum
 from itertools import chain
+from pathlib import Path
 from typing import (
     Any,
     Callable,
@@ -31,16 +32,32 @@ from typing import (
     TypeVar,
     Union,
     cast,
+    get_args,
+    get_origin,
     get_type_hints,
     overload,
 )
 
 from omegaconf import DictConfig, ListConfig
-from typing_extensions import Final, Literal, ParamSpec, TypeAlias, dataclass_transform
+from typing_extensions import (
+    Annotated,
+    Final,
+    Literal,
+    ParamSpec,
+    ParamSpecArgs,
+    ParamSpecKwargs,
+    TypeAlias,
+    Unpack,
+    _AnnotatedAlias,
+    dataclass_transform,
+)
 
 from hydra_zen._compatibility import (
+    HYDRA_SUPPORTED_PRIMITIVE_TYPES,
     HYDRA_SUPPORTED_PRIMITIVES,
+    OMEGACONF_VERSION,
     ZEN_SUPPORTED_PRIMITIVES,
+    Version,
 )
 from hydra_zen.errors import (
     HydraZenDeprecationWarning,
@@ -55,6 +72,7 @@ from hydra_zen.typing import (
     DataclassOptions,
     PartialBuilds,
     SupportedPrimitive,
+    ZenConvert,
     ZenWrappers,
 )
 from hydra_zen.typing._implementations import (
@@ -112,6 +130,17 @@ _POSITIONAL_OR_KEYWORD: Final = inspect.Parameter.POSITIONAL_OR_KEYWORD
 _VAR_POSITIONAL: Final = inspect.Parameter.VAR_POSITIONAL
 _KEYWORD_ONLY: Final = inspect.Parameter.KEYWORD_ONLY
 _VAR_KEYWORD: Final = inspect.Parameter.VAR_KEYWORD
+
+
+NoneType = type(None)
+_supported_types = HYDRA_SUPPORTED_PRIMITIVE_TYPES | {
+    list,
+    dict,
+    tuple,
+    List,
+    Tuple,
+    Dict,
+}
 
 
 _builtin_function_or_method_type = type(len)
@@ -981,6 +1010,187 @@ class BuildsFn(Generic[T]):
         super().__init__()
         self.__name__: str = name
         self.__qualname__: str = qualname if qualname is not None else name
+
+    @classmethod
+    def _sanitized_type(
+        cls,
+        type_: Any,
+        *,
+        primitive_only: bool = False,
+        wrap_optional: bool = False,
+        nested: bool = False,
+    ) -> type:
+        """Broadens a type annotation until it is compatible with Hydra.
+
+        Examples
+        --------
+        >>> sanitized_type(int)
+        <class 'int'>
+
+        >>> sanitized_type(frozenset)  # not supported by hydra
+        typing.Any
+
+        >>> sanitized_type(int, wrap_optional=True)
+        typing.Union[int, NoneType]
+
+        >>> sanitized_type(List[int])
+        List[int]
+
+        >>> sanitized_type(List[int], primitive_only=True)
+        Any
+
+        >>> sanitized_type(Dict[str, frozenset])
+        Dict[str, Any]
+        """
+        if hasattr(type_, "__supertype__"):
+            # is NewType
+            return cls._sanitized_type(
+                type_.__supertype__,
+                primitive_only=primitive_only,
+                wrap_optional=wrap_optional,
+                nested=nested,
+            )
+
+        if OMEGACONF_VERSION < Version(2, 2, 3):  # pragma: no cover
+            try:
+                type_ = {list: List, tuple: Tuple, dict: Dict}.get(type_, type_)
+            except TypeError:
+                pass
+
+        # Warning: mutating `type_` will mutate the signature being inspected
+        # Even calling deepcopy(`type_`) silently fails to prevent this.
+        origin = get_origin(type_)
+
+        if origin is not None:
+            # Support for Annotated[x, y]
+            # Python 3.9+
+            # # type_: Annotated[x, y]; origin -> Annotated; args -> (x, y)
+            if origin is Annotated:  # pragma: no cover
+                return cls._sanitized_type(
+                    get_args(type_)[0],
+                    primitive_only=primitive_only,
+                    wrap_optional=wrap_optional,
+                    nested=nested,
+                )
+
+            # Python 3.7-3.8
+            # type_: Annotated[x, y]; origin -> x
+            if isinstance(type_, _AnnotatedAlias):  # pragma: no cover
+                return cls._sanitized_type(
+                    origin,
+                    primitive_only=primitive_only,
+                    wrap_optional=wrap_optional,
+                    nested=nested,
+                )
+
+            if primitive_only:  # pragma: no cover
+                return Any
+
+            args = get_args(type_)
+            if origin is Union:
+                # Hydra only supports Optional[<type>] unions
+                if len(args) != 2 or NoneType not in args:
+                    # isn't Optional[<type>]
+                    return Any
+
+                args = cast(Tuple[type, type], args)
+
+                optional_type, none_type = args
+                if none_type is not NoneType:
+                    optional_type = none_type
+
+                optional_type = cls._sanitized_type(optional_type)
+
+                if optional_type is Any:  # Union[Any, T] is just Any
+                    return Any
+
+                return Union[optional_type, NoneType]
+
+            if origin is list or origin is List:
+                if args:
+                    return List[
+                        cls._sanitized_type(args[0], primitive_only=False, nested=True)
+                    ]
+                return List
+
+            if origin is dict or origin is Dict:
+                if args:
+                    KeyType = cls._sanitized_type(
+                        args[0], primitive_only=True, nested=True
+                    )
+                    ValueType = cls._sanitized_type(
+                        args[1], primitive_only=False, nested=True
+                    )
+                    return Dict[KeyType, ValueType]
+                return Dict
+
+            if (origin is tuple or origin is Tuple) and not nested:
+                # hydra silently supports tuples of homogeneous types
+                # It has some weird behavior. It treats `Tuple[t1, t2, ...]` as `List[t1]`
+                # It isn't clear that we want to perpetrate this on our end..
+                # So we deal with inhomogeneous types as e.g. `Tuple[str, int]` -> `Tuple[Any, Any]`.
+                #
+                # Otherwise we preserve the annotation as accurately as possible
+                if not args:
+                    return Any if OMEGACONF_VERSION < (2, 2, 3) else Tuple
+
+                args = cast(Tuple[type, ...], args)
+                unique_args = set(args)
+
+                if any(get_origin(tp) is Unpack for tp in unique_args):
+                    # E.g. Tuple[*Ts]
+                    return Tuple[Any, ...]
+
+                has_ellipses = Ellipsis in unique_args
+
+                # E.g. Tuple[int, int, int] or Tuple[int, ...]
+                _unique_type = (
+                    cls._sanitized_type(args[0], primitive_only=False, nested=True)
+                    if len(unique_args) == 1 or (len(unique_args) == 2 and has_ellipses)
+                    else Any
+                )
+
+                if has_ellipses:
+                    return Tuple[_unique_type, ...]
+                else:
+                    return Tuple[(_unique_type,) * len(args)]  # type: ignore
+
+            return Any
+
+        if isinstance(type_, type) and issubclass(type_, Path):
+            type_ = Path
+
+        if isinstance(type_, (ParamSpecArgs, ParamSpecKwargs)):  # pragma: no cover
+            # Python 3.7 - 3.9
+            # these aren't hashable -- can't check for membership in set
+            return Any
+
+        if isinstance(type_, InitVar):
+            return cls._sanitized_type(
+                type_.type,
+                primitive_only=primitive_only,
+                wrap_optional=wrap_optional,
+                nested=nested,
+            )
+        if (
+            type_ is Any
+            or type_ in _supported_types
+            or is_dataclass(type_)
+            or (isinstance(type_, type) and issubclass(type_, Enum))
+        ):
+            if sys.version_info[:2] == (3, 6) and type_ is Dict:  # pragma: no cover
+                type_ = Dict[Any, Any]
+
+            if wrap_optional and type_ is not Any:  # pragma: no cover
+                # normally get_type_hints automatically resolves Optional[...]
+                # when None is set as the default, but this has been flaky
+                # for some pytorch-lightning classes. So we just do it ourselves...
+                # It might be worth removing this later since none of our standard tests
+                # cover it.
+                type_ = Optional[type_]
+            return type_
+
+        return Any
 
     @classmethod
     def _get_obj_path(cls, target: Any) -> str:
@@ -2320,7 +2530,7 @@ class BuildsFn(Generic[T]):
             name = item[0]
             type_ = item[1]
             if len(item) == 2:
-                sanitized_base_fields.append((name, _utils.sanitized_type(type_)))
+                sanitized_base_fields.append((name, self._sanitized_type(type_)))
             else:
                 assert len(item) == 3, item
                 value = item[-1]
@@ -2339,7 +2549,7 @@ class BuildsFn(Generic[T]):
                 # value, and thus it is "sanitized"
                 sanitized_value = safe_getattr(_field, "default", value)
                 sanitized_type = (
-                    _utils.sanitized_type(type_, wrap_optional=sanitized_value is None)
+                    self._sanitized_type(type_, wrap_optional=sanitized_value is None)
                     if _retain_type_info(
                         type_=type_,
                         value=sanitized_value,
