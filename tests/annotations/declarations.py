@@ -1281,7 +1281,8 @@ def builds_target_pass_through():
     c1 = builds(builds(foo, x=1), x=2)
     reveal_type(instantiate(c1), expected_text="str")
 
-    c2 = builds(builds(foo, populate_full_signature=True))
+    _c2 = builds(foo, populate_full_signature=True)
+    c2 = builds(_c2)
     reveal_type(instantiate(c2), expected_text="str")
     reveal_type(c2, expected_text="type[Builds[type[str]]]")
 
@@ -1291,7 +1292,8 @@ def builds_target_pass_through():
     pc1 = builds(builds(foo, x=1), x=2, zen_partial=True)
     reveal_type(instantiate(pc1), expected_text="Partial[str]")
 
-    pc2 = builds(builds(foo, populate_full_signature=True), zen_partial=True)
+    _pc2 = builds(foo, populate_full_signature=True)
+    pc2 = builds(_pc2, zen_partial=True)
     reveal_type(instantiate(pc2), expected_text="Partial[str]")
 
     pc3 = builds(builds(foo, zen_partial=True), zen_partial=True)
@@ -1384,7 +1386,8 @@ def pbuilds_target_pass_through():
     pc1 = pbuilds(tmp1, x=2)
     reveal_type(instantiate(pc1), expected_text="Partial[str]")
 
-    pc2 = pbuilds(builds(foo, populate_full_signature=True))
+    _pc2 = builds(foo, populate_full_signature=True)
+    pc2 = pbuilds(_pc2)
     reveal_type(instantiate(pc2), expected_text="Partial[str]")
 
     tmp3 = pbuilds(foo, zen_partial=False)
