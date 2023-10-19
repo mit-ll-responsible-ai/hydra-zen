@@ -1,6 +1,7 @@
 # Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
+import dataclasses
 from pathlib import Path
 from typing import Optional
 
@@ -15,8 +16,6 @@ from hydra_zen import builds, instantiate, launch, make_config
 from hydra_zen._launch import _store_config
 
 try:
-    import dataclasses
-
     import cloudpickle
 
     CLOUDPICKLE_AVAIL = True
@@ -74,7 +73,7 @@ def test_launch_to_dictconfig(cfg, to_dictconfig, version_base):
     launch(cfg, task_function=task_fn, to_dictconfig=to_dictconfig, **version_base)
 
     if pre_num_fields > 0:
-        if not to_dictconfig:
+        if not to_dictconfig and int(cloudpickle.__version__.split(".")[0]) < 3:
             assert len(dataclasses.fields(cfg)) == 0
         else:
             assert len(dataclasses.fields(cfg)) > 0
