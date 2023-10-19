@@ -1827,7 +1827,7 @@ document.write(`
 
 <div class="viewcode-block" id="ZenStore.__call__">
 <a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.__call__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">F</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">F</span><span class="p">,</span> <span class="s2">&quot;ZenStore&quot;</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">__target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">F</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">F</span><span class="p">,</span> <span class="n">Self</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;__call__(target : Optional[T] = None, /, name: NodeName | Callable[[Any], NodeName]] = ..., group: GroupName | Callable[[T], GroupName]] = None, package: Optional[str | Callable[[T], str]]] | None], provider: Optional[str], to_config: Callable[[T], Node] = ..., **to_config_kw: Any) -&gt; T | ZenStore</span>
 
 <span class="sd">        The interface to an initialized store. Can be used to store a config or to</span>
@@ -1977,7 +1977,7 @@ document.write(`
 
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_deferred_store</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">add_to_hydra_store</span><span class="p">()</span>
-            <span class="k">return</span> <span class="n">__target</span></div>
+            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Union</span><span class="p">[</span><span class="n">F</span><span class="p">,</span> <span class="n">Self</span><span class="p">],</span> <span class="n">__target</span><span class="p">)</span></div>
 
 
     <span class="nd">@property</span>
