@@ -886,7 +886,7 @@ document.write(`
             <span class="n">job</span> <span class="o">=</span> <span class="n">sweeper</span><span class="o">.</span><span class="n">sweep</span><span class="p">(</span><span class="n">arguments</span><span class="o">=</span><span class="n">task_overrides</span><span class="p">)</span>
             <span class="n">callbacks</span><span class="o">.</span><span class="n">on_multirun_end</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">cfg</span><span class="p">,</span> <span class="n">config_name</span><span class="o">=</span><span class="n">config_name</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
         <span class="n">_num_dataclass_fields_after</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">fields</span><span class="p">(</span><span class="n">config</span><span class="p">))</span>
         <span class="k">if</span> <span class="p">(</span>
             <span class="n">_num_dataclass_fields_after</span> <span class="o">==</span> <span class="mi">0</span>
