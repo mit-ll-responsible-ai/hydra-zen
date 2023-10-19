@@ -40,6 +40,9 @@ __BUILDS_DEFAULTS["frozen"] = False
 __BUILDS_DEFAULTS["dataclass_name"] = None
 del _builds_sig
 
+# TODO: parameterize the return types and attach this
+#       as a classmethod to `BuildsFn`
+
 
 # partial=False, pop-sig=True
 @overload

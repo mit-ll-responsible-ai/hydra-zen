@@ -10,7 +10,7 @@ from typing import Any, Tuple, Type, TypeVar, cast
 from hydra_zen._compatibility import ZEN_SUPPORTED_PRIMITIVES
 from hydra_zen.typing import Builds, Partial, PartialBuilds
 
-from ._implementations import ZEN_VALUE_CONVERSION, builds, sanitized_default_value
+from ._implementations import ZEN_VALUE_CONVERSION, builds
 from ._utils import get_obj_path
 
 _T = TypeVar("_T")
@@ -58,7 +58,7 @@ class ConfigFromTuple:
 
     def __post_init__(self):
         self._args_ = (
-            sanitized_default_value(
+            builds.sanitized_default_value(
                 tuple(self._args_),
                 convert_dataclass=True,
                 allow_zen_conversion=True,
@@ -74,7 +74,7 @@ class ConfigFromDict:
 
     def __post_init__(self):
         self._args_ = (
-            sanitized_default_value(
+            builds.sanitized_default_value(
                 dict(self._args_),
                 convert_dataclass=True,
                 allow_zen_conversion=True,
