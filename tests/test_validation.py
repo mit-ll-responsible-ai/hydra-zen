@@ -28,8 +28,9 @@ from hydra_zen.structured_configs._globals import (
     HYDRA_FIELD_NAMES,
     ZEN_TARGET_FIELD_NAME,
 )
-from hydra_zen.structured_configs._utils import get_obj_path
 from tests import everything_except
+
+get_obj_path = builds._get_obj_path
 
 
 def test_builds_no_args_raises():

@@ -48,8 +48,8 @@ from typing_extensions import (
 from hydra_zen import instantiate, just, make_custom_builds_fn
 from hydra_zen._compatibility import HYDRA_VERSION, Version
 from hydra_zen.errors import HydraZenValidationError
+from hydra_zen.structured_configs._implementations import builds
 from hydra_zen.structured_configs._type_guards import safe_getattr
-from hydra_zen.structured_configs._utils import get_obj_path
 from hydra_zen.typing._implementations import (
     DataClass_,
     GroupName,
@@ -63,6 +63,7 @@ from ..structured_configs._utils import safe_name
 
 __all__ = ["zen", "store", "Zen"]
 
+get_obj_path = builds._get_obj_path  # type: ignore
 
 R = TypeVar("R")
 P = ParamSpec("P")
