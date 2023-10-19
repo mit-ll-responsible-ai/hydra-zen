@@ -91,7 +91,7 @@ class ZenField:
         convert_settings = _utils.merge_settings(zen_convert, _BUILDS_CONVERT_SETTINGS)
         del zen_convert
 
-        self.hint = _utils.sanitized_type(self.hint)
+        self.hint = builds._sanitized_type(self.hint)
 
         if self.default is not NOTHING:
             self.default = builds.sanitized_field(
