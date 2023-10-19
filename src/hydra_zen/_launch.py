@@ -484,7 +484,7 @@ def launch(
             job = sweeper.sweep(arguments=task_overrides)
             callbacks.on_multirun_end(config=cfg, config_name=config_name)
 
-    if is_dataclass(config):
+    if is_dataclass(config):  # pragma: no cover
         _num_dataclass_fields_after = len(fields(config))
         if (
             _num_dataclass_fields_after == 0
