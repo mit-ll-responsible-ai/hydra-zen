@@ -18,7 +18,6 @@ import hypothesis.strategies as st
 
 from hydra_zen import ZenStore, builds
 from hydra_zen._compatibility import HYDRA_SUPPORTS_OBJECT_CONVERT
-from hydra_zen.structured_configs._utils import get_obj_path
 from hydra_zen.typing import DataclassOptions
 from hydra_zen.typing._implementations import ZenConvert
 
@@ -35,7 +34,7 @@ def _wrapper(obj):
 # strategies for drawing valid inputs to `zen_wrappers`
 single_wrapper_strat = (
     st.just(_wrapper)
-    | st.just(get_obj_path(_wrapper))
+    | st.just(builds._get_obj_path(_wrapper))
     | st.just(_wrapper).map(lambda x: builds(x, zen_partial=True))
 )
 wrapper_strat = single_wrapper_strat | st.lists(single_wrapper_strat)

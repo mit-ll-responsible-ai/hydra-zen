@@ -456,10 +456,6 @@ class Just:
     _target_: str = field(default="hydra_zen.funcs.get_obj", init=False, repr=False)
 
 
-def _just(obj: Any) -> Just:
-    return Just(path=_utils.get_obj_path(obj))
-
-
 def _is_ufunc(value: Any) -> bool:
     # checks without importing numpy
     numpy = sys.modules.get("numpy")
@@ -987,6 +983,56 @@ class BuildsFn(Generic[T]):
         self.__qualname__: str = qualname if qualname is not None else name
 
     @classmethod
+    def _get_obj_path(cls, target: Any) -> str:
+        """Used to get the `_target_` value for the resulting config."""
+        name = _utils.safe_name(target, repr_allowed=False)
+
+        if name == _utils.UNKNOWN_NAME:
+            raise AttributeError(f"{target} does not have a `__name__` attribute")
+
+        module = getattr(target, "__module__", None)
+        qualname = getattr(target, "__qualname__", None)
+
+        if (qualname is not None and "<" in qualname) or module is None:
+            # NumPy's ufuncs do not have an inspectable `__module__` attribute, so we
+            # check to see if the object lives in NumPy's top-level namespace.
+            #
+            # or..
+            #
+            # Qualname produced a name from a local namespace.
+            # E.g. jax.numpy.add.__qualname__ is '_maybe_bool_binop.<locals>.fn'
+            # Thus we defer to the name of the object and look for it in the
+            # top-level namespace of the known suspects
+            #
+            # or...
+            #
+            # module is None, which is apparently a thing..:
+            # __module__ is None for both numpy.random.rand and random.random
+            #
+
+            # don't use qualname for obfuscated paths
+            for new_module in _utils.COMMON_MODULES_WITH_OBFUSCATED_IMPORTS:
+                if getattr(sys.modules.get(new_module), name, None) is target:
+                    module = new_module
+                    break
+            else:
+                raise ModuleNotFoundError(f"{name} is not importable")
+
+        if not _utils.is_classmethod(target):
+            return f"{module}.{name}"
+        else:
+            # __qualname__ reflects name of class that originally defines classmethod.
+            # Does not point to child in case of inheritance.
+            #
+            # obj.__self__ -> parent object
+            # obj.__name__ -> name of classmethod
+            return f"{cls._get_obj_path(target.__self__)}.{target.__name__}"
+
+    @classmethod
+    def _just(cls, obj: Any) -> Just:
+        return Just(path=cls._get_obj_path(obj))
+
+    @classmethod
     def mutable_value(cls, x: _T, *, zen_convert: Optional[ZenConvert] = None) -> _T:
         """Used to set a mutable object as a default value for a field
         in a dataclass.
@@ -1125,7 +1171,7 @@ class BuildsFn(Generic[T]):
         ):
             # `value` is importable callable -- create config that will import
             # `value` upon instantiation
-            out = _just(value)
+            out = cls._just(value)
             if convert_dataclass and is_dataclass(value):
                 _check_for_dynamically_defined_dataclass_type(
                     safe_getattr(out, JUST_FIELD_NAME), value
@@ -1637,7 +1683,7 @@ class BuildsFn(Generic[T]):
             # pass through _target_ field
             target_path = safe_getattr(target, TARGET_FIELD_NAME)
         else:
-            target_path = _utils.get_obj_path(target)
+            target_path = self._get_obj_path(target)
 
         if zen_wrappers is not None:
             if not isinstance(zen_wrappers, Sequence) or isinstance(zen_wrappers, str):
@@ -1673,7 +1719,7 @@ class BuildsFn(Generic[T]):
                         validated_wrappers.append(wrapper)
 
                 elif callable(wrapper):
-                    validated_wrappers.append(_utils.get_obj_path(wrapper))
+                    validated_wrappers.append(self._get_obj_path(wrapper))
 
                 elif isinstance(wrapper, str):
                     # Assumed that wrapper is either a valid omegaconf-style interpolation string
