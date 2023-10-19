@@ -531,8 +531,8 @@ class BuildsFn(Generic[T]):
 
     def __init__(self, name: str, qualname: Optional[str] = None) -> None:
         super().__init__()
-        self.__name__ = name
-        self.__qualname__ = qualname if qualname is not None else name
+        self.__name__: str = name
+        self.__qualname__: str = qualname if qualname is not None else name
 
     @classmethod
     def mutable_value(cls, x: _T, *, zen_convert: Optional[ZenConvert] = None) -> _T:
@@ -2338,7 +2338,7 @@ class BuildsFn(Generic[T]):
         )
 
 
-builds = BuildsFn[SupportedPrimitive]("builds")
+builds: BuildsFn[SupportedPrimitive] = BuildsFn[SupportedPrimitive]("builds")
 
 
 @overload
