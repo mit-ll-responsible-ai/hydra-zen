@@ -10,7 +10,7 @@ from hydra_zen.typing._implementations import _HydraPrimitive  # type: ignore
 from hydra_zen.typing._implementations import _SupportedViaBuilds  # type: ignore
 from hydra_zen.typing._implementations import AllConvert, DataClass_, ZenConvert
 
-from ._implementations import sanitized_default_value
+from ._implementations import builds
 from ._utils import merge_settings
 from ._value_conversion import ConfigComplex
 
@@ -311,7 +311,7 @@ def just(
     if zen_dataclass is None:
         zen_dataclass = {}
 
-    return sanitized_default_value(
+    return builds.sanitized_default_value(
         obj,
         allow_zen_conversion=True,
         structured_conf_permitted=True,

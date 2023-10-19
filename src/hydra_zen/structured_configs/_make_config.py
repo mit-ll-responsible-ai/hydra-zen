@@ -13,10 +13,7 @@ from typing_extensions import Literal
 
 from hydra_zen.errors import HydraZenDeprecationWarning
 from hydra_zen.structured_configs import _utils
-from hydra_zen.structured_configs._implementations import (
-    _BUILDS_CONVERT_SETTINGS,
-    sanitize_collection,
-)
+from hydra_zen.structured_configs._implementations import _BUILDS_CONVERT_SETTINGS
 from hydra_zen.typing import DataclassOptions, SupportedPrimitive
 from hydra_zen.typing._implementations import (
     AllConvert,
@@ -35,7 +32,7 @@ from ._globals import (
     ZEN_PARTIAL_FIELD_NAME,
     ZEN_TARGET_FIELD_NAME,
 )
-from ._implementations import _retain_type_info, builds, sanitized_field
+from ._implementations import _retain_type_info, builds
 from ._type_guards import safe_getattr, uses_zen_processing
 
 __all__ = ["ZenField", "make_config"]
@@ -97,7 +94,7 @@ class ZenField:
         self.hint = _utils.sanitized_type(self.hint)
 
         if self.default is not NOTHING:
-            self.default = sanitized_field(
+            self.default = builds.sanitized_field(
                 self.default,
                 convert_dataclass=convert_settings["dataclass"],
             )
@@ -515,7 +512,9 @@ def make_config(
         )
 
     if hydra_defaults is not None:
-        hydra_defaults = sanitize_collection(hydra_defaults, convert_dataclass=False)
+        hydra_defaults = builds.sanitize_collection(
+            hydra_defaults, convert_dataclass=False
+        )
         config_fields.append(
             (
                 DEFAULTS_LIST_FIELD_NAME,

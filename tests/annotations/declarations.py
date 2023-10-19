@@ -47,6 +47,7 @@ from hydra_zen import (
     store,
     zen,
 )
+from hydra_zen.structured_configs._implementations import BuildsFn
 from hydra_zen.structured_configs._value_conversion import ConfigComplex, ConfigPath
 from hydra_zen.typing import (
     Builds,
@@ -1278,7 +1279,8 @@ def builds_target_pass_through():
     def foo(x: int) -> str:
         ...
 
-    c1 = builds(builds(foo, x=1), x=2)
+    _c1 = builds(foo, x=1)
+    c1 = builds(_c1, x=2)
     reveal_type(instantiate(c1), expected_text="str")
 
     _c2 = builds(foo, populate_full_signature=True)
@@ -1286,17 +1288,20 @@ def builds_target_pass_through():
     reveal_type(instantiate(c2), expected_text="str")
     reveal_type(c2, expected_text="type[Builds[type[str]]]")
 
-    c3 = builds(builds(foo, zen_partial=True))
+    _c3 = builds(foo, zen_partial=True)
+    c3 = builds(_c3)
     reveal_type(instantiate(c3), expected_text="str")
 
-    pc1 = builds(builds(foo, x=1), x=2, zen_partial=True)
+    _pc1 = builds(foo, x=1)
+    pc1 = builds(_pc1, x=2, zen_partial=True)
     reveal_type(instantiate(pc1), expected_text="Partial[str]")
 
     _pc2 = builds(foo, populate_full_signature=True)
     pc2 = builds(_pc2, zen_partial=True)
     reveal_type(instantiate(pc2), expected_text="Partial[str]")
 
-    pc3 = builds(builds(foo, zen_partial=True), zen_partial=True)
+    _pc3 = builds(foo, zen_partial=True)
+    pc3 = builds(_pc3, zen_partial=True)
     reveal_type(instantiate(pc3), expected_text="Partial[str]")
 
     tmp = builds(foo, populate_full_signature=True)
@@ -1410,3 +1415,9 @@ def pbuilds_target_pass_through():
     tmp6 = pbuilds(foo, zen_partial=True)
     pc4 = pbuilds(tmp6, zen_partial=True)
     reveal_type(instantiate(pc4), expected_text="Partial[str]")
+
+
+def check_BuildsFn():
+    my_builds = BuildsFn[int]("my_builds")
+    my_builds(int, 1)
+    my_builds(int, "a")  # type: ignore
