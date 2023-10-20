@@ -60,7 +60,7 @@ PYRIGHT_SCAN_RESULTS: Dict[Any, PyrightOutput] = {}
 FUNCS_TO_SCAN = [
     ZenField,
     ZenStore,
-    builds,
+    builds.__call__,
     get_target,
     hydrated_dataclass,
     instantiate,
