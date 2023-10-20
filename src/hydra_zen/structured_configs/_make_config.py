@@ -94,7 +94,7 @@ class ZenField:
         self.hint = builds._sanitized_type(self.hint)
 
         if self.default is not NOTHING:
-            self.default = builds.sanitized_field(
+            self.default = builds._sanitized_field(
                 self.default,
                 convert_dataclass=convert_settings["dataclass"],
             )
@@ -512,7 +512,7 @@ def make_config(
         )
 
     if hydra_defaults is not None:
-        hydra_defaults = builds.sanitize_collection(
+        hydra_defaults = builds._sanitize_collection(
             hydra_defaults, convert_dataclass=False
         )
         config_fields.append(

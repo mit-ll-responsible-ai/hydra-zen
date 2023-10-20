@@ -39,6 +39,7 @@ list_of_objects = [
     functools.partial(f, x=1),
     ADataclass,
     ADataclass(x=2),
+    {1, 2, 3},
 ]
 
 
