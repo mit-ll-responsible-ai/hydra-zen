@@ -22,9 +22,9 @@ from typing_extensions import Final, Literal
 from hydra_zen.errors import HydraZenDeprecationWarning
 from hydra_zen.typing import DataclassOptions, ZenWrappers
 from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds, StdBuilds
-from hydra_zen.typing._implementations import ZenConvert
+from hydra_zen.typing._implementations import InstOrType, ZenConvert
 
-from ._implementations import BuildsFn, builds
+from ._implementations import BuildsFn, DefaultBuilds, builds
 from ._utils import parse_dataclass_options
 
 __all__ = ["make_custom_builds_fn"]
@@ -60,7 +60,7 @@ def make_custom_builds_fn(
     zen_dataclass: Optional[DataclassOptions] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
-    builds_fn: BuildsFn[T] = builds,
+    builds_fn: InstOrType[BuildsFn[T]] = DefaultBuilds,
 ) -> FullBuilds[T]:
     ...
 
@@ -78,7 +78,7 @@ def make_custom_builds_fn(
     zen_dataclass: Optional[DataclassOptions] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
-    builds_fn: BuildsFn[T] = builds,
+    builds_fn: InstOrType[BuildsFn[T]] = DefaultBuilds,
 ) -> PBuilds[T]:
     ...
 
@@ -96,7 +96,7 @@ def make_custom_builds_fn(
     zen_dataclass: Optional[DataclassOptions] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
-    builds_fn: BuildsFn[T] = builds,
+    builds_fn: InstOrType[BuildsFn[T]] = DefaultBuilds,
 ) -> StdBuilds[T]:
     ...
 
@@ -114,7 +114,7 @@ def make_custom_builds_fn(
     zen_dataclass: Optional[DataclassOptions] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
-    builds_fn: BuildsFn[T] = builds,
+    builds_fn: InstOrType[BuildsFn[T]] = DefaultBuilds,
 ) -> Union[FullBuilds[T], StdBuilds[T]]:
     ...
 
@@ -132,7 +132,7 @@ def make_custom_builds_fn(
     zen_dataclass: Optional[DataclassOptions] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
-    builds_fn: BuildsFn[T] = builds,
+    builds_fn: InstOrType[BuildsFn[T]] = DefaultBuilds,
 ) -> Union[PBuilds[T], StdBuilds[T]]:
     ...
 
@@ -150,7 +150,7 @@ def make_custom_builds_fn(
     zen_dataclass: Optional[DataclassOptions] = ...,
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
-    builds_fn: BuildsFn[T] = builds,
+    builds_fn: InstOrType[BuildsFn[T]] = DefaultBuilds,
 ) -> Union[FullBuilds[T], PBuilds[T], StdBuilds[T],]:
     ...
 
@@ -166,7 +166,7 @@ def make_custom_builds_fn(
     zen_dataclass: Optional[DataclassOptions] = None,
     frozen: bool = False,
     zen_convert: Optional[ZenConvert] = None,
-    builds_fn: BuildsFn[T] = builds,
+    builds_fn: InstOrType[BuildsFn[T]] = DefaultBuilds,
 ) -> Union[FullBuilds[T], PBuilds[T], StdBuilds[T],]:
     """Returns the `builds` function, but with customized default values.
 
@@ -282,8 +282,9 @@ def make_custom_builds_fn(
     <Validation error: "c" is not "a" or "b">
     """
     excluded_fields = frozenset({"dataclass_name", "hydra_defaults", "builds_bases"})
+    fn = builds_fn.__call__
+    del builds_fn
     LOCALS = locals()
-
     # Ensures that new defaults added to `builds` must be reflected
     # in the signature of `make_custom_builds_fn`.
     assert (set(__BUILDS_DEFAULTS) - excluded_fields) <= set(LOCALS)
@@ -298,7 +299,7 @@ def make_custom_builds_fn(
     # causing them to resolve the return type of this function as "unknown"
     if not TYPE_CHECKING:  # pragma: no branch
         # let `builds` validate the new defaults!
-        builds_fn(builds_fn, **_new_defaults)
+        fn(fn, **_new_defaults)
 
     _zen_dataclass: Optional[DataclassOptions] = _new_defaults.pop("zen_dataclass")
     if _zen_dataclass is None:
@@ -317,7 +318,7 @@ def make_custom_builds_fn(
 
     _zen_dataclass = parse_dataclass_options(_zen_dataclass)
 
-    @wraps(builds_fn)
+    @wraps(fn)
     def wrapped(*args: Any, **kwargs: Any) -> Any:
         merged_kwargs: Dict[str, Any] = {}
         _dataclass: Optional[DataclassOptions] = kwargs.pop("zen_dataclass", None)
@@ -329,7 +330,7 @@ def make_custom_builds_fn(
 
         merged_kwargs.update(_new_defaults)
         merged_kwargs.update(kwargs)
-        return cast(Any, builds_fn(*args, **merged_kwargs))
+        return cast(Any, fn(*args, **merged_kwargs))
 
     return cast(
         Union[

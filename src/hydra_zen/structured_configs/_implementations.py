@@ -1409,7 +1409,9 @@ class BuildsFn(Generic[T]):
         """Converts `value` to Hydra-supported type if necessary and possible. Otherwise
         raises `HydraZenUnsupportedPrimitiveError`.
 
-        Override this method to add"""
+        Override this method to add customized auto-config capabilities.
+
+        This method shuld always return a Hydra-compatible value."""
         # Common primitives supported by Hydra.
         # We check exhaustively for all Hydra-supported primitives below but seek to
         # speedup checks for common types here.
@@ -1680,8 +1682,9 @@ class BuildsFn(Generic[T]):
 
     # partial=False, pop-sig=True; no *args, **kwargs, nor builds_bases
     @overload
+    @classmethod
     def __call__(
-        self,
+        cls,
         __hydra_target: Type[BuildsWithSig[Type[R], P]],
         *,
         zen_partial: Literal[False, None] = ...,
@@ -1700,8 +1703,9 @@ class BuildsFn(Generic[T]):
         ...
 
     @overload
+    @classmethod
     def __call__(
-        self,
+        cls,
         __hydra_target: Callable[P, R],
         *,
         zen_partial: Literal[False, None] = ...,
@@ -1721,8 +1725,9 @@ class BuildsFn(Generic[T]):
 
     # partial=False, pop-sig=bool
     @overload
+    @classmethod
     def __call__(
-        self,
+        cls,
         __hydra_target: Type[AnyBuilds[Importable]],
         *pos_args: T,
         zen_partial: Literal[False, None] = ...,
@@ -1743,8 +1748,9 @@ class BuildsFn(Generic[T]):
 
     # partial=False, pop-sig=bool
     @overload
+    @classmethod
     def __call__(
-        self,
+        cls,
         __hydra_target: Importable,
         *pos_args: T,
         zen_partial: Literal[False, None] = ...,
@@ -1765,8 +1771,9 @@ class BuildsFn(Generic[T]):
 
     # partial=True, pop-sig=bool
     @overload
+    @classmethod
     def __call__(
-        self,
+        cls,
         __hydra_target: Type[AnyBuilds[Importable]],
         *pos_args: T,
         zen_partial: Literal[True] = ...,
@@ -1787,8 +1794,9 @@ class BuildsFn(Generic[T]):
 
     # partial=True, pop-sig=bool
     @overload
+    @classmethod
     def __call__(
-        self,
+        cls,
         __hydra_target: Importable,
         *pos_args: T,
         zen_partial: Literal[True] = ...,
@@ -1809,8 +1817,9 @@ class BuildsFn(Generic[T]):
 
     # partial=bool, pop-sig=False
     @overload
+    @classmethod
     def __call__(
-        self,
+        cls,
         __hydra_target: Type[AnyBuilds[Importable]],
         *pos_args: T,
         zen_partial: Optional[bool] = ...,
@@ -1831,8 +1840,9 @@ class BuildsFn(Generic[T]):
 
     # partial=bool, pop-sig=False
     @overload
+    @classmethod
     def __call__(
-        self,
+        cls,
         __hydra_target: Importable,
         *pos_args: T,
         zen_partial: Optional[bool] = ...,
@@ -1853,8 +1863,9 @@ class BuildsFn(Generic[T]):
 
     # partial=bool, pop-sig=bool
     @overload
+    @classmethod
     def __call__(
-        self,
+        cls,
         __hydra_target: Union[Callable[P, R], Type[Builds[Importable]], Importable],
         *pos_args: T,
         zen_partial: Optional[bool],
@@ -1877,8 +1888,9 @@ class BuildsFn(Generic[T]):
     ]:
         ...
 
+    @classmethod
     def __call__(
-        self,
+        cls,
         *pos_args: Union[Importable, Callable[P, R], Type[AnyBuilds[Importable]], Any],
         zen_partial: Optional[bool] = None,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
@@ -2004,7 +2016,7 @@ class BuildsFn(Generic[T]):
             # pass through _target_ field
             target_path = safe_getattr(target, TARGET_FIELD_NAME)
         else:
-            target_path = self._get_obj_path(target)
+            target_path = cls._get_obj_path(target)
 
         if zen_wrappers is not None:
             if not isinstance(zen_wrappers, Sequence) or isinstance(zen_wrappers, str):
@@ -2040,7 +2052,7 @@ class BuildsFn(Generic[T]):
                         validated_wrappers.append(wrapper)
 
                 elif callable(wrapper):
-                    validated_wrappers.append(self._get_obj_path(wrapper))
+                    validated_wrappers.append(cls._get_obj_path(wrapper))
 
                 elif isinstance(wrapper, str):
                     # Assumed that wrapper is either a valid omegaconf-style interpolation string
@@ -2259,7 +2271,7 @@ class BuildsFn(Generic[T]):
                     f"`hydra_defaults` must be type `None | list[str | dict[str, str | list[str] | None ]]`"
                     f", Got: {repr(hydra_defaults)}"
                 )
-            hydra_defaults = self._sanitize_collection(
+            hydra_defaults = cls._sanitize_collection(
                 hydra_defaults, convert_dataclass=False
             )
             base_fields.append(
@@ -2280,7 +2292,7 @@ class BuildsFn(Generic[T]):
                     Tuple[Any, ...],
                     _utils.field(
                         default=tuple(
-                            self._sanitized_default_value(
+                            cls._sanitized_default_value(
                                 x,
                                 error_prefix=BUILDS_ERROR_PREFIX,
                                 convert_dataclass=zen_convert_settings["dataclass"],
@@ -2292,7 +2304,7 @@ class BuildsFn(Generic[T]):
                 )
             )
 
-        _sig_target = self._get_sig_obj(target)
+        _sig_target = cls._get_sig_obj(target)
 
         try:
             # We want to rely on `inspect.signature` logic for raising
@@ -2415,7 +2427,7 @@ class BuildsFn(Generic[T]):
 
                 # validates
                 _pos_args = tuple(
-                    self._sanitized_default_value(
+                    cls._sanitized_default_value(
                         x, allow_zen_conversion=False, convert_dataclass=False
                     )
                     for x in _pos_args
@@ -2623,7 +2635,7 @@ class BuildsFn(Generic[T]):
             for field_ in fields(base):
                 if field_.default is not MISSING:
                     # performs validation
-                    self._sanitized_default_value(
+                    cls._sanitized_default_value(
                         field_.default,
                         allow_zen_conversion=False,
                         error_prefix=BUILDS_ERROR_PREFIX,
@@ -2641,13 +2653,13 @@ class BuildsFn(Generic[T]):
             name = item[0]
             type_ = item[1]
             if len(item) == 2:
-                sanitized_base_fields.append((name, self._sanitized_type(type_)))
+                sanitized_base_fields.append((name, cls._sanitized_type(type_)))
             else:
                 assert len(item) == 3, item
                 value = item[-1]
 
                 if not isinstance(value, _Field):
-                    _field = self._sanitized_field(
+                    _field = cls._sanitized_field(
                         value,
                         error_prefix=BUILDS_ERROR_PREFIX,
                         field_name=item[0],
@@ -2660,7 +2672,7 @@ class BuildsFn(Generic[T]):
                 # value, and thus it is "sanitized"
                 sanitized_value = safe_getattr(_field, "default", value)
                 sanitized_type = (
-                    self._sanitized_type(type_, wrap_optional=sanitized_value is None)
+                    cls._sanitized_type(type_, wrap_optional=sanitized_value is None)
                     if _retain_type_info(
                         type_=type_,
                         value=sanitized_value,
@@ -2944,7 +2956,7 @@ class BuildsFn(Generic[T]):
         # also check for use of reserved names
         _tmp: Any = None
 
-        builds(
+        cls.__call__(
             dict,
             hydra_convert=hydra_convert,
             hydra_recursive=hydra_recursive,
@@ -3066,7 +3078,11 @@ class BuildsFn(Generic[T]):
         return cast(Type[DataClass], out)
 
 
-builds: BuildsFn[SupportedPrimitive] = BuildsFn[SupportedPrimitive]("builds")
+class DefaultBuilds(BuildsFn[SupportedPrimitive]):
+    ...
+
+
+builds: DefaultBuilds = DefaultBuilds("builds")
 
 
 @dataclass(unsafe_hash=True)

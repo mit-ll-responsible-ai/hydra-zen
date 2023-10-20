@@ -55,7 +55,7 @@ class MyBuildsFn(
         zen_dataclass: Union[DataclassOptions, None] = None,
     ) -> Any:
         if isinstance(value, A):
-            return builds(A, value.x)
+            return cls.__call__(A, value.x)
 
         return super()._sanitized_default_value(
             value,
