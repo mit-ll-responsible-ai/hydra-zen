@@ -3084,7 +3084,7 @@ class BuildsFn(Generic[T]):
 
 
 class DefaultBuilds(BuildsFn[SupportedPrimitive]):
-    ...
+    pass
 
 
 builds: DefaultBuilds = DefaultBuilds("builds")
