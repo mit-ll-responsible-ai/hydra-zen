@@ -32,7 +32,6 @@ from typing import (
 import hydra
 from hydra.conf import HydraConf
 from hydra.core.config_store import ConfigStore
-from hydra.utils import instantiate
 from omegaconf import DictConfig, ListConfig, OmegaConf
 from typing_extensions import (
     Final,

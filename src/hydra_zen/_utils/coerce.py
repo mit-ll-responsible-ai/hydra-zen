@@ -12,13 +12,13 @@ from typing import (
     TypeVar,
     Union,
     cast,
+    get_args,
+    get_origin,
     get_type_hints,
 )
 
 from omegaconf import ListConfig
 from typing_extensions import TypeGuard
-
-from hydra_zen.structured_configs._utils import get_args, get_origin
 
 _T = TypeVar("_T", bound=Callable)
 
