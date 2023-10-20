@@ -83,6 +83,7 @@ from hydra_zen.typing._implementations import (
     AnyBuilds,
     Builds,
     BuildsWithSig,
+    DataClass,
     DataClass_,
     DataclassOptions,
     DefaultsList,
@@ -567,8 +568,75 @@ def _check_for_dynamically_defined_dataclass_type(target_path: str, value: Any) 
         )
 
 
-# TODO: Add auto-builds support for `BuildsFn`
-# TODO: Make most of _utils classmethods
+class NOTHING:
+    def __init__(self) -> None:
+        raise TypeError("`NOTHING` cannot be instantiated")
+
+
+@dataclass(unsafe_hash=True)
+class ZenField:
+    """
+    ZenField(hint=Any, default=<class 'NOTHING'>, name=<class 'NOTHING'>)
+
+    Specifies a field's name and/or type-annotation and/or default value.
+    Designed to specify fields in `make_config`.
+
+    See the Examples section of the docstring for `make_config` for examples of using
+    `ZenField`.
+
+    Parameters
+    ----------
+    hint : type, optional (default=Any)
+    default : Any, optional
+    name : str, optional
+
+    Notes
+    -----
+    ``default`` will be returned as an instance of :class:`dataclasses.Field`.
+    Mutable values (e.g. lists or dictionaries) passed to ``default`` will automatically
+    be "packaged" in a default-factory function [1]_.
+
+    A type passed to ``hint`` will automatically be "broadened" such that the resulting
+    type is compatible with Hydra's set of supported type annotations [2]_.
+
+    References
+    ----------
+    .. [1] https://docs.python.org/3/library/dataclasses.html#default-factory-functions
+    .. [2] https://hydra.cc/docs/next/tutorials/structured_config/intro/#structured-configs-supports
+
+    See Also
+    --------
+    make_config: create a config with customized field names, default values, and annotations.
+    """
+
+    hint: type = Any
+    default: Union[Any, Field[Any]] = _utils.field(default=NOTHING)
+    name: Union[str, Type[NOTHING]] = NOTHING
+    zen_convert: InitVar[Optional[ZenConvert]] = None
+    _builds_fn: "Union[BuildsFn[Any], Type[BuildsFn[Any]]]" = _utils.field(default_factory=lambda: builds)  # type: ignore
+
+    def __post_init__(
+        self,
+        zen_convert: Optional[ZenConvert],
+    ) -> None:
+        if not isinstance(self.name, str):
+            if self.name is not NOTHING:
+                raise TypeError(f"`ZenField.name` expects a string, got: {self.name}")
+        convert_settings = _utils.merge_settings(zen_convert, _BUILDS_CONVERT_SETTINGS)
+        del zen_convert
+
+        self.hint = self._builds_fn._sanitized_type(self.hint)
+
+        if self.default is not NOTHING:
+            self.default = self._builds_fn._sanitized_field(
+                self.default,
+                convert_dataclass=convert_settings["dataclass"],
+            )
+
+
+_MAKE_CONFIG_SETTINGS = AllConvert(dataclass=False, flat_target=False)
+
+
 class BuildsFn(Generic[T]):
     """builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, hydra_recursive=None, hydra_convert=None, hydra_defaults=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
 
@@ -2744,183 +2812,7 @@ class BuildsFn(Generic[T]):
 
         `just` is designed to be idempotent. I.e., `just(obj) == just(just(obj))`
 
-        Parameters
-        ----------
-        obj : Callable[..., Any] | HydraSupportedPrimitive | ZenSupportedPrimitive
-            A type (e.g. a class-object), function-object, or a value that is either
-            supported by Hydra or has auto-config support via hydra-zen.
-
-        zen_convert : Optional[ZenConvert]
-            A dictionary that modifies hydra-zen's value and type conversion behavior.
-            Consists of the following optional key-value pairs (:ref:`zen-convert`):
-
-            - `dataclass` : `bool` (default=True):
-                If `True` any dataclass type/instance without a
-                `_target_` field is automatically converted to a targeted config
-                that will instantiate to that type/instance. Otherwise the dataclass
-                type/instance will be passed through as-is.
-
-
-        hydra_recursive : Optional[bool], optional (default=True)
-            If ``True``, then Hydra will recursively instantiate all other
-            hydra-config objects nested within this config [2]_.
-
-            If ``None``, the ``_recursive_`` attribute is not set on the resulting config.
-
-        hydra_convert : Optional[Literal["none", "partial", "all", "object"]], optional (default="none")
-            Determines how Hydra treats the non-primitive, omegaconf-specific objects
-            during instantiateion [3]_.
-
-            - ``"none"``: No conversion occurs; omegaconf containers are passed through (Default)
-            - ``"partial"``: ``DictConfig`` and ``ListConfig`` objects converted to ``dict`` and
-            ``list``, respectively. Structured configs and their fields are passed without conversion.
-            - ``"all"``: All passed objects are converted to dicts, lists, and primitives, without
-            a trace of OmegaConf containers.
-            - ``"object"``: Passed objects are converted to dict and list. Structured Configs are converted to instances of the backing dataclass / attr class.
-
-            If ``None``, the ``_convert_`` attribute is not set on the resulting config.
-
-        zen_dataclass : Optional[DataclassOptions]
-            A dictionary that can specify any option that is supported by
-            :py:func:`dataclasses.make_dataclass` other than `fields`.
-            The default value for `unsafe_hash` is `True`.
-
-            These options are only relevant when the input to `just` is a dataclass
-            instance. Otherwise, `just` does not utilize these options when auto-generating
-            configs.
-
-            Additionally, the `module` field can be specified to enable pickle
-            compatibility. See `hydra_zen.typing.DataclassOptions` for details.
-
-        Returns
-        -------
-        out : HydraSupportedPrimitive | Builds[Type[obj]]
-            ``out`` is ``obj`` unchanged if ``obj`` is supported natively by Hydra, otherwise ``out`` is a dynamically-generated dataclass type or instance.
-
-        Raises
-        ------
-        hydra_zen.errors.HydraZenUnsupportedPrimitiveError
-
-        References
-        ----------
-        .. [1] https://hydra.cc/docs/tutorials/structured_config/intro/
-        .. [2] https://hydra.cc/docs/advanced/instantiate_objects/overview/#recursive-instantiation
-        .. [3] https://hydra.cc/docs/advanced/instantiate_objects/overview/#parameter-conversion-strategies
-
-        See Also
-        --------
-        builds : Create a targeted structured config designed to "build" a particular object.
-        make_config: Creates a general config with customized field names, default values, and annotations.
-
-        Notes
-        -----
-        Here, a "config" is a dynamically-generated dataclass type that is designed to be
-        compatible with Hydra [1]_.
-
-        The configs produced by ``just(<type_or_func>)`` introduce an explicit dependency
-        on hydra-zen. I.e. hydra-zen must be installed in order to instantiate any config
-        that used `just`.
-
-        Examples
-        --------
-        **Basic usage**
-
-        >>> from hydra_zen import just, instantiate, to_yaml
-
-        `just`, called on a value of a type that is natively supported by Hydra,
-        will return that value unchanged:
-
-        >>> just(1)
-        1
-        >>> just({"a": False})
-        {"a": False}
-
-        `just` can be used to create a config that will simply import a class-object or function when the config is instantiated by Hydra.
-
-
-        >>> class A: pass
-        >>> def my_func(x: int): pass
-
-        >>> instantiate(just(A)) is A
-        True
-        >>> instantiate(just(my_func)) is my_func
-        True
-
-        `just` dynamically generates dataclass types, a.k.a structured configs, to describe
-        ``obj``
-
-        >>> just(A)
-        Just_A(_target_='hydra_zen.funcs.get_obj', path='__main__.A')
-        >>> just(my_func)
-        Just_my_func(_target_='hydra_zen.funcs.get_obj', path='__main__.my_func')
-
-        **Auto-config support**
-
-        Calling `just` on a value of a type that has
-        :ref:`special support from hydra-zen <additional-types>`
-        will return a structured config instance that, when instantiated by Hydra, returns
-        that value.
-
-        >>> just(1+2j)
-        ConfigComplex(real=1.0, imag=2.0, _target_='builtins.complex')
-        >>> instantiate(just(1+2j))
-        (1+2j)
-
-        >>> just({1, 2, 3})
-        Builds_set(_target_='builtins.set', _args_=((1, 2, 3),))
-        >>> instantiate(just({1, 2, 3}))
-        {1, 2, 3}
-
-        By default, `just` will convert a dataclass instance to a corresponding targeted
-        config. This behavior can be modified via :ref:`zen-convert settings<zen-convert>`.
-
-        >>> from dataclasses import dataclass
-        >>> @dataclass
-        ... class B:
-        ...     x: complex
-        >>>
-        >>> instantiate(just(B)) is B
-        True
-        >>> instantiate(just(B(2+3j))) == B(2+3j)
-        True
-
-        `just` operates recursively within sequences, mappings, and dataclass fields.
-
-        >>> z_dict = {'a': [3-4j, 1+2j]}
-        >>> assert instantiate(just(z_dict)) == z_dict
-        >>>
-        >>> from typing import Any
-        >>> @dataclass
-        ... class C:
-        ...     x: Any
-        >>>
-        >>> instantiate(just(C(B(2+3j))))
-        C(B(2+3j))
-
-        **Auto-Application of just**
-
-        Both `builds` and `make_config` will automatically (and recursively) apply
-        `just` to all configured values. E.g. in the following example `just` will be
-        applied to both  the complex-valued the list and to ``sum``.
-
-        >>> from hydra_zen import make_config
-        >>> Conf2 = make_config(data=[1+2j, 2+3j], reduction_fn=sum)
-
-        >>> print(to_yaml(Conf2))
-        data:
-        - real: 1.0
-        imag: 2.0
-        _target_: builtins.complex
-        - real: 2.0
-        imag: 3.0
-        _target_: builtins.complex
-        reduction_fn:
-        _target_: hydra_zen.funcs.get_obj
-        path: builtins.sum
-
-        >>> conf = instantiate(Conf2)
-        >>> conf.reduction_fn(conf.data)
-        (3+5j)
+        See the docstring for `hydra_zen.just`
         """
         convert_settings = merge_settings(zen_convert, _JUST_CONVERT_SETTINGS)
         del zen_convert
@@ -2941,6 +2833,237 @@ class BuildsFn(Generic[T]):
             hydra_recursive=hydra_recursive,
             zen_dataclass=_utils.parse_dataclass_options(zen_dataclass),
         )
+
+    @classmethod
+    def make_config(
+        cls,
+        *fields_as_args: Union[str, ZenField],
+        hydra_recursive: Optional[bool] = None,
+        hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = None,
+        hydra_defaults: Optional[DefaultsList] = None,
+        zen_dataclass: Optional[DataclassOptions] = None,
+        bases: Tuple[Type[DataClass_], ...] = (),
+        zen_convert: Optional[ZenConvert] = None,
+        **fields_as_kwargs: Union[T, ZenField],
+    ) -> Type[DataClass]:
+        """
+        Returns a config with user-defined field names and, optionally,
+        associated default values and/or type annotations.
+
+        See the docstring for hydra_zen.make_config
+        """
+        convert_settings = _utils.merge_settings(zen_convert, _MAKE_CONFIG_SETTINGS)
+        convert_settings = cast(ZenConvert, convert_settings)
+        del zen_convert
+
+        if zen_dataclass is None:
+            zen_dataclass = {}
+
+        # initial validation
+        _utils.parse_dataclass_options(zen_dataclass)
+
+        if "frozen" in fields_as_kwargs:
+            warnings.warn(
+                HydraZenDeprecationWarning(
+                    "Specifying `builds(frozen=<...>)` is deprecated. Instead, "
+                    "specify `builds(zen_dataclass={'frozen': <...>})"
+                ),
+                stacklevel=2,
+            )
+            zen_dataclass["frozen"] = fields_as_kwargs.pop("frozen")  # type: ignore
+
+        if "config_name" in fields_as_kwargs:
+            warnings.warn(
+                HydraZenDeprecationWarning(
+                    "Specifying `make_config(config_name=<...>)` is deprecated. "
+                    "Instead specify `make_config(zen_dataclass={'cls_name': <...>})"
+                ),
+                stacklevel=2,
+            )
+            zen_dataclass["cls_name"] = fields_as_kwargs.pop("config_name")  # type: ignore
+
+        if not bases:
+            bases = zen_dataclass.get("bases", ())
+
+        zen_dataclass.setdefault("cls_name", "Config")
+        dataclass_options = _utils.parse_dataclass_options(zen_dataclass)
+
+        for _field in fields_as_args:
+            if not isinstance(_field, (str, ZenField)):
+                raise TypeError(
+                    f"`fields_as_args` can only consist of field-names (i.e. strings) or "
+                    f"`ZenField` instances. Got: "
+                    f"{', '.join(str(x) for x in fields_as_args if not isinstance(x, (str, ZenField)))}"
+                )
+            if isinstance(_field, ZenField) and _field.name is NOTHING:
+                raise ValueError(
+                    f"All `ZenField` instances specified in `fields_as_args` must have a "
+                    f"name associated with it. Got: {_field}"
+                )
+        for name, _field in fields_as_kwargs.items():
+            if isinstance(_field, ZenField):
+                if _field.name is not NOTHING and _field.name != name:
+                    raise ValueError(
+                        f"`fields_as_kwargs` specifies conflicting names: the kwarg {name} "
+                        f"is associated with a `ZenField` with name {_field.name}"
+                    )
+                else:
+                    _field.name = name
+
+        if fields_as_args:
+            all_names = [
+                f.name if isinstance(f, ZenField) else f for f in fields_as_args
+            ]
+            all_names.extend(fields_as_kwargs)
+
+            if len(all_names) != len(set(all_names)):
+                raise ValueError(
+                    f"`fields_as_args` cannot specify the same field-name multiple times."
+                    f" Got multiple entries for:"
+                    f" {', '.join(str(n) for n, count in Counter(all_names).items() if count > 1)}"
+                )
+            for _name in all_names:
+                if isinstance(_name, str) and _name.startswith("_zen_"):
+                    raise ValueError(
+                        f"The field-name specified via `{_name}=<...>` is reserved by hydra-zen."
+                        " You can manually create a dataclass to utilize this name in a structured config."
+                    )
+            del all_names
+
+        if "defaults" in fields_as_kwargs:
+            if hydra_defaults is not None:
+                raise TypeError(
+                    "`defaults` and `hydra_defaults` cannot be specified simultaneously"
+                )
+            _defaults = fields_as_kwargs.pop("defaults")
+
+            if not isinstance(_defaults, ZenField):  # pragma: no branch
+                hydra_defaults = _defaults  # type: ignore
+
+        # validate hydra-args via `builds`
+        # also check for use of reserved names
+        _tmp: Any = None
+
+        builds(
+            dict,
+            hydra_convert=hydra_convert,
+            hydra_recursive=hydra_recursive,
+            hydra_defaults=hydra_defaults,
+            **{k: _tmp for k in fields_as_kwargs},
+        )
+
+        normalized_fields: Dict[str, ZenField] = {}
+
+        for _field in fields_as_args:
+            if isinstance(_field, str):
+                normalized_fields[_field] = ZenField(
+                    name=_field,
+                    hint=Any,
+                    zen_convert=convert_settings,
+                    _builds_fn=cls,
+                )
+            else:
+                assert isinstance(_field.name, str)
+                normalized_fields[_field.name] = _field
+
+        for name, value in fields_as_kwargs.items():
+            if not isinstance(value, ZenField):
+                normalized_fields[name] = ZenField(
+                    name=name,
+                    default=value,
+                    zen_convert=convert_settings,
+                    _builds_fn=cls,
+                )
+            else:
+                normalized_fields[name] = value
+
+        # fields without defaults must come first
+        config_fields: List[Union[Tuple[str, type], Tuple[str, type, Any]]] = [
+            (str(f.name), f.hint)
+            for f in normalized_fields.values()
+            if f.default is NOTHING
+        ]
+
+        config_fields.extend(
+            [
+                (
+                    str(f.name),
+                    (
+                        # f.default: Field
+                        # f.default.default: Any
+                        f.hint
+                        if _retain_type_info(
+                            type_=f.hint,
+                            value=f.default.default,  # type: ignore
+                            hydra_recursive=hydra_recursive,
+                        )
+                        else Any
+                    ),
+                    f.default,
+                )
+                for f in normalized_fields.values()
+                if f.default is not NOTHING
+            ]
+        )
+
+        if hydra_recursive is not None:
+            config_fields.append(
+                (
+                    RECURSIVE_FIELD_NAME,
+                    bool,
+                    _utils.field(default=hydra_recursive, init=False),
+                )
+            )
+
+        if hydra_convert is not None:
+            config_fields.append(
+                (
+                    CONVERT_FIELD_NAME,
+                    str,
+                    _utils.field(default=hydra_convert, init=False),
+                )
+            )
+
+        if hydra_defaults is not None:
+            hydra_defaults = builds._sanitize_collection(
+                hydra_defaults, convert_dataclass=False
+            )
+            config_fields.append(
+                (
+                    DEFAULTS_LIST_FIELD_NAME,
+                    List[Any],
+                    _utils.field(
+                        default_factory=lambda: list(hydra_defaults), init=False
+                    ),
+                )
+            )
+
+        dataclass_options["bases"] = bases
+        module = dataclass_options.pop("module", None)
+        assert _utils.parse_strict_dataclass_options(
+            dataclass_options
+        ), dataclass_options
+
+        out = make_dataclass(fields=config_fields, **dataclass_options)
+
+        if module is not None:
+            out.__module__ = module
+
+        if hasattr(out, ZEN_TARGET_FIELD_NAME) and not uses_zen_processing(out):
+            raise ValueError(
+                f"{out.__name__} inherits from base classes that overwrite some fields "
+                f"associated with zen-processing features. As a result, this config will "
+                f"not instantiate correctly."
+            )
+        if safe_getattr(out, PARTIAL_FIELD_NAME, False) and uses_zen_processing(out):
+            raise ValueError(
+                f"{out.__name__} specifies both `{PARTIAL_FIELD_NAME}=True` and `"
+                f"{ZEN_PARTIAL_FIELD_NAME}=True`. This config will not instantiate "
+                f"correctly. This is typically caused by inheriting from multiple, "
+                f"conflicting configs."
+            )
+
+        return cast(Type[DataClass], out)
 
 
 builds: BuildsFn[SupportedPrimitive] = BuildsFn[SupportedPrimitive]("builds")
