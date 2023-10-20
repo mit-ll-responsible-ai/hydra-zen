@@ -298,5 +298,4 @@ def just(
     >>> conf.reduction_fn(conf.data)
     (3+5j)
     """
-
-    return builds.just(obj)
+    return builds.just(**locals())
