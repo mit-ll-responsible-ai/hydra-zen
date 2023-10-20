@@ -89,6 +89,7 @@ from hydra_zen.typing._implementations import (
     DefaultsList,
     Field,
     HasTarget,
+    HydraSupportedType,
     InstOrType,
     Just as JustT,
     Partial,
@@ -946,7 +947,7 @@ class BuildsFn(Generic[T]):
         return field(default_factory=lambda: x)
 
     @classmethod
-    def _sanitized_default_value(
+    def _make_hydra_compatible(
         cls,
         value: Any,
         allow_zen_conversion: bool = True,
@@ -958,13 +959,20 @@ class BuildsFn(Generic[T]):
         hydra_recursive: Optional[bool] = None,
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = None,
         zen_dataclass: Optional[DataclassOptions] = None,
-    ) -> Any:
+    ) -> HydraSupportedType:
         """Converts `value` to Hydra-supported type if necessary and possible. Otherwise
         raises `HydraZenUnsupportedPrimitiveError`.
 
-        Override this method to add customized auto-config capabilities.
+        Override this method to add support for adding auto-config support to custom
+        types.
 
-        This method should always return a Hydra-compatible value."""
+        Notes
+        -----
+        Hydra supports the following types:
+            `bool`, `None`, `int`, `float`, `str`, `ByteString`, `pathlib.Path`,
+            `dataclasses.MISSING`. As well as lists, tuples, dicts, and omegaconf
+            containers containing the above.
+        """
         # Common primitives supported by Hydra.
         # We check exhaustively for all Hydra-supported primitives below but seek to
         # speedup checks for common types here.
@@ -1006,14 +1014,14 @@ class BuildsFn(Generic[T]):
             for _field in _val_fields:
                 if _field.init and hasattr(value, _field.name):
                     _val = safe_getattr(value, _field.name)
-                    converted_fields[_field.name] = cls._sanitized_default_value(
+                    converted_fields[_field.name] = cls._make_hydra_compatible(
                         _val,
                         allow_zen_conversion=allow_zen_conversion,
                         field_name=_field.name,
                         convert_dataclass=convert_dataclass,
                     )
 
-            out = cls("builds")(
+            out = cls.__call__(
                 type(value),
                 **converted_fields,
                 hydra_recursive=hydra_recursive,
@@ -1088,7 +1096,7 @@ class BuildsFn(Generic[T]):
             if isinstance(_val, pydantic.fields.UndefinedType):
                 return MISSING
 
-            return cls._sanitized_default_value(
+            return cls._make_hydra_compatible(
                 _val,
                 allow_zen_conversion=allow_zen_conversion,
                 error_prefix=error_prefix,
@@ -1145,7 +1153,7 @@ class BuildsFn(Generic[T]):
         type_x = type(x)
         if type_x in {list, tuple}:
             return type_x(
-                cls._sanitized_default_value(
+                cls._make_hydra_compatible(
                     _x,
                     convert_dataclass=convert_dataclass,
                     hydra_convert=hydra_convert,
@@ -1157,13 +1165,13 @@ class BuildsFn(Generic[T]):
             return {
                 # Hydra doesn't permit structured configs for keys, thus we only
                 # support its basic primitives here.
-                cls._sanitized_default_value(
+                cls._make_hydra_compatible(
                     k,
                     allow_zen_conversion=False,
                     structured_conf_permitted=False,
                     error_prefix="Configuring dictionary key:",
                     convert_dataclass=False,
-                ): cls._sanitized_default_value(
+                ): cls._make_hydra_compatible(
                     v,
                     convert_dataclass=convert_dataclass,
                     hydra_convert=hydra_convert,
@@ -1186,7 +1194,7 @@ class BuildsFn(Generic[T]):
         field_name: str = "",
         convert_dataclass: bool,
     ) -> Field[Any]:
-        value = cls._sanitized_default_value(
+        value = cls._make_hydra_compatible(
             value,
             allow_zen_conversion=allow_zen_conversion,
             error_prefix=error_prefix,
@@ -2297,7 +2305,7 @@ class BuildsFn(Generic[T]):
                     Tuple[Any, ...],
                     _utils.field(
                         default=tuple(
-                            cls._sanitized_default_value(
+                            cls._make_hydra_compatible(
                                 x,
                                 error_prefix=BUILDS_ERROR_PREFIX,
                                 convert_dataclass=zen_convert_settings["dataclass"],
@@ -2432,7 +2440,7 @@ class BuildsFn(Generic[T]):
 
                 # validates
                 _pos_args = tuple(
-                    cls._sanitized_default_value(
+                    cls._make_hydra_compatible(
                         x, allow_zen_conversion=False, convert_dataclass=False
                     )
                     for x in _pos_args
@@ -2640,7 +2648,7 @@ class BuildsFn(Generic[T]):
             for field_ in fields(base):
                 if field_.default is not MISSING:
                     # performs validation
-                    cls._sanitized_default_value(
+                    cls._make_hydra_compatible(
                         field_.default,
                         allow_zen_conversion=False,
                         error_prefix=BUILDS_ERROR_PREFIX,
@@ -2839,7 +2847,7 @@ class BuildsFn(Generic[T]):
         if zen_dataclass is None:
             zen_dataclass = {}
 
-        return cls._sanitized_default_value(
+        return cls._make_hydra_compatible(
             obj,
             allow_zen_conversion=True,
             structured_conf_permitted=True,
@@ -3266,7 +3274,7 @@ class ConfigFromTuple:
 
     def __post_init__(self):
         self._args_ = (
-            builds._sanitized_default_value(
+            builds._make_hydra_compatible(
                 tuple(self._args_),
                 convert_dataclass=True,
                 allow_zen_conversion=True,
@@ -3282,7 +3290,7 @@ class ConfigFromDict:
 
     def __post_init__(self):
         self._args_ = (
-            builds._sanitized_default_value(
+            builds._make_hydra_compatible(
                 dict(self._args_),
                 convert_dataclass=True,
                 allow_zen_conversion=True,
