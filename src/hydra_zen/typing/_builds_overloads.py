@@ -3,7 +3,7 @@
 
 # Stores overloads for `builds` with different default-values for signature
 # pyright: strict
-
+# pragma: no cover
 from typing import (
     Any,
     Callable,
@@ -259,7 +259,7 @@ class StdBuilds(Generic[T]):
         Type[Builds[Importable]],
         Type[PartialBuilds[Importable]],
         Type[BuildsWithSig[Type[R], P]],
-    ]:
+    ]:  # pragma: no cover
         ...
 
 
@@ -508,7 +508,7 @@ class FullBuilds(Generic[T]):
         Type[Builds[Importable]],
         Type[PartialBuilds[Importable]],
         Type[BuildsWithSig[Type[R], P]],
-    ]:
+    ]:  # pragma: no cover
         ...
 
 
@@ -689,5 +689,5 @@ class PBuilds(Generic[T]):
         Type[Builds[Importable]],
         Type[PartialBuilds[Importable]],
         Type[BuildsWithSig[Type[R], P]],
-    ]:
+    ]:  # pragma: no cover
         ...
