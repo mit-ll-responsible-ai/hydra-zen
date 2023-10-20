@@ -47,8 +47,11 @@ from hydra_zen import (
     store,
     zen,
 )
-from hydra_zen.structured_configs._implementations import BuildsFn
-from hydra_zen.structured_configs._value_conversion import ConfigComplex, ConfigPath
+from hydra_zen.structured_configs._implementations import (
+    BuildsFn,
+    ConfigComplex,
+    ConfigPath,
+)
 from hydra_zen.typing import (
     Builds,
     HydraPartialBuilds,
