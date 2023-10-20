@@ -2994,7 +2994,7 @@ class BuildsFn(Generic[T]):
                         f.hint
                         if _retain_type_info(
                             type_=f.hint,
-                            value=f.default.default,  # type: ignore
+                            value=f.default.default,
                             hydra_recursive=hydra_recursive,
                         )
                         else Any
