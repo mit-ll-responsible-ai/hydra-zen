@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Massachusetts Institute of Technology
+# SPDX-License-Identifier: MIT
+
 from inspect import signature
 from typing import Any, List, Union
 
