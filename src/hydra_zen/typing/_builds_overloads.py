@@ -7,6 +7,7 @@
 from typing import (
     Any,
     Callable,
+    Generic,
     Mapping,
     Optional,
     Tuple,
@@ -16,7 +17,7 @@ from typing import (
     overload,
 )
 
-from typing_extensions import Literal, ParamSpec, Protocol
+from typing_extensions import Literal, ParamSpec
 
 from ._implementations import (
     AnyBuilds,
@@ -32,13 +33,14 @@ from ._implementations import (
 )
 
 Importable = TypeVar("Importable", bound=Callable[..., Any])
+T = TypeVar("T")
 R = TypeVar("R")
 P = ParamSpec("P")
 
 __all__ = ["FullBuilds", "PBuilds", "StdBuilds"]
 
 
-class StdBuilds(Protocol):
+class StdBuilds(Generic[T]):
     # partial=False, pop-sig=True; no *args, **kwargs, nor builds_bases
     @overload
     def __call__(
@@ -86,7 +88,7 @@ class StdBuilds(Protocol):
     def __call__(
         self,
         __hydra_target: Type[AnyBuilds[Importable]],
-        *pos_args: SupportedPrimitive,
+        *pos_args: T,
         zen_partial: Literal[False, None] = ...,
         populate_full_signature: bool = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -99,7 +101,7 @@ class StdBuilds(Protocol):
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-        **kwargs_for_target: SupportedPrimitive,
+        **kwargs_for_target: T,
     ) -> Type[Builds[Importable]]:
         ...
 
@@ -107,7 +109,7 @@ class StdBuilds(Protocol):
     def __call__(
         self,
         __hydra_target: Importable,
-        *pos_args: SupportedPrimitive,
+        *pos_args: T,
         zen_partial: Literal[False, None] = ...,
         populate_full_signature: bool = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -120,7 +122,7 @@ class StdBuilds(Protocol):
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-        **kwargs_for_target: SupportedPrimitive,
+        **kwargs_for_target: T,
     ) -> Type[Builds[Importable]]:
         ...
 
@@ -129,7 +131,7 @@ class StdBuilds(Protocol):
     def __call__(
         self,
         __hydra_target: Type[AnyBuilds[Importable]],
-        *pos_args: SupportedPrimitive,
+        *pos_args: T,
         zen_partial: Literal[True] = ...,
         populate_full_signature: bool = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -142,7 +144,7 @@ class StdBuilds(Protocol):
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-        **kwargs_for_target: SupportedPrimitive,
+        **kwargs_for_target: T,
     ) -> Type[PartialBuilds[Importable]]:
         ...
 
@@ -150,7 +152,7 @@ class StdBuilds(Protocol):
     def __call__(
         self,
         __hydra_target: Importable,
-        *pos_args: SupportedPrimitive,
+        *pos_args: T,
         zen_partial: Literal[True] = ...,
         populate_full_signature: bool = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -163,7 +165,7 @@ class StdBuilds(Protocol):
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-        **kwargs_for_target: SupportedPrimitive,
+        **kwargs_for_target: T,
     ) -> Type[PartialBuilds[Importable]]:
         ...
 
@@ -172,7 +174,7 @@ class StdBuilds(Protocol):
     def __call__(
         self,
         __hydra_target: Type[AnyBuilds[Importable]],
-        *pos_args: SupportedPrimitive,
+        *pos_args: T,
         zen_partial: Optional[bool] = ...,
         populate_full_signature: Literal[False] = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -185,7 +187,7 @@ class StdBuilds(Protocol):
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-        **kwargs_for_target: SupportedPrimitive,
+        **kwargs_for_target: T,
     ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]],]:
         ...
 
@@ -193,7 +195,7 @@ class StdBuilds(Protocol):
     def __call__(
         self,
         __hydra_target: Importable,
-        *pos_args: SupportedPrimitive,
+        *pos_args: T,
         zen_partial: Optional[bool] = ...,
         populate_full_signature: Literal[False] = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -206,7 +208,7 @@ class StdBuilds(Protocol):
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-        **kwargs_for_target: SupportedPrimitive,
+        **kwargs_for_target: T,
     ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]],]:
         ...
 
@@ -215,7 +217,7 @@ class StdBuilds(Protocol):
     def __call__(
         self,
         __hydra_target: Union[Callable[P, R], Type[AnyBuilds[Importable]], Importable],
-        *pos_args: SupportedPrimitive,
+        *pos_args: T,
         zen_partial: Optional[bool],
         populate_full_signature: bool = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -228,7 +230,7 @@ class StdBuilds(Protocol):
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-        **kwargs_for_target: SupportedPrimitive,
+        **kwargs_for_target: T,
     ) -> Union[
         Type[Builds[Importable]],
         Type[PartialBuilds[Importable]],
@@ -239,7 +241,7 @@ class StdBuilds(Protocol):
     def __call__(
         self,
         __hydra_target: Union[Callable[P, R], Type[Builds[Importable]], Importable],
-        *pos_args: SupportedPrimitive,
+        *pos_args: T,
         zen_partial: Optional[bool] = None,
         populate_full_signature: bool = False,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
@@ -252,7 +254,7 @@ class StdBuilds(Protocol):
         dataclass_name: Optional[str] = None,
         zen_dataclass: Optional[DataclassOptions] = None,
         zen_convert: Optional[ZenConvert] = None,
-        **kwargs_for_target: SupportedPrimitive,
+        **kwargs_for_target: T,
     ) -> Union[
         Type[Builds[Importable]],
         Type[PartialBuilds[Importable]],
@@ -261,7 +263,7 @@ class StdBuilds(Protocol):
         ...
 
 
-class FullBuilds(Protocol):
+class FullBuilds(Generic[T]):
     # full_builds -> populate_full_signature=True  (new default value)
 
     # partial=False, pop_sig=True; no *args, **kwargs, nor builds_bases`
@@ -330,7 +332,7 @@ class FullBuilds(Protocol):
     def __call__(
         self,
         __hydra_target: Type[Union[AnyBuilds[Importable], PartialBuilds[Importable]]],
-        *pos_args: SupportedPrimitive,
+        *pos_args: T,
         zen_partial: Literal[False, None] = ...,
         populate_full_signature: bool = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -343,7 +345,7 @@ class FullBuilds(Protocol):
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-        **kwargs_for_target: SupportedPrimitive,
+        **kwargs_for_target: T,
     ) -> Type[Builds[Importable]]:
         ...
 
@@ -351,7 +353,7 @@ class FullBuilds(Protocol):
     def __call__(
         self,
         __hydra_target: Importable,
-        *pos_args: SupportedPrimitive,
+        *pos_args: T,
         zen_partial: Literal[False, None] = ...,
         populate_full_signature: bool = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -364,7 +366,7 @@ class FullBuilds(Protocol):
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-        **kwargs_for_target: SupportedPrimitive,
+        **kwargs_for_target: T,
     ) -> Type[Builds[Importable]]:
         ...
 
@@ -373,7 +375,7 @@ class FullBuilds(Protocol):
     def __call__(
         self,
         __hydra_target: Type[AnyBuilds[Importable]],
-        *pos_args: SupportedPrimitive,
+        *pos_args: T,
         zen_partial: Literal[True] = ...,
         populate_full_signature: bool = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -386,7 +388,7 @@ class FullBuilds(Protocol):
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-        **kwargs_for_target: SupportedPrimitive,
+        **kwargs_for_target: T,
     ) -> Type[PartialBuilds[Importable]]:
         ...
 
@@ -394,7 +396,7 @@ class FullBuilds(Protocol):
     def __call__(
         self,
         __hydra_target: Importable,
-        *pos_args: SupportedPrimitive,
+        *pos_args: T,
         zen_partial: Literal[True] = ...,
         populate_full_signature: bool = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -407,7 +409,7 @@ class FullBuilds(Protocol):
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-        **kwargs_for_target: SupportedPrimitive,
+        **kwargs_for_target: T,
     ) -> Type[PartialBuilds[Importable]]:
         ...
 
@@ -416,7 +418,7 @@ class FullBuilds(Protocol):
     def __call__(
         self,
         __hydra_target: Type[AnyBuilds[Importable]],
-        *pos_args: SupportedPrimitive,
+        *pos_args: T,
         zen_partial: Optional[bool] = ...,
         populate_full_signature: Literal[False],
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -429,7 +431,7 @@ class FullBuilds(Protocol):
         dataclass_name: Optional[str] = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-        **kwargs_for_target: SupportedPrimitive,
+        **kwargs_for_target: T,
     ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]:
         ...
 
@@ -437,7 +439,7 @@ class FullBuilds(Protocol):
     def __call__(
         self,
         __hydra_target: Importable,
-        *pos_args: SupportedPrimitive,
+        *pos_args: T,
         zen_partial: Optional[bool] = ...,
         populate_full_signature: Literal[False],
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -450,7 +452,7 @@ class FullBuilds(Protocol):
         dataclass_name: Optional[str] = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-        **kwargs_for_target: SupportedPrimitive,
+        **kwargs_for_target: T,
     ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]:
         ...
 
@@ -459,7 +461,7 @@ class FullBuilds(Protocol):
     def __call__(
         self,
         __hydra_target: Union[Callable[P, R], Type[AnyBuilds[Importable]], Importable],
-        *pos_args: SupportedPrimitive,
+        *pos_args: T,
         zen_partial: Optional[bool],
         populate_full_signature: bool = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -472,7 +474,7 @@ class FullBuilds(Protocol):
         dataclass_name: Optional[str] = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-        **kwargs_for_target: SupportedPrimitive,
+        **kwargs_for_target: T,
     ) -> Union[
         Type[Builds[Importable]],
         Type[PartialBuilds[Importable]],
@@ -488,7 +490,7 @@ class FullBuilds(Protocol):
             Type[Builds[Importable]],
             Type[PartialBuilds[Importable]],
         ],
-        *pos_args: SupportedPrimitive,
+        *pos_args: T,
         zen_partial: Optional[bool] = None,
         populate_full_signature: bool = True,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
@@ -501,7 +503,7 @@ class FullBuilds(Protocol):
         dataclass_name: Optional[str] = None,
         zen_dataclass: Optional[DataclassOptions] = None,
         zen_convert: Optional[ZenConvert] = None,
-        **kwargs_for_target: SupportedPrimitive,
+        **kwargs_for_target: T,
     ) -> Union[
         Type[Builds[Importable]],
         Type[PartialBuilds[Importable]],
@@ -510,7 +512,7 @@ class FullBuilds(Protocol):
         ...
 
 
-class PBuilds(Protocol):
+class PBuilds(Generic[T]):
     # partial_builds -> zen_partial=True (new default value)
 
     # partial=True, pop-sig=bool
@@ -518,7 +520,7 @@ class PBuilds(Protocol):
     def __call__(
         self,
         __hydra_target: Type[AnyBuilds[Importable]],
-        *pos_args: SupportedPrimitive,
+        *pos_args: T,
         zen_partial: Literal[True] = ...,
         populate_full_signature: bool = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -531,7 +533,7 @@ class PBuilds(Protocol):
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-        **kwargs_for_target: SupportedPrimitive,
+        **kwargs_for_target: T,
     ) -> Type[PartialBuilds[Importable]]:
         ...
 
@@ -539,7 +541,7 @@ class PBuilds(Protocol):
     def __call__(
         self,
         __hydra_target: Importable,
-        *pos_args: SupportedPrimitive,
+        *pos_args: T,
         zen_partial: Literal[True] = ...,
         populate_full_signature: bool = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -552,7 +554,7 @@ class PBuilds(Protocol):
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-        **kwargs_for_target: SupportedPrimitive,
+        **kwargs_for_target: T,
     ) -> Type[PartialBuilds[Importable]]:
         ...
 
@@ -602,7 +604,7 @@ class PBuilds(Protocol):
     def __call__(
         self,
         __hydra_target: Type[AnyBuilds[Importable]],
-        *pos_args: SupportedPrimitive,
+        *pos_args: T,
         zen_partial: Optional[bool] = ...,
         populate_full_signature: Literal[False] = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -615,7 +617,7 @@ class PBuilds(Protocol):
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-        **kwargs_for_target: SupportedPrimitive,
+        **kwargs_for_target: T,
     ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]],]:
         ...
 
@@ -623,7 +625,7 @@ class PBuilds(Protocol):
     def __call__(
         self,
         __hydra_target: Importable,
-        *pos_args: SupportedPrimitive,
+        *pos_args: T,
         zen_partial: Optional[bool] = ...,
         populate_full_signature: Literal[False] = ...,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -636,7 +638,7 @@ class PBuilds(Protocol):
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-        **kwargs_for_target: SupportedPrimitive,
+        **kwargs_for_target: T,
     ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]],]:
         ...
 
@@ -645,7 +647,7 @@ class PBuilds(Protocol):
     def __call__(
         self,
         __hydra_target: Union[Callable[P, R], Importable],
-        *pos_args: SupportedPrimitive,
+        *pos_args: T,
         zen_partial: Optional[bool] = ...,
         populate_full_signature: bool,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
@@ -658,7 +660,7 @@ class PBuilds(Protocol):
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-        **kwargs_for_target: SupportedPrimitive,
+        **kwargs_for_target: T,
     ) -> Union[
         Type[Builds[Importable]],
         Type[PartialBuilds[Importable]],
@@ -669,7 +671,7 @@ class PBuilds(Protocol):
     def __call__(
         self,
         __hydra_target: Union[Callable[P, R], Type[AnyBuilds[Importable]], Importable],
-        *pos_args: SupportedPrimitive,
+        *pos_args: T,
         zen_partial: Optional[bool] = True,
         populate_full_signature: bool = False,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
@@ -682,7 +684,7 @@ class PBuilds(Protocol):
         dataclass_name: Optional[str] = None,
         zen_dataclass: Optional[DataclassOptions] = None,
         zen_convert: Optional[ZenConvert] = None,
-        **kwargs_for_target: SupportedPrimitive,
+        **kwargs_for_target: T,
     ) -> Union[
         Type[Builds[Importable]],
         Type[PartialBuilds[Importable]],
