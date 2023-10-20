@@ -5,6 +5,8 @@
 from typing_extensions import assert_type
 
 from hydra_zen import builds, instantiate, just, make_custom_builds_fn, store
+from hydra_zen.typing import SupportedPrimitive
+from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds, StdBuilds
 from hydra_zen.wrapper import ZenStore
 
 
@@ -33,9 +35,13 @@ def check_make_custom_builds() -> None:
     def f(x: int) -> str:
         ...
 
-    builds_ = make_custom_builds_fn()
-    partial_builds = make_custom_builds_fn(zen_partial=True)
-    full_builds = make_custom_builds_fn(populate_full_signature=True)
+    builds_: StdBuilds[SupportedPrimitive] = make_custom_builds_fn()
+    partial_builds: PBuilds[SupportedPrimitive] = make_custom_builds_fn(
+        zen_partial=True
+    )
+    full_builds: FullBuilds[SupportedPrimitive] = make_custom_builds_fn(
+        populate_full_signature=True
+    )
 
     assert_type(instantiate(builds_(A)), A)
     assert_type(instantiate(full_builds(A)), A)
