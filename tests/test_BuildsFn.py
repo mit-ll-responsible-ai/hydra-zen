@@ -41,7 +41,7 @@ class MyBuildsFn(
     BuildsFn[Union[SupportedPrimitive, A, List[Union[SupportedPrimitive, A]]]]
 ):
     @classmethod
-    def _sanitized_default_value(
+    def _make_hydra_compatible(
         cls,
         value: Any,
         allow_zen_conversion: bool = True,
@@ -57,7 +57,7 @@ class MyBuildsFn(
         if isinstance(value, A):
             return cls.__call__(A, value.x)
 
-        return super()._sanitized_default_value(
+        return super()._make_hydra_compatible(
             value,
             allow_zen_conversion,
             error_prefix=error_prefix,
