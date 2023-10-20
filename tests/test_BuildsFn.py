@@ -7,7 +7,15 @@ from typing import Any, List, Union
 import pytest
 from typing_extensions import Literal
 
-from hydra_zen import BuildsFn, builds, instantiate, just, make_custom_builds_fn
+from hydra_zen import (
+    BuildsFn,
+    ZenField,
+    builds,
+    instantiate,
+    just,
+    make_config,
+    make_custom_builds_fn,
+)
 from hydra_zen.errors import HydraZenUnsupportedPrimitiveError
 from hydra_zen.typing import DataclassOptions, SupportedPrimitive
 from hydra_zen.typing._implementations import DataclassOptions
@@ -144,3 +152,16 @@ def test_get_obj_path_override():
     with pytest.raises(Exception, match="Error locating target"):
         assert instantiate(builds(A.static)) == 11
     assert instantiate(my_builds(A.static)) == 11
+
+
+def test_make_config():
+    with pytest.raises(HydraZenUnsupportedPrimitiveError):
+        make_config(x=A(1))  # type: ignore
+
+    assert instantiate(my_builds.make_config(x=A(1))().x) == A(1)
+
+
+def test_zen_field():
+    with pytest.raises(HydraZenUnsupportedPrimitiveError):
+        ZenField(default=A(1))
+    ZenField(default=A(1), _builds_fn=my_builds)
