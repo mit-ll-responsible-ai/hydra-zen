@@ -569,7 +569,7 @@ def _check_for_dynamically_defined_dataclass_type(target_path: str, value: Any) 
 
 
 class NOTHING:
-    def __init__(self) -> None:
+    def __init__(self) -> None:  # pragma: no cover
         raise TypeError("`NOTHING` cannot be instantiated")
 
 
