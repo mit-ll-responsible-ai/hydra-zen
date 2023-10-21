@@ -950,8 +950,8 @@ class BuildsFn(Generic[T]):
     def _make_hydra_compatible(
         cls,
         value: Any,
-        allow_zen_conversion: bool = True,
         *,
+        allow_zen_conversion: bool = True,
         error_prefix: str = "",
         field_name: str = "",
         structured_conf_permitted: bool = True,
