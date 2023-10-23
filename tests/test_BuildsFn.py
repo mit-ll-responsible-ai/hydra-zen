@@ -55,7 +55,7 @@ class MyBuildsFn(
         zen_dataclass: Union[DataclassOptions, None] = None,
     ) -> Any:
         if isinstance(value, A):
-            return cls.__call__(A, value.x)
+            return cls.builds(A, value.x)
 
         return super()._make_hydra_compatible(
             value,
