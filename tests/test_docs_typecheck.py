@@ -60,7 +60,7 @@ PYRIGHT_SCAN_RESULTS: Dict[Any, PyrightOutput] = {}
 FUNCS_TO_SCAN = [
     ZenField,
     ZenStore,
-    builds,
+    builds.__call__,
     get_target,
     hydrated_dataclass,
     instantiate,
@@ -92,29 +92,7 @@ if PYRIGHT_PATH is not None:
 
 
 @pytest.mark.skipif(PYRIGHT_PATH is None, reason="pyright is not installed")
-@pytest.mark.parametrize(
-    "func",
-    [
-        ZenField,
-        ZenStore,
-        builds,
-        get_target,
-        hydrated_dataclass,
-        instantiate,
-        is_partial_builds,
-        just,
-        # launch,  # TODO: add after https://github.com/mit-ll-responsible-ai/hydra-zen/pull/313 is merged
-        load_from_yaml,
-        make_config,
-        make_custom_builds_fn,
-        save_as_yaml,
-        to_yaml,
-        uses_zen_processing,
-        zen,
-        ZenConvert,
-        DataclassOptions,
-    ],
-)
+@pytest.mark.parametrize("func", FUNCS_TO_SCAN)
 def test_docstrings_scan_clean_via_pyright(func):
     results = PYRIGHT_SCAN_RESULTS[func]
     assert results["summary"]["errorCount"] == 0, list_error_messages(results)
