@@ -44,7 +44,7 @@ from typing_extensions import (
     Unpack,
 )
 
-from hydra_zen import builds, instantiate, mutable_value
+from hydra_zen import DefaultBuilds, builds, instantiate, mutable_value
 from hydra_zen._compatibility import (
     HYDRA_VERSION,
     OMEGACONF_VERSION,
@@ -260,7 +260,7 @@ NoneType: TypeAlias = None
     ],
 )
 def test_sanitized_type_expected_behavior(in_type, expected_type):
-    assert builds._sanitized_type(in_type) == expected_type, in_type
+    assert DefaultBuilds._sanitized_type(in_type) == expected_type, in_type
 
     if in_type != expected_type:
         # In cases where we change the type, it should be because omegaconf
@@ -294,7 +294,7 @@ def test_sanitized_type_expected_behavior(in_type, expected_type):
 
 
 def test_tuple_annotation_normalization():
-    assert builds._sanitized_type(Tuple[int, str, int]) is Tuple[Any, Any, Any]
+    assert DefaultBuilds._sanitized_type(Tuple[int, str, int]) is Tuple[Any, Any, Any]
 
 
 def f_list(x: List):

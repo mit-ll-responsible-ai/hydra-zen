@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Tuple
 import pytest
 from omegaconf import OmegaConf
 
-from hydra_zen import builds
+from hydra_zen import DefaultBuilds
 
 
 @pytest.mark.parametrize(
@@ -20,7 +20,7 @@ from hydra_zen import builds
 )
 def test_sanitized_type_expected_behavior(in_type, expected_type):
     # tests collections-as-generics introduced in py39
-    actual = builds._sanitized_type(in_type)
+    actual = DefaultBuilds._sanitized_type(in_type)
     assert actual is expected_type or actual == expected_type
 
     @dataclass

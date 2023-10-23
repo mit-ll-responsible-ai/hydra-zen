@@ -13,7 +13,7 @@ from hydra_zen.typing._implementations import (
     ZenConvert,
 )
 
-from ._implementations import ZenField, builds
+from ._implementations import DefaultBuilds, ZenField
 
 __all__ = ["ZenField", "make_config"]
 
@@ -275,4 +275,4 @@ def make_config(
     _locals = locals().copy()
     fields_as_args = _locals.pop("fields_as_args")
     fields_as_kwargs = _locals.pop("fields_as_kwargs")
-    return builds.make_config(*fields_as_args, **_locals, **fields_as_kwargs)  # type: ignore
+    return DefaultBuilds.make_config(*fields_as_args, **_locals, **fields_as_kwargs)  # type: ignore

@@ -5,11 +5,17 @@ from functools import partial
 
 import pytest
 
-from hydra_zen import builds, get_target, instantiate, make_custom_builds_fn
+from hydra_zen import (
+    DefaultBuilds,
+    builds,
+    get_target,
+    instantiate,
+    make_custom_builds_fn,
+)
 from hydra_zen.funcs import zen_processing
 from hydra_zen.typing import HydraPartialBuilds, ZenPartialBuilds
 
-get_obj_path = builds._get_obj_path
+get_obj_path = DefaultBuilds._get_obj_path
 
 
 @dataclass

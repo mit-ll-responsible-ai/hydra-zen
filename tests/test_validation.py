@@ -14,6 +14,7 @@ from hypothesis import assume, given, settings
 from omegaconf import OmegaConf
 
 from hydra_zen import (
+    DefaultBuilds,
     builds,
     get_target,
     hydrated_dataclass,
@@ -30,7 +31,7 @@ from hydra_zen.structured_configs._globals import (
 )
 from tests import everything_except
 
-get_obj_path = builds._get_obj_path
+get_obj_path = DefaultBuilds._get_obj_path
 
 
 def test_builds_no_args_raises():
