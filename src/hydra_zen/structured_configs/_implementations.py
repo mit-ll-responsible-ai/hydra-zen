@@ -641,7 +641,9 @@ _MAKE_CONFIG_SETTINGS = AllConvert(dataclass=False, flat_target=False)
 class BuildsFn(Generic[T]):
     """builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, hydra_recursive=None, hydra_convert=None, hydra_defaults=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
 
-    WRITE ME
+    To customize type-refinement support, override `_sanitized_type`.
+    To customize auto-config support, override `_make_hydra_compatible`.
+    To customize the ability to resolve import paths, override `_get_obj_path`.
     """
 
     __slots__ = ("__name__", "__qualname__")
@@ -1244,7 +1246,7 @@ class BuildsFn(Generic[T]):
     # partial=False, pop-sig=True; no *args, **kwargs, nor builds_bases
     @overload
     @classmethod
-    def __call__(
+    def builds(
         cls,
         __hydra_target: Type[BuildsWithSig[Type[R], P]],
         *,
@@ -1265,7 +1267,7 @@ class BuildsFn(Generic[T]):
 
     @overload
     @classmethod
-    def __call__(
+    def builds(
         cls,
         __hydra_target: Callable[P, R],
         *,
@@ -1287,7 +1289,7 @@ class BuildsFn(Generic[T]):
     # partial=False, pop-sig=bool
     @overload
     @classmethod
-    def __call__(
+    def builds(
         cls,
         __hydra_target: Type[AnyBuilds[Importable]],
         *pos_args: T,
@@ -1310,7 +1312,7 @@ class BuildsFn(Generic[T]):
     # partial=False, pop-sig=bool
     @overload
     @classmethod
-    def __call__(
+    def builds(
         cls,
         __hydra_target: Importable,
         *pos_args: T,
@@ -1333,7 +1335,7 @@ class BuildsFn(Generic[T]):
     # partial=True, pop-sig=bool
     @overload
     @classmethod
-    def __call__(
+    def builds(
         cls,
         __hydra_target: Type[AnyBuilds[Importable]],
         *pos_args: T,
@@ -1356,7 +1358,7 @@ class BuildsFn(Generic[T]):
     # partial=True, pop-sig=bool
     @overload
     @classmethod
-    def __call__(
+    def builds(
         cls,
         __hydra_target: Importable,
         *pos_args: T,
@@ -1379,7 +1381,7 @@ class BuildsFn(Generic[T]):
     # partial=bool, pop-sig=False
     @overload
     @classmethod
-    def __call__(
+    def builds(
         cls,
         __hydra_target: Type[AnyBuilds[Importable]],
         *pos_args: T,
@@ -1402,7 +1404,7 @@ class BuildsFn(Generic[T]):
     # partial=bool, pop-sig=False
     @overload
     @classmethod
-    def __call__(
+    def builds(
         cls,
         __hydra_target: Importable,
         *pos_args: T,
@@ -1425,7 +1427,7 @@ class BuildsFn(Generic[T]):
     # partial=bool, pop-sig=bool
     @overload
     @classmethod
-    def __call__(
+    def builds(
         cls,
         __hydra_target: Union[Callable[P, R], Type[Builds[Importable]], Importable],
         *pos_args: T,
@@ -1450,7 +1452,7 @@ class BuildsFn(Generic[T]):
         ...
 
     @classmethod
-    def __call__(
+    def builds(
         cls,
         *pos_args: Union[Importable, Callable[P, R], Type[AnyBuilds[Importable]], Any],
         zen_partial: Optional[bool] = None,
@@ -1620,7 +1622,7 @@ class BuildsFn(Generic[T]):
 
         from dataclasses import make_dataclass
 
-        def __call__(self,target, populate_full_signature=False, **kw):
+        def builds(self,target, populate_full_signature=False, **kw):
             # Dynamically defines a Hydra-compatible dataclass type.
             # Akin to doing:
             #
@@ -2729,6 +2731,8 @@ class BuildsFn(Generic[T]):
         return cast(
             Union[Type[Builds[Importable]], Type[BuildsWithSig[Type[R], P]]], out
         )
+
+    __call__ = builds
 
     @overload
     @classmethod

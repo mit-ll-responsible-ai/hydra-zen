@@ -282,7 +282,7 @@ def make_custom_builds_fn(
     <Validation error: "c" is not "a" or "b">
     """
     excluded_fields = frozenset({"dataclass_name", "hydra_defaults", "builds_bases"})
-    fn = builds_fn.__call__
+    fn = builds_fn.builds
     del builds_fn
     LOCALS = locals()
     # Ensures that new defaults added to `builds` must be reflected
