@@ -59,7 +59,7 @@ class MyBuildsFn(
 
         return super()._make_hydra_compatible(
             value,
-            allow_zen_conversion,
+            allow_zen_conversion=allow_zen_conversion,
             error_prefix=error_prefix,
             field_name=field_name,
             structured_conf_permitted=structured_conf_permitted,
