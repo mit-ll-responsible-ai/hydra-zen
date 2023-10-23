@@ -411,6 +411,7 @@ document.write(`
     <span class="n">Dict</span><span class="p">,</span>
     <span class="n">Mapping</span><span class="p">,</span>
     <span class="n">Optional</span><span class="p">,</span>
+    <span class="n">TypeVar</span><span class="p">,</span>
     <span class="n">Union</span><span class="p">,</span>
     <span class="n">cast</span><span class="p">,</span>
     <span class="n">overload</span><span class="p">,</span>
@@ -421,9 +422,9 @@ document.write(`
 <span class="kn">from</span> <span class="nn">hydra_zen.errors</span> <span class="kn">import</span> <span class="n">HydraZenDeprecationWarning</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">DataclassOptions</span><span class="p">,</span> <span class="n">ZenWrappers</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._builds_overloads</span> <span class="kn">import</span> <span class="n">FullBuilds</span><span class="p">,</span> <span class="n">PBuilds</span><span class="p">,</span> <span class="n">StdBuilds</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">ZenConvert</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">InstOrType</span><span class="p">,</span> <span class="n">ZenConvert</span>
 
-<span class="kn">from</span> <span class="nn">._implementations</span> <span class="kn">import</span> <span class="n">builds</span>
+<span class="kn">from</span> <span class="nn">._implementations</span> <span class="kn">import</span> <span class="n">BuildsFn</span><span class="p">,</span> <span class="n">DefaultBuilds</span><span class="p">,</span> <span class="n">builds</span>
 <span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">parse_dataclass_options</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;make_custom_builds_fn&quot;</span><span class="p">]</span>
@@ -440,6 +441,11 @@ document.write(`
 <span class="n">__BUILDS_DEFAULTS</span><span class="p">[</span><span class="s2">&quot;dataclass_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">del</span> <span class="n">_builds_sig</span>
 
+<span class="c1"># TODO: parameterize the return types and attach this</span>
+<span class="c1">#       as a classmethod to `BuildsFn`</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+
 
 <span class="c1"># partial=False, pop-sig=True</span>
 <span class="nd">@overload</span>
@@ -454,7 +460,8 @@ document.write(`
     <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FullBuilds</span><span class="p">:</span>
+    <span class="n">builds_fn</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">T</span><span class="p">]]</span> <span class="o">=</span> <span class="n">DefaultBuilds</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FullBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
     <span class="o">...</span>
 
 
@@ -471,7 +478,8 @@ document.write(`
     <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PBuilds</span><span class="p">:</span>
+    <span class="n">builds_fn</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">T</span><span class="p">]]</span> <span class="o">=</span> <span class="n">DefaultBuilds</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
     <span class="o">...</span>
 
 
@@ -488,7 +496,8 @@ document.write(`
     <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StdBuilds</span><span class="p">:</span>
+    <span class="n">builds_fn</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">T</span><span class="p">]]</span> <span class="o">=</span> <span class="n">DefaultBuilds</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StdBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
     <span class="o">...</span>
 
 
@@ -505,7 +514,8 @@ document.write(`
     <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">FullBuilds</span><span class="p">,</span> <span class="n">StdBuilds</span><span class="p">]:</span>
+    <span class="n">builds_fn</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">T</span><span class="p">]]</span> <span class="o">=</span> <span class="n">DefaultBuilds</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">FullBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">StdBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">]]:</span>
     <span class="o">...</span>
 
 
@@ -522,7 +532,8 @@ document.write(`
     <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">PBuilds</span><span class="p">,</span> <span class="n">StdBuilds</span><span class="p">]:</span>
+    <span class="n">builds_fn</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">T</span><span class="p">]]</span> <span class="o">=</span> <span class="n">DefaultBuilds</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">PBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">StdBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">]]:</span>
     <span class="o">...</span>
 
 
@@ -539,7 +550,8 @@ document.write(`
     <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">FullBuilds</span><span class="p">,</span> <span class="n">PBuilds</span><span class="p">,</span> <span class="n">StdBuilds</span><span class="p">]:</span>
+    <span class="n">builds_fn</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">T</span><span class="p">]]</span> <span class="o">=</span> <span class="n">DefaultBuilds</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">FullBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">PBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">StdBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],]:</span>
     <span class="o">...</span>
 
 
@@ -556,7 +568,8 @@ document.write(`
     <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">FullBuilds</span><span class="p">,</span> <span class="n">PBuilds</span><span class="p">,</span> <span class="n">StdBuilds</span><span class="p">]:</span>
+    <span class="n">builds_fn</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">T</span><span class="p">]]</span> <span class="o">=</span> <span class="n">DefaultBuilds</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">FullBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">PBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">StdBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the `builds` function, but with customized default values.</span>
 
 <span class="sd">    E.g. ``make_custom_builds_fn(hydra_convert=&#39;all&#39;)`` will return a version</span>
@@ -608,9 +621,12 @@ document.write(`
 
 <span class="sd">        Specifies a new the default value for ``builds(..., frozen=&lt;..&gt;)``</span>
 
+<span class="sd">    builds_fn: BuildsFn[T]</span>
+<span class="sd">        The builds-function whose defaults are modified.</span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    custom_builds</span>
+<span class="sd">    custom_builds[T]</span>
 <span class="sd">        The function `builds`, but with customized default values.</span>
 
 <span class="sd">    See Also</span>
@@ -668,8 +684,9 @@ document.write(`
 <span class="sd">    &lt;Validation error: &quot;c&quot; is not &quot;a&quot; or &quot;b&quot;&gt;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">excluded_fields</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">&quot;dataclass_name&quot;</span><span class="p">,</span> <span class="s2">&quot;hydra_defaults&quot;</span><span class="p">,</span> <span class="s2">&quot;builds_bases&quot;</span><span class="p">})</span>
+    <span class="n">fn</span> <span class="o">=</span> <span class="n">builds_fn</span><span class="o">.</span><span class="n">builds</span>
+    <span class="k">del</span> <span class="n">builds_fn</span>
     <span class="n">LOCALS</span> <span class="o">=</span> <span class="nb">locals</span><span class="p">()</span>
-
     <span class="c1"># Ensures that new defaults added to `builds` must be reflected</span>
     <span class="c1"># in the signature of `make_custom_builds_fn`.</span>
     <span class="k">assert</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">__BUILDS_DEFAULTS</span><span class="p">)</span> <span class="o">-</span> <span class="n">excluded_fields</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">LOCALS</span><span class="p">)</span>
@@ -684,7 +701,7 @@ document.write(`
     <span class="c1"># causing them to resolve the return type of this function as &quot;unknown&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>  <span class="c1"># pragma: no branch</span>
         <span class="c1"># let `builds` validate the new defaults!</span>
-        <span class="n">builds</span><span class="p">(</span><span class="n">builds</span><span class="p">,</span> <span class="o">**</span><span class="n">_new_defaults</span><span class="p">)</span>
+        <span class="n">fn</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="o">**</span><span class="n">_new_defaults</span><span class="p">)</span>
 
     <span class="n">_zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="n">_new_defaults</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;zen_dataclass&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">_zen_dataclass</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -703,7 +720,7 @@ document.write(`
 
     <span class="n">_zen_dataclass</span> <span class="o">=</span> <span class="n">parse_dataclass_options</span><span class="p">(</span><span class="n">_zen_dataclass</span><span class="p">)</span>
 
-    <span class="nd">@wraps</span><span class="p">(</span><span class="n">builds</span><span class="p">)</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="n">merged_kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;zen_dataclass&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -715,9 +732,16 @@ document.write(`
 
         <span class="n">merged_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_new_defaults</span><span class="p">)</span>
         <span class="n">merged_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">builds</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">merged_kwargs</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">merged_kwargs</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Union</span><span class="p">[</span><span class="n">FullBuilds</span><span class="p">,</span> <span class="n">PBuilds</span><span class="p">,</span> <span class="n">StdBuilds</span><span class="p">],</span> <span class="n">wrapped</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
+        <span class="n">Union</span><span class="p">[</span>
+            <span class="n">FullBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
+            <span class="n">PBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
+            <span class="n">StdBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
+        <span class="p">],</span>
+        <span class="n">wrapped</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 </pre></div>
 

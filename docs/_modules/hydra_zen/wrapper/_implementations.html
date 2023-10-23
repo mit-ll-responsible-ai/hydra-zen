@@ -432,7 +432,6 @@ document.write(`
 <span class="kn">import</span> <span class="nn">hydra</span>
 <span class="kn">from</span> <span class="nn">hydra.conf</span> <span class="kn">import</span> <span class="n">HydraConf</span>
 <span class="kn">from</span> <span class="nn">hydra.core.config_store</span> <span class="kn">import</span> <span class="n">ConfigStore</span>
-<span class="kn">from</span> <span class="nn">hydra.utils</span> <span class="kn">import</span> <span class="n">instantiate</span>
 <span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">,</span> <span class="n">OmegaConf</span>
 <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Final</span><span class="p">,</span>
@@ -448,8 +447,8 @@ document.write(`
 <span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">instantiate</span><span class="p">,</span> <span class="n">just</span><span class="p">,</span> <span class="n">make_custom_builds_fn</span>
 <span class="kn">from</span> <span class="nn">hydra_zen._compatibility</span> <span class="kn">import</span> <span class="n">HYDRA_VERSION</span><span class="p">,</span> <span class="n">Version</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.errors</span> <span class="kn">import</span> <span class="n">HydraZenValidationError</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.structured_configs._implementations</span> <span class="kn">import</span> <span class="n">BuildsFn</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.structured_configs._type_guards</span> <span class="kn">import</span> <span class="n">safe_getattr</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.structured_configs._utils</span> <span class="kn">import</span> <span class="n">get_obj_path</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">DataClass_</span><span class="p">,</span>
     <span class="n">GroupName</span><span class="p">,</span>
@@ -463,6 +462,7 @@ document.write(`
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;zen&quot;</span><span class="p">,</span> <span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="s2">&quot;Zen&quot;</span><span class="p">]</span>
 
+<span class="n">get_obj_path</span> <span class="o">=</span> <span class="n">BuildsFn</span><span class="o">.</span><span class="n">_get_obj_path</span>  <span class="c1"># type: ignore</span>
 
 <span class="n">R</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;R&quot;</span><span class="p">)</span>
 <span class="n">P</span> <span class="o">=</span> <span class="n">ParamSpec</span><span class="p">(</span><span class="s2">&quot;P&quot;</span><span class="p">)</span>

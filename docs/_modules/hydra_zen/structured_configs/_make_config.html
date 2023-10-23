@@ -400,43 +400,20 @@ document.write(`
   <h1>Source code for hydra_zen.structured_configs._make_config</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) 2023 Massachusetts Institute of Technology</span>
 <span class="c1"># SPDX-License-Identifier: MIT</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># use this for runtime checks</span>
-    <span class="n">InitVar</span><span class="p">,</span>
-    <span class="n">dataclass</span><span class="p">,</span>
-    <span class="n">make_dataclass</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Literal</span>
 
-<span class="kn">from</span> <span class="nn">hydra_zen.errors</span> <span class="kn">import</span> <span class="n">HydraZenDeprecationWarning</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.structured_configs</span> <span class="kn">import</span> <span class="n">_utils</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.structured_configs._implementations</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">_BUILDS_CONVERT_SETTINGS</span><span class="p">,</span>
-    <span class="n">sanitize_collection</span><span class="p">,</span>
-<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">DataclassOptions</span><span class="p">,</span> <span class="n">SupportedPrimitive</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AllConvert</span><span class="p">,</span>
     <span class="n">DataClass</span><span class="p">,</span>
     <span class="n">DataClass_</span><span class="p">,</span>
     <span class="n">DefaultsList</span><span class="p">,</span>
-    <span class="n">Field</span><span class="p">,</span>
     <span class="n">ZenConvert</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">._globals</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">CONVERT_FIELD_NAME</span><span class="p">,</span>
-    <span class="n">DEFAULTS_LIST_FIELD_NAME</span><span class="p">,</span>
-    <span class="n">PARTIAL_FIELD_NAME</span><span class="p">,</span>
-    <span class="n">RECURSIVE_FIELD_NAME</span><span class="p">,</span>
-    <span class="n">ZEN_PARTIAL_FIELD_NAME</span><span class="p">,</span>
-    <span class="n">ZEN_TARGET_FIELD_NAME</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span> <span class="nn">._implementations</span> <span class="kn">import</span> <span class="n">_retain_type_info</span><span class="p">,</span> <span class="n">builds</span><span class="p">,</span> <span class="n">sanitized_field</span>
-<span class="kn">from</span> <span class="nn">._type_guards</span> <span class="kn">import</span> <span class="n">safe_getattr</span><span class="p">,</span> <span class="n">uses_zen_processing</span>
+<span class="kn">from</span> <span class="nn">._implementations</span> <span class="kn">import</span> <span class="n">DefaultBuilds</span><span class="p">,</span> <span class="n">ZenField</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ZenField&quot;</span><span class="p">,</span> <span class="s2">&quot;make_config&quot;</span><span class="p">]</span>
 
@@ -444,66 +421,6 @@ document.write(`
 <span class="k">class</span> <span class="nc">NOTHING</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;`NOTHING` cannot be instantiated&quot;</span><span class="p">)</span>
-
-
-<div class="viewcode-block" id="ZenField">
-<a class="viewcode-back" href="../../../generated/hydra_zen.ZenField.html#hydra_zen.ZenField">[docs]</a>
-<span class="nd">@dataclass</span><span class="p">(</span><span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ZenField</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    ZenField(hint=Any, default=&lt;class &#39;NOTHING&#39;&gt;, name=&lt;class &#39;NOTHING&#39;&gt;)</span>
-
-<span class="sd">    Specifies a field&#39;s name and/or type-annotation and/or default value.</span>
-<span class="sd">    Designed to specify fields in `make_config`.</span>
-
-<span class="sd">    See the Examples section of the docstring for `make_config` for examples of using</span>
-<span class="sd">    `ZenField`.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    hint : type, optional (default=Any)</span>
-<span class="sd">    default : Any, optional</span>
-<span class="sd">    name : str, optional</span>
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    ``default`` will be returned as an instance of :class:`dataclasses.Field`.</span>
-<span class="sd">    Mutable values (e.g. lists or dictionaries) passed to ``default`` will automatically</span>
-<span class="sd">    be &quot;packaged&quot; in a default-factory function [1]_.</span>
-
-<span class="sd">    A type passed to ``hint`` will automatically be &quot;broadened&quot; such that the resulting</span>
-<span class="sd">    type is compatible with Hydra&#39;s set of supported type annotations [2]_.</span>
-
-<span class="sd">    References</span>
-<span class="sd">    ----------</span>
-<span class="sd">    .. [1] https://docs.python.org/3/library/dataclasses.html#default-factory-functions</span>
-<span class="sd">    .. [2] https://hydra.cc/docs/next/tutorials/structured_config/intro/#structured-configs-supports</span>
-
-<span class="sd">    See Also</span>
-<span class="sd">    --------</span>
-<span class="sd">    make_config: create a config with customized field names, default values, and annotations.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">hint</span><span class="p">:</span> <span class="nb">type</span> <span class="o">=</span> <span class="n">Any</span>
-    <span class="n">default</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportedPrimitive</span><span class="p">,</span> <span class="n">Field</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">NOTHING</span><span class="p">)</span>
-    <span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">NOTHING</span><span class="p">]]</span> <span class="o">=</span> <span class="n">NOTHING</span>
-    <span class="n">zen_convert</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
-
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NOTHING</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`ZenField.name` expects a string, got: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">convert_settings</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">merge_settings</span><span class="p">(</span><span class="n">zen_convert</span><span class="p">,</span> <span class="n">_BUILDS_CONVERT_SETTINGS</span><span class="p">)</span>
-        <span class="k">del</span> <span class="n">zen_convert</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">hint</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">sanitized_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hint</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NOTHING</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">sanitized_field</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">,</span>
-                <span class="n">convert_dataclass</span><span class="o">=</span><span class="n">convert_settings</span><span class="p">[</span><span class="s2">&quot;dataclass&quot;</span><span class="p">],</span>
-            <span class="p">)</span></div>
-
 
 
 <span class="n">_MAKE_CONFIG_SETTINGS</span> <span class="o">=</span> <span class="n">AllConvert</span><span class="p">(</span><span class="n">dataclass</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">flat_target</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -757,202 +674,10 @@ document.write(`
 
 <span class="sd">    See :ref:`data-val` for more general data validation capabilities via hydra-zen.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">convert_settings</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">merge_settings</span><span class="p">(</span><span class="n">zen_convert</span><span class="p">,</span> <span class="n">_MAKE_CONFIG_SETTINGS</span><span class="p">)</span>
-    <span class="n">convert_settings</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">ZenConvert</span><span class="p">,</span> <span class="n">convert_settings</span><span class="p">)</span>
-    <span class="k">del</span> <span class="n">zen_convert</span>
-
-    <span class="k">if</span> <span class="n">zen_dataclass</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">zen_dataclass</span> <span class="o">=</span> <span class="p">{}</span>
-
-    <span class="c1"># initial validation</span>
-    <span class="n">_utils</span><span class="o">.</span><span class="n">parse_dataclass_options</span><span class="p">(</span><span class="n">zen_dataclass</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="s2">&quot;frozen&quot;</span> <span class="ow">in</span> <span class="n">fields_as_kwargs</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="n">HydraZenDeprecationWarning</span><span class="p">(</span>
-                <span class="s2">&quot;Specifying `builds(frozen=&lt;...&gt;)` is deprecated. Instead, &quot;</span>
-                <span class="s2">&quot;specify `builds(zen_dataclass={&#39;frozen&#39;: &lt;...&gt;})&quot;</span>
-            <span class="p">),</span>
-            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">zen_dataclass</span><span class="p">[</span><span class="s2">&quot;frozen&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fields_as_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;frozen&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
-
-    <span class="k">if</span> <span class="s2">&quot;config_name&quot;</span> <span class="ow">in</span> <span class="n">fields_as_kwargs</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="n">HydraZenDeprecationWarning</span><span class="p">(</span>
-                <span class="s2">&quot;Specifying `make_config(config_name=&lt;...&gt;)` is deprecated. &quot;</span>
-                <span class="s2">&quot;Instead specify `make_config(zen_dataclass={&#39;cls_name&#39;: &lt;...&gt;})&quot;</span>
-            <span class="p">),</span>
-            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">zen_dataclass</span><span class="p">[</span><span class="s2">&quot;cls_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fields_as_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;config_name&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">bases</span><span class="p">:</span>
-        <span class="n">bases</span> <span class="o">=</span> <span class="n">zen_dataclass</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bases&quot;</span><span class="p">,</span> <span class="p">())</span>
-
-    <span class="n">zen_dataclass</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;cls_name&quot;</span><span class="p">,</span> <span class="s2">&quot;Config&quot;</span><span class="p">)</span>
-    <span class="n">dataclass_options</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">parse_dataclass_options</span><span class="p">(</span><span class="n">zen_dataclass</span><span class="p">)</span>
-
-    <span class="k">for</span> <span class="n">_field</span> <span class="ow">in</span> <span class="n">fields_as_args</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_field</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;`fields_as_args` can only consist of field-names (i.e. strings) or &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;`ZenField` instances. Got: &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">fields_as_args</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nb">str</span><span class="p">,</span><span class="w"> </span><span class="n">ZenField</span><span class="p">)))</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_field</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_field</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="n">NOTHING</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;All `ZenField` instances specified in `fields_as_args` must have a &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;name associated with it. Got: </span><span class="si">{</span><span class="n">_field</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">_field</span> <span class="ow">in</span> <span class="n">fields_as_kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_field</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">_field</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NOTHING</span> <span class="ow">and</span> <span class="n">_field</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">name</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;`fields_as_kwargs` specifies conflicting names: the kwarg </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;is associated with a `ZenField` with name </span><span class="si">{</span><span class="n">_field</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">_field</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
-
-    <span class="k">if</span> <span class="n">fields_as_args</span><span class="p">:</span>
-        <span class="n">all_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">)</span> <span class="k">else</span> <span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields_as_args</span><span class="p">]</span>
-        <span class="n">all_names</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">fields_as_kwargs</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_names</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">all_names</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;`fields_as_args` cannot specify the same field-name multiple times.&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot; Got multiple entries for:&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">Counter</span><span class="p">(</span><span class="n">all_names</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-        <span class="k">for</span> <span class="n">_name</span> <span class="ow">in</span> <span class="n">all_names</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_zen_&quot;</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;The field-name specified via `</span><span class="si">{</span><span class="n">_name</span><span class="si">}</span><span class="s2">=&lt;...&gt;` is reserved by hydra-zen.&quot;</span>
-                    <span class="s2">&quot; You can manually create a dataclass to utilize this name in a structured config.&quot;</span>
-                <span class="p">)</span>
-        <span class="k">del</span> <span class="n">all_names</span>
-
-    <span class="k">if</span> <span class="s2">&quot;defaults&quot;</span> <span class="ow">in</span> <span class="n">fields_as_kwargs</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">hydra_defaults</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;`defaults` and `hydra_defaults` cannot be specified simultaneously&quot;</span>
-            <span class="p">)</span>
-        <span class="n">_defaults</span> <span class="o">=</span> <span class="n">fields_as_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;defaults&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_defaults</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">):</span>  <span class="c1"># pragma: no branch</span>
-            <span class="n">hydra_defaults</span> <span class="o">=</span> <span class="n">_defaults</span>  <span class="c1"># type: ignore</span>
-
-    <span class="c1"># validate hydra-args via `builds`</span>
-    <span class="c1"># also check for use of reserved names</span>
-    <span class="n">_tmp</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
-
-    <span class="n">builds</span><span class="p">(</span>
-        <span class="nb">dict</span><span class="p">,</span>
-        <span class="n">hydra_convert</span><span class="o">=</span><span class="n">hydra_convert</span><span class="p">,</span>
-        <span class="n">hydra_recursive</span><span class="o">=</span><span class="n">hydra_recursive</span><span class="p">,</span>
-        <span class="n">hydra_defaults</span><span class="o">=</span><span class="n">hydra_defaults</span><span class="p">,</span>
-        <span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_tmp</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fields_as_kwargs</span><span class="p">},</span>
-    <span class="p">)</span>
-
-    <span class="n">normalized_fields</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-
-    <span class="k">for</span> <span class="n">_field</span> <span class="ow">in</span> <span class="n">fields_as_args</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_field</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">normalized_fields</span><span class="p">[</span><span class="n">_field</span><span class="p">]</span> <span class="o">=</span> <span class="n">ZenField</span><span class="p">(</span>
-                <span class="n">name</span><span class="o">=</span><span class="n">_field</span><span class="p">,</span> <span class="n">hint</span><span class="o">=</span><span class="n">Any</span><span class="p">,</span> <span class="n">zen_convert</span><span class="o">=</span><span class="n">convert_settings</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_field</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-            <span class="n">normalized_fields</span><span class="p">[</span><span class="n">_field</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_field</span>
-
-    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">fields_as_kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">):</span>
-            <span class="n">normalized_fields</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ZenField</span><span class="p">(</span>
-                <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-                <span class="n">default</span><span class="o">=</span><span class="n">value</span><span class="p">,</span>
-                <span class="n">zen_convert</span><span class="o">=</span><span class="n">convert_settings</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">normalized_fields</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-
-    <span class="c1"># fields without defaults must come first</span>
-    <span class="n">config_fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="n">f</span><span class="o">.</span><span class="n">hint</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">normalized_fields</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="n">NOTHING</span>
-    <span class="p">]</span>
-
-    <span class="n">config_fields</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-        <span class="p">[</span>
-            <span class="p">(</span>
-                <span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
-                <span class="p">(</span>
-                    <span class="c1"># f.default: Field</span>
-                    <span class="c1"># f.default.default: Any</span>
-                    <span class="n">f</span><span class="o">.</span><span class="n">hint</span>
-                    <span class="k">if</span> <span class="n">_retain_type_info</span><span class="p">(</span>
-                        <span class="n">type_</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">hint</span><span class="p">,</span>
-                        <span class="n">value</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">default</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
-                        <span class="n">hydra_recursive</span><span class="o">=</span><span class="n">hydra_recursive</span><span class="p">,</span>
-                    <span class="p">)</span>
-                    <span class="k">else</span> <span class="n">Any</span>
-                <span class="p">),</span>
-                <span class="n">f</span><span class="o">.</span><span class="n">default</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">normalized_fields</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NOTHING</span>
-        <span class="p">]</span>
-    <span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">hydra_recursive</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">config_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="p">(</span>
-                <span class="n">RECURSIVE_FIELD_NAME</span><span class="p">,</span>
-                <span class="nb">bool</span><span class="p">,</span>
-                <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">hydra_recursive</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">hydra_convert</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">config_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="p">(</span><span class="n">CONVERT_FIELD_NAME</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">hydra_convert</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
-        <span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">hydra_defaults</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">hydra_defaults</span> <span class="o">=</span> <span class="n">sanitize_collection</span><span class="p">(</span><span class="n">hydra_defaults</span><span class="p">,</span> <span class="n">convert_dataclass</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">config_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="p">(</span>
-                <span class="n">DEFAULTS_LIST_FIELD_NAME</span><span class="p">,</span>
-                <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
-                <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">hydra_defaults</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
-
-    <span class="n">dataclass_options</span><span class="p">[</span><span class="s2">&quot;bases&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bases</span>
-    <span class="n">module</span> <span class="o">=</span> <span class="n">dataclass_options</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;module&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">_utils</span><span class="o">.</span><span class="n">parse_strict_dataclass_options</span><span class="p">(</span><span class="n">dataclass_options</span><span class="p">),</span> <span class="n">dataclass_options</span>
-
-    <span class="n">out</span> <span class="o">=</span> <span class="n">make_dataclass</span><span class="p">(</span><span class="n">fields</span><span class="o">=</span><span class="n">config_fields</span><span class="p">,</span> <span class="o">**</span><span class="n">dataclass_options</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">module</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">out</span><span class="o">.</span><span class="vm">__module__</span> <span class="o">=</span> <span class="n">module</span>
-
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">ZEN_TARGET_FIELD_NAME</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">uses_zen_processing</span><span class="p">(</span><span class="n">out</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">out</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> inherits from base classes that overwrite some fields &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;associated with zen-processing features. As a result, this config will &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;not instantiate correctly.&quot;</span>
-        <span class="p">)</span>
-    <span class="k">if</span> <span class="n">safe_getattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">PARTIAL_FIELD_NAME</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="n">uses_zen_processing</span><span class="p">(</span><span class="n">out</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">out</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> specifies both `</span><span class="si">{</span><span class="n">PARTIAL_FIELD_NAME</span><span class="si">}</span><span class="s2">=True` and `&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ZEN_PARTIAL_FIELD_NAME</span><span class="si">}</span><span class="s2">=True`. This config will not instantiate &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;correctly. This is typically caused by inheriting from multiple, &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;conflicting configs.&quot;</span>
-        <span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass</span><span class="p">],</span> <span class="n">out</span><span class="p">)</span></div>
+    <span class="n">_locals</span> <span class="o">=</span> <span class="nb">locals</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">fields_as_args</span> <span class="o">=</span> <span class="n">_locals</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;fields_as_args&quot;</span><span class="p">)</span>
+    <span class="n">fields_as_kwargs</span> <span class="o">=</span> <span class="n">_locals</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;fields_as_kwargs&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">DefaultBuilds</span><span class="o">.</span><span class="n">make_config</span><span class="p">(</span><span class="o">*</span><span class="n">fields_as_args</span><span class="p">,</span> <span class="o">**</span><span class="n">_locals</span><span class="p">,</span> <span class="o">**</span><span class="n">fields_as_kwargs</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div>
 
 </pre></div>
 

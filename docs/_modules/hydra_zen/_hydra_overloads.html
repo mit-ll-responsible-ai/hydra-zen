@@ -428,8 +428,11 @@ document.write(`
 <span class="kn">from</span> <span class="nn">hydra.utils</span> <span class="kn">import</span> <span class="n">instantiate</span> <span class="k">as</span> <span class="n">hydra_instantiate</span>
 <span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">MISSING</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">,</span> <span class="n">OmegaConf</span>
 
-<span class="kn">from</span> <span class="nn">.structured_configs._just</span> <span class="kn">import</span> <span class="n">just</span>
-<span class="kn">from</span> <span class="nn">.structured_configs._value_conversion</span> <span class="kn">import</span> <span class="n">ConfigComplex</span><span class="p">,</span> <span class="n">ConfigPath</span>
+<span class="kn">from</span> <span class="nn">.structured_configs._implementations</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ConfigComplex</span><span class="p">,</span>
+    <span class="n">ConfigPath</span><span class="p">,</span>
+    <span class="n">DefaultBuilds</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.typing</span> <span class="kn">import</span> <span class="n">Builds</span><span class="p">,</span> <span class="n">Just</span><span class="p">,</span> <span class="n">Partial</span>
 <span class="kn">from</span> <span class="nn">.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass_</span><span class="p">,</span> <span class="n">HasTarget</span><span class="p">,</span> <span class="n">InstOrType</span><span class="p">,</span> <span class="n">IsPartial</span>
 
@@ -622,7 +625,7 @@ document.write(`
     <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
-            <span class="n">cfg</span> <span class="o">=</span> <span class="n">just</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+            <span class="n">cfg</span> <span class="o">=</span> <span class="n">DefaultBuilds</span><span class="o">.</span><span class="n">just</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">wrapper</span><span class="p">)</span>

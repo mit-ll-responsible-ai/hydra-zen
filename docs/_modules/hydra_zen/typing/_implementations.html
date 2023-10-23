@@ -405,6 +405,7 @@ document.write(`
 
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">MISSING</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span><span class="p">,</span> <span class="n">PosixPath</span><span class="p">,</span> <span class="n">WindowsPath</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
@@ -415,7 +416,6 @@ document.write(`
     <span class="n">ClassVar</span><span class="p">,</span>
     <span class="n">Dict</span><span class="p">,</span>
     <span class="n">FrozenSet</span><span class="p">,</span>
-    <span class="n">Generic</span><span class="p">,</span>
     <span class="n">List</span><span class="p">,</span>
     <span class="n">Mapping</span><span class="p">,</span>
     <span class="n">NewType</span><span class="p">,</span>
@@ -490,6 +490,8 @@ document.write(`
 
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span> <span class="nc">Partial</span><span class="p">(</span><span class="n">Protocol</span><span class="p">[</span><span class="n">T2</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A protocol that matches against `functools.partial`&quot;&quot;&quot;</span>
+
     <span class="fm">__call__</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">T2</span><span class="p">]</span>
 
     <span class="nd">@property</span>
@@ -588,6 +590,23 @@ document.write(`
     <span class="nb">bool</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ByteString</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">WindowsPath</span><span class="p">,</span> <span class="n">PosixPath</span>
 <span class="p">]</span>
 
+<span class="n">HydraSupportedType</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span>
+    <span class="n">_HydraPrimitive</span><span class="p">,</span>
+    <span class="n">DataClass_</span><span class="p">,</span>
+    <span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span>
+    <span class="n">ListConfig</span><span class="p">,</span>
+    <span class="n">DictConfig</span><span class="p">,</span>
+    <span class="n">Enum</span><span class="p">,</span>
+    <span class="n">Literal</span><span class="p">[</span><span class="n">MISSING</span><span class="p">],</span>
+    <span class="c1"># Even thought this is redundant with Sequence, it seems to</span>
+    <span class="c1"># be needed for pyright to do proper checking of tuple contents</span>
+    <span class="n">Tuple</span><span class="p">[</span><span class="s2">&quot;HydraSupportedType&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+    <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;HydraSupportedType&quot;</span><span class="p">],</span>
+    <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="s2">&quot;HydraSupportedType&quot;</span><span class="p">],</span>
+<span class="p">]</span>
+<span class="sd">&quot;&quot;&quot;Describes types that are compatible with Hydra -- they can be used in</span>
+<span class="sd">configs provided to Hydra.&quot;&quot;&quot;</span>
+
 <span class="n">_SupportedViaBuilds</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span>
     <span class="n">Partial</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
     <span class="nb">range</span><span class="p">,</span>
@@ -606,25 +625,23 @@ document.write(`
     <span class="n">EmptyDict</span><span class="p">,</span>  <span class="c1"># not covered by Mapping[..., ...]]</span>
 <span class="p">]</span>
 
-<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="n">SupportedPrimitive</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">_SupportedPrimitive</span><span class="p">,</span>
-        <span class="n">FrozenSet</span><span class="p">[</span><span class="s2">&quot;SupportedPrimitive&quot;</span><span class="p">],</span>
-        <span class="c1"># Even thought this is redundant with Sequence, it seems to</span>
-        <span class="c1"># be needed for pyright to do proper checking of tuple contents</span>
-        <span class="n">Tuple</span><span class="p">[</span><span class="s2">&quot;SupportedPrimitive&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
-        <span class="c1"># Mutable generic containers need to be invariant, so</span>
-        <span class="c1"># we have to settle for Sequence/Mapping. While this</span>
-        <span class="c1"># is overly permissive in terms of sequence-type, it</span>
-        <span class="c1"># at least affords quality checking of sequence content</span>
-        <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;SupportedPrimitive&quot;</span><span class="p">],</span>
-        <span class="c1"># Mapping is covariant only in value</span>
-        <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="s2">&quot;SupportedPrimitive&quot;</span><span class="p">],</span>
-    <span class="p">]</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="c1"># cleans up annotations for REPLs</span>
-    <span class="n">SupportedPrimitive</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;SupportedPrimitive&quot;</span><span class="p">)</span>
 
+<span class="n">SupportedPrimitive</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span>
+    <span class="n">_SupportedPrimitive</span><span class="p">,</span>
+    <span class="n">FrozenSet</span><span class="p">[</span><span class="s2">&quot;SupportedPrimitive&quot;</span><span class="p">],</span>
+    <span class="c1"># Even thought this is redundant with Sequence, it seems to</span>
+    <span class="c1"># be needed for pyright to do proper checking of tuple contents</span>
+    <span class="n">Tuple</span><span class="p">[</span><span class="s2">&quot;SupportedPrimitive&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+    <span class="c1"># Mutable generic containers need to be invariant, so</span>
+    <span class="c1"># we have to settle for Sequence/Mapping. While this</span>
+    <span class="c1"># is overly permissive in terms of sequence-type, it</span>
+    <span class="c1"># at least affords quality checking of sequence content</span>
+    <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;SupportedPrimitive&quot;</span><span class="p">],</span>
+    <span class="c1"># Mapping is covariant only in value</span>
+    <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="s2">&quot;SupportedPrimitive&quot;</span><span class="p">],</span>
+<span class="p">]</span>
+<span class="sd">&quot;&quot;&quot;Describes types that are natively supported by hydra-zen&#39;s config-creation</span>
+<span class="sd">functions.&quot;&quot;&quot;</span>
 
 <span class="n">ZenWrapper</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span>
     <span class="kc">None</span><span class="p">,</span>
@@ -637,12 +654,9 @@ document.write(`
     <span class="n">Callable</span><span class="p">[[</span><span class="n">T4</span><span class="p">],</span> <span class="n">T4</span><span class="p">],</span>
     <span class="nb">str</span><span class="p">,</span>
 <span class="p">]</span>
-<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="n">ZenWrappers</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">ZenWrapper</span><span class="p">[</span><span class="n">T4</span><span class="p">],</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">ZenWrapper</span><span class="p">[</span><span class="n">T4</span><span class="p">]]]</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="c1"># cleans up annotations for REPLs</span>
-    <span class="k">class</span> <span class="nc">ZenWrappers</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">T2</span><span class="p">]):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="k">pass</span>
+
+
+<span class="n">ZenWrappers</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">ZenWrapper</span><span class="p">[</span><span class="n">T4</span><span class="p">],</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">ZenWrapper</span><span class="p">[</span><span class="n">T4</span><span class="p">]]]</span>
 
 
 <span class="n">DefaultsList</span> <span class="o">=</span> <span class="n">List</span><span class="p">[</span>

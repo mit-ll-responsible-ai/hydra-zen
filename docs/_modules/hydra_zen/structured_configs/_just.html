@@ -400,19 +400,17 @@ document.write(`
   <h1>Source code for hydra_zen.structured_configs._just</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) 2023 Massachusetts Institute of Technology</span>
 <span class="c1"># SPDX-License-Identifier: MIT</span>
+
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">FrozenSet</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">overload</span>
 
 <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Literal</span>
 
-<span class="kn">from</span> <span class="nn">hydra_zen.structured_configs</span> <span class="kn">import</span> <span class="n">_utils</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">Builds</span><span class="p">,</span> <span class="n">DataclassOptions</span><span class="p">,</span> <span class="n">Just</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">_HydraPrimitive</span>  <span class="c1"># type: ignore</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">_SupportedViaBuilds</span>  <span class="c1"># type: ignore</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">AllConvert</span><span class="p">,</span> <span class="n">DataClass_</span><span class="p">,</span> <span class="n">ZenConvert</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass_</span><span class="p">,</span> <span class="n">ZenConvert</span>
 
-<span class="kn">from</span> <span class="nn">._implementations</span> <span class="kn">import</span> <span class="n">sanitized_default_value</span>
-<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">merge_settings</span>
-<span class="kn">from</span> <span class="nn">._value_conversion</span> <span class="kn">import</span> <span class="n">ConfigComplex</span>
+<span class="kn">from</span> <span class="nn">._implementations</span> <span class="kn">import</span> <span class="n">ConfigComplex</span><span class="p">,</span> <span class="n">DefaultBuilds</span>
 
 <span class="c1"># pyright: strict</span>
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
@@ -422,9 +420,6 @@ document.write(`
 <span class="n">TB</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TB&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Union</span><span class="p">[</span><span class="n">_SupportedViaBuilds</span><span class="p">,</span> <span class="n">FrozenSet</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;just&quot;</span><span class="p">]</span>
-
-
-<span class="n">_JUST_CONVERT_SETTINGS</span> <span class="o">=</span> <span class="n">AllConvert</span><span class="p">(</span><span class="n">dataclass</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">flat_target</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 
 <span class="nd">@overload</span>
@@ -705,25 +700,7 @@ document.write(`
 <span class="sd">    &gt;&gt;&gt; conf.reduction_fn(conf.data)</span>
 <span class="sd">    (3+5j)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">convert_settings</span> <span class="o">=</span> <span class="n">merge_settings</span><span class="p">(</span><span class="n">zen_convert</span><span class="p">,</span> <span class="n">_JUST_CONVERT_SETTINGS</span><span class="p">)</span>
-    <span class="k">del</span> <span class="n">zen_convert</span>
-    <span class="n">_utils</span><span class="o">.</span><span class="n">validate_hydra_options</span><span class="p">(</span>
-        <span class="n">hydra_recursive</span><span class="o">=</span><span class="n">hydra_recursive</span><span class="p">,</span> <span class="n">hydra_convert</span><span class="o">=</span><span class="n">hydra_convert</span>
-    <span class="p">)</span>
-    <span class="k">if</span> <span class="n">zen_dataclass</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">zen_dataclass</span> <span class="o">=</span> <span class="p">{}</span>
-
-    <span class="k">return</span> <span class="n">sanitized_default_value</span><span class="p">(</span>
-        <span class="n">obj</span><span class="p">,</span>
-        <span class="n">allow_zen_conversion</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">structured_conf_permitted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">field_name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">error_prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">convert_dataclass</span><span class="o">=</span><span class="n">convert_settings</span><span class="p">[</span><span class="s2">&quot;dataclass&quot;</span><span class="p">],</span>
-        <span class="n">hydra_convert</span><span class="o">=</span><span class="n">hydra_convert</span><span class="p">,</span>
-        <span class="n">hydra_recursive</span><span class="o">=</span><span class="n">hydra_recursive</span><span class="p">,</span>
-        <span class="n">zen_dataclass</span><span class="o">=</span><span class="n">_utils</span><span class="o">.</span><span class="n">parse_dataclass_options</span><span class="p">(</span><span class="n">zen_dataclass</span><span class="p">),</span>
-    <span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">DefaultBuilds</span><span class="o">.</span><span class="n">just</span><span class="p">(</span><span class="o">**</span><span class="nb">locals</span><span class="p">())</span></div>
 
 </pre></div>
 
