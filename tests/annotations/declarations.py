@@ -47,7 +47,11 @@ from hydra_zen import (
     store,
     zen,
 )
-from hydra_zen.structured_configs._value_conversion import ConfigComplex, ConfigPath
+from hydra_zen.structured_configs._implementations import (
+    BuildsFn,
+    ConfigComplex,
+    ConfigPath,
+)
 from hydra_zen.typing import (
     Builds,
     HydraPartialBuilds,
@@ -940,55 +944,66 @@ def check_partial_narrowing_full(
 
 def check_make_custom_builds_overloads(boolean: bool, optional_boolean: Optional[bool]):
     # partial = False, pop-sig = False
-    reveal_type(make_custom_builds_fn(zen_partial=False), expected_text="StdBuilds")
+    assert_type(
+        make_custom_builds_fn(zen_partial=False),
+        StdBuilds[SupportedPrimitive],
+    )
 
-    reveal_type(
+    assert_type(
         make_custom_builds_fn(zen_partial=False, populate_full_signature=False),
-        expected_text="StdBuilds",
+        StdBuilds[SupportedPrimitive],
     )
 
     # Returns `PBuilds`
-    reveal_type(
+    assert_type(
         make_custom_builds_fn(zen_partial=True, populate_full_signature=boolean),
-        expected_text="PBuilds",
+        PBuilds[SupportedPrimitive],
     )
-    reveal_type(make_custom_builds_fn(zen_partial=True), expected_text="PBuilds")
-    reveal_type(
+    assert_type(make_custom_builds_fn(zen_partial=True), PBuilds[SupportedPrimitive])
+    assert_type(
         make_custom_builds_fn(zen_partial=True, populate_full_signature=False),
-        expected_text="PBuilds",
+        PBuilds[SupportedPrimitive],
     )
 
     # Returns `PBuilds | StdBuilds``
-    reveal_type(
+    assert_type(
         make_custom_builds_fn(zen_partial=False, populate_full_signature=boolean),
-        expected_text="FullBuilds | StdBuilds",
+        Union[FullBuilds[SupportedPrimitive], StdBuilds[SupportedPrimitive]],
     )
 
-    reveal_type(
+    assert_type(
         make_custom_builds_fn(zen_partial=optional_boolean),
-        expected_text="PBuilds | StdBuilds",
+        Union[PBuilds[SupportedPrimitive], StdBuilds[SupportedPrimitive]],
     )
 
-    reveal_type(
+    assert_type(
         make_custom_builds_fn(
             populate_full_signature=False, zen_partial=optional_boolean
         ),
-        expected_text="PBuilds | StdBuilds",
+        Union[PBuilds[SupportedPrimitive], StdBuilds[SupportedPrimitive]],
     )
 
     # Returns `FullBuilds | PBuilds | StdBuilds`
-    reveal_type(
+    assert_type(
         make_custom_builds_fn(
             populate_full_signature=True, zen_partial=optional_boolean
         ),
-        expected_text="FullBuilds | PBuilds | StdBuilds",
+        Union[
+            FullBuilds[SupportedPrimitive],
+            PBuilds[SupportedPrimitive],
+            StdBuilds[SupportedPrimitive],
+        ],
     )
 
-    reveal_type(
+    assert_type(
         make_custom_builds_fn(
             populate_full_signature=boolean, zen_partial=optional_boolean
         ),
-        expected_text="FullBuilds | PBuilds | StdBuilds",
+        Union[
+            FullBuilds[SupportedPrimitive],
+            PBuilds[SupportedPrimitive],
+            StdBuilds[SupportedPrimitive],
+        ],
     )
 
 
@@ -1278,7 +1293,8 @@ def builds_target_pass_through():
     def foo(x: int) -> str:
         ...
 
-    c1 = builds(builds(foo, x=1), x=2)
+    _c1 = builds(foo, x=1)
+    c1 = builds(_c1, x=2)
     reveal_type(instantiate(c1), expected_text="str")
 
     _c2 = builds(foo, populate_full_signature=True)
@@ -1286,17 +1302,20 @@ def builds_target_pass_through():
     reveal_type(instantiate(c2), expected_text="str")
     reveal_type(c2, expected_text="type[Builds[type[str]]]")
 
-    c3 = builds(builds(foo, zen_partial=True))
+    _c3 = builds(foo, zen_partial=True)
+    c3 = builds(_c3)
     reveal_type(instantiate(c3), expected_text="str")
 
-    pc1 = builds(builds(foo, x=1), x=2, zen_partial=True)
+    _pc1 = builds(foo, x=1)
+    pc1 = builds(_pc1, x=2, zen_partial=True)
     reveal_type(instantiate(pc1), expected_text="Partial[str]")
 
     _pc2 = builds(foo, populate_full_signature=True)
     pc2 = builds(_pc2, zen_partial=True)
     reveal_type(instantiate(pc2), expected_text="Partial[str]")
 
-    pc3 = builds(builds(foo, zen_partial=True), zen_partial=True)
+    _pc3 = builds(foo, zen_partial=True)
+    pc3 = builds(_pc3, zen_partial=True)
     reveal_type(instantiate(pc3), expected_text="Partial[str]")
 
     tmp = builds(foo, populate_full_signature=True)
@@ -1410,3 +1429,51 @@ def pbuilds_target_pass_through():
     tmp6 = pbuilds(foo, zen_partial=True)
     pc4 = pbuilds(tmp6, zen_partial=True)
     reveal_type(instantiate(pc4), expected_text="Partial[str]")
+
+
+def check_BuildsFn():
+    my_builds = BuildsFn[int]("my_builds")
+    my_builds(int, 1)
+    my_builds(int, "a")  # type: ignore
+
+
+def check_make_custom_reflection():
+    def foo(x: int):
+        ...
+
+    bb = BuildsFn[int]("a")
+
+    pb = make_custom_builds_fn(zen_partial=True, builds_fn=bb)
+    assert_type(pb, PBuilds[int])
+
+    _ = pb(foo)
+    _ = pb(foo, x=1)
+    _ = pb(foo, x="a")  # type: ignore
+
+    fb = make_custom_builds_fn(populate_full_signature=True, builds_fn=bb)
+    assert_type(fb, FullBuilds[int])
+
+    reveal_type(fb(foo), expected_text="type[BuildsWithSig[type[None], (x: int)]]")
+    _ = fb(foo)(x=1)
+    _ = fb(foo)(x="a")  # type: ignore
+
+
+def check_parameterized_BuildsFn():
+    class A:
+        ...
+
+    class B(A):
+        ...
+
+    class C:
+        ...
+
+    def foo(x: A):
+        ...
+
+    bg = BuildsFn[Union[SupportedPrimitive, A]]("a")
+
+    assert_type(bg(A, A()), Type[Builds[Type[A]]])
+    assert_type(bg(A, B()), Type[Builds[Type[A]]])
+    assert_type(bg(A, B(), zen_partial=True), Type[PartialBuilds[Type[A]]])
+    bg(A, C())  # type: ignore

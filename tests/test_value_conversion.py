@@ -25,7 +25,7 @@ from hydra_zen import (
     to_yaml,
 )
 from hydra_zen._compatibility import ZEN_SUPPORTED_PRIMITIVES
-from hydra_zen.structured_configs._value_conversion import ZEN_VALUE_CONVERSION
+from hydra_zen.structured_configs._implementations import ZEN_VALUE_CONVERSION
 from hydra_zen.typing import Partial
 from tests import is_same
 

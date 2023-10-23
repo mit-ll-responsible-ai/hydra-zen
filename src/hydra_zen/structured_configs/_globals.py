@@ -5,8 +5,7 @@ from typing import FrozenSet
 
 from typing_extensions import Final
 
-from hydra_zen.funcs import get_obj, zen_processing
-from hydra_zen.structured_configs import _utils
+from hydra_zen.funcs import zen_processing
 
 # Hydra-specific fields
 TARGET_FIELD_NAME: Final[str] = "_target_"
@@ -30,8 +29,9 @@ HYDRA_FIELD_NAMES: FrozenSet[str] = frozenset(_names)
 del _names
 
 # hydra-zen-specific fields
-ZEN_PROCESSING_LOCATION: Final[str] = _utils.get_obj_path(zen_processing)
-GET_OBJ_LOCATION: Final[str] = _utils.get_obj_path(get_obj)
+ZEN_PROCESSING_LOCATION: Final[str] = ".".join(
+    [zen_processing.__module__, zen_processing.__name__]
+)
 ZEN_TARGET_FIELD_NAME: Final[str] = "_zen_target"
 ZEN_PARTIAL_FIELD_NAME: Final[str] = "_zen_partial"
 META_FIELD_NAME: Final[str] = "_zen_exclude"

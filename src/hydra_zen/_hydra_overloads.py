@@ -28,8 +28,11 @@ from typing import IO, Any, Callable, Dict, List, Type, TypeVar, Union, cast, ov
 from hydra.utils import instantiate as hydra_instantiate
 from omegaconf import MISSING, DictConfig, ListConfig, OmegaConf
 
-from .structured_configs._just import just
-from .structured_configs._value_conversion import ConfigComplex, ConfigPath
+from .structured_configs._implementations import (
+    ConfigComplex,
+    ConfigPath,
+    DefaultBuilds,
+)
 from .typing import Builds, Just, Partial
 from .typing._implementations import DataClass_, HasTarget, InstOrType, IsPartial
 
@@ -219,7 +222,7 @@ def _apply_just(fn: F) -> F:
     @wraps(fn)
     def wrapper(cfg: Any, *args: Any, **kwargs: Any):
         if not is_dataclass(cfg):
-            cfg = just(cfg)
+            cfg = DefaultBuilds.just(cfg)
         return fn(cfg, *args, **kwargs)
 
     return cast(F, wrapper)
