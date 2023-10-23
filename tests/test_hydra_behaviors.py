@@ -10,6 +10,7 @@ from omegaconf import DictConfig, ListConfig
 from omegaconf.errors import ValidationError
 
 from hydra_zen import (
+    DefaultBuilds,
     builds,
     hydrated_dataclass,
     instantiate,
@@ -18,7 +19,7 @@ from hydra_zen import (
 )
 from hydra_zen._compatibility import HYDRA_SUPPORTS_OBJECT_CONVERT
 
-get_obj_path = builds._get_obj_path
+get_obj_path = DefaultBuilds._get_obj_path
 
 
 def f_three_vars(x, y, z):

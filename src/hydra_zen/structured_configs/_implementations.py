@@ -78,6 +78,7 @@ from hydra_zen.typing import (
     ZenConvert,
     ZenWrappers,
 )
+from hydra_zen.typing._builds_overloads import StdBuilds
 from hydra_zen.typing._implementations import (
     AllConvert,
     AnyBuilds,
@@ -464,7 +465,7 @@ def hydrated_dataclass(
         else:
             kwargs: Dict[str, Any] = {}
 
-        out = builds(
+        out = DefaultBuilds.builds(
             target,
             *pos_args,
             **kwargs,
@@ -614,7 +615,7 @@ class ZenField:
     default: Union[Any, Field[Any]] = _utils.field(default=NOTHING)
     name: Union[str, Type[NOTHING]] = NOTHING
     zen_convert: InitVar[Optional[ZenConvert]] = None
-    _builds_fn: "Union[BuildsFn[Any], Type[BuildsFn[Any]]]" = _utils.field(default_factory=lambda: builds)  # type: ignore
+    _builds_fn: "Union[BuildsFn[Any], Type[BuildsFn[Any]]]" = _utils.field(default_factory=lambda: DefaultBuilds)  # type: ignore
 
     def __post_init__(
         self,
@@ -1620,37 +1621,37 @@ class BuildsFn(Generic[T]):
 
         .. code-block:: python
 
-        from dataclasses import make_dataclass
+            from dataclasses import make_dataclass
 
-        def builds(self,target, populate_full_signature=False, **kw):
-            # Dynamically defines a Hydra-compatible dataclass type.
-            # Akin to doing:
-            #
-            # @dataclass
-            # class Builds_thing:
-            #     _target_: str = get_import_path(target)
-            #     # etc.
+            def builds(self,target, populate_full_signature=False, **kw):
+                # Dynamically defines a Hydra-compatible dataclass type.
+                # Akin to doing:
+                #
+                # @dataclass
+                # class Builds_thing:
+                #     _target_: str = get_import_path(target)
+                #     # etc.
 
-            _target_ = get_import_path(target)
+                _target_ = get_import_path(target)
 
-            if populate_full_signature:
-                sig = get_signature(target)
-                kw = {**sig, **kw}  # merge w/ preference for kw
+                if populate_full_signature:
+                    sig = get_signature(target)
+                    kw = {**sig, **kw}  # merge w/ preference for kw
 
-            type_annots = [get_hints(target)[k] for k in kw]
+                type_annots = [get_hints(target)[k] for k in kw]
 
-            fields = [("_target_", str, _target_)]
-            fields += [
-                (
-                    field_name,
-                    hydra_compat_type_annot(hint),
-                    hydra_compat_val(v),
-                )
-                for hint, (field_name, v) in zip(type_annots, kw.items())
-            ]
+                fields = [("_target_", str, _target_)]
+                fields += [
+                    (
+                        field_name,
+                        hydra_compat_type_annot(hint),
+                        hydra_compat_val(v),
+                    )
+                    for hint, (field_name, v) in zip(type_annots, kw.items())
+                ]
 
-            Config = make_dataclass(f"Builds_{target}", fields)
-            return Config
+                Config = make_dataclass(f"Builds_{target}", fields)
+                return Config
 
         The resulting "config" is a dynamically-generated dataclass type [5]_ with
         Hydra-specific attributes attached to it [1]_. It possesses a `_target_`
@@ -3054,7 +3055,7 @@ class BuildsFn(Generic[T]):
             )
 
         if hydra_defaults is not None:
-            hydra_defaults = builds._sanitize_collection(
+            hydra_defaults = cls._sanitize_collection(
                 hydra_defaults, convert_dataclass=False
             )
             config_fields.append(
@@ -3099,20 +3100,22 @@ class DefaultBuilds(BuildsFn[SupportedPrimitive]):
     pass
 
 
-builds: DefaultBuilds = DefaultBuilds("builds")
+builds: StdBuilds[SupportedPrimitive] = cast(
+    StdBuilds[SupportedPrimitive], DefaultBuilds("builds").builds
+)
 
 
 @dataclass(unsafe_hash=True)
 class ConfigComplex:
     real: Any
     imag: Any
-    _target_: str = field(default=builds._get_obj_path(complex), init=False)
+    _target_: str = field(default=BuildsFn._get_obj_path(complex), init=False)
 
 
 @dataclass(unsafe_hash=True)
 class ConfigPath:
     _args_: Tuple[str]
-    _target_: str = field(default=builds._get_obj_path(Path), init=False)
+    _target_: str = field(default=BuildsFn._get_obj_path(Path), init=False)
 
 
 @overload
@@ -3278,7 +3281,7 @@ class ConfigFromTuple:
 
     def __post_init__(self):
         self._args_ = (
-            builds._make_hydra_compatible(
+            BuildsFn._make_hydra_compatible(
                 tuple(self._args_),
                 convert_dataclass=True,
                 allow_zen_conversion=True,
@@ -3294,7 +3297,7 @@ class ConfigFromDict:
 
     def __post_init__(self):
         self._args_ = (
-            builds._make_hydra_compatible(
+            BuildsFn._make_hydra_compatible(
                 dict(self._args_),
                 convert_dataclass=True,
                 allow_zen_conversion=True,
@@ -3308,33 +3311,35 @@ class ConfigRange:
     start: InitVar[int]
     stop: InitVar[int]
     step: InitVar[int]
-    _target_: str = field(default=builds._get_obj_path(range), init=False)
+    _target_: str = field(default=BuildsFn._get_obj_path(range), init=False)
     _args_: Tuple[int, ...] = field(default=(), init=False, repr=False)
 
     def __post_init__(self, start, stop, step):
         self._args_ = (start, stop, step)
 
 
-ZEN_VALUE_CONVERSION[set] = partial(ConfigFromTuple, _target_=builds._get_obj_path(set))
+ZEN_VALUE_CONVERSION[set] = partial(
+    ConfigFromTuple, _target_=BuildsFn._get_obj_path(set)
+)
 ZEN_VALUE_CONVERSION[frozenset] = partial(
-    ConfigFromTuple, _target_=builds._get_obj_path(frozenset)
+    ConfigFromTuple, _target_=BuildsFn._get_obj_path(frozenset)
 )
 ZEN_VALUE_CONVERSION[deque] = partial(
-    ConfigFromTuple, _target_=builds._get_obj_path(deque)
+    ConfigFromTuple, _target_=BuildsFn._get_obj_path(deque)
 )
 
 if bytes in ZEN_SUPPORTED_PRIMITIVES:  # pragma: no cover
     ZEN_VALUE_CONVERSION[bytes] = partial(
-        ConfigFromTuple, _target_=builds._get_obj_path(bytes)
+        ConfigFromTuple, _target_=BuildsFn._get_obj_path(bytes)
     )
 
 ZEN_VALUE_CONVERSION[bytearray] = partial(
-    ConfigFromTuple, _target_=builds._get_obj_path(bytearray)
+    ConfigFromTuple, _target_=BuildsFn._get_obj_path(bytearray)
 )
 ZEN_VALUE_CONVERSION[range] = lambda value: ConfigRange(
     value.start, value.stop, value.step
 )
 ZEN_VALUE_CONVERSION[Counter] = partial(
-    ConfigFromDict, _target_=builds._get_obj_path(Counter)
+    ConfigFromDict, _target_=BuildsFn._get_obj_path(Counter)
 )
 ZEN_VALUE_CONVERSION[functools.partial] = _unpack_partial

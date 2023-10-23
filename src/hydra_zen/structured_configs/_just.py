@@ -10,7 +10,7 @@ from hydra_zen.typing._implementations import _HydraPrimitive  # type: ignore
 from hydra_zen.typing._implementations import _SupportedViaBuilds  # type: ignore
 from hydra_zen.typing._implementations import DataClass_, ZenConvert
 
-from ._implementations import ConfigComplex, builds
+from ._implementations import ConfigComplex, DefaultBuilds
 
 # pyright: strict
 T = TypeVar("T")
@@ -298,4 +298,4 @@ def just(
     >>> conf.reduction_fn(conf.data)
     (3+5j)
     """
-    return builds.just(**locals())
+    return DefaultBuilds.just(**locals())
