@@ -91,6 +91,8 @@ _valid_builds_strats = dict(
     builds_bases=st.just(()),
     zen_convert=st.none() | st.from_type(ZenConvert),
     zen_dataclass=st.none() | st.from_type(DataclassOptions),
+    zen_exclude=st.just(())
+    | st.sampled_from([set(), ["momomomo"], lambda x: x.endswith("momomomo")]),
 )
 
 
