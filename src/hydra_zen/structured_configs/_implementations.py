@@ -4,7 +4,7 @@ import functools
 import inspect
 import sys
 import warnings
-from collections import Counter, deque
+from collections import Collection, Counter, deque
 from dataclasses import (  # use this for runtime checks
     MISSING,
     Field as _Field,
@@ -1987,6 +1987,21 @@ class BuildsFn(Generic[T]):
 
         del pos_args
 
+        zen_exclude: Callable[[str], bool] = kwargs_for_target.pop(
+            "zen_exclude", frozenset()
+        )
+
+        if (
+            not isinstance(zen_exclude, Collection) or isinstance(zen_exclude, str)
+        ) and not callable(zen_exclude):
+            raise TypeError(
+                f"`zen_exclude` must be a non-string collection of strings, or "
+                f"callable[[str], bool]. Got {zen_exclude}"
+            )
+
+        if isinstance(zen_exclude, Collection):
+            zen_exclude = set(zen_exclude).__contains__
+
         if not callable(target):
             raise TypeError(
                 BUILDS_ERROR_PREFIX
@@ -2549,6 +2564,7 @@ class BuildsFn(Generic[T]):
         user_specified_named_params: Dict[str, Tuple[str, type, Any]] = {
             name: (name, type_hints.get(name, Any), value)
             for name, value in kwargs_for_target.items()
+            if not zen_exclude(name)
         }
 
         if populate_full_signature is True:
@@ -2569,6 +2585,9 @@ class BuildsFn(Generic[T]):
             _seen: Set[str] = set()
 
             for n, param in enumerate(signature_params.values()):
+                if zen_exclude(param.name):
+                    continue
+
                 if n + 1 <= len(_pos_args):
                     # Positional parameters are populated from "left to right" in the signature.
                     # We have already done validation, so we know that positional params aren't redundant
