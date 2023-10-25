@@ -5,6 +5,7 @@ import inspect
 import sys
 import warnings
 from collections import Counter, deque
+from collections.abc import Collection
 from dataclasses import (  # use this for runtime checks
     MISSING,
     Field as _Field,
@@ -1472,7 +1473,7 @@ class BuildsFn(Generic[T]):
         Type[PartialBuilds[Importable]],
         Type[BuildsWithSig[Type[R], P]],
     ]:
-        """builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, hydra_recursive=None, hydra_convert=None, hydra_defaults=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
+        """builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, zen_exclude=(), hydra_recursive=None, hydra_convert=None, hydra_defaults=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
 
         `builds(target, *args, **kw)` returns a Hydra-compatible config that, when
         instantiated, returns `target(*args, **kw)`.
@@ -1532,13 +1533,18 @@ class BuildsFn(Generic[T]):
             ``<hydra_target>``. These are called "meta" fields.
 
         populate_full_signature : bool, optional (default=False)
-            If ``True``, then the resulting config's signature and fields will be populated
-            according to the signature of ``<hydra_target>``; values also specified in
-            ``**kwargs_for_target`` take precedent.
+            If ``True``, then the resulting config's signature and fields will be
+            populated according to the signature of ``<hydra_target>``; values also
+            specified in ``**kwargs_for_target`` take precedent.
 
-            This option is not available for objects with inaccessible signatures, such as
-            NumPy's various ufuncs.
+            This option is not available for objects with inaccessible signatures, such
+            as NumPy's various ufuncs.
 
+        zen_exclude : Collection[str] | Callable[[str], bool], optional (default=[])
+            Specifies parameter names, or a function for checking names, to exclude
+            those parameters from the config-creation process.
+
+        Note that inherited fields cannot be excluded.
         zen_convert : Optional[ZenConvert]
             A dictionary that modifies hydra-zen's value and type conversion behavior.
             Consists of the following optional key-value pairs (:ref:`zen-convert`):
@@ -1612,8 +1618,9 @@ class BuildsFn(Generic[T]):
         Raises
         ------
         hydra_zen.errors.HydraZenUnsupportedPrimitiveError
-            The provided configured value cannot be serialized by Hydra, nor does hydra-zen
-            provide specialized support for it. See :ref:`valid-types` for more details.
+            The provided configured value cannot be serialized by Hydra, nor does
+            hydra-zen provide specialized support for it. See :ref:`valid-types` for
+            more details.
 
         Notes
         -----
@@ -1792,8 +1799,25 @@ class BuildsFn(Generic[T]):
         x: ???
         'y': foo
 
-        Annotations will be used by Hydra to provide limited runtime type-checking during
-        instantiation. Here, we'll pass a float for ``x``, which expects a boolean value.
+        `zen_exclude` can be used to either name parameter to be excluded from the
+        auto-population process:
+
+        >>> Conf2 = builds(bar, populate_full_signature=True, zen_exclude=["y"])
+        >>> pyaml(Conf2)
+        _target_: __main__.bar
+        x: ???
+        'y': foo
+
+        or specify a pattern - via a function - for excluding parameters:
+
+        >>> Conf3 = builds(bar, populate_full_signature=True, zen_exclude=lambda name: name.startswith("x"))
+        >>> pyaml(Conf3)
+        _target_: __main__.bar
+        'y': foo
+
+        Annotations will be used by Hydra to provide limited runtime type-checking
+        during instantiation. Here, we'll pass a float for ``x``, which expects a
+        boolean value.
 
         >>> instantiate(Conf(x=10.0))  # type: ignore
         ValidationError: Value '10.0' is not a valid bool (type float)
@@ -1888,14 +1912,14 @@ class BuildsFn(Generic[T]):
 
         .. code-block:: python
 
-        # contents of mylib/foo.py
-        from pickle import dumps, loads
+           # contents of mylib/foo.py
+           from pickle import dumps, loads
 
-        DictConf = builds(dict,
-                            zen_dataclass={'module': 'mylib.foo',
-                                            'cls_name': 'DictConf'})
+           DictConf = builds(dict,
+                               zen_dataclass={'module': 'mylib.foo',
+                                               'cls_name': 'DictConf'})
 
-        assert DictConf is loads(dumps(DictConf))
+           assert DictConf is loads(dumps(DictConf))
 
 
         **Creating a frozen config**
@@ -1986,6 +2010,21 @@ class BuildsFn(Generic[T]):
         BUILDS_ERROR_PREFIX = _utils.building_error_prefix(target)
 
         del pos_args
+
+        zen_exclude: Callable[[str], bool] = kwargs_for_target.pop(
+            "zen_exclude", frozenset()
+        )
+
+        if (
+            not isinstance(zen_exclude, Collection) or isinstance(zen_exclude, str)
+        ) and not callable(zen_exclude):
+            raise TypeError(
+                f"`zen_exclude` must be a non-string collection of strings, or "
+                f"callable[[str], bool]. Got {zen_exclude}"
+            )
+
+        if isinstance(zen_exclude, Collection):
+            zen_exclude = set(zen_exclude).__contains__
 
         if not callable(target):
             raise TypeError(
@@ -2549,6 +2588,7 @@ class BuildsFn(Generic[T]):
         user_specified_named_params: Dict[str, Tuple[str, type, Any]] = {
             name: (name, type_hints.get(name, Any), value)
             for name, value in kwargs_for_target.items()
+            if not zen_exclude(name)
         }
 
         if populate_full_signature is True:
@@ -2569,6 +2609,9 @@ class BuildsFn(Generic[T]):
             _seen: Set[str] = set()
 
             for n, param in enumerate(signature_params.values()):
+                if zen_exclude(param.name):
+                    continue
+
                 if n + 1 <= len(_pos_args):
                     # Positional parameters are populated from "left to right" in the signature.
                     # We have already done validation, so we know that positional params aren't redundant

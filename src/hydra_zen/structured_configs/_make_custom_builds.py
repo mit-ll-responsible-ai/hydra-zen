@@ -8,6 +8,7 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
+    Collection,
     Dict,
     Mapping,
     Optional,
@@ -36,6 +37,7 @@ __BUILDS_DEFAULTS: Final[Dict[str, Any]] = {
     for name, p in _builds_sig.parameters.items()
     if p.kind is p.KEYWORD_ONLY
 }
+__BUILDS_DEFAULTS["zen_exclude"] = frozenset()
 # TODO: Remove deprecated options once they are phased out
 __BUILDS_DEFAULTS["frozen"] = False
 __BUILDS_DEFAULTS["dataclass_name"] = None
@@ -55,6 +57,7 @@ def make_custom_builds_fn(
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
     populate_full_signature: Literal[True],
+    zen_exclude: Union[Collection[str], Callable[[str], bool]] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
@@ -73,6 +76,7 @@ def make_custom_builds_fn(
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
     populate_full_signature: bool = ...,
+    zen_exclude: Union[Collection[str], Callable[[str], bool]] = ...,
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
@@ -89,6 +93,7 @@ def make_custom_builds_fn(
     *,
     zen_partial: Literal[False, None] = ...,
     populate_full_signature: Literal[False] = ...,
+    zen_exclude: Union[Collection[str], Callable[[str], bool]] = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
     hydra_recursive: Optional[bool] = ...,
@@ -107,6 +112,7 @@ def make_custom_builds_fn(
     *,
     zen_partial: Literal[False, None] = ...,
     populate_full_signature: bool,
+    zen_exclude: Union[Collection[str], Callable[[str], bool]] = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
     hydra_recursive: Optional[bool] = ...,
@@ -125,6 +131,7 @@ def make_custom_builds_fn(
     *,
     zen_partial: Union[bool, None],
     populate_full_signature: Literal[False] = ...,
+    zen_exclude: Union[Collection[str], Callable[[str], bool]] = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
     hydra_recursive: Optional[bool] = ...,
@@ -143,6 +150,7 @@ def make_custom_builds_fn(
     *,
     zen_partial: Union[bool, None],
     populate_full_signature: bool,
+    zen_exclude: Union[Collection[str], Callable[[str], bool]] = ...,
     zen_wrappers: ZenWrappers[Callable[..., Any]] = ...,
     zen_meta: Optional[Mapping[str, Any]] = ...,
     hydra_recursive: Optional[bool] = ...,
@@ -159,6 +167,7 @@ def make_custom_builds_fn(
     *,
     zen_partial: Optional[bool] = None,
     populate_full_signature: bool = False,
+    zen_exclude: Union[Collection[str], Callable[[str], bool]] = frozenset(),
     zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
     zen_meta: Optional[Mapping[str, Any]] = None,
     hydra_recursive: Optional[bool] = None,
@@ -187,6 +196,12 @@ def make_custom_builds_fn(
 
     populate_full_signature : bool, optional (default=False)
         Specifies a new the default value for ``builds(..., populate_full_signature=<..>)``
+
+    zen_exclude : Collection[str] | Callable[[str], bool], optional (default=[])
+        Specifies parameter names, or a function for checking names, to exclude
+        those parameters from the config-creation process.
+
+        Note that inherited fields cannot be excluded.
 
     zen_convert : Optional[ZenConvert]
         A dictionary that modifies hydra-zen's value and type conversion behavior.
