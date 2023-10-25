@@ -1,3 +1,5 @@
+# Copyright (c) 2023 Massachusetts Institute of Technology
+# SPDX-License-Identifier: MIT
 import pytest
 
 from hydra_zen import builds, instantiate, make_custom_builds_fn
