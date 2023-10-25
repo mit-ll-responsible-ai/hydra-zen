@@ -1806,11 +1806,11 @@ class BuildsFn(Generic[T]):
         >>> pyaml(Conf2)
         _target_: __main__.bar
         x: ???
-        'y': foo
 
         or specify a pattern - via a function - for excluding parameters:
 
-        >>> Conf3 = builds(bar, populate_full_signature=True, zen_exclude=lambda name: name.startswith("x"))
+        >>> Conf3 = builds(bar, populate_full_signature=True,
+        ...                zen_exclude=lambda name: name.startswith("x"))
         >>> pyaml(Conf3)
         _target_: __main__.bar
         'y': foo
