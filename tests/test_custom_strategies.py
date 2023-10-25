@@ -28,6 +28,7 @@ def test_valid_build_strats_are_exhaustive():
         for n, p in inspect.signature(builds).parameters.items()
         if p.kind is p.KEYWORD_ONLY
     )
+    nameable_builds_args.add("zen_exclude")
     assert nameable_builds_args - {"dataclass_name", "hydra_defaults"} == set(
         _valid_builds_strats
     )
