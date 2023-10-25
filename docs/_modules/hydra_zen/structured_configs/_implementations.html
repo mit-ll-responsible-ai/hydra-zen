@@ -2212,11 +2212,11 @@ document.write(`
 <span class="sd">        &gt;&gt;&gt; pyaml(Conf2)</span>
 <span class="sd">        _target_: __main__.bar</span>
 <span class="sd">        x: ???</span>
-<span class="sd">        &#39;y&#39;: foo</span>
 
 <span class="sd">        or specify a pattern - via a function - for excluding parameters:</span>
 
-<span class="sd">        &gt;&gt;&gt; Conf3 = builds(bar, populate_full_signature=True, zen_exclude=lambda name: name.startswith(&quot;x&quot;))</span>
+<span class="sd">        &gt;&gt;&gt; Conf3 = builds(bar, populate_full_signature=True,</span>
+<span class="sd">        ...                zen_exclude=lambda name: name.startswith(&quot;x&quot;))</span>
 <span class="sd">        &gt;&gt;&gt; pyaml(Conf3)</span>
 <span class="sd">        _target_: __main__.bar</span>
 <span class="sd">        &#39;y&#39;: foo</span>
