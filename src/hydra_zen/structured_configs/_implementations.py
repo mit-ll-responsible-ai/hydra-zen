@@ -4,7 +4,8 @@ import functools
 import inspect
 import sys
 import warnings
-from collections import Collection, Counter, deque
+from collections import Counter, deque
+from collections.abc import Collection
 from dataclasses import (  # use this for runtime checks
     MISSING,
     Field as _Field,
