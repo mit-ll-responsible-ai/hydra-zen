@@ -28,6 +28,7 @@ jobs:
         path: dist
         retention-days: 0
   pypi-publish:
+    needs: build-artifacts
     name: Upload release to PyPI
     runs-on: ubuntu-latest
     environment: pypi-publish
