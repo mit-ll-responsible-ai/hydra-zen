@@ -291,7 +291,7 @@ document.write(`
 <h1>hydra_zen.wrapper.default_to_config<a class="headerlink" href="#hydra-zen-wrapper-default-to-config" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="hydra_zen.wrapper.default_to_config">
-<span class="sig-prename descclassname"><span class="pre">hydra_zen.wrapper.</span></span><span class="sig-name descname"><span class="pre">default_to_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/wrapper/_implementations.html#default_to_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.wrapper.default_to_config" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">hydra_zen.wrapper.</span></span><span class="sig-name descname"><span class="pre">default_to_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BuildsFn=&lt;class</span> <span class="pre">'hydra_zen.structured_configs._implementations.DefaultBuilds'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/wrapper/_implementations.html#default_to_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.wrapper.default_to_config" title="Link to this definition">#</a></dt>
 <dd><p>Creates a config that describes <code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code>.</p>
 <p>This function is designed to selectively apply <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.builds</span></code></a> or
 <a class="reference internal" href="hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.just</span></code></a> in a way that permits maximum compatibility with common
@@ -307,6 +307,9 @@ inputs to <a class="reference internal" href="hydra_zen.ZenStore.html#hydra_zen.
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>target</strong><span class="classifier">Callable[…, Any] | DataClass | Type[DataClass] | list | dict</span></dt><dd></dd>
+<dt><strong>BuildsFn</strong><span class="classifier">Type[BuildsFn[Any]], optional (default=DefaultBuilds)</span></dt><dd><p>Provides the config-creation functions (<code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code>) used
+by this function.</p>
+</dd>
 <dt><strong>**kw</strong><span class="classifier">Any</span></dt><dd><p>Keyword arguments to be passed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code>.</p>
 </dd>
 </dl>

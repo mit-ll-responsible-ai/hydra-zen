@@ -444,10 +444,10 @@ document.write(`
     <span class="n">TypeGuard</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">instantiate</span><span class="p">,</span> <span class="n">just</span><span class="p">,</span> <span class="n">make_custom_builds_fn</span>
+<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">instantiate</span>
 <span class="kn">from</span> <span class="nn">hydra_zen._compatibility</span> <span class="kn">import</span> <span class="n">HYDRA_VERSION</span><span class="p">,</span> <span class="n">Version</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.errors</span> <span class="kn">import</span> <span class="n">HydraZenValidationError</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.structured_configs._implementations</span> <span class="kn">import</span> <span class="n">BuildsFn</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.structured_configs._implementations</span> <span class="kn">import</span> <span class="n">BuildsFn</span><span class="p">,</span> <span class="n">DefaultBuilds</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.structured_configs._type_guards</span> <span class="kn">import</span> <span class="n">safe_getattr</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">DataClass_</span><span class="p">,</span>
@@ -1183,9 +1183,6 @@ document.write(`
 
 
 
-<span class="n">fbuilds</span> <span class="o">=</span> <span class="n">make_custom_builds_fn</span><span class="p">(</span><span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-
 <div class="viewcode-block" id="default_to_config">
 <a class="viewcode-back" href="../../../generated/hydra_zen.wrapper.default_to_config.html#hydra_zen.default_to_config">[docs]</a>
 <span class="k">def</span> <span class="nf">default_to_config</span><span class="p">(</span>
@@ -1197,6 +1194,7 @@ document.write(`
         <span class="n">ListConfig</span><span class="p">,</span>
         <span class="n">DictConfig</span><span class="p">,</span>
     <span class="p">],</span>
+    <span class="n">BuildsFn</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">DefaultBuilds</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="n">ListConfig</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a config that describes `target`.</span>
@@ -1214,6 +1212,10 @@ document.write(`
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    target : Callable[..., Any] | DataClass | Type[DataClass] | list | dict</span>
+
+<span class="sd">    BuildsFn : Type[BuildsFn[Any]], optional (default=DefaultBuilds)</span>
+<span class="sd">        Provides the config-creation functions (`builds`, `just`) used</span>
+<span class="sd">        by this function.</span>
 
 <span class="sd">    **kw : Any</span>
 <span class="sd">        Keyword arguments to be passed to `builds`.</span>
@@ -1254,6 +1256,7 @@ document.write(`
 <span class="sd">    x: ???</span>
 <span class="sd">    &#39;y&#39;: ???</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">if</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">HydraConf</span><span class="p">):</span>
@@ -1263,7 +1266,12 @@ document.write(`
             <span class="k">if</span> <span class="ow">not</span> <span class="n">kw</span> <span class="ow">and</span> <span class="n">get_obj_path</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;types.&quot;</span><span class="p">):</span>
                 <span class="c1"># handles dataclasses returned by make_config()</span>
                 <span class="k">return</span> <span class="n">target</span>
-            <span class="k">return</span> <span class="n">fbuilds</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">,</span> <span class="n">builds_bases</span><span class="o">=</span><span class="p">(</span><span class="n">target</span><span class="p">,))</span>
+            <span class="k">return</span> <span class="n">BuildsFn</span><span class="o">.</span><span class="n">builds</span><span class="p">(</span>
+                <span class="n">target</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kw</span><span class="p">,</span>
+                <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">builds_bases</span><span class="o">=</span><span class="p">(</span><span class="n">target</span><span class="p">,),</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="n">kw</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;store(&lt;dataclass-instance&gt;, [...]) does not support specifying &quot;</span>
@@ -1273,12 +1281,14 @@ document.write(`
 
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
         <span class="c1"># TODO: convert to OmegaConf containers?</span>
-        <span class="k">return</span> <span class="n">just</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">BuildsFn</span><span class="o">.</span><span class="n">just</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="p">(</span><span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">)):</span>
         <span class="k">return</span> <span class="n">target</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">t</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">target</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="n">fbuilds</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
+            <span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="n">BuildsFn</span><span class="o">.</span><span class="n">builds</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="p">)</span></div>
 
 
 
