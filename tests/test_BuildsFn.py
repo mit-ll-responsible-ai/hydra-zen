@@ -1,6 +1,7 @@
 # Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
+from functools import partial
 from inspect import signature
 from typing import Any, List, Union
 
@@ -10,6 +11,7 @@ from typing_extensions import Literal
 from hydra_zen import (
     BuildsFn,
     ZenField,
+    ZenStore,
     builds,
     instantiate,
     just,
@@ -19,10 +21,11 @@ from hydra_zen import (
 from hydra_zen.errors import HydraZenUnsupportedPrimitiveError
 from hydra_zen.typing import DataclassOptions, SupportedPrimitive
 from hydra_zen.typing._implementations import DataclassOptions
+from hydra_zen.wrapper import default_to_config
 
 
 class A:
-    def __init__(self, x: int) -> None:
+    def __init__(self, x: Any) -> None:
         self.x = x
 
     def __eq__(self, __value: object) -> bool:
@@ -165,3 +168,11 @@ def test_zen_field():
     with pytest.raises(HydraZenUnsupportedPrimitiveError):
         ZenField(default=A(1))
     ZenField(default=A(1), _builds_fn=my_builds)
+
+
+def test_default_to_config():
+    store = ZenStore("my store")(
+        to_config=partial(default_to_config, BuildsFn=MyBuildsFn)
+    )
+    store(A, x=A(x=2), name="blah")
+    assert instantiate(store[None, "blah"]) == A(x=A(x=2))
