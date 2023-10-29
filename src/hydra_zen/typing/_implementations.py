@@ -5,6 +5,7 @@
 
 import sys
 import types
+from dataclasses import MISSING
 from enum import Enum
 from pathlib import Path, PosixPath, WindowsPath
 from typing import (
@@ -15,7 +16,6 @@ from typing import (
     ClassVar,
     Dict,
     FrozenSet,
-    Generic,
     List,
     Mapping,
     NewType,
@@ -90,6 +90,8 @@ else:
 
 @runtime_checkable
 class Partial(Protocol[T2]):
+    """A protocol that matches against `functools.partial`"""
+
     __call__: Callable[..., T2]
 
     @property
@@ -188,6 +190,23 @@ _HydraPrimitive: TypeAlias = Union[
     bool, None, int, float, str, ByteString, Path, WindowsPath, PosixPath
 ]
 
+HydraSupportedType = Union[
+    _HydraPrimitive,
+    DataClass_,
+    Type[DataClass_],
+    ListConfig,
+    DictConfig,
+    Enum,
+    Literal[MISSING],
+    # Even thought this is redundant with Sequence, it seems to
+    # be needed for pyright to do proper checking of tuple contents
+    Tuple["HydraSupportedType", ...],
+    Sequence["HydraSupportedType"],
+    Mapping[Any, "HydraSupportedType"],
+]
+"""Describes types that are compatible with Hydra -- they can be used in
+configs provided to Hydra."""
+
 _SupportedViaBuilds = Union[
     Partial[Any],
     range,
@@ -206,25 +225,23 @@ _SupportedPrimitive: TypeAlias = Union[
     EmptyDict,  # not covered by Mapping[..., ...]]
 ]
 
-if TYPE_CHECKING:
-    SupportedPrimitive: TypeAlias = Union[
-        _SupportedPrimitive,
-        FrozenSet["SupportedPrimitive"],
-        # Even thought this is redundant with Sequence, it seems to
-        # be needed for pyright to do proper checking of tuple contents
-        Tuple["SupportedPrimitive", ...],
-        # Mutable generic containers need to be invariant, so
-        # we have to settle for Sequence/Mapping. While this
-        # is overly permissive in terms of sequence-type, it
-        # at least affords quality checking of sequence content
-        Sequence["SupportedPrimitive"],
-        # Mapping is covariant only in value
-        Mapping[Any, "SupportedPrimitive"],
-    ]
-else:
-    # cleans up annotations for REPLs
-    SupportedPrimitive = TypeVar("SupportedPrimitive")
 
+SupportedPrimitive: TypeAlias = Union[
+    _SupportedPrimitive,
+    FrozenSet["SupportedPrimitive"],
+    # Even thought this is redundant with Sequence, it seems to
+    # be needed for pyright to do proper checking of tuple contents
+    Tuple["SupportedPrimitive", ...],
+    # Mutable generic containers need to be invariant, so
+    # we have to settle for Sequence/Mapping. While this
+    # is overly permissive in terms of sequence-type, it
+    # at least affords quality checking of sequence content
+    Sequence["SupportedPrimitive"],
+    # Mapping is covariant only in value
+    Mapping[Any, "SupportedPrimitive"],
+]
+"""Describes types that are natively supported by hydra-zen's config-creation
+functions."""
 
 ZenWrapper: TypeAlias = Union[
     None,
@@ -237,12 +254,9 @@ ZenWrapper: TypeAlias = Union[
     Callable[[T4], T4],
     str,
 ]
-if TYPE_CHECKING:
-    ZenWrappers: TypeAlias = Union[ZenWrapper[T4], Sequence[ZenWrapper[T4]]]
-else:
-    # cleans up annotations for REPLs
-    class ZenWrappers(Generic[T2]):  # pragma: no cover
-        pass
+
+
+ZenWrappers: TypeAlias = Union[ZenWrapper[T4], Sequence[ZenWrapper[T4]]]
 
 
 DefaultsList = List[

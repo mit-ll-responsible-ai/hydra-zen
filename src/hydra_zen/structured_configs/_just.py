@@ -1,18 +1,16 @@
 # Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+
 from typing import Any, Callable, FrozenSet, Optional, Type, TypeVar, Union, overload
 
 from typing_extensions import Literal
 
-from hydra_zen.structured_configs import _utils
 from hydra_zen.typing import Builds, DataclassOptions, Just
 from hydra_zen.typing._implementations import _HydraPrimitive  # type: ignore
 from hydra_zen.typing._implementations import _SupportedViaBuilds  # type: ignore
-from hydra_zen.typing._implementations import AllConvert, DataClass_, ZenConvert
+from hydra_zen.typing._implementations import DataClass_, ZenConvert
 
-from ._implementations import sanitized_default_value
-from ._utils import merge_settings
-from ._value_conversion import ConfigComplex
+from ._implementations import ConfigComplex, DefaultBuilds
 
 # pyright: strict
 T = TypeVar("T")
@@ -22,9 +20,6 @@ TP = TypeVar("TP", bound=_HydraPrimitive)
 TB = TypeVar("TB", bound=Union[_SupportedViaBuilds, FrozenSet[Any]])
 
 __all__ = ["just"]
-
-
-_JUST_CONVERT_SETTINGS = AllConvert(dataclass=True, flat_target=False)
 
 
 @overload
@@ -303,22 +298,4 @@ def just(
     >>> conf.reduction_fn(conf.data)
     (3+5j)
     """
-    convert_settings = merge_settings(zen_convert, _JUST_CONVERT_SETTINGS)
-    del zen_convert
-    _utils.validate_hydra_options(
-        hydra_recursive=hydra_recursive, hydra_convert=hydra_convert
-    )
-    if zen_dataclass is None:
-        zen_dataclass = {}
-
-    return sanitized_default_value(
-        obj,
-        allow_zen_conversion=True,
-        structured_conf_permitted=True,
-        field_name="",
-        error_prefix="",
-        convert_dataclass=convert_settings["dataclass"],
-        hydra_convert=hydra_convert,
-        hydra_recursive=hydra_recursive,
-        zen_dataclass=_utils.parse_dataclass_options(zen_dataclass),
-    )
+    return DefaultBuilds.just(**locals())

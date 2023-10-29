@@ -6,11 +6,11 @@ from dataclasses import dataclass
 
 import pytest
 
-from hydra_zen import builds, instantiate, make_custom_builds_fn
-from hydra_zen.structured_configs._utils import get_obj_path
+from hydra_zen import DefaultBuilds, builds, instantiate, make_custom_builds_fn
 from hydra_zen.typing import ZenConvert
 
 fbuilds = make_custom_builds_fn(populate_full_signature=True)
+get_obj_path = DefaultBuilds._get_obj_path
 
 
 def test_no_flat_target():

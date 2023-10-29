@@ -32,7 +32,6 @@ from typing import (
 import hydra
 from hydra.conf import HydraConf
 from hydra.core.config_store import ConfigStore
-from hydra.utils import instantiate
 from omegaconf import DictConfig, ListConfig, OmegaConf
 from typing_extensions import (
     Final,
@@ -45,11 +44,11 @@ from typing_extensions import (
     TypeGuard,
 )
 
-from hydra_zen import instantiate, just, make_custom_builds_fn
+from hydra_zen import instantiate
 from hydra_zen._compatibility import HYDRA_VERSION, Version
 from hydra_zen.errors import HydraZenValidationError
+from hydra_zen.structured_configs._implementations import BuildsFn, DefaultBuilds
 from hydra_zen.structured_configs._type_guards import safe_getattr
-from hydra_zen.structured_configs._utils import get_obj_path
 from hydra_zen.typing._implementations import (
     DataClass_,
     GroupName,
@@ -63,6 +62,7 @@ from ..structured_configs._utils import safe_name
 
 __all__ = ["zen", "store", "Zen"]
 
+get_obj_path = BuildsFn._get_obj_path  # type: ignore
 
 R = TypeVar("R")
 P = ParamSpec("P")
@@ -765,9 +765,6 @@ def zen(
     return wrap
 
 
-fbuilds = make_custom_builds_fn(populate_full_signature=True)
-
-
 def default_to_config(
     target: Union[
         Callable[..., Any],
@@ -777,6 +774,7 @@ def default_to_config(
         ListConfig,
         DictConfig,
     ],
+    BuildsFn: Type[BuildsFn[Any]] = DefaultBuilds,
     **kw: Any,
 ) -> Union[DataClass_, Type[DataClass_], ListConfig, DictConfig]:
     """Creates a config that describes `target`.
@@ -794,6 +792,10 @@ def default_to_config(
     Parameters
     ----------
     target : Callable[..., Any] | DataClass | Type[DataClass] | list | dict
+
+    BuildsFn : Type[BuildsFn[Any]], optional (default=DefaultBuilds)
+        Provides the config-creation functions (`builds`, `just`) used
+        by this function.
 
     **kw : Any
         Keyword arguments to be passed to `builds`.
@@ -834,6 +836,7 @@ def default_to_config(
     x: ???
     'y': ???
     """
+
     if is_dataclass(target):
         if isinstance(target, type):
             if issubclass(target, HydraConf):
@@ -843,7 +846,12 @@ def default_to_config(
             if not kw and get_obj_path(target).startswith("types."):
                 # handles dataclasses returned by make_config()
                 return target
-            return fbuilds(target, **kw, builds_bases=(target,))
+            return BuildsFn.builds(
+                target,
+                **kw,
+                populate_full_signature=True,
+                builds_bases=(target,),
+            )
         if kw:
             raise ValueError(
                 "store(<dataclass-instance>, [...]) does not support specifying "
@@ -853,12 +861,14 @@ def default_to_config(
 
     elif isinstance(target, (dict, list)):
         # TODO: convert to OmegaConf containers?
-        return just(target)
+        return BuildsFn.just(target)
     elif isinstance(target, (DictConfig, ListConfig)):
         return target
     else:
         t = cast(Callable[..., Any], target)
-        return cast(Type[DataClass_], fbuilds(t, **kw))
+        return cast(
+            Type[DataClass_], BuildsFn.builds(t, **kw, populate_full_signature=True)
+        )
 
 
 class _HasName(Protocol):

@@ -1,12 +1,9 @@
 # Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import inspect
-import sys
 import warnings
-from dataclasses import MISSING, InitVar, field as _field, is_dataclass
-from enum import Enum
+from dataclasses import MISSING, field as _field, is_dataclass
 from keyword import iskeyword
-from pathlib import Path
 from typing import (
     Any,
     Callable,
@@ -23,29 +20,13 @@ from typing import (
     TypeVar,
     Union,
     cast,
-    get_args,
-    get_origin,
     overload,
 )
 
 from omegaconf import II, DictConfig, ListConfig
-from typing_extensions import (
-    Annotated,
-    Final,
-    Literal,
-    ParamSpecArgs,
-    ParamSpecKwargs,
-    TypeGuard,
-    Unpack,
-    _AnnotatedAlias,
-)
+from typing_extensions import Final, Literal, TypeGuard
 
-from hydra_zen._compatibility import (
-    HYDRA_SUPPORTED_PRIMITIVE_TYPES,
-    HYDRA_SUPPORTS_OBJECT_CONVERT,
-    OMEGACONF_VERSION,
-    Version,
-)
+from hydra_zen._compatibility import HYDRA_SUPPORTS_OBJECT_CONVERT
 from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.typing import DataclassOptions, ZenConvert
 from hydra_zen.typing._implementations import (
@@ -186,235 +167,7 @@ def building_error_prefix(target: Any) -> str:
     return f"Building: {safe_name(target)} ..\n"
 
 
-def get_obj_path(obj: Any) -> str:
-    name = safe_name(obj, repr_allowed=False)
-
-    if name == UNKNOWN_NAME:
-        raise AttributeError(f"{obj} does not have a `__name__` attribute")
-
-    module = getattr(obj, "__module__", None)
-    qualname = getattr(obj, "__qualname__", None)
-
-    if (qualname is not None and "<" in qualname) or module is None:
-        # NumPy's ufuncs do not have an inspectable `__module__` attribute, so we
-        # check to see if the object lives in NumPy's top-level namespace.
-        #
-        # or..
-        #
-        # Qualname produced a name from a local namespace.
-        # E.g. jax.numpy.add.__qualname__ is '_maybe_bool_binop.<locals>.fn'
-        # Thus we defer to the name of the object and look for it in the
-        # top-level namespace of the known suspects
-        #
-        # or...
-        #
-        # module is None, which is apparently a thing..:
-        # __module__ is None for both numpy.random.rand and random.random
-        #
-
-        # don't use qualname for obfuscated paths
-        for new_module in COMMON_MODULES_WITH_OBFUSCATED_IMPORTS:
-            if getattr(sys.modules.get(new_module), name, None) is obj:
-                module = new_module
-                break
-        else:
-            raise ModuleNotFoundError(f"{name} is not importable")
-
-    if not is_classmethod(obj):
-        return f"{module}.{name}"
-    else:
-        # __qualname__ reflects name of class that originally defines classmethod.
-        # Does not point to child in case of inheritance.
-        #
-        # obj.__self__ -> parent object
-        # obj.__name__ -> name of classmethod
-        return f"{get_obj_path(obj.__self__)}.{obj.__name__}"
-
-
 NoneType = type(None)
-_supported_types = HYDRA_SUPPORTED_PRIMITIVE_TYPES | {
-    list,
-    dict,
-    tuple,
-    List,
-    Tuple,
-    Dict,
-}
-
-
-def sanitized_type(
-    type_: Any,
-    *,
-    primitive_only: bool = False,
-    wrap_optional: bool = False,
-    nested: bool = False,
-) -> type:
-    """Returns ``type_`` unchanged if it is supported as an annotation by hydra,
-    otherwise returns ``Any``.
-
-    Examples
-    --------
-    >>> sanitized_type(int)
-    <class 'int'>
-
-    >>> sanitized_type(frozenset)  # not supported by hydra
-    typing.Any
-
-    >>> sanitized_type(int, wrap_optional=True)
-    typing.Union[int, NoneType]
-
-    >>> sanitized_type(List[int])
-    List[int]
-
-    >>> sanitized_type(List[int], primitive_only=True)
-    Any
-
-    >>> sanitized_type(Dict[str, frozenset])
-    Dict[str, Any]
-    """
-    if hasattr(type_, "__supertype__"):
-        # is NewType
-        return sanitized_type(
-            type_.__supertype__,
-            primitive_only=primitive_only,
-            wrap_optional=wrap_optional,
-            nested=nested,
-        )
-
-    if OMEGACONF_VERSION < Version(2, 2, 3):  # pragma: no cover
-        try:
-            type_ = {list: List, tuple: Tuple, dict: Dict}.get(type_, type_)
-        except TypeError:
-            pass
-
-    # Warning: mutating `type_` will mutate the signature being inspected
-    # Even calling deepcopy(`type_`) silently fails to prevent this.
-    origin = get_origin(type_)
-
-    if origin is not None:
-        # Support for Annotated[x, y]
-        # Python 3.9+
-        # # type_: Annotated[x, y]; origin -> Annotated; args -> (x, y)
-        if origin is Annotated:  # pragma: no cover
-            return sanitized_type(
-                get_args(type_)[0],
-                primitive_only=primitive_only,
-                wrap_optional=wrap_optional,
-                nested=nested,
-            )
-
-        # Python 3.7-3.8
-        # type_: Annotated[x, y]; origin -> x
-        if isinstance(type_, _AnnotatedAlias):  # pragma: no cover
-            return sanitized_type(
-                origin,
-                primitive_only=primitive_only,
-                wrap_optional=wrap_optional,
-                nested=nested,
-            )
-
-        if primitive_only:  # pragma: no cover
-            return Any
-
-        args = get_args(type_)
-        if origin is Union:
-            # Hydra only supports Optional[<type>] unions
-            if len(args) != 2 or NoneType not in args:
-                # isn't Optional[<type>]
-                return Any
-
-            args = cast(Tuple[type, type], args)
-
-            optional_type, none_type = args
-            if none_type is not NoneType:
-                optional_type = none_type
-
-            optional_type = sanitized_type(optional_type)
-
-            if optional_type is Any:  # Union[Any, T] is just Any
-                return Any
-
-            return Union[optional_type, NoneType]
-
-        if origin is list or origin is List:
-            if args:
-                return List[sanitized_type(args[0], primitive_only=False, nested=True)]
-            return List
-
-        if origin is dict or origin is Dict:
-            if args:
-                KeyType = sanitized_type(args[0], primitive_only=True, nested=True)
-                ValueType = sanitized_type(args[1], primitive_only=False, nested=True)
-                return Dict[KeyType, ValueType]
-            return Dict
-
-        if (origin is tuple or origin is Tuple) and not nested:
-            # hydra silently supports tuples of homogeneous types
-            # It has some weird behavior. It treats `Tuple[t1, t2, ...]` as `List[t1]`
-            # It isn't clear that we want to perpetrate this on our end..
-            # So we deal with inhomogeneous types as e.g. `Tuple[str, int]` -> `Tuple[Any, Any]`.
-            #
-            # Otherwise we preserve the annotation as accurately as possible
-            if not args:
-                return Any if OMEGACONF_VERSION < (2, 2, 3) else Tuple
-
-            args = cast(Tuple[type, ...], args)
-            unique_args = set(args)
-
-            if any(get_origin(tp) is Unpack for tp in unique_args):
-                # E.g. Tuple[*Ts]
-                return Tuple[Any, ...]
-
-            has_ellipses = Ellipsis in unique_args
-
-            # E.g. Tuple[int, int, int] or Tuple[int, ...]
-            _unique_type = (
-                sanitized_type(args[0], primitive_only=False, nested=True)
-                if len(unique_args) == 1 or (len(unique_args) == 2 and has_ellipses)
-                else Any
-            )
-
-            if has_ellipses:
-                return Tuple[_unique_type, ...]
-            else:
-                return Tuple[(_unique_type,) * len(args)]  # type: ignore
-
-        return Any
-
-    if isinstance(type_, type) and issubclass(type_, Path):
-        type_ = Path
-
-    if isinstance(type_, (ParamSpecArgs, ParamSpecKwargs)):  # pragma: no cover
-        # Python 3.7 - 3.9
-        # these aren't hashable -- can't check for membership in set
-        return Any
-
-    if isinstance(type_, InitVar):
-        return sanitized_type(
-            type_.type,
-            primitive_only=primitive_only,
-            wrap_optional=wrap_optional,
-            nested=nested,
-        )
-    if (
-        type_ is Any
-        or type_ in _supported_types
-        or is_dataclass(type_)
-        or (isinstance(type_, type) and issubclass(type_, Enum))
-    ):
-        if sys.version_info[:2] == (3, 6) and type_ is Dict:  # pragma: no cover
-            type_ = Dict[Any, Any]
-
-        if wrap_optional and type_ is not Any:  # pragma: no cover
-            # normally get_type_hints automatically resolves Optional[...]
-            # when None is set as the default, but this has been flaky
-            # for some pytorch-lightning classes. So we just do it ourselves...
-            # It might be worth removing this later since none of our standard tests
-            # cover it.
-            type_ = Optional[type_]
-        return type_
-
-    return Any
 
 
 def is_interpolated_string(x: Any) -> TypeGuard[InterpStr]:

@@ -8,6 +8,66 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse 
 chronological order. All previous releases should still be available on pip.
 
+.. _v0.12.0:
+
+----------------------
+0.12.0rc2 - 2023-11-23
+----------------------
+
+
+.. note:: This is documentation for an unreleased version of hydra-zen. You can try out this pre-release version using `pip install --pre hydra-zen`
+
+This release makes hydra-zen's :ref:`auto-config <additional-types>` and :ref:`type-refinement <type-support>` capabilities fully customizable and extensible, while still preserving static type-checking 🎉.
+
+It does so by exposing a customizable class – `hydra_zen.BuildsFn` – with methods that can be overridden to modify the aforementioned auto-config and type-refinement capabilities. This class then exposes the classmethods `just`, `builds`, and `make_config`, which will leverage these customized capabilities.
+
+Here is a stripped-down example.
+
+.. code-block:: python
+   :caption: Basic structure for adding custom auto-config support for a type.
+
+   from hydra_zen import BuildsFn
+   from hydra_zen.typing import SupportedPrimitive
+   
+   # We want builds/just/make_config to be able to automatically
+   # configure instances of `SomeType`
+   class SomeType:
+       ...
+   
+   # The type parameter provided to `BuildsFn[...]` updates the type
+   # annotations of the config-creation functions so that type-checkers
+   # know that `SomeType` is now supported.
+   class CustomBuilds(BuildsFn[SomeType | SupportedPrimitive]):
+       """
+       - To customize type-refinement support, override `_sanitized_type`.
+       - To customize auto-config support, override `_make_hydra_compatible`.
+       - To customize the ability to resolve import paths, override `_get_obj_path`.
+       """
+       @classmethod
+       def _make_hydra_compatible(
+           cls, value, **kw
+       ) -> SupportedPrimitive:
+           # Take some value and return a Hydra-compatible config for it.
+           if isinstance(value, SomeType):
+               return cls.builds(SomeType)
+           return super()._make_hydra_compatible(value, **kw)
+   
+   # These config-creation functions now know how to automatically
+   # - and recursively - generate configs instances of `SomeType`
+   builds = CustomBuilds.builds
+   just = CustomBuilds.just
+   make_config = CustomBuilds.make_config
+
+
+
+For more details and examples, see :pull:`553`.
+
+Improvements
+------------
+- :func:`~hydra_zen.BuildsFn` was introduced to permit customizable auto-config and type-refinement support in config-creation functions. See :pull:`553`.
+- :func:`~hydra_zen.builds` and :func:`~hydra_zen.make_custom_builds_fn` now accept a `zen_exclude` field for excluding parameters from auto-population, either by name or by pattern. See :pull:`558`.
+
+
 .. _v0.11.0:
 
 -------------------
