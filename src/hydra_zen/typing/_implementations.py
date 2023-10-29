@@ -581,7 +581,7 @@ def _permitted_keys(typed_dict: Any) -> FrozenSet[str]:
 
 DEFAULT_DATACLASS_OPTIONS = DataclassOptions(unsafe_hash=True)
 PERMITTED_DATACLASS_OPTIONS = _permitted_keys(DataclassOptions)
-UNSUPPORTED_DATACLASS_OPTIONS = _permitted_keys(_Py312Dataclass) - _permitted_keys(
-    StrictDataclassOptions
-)
+UNSUPPORTED_DATACLASS_OPTIONS = (
+    _permitted_keys(_Py312Dataclass) - {"module"}
+) - _permitted_keys(StrictDataclassOptions)
 del _AllPyDataclassOptions, _Py310Dataclass, _Py311Dataclass, _Py312Dataclass
