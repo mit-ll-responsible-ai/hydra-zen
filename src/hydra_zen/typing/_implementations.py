@@ -393,19 +393,25 @@ class _Py311Dataclass(_Py310Dataclass, total=False):
     weakref_slot: bool
 
 
+class _Py312Dataclass(_Py311Dataclass, total=False):
+    module: Optional[str]
+
+
 if sys.version_info < (3, 10):
     _StrictDataclassOptions = _AllPyDataclassOptions
 elif sys.version_info < (3, 11):
     _StrictDataclassOptions = _Py310Dataclass
-else:  # pragma: no cover
+elif sys.version_info < (3, 12):  # pragma: no cover
     _StrictDataclassOptions = _Py311Dataclass
+else:  # pragma: no cover
+    _StrictDataclassOptions = _Py312Dataclass
 
 
 class StrictDataclassOptions(_StrictDataclassOptions):
     cls_name: Required[str]
 
 
-class DataclassOptions(_Py311Dataclass, total=False):
+class DataclassOptions(_Py312Dataclass, total=False):
     """Specifies dataclass-creation options via `builds`, `just` et al.
 
     Note that, unlike :func:`dataclasses.make_dataclass`, the default value for
@@ -492,6 +498,9 @@ class DataclassOptions(_Py311Dataclass, total=False):
         “__weakref__”, which is required to make an instance weakref-able. It is an
         error to specify `weakref_slot=True` without also specifying `slots=True`.
 
+    module : str | None
+        If module is defined, the __module__ attribute of the dataclass is set to that value. By default, it is set to the module name of the caller.
+
     References
     ----------
     .. [1] https://docs.python.org/3/library/dataclasses.html
@@ -563,7 +572,7 @@ class DataclassOptions(_Py311Dataclass, total=False):
     None
     """
 
-    module: str  # zen-only
+    pass
 
 
 def _permitted_keys(typed_dict: Any) -> FrozenSet[str]:
@@ -572,7 +581,7 @@ def _permitted_keys(typed_dict: Any) -> FrozenSet[str]:
 
 DEFAULT_DATACLASS_OPTIONS = DataclassOptions(unsafe_hash=True)
 PERMITTED_DATACLASS_OPTIONS = _permitted_keys(DataclassOptions)
-UNSUPPORTED_DATACLASS_OPTIONS = _permitted_keys(_Py311Dataclass) - _permitted_keys(
+UNSUPPORTED_DATACLASS_OPTIONS = _permitted_keys(_Py312Dataclass) - _permitted_keys(
     StrictDataclassOptions
 )
-del _AllPyDataclassOptions, _Py310Dataclass, _Py311Dataclass
+del _AllPyDataclassOptions, _Py310Dataclass, _Py311Dataclass, _Py312Dataclass
