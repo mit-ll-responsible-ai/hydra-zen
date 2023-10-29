@@ -377,7 +377,10 @@ def parse_dataclass_options(
         include_module
         and "module" not in merged
         and "module" in _STRICT_DATACLASS_OPTION_KEYS
-    ):
+    ):  # pragma: no cover
+        # For Python 3.12+ we want the default module to
+        # remain "types" rather than being inferred as some
+        # internal hydra-zen module.
         merged["module"] = "types"
     return merged
 
