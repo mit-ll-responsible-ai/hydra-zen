@@ -410,3 +410,44 @@ def test_unhashable_dataclass_supported():
     Conf = builds(dict, y=unhash, zen_convert={"dataclass": False})
     assert not hasattr(Conf, "y")
     assert Conf().y is unhash
+
+
+@pytest.mark.parametrize(
+    "Conf",
+    [
+        make_config(zen_dataclass={"module": None}),
+        builds(dict, zen_dataclass={"module": None}),
+        make_custom_builds_fn(zen_dataclass={"module": None})(dict),
+    ],
+)
+def test_module_is_None(Conf):
+    if sys.version_info < (3, 12):
+        assert Conf.__module__ == "types"
+    else:
+        assert Conf.__module__.startswith("hydra_zen")
+
+
+@pytest.mark.parametrize(
+    "Conf",
+    [
+        make_config(),
+        builds(
+            dict,
+        ),
+        make_custom_builds_fn()(dict),
+    ],
+)
+def test_module_is_not_specified(Conf):
+    assert Conf.__module__ == "types"
+
+
+@pytest.mark.parametrize(
+    "Conf",
+    [
+        make_config(zen_dataclass={"module": "aaa"}),
+        builds(dict, zen_dataclass={"module": "aaa"}),
+        make_custom_builds_fn(zen_dataclass={"module": "aaa"})(dict),
+    ],
+)
+def test_modules_is_specified(Conf):
+    assert Conf.__module__ == "aaa"

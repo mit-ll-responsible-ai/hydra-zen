@@ -449,7 +449,8 @@ def hydrated_dataclass(
                 "kw_only": kw_only,
                 "slots": slots,
                 "weakref_slot": weakref_slot,
-            }
+            },
+            include_module=False,
         )
         decorated_obj = dataclass(**dc_options)(decorated_obj)  # type: ignore
 

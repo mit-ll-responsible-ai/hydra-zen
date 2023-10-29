@@ -284,7 +284,9 @@ _STRICT_DATACLASS_OPTION_KEYS: FrozenSet[str] = (
 _STRICT_DATACLASS_OPTION_KEYS.copy()
 
 
-def parse_dataclass_options(options: Mapping[str, Any]) -> DataclassOptions:
+def parse_dataclass_options(
+    options: Mapping[str, Any], include_module: bool = True
+) -> DataclassOptions:
     """
     Ensures `options` adheres to `DataclassOptions` and merges hydra-zen defaults
     for missing options.
@@ -335,12 +337,16 @@ def parse_dataclass_options(options: Mapping[str, Any]) -> DataclassOptions:
             raise ValueError(f"{name} is not a valid dataclass option.")
 
         if name == "module":
-            if not isinstance(val, str) or not all(
-                v.isidentifier() and not iskeyword(v) for v in val.split(".")
+            if val is not None and (
+                not isinstance(val, str)
+                or not all(
+                    v.isidentifier() and not iskeyword(v) for v in val.split(".")
+                )
             ):
                 raise ValueError(
                     f"dataclass option `{name}` must be a valid module name, got {val}"
                 )
+
         elif name == "cls_name":
             if val is not None and (not isinstance(val, str) or not val.isidentifier()):
                 raise ValueError(
@@ -367,6 +373,15 @@ def parse_dataclass_options(options: Mapping[str, Any]) -> DataclassOptions:
                 f"(type: {type(val)})"
             )
         merged[name] = val
+    if (
+        include_module
+        and "module" not in merged
+        and "module" in _STRICT_DATACLASS_OPTION_KEYS
+    ):  # pragma: no cover
+        # For Python 3.12+ we want the default module to
+        # remain "types" rather than being inferred as some
+        # internal hydra-zen module.
+        merged["module"] = "types"
     return merged
 
 

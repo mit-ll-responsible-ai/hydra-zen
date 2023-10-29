@@ -45,6 +45,7 @@ classifiers = [
        "Programming Language :: Python :: 3.9",
        "Programming Language :: Python :: 3.10",
        "Programming Language :: Python :: 3.11",
+       "Programming Language :: Python :: 3.12",
        "Topic :: Scientific/Engineering",
        "Programming Language :: Python :: 3 :: Only",
 ]
@@ -127,7 +128,7 @@ skip = 'docs/build/*'
 legacy_tox_ini = """
 [tox]
 isolated_build = True
-envlist = py38, py39, py310, py311
+envlist = py38, py39, py310, py311, py312
 
 [gh-actions]
 python =
@@ -135,6 +136,7 @@ python =
   3.9: py39
   3.10: py310
   3.11: py311
+  3.12: py312
 
 
 [testenv]
@@ -143,7 +145,8 @@ description = Runs test suite parallelized in the specified python enviornment a
               Run `tox -e py39 -- -n 0` to run tests in a python 3.9 with 
               parallelization disabled.
 passenv = *
-deps = pytest
+deps = setuptools
+       pytest
        hypothesis
        pytest-xdist
        tzdata
