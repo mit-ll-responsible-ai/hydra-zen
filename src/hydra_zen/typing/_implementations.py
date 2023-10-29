@@ -572,7 +572,7 @@ class DataclassOptions(_Py312Dataclass, total=False):
     None
     """
 
-    pass
+    module: Optional[str]
 
 
 def _permitted_keys(typed_dict: Any) -> FrozenSet[str]:
