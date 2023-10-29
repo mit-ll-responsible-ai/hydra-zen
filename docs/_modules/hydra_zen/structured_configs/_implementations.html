@@ -851,7 +851,8 @@ document.write(`
                 <span class="s2">&quot;kw_only&quot;</span><span class="p">:</span> <span class="n">kw_only</span><span class="p">,</span>
                 <span class="s2">&quot;slots&quot;</span><span class="p">:</span> <span class="n">slots</span><span class="p">,</span>
                 <span class="s2">&quot;weakref_slot&quot;</span><span class="p">:</span> <span class="n">weakref_slot</span><span class="p">,</span>
-            <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="n">include_module</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">decorated_obj</span> <span class="o">=</span> <span class="n">dataclass</span><span class="p">(</span><span class="o">**</span><span class="n">dc_options</span><span class="p">)(</span><span class="n">decorated_obj</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
 

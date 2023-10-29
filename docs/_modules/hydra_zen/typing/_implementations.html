@@ -796,12 +796,18 @@ document.write(`
     <span class="n">weakref_slot</span><span class="p">:</span> <span class="nb">bool</span>
 
 
+<span class="k">class</span> <span class="nc">_Py312Dataclass</span><span class="p">(</span><span class="n">_Py311Dataclass</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">module</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
+
 <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span>
     <span class="n">_StrictDataclassOptions</span> <span class="o">=</span> <span class="n">_AllPyDataclassOptions</span>
 <span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">11</span><span class="p">):</span>
     <span class="n">_StrictDataclassOptions</span> <span class="o">=</span> <span class="n">_Py310Dataclass</span>
-<span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+<span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
     <span class="n">_StrictDataclassOptions</span> <span class="o">=</span> <span class="n">_Py311Dataclass</span>
+<span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="n">_StrictDataclassOptions</span> <span class="o">=</span> <span class="n">_Py312Dataclass</span>
 
 
 <span class="k">class</span> <span class="nc">StrictDataclassOptions</span><span class="p">(</span><span class="n">_StrictDataclassOptions</span><span class="p">):</span>
@@ -810,7 +816,7 @@ document.write(`
 
 <div class="viewcode-block" id="DataclassOptions">
 <a class="viewcode-back" href="../../../generated/hydra_zen.typing.DataclassOptions.html#hydra_zen.typing.DataclassOptions">[docs]</a>
-<span class="k">class</span> <span class="nc">DataclassOptions</span><span class="p">(</span><span class="n">_Py311Dataclass</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">DataclassOptions</span><span class="p">(</span><span class="n">_Py312Dataclass</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Specifies dataclass-creation options via `builds`, `just` et al.</span>
 
 <span class="sd">    Note that, unlike :func:`dataclasses.make_dataclass`, the default value for</span>
@@ -897,6 +903,9 @@ document.write(`
 <span class="sd">        “__weakref__”, which is required to make an instance weakref-able. It is an</span>
 <span class="sd">        error to specify `weakref_slot=True` without also specifying `slots=True`.</span>
 
+<span class="sd">    module : str | None</span>
+<span class="sd">        If module is defined, the __module__ attribute of the dataclass is set to that value. By default, it is set to the module name of the caller.</span>
+
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
 <span class="sd">    .. [1] https://docs.python.org/3/library/dataclasses.html</span>
@@ -968,7 +977,7 @@ document.write(`
 <span class="sd">    None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">module</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># zen-only</span></div>
+    <span class="n">module</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></div>
 
 
 
@@ -978,10 +987,10 @@ document.write(`
 
 <span class="n">DEFAULT_DATACLASS_OPTIONS</span> <span class="o">=</span> <span class="n">DataclassOptions</span><span class="p">(</span><span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">PERMITTED_DATACLASS_OPTIONS</span> <span class="o">=</span> <span class="n">_permitted_keys</span><span class="p">(</span><span class="n">DataclassOptions</span><span class="p">)</span>
-<span class="n">UNSUPPORTED_DATACLASS_OPTIONS</span> <span class="o">=</span> <span class="n">_permitted_keys</span><span class="p">(</span><span class="n">_Py311Dataclass</span><span class="p">)</span> <span class="o">-</span> <span class="n">_permitted_keys</span><span class="p">(</span>
-    <span class="n">StrictDataclassOptions</span>
-<span class="p">)</span>
-<span class="k">del</span> <span class="n">_AllPyDataclassOptions</span><span class="p">,</span> <span class="n">_Py310Dataclass</span><span class="p">,</span> <span class="n">_Py311Dataclass</span>
+<span class="n">UNSUPPORTED_DATACLASS_OPTIONS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">_permitted_keys</span><span class="p">(</span><span class="n">_Py312Dataclass</span><span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="s2">&quot;module&quot;</span><span class="p">}</span>
+<span class="p">)</span> <span class="o">-</span> <span class="n">_permitted_keys</span><span class="p">(</span><span class="n">StrictDataclassOptions</span><span class="p">)</span>
+<span class="k">del</span> <span class="n">_AllPyDataclassOptions</span><span class="p">,</span> <span class="n">_Py310Dataclass</span><span class="p">,</span> <span class="n">_Py311Dataclass</span><span class="p">,</span> <span class="n">_Py312Dataclass</span>
 </pre></div>
 
                 </article>
