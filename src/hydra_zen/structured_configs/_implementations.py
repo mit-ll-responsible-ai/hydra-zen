@@ -682,7 +682,7 @@ class BuildsFn(Generic[T]):
         -----
         A staticmethod does not possess any information to indicate that it is not
         merely a function; e.g. it does not have any reference to its parent class.
-        Thus `builds` is unsable to resolve the import path of a static method. Instead,
+        Thus `builds` is unable to resolve the import path of a static method. Instead,
         `note_static_method` explicitly stores the module and qualname of the
         static method in a global set that `builds` can reference later.
 
