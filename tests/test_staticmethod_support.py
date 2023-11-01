@@ -64,3 +64,8 @@ def test_local_registry_is_isolated():
 
     assert instantiate(MyBuilds.builds(MyBuilds.note_static_method(BB.f))) == "moo"
     assert num_global_registered == len(BuildsFn._registered_static_methods)
+
+
+def test_validation():
+    with pytest.raises(TypeError):
+        note_static_method(BB)

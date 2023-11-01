@@ -713,15 +713,19 @@ class BuildsFn(Generic[T]):
         >>> instantiate(builds(Bar.g))
         "MEOW:
         """
+        if not TYPE_CHECKING:  # pragma: no cover
+            if isinstance(__x, staticmethod):
+                if sys.version_info < (3, 10):
+                    raise TypeError(
+                        "`note_static_method` can only be used as a decorator for Python 3.10+"
+                    )
 
-        if (
-            not TYPE_CHECKING
-            and isinstance(__x, staticmethod)
-            and sys.version_info < (3, 10)
-        ):  # pragma: no cover
-            raise TypeError(
-                "`note_static_method` can only be used as a decorator for Python 3.10+"
-            )
+            elif not inspect.isfunction(__x):
+                raise TypeError(
+                    f"`note_static_method` must be passed a "
+                    f"static method, got {__x}"
+                )
+
         cls._registered_static_methods.add((__x.__module__, __x.__qualname__))
         return __x
 

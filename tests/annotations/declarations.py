@@ -44,6 +44,7 @@ from hydra_zen import (
     make_config,
     make_custom_builds_fn,
     mutable_value,
+    note_static_method,
     store,
     zen,
 )
@@ -1477,3 +1478,14 @@ def check_parameterized_BuildsFn():
     assert_type(bg(A, B()), Type[Builds[Type[A]]])
     assert_type(bg(A, B(), zen_partial=True), Type[PartialBuilds[Type[A]]])
     bg(A, C())  # type: ignore
+
+
+def check_noted_static_method():
+    class A:
+        @staticmethod
+        def foo(x: int) -> bool:
+            ...
+
+    reveal_type(note_static_method(A.foo), expected_text="(x: int) -> bool")
+
+    note_static_method(None)  # type: ignore
