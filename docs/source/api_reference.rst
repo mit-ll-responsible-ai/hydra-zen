@@ -38,6 +38,7 @@ Creating Configs
    builds
    just
    hydrated_dataclass
+   note_static_method
 
 
 Storing Configs

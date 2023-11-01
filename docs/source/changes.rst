@@ -67,6 +67,7 @@ Improvements
 - Adds formal support for Python 3.12. See :pull:`555`
 - :func:`~hydra_zen.BuildsFn` was introduced to permit customizable auto-config and type-refinement support in config-creation functions. See :pull:`553`.
 - :func:`~hydra_zen.builds` and :func:`~hydra_zen.make_custom_builds_fn` now accept a `zen_exclude` field for excluding parameters from auto-population, either by name or by pattern. See :pull:`558`.
+- :func:`~hydra_zen.note_static_method` and :func:`~hydra_zen.BuildsFn.note_static_method` have been added to enable support for passing a static method to :func:`~hydra_zen.builds`. See :pull:`565`.
 
 
 .. _v0.11.0:

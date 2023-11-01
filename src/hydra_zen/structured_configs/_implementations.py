@@ -2019,6 +2019,20 @@ class BuildsFn(Generic[T]):
         {'a': 1, 'b': 2}
         >>> instantiate(Conf(a=-4))  # equivalent to calling: `partiald_dict(a=-4)`
         {'a': -4, 'b': 2}
+
+        **Building a config for a static method**
+
+        A static method must first be passed to :func:`~hydra_zen.note_static_method`
+        before being passed to builds.
+
+        >>> from hydra_zen import note_static_method, builds, instantiate
+        >>> class Foo:
+        ...     @staticmethod
+        ...     def f():
+        ...         return "BARK"
+        >>> note_static_method(Foo.f)
+        >>> builds(Foo.f)._target_
+        "__main__.Foo.f"
         """
 
         zen_convert_settings = _utils.merge_settings(
