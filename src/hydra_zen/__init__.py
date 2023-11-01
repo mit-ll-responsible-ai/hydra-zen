@@ -19,7 +19,12 @@ from .structured_configs import (
     make_custom_builds_fn,
     mutable_value,
 )
-from .structured_configs._implementations import BuildsFn, DefaultBuilds, get_target
+from .structured_configs._implementations import (
+    BuildsFn,
+    DefaultBuilds,
+    get_target,
+    note_static_method,
+)
 from .structured_configs._type_guards import is_partial_builds, uses_zen_processing
 from .wrapper import ZenStore, store, zen
 
@@ -28,6 +33,7 @@ __all__ = [
     "BuildsFn",
     "DefaultBuilds",
     "hydrated_dataclass",
+    "note_static_method",
     "just",
     "mutable_value",
     "get_target",

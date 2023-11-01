@@ -79,7 +79,6 @@ from hydra_zen.typing import (
     ZenConvert,
     ZenWrappers,
 )
-from hydra_zen.typing._builds_overloads import StdBuilds
 from hydra_zen.typing._implementations import (
     AllConvert,
     AnyBuilds,
@@ -649,12 +648,79 @@ class BuildsFn(Generic[T]):
     To customize the ability to resolve import paths, override `_get_obj_path`.
     """
 
+    _registered_static_methods: Set[Tuple[str, str]] = set()
+    """Stores the registered staticmethod paths used by `cls.note_static_method`.
+
+    To isolate this registry to a specific subclass, redefine
+    `_registered_static_methods = set()` in your subclass' class definition.
+    """
+
     __slots__ = ("__name__", "__qualname__")
 
     def __init__(self, name: str, qualname: Optional[str] = None) -> None:
         super().__init__()
         self.__name__: str = name
         self.__qualname__: str = qualname if qualname is not None else name
+
+    @classmethod
+    def note_static_method(cls, __x: TC) -> TC:
+        """Marks static methods so that their import paths can be resolved by hydra-zen's config-creation functions.
+
+        For Python 3.10+, this can be used as a decorator on a staticmethod.
+
+        Parameters
+        ----------
+        x : Callable[..., Any] | staticmethod
+
+        Returns
+        -------
+        x
+           The input, unchanged.
+
+        Notes
+        -----
+        A staticmethod does not possess any information to indicate that it is not
+        merely a function; e.g. it does not have any reference to its parent class.
+        Thus `builds` is unsable to resolve the import path of a static method. Instead,
+        `note_static_method` explicitly stores the module and qualname of the
+        static method in a global set that `builds` can reference later.
+
+        Examples
+        --------
+        Given
+
+        >>> class Foo:
+        ...     @staticmethod
+        ...     def f():
+        ...         return "BARK"
+
+        Calling `instantiate(builds(Foo.f))` will raise `ModuleNotFoundError` unless
+        we first register the import path for `Foo.f`.
+
+        >>> from hydra_zen import note_static_method, builds, instantiate
+        >>> note_static_method(Foo.f)
+        >>> instantiate(builds(Foo.f))
+        "BARK"
+
+        For Python 3.10+, this can be used as a decorator on a staticmethod.
+
+        >>> class Bar:
+        ...     @note_static_method
+        ...     @staticmethod
+        ...     def g():
+        ...         return "MEOW"
+        >>> instantiate(builds(Bar.g))
+        "MEOW:
+        """
+
+        # if x is staticmethod:
+        #     return _as_static_method if sys.version_info >= (3, 10) else staticmethod
+        if isinstance(__x, staticmethod) and sys.version_info < (3, 10):
+            raise TypeError(
+                "`note_static_method` can only be used as a decorator for Python 3.10+"
+            )
+        cls._registered_static_methods.add((__x.__module__, __x.__qualname__))
+        return __x
 
     @classmethod
     def _sanitized_type(
@@ -897,6 +963,9 @@ class BuildsFn(Generic[T]):
                 raise ModuleNotFoundError(f"{name} is not importable")
 
         if not _utils.is_classmethod(target):
+            if (module, qualname) in cls._registered_static_methods:
+                return f"{module}.{qualname}"
+
             return f"{module}.{name}"
         else:
             # __qualname__ reflects name of class that originally defines classmethod.
@@ -3144,9 +3213,8 @@ class DefaultBuilds(BuildsFn[SupportedPrimitive]):
     pass
 
 
-builds: StdBuilds[SupportedPrimitive] = cast(
-    StdBuilds[SupportedPrimitive], DefaultBuilds("builds").builds
-)
+builds: Final = DefaultBuilds.builds
+note_static_method: Final = DefaultBuilds.note_static_method
 
 
 @dataclass(unsafe_hash=True)

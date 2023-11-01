@@ -10,7 +10,7 @@ import hypothesis.strategies as st
 import pytest
 from hypothesis import assume, given
 
-from hydra_zen import builds, instantiate, just, make_config
+from hydra_zen import builds, instantiate, just, make_config, note_static_method
 from hydra_zen.structured_configs._type_guards import safe_getattr
 from hydra_zen.typing import DataclassOptions as Dc
 from tests.custom_strategies import valid_builds_args
@@ -97,3 +97,14 @@ def test_safe_getattr_no_default():
         safe_getattr(conf, "x")
 
     assert safe_getattr(conf, "x", 1) == 1
+
+
+class A:
+    @note_static_method
+    @staticmethod
+    def foo(x: int):
+        return "A.grr" * x
+
+
+def test_note_static_method_as_decorator():
+    assert instantiate(builds(A.foo, 2)) == "A.grr" * 2
