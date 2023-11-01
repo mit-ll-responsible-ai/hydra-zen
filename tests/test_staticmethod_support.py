@@ -44,9 +44,23 @@ def test_builds_static_methods():
     assert instantiate(builds(C.foo, 4)) == "C.foo" * 4
 
 
-def test_local_registry_is_isolated():
-    assert not MyBuilds._registered_static_methods
-    assert BuildsFn._registered_static_methods
+class BB:
+    @staticmethod
+    def f():
+        return "moo"
 
+
+def test_local_registry_is_isolated():
+    BuildsFn.note_static_method(A.foo)
+    num_global_registered = len(BuildsFn._registered_static_methods)
+    assert num_global_registered
+
+    # `MyBuilds` should not know about `A.foo`
     with pytest.raises(Exception, match="Error locating target"):
         instantiate(MyBuilds.builds(A.foo))
+
+    with pytest.raises(Exception, match="Error locating target"):
+        instantiate(MyBuilds.builds(BB.f))
+
+    assert instantiate(MyBuilds.builds(MyBuilds.note_static_method(BB.f))) == "moo"
+    assert num_global_registered == len(BuildsFn._registered_static_methods)
