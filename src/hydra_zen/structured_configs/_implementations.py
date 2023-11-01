@@ -21,6 +21,7 @@ from functools import partial
 from itertools import chain
 from pathlib import Path, PosixPath, WindowsPath
 from typing import (
+    TYPE_CHECKING,
     Any,
     Callable,
     Dict,
@@ -713,9 +714,11 @@ class BuildsFn(Generic[T]):
         "MEOW:
         """
 
-        # if x is staticmethod:
-        #     return _as_static_method if sys.version_info >= (3, 10) else staticmethod
-        if isinstance(__x, staticmethod) and sys.version_info < (3, 10):
+        if (
+            not TYPE_CHECKING
+            and isinstance(__x, staticmethod)
+            and sys.version_info < (3, 10)
+        ):  # pragma: no cover
             raise TypeError(
                 "`note_static_method` can only be used as a decorator for Python 3.10+"
             )
