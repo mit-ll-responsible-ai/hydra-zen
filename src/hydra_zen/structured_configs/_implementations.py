@@ -869,7 +869,7 @@ class BuildsFn(Generic[T]):
             raise AttributeError(f"{target} does not have a `__name__` attribute")
 
         module = getattr(target, "__module__", None)
-        qualname = getattr(target, "__qualname__", None)
+        qualname: Union[str, None] = getattr(target, "__qualname__", None)
 
         if (qualname is not None and "<" in qualname) or module is None:
             # NumPy's ufuncs do not have an inspectable `__module__` attribute, so we
@@ -897,6 +897,14 @@ class BuildsFn(Generic[T]):
                 raise ModuleNotFoundError(f"{name} is not importable")
 
         if not _utils.is_classmethod(target):
+            if (
+                inspect.isfunction(target)
+                and isinstance(qualname, str)
+                and "." in qualname
+                and all(x.isidentifier() for x in qualname.split("."))
+            ):
+                # this looks like it is a staticmethod. E.g. qualname: SomeClass.func
+                return f"{module}.{qualname}"
             return f"{module}.{name}"
         else:
             # __qualname__ reflects name of class that originally defines classmethod.
