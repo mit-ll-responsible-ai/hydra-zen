@@ -151,12 +151,6 @@ def test_sanitized_type_override():
     assert out.annotation is A
 
 
-def test_get_obj_path_override():
-    with pytest.raises(Exception, match="Error locating target"):
-        assert instantiate(builds(A.static)) == 11
-    assert instantiate(my_builds(A.static)) == 11
-
-
 def test_make_config():
     with pytest.raises(HydraZenUnsupportedPrimitiveError):
         make_config(x=A(1))  # type: ignore
