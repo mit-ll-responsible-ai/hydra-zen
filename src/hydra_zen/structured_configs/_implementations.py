@@ -79,7 +79,6 @@ from hydra_zen.typing import (
     ZenConvert,
     ZenWrappers,
 )
-from hydra_zen.typing._builds_overloads import StdBuilds
 from hydra_zen.typing._implementations import (
     AllConvert,
     AnyBuilds,
@@ -3152,9 +3151,7 @@ class DefaultBuilds(BuildsFn[SupportedPrimitive]):
     pass
 
 
-builds: StdBuilds[SupportedPrimitive] = cast(
-    StdBuilds[SupportedPrimitive], DefaultBuilds("builds").builds
-)
+builds: Final = DefaultBuilds.builds
 
 
 @dataclass(unsafe_hash=True)
