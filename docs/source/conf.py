@@ -44,6 +44,7 @@ extensions = [
     "sphinx_copybutton",
     "sphinx_design",
     "sphinx_codeautolink",
+    "sphinx_favicon",
 ]
 
 autosummary_generate = False
@@ -111,16 +112,8 @@ html_theme_options = {
 html_static_path = ["_static"]
 
 favicons = [
-    {
-        "rel": "icon",
-        "sizes": "32x32",
-        "href": "hydra_zen_favicon_32x32.png",
-    },
-    {
-        "rel": "icon",
-        "sizes": "64x64",
-        "href": "hydra_zen_favicon_64x64.png",
-    },
+    "hydra_zen_favicon_32x32.png",
+    "hydra_zen_favicon_64x64.png",
 ]
 
 
