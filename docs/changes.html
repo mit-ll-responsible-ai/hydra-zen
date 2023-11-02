@@ -6,14 +6,16 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
 <meta content="The changelog for hydra-zen, including what's new." name="description"/>
+<link href="_static/hydra_zen_favicon_32x32.png" rel="icon" sizes="-1x-1" type="image/png"/>
+<link href="_static/hydra_zen_favicon_64x64.png" rel="icon" sizes="-1x-1" type="image/png"/>
 <title>Changelog — hydra-zen  documentation</title>
 <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
   </script>
 <!-- Loaded before other Sphinx assets -->
-<link href="_static/styles/theme.css?digest=365ca57ee442770a23c6" rel="stylesheet"/>
-<link href="_static/styles/bootstrap.css?digest=365ca57ee442770a23c6" rel="stylesheet"/>
+<link href="_static/styles/theme.css?digest=365ca57ee442770a23c6" rel="stylesheet">
+<link href="_static/styles/bootstrap.css?digest=365ca57ee442770a23c6" rel="stylesheet">
 <link href="_static/styles/pydata-sphinx-theme.css?digest=365ca57ee442770a23c6" rel="stylesheet"/>
 <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=365ca57ee442770a23c6" rel="stylesheet"/>
 <link as="font" crossorigin="" href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" rel="preload" type="font/woff2"/>
@@ -41,7 +43,7 @@
 <link href="generated/hydra_zen.third_party.pydantic.validates_with_pydantic.html" rel="prev" title="hydra_zen.third_party.pydantic.validates_with_pydantic"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <meta content="en" name="docsearch:language"/>
-</head>
+</link></link></head>
 <body data-bs-root-margin="0px 0px -60%" data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-default-mode="" data-offset="180">
 <a class="skip-link" href="#main-content">Skip to main content</a>
 <div id="pst-scroll-pixel-helper"></div>
@@ -243,8 +245,8 @@ document.write(`
 <h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h1>
 <p>This is a record of all past hydra-zen releases and what went into them, in reverse
 chronological order. All previous releases should still be available on pip.</p>
-<section id="rc2-2023-11-23">
-<span id="v0-12-0"></span><h2>0.12.0rc2 - 2023-11-23<a class="headerlink" href="#rc2-2023-11-23" title="Link to this heading">#</a></h2>
+<section id="rc3-2023-11-02">
+<span id="v0-12-0"></span><h2>0.12.0rc3 - 2023-11-02<a class="headerlink" href="#rc3-2023-11-02" title="Link to this heading">#</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This is documentation for an unreleased version of hydra-zen. You can try out this pre-release version using <code class="xref py py-obj docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--pre</span> <span class="pre">hydra-zen</span></code></p>
@@ -292,9 +294,9 @@ chronological order. All previous releases should still be available on pip.</p>
 <section id="improvements">
 <h3>Improvements<a class="headerlink" href="#improvements" title="Link to this heading">#</a></h3>
 <ul class="simple">
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">BuildsFn()</span></code> was introduced to permit customizable auto-config and type-refinement support in config-creation functions. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/553">pull request #553</a>.</p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">BuildsFn</span></code> was introduced to permit customizable auto-config and type-refinement support in config-creation functions. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/553">pull request #553</a>.</p></li>
 <li><p><a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> and <a class="reference internal" href="generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_custom_builds_fn()</span></code></a> now accept a <code class="xref py py-obj docutils literal notranslate"><span class="pre">zen_exclude</span></code> field for excluding parameters from auto-population, either by name or by pattern. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/558">pull request #558</a>.</p></li>
-<li><p><a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> and <a class="reference internal" href="generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-func docutils literal notranslate"><span class="pre">just()</span></code></a> can now configure static methods. Previously they incorrect import path would be found. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/566">pull request #566</a></p></li>
+<li><p><a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> and <a class="reference internal" href="generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-func docutils literal notranslate"><span class="pre">just()</span></code></a> can now configure static methods. Previously the incorrect <code class="docutils literal notranslate"><span class="pre">_target_</span></code> would be resolved. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/566">pull request #566</a></p></li>
 <li><p>Adds formal support for Python 3.12. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/555">pull request #555</a></p></li>
 </ul>
 </section>
@@ -1250,7 +1252,7 @@ the config is actually accessed by the store. Thus this decorator pattern does n
   </div>
 <nav class="bd-toc-nav page-toc">
 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rc2-2023-11-23">0.12.0rc2 - 2023-11-23</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rc3-2023-11-02">0.12.0rc3 - 2023-11-02</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#improvements">Improvements</a></li>
 </ul>
 </li>
