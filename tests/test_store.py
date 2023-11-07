@@ -426,6 +426,7 @@ def test_overwrite_ok(outer: bool, inner: bool, name, group):
         ):
             _store({}, name=name, group=group)
         return
+    _store.add_to_hydra_store(overwrite_ok=True)
     _store({}, name=name, group=group)
     if not inner:
         with pytest.raises(
@@ -548,7 +549,7 @@ def test_default_to_config_validates_dataclass_instance_with_kw():
 )
 def test_validate_init(param_name):
     with pytest.raises(TypeError, match=f"{param_name} must be a bool"):
-        ZenStore(**{param_name: "bad"})
+        ZenStore(**{param_name: "bad"})  # type: ignore
 
 
 def contains(key, store_):
@@ -808,3 +809,21 @@ def test_store_hydrated_dataclass():
     store = ZenStore()
     store(SomethingHydrated, name="foo", x=2)
     assert instantiate(store[None, "foo"]) == 2
+
+
+def test_del():
+    s = ZenStore()
+    s({}, name="a")
+    s({}, name="b")
+    assert len(s) == 2
+    assert len(s._queue) == 2
+
+    del s[None, "a"]
+    assert len(s) == 1
+    assert len(s._queue) == 1
+    assert (None, "a") not in s
+    assert (None, "a") not in s._queue
+
+    s.delete_entry(None, "b")
+    assert not s
+    assert not s._queue
