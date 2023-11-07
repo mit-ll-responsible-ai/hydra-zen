@@ -848,3 +848,55 @@ def test_copy():
 
     assert s2.name == "s_copy"
     assert s2.copy("moo").name == "moo"
+
+
+@pytest.mark.usefixtures("clean_store")
+@pytest.mark.parametrize(
+    "mapping",
+    [
+        {"A": "B"},
+        lambda x: "B" if x and x.startswith("A") else x,
+    ],
+)
+def test_map_groups(mapping):
+    s1 = ZenStore()
+    s1({"x": 1}, group=None, name="a")
+    s1({"y": 2}, group="A", name="b")
+
+    s2 = s1.copy_with_mapped_groups(mapping)
+    assert s1 != s2
+
+    assert (None, "a") in s1
+    assert ("A", "b") in s1
+    assert ("B", "b") not in s1
+    assert len(s1) == 2
+    assert s1._queue == {(None, "a"), ("A", "b")}
+
+    assert (None, "a") in s1
+    assert ("A", "b") not in s2
+    assert ("B", "b") in s2
+    assert len(s2) == 2
+    assert s2._queue == {(None, "a"), ("B", "b")}
+
+    s1.add_to_hydra_store()
+    assert instantiate_from_repo("a", group=None) == {"x": 1}
+    assert instantiate_from_repo("b", group="A") == {"y": 2}
+
+    with pytest.raises(KeyError):
+        instantiate_from_repo("b", group="B")
+
+    s2.add_to_hydra_store(overwrite_ok=True)
+    assert instantiate_from_repo("b", group="B") == {"y": 2}
+
+
+@pytest.mark.usefixtures("clean_store")
+def test_map_with_overwrite():
+    s1 = ZenStore()
+    s1(dict(x=1), name="b")
+    s1(dict(x=2), name="b", group="G")
+    with pytest.raises(ValueError, match="Store entry already exists"):
+        s1.copy_with_mapped_groups({None: "G"})
+
+    s2 = s1.copy_with_mapped_groups({None: "G"}, overwrite_ok=True)
+    s2.add_to_hydra_store()
+    assert instantiate_from_repo("b", group="G") == {"x": 1}

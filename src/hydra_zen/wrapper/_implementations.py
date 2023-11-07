@@ -1544,7 +1544,7 @@ class ZenStore:
                 node=node,
             )
 
-            self._set_entry(entry)
+            self._set_entry(entry, overwrite=self._overwrite_ok)
             return cast(Union[F, Self], __target)
 
     def copy(self: Self, name: Optional[str] = None) -> Self:
@@ -1578,28 +1578,82 @@ class ZenStore:
         cp.name = name if name is not None else self.name + "_copy"
         return cp
 
-    def map_groups(
+    def copy_with_mapped_groups(
         self: Self,
         old_group_to_new_group: Union[
             Mapping[GroupName, GroupName], Callable[[GroupName], GroupName]
         ],
+        store_name: Optional[str] = None,
+        overwrite_ok: Optional[bool] = None,
     ) -> Self:
+        """Create a copy of a store, whose group entries have been updated according to the provided mapping.
+
+        Parameters
+        ----------
+        old_group_to_new_group : Mapping[GroupName, GroupName] | Callable[[GroupName], GroupName]
+            A mapping or callable that transforms an old group name to a new one.
+            Groups in the store that are not included in the mapping are unaffected.
+
+            A `GroupName` is `str | None`.
+
+        store_name : Optional[None]
+            If specified, the name of the new store.
+
+        overwrite_ok : Optional[bool]:
+            If specified, determines if the mapping can overwrite existing store
+            entries. Otherwise, defers to `self._overwrite_ok`.
+
+        Returns
+        -------
+        new_store
+            A copy of `self` with remapped group entries.
+
+        Examples
+        --------
+        >>> from hydra_zen import ZenStore
+
+        Creating an initial store
+
+        >>> s1 = ZenStore("s1")
+        >>> s1({}, group=None, name="a")
+        >>> s1({}, group="A/1", name="b")
+        >>> s1({}, group="A/2", name="c")
+        >>> s1
+        s1
+        {None: ['a'], 'A/1': ['b'], 'A/2': ['c']}
+
+        Replacing group "A/1" with "B", via a mapping
+
+        >>> s2 = s1.copy_with_mapped_groups({"A/1": "B"}, store_name="s2")
+        >>> s2
+        s2
+        {None: ['a'], 'A/2': ['c'], 'B': ['b']}
+
+        Placing all entries under group "A/" within a new inner group "p", via a
+        function
+
+        >>> s3 = s1.copy_with_mapped_groups(
+        ...     lambda g: g + "/p" if g and g.startswith("A/") else g, store_name="s3"
+        ... )
+        >>> s3
+        s3
+        {None: ['a'], 'A/1/p': ['b'], 'A/2/p': ['c']}
+        """
+        overwrite = overwrite_ok if overwrite_ok is not None else self._overwrite_ok
+
         map_fn: Callable[[GroupName], GroupName] = (
             (lambda x: old_group_to_new_group.get(x, x))
             if isinstance(old_group_to_new_group, Mapping)
             else old_group_to_new_group
         )
 
-        copy = self.copy()
-        new_repo = {}
-        for (group, name), entry in copy._internal_repo.items():
+        copy = self.copy(store_name)
+        for (group, name), entry in tuple(copy._internal_repo.items()):
             new_group = map_fn(group)
-            entry["group"] = new_group
-            new_repo[new_group, name] = entry
-            if (group, name) in copy._queue:
-                copy._queue.remove((group, name))
-                copy._queue.add((new_group, name))
-        copy._internal_repo = new_repo
+            if new_group != group:
+                del copy[group, name]
+                entry["group"] = new_group
+                copy._set_entry(entry, overwrite=overwrite)
         return copy
 
     @property
@@ -1752,15 +1806,10 @@ class ZenStore:
         """
         return _resolve_node(self._internal_repo[(group, name)], copy=True)
 
-    def _set_entry(self, __entry: StoreEntry, force_overwrite: bool = False) -> None:
-        """Add a store entry"""
+    def _set_entry(self, __entry: StoreEntry, overwrite: bool) -> None:
         _group = __entry["group"]
         _name = __entry["name"]
-        if (
-            not force_overwrite
-            and not self._overwrite_ok
-            and (_group, _name) in self._internal_repo
-        ):
+        if not overwrite and (_group, _name) in self._internal_repo:
             raise ValueError(
                 f"(name={__entry['name']} group={__entry['group']}): "
                 f"Store entry already exists. Use a store initialized "
