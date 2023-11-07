@@ -824,9 +824,12 @@ def test_del():
     assert (None, "a") not in s
     assert (None, "a") not in s._queue
 
+    assert s
+    assert s.has_enqueued()
+
     s.delete_entry(None, "b")
     assert not s
-    assert not s._queue
+    assert not s.has_enqueued()
 
 
 def test_copy():
@@ -900,3 +903,52 @@ def test_map_with_overwrite():
     s2 = s1.copy_with_mapped_groups({None: "G"}, overwrite_ok=True)
     s2.add_to_hydra_store()
     assert instantiate_from_repo("b", group="G") == {"x": 1}
+
+
+@pytest.mark.usefixtures("clean_store")
+def test_enqueue_all():
+    s1 = ZenStore()
+    s1(dict(x=1), name="b")
+    s2 = s1(group="G")
+    s2(dict(x=2), name="b")
+
+    q = s2._queue.copy()
+    assert s1 == s2
+    s2.add_to_hydra_store(overwrite_ok=True)
+    assert s1 == s2
+    assert not s1.has_enqueued()
+    s1.enqueue_all()
+    assert s1.has_enqueued()
+    assert s1._queue == q
+    assert s1 == s2
+
+
+def test_update():
+    s1 = ZenStore()
+    s2 = ZenStore()
+    s1({}, name="a")
+    s1({}, name="b")  # should get overwritten
+
+    s2({"x": 1}, name="b")
+    s2({}, name="c", group="G")  # should be added
+
+    s1 |= s2
+    assert len(s1) == 3
+    assert s1._queue == {(None, "a"), (None, "b"), ("G", "c")}
+    assert s1._internal_repo[None, "b"] is not s2._internal_repo[None, "b"]
+    assert s2[None, "b"] == {"x": 1}
+
+
+def test_merge():
+    s1 = ZenStore()
+    s2 = ZenStore()
+    s1({}, name="a")
+    s2({}, name="b")
+    s3 = s1 | s2
+    s3({}, name="c")
+    assert len(s1) == 1
+    assert len(s2) == 1
+    assert len(s3) == 3
+    assert s3._queue == {(None, "a"), (None, "b"), (None, "c")}
+    assert s3._internal_repo[None, "a"] is not s1._internal_repo[None, "a"]
+    assert s3._internal_repo[None, "b"] is not s2._internal_repo[None, "b"]

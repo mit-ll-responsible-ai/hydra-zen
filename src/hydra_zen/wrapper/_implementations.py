@@ -1271,6 +1271,12 @@ class ZenStore:
     schema: <none>
     has_root: true
     _target_: __main__.Profile
+
+    **Manipulating and updating a store**
+
+    A store can be copied, updated, and merged. Its entries can have their groups
+    remapped, and individual entries can be deleted. See the docs for the corresponding
+    methods for details and examples.
     """
 
     __slots__ = (
@@ -1409,8 +1415,7 @@ class ZenStore:
     def __call__(self: Self, __target: Optional[F] = None, **kw: Any) -> Union[F, Self]:
         """__call__(target : Optional[T] = None, /, name: NodeName | Callable[[Any], NodeName]] = ..., group: GroupName | Callable[[T], GroupName]] = None, package: Optional[str | Callable[[T], str]]] | None], provider: Optional[str], to_config: Callable[[T], Node] = ..., **to_config_kw: Any) -> T | ZenStore
 
-        The interface to an initialized store. Can be used to store a config or to
-        :ref:`customize the default values <self-partial>` of the store.
+        Store a config or :ref:`customize the default values <self-partial>` of the store.
 
         Parameters
         ----------
@@ -1668,6 +1673,27 @@ class ZenStore:
             no_none = cast(Set[str], set_)
             return sorted(no_none)
 
+    def enqueue_all(self) -> None:
+        """Add all of the store's entries to the queue to be added to hydra's store.
+
+        Examples
+        --------
+        >>> from hydra_zen import ZenStore
+        >>> store = ZenStore(deferred_hydra_store=True)
+        >>> store({"a": 1}, name)
+        >>> store.has_enqueued()
+        True
+
+        >>> store.add_to_hydra_store()
+        >>> store.has_enqueued()
+        False
+
+        >>> store.enqueue_all()
+        >>> store.has_enqueued()
+        True
+        """
+        self._queue.update(self._internal_repo.keys())
+
     def has_enqueued(self) -> bool:
         """`True` if this store has entries that have not yet been added to
         Hydra's config store.
@@ -1700,6 +1726,81 @@ class ZenStore:
 
     def __len__(self) -> int:
         return len(self._internal_repo)
+
+    def update(self, __other: "ZenStore") -> None:
+        """Updates the store inplace with redundant entries being overwritten.
+
+        Can also be applied via the `|=` in-place operator.
+
+        Examples
+        --------
+        >>> from hydra_zen import ZenStore
+        >>> def f(): ...
+        >>> def g(): ...
+        >>> s1 = ZenStore("s1")
+        >>> s2 = ZenStore("s2")
+        >>> s1(f)  # store f in s1
+        >>> s2(g)  # store g in s2
+
+        >>> s1.update(s2)
+        >>> s1  # s1 now has entries for both f and g
+        s1
+        {None: ['f', 'g']}
+
+        Alternatively, the `|=` operator can be used to update a store inplace.
+
+        >>> s3 = ZenStore("s3")
+        >>> s3 |= s2
+        >>> s3
+        s3
+        {None: ['g']}
+        """
+        self._internal_repo.update(deepcopy(__other._internal_repo))
+        self._queue.update(__other._queue)
+        if not self._deferred_store:
+            self.add_to_hydra_store()
+        return
+
+    def merge(
+        self: Self, __other: "ZenStore", store_name: Optional[str] = None
+    ) -> Self:
+        """Create a new store by merging two stores.
+
+        The new store's default settings will reflect those of `self` in
+        `self.merge(other)`. This can also be applied via the `|` operator.
+
+        Examples
+        --------
+        >>> from hydra_zen import ZenStore
+        >>> def f(): ...
+        >>> def g(): ...
+        >>> s1 = ZenStore("s1")
+        >>> s2 = ZenStore("s2")
+        >>> s1(f)  # store f in s1
+        >>> s2(g)  # store g in s2
+
+        >>> s3 = s1.merge(s2)
+        >>> s3
+        s1_copy
+        {None: ['f', 'g']}
+
+        Alternatively, the `|` operator can be used to merge stores.
+
+        >>> s4 = s1 | s2
+        >>> s4
+        s1_copy
+        {None: ['f', 'g']}
+        """
+        cp = self.copy(store_name)
+        cp.update(__other)
+        return cp
+
+    def __or__(self: Self, other: "ZenStore") -> Self:
+        return self.merge(other)
+
+    def __ior__(self: Self, other: "ZenStore") -> Self:
+        self.update(other)
+        return self
 
     @overload
     def __getitem__(self, key: Tuple[GroupName, NodeName]) -> Node:
