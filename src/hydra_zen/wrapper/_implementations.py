@@ -3,7 +3,7 @@
 # pyright: strict, reportUnnecessaryTypeIgnoreComment = true, reportUnnecessaryIsInstance = false
 
 import warnings
-from collections import defaultdict, deque
+from collections import defaultdict
 from copy import deepcopy
 from functools import wraps
 from inspect import Parameter, signature
@@ -11,7 +11,6 @@ from typing import (
     Any,
     Callable,
     DefaultDict,
-    Deque,
     Dict,
     FrozenSet,
     Generator,
@@ -1340,7 +1339,7 @@ class ZenStore:
         # created via the 'self-partialing' process
         self._internal_repo: Dict[Tuple[GroupName, NodeName], StoreEntry] = {}
         # Internal repo entries that have yet to be added to Hydra's config store
-        self._queue: Deque[StoreEntry] = deque([])
+        self._queue: Set[Tuple[GroupName, NodeName]] = set()
 
         self._deferred_to_config = deferred_to_config
         self._deferred_store = deferred_hydra_store
@@ -1545,18 +1544,7 @@ class ZenStore:
                 node=node,
             )
 
-            if not self._overwrite_ok and (_group, _name) in self._internal_repo:
-                raise ValueError(
-                    f"(name={entry['name']} group={entry['group']}): "
-                    f"Store entry already exists. Use a store initialized "
-                    f"with `ZenStore(overwrite_ok=True)` to overwrite config store "
-                    f"entries."
-                )
-            self._internal_repo[_group, _name] = entry
-            self._queue.append(entry)
-
-            if not self._deferred_store:
-                self.add_to_hydra_store()
+            self._set_entry(entry)
             return cast(Union[F, Self], __target)
 
     def copy(self: Self) -> Self:
@@ -1580,6 +1568,9 @@ class ZenStore:
             new_group = map_fn(group)
             entry["group"] = new_group
             new_repo[new_group, name] = entry
+            if (group, name) in copy._queue:
+                copy._queue.remove((group, name))
+                copy._queue.add((new_group, name))
         copy._internal_repo = new_repo
         return copy
 
@@ -1624,6 +1615,9 @@ class ZenStore:
         """`True` if entries have been added to this store, regardless of whether or
         not they have been added to Hydra's config store"""
         return bool(self._internal_repo)
+
+    def __len__(self) -> int:
+        return len(self._internal_repo)
 
     @overload
     def __getitem__(self, key: Tuple[GroupName, NodeName]) -> Node:
@@ -1688,6 +1682,7 @@ class ZenStore:
 
     def __delitem__(self, key: Tuple[GroupName, NodeName]) -> None:
         del self._internal_repo[key]
+        self._queue.discard(key)
 
     def delete_entry(self, group: GroupName, name: NodeName) -> None:
         del self[group, name]
@@ -1695,6 +1690,20 @@ class ZenStore:
     def get_entry(self, group: GroupName, name: NodeName) -> StoreEntry:
         """Access a store entry, which is a mapping that specifies the entry's
         name, group, package, provider, and node.
+
+        Parameters
+        ----------
+        group : str | None
+        name : str
+
+        Returns
+        -------
+        dict
+           - name: NodeName
+           - group: GroupName
+           - package: Optional[str]
+           - provider: Optional[str]
+           - node: ConfigType
 
         Notes
         -----
@@ -1714,6 +1723,23 @@ class ZenStore:
          'node': {'x': 1}}
         """
         return _resolve_node(self._internal_repo[(group, name)], copy=True)
+
+    def _set_entry(self, __entry: StoreEntry) -> None:
+        """Add a store entry"""
+        _group = __entry["group"]
+        _name = __entry["name"]
+        if not self._overwrite_ok and (_group, _name) in self._internal_repo:
+            raise ValueError(
+                f"(name={__entry['name']} group={__entry['group']}): "
+                f"Store entry already exists. Use a store initialized "
+                f"with `ZenStore(overwrite_ok=True)` to overwrite config store "
+                f"entries."
+            )
+        self._internal_repo[_group, _name] = __entry
+        self._queue.add((_group, _name))
+
+        if not self._deferred_store:
+            self.add_to_hydra_store()
 
     def __contains__(self, key: Union[GroupName, Tuple[GroupName, NodeName]]) -> bool:
         """Checks if group or (group, node-name) exists in zen-store."""
@@ -1791,8 +1817,9 @@ class ZenStore:
 
         """
         _store = ConfigStore.instance().store
-        while self._queue:
-            entry = _resolve_node(self._queue.popleft(), copy=False)
+
+        for key in tuple(self._queue):
+            entry = _resolve_node(self._internal_repo[key], copy=False)
             if (
                 (
                     overwrite_ok is False
@@ -1814,6 +1841,7 @@ class ZenStore:
                     f"`overwrite_ok=True` to enable replacing config store entries"
                 )
             _store(**entry)
+            self._queue.discard(key)
 
     def _exists_in_hydra_store(
         self,
