@@ -939,6 +939,20 @@ def test_update():
     assert s2[None, "b"] == {"x": 1}
 
 
+@pytest.mark.usefixtures("clean_store")
+def test_update_respects_add_to_hydra_store():
+    s = ZenStore(deferred_hydra_store=True)
+    s({}, name="a")
+    s1 = ZenStore(deferred_hydra_store=True)
+    s2 = ZenStore(deferred_hydra_store=False)
+    s1.update(s)
+    with pytest.raises(KeyError):
+        instantiate_from_repo("a")
+
+    s2.update(s)
+    assert instantiate_from_repo("a") == {}
+
+
 def test_merge():
     s1 = ZenStore()
     s2 = ZenStore()
