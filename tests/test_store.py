@@ -827,3 +827,24 @@ def test_del():
     s.delete_entry(None, "b")
     assert not s
     assert not s._queue
+
+
+def test_copy():
+    s = ZenStore(name="s")(group="G")
+    s({}, name="a")
+    s({}, name="b")
+
+    s2 = s.copy()
+    s2({}, name="c")
+
+    assert s != s2
+
+    del s["G", "a"]
+    assert len(s) == 1
+    assert len(s._queue) == 1
+    assert len(s2) == 3
+    assert len(s2._queue) == 3
+    assert ("G", "c") in s2
+
+    assert s2.name == "s_copy"
+    assert s2.copy("moo").name == "moo"
