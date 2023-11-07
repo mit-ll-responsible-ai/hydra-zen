@@ -1547,8 +1547,36 @@ class ZenStore:
             self._set_entry(entry)
             return cast(Union[F, Self], __target)
 
-    def copy(self: Self) -> Self:
-        return deepcopy(self)
+    def copy(self: Self, name: Optional[str] = None) -> Self:
+        """Returns a copy of the store with the same overridden defaults.
+
+        Parameters
+        ----------
+        name : str | None, optional (default=None)
+            The name of the new store.
+
+        Returns
+        -------
+        ZenStore
+
+        Examples
+        --------
+        >>> from hydra_zen import ZenStore
+        >>> s1 = ZenStore()(group="G")
+        >>> s1({}, name="a")
+        >>> s2 = s1.copy()
+        >>> s2({}, name="b")
+        >>> s1
+        s1
+        {'G': ['a']}
+        >>> s2
+        s1_copy
+        {'G': ['a', 'b']}
+        """
+        cp = deepcopy(self)
+
+        cp.name = name if name is not None else self.name + "_copy"
+        return cp
 
     def map_groups(
         self: Self,
@@ -1724,11 +1752,15 @@ class ZenStore:
         """
         return _resolve_node(self._internal_repo[(group, name)], copy=True)
 
-    def _set_entry(self, __entry: StoreEntry) -> None:
+    def _set_entry(self, __entry: StoreEntry, force_overwrite: bool = False) -> None:
         """Add a store entry"""
         _group = __entry["group"]
         _name = __entry["name"]
-        if not self._overwrite_ok and (_group, _name) in self._internal_repo:
+        if (
+            not force_overwrite
+            and not self._overwrite_ok
+            and (_group, _name) in self._internal_repo
+        ):
             raise ValueError(
                 f"(name={__entry['name']} group={__entry['group']}): "
                 f"Store entry already exists. Use a store initialized "
