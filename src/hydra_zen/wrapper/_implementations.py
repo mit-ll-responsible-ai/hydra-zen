@@ -4,6 +4,7 @@
 
 import warnings
 from collections import defaultdict, deque
+from copy import deepcopy
 from functools import wraps
 from inspect import Parameter, signature
 from typing import (
@@ -1558,6 +1559,30 @@ class ZenStore:
                 self.add_to_hydra_store()
             return cast(Union[F, Self], __target)
 
+    def copy(self: Self) -> Self:
+        return deepcopy(self)
+
+    def map_groups(
+        self: Self,
+        old_group_to_new_group: Union[
+            Mapping[GroupName, GroupName], Callable[[GroupName], GroupName]
+        ],
+    ) -> Self:
+        map_fn: Callable[[GroupName], GroupName] = (
+            (lambda x: old_group_to_new_group.get(x, x))
+            if isinstance(old_group_to_new_group, Mapping)
+            else old_group_to_new_group
+        )
+
+        copy = self.copy()
+        new_repo = {}
+        for (group, name), entry in copy._internal_repo.items():
+            new_group = map_fn(group)
+            entry["group"] = new_group
+            new_repo[new_group, name] = entry
+        copy._internal_repo = new_repo
+        return copy
+
     @property
     def groups(self) -> Sequence[GroupName]:
         """Returns a sorted list of the groups registered with this store"""
@@ -1660,6 +1685,12 @@ class ZenStore:
                 )
             }
         return _resolve_node(self._internal_repo[key], copy=False)["node"]
+
+    def __delitem__(self, key: Tuple[GroupName, NodeName]) -> None:
+        del self._internal_repo[key]
+
+    def delete_entry(self, group: GroupName, name: NodeName) -> None:
+        del self[group, name]
 
     def get_entry(self, group: GroupName, name: NodeName) -> StoreEntry:
         """Access a store entry, which is a mapping that specifies the entry's
