@@ -16,7 +16,10 @@ hydra\_zen.ZenStore
    .. automethod:: copy_with_mapped_groups
    .. automethod:: get_entry
    .. automethod:: delete_entry
+   .. automethod:: update
+   .. automethod:: merge
    .. automethod:: has_enqueued
+   .. automethod:: enqueue_all
    .. automethod:: __iter__
    .. automethod:: __eq__
    

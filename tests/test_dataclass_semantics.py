@@ -17,6 +17,7 @@ from hydra_zen import (
     just,
     make_config,
     make_custom_builds_fn,
+    to_yaml,
 )
 from hydra_zen.errors import HydraZenDeprecationWarning
 
@@ -451,3 +452,14 @@ def test_module_is_not_specified(Conf):
 )
 def test_modules_is_specified(Conf):
     assert Conf.__module__ == "aaa"
+
+
+@pytest.mark.parametrize(
+    "cfg",
+    [
+        builds(dict, x=1),
+        builds(dict, x=2)(),
+    ],
+)
+def test_builds_is_copyable(cfg):
+    assert to_yaml(cfg) == to_yaml(deepcopy(cfg))
