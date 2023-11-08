@@ -41,7 +41,7 @@ Modify your script to match this:
 .. code-block:: python
    :caption: Contents of my_app.py:
 
-   from hydra_zen import zen, ZenStore
+   from hydra_zen import builds, zen, ZenStore
    
    # The same task function as before
    def task_function(player1: str, player2: str):
@@ -51,7 +51,7 @@ Modify your script to match this:
 
        return player1, player2
    
-   Config = builds(new_task_function, populate_full_signature=True)
+   Config = builds(task_function, populate_full_signature=True)
    
    # 1) Create a local config store and store our config
    store = ZenStore()
