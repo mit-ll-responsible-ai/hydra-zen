@@ -1552,13 +1552,12 @@ class ZenStore:
             self._set_entry(entry, overwrite=self._overwrite_ok)
             return cast(Union[F, Self], __target)
 
-    def copy(self: Self, name: Optional[str] = None) -> Self:
+    def copy(self: Self, store_name: Optional[str] = None) -> Self:
         """Returns a copy of the store with the same overridden defaults.
 
         Parameters
         ----------
-        name : str | None, optional (default=None)
-            The name of the new store.
+        store_name : str | None, optional (default=None)
 
         Returns
         -------
@@ -1580,7 +1579,7 @@ class ZenStore:
         """
         cp = deepcopy(self)
 
-        cp.name = name if name is not None else self.name + "_copy"
+        cp.name = store_name if store_name is not None else self.name + "_copy"
         return cp
 
     def copy_with_mapped_groups(
@@ -1588,10 +1587,11 @@ class ZenStore:
         old_group_to_new_group: Union[
             Mapping[GroupName, GroupName], Callable[[GroupName], GroupName]
         ],
+        *,
         store_name: Optional[str] = None,
         overwrite_ok: Optional[bool] = None,
     ) -> Self:
-        """Create a copy of a store, whose group entries have been updated according to the provided mapping.
+        """Create a copy of a store whose entries' groups have been updated according to the provided mapping.
 
         Parameters
         ----------
@@ -1606,12 +1606,12 @@ class ZenStore:
 
         overwrite_ok : Optional[bool]:
             If specified, determines if the mapping can overwrite existing store
-            entries. Otherwise, defers to `self._overwrite_ok`.
+            entries. Otherwise, defers to `ZenStore(overwrite_ok)`.
 
         Returns
         -------
         new_store
-            A copy of `self` with remapped group entries.
+            A copy of `self` with remapped groups.
 
         Examples
         --------

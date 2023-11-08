@@ -815,6 +815,7 @@ def test_del():
     s = ZenStore()
     s({}, name="a")
     s({}, name="b")
+    s2 = s(group="G")
     assert len(s) == 2
     assert len(s._queue) == 2
 
@@ -826,6 +827,7 @@ def test_del():
 
     assert s
     assert s.has_enqueued()
+    assert s == s2
 
     s.delete_entry(None, "b")
     assert not s
@@ -836,21 +838,22 @@ def test_copy():
     s = ZenStore(name="s")(group="G")
     s({}, name="a")
     s({}, name="b")
+    s2 = s(group="G")
+    s3 = s.copy()
+    s3({}, name="c")
 
-    s2 = s.copy()
-    s2({}, name="c")
-
-    assert s != s2
+    assert s == s2
+    assert s != s3
 
     del s["G", "a"]
     assert len(s) == 1
     assert len(s._queue) == 1
-    assert len(s2) == 3
-    assert len(s2._queue) == 3
-    assert ("G", "c") in s2
+    assert len(s3) == 3
+    assert len(s3._queue) == 3
+    assert ("G", "c") in s3
 
-    assert s2.name == "s_copy"
-    assert s2.copy("moo").name == "moo"
+    assert s3.name == "s_copy"
+    assert s3.copy("moo").name == "moo"
 
 
 @pytest.mark.usefixtures("clean_store")
@@ -865,6 +868,7 @@ def test_map_groups(mapping):
     s1 = ZenStore()
     s1({"x": 1}, group=None, name="a")
     s1({"y": 2}, group="A", name="b")
+    s1({"z": 3}, group="A", name="c")
 
     s2 = s1.copy_with_mapped_groups(mapping)
     assert s1 != s2
@@ -872,14 +876,14 @@ def test_map_groups(mapping):
     assert (None, "a") in s1
     assert ("A", "b") in s1
     assert ("B", "b") not in s1
-    assert len(s1) == 2
-    assert s1._queue == {(None, "a"), ("A", "b")}
+    assert len(s1) == 3
+    assert s1._queue == {(None, "a"), ("A", "b"), ("A", "c")}
 
     assert (None, "a") in s1
     assert ("A", "b") not in s2
     assert ("B", "b") in s2
-    assert len(s2) == 2
-    assert s2._queue == {(None, "a"), ("B", "b")}
+    assert len(s2) == 3
+    assert s2._queue == {(None, "a"), ("B", "b"), ("B", "c")}
 
     s1.add_to_hydra_store()
     assert instantiate_from_repo("a", group=None) == {"x": 1}
