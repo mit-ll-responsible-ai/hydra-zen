@@ -426,6 +426,7 @@ def test_overwrite_ok(outer: bool, inner: bool, name, group):
         ):
             _store({}, name=name, group=group)
         return
+    _store.add_to_hydra_store(overwrite_ok=True)
     _store({}, name=name, group=group)
     if not inner:
         with pytest.raises(
@@ -548,7 +549,7 @@ def test_default_to_config_validates_dataclass_instance_with_kw():
 )
 def test_validate_init(param_name):
     with pytest.raises(TypeError, match=f"{param_name} must be a bool"):
-        ZenStore(**{param_name: "bad"})
+        ZenStore(**{param_name: "bad"})  # type: ignore
 
 
 def contains(key, store_):
@@ -808,3 +809,173 @@ def test_store_hydrated_dataclass():
     store = ZenStore()
     store(SomethingHydrated, name="foo", x=2)
     assert instantiate(store[None, "foo"]) == 2
+
+
+def test_del():
+    s = ZenStore()
+    s({}, name="a")
+    s({}, name="b")
+    s2 = s(group="G")
+    assert len(s) == 2
+    assert len(s._queue) == 2
+
+    del s[None, "a"]
+    assert len(s) == 1
+    assert len(s._queue) == 1
+    assert (None, "a") not in s
+    assert (None, "a") not in s._queue
+
+    assert s
+    assert s.has_enqueued()
+    assert s == s2
+
+    s.delete_entry(None, "b")
+    assert not s
+    assert not s.has_enqueued()
+
+
+def test_copy():
+    s = ZenStore(name="s")(group="G")
+    s({}, name="a")
+    s({}, name="b")
+    s2 = s(group="G")
+    s3 = s.copy()
+    s3({}, name="c")
+
+    assert s == s2
+    assert s != s3
+
+    del s["G", "a"]
+    assert len(s) == 1
+    assert len(s._queue) == 1
+    assert len(s3) == 3
+    assert len(s3._queue) == 3
+    assert ("G", "c") in s3
+
+    assert s3.name == "s_copy"
+    assert s3.copy("moo").name == "moo"
+
+
+@pytest.mark.usefixtures("clean_store")
+@pytest.mark.parametrize(
+    "mapping",
+    [
+        {"A": "B"},
+        lambda x: "B" if x and x.startswith("A") else x,
+    ],
+)
+def test_map_groups(mapping):
+    s1 = ZenStore()
+    s1({"x": 1}, group=None, name="a")
+    s1({"y": 2}, group="A", name="b")
+    s1({"z": 3}, group="A", name="c")
+
+    s2 = s1.copy_with_mapped_groups(mapping)
+    assert s1 != s2
+
+    assert (None, "a") in s1
+    assert ("A", "b") in s1
+    assert ("B", "b") not in s1
+    assert len(s1) == 3
+    assert s1._queue == {(None, "a"), ("A", "b"), ("A", "c")}
+
+    assert (None, "a") in s1
+    assert ("A", "b") not in s2
+    assert ("B", "b") in s2
+    assert len(s2) == 3
+    assert s2._queue == {(None, "a"), ("B", "b"), ("B", "c")}
+
+    s1.add_to_hydra_store()
+    assert instantiate_from_repo("a", group=None) == {"x": 1}
+    assert instantiate_from_repo("b", group="A") == {"y": 2}
+
+    with pytest.raises(KeyError):
+        instantiate_from_repo("b", group="B")
+
+    s2.add_to_hydra_store(overwrite_ok=True)
+    assert instantiate_from_repo("b", group="B") == {"y": 2}
+
+
+@pytest.mark.usefixtures("clean_store")
+def test_map_with_overwrite():
+    s1 = ZenStore()
+    s1(dict(x=1), name="b")
+    s1(dict(x=2), name="b", group="G")
+    with pytest.raises(ValueError, match="Store entry already exists"):
+        s1.copy_with_mapped_groups({None: "G"})
+
+    s2 = s1.copy_with_mapped_groups({None: "G"}, overwrite_ok=True)
+    s2.add_to_hydra_store()
+    assert instantiate_from_repo("b", group="G") == {"x": 1}
+
+
+@pytest.mark.usefixtures("clean_store")
+def test_enqueue_all():
+    s1 = ZenStore()
+    s1(dict(x=1), name="b")
+    s2 = s1(group="G")
+    s2(dict(x=2), name="b")
+
+    q = s2._queue.copy()
+    assert s1 == s2
+    s2.add_to_hydra_store(overwrite_ok=True)
+    assert s1 == s2
+    assert not s1.has_enqueued()
+    s1.enqueue_all()
+    assert s1.has_enqueued()
+    assert s1._queue == q
+    assert s1 == s2
+
+
+def test_update():
+    s1 = ZenStore()
+    s2 = ZenStore()
+    s1({}, name="a")
+    s1({}, name="b")  # should get overwritten
+
+    s2({"x": 1}, name="b")
+    s2({}, name="c", group="G")  # should be added
+
+    s3 = s1(group="BB")
+    assert s3 == s1
+    s1 |= s2
+
+    assert len(s1) == 3
+    assert s1._queue == {(None, "a"), (None, "b"), ("G", "c")}
+    assert s1._internal_repo[None, "b"] is not s2._internal_repo[None, "b"]
+    assert s2[None, "b"] == {"x": 1}
+
+    # make sure partiald stores are still connected
+    assert s3 == s1
+    assert ("BB", "foo") not in s1
+    s3({}, name="foo")
+    assert ("BB", "foo") in s1
+
+
+@pytest.mark.usefixtures("clean_store")
+def test_update_respects_add_to_hydra_store():
+    s = ZenStore(deferred_hydra_store=True)
+    s({}, name="a")
+    s1 = ZenStore(deferred_hydra_store=True)
+    s2 = ZenStore(deferred_hydra_store=False)
+    s1.update(s)
+    with pytest.raises(KeyError):
+        instantiate_from_repo("a")
+
+    s2.update(s)
+    assert instantiate_from_repo("a") == {}
+
+
+def test_merge():
+    s1 = ZenStore()
+    s2 = ZenStore()
+    s1({}, name="a")
+    s2({}, name="b")
+    s3 = s1 | s2
+    s3({}, name="c")
+    assert len(s1) == 1
+    assert len(s2) == 1
+    assert len(s3) == 3
+    assert s3._queue == {(None, "a"), (None, "b"), (None, "c")}
+    assert s3._internal_repo[None, "a"] is not s1._internal_repo[None, "a"]
+    assert s3._internal_repo[None, "b"] is not s2._internal_repo[None, "b"]
