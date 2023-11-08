@@ -641,19 +641,14 @@ _MAKE_CONFIG_SETTINGS = AllConvert(dataclass=False, flat_target=False)
 
 
 class BuildsFn(Generic[T]):
-    """builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, hydra_recursive=None, hydra_convert=None, hydra_defaults=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
+    """A class that can be modified to customize the behavior of `builds`, `just`, and `make_config`. These functions are exposed as class methods of `BuildsFn`.
 
     To customize type-refinement support, override `_sanitized_type`.
     To customize auto-config support, override `_make_hydra_compatible`.
     To customize the ability to resolve import paths, override `_get_obj_path`.
     """
 
-    __slots__ = ("__name__", "__qualname__")
-
-    def __init__(self, name: str, qualname: Optional[str] = None) -> None:
-        super().__init__()
-        self.__name__: str = name
-        self.__qualname__: str = qualname if qualname is not None else name
+    __slots__ = ()
 
     @classmethod
     def _sanitized_type(
@@ -1033,7 +1028,7 @@ class BuildsFn(Generic[T]):
                         convert_dataclass=convert_dataclass,
                     )
 
-            out = cls.__call__(
+            out = cls.builds(
                 type(value),
                 **converted_fields,
                 hydra_recursive=hydra_recursive,
@@ -2784,8 +2779,6 @@ class BuildsFn(Generic[T]):
             Union[Type[Builds[Importable]], Type[BuildsWithSig[Type[R], P]]], out
         )
 
-    __call__ = builds
-
     @overload
     @classmethod
     def just(
@@ -3025,7 +3018,7 @@ class BuildsFn(Generic[T]):
         # also check for use of reserved names
         _tmp: Any = None
 
-        cls.__call__(
+        cls.builds(
             dict,
             hydra_convert=hydra_convert,
             hydra_recursive=hydra_recursive,
