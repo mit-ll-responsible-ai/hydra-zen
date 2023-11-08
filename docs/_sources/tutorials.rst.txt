@@ -28,6 +28,8 @@ application that is configurable, reproducible, and scalable.
    tutorials/hierarchy
    tutorials/config_groups
    tutorials/inject_wrapper
+   tutorials/using_scikit_learn
+   tutorials/pytorch_lightning
 
 
 .. tip::

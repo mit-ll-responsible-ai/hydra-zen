@@ -38,10 +38,10 @@
 <script src="../_static/gtag.js?v=dff6cbd6"></script>
 <script src="../_static/design-tabs.js?v=36754332"></script>
 <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-<script>DOCUMENTATION_OPTIONS.pagename = 'how_to/pytorch_lightning';</script>
+<script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/pytorch_lightning';</script>
 <link href="../genindex.html" rel="index" title="Index"/>
 <link href="../search.html" rel="search" title="Search"/>
-<link href="../explanation.html" rel="next" title="Explanation"/>
+<link href="../how_tos.html" rel="next" title="How-To Guides"/>
 <link href="using_scikit_learn.html" rel="prev" title="Configure and Run scikit-learn’s Classifier Comparison Example"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <meta content="en" name="docsearch:language"/>
@@ -85,12 +85,12 @@
     Site Navigation
   </p>
 <ul class="bd-navbar-elements navbar-nav">
-<li class="nav-item">
+<li class="nav-item current active">
 <a class="nav-link nav-internal" href="../tutorials.html">
                         Tutorials
                       </a>
 </li>
-<li class="nav-item current active">
+<li class="nav-item">
 <a class="nav-link nav-internal" href="../how_tos.html">
                         How-To Guides
                       </a>
@@ -169,12 +169,12 @@ document.write(`
     Site Navigation
   </p>
 <ul class="bd-navbar-elements navbar-nav">
-<li class="nav-item">
+<li class="nav-item current active">
 <a class="nav-link nav-internal" href="../tutorials.html">
                         Tutorials
                       </a>
 </li>
-<li class="nav-item current active">
+<li class="nav-item">
 <a class="nav-link nav-internal" href="../how_tos.html">
                         How-To Guides
                       </a>
@@ -221,10 +221,11 @@ document.write(`
 <p aria-level="1" class="bd-links__title" role="heading">Section Navigation</p>
 <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="configuring_experiments.html">Configure Multiple Experiments</a></li>
-<li class="toctree-l1"><a class="reference internal" href="configure_hydra.html">Customize Hydra’s Configuration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="partial_config.html">Partially Configure an Object</a></li>
-<li class="toctree-l1"><a class="reference internal" href="beartype.html">Add Enhanced Runtime Type-Checking to a Hydra App</a></li>
+<li class="toctree-l1"><a class="reference internal" href="basic_app.html">Create and Launch a Basic Application with Hydra</a></li>
+<li class="toctree-l1"><a class="reference internal" href="add_cli.html">Add a Command Line Interface to Our Application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hierarchy.html">Design a Hierarchical Interface for an Application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_groups.html">Provide Swappable Configuration Groups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inject_wrapper.html">Inject Novel Functionality via the Application’s Configurable Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="using_scikit_learn.html">Configure and Run scikit-learn’s Classifier Comparison Example</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Run Boilerplate-Free ML Experiments with PyTorch Lightning &amp; hydra-zen</a></li>
 </ul>
@@ -249,7 +250,7 @@ document.write(`
 <i class="fa-solid fa-home"></i>
 </a>
 </li>
-<li class="breadcrumb-item"><a class="nav-link" href="../how_tos.html">How-To Guides</a></li>
+<li class="breadcrumb-item"><a class="nav-link" href="../tutorials.html">Tutorials</a></li>
 <li aria-current="page" class="breadcrumb-item active">Run...</li>
 </ul>
 </nav>
@@ -262,7 +263,7 @@ document.write(`
 <div class="admonition-prerequisites admonition" id="lightning">
 <p class="admonition-title">Prerequisites</p>
 <p>Your must install <a class="reference external" href="https://pytorch.org/">PyTorch</a> and <a class="reference external" href="https://www.pytorchlightning.ai/">PyTorch Lightning</a> in your Python environment in order to follow this
-How-To guide.</p>
+tutorial.</p>
 </div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
@@ -277,7 +278,7 @@ networks in PyTorch. This is a natural bedfellow of Hydra and hydra-zen, which e
 single-layer neural networks without any boilerplate code</strong>. For the sake of
 simplicity, we will train it to simply fit <span class="math notranslate nohighlight">\(\cos{x}\)</span> on
 <span class="math notranslate nohighlight">\(x \in [-2\pi, 2\pi]\)</span>.</p>
-<p>In this “How-To” we will do the following:</p>
+<p>In this tutorial we will do the following:</p>
 <ol class="arabic simple">
 <li><p>Define a simple neural network and <a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/latest/common/lightning_module.html">lightning module</a>.</p></li>
 <li><p>Create configs for our lighting module, data loader, optimizer, and trainer.</p></li>
@@ -665,10 +666,10 @@ created upon launching our app. You can find this in the same directory as your
 <p class="prev-next-title">Configure and Run scikit-learn’s Classifier Comparison Example</p>
 </div>
 </a>
-<a class="right-next" href="../explanation.html" title="next page">
+<a class="right-next" href="../how_tos.html" title="next page">
 <div class="prev-next-info">
 <p class="prev-next-subtitle">next</p>
-<p class="prev-next-title">Explanation</p>
+<p class="prev-next-title">How-To Guides</p>
 </div>
 <i class="fa-solid fa-angle-right"></i>
 </a>
@@ -694,7 +695,7 @@ created upon launching our app. You can find this in the same directory as your
 </nav></div>
 <div class="sidebar-secondary-item">
 <div class="tocsection sourcelink">
-<a href="../_sources/how_to/pytorch_lightning.rst.txt">
+<a href="../_sources/tutorials/pytorch_lightning.rst.txt">
 <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
 </div>

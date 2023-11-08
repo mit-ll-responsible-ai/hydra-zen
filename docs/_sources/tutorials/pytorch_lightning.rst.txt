@@ -7,7 +7,7 @@
 
    Your must install `PyTorch <https://pytorch.org/>`_ and `PyTorch Lightning <https://
    www.pytorchlightning.ai/>`_ in your Python environment in order to follow this 
-   How-To guide.
+   tutorial.
 
 .. tip::
 
@@ -26,7 +26,7 @@ single-layer neural networks without any boilerplate code**. For the sake of
 simplicity, we will train it to simply fit :math:`\cos{x}` on 
 :math:`x \in [-2\pi, 2\pi]`.
 
-In this "How-To" we will do the following:
+In this tutorial we will do the following:
 
 1. Define a simple neural network and `lightning module <https://pytorch-lightning.readthedocs.io/en/latest/common/lightning_module.html>`_.
 2. Create configs for our lighting module, data loader, optimizer, and trainer.

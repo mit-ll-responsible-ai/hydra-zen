@@ -8,12 +8,12 @@ Configure and Run scikit-learn's Classifier Comparison Example
 
 .. admonition:: Note
 
-   This How-To guide closely mirrors scikit-learn's `Classifier Comparison <https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html#sphx-glr-auto-examples-classification-plot-classifier-comparison-py>`_  example.
+   This tutorial section closely mirrors scikit-learn's `Classifier Comparison <https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html#sphx-glr-auto-examples-classification-plot-classifier-comparison-py>`_  example.
 
-This guide will demonstrate how to hydra-zen with `scikit-learn <https://scikit-learn.org/stable/index.html>`_ to configure and run reproducible experiments.
-Specifically, we will demonstrate how to configure multiple scikit-learn datasets and classifiers, and how to launch multiple classifer-fitting experiments using Hydra's CLI.
+This tutorial will use hydra-zen with `scikit-learn <https://scikit-learn.org/stable/index.html>`_ to configure and run reproducible experiments.
+Specifically, we will demonstrate how to configure multiple scikit-learn datasets and classifiers, and how to launch multiple classifier-fitting experiments using Hydra's CLI.
 
-This How-To consists of the following steps:
+This tutorial consists of the following steps:
 
 1. Configure multiple scikit-learn datasets and classifiers.
 2. Create a task function to load data, fit a classifier, and visualize the fit.
