@@ -73,7 +73,7 @@ Hydra-based application:
 2. A task function, which accepts the populated config, and whose body specifies the code that will be executed when our application is launched.
 
 We will then use `hydra_zen.launch(Config, task_function, overrides=<...>)` to 
-configure and run our task-function from withing a python program.
+configure and run our task-function from within a python program.
 
 Once we create this typical Hydra app, we will iterate on it and simplify things by using how hydra-zen's :func:`hydra_zen.zen` wrapper.
 
