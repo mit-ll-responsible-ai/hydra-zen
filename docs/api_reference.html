@@ -232,6 +232,11 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.wrapper.default_to_config.html">hydra_zen.wrapper.default_to_config</a></li>
 </ul>
 <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.zen.html">hydra_zen.zen</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.launch.html">hydra_zen.launch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.wrapper.Zen.html">hydra_zen.wrapper.Zen</a></li>
+</ul>
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.instantiate.html">hydra_zen.instantiate</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.get_target.html">hydra_zen.get_target</a></li>
 </ul>
@@ -249,11 +254,6 @@ document.write(`
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.typing.DataclassOptions.html">hydra_zen.typing.DataclassOptions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.typing.ZenConvert.html">hydra_zen.typing.ZenConvert</a></li>
-</ul>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.launch.html">hydra_zen.launch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.zen.html">hydra_zen.zen</a></li>
-<li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.wrapper.Zen.html">hydra_zen.wrapper.Zen</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.third_party.beartype.validates_with_beartype.html">hydra_zen.third_party.beartype.validates_with_beartype</a></li>
@@ -340,6 +340,24 @@ return the data and class-instances that we need for our application.</p>
 </tbody>
 </table>
 </section>
+</section>
+<section id="creating-and-launching-jobs-with-hydra">
+<h2>Creating and Launching Jobs with Hydra<a class="headerlink" href="#creating-and-launching-jobs-with-hydra" title="Link to this heading">#</a></h2>
+<p>hydra-zen provides users the ability to launch a Hydra job via a
+Python function instead of from a commandline interface.</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code></a>(func, /, pre_call, ZenWrapper)</p></td>
+<td><p>A wrapper that returns a function that will auto-extract, resolve, and instantiate fields from an input config based on the wrapped function's signature.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">launch</span></code></a>(config, task_function[, overrides, ...])</p></td>
+<td><p>Launches a Hydra job from a Python function rather than a CLI.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.wrapper.Zen.html#hydra_zen.wrapper.Zen" title="hydra_zen.wrapper.Zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wrapper.Zen</span></code></a>(_Zen__func, *[, exclude, ...])</p></td>
+<td><p>Implements the wrapping logic that is exposed by <a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.zen</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
 <section id="instantiating-and-resolving-configs">
 <h3>Instantiating and Resolving Configs<a class="headerlink" href="#instantiating-and-resolving-configs" title="Link to this heading">#</a></h3>
 <table class="autosummary longtable table autosummary">
@@ -403,24 +421,6 @@ The following utilities can be used to work with YAML-serialized configs.</p>
 </tbody>
 </table>
 </section>
-</section>
-<section id="creating-and-launching-jobs-with-hydra">
-<h2>Creating and Launching Jobs with Hydra<a class="headerlink" href="#creating-and-launching-jobs-with-hydra" title="Link to this heading">#</a></h2>
-<p>hydra-zen provides users the ability to launch a Hydra job via a
-Python function instead of from a commandline interface.</p>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">launch</span></code></a>(config, task_function[, overrides, ...])</p></td>
-<td><p>Launches a Hydra job from a Python function rather than a CLI.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code></a>(func, /, pre_call, ZenWrapper)</p></td>
-<td><p>A wrapper that returns a function that will auto-extract, resolve, and instantiate fields from an input config based on the wrapped function's signature.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.wrapper.Zen.html#hydra_zen.wrapper.Zen" title="hydra_zen.wrapper.Zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wrapper.Zen</span></code></a>(_Zen__func, *[, exclude, ...])</p></td>
-<td><p>Implements the wrapping logic that is exposed by <a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.zen</span></code></a></p></td>
-</tr>
-</tbody>
-</table>
 </section>
 <section id="configuration-value-types-supported-by-hydra-and-hydra-zen">
 <span id="valid-types"></span><h2>Configuration-Value Types Supported by Hydra and hydra-zen<a class="headerlink" href="#configuration-value-types-supported-by-hydra-and-hydra-zen" title="Link to this heading">#</a></h2>
@@ -575,13 +575,15 @@ represents that complex value in a Hydra-compatible way.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#storing-configs">Storing Configs</a><ul class="nav section-nav flex-column">
 </ul>
 </li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-and-launching-jobs-with-hydra">Creating and Launching Jobs with Hydra</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#instantiating-and-resolving-configs">Instantiating and Resolving Configs</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#utilities">Utilities</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#working-with-yamls">Working with YAMLs</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hydra-zen-typing">hydra_zen.typing</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-and-launching-jobs-with-hydra">Creating and Launching Jobs with Hydra</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuration-value-types-supported-by-hydra-and-hydra-zen">Configuration-Value Types Supported by Hydra and hydra-zen</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#types-supported-natively-by-hydra">Types Supported Natively by Hydra</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#auto-config-support-for-additional-types-via-hydra-zen">Auto-Config Support for Additional Types via hydra-zen</a></li>

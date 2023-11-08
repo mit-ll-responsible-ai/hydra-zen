@@ -348,7 +348,7 @@ And, suppose that there are particular database-server configurations that we wa
 </section>
 <section id="creating-configurations-for-particular-experiments">
 <h2>Creating Configurations for Particular “Experiments”<a class="headerlink" href="#creating-configurations-for-particular-experiments" title="Link to this heading">#</a></h2>
-<p>Suppose that we frequently want to run our application using the following two configurations (which we will refer to as <code class="xref py py-obj docutils literal notranslate"><span class="pre">aplite</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">nglite</span></code>, respectively)</p>
+<p>Suppose that we frequently want to run our application using the following two configurations, which we will refer to as <code class="xref py py-obj docutils literal notranslate"><span class="pre">aplite</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">nglite</span></code>, respectively.</p>
 <div class="literal-block-wrapper docutils container" id="id5">
 <div class="code-block-caption"><span class="caption-text">Manually running the so-called <code class="xref py py-obj docutils literal notranslate"><span class="pre">aplite</span></code> configuration</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span><span class="nv">db</span><span class="o">=</span>sqlite<span class="w"> </span>server.port<span class="o">=</span><span class="m">8080</span>
@@ -374,7 +374,7 @@ And, suppose that there are particular database-server configurations that we wa
 </div>
 </div>
 <p>Our objective is to be able run these experiments more concisely, as:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span>+experiment<span class="o">=</span>&lt;aglite<span class="w"> </span>or<span class="w"> </span>nginx&gt;
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span>+experiment<span class="o">=</span>&lt;aplite<span class="w"> </span>or<span class="w"> </span>nglite&gt;
 </pre></div>
 </div>
 <p>To do this we implement new experiment configurations that:</p>
@@ -426,7 +426,7 @@ And, suppose that there are particular database-server configurations that we wa
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio"/>
 <label class="sd-tab-label" for="sd-tab-item-0">
-aplit</label><div class="sd-tab-content docutils">
+aplite</label><div class="sd-tab-content docutils">
 <div class="literal-block-wrapper docutils container" id="id8">
 <div class="code-block-caption"><span class="caption-text">4 Running the <code class="xref py py-obj docutils literal notranslate"><span class="pre">aplite</span></code> experiment</span><a class="headerlink" href="#id8" title="Link to this code">#</a></div>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>my_app.py<span class="w"> </span>+experiment<span class="o">=</span>aplite

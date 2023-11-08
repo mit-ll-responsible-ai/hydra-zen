@@ -443,13 +443,7 @@ over. Modify your <code class="docutils literal notranslate"><span class="pre">m
 
 
 <span class="k">if</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/reference/import.html#name__" title="__name__"><span class="vm">__name__</span></a> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
-    <span class="c1"># We need to add the configs from our local store to Hydra's</span>
-    <span class="c1"># global config store</span>
     <span class="n">store</span><span class="o">.</span><span class="n">add_to_hydra_store</span><span class="p">()</span>
-
-    <span class="c1"># Our zen-wrapped task function is used to generate</span>
-    <span class="c1"># the CLI, and to specify which config we want to use</span>
-    <span class="c1"># to configure the app by default</span>
     <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">(</span><span class="n">task_function</span><span class="p">)</span><span class="o">.</span><span class="n">hydra_main</span><span class="p">(</span><span class="n">config_name</span><span class="o">=</span><span class="s2">"my_app"</span><span class="p">,</span>
                                   <span class="n">version_base</span><span class="o">=</span><span class="s2">"1.1"</span><span class="p">,</span>
                                   <span class="n">config_path</span><span class="o">=</span><span class="s2">"."</span><span class="p">,</span>

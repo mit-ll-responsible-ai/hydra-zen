@@ -270,39 +270,52 @@ Click it to copy the contents of the code block.</p>
 <span id="cli-app"></span><h1>Add a Command Line Interface to Our Application<a class="headerlink" href="#add-a-command-line-interface-to-our-application" title="Link to this heading">#</a></h1>
 <p>In this tutorial we will update our project so that it can be configured and launched
 from a command line interface (CLI), using Hydra.</p>
+<p>In the last section of the tutorial, we</p>
+<ul class="simple">
+<li><p>Defined a task function</p></li>
+<li><p>Created a config for that task function</p></li>
+<li><p>Ran the task function via <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.launch(Config,</span> <span class="pre">task_function,</span> <span class="pre">overrides=&lt;...&gt;)</span></code></p></li>
+</ul>
+<p>In this section, we need to add our config to Hydra’s config-store; this enables Hydra to generate a CLI from this config.</p>
 <section id="modifying-our-project">
 <h2>Modifying Our Project<a class="headerlink" href="#modifying-our-project" title="Link to this heading">#</a></h2>
 <p>Open <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code> in your editor. We will make the following modifications to it:</p>
 <ol class="arabic simple">
-<li><p>Use <code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.store()</span></code> (<a class="reference external" href="https://mit-ll-responsible-ai.github.io/hydra-zen/generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore">docs</a>) to generate for our task function and to store it in Hydra’s global config store.</p></li>
+<li><p>Use <a class="reference internal" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.ZenStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">hydra_zen.ZenStore</span></code></a> to store our config locally.</p></li>
 <li><p>Add a <code class="docutils literal notranslate"><span class="pre">__main__</span></code> clause to our <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code> script so that the script runs our task function.</p></li>
+<li><p>Within <code class="docutils literal notranslate"><span class="pre">__main__</span></code> populate Hydra’s global config store so that Hydra can generate a CLI using our configs.</p></li>
 <li><p>Use <a class="reference internal" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.zen()</span></code></a> to wrap the task function and to generate the CLI.</p></li>
 </ol>
 <p>Modify your script to match this:</p>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Contents of my_app.py:</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">store</span><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">ZenStore</span></a>
 
-<span class="c1"># 1) `hydra_zen.store generates a config for our task function</span>
-<span class="c1">#    and stores it locally under the entry-name "my_app"</span>
-<span class="nd">@store</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"my_app"</span><span class="p">)</span>
+<span class="c1"># The same task function as before</span>
 <span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">player1</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a><span class="p">,</span> <span class="n">player2</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a><span class="p">):</span>
-    <span class="c1"># write the log with the names</span>
     <span class="k">with</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#open" title="open"><span class="nb">open</span></a><span class="p">(</span><span class="s2">"player_log.txt"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"Game session log:</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Player 1: </span><span class="si">{</span><span class="n">player1</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span> <span class="sa">f</span><span class="s2">"Player 2: </span><span class="si">{</span><span class="n">player2</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">player1</span><span class="p">,</span> <span class="n">player2</span>
 
-<span class="c1"># 2) Executing `python my_app.py [...]` will run our task function</span>
+<span class="n">Config</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">(</span><span class="n">task_function</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># 1) Create a local config store and store our config</span>
+<a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">store</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">ZenStore</span></a><span class="p">()</span>
+<a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">store</span></a><span class="p">(</span><span class="n">Config</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my_app"</span><span class="p">)</span>
+
+<span class="c1"># 2) Adding our __main__ clause to our script.</span>
+<span class="c1">#    Executing `python my_app.py [...]` will generate a CLI for our running</span>
+<span class="c1">#    our task function</span>
 <span class="k">if</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/reference/import.html#name__" title="__name__"><span class="vm">__name__</span></a> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="c1"># 3) We need to add the configs from our local store to Hydra's</span>
     <span class="c1">#    global config store</span>
     <span class="n">store</span><span class="o">.</span><span class="n">add_to_hydra_store</span><span class="p">()</span>
 
-    <span class="c1"># 4) Our zen-wrapped task function is used to generate</span>
-    <span class="c1">#    the CLI, and to specify which config we want to use</span>
-    <span class="c1">#    to configure the app by default</span>
+    <span class="c1"># 4) hydra_main generates a CLI based off of the config</span>
+    <span class="c1">#    stored under the name "my_app", and will run</span>
+    <span class="c1">#    `task_function`</span>
     <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">(</span><span class="n">task_function</span><span class="p">)</span><span class="o">.</span><span class="n">hydra_main</span><span class="p">(</span><span class="n">config_name</span><span class="o">=</span><span class="s2">"my_app"</span><span class="p">,</span>
                                   <span class="n">version_base</span><span class="o">=</span><span class="s2">"1.1"</span><span class="p">,</span>
                                   <span class="n">config_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -376,6 +389,38 @@ program:</p>
 command line. It should be noted that we can still launch our app from a Python
 console, using <a class="reference internal" href="../generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><code class="xref py py-func docutils literal notranslate"><span class="pre">launch()</span></code></a>, as we did <a class="reference internal" href="basic_app.html#launch-basic-app"><span class="std std-ref">in the previous tutorial</span></a>.</p>
 </section>
+<section id="streamlining-our-code">
+<h2>Streamlining Our Code<a class="headerlink" href="#streamlining-our-code" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.ZenStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">hydra_zen.ZenStore</span></code></a> has <a class="reference internal" href="../generated/hydra_zen.ZenStore.html#store-autoconf"><span class="std std-ref">auto-config capabilities</span></a> and it
+can be used as a decorator. This enables us to both create and store a config for our task function in a single line.</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Streamlined version of my_app.py:</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">ZenStore</span></a>
+
+<a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">store</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">ZenStore</span></a><span class="p">()</span>
+
+<a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="nd">@store</span></a><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"my_app"</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">player1</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a><span class="p">,</span> <span class="n">player2</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a><span class="p">):</span>
+    <span class="k">with</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#open" title="open"><span class="nb">open</span></a><span class="p">(</span><span class="s2">"player_log.txt"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"Game session log:</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Player 1: </span><span class="si">{</span><span class="n">player1</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span> <span class="sa">f</span><span class="s2">"Player 2: </span><span class="si">{</span><span class="n">player2</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">player1</span><span class="p">,</span> <span class="n">player2</span>
+
+<span class="k">if</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/reference/import.html#name__" title="__name__"><span class="vm">__name__</span></a> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">store</span><span class="o">.</span><span class="n">add_to_hydra_store</span><span class="p">()</span>
+    <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">(</span><span class="n">task_function</span><span class="p">)</span><span class="o">.</span><span class="n">hydra_main</span><span class="p">(</span><span class="n">config_name</span><span class="o">=</span><span class="s2">"my_app"</span><span class="p">,</span>
+                                  <span class="n">version_base</span><span class="o">=</span><span class="s2">"1.1"</span><span class="p">,</span>
+                                  <span class="n">config_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                  <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Here, applying <code class="docutils literal notranslate"><span class="pre">@store("my_app")</span></code> to <code class="docutils literal notranslate"><span class="pre">task_function</span></code> is equivalent to</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">store</span><span class="p">(</span><span class="n">builds</span><span class="p">(</span><span class="n">task_function</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my_app"</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
 <section id="reference-documentation">
 <h2>Reference Documentation<a class="headerlink" href="#reference-documentation" title="Link to this heading">#</a></h2>
 <p>Want a deeper understanding of how hydra-zen and Hydra work?
@@ -425,6 +470,7 @@ upon launching our application.</p>
 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modifying-our-project">Modifying Our Project</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#launching-our-application-from-the-command-line">Launching Our Application from the Command Line</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#streamlining-our-code">Streamlining Our Code</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-documentation">Reference Documentation</a></li>
 </ul>
 </nav></div>

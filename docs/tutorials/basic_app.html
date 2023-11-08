@@ -274,7 +274,8 @@ and this
 <section id="create-and-launch-a-basic-application-with-hydra">
 <span id="basic-app"></span><h1>Create and Launch a Basic Application with Hydra<a class="headerlink" href="#create-and-launch-a-basic-application-with-hydra" title="Link to this heading">#</a></h1>
 <p>In this tutorial we will create a basic application that we can configure and launch
-using Hydra. Although this project will be trivial, we will be introduced to the
+using Hydra, within a Python program (the next section of the tutorial will introduce a
+CLI). Although this project will be trivial, we will be introduced to the
 overarching design that is used for any Hydra-based project, as well to the
 core functionality provided by hydra-zen.</p>
 <section id="getting-started">
@@ -311,6 +312,8 @@ Hydra-based application:</p>
 <li><p>A “config”, which defines the configurable interface of our application.</p></li>
 <li><p>A task function, which accepts the populated config, and whose body specifies the code that will be executed when our application is launched.</p></li>
 </ol>
+<p>We will then use <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.launch(Config,</span> <span class="pre">task_function,</span> <span class="pre">overrides=&lt;...&gt;)</span></code> to
+configure and run our task-function from within a python program.</p>
 <p>Once we create this typical Hydra app, we will iterate on it and simplify things by using how hydra-zen’s <a class="reference internal" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.zen()</span></code></a> wrapper.</p>
 <section id="writing-the-application">
 <h3>Writing the Application<a class="headerlink" href="#writing-the-application" title="Link to this heading">#</a></h3>
@@ -322,6 +325,9 @@ this file.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a>
 
 <span class="n">Config</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">(</span><span class="s2">"player1"</span><span class="p">,</span> <span class="s2">"player2"</span><span class="p">)</span>
+<span class="c1"># A dataclass-type with fields</span>
+<span class="c1">#  - player1: Any</span>
+<span class="c1">#  - player2: Any</span>
 
 <span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
     <span class="c1"># cfg: Config</span>
@@ -440,10 +446,6 @@ Hydra! In the next tutorial, we will add a command line interface to this app.</
 </section>
 <section id="simplifying-things-with-hydra-zen-zen">
 <h3>Simplifying Things with <a class="reference internal" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.zen()</span></code></a><a class="headerlink" href="#simplifying-things-with-hydra-zen-zen" title="Link to this heading">#</a></h3>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This part of the tutorial requires <code class="docutils literal notranslate"><span class="pre">hydra-zen</span> <span class="pre">v0.9.0</span></code> or later to be installed.</p>
-</div>
 <p>We can simplify our task function, removing Hydra-specific logic from it, by using <a class="reference internal" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.zen()</span></code></a>.</p>
 <p>Let’s update our task function in <code class="xref py py-obj docutils literal notranslate"><span class="pre">my_app.py</span></code> to be a simple function whose signature determines the fields that will be extracted and instantiated from our config.
 Then we can use <a class="reference internal" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.builds()</span></code></a>, instead of <a class="reference internal" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.make_config()</span></code></a>, to generate our config based off of the task function’s signature.</p>
@@ -460,9 +462,14 @@ Then we can use <a class="reference internal" href="../generated/hydra_zen.build
 
     <span class="k">return</span> <span class="n">player1</span><span class="p">,</span> <span class="n">player2</span>
 
-<span class="c1"># auto-populates the fields of our configs based on the signature of</span>
-<span class="c1"># `task_function`</span>
 <span class="n">Config</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">(</span><span class="n">new_task_function</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># `builds` auto-populates the fields of our config based on the</span>
+<span class="c1"># signature of `task_function`</span>
+<span class="c1">#</span>
+<span class="c1"># `Config` is dataclass-type whose fields are</span>
+<span class="c1">#   - player1: str</span>
+<span class="c1">#   - player2: str</span>
+<span class="c1">#   - _target_: str = "my_app.task_function"</span>
 </pre></div>
 </div>
 </div>
