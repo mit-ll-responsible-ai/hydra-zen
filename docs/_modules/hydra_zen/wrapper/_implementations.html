@@ -404,14 +404,14 @@ document.write(`
 <span class="c1"># pyright: strict, reportUnnecessaryTypeIgnoreComment = true, reportUnnecessaryIsInstance = false</span>
 
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">deque</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
 <span class="kn">from</span> <span class="nn">inspect</span> <span class="kn">import</span> <span class="n">Parameter</span><span class="p">,</span> <span class="n">signature</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
     <span class="n">DefaultDict</span><span class="p">,</span>
-    <span class="n">Deque</span><span class="p">,</span>
     <span class="n">Dict</span><span class="p">,</span>
     <span class="n">FrozenSet</span><span class="p">,</span>
     <span class="n">Generator</span><span class="p">,</span>
@@ -1695,6 +1695,12 @@ document.write(`
 <span class="sd">    schema: &lt;none&gt;</span>
 <span class="sd">    has_root: true</span>
 <span class="sd">    _target_: __main__.Profile</span>
+
+<span class="sd">    **Manipulating and updating a store**</span>
+
+<span class="sd">    A store can be copied, updated, and merged. Its entries can have their groups</span>
+<span class="sd">    remapped, and individual entries can be deleted. See the docs for the corresponding</span>
+<span class="sd">    methods for details and examples.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span>
@@ -1765,7 +1771,7 @@ document.write(`
         <span class="c1"># created via the &#39;self-partialing&#39; process</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">NodeName</span><span class="p">],</span> <span class="n">StoreEntry</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="c1"># Internal repo entries that have yet to be added to Hydra&#39;s config store</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="p">:</span> <span class="n">Deque</span><span class="p">[</span><span class="n">StoreEntry</span><span class="p">]</span> <span class="o">=</span> <span class="n">deque</span><span class="p">([])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">NodeName</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_deferred_to_config</span> <span class="o">=</span> <span class="n">deferred_to_config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_deferred_store</span> <span class="o">=</span> <span class="n">deferred_hydra_store</span>
@@ -1841,8 +1847,7 @@ document.write(`
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">__target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">F</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">F</span><span class="p">,</span> <span class="n">Self</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;__call__(target : Optional[T] = None, /, name: NodeName | Callable[[Any], NodeName]] = ..., group: GroupName | Callable[[T], GroupName]] = None, package: Optional[str | Callable[[T], str]]] | None], provider: Optional[str], to_config: Callable[[T], Node] = ..., **to_config_kw: Any) -&gt; T | ZenStore</span>
 
-<span class="sd">        The interface to an initialized store. Can be used to store a config or to</span>
-<span class="sd">        :ref:`customize the default values &lt;self-partial&gt;` of the store.</span>
+<span class="sd">        Store a config or :ref:`customize the default values &lt;self-partial&gt;` of the store.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1976,19 +1981,123 @@ document.write(`
                 <span class="n">node</span><span class="o">=</span><span class="n">node</span><span class="p">,</span>
             <span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_overwrite_ok</span> <span class="ow">and</span> <span class="p">(</span><span class="n">_group</span><span class="p">,</span> <span class="n">_name</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;(name=</span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> group=</span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">): &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;Store entry already exists. Use a store initialized &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;with `ZenStore(overwrite_ok=True)` to overwrite config store &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;entries.&quot;</span>
-                <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">[</span><span class="n">_group</span><span class="p">,</span> <span class="n">_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_deferred_store</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">add_to_hydra_store</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_entry</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_overwrite_ok</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Union</span><span class="p">[</span><span class="n">F</span><span class="p">,</span> <span class="n">Self</span><span class="p">],</span> <span class="n">__target</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ZenStore.copy">
+<a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.copy">[docs]</a>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">store_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a copy of the store with the same overridden defaults.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        store_name : str | None, optional (default=None)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ZenStore</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from hydra_zen import ZenStore</span>
+<span class="sd">        &gt;&gt;&gt; s1 = ZenStore()(group=&quot;G&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; s1({}, name=&quot;a&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; s2 = s1.copy()</span>
+<span class="sd">        &gt;&gt;&gt; s2({}, name=&quot;b&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; s1</span>
+<span class="sd">        s1</span>
+<span class="sd">        {&#39;G&#39;: [&#39;a&#39;]}</span>
+<span class="sd">        &gt;&gt;&gt; s2</span>
+<span class="sd">        s1_copy</span>
+<span class="sd">        {&#39;G&#39;: [&#39;a&#39;, &#39;b&#39;]}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="n">cp</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">store_name</span> <span class="k">if</span> <span class="n">store_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_copy&quot;</span>
+        <span class="k">return</span> <span class="n">cp</span></div>
+
+
+<div class="viewcode-block" id="ZenStore.copy_with_mapped_groups">
+<a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.copy_with_mapped_groups">[docs]</a>
+    <span class="k">def</span> <span class="nf">copy_with_mapped_groups</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
+        <span class="n">old_group_to_new_group</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
+            <span class="n">Mapping</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">GroupName</span><span class="p">],</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">GroupName</span><span class="p">],</span> <span class="n">GroupName</span><span class="p">]</span>
+        <span class="p">],</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">store_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">overwrite_ok</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a copy of a store whose entries&#39; groups have been updated according to the provided mapping.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        old_group_to_new_group : Mapping[GroupName, GroupName] | Callable[[GroupName], GroupName]</span>
+<span class="sd">            A mapping or callable that transforms an old group name to a new one.</span>
+<span class="sd">            Groups in the store that are not included in the mapping are unaffected.</span>
+
+<span class="sd">            A `GroupName` is `str | None`.</span>
+
+<span class="sd">        store_name : Optional[None]</span>
+<span class="sd">            If specified, the name of the new store.</span>
+
+<span class="sd">        overwrite_ok : Optional[bool]:</span>
+<span class="sd">            If specified, determines if the mapping can overwrite existing store</span>
+<span class="sd">            entries. Otherwise, defers to `ZenStore(overwrite_ok)`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        new_store</span>
+<span class="sd">            A copy of `self` with remapped groups.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from hydra_zen import ZenStore</span>
+
+<span class="sd">        Creating an initial store</span>
+
+<span class="sd">        &gt;&gt;&gt; s1 = ZenStore(&quot;s1&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; s1({}, group=None, name=&quot;a&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; s1({}, group=&quot;A/1&quot;, name=&quot;b&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; s1({}, group=&quot;A/2&quot;, name=&quot;c&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; s1</span>
+<span class="sd">        s1</span>
+<span class="sd">        {None: [&#39;a&#39;], &#39;A/1&#39;: [&#39;b&#39;], &#39;A/2&#39;: [&#39;c&#39;]}</span>
+
+<span class="sd">        Replacing group &quot;A/1&quot; with &quot;B&quot;, via a mapping</span>
+
+<span class="sd">        &gt;&gt;&gt; s2 = s1.copy_with_mapped_groups({&quot;A/1&quot;: &quot;B&quot;}, store_name=&quot;s2&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; s2</span>
+<span class="sd">        s2</span>
+<span class="sd">        {None: [&#39;a&#39;], &#39;A/2&#39;: [&#39;c&#39;], &#39;B&#39;: [&#39;b&#39;]}</span>
+
+<span class="sd">        Placing all entries under group &quot;A/&quot; within a new inner group &quot;p&quot;, via a</span>
+<span class="sd">        function</span>
+
+<span class="sd">        &gt;&gt;&gt; s3 = s1.copy_with_mapped_groups(</span>
+<span class="sd">        ...     lambda g: g + &quot;/p&quot; if g and g.startswith(&quot;A/&quot;) else g, store_name=&quot;s3&quot;</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; s3</span>
+<span class="sd">        s3</span>
+<span class="sd">        {None: [&#39;a&#39;], &#39;A/1/p&#39;: [&#39;b&#39;], &#39;A/2/p&#39;: [&#39;c&#39;]}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">overwrite</span> <span class="o">=</span> <span class="n">overwrite_ok</span> <span class="k">if</span> <span class="n">overwrite_ok</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_overwrite_ok</span>
+
+        <span class="n">map_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">GroupName</span><span class="p">],</span> <span class="n">GroupName</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">old_group_to_new_group</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">old_group_to_new_group</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">)</span>
+            <span class="k">else</span> <span class="n">old_group_to_new_group</span>
+        <span class="p">)</span>
+
+        <span class="n">copy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">store_name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">name</span><span class="p">),</span> <span class="n">entry</span> <span class="ow">in</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">_internal_repo</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="n">new_group</span> <span class="o">=</span> <span class="n">map_fn</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">new_group</span> <span class="o">!=</span> <span class="n">group</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">copy</span><span class="p">[</span><span class="n">group</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span>
+                <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;group&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_group</span>
+                <span class="n">copy</span><span class="o">.</span><span class="n">_set_entry</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">copy</span></div>
 
 
     <span class="nd">@property</span>
@@ -2002,6 +2111,30 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="n">no_none</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">set_</span><span class="p">)</span>
             <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">no_none</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ZenStore.enqueue_all">
+<a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.enqueue_all">[docs]</a>
+    <span class="k">def</span> <span class="nf">enqueue_all</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add all of the store&#39;s entries to the queue to be added to hydra&#39;s store.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from hydra_zen import ZenStore</span>
+<span class="sd">        &gt;&gt;&gt; store = ZenStore(deferred_hydra_store=True)</span>
+<span class="sd">        &gt;&gt;&gt; store({&quot;a&quot;: 1}, name)</span>
+<span class="sd">        &gt;&gt;&gt; store.has_enqueued()</span>
+<span class="sd">        True</span>
+
+<span class="sd">        &gt;&gt;&gt; store.add_to_hydra_store()</span>
+<span class="sd">        &gt;&gt;&gt; store.has_enqueued()</span>
+<span class="sd">        False</span>
+
+<span class="sd">        &gt;&gt;&gt; store.enqueue_all()</span>
+<span class="sd">        &gt;&gt;&gt; store.has_enqueued()</span>
+<span class="sd">        True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
 
 <div class="viewcode-block" id="ZenStore.has_enqueued">
 <a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.has_enqueued">[docs]</a>
@@ -2035,6 +2168,90 @@ document.write(`
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;`True` if entries have been added to this store, regardless of whether or</span>
 <span class="sd">        not they have been added to Hydra&#39;s config store&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ZenStore.update">
+<a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.update">[docs]</a>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__other</span><span class="p">:</span> <span class="s2">&quot;ZenStore&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates the store inplace with redundant entries being overwritten.</span>
+
+<span class="sd">        Can also be applied via the `|=` in-place operator.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from hydra_zen import ZenStore</span>
+<span class="sd">        &gt;&gt;&gt; def f(): ...</span>
+<span class="sd">        &gt;&gt;&gt; def g(): ...</span>
+<span class="sd">        &gt;&gt;&gt; s1 = ZenStore(&quot;s1&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; s2 = ZenStore(&quot;s2&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; s1(f)  # store f in s1</span>
+<span class="sd">        &gt;&gt;&gt; s2(g)  # store g in s2</span>
+
+<span class="sd">        &gt;&gt;&gt; s1.update(s2)</span>
+<span class="sd">        &gt;&gt;&gt; s1  # s1 now has entries for both f and g</span>
+<span class="sd">        s1</span>
+<span class="sd">        {None: [&#39;f&#39;, &#39;g&#39;]}</span>
+
+<span class="sd">        Alternatively, the `|=` operator can be used to update a store inplace.</span>
+
+<span class="sd">        &gt;&gt;&gt; s3 = ZenStore(&quot;s3&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; s3 |= s2</span>
+<span class="sd">        &gt;&gt;&gt; s3</span>
+<span class="sd">        s3</span>
+<span class="sd">        {None: [&#39;g&#39;]}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">__other</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">__other</span><span class="o">.</span><span class="n">_queue</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_deferred_store</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_to_hydra_store</span><span class="p">()</span>
+        <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="ZenStore.merge">
+<a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.merge">[docs]</a>
+    <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">__other</span><span class="p">:</span> <span class="s2">&quot;ZenStore&quot;</span><span class="p">,</span> <span class="n">store_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new store by merging two stores.</span>
+
+<span class="sd">        The new store&#39;s default settings will reflect those of `self` in</span>
+<span class="sd">        `self.merge(other)`. This can also be applied via the `|` operator.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from hydra_zen import ZenStore</span>
+<span class="sd">        &gt;&gt;&gt; def f(): ...</span>
+<span class="sd">        &gt;&gt;&gt; def g(): ...</span>
+<span class="sd">        &gt;&gt;&gt; s1 = ZenStore(&quot;s1&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; s2 = ZenStore(&quot;s2&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; s1(f)  # store f in s1</span>
+<span class="sd">        &gt;&gt;&gt; s2(g)  # store g in s2</span>
+
+<span class="sd">        &gt;&gt;&gt; s3 = s1.merge(s2)</span>
+<span class="sd">        &gt;&gt;&gt; s3</span>
+<span class="sd">        s1_copy</span>
+<span class="sd">        {None: [&#39;f&#39;, &#39;g&#39;]}</span>
+
+<span class="sd">        Alternatively, the `|` operator can be used to merge stores.</span>
+
+<span class="sd">        &gt;&gt;&gt; s4 = s1 | s2</span>
+<span class="sd">        &gt;&gt;&gt; s4</span>
+<span class="sd">        s1_copy</span>
+<span class="sd">        {None: [&#39;f&#39;, &#39;g&#39;]}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">store_name</span><span class="p">)</span>
+        <span class="n">cp</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">__other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cp</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;ZenStore&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__ior__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;ZenStore&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">NodeName</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Node</span><span class="p">:</span>
@@ -2100,11 +2317,35 @@ document.write(`
         <span class="k">return</span> <span class="n">_resolve_node</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="s2">&quot;node&quot;</span><span class="p">]</span></div>
 
 
+    <span class="k">def</span> <span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">NodeName</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ZenStore.delete_entry">
+<a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.delete_entry">[docs]</a>
+    <span class="k">def</span> <span class="nf">delete_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">GroupName</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">NodeName</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="p">[</span><span class="n">group</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span></div>
+
+
 <div class="viewcode-block" id="ZenStore.get_entry">
 <a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.get_entry">[docs]</a>
     <span class="k">def</span> <span class="nf">get_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">GroupName</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">NodeName</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StoreEntry</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Access a store entry, which is a mapping that specifies the entry&#39;s</span>
 <span class="sd">        name, group, package, provider, and node.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        group : str | None</span>
+<span class="sd">        name : str</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">           - name: NodeName</span>
+<span class="sd">           - group: GroupName</span>
+<span class="sd">           - package: Optional[str]</span>
+<span class="sd">           - provider: Optional[str]</span>
+<span class="sd">           - node: ConfigType</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -2125,6 +2366,22 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_resolve_node</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">[(</span><span class="n">group</span><span class="p">,</span> <span class="n">name</span><span class="p">)],</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
+
+    <span class="k">def</span> <span class="nf">_set_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__entry</span><span class="p">:</span> <span class="n">StoreEntry</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_group</span> <span class="o">=</span> <span class="n">__entry</span><span class="p">[</span><span class="s2">&quot;group&quot;</span><span class="p">]</span>
+        <span class="n">_name</span> <span class="o">=</span> <span class="n">__entry</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">overwrite</span> <span class="ow">and</span> <span class="p">(</span><span class="n">_group</span><span class="p">,</span> <span class="n">_name</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;(name=</span><span class="si">{</span><span class="n">__entry</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> group=</span><span class="si">{</span><span class="n">__entry</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">): &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Store entry already exists. Use a store initialized &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;with `ZenStore(overwrite_ok=True)` to overwrite config store &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;entries.&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">[</span><span class="n">_group</span><span class="p">,</span> <span class="n">_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">__entry</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">_group</span><span class="p">,</span> <span class="n">_name</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_deferred_store</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_to_hydra_store</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">NodeName</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks if group or (group, node-name) exists in zen-store.&quot;&quot;&quot;</span>
@@ -2207,8 +2464,9 @@ document.write(`
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_store</span> <span class="o">=</span> <span class="n">ConfigStore</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span><span class="o">.</span><span class="n">store</span>
-        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="p">:</span>
-            <span class="n">entry</span> <span class="o">=</span> <span class="n">_resolve_node</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">popleft</span><span class="p">(),</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="p">):</span>
+            <span class="n">entry</span> <span class="o">=</span> <span class="n">_resolve_node</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span>
                 <span class="p">(</span>
                     <span class="n">overwrite_ok</span> <span class="ow">is</span> <span class="kc">False</span>
@@ -2229,7 +2487,8 @@ document.write(`
                     <span class="sa">f</span><span class="s2">&quot;Hydra config store entry already exists. Specify &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;`overwrite_ok=True` to enable replacing config store entries&quot;</span>
                 <span class="p">)</span>
-            <span class="n">_store</span><span class="p">(</span><span class="o">**</span><span class="n">entry</span><span class="p">)</span></div>
+            <span class="n">_store</span><span class="p">(</span><span class="o">**</span><span class="n">entry</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
 
 
     <span class="k">def</span> <span class="nf">_exists_in_hydra_store</span><span class="p">(</span>
