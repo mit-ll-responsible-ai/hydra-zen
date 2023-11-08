@@ -98,9 +98,6 @@ class MyBuildsFn(
         return super()._get_obj_path(target)
 
 
-my_builds = MyBuildsFn("my_builds")
-
-
 def f(x):
     return x
 
@@ -109,19 +106,21 @@ def test_call():
     with pytest.raises(HydraZenUnsupportedPrimitiveError):
         builds(dict, x=A(22))  # pyright: ignore
 
-    assert instantiate(my_builds(dict, x=A(22))) == {"x": A(22)}
-    assert instantiate(my_builds(dict, x=A(22), zen_partial=True))() == {"x": A(22)}
-    assert instantiate(my_builds(dict, x=[A(22), A(33)], zen_partial=True))() == {
-        "x": [A(22), A(33)]
+    assert instantiate(MyBuildsFn.builds(dict, x=A(22))) == {"x": A(22)}
+    assert instantiate(MyBuildsFn.builds(dict, x=A(22), zen_partial=True))() == {
+        "x": A(22)
     }
+    assert instantiate(
+        MyBuildsFn.builds(dict, x=[A(22), A(33)], zen_partial=True)
+    )() == {"x": [A(22), A(33)]}
 
 
 def test_just():
     with pytest.raises(HydraZenUnsupportedPrimitiveError):
         just(A(22))
 
-    assert instantiate(my_builds.just(A(22))) == A(22)
-    assert instantiate(my_builds.just(dict(x=A(22)))) == {"x": A(22)}
+    assert instantiate(MyBuildsFn.just(A(22))) == A(22)
+    assert instantiate(MyBuildsFn.just(dict(x=A(22)))) == {"x": A(22)}
 
 
 def foo(x: A = A(5)):
@@ -129,15 +128,15 @@ def foo(x: A = A(5)):
 
 
 def test_make_custom_builds():
-    new_builds = make_custom_builds_fn(builds_fn=my_builds)
+    new_builds = make_custom_builds_fn(builds_fn=MyBuildsFn)
     assert instantiate(new_builds(dict, x=A(22))) == {"x": A(22)}
 
     new_fbuilds = make_custom_builds_fn(
-        builds_fn=my_builds, populate_full_signature=True
+        builds_fn=MyBuildsFn, populate_full_signature=True
     )
     assert instantiate(new_fbuilds(foo)().x) == A(5)
 
-    new_pbuilds = make_custom_builds_fn(builds_fn=my_builds, zen_partial=True)
+    new_pbuilds = make_custom_builds_fn(builds_fn=MyBuildsFn, zen_partial=True)
     assert instantiate(new_pbuilds(foo))() == A(5)
 
 
@@ -147,7 +146,9 @@ def bar(x: B):
 
 def test_sanitized_type_override():
     # should swap B -> A in annotation
-    out = signature(my_builds(bar, populate_full_signature=True)).parameters["x"]
+    out = signature(MyBuildsFn.builds(bar, populate_full_signature=True)).parameters[
+        "x"
+    ]
     assert out.annotation is A
 
 
@@ -155,13 +156,13 @@ def test_make_config():
     with pytest.raises(HydraZenUnsupportedPrimitiveError):
         make_config(x=A(1))  # type: ignore
 
-    assert instantiate(my_builds.make_config(x=A(1))().x) == A(1)
+    assert instantiate(MyBuildsFn.make_config(x=A(1))().x) == A(1)
 
 
 def test_zen_field():
     with pytest.raises(HydraZenUnsupportedPrimitiveError):
         ZenField(default=A(1))
-    ZenField(default=A(1), _builds_fn=my_builds)
+    ZenField(default=A(1), _builds_fn=MyBuildsFn)
 
 
 def test_default_to_config():
