@@ -938,8 +938,8 @@ def test_update():
 
     s3 = s1(group="BB")
     assert s3 == s1
-    s1 |= s2
 
+    s1 |= s2
     assert len(s1) == 3
     assert s1._queue == {(None, "a"), (None, "b"), ("G", "c")}
     assert s1._internal_repo[None, "b"] is not s2._internal_repo[None, "b"]
@@ -950,6 +950,9 @@ def test_update():
     assert ("BB", "foo") not in s1
     s3({}, name="foo")
     assert ("BB", "foo") in s1
+
+    s1 |= s3
+    assert s3 == s1
 
 
 @pytest.mark.usefixtures("clean_store")
