@@ -1755,6 +1755,9 @@ class ZenStore:
         s3
         {None: ['g']}
         """
+        if __other == self:
+            return
+
         self._internal_repo.update(deepcopy(__other._internal_repo))
         self._queue.update(__other._queue)
         if not self._deferred_store:
