@@ -201,13 +201,7 @@ over. Modify your ``my_app.py`` script to match the following code.
    
    
    if __name__ == "__main__":
-       # We need to add the configs from our local store to Hydra's
-       # global config store
        store.add_to_hydra_store()
-   
-       # Our zen-wrapped task function is used to generate
-       # the CLI, and to specify which config we want to use
-       # to configure the app by default
        zen(task_function).hydra_main(config_name="my_app",
                                      version_base="1.1",
                                      config_path=".",

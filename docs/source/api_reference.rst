@@ -56,6 +56,22 @@ Storing Configs
    wrapper.default_to_config
    
 
+**************************************
+Creating and Launching Jobs with Hydra
+**************************************
+
+hydra-zen provides users the ability to launch a Hydra job via a 
+Python function instead of from a commandline interface.
+
+.. currentmodule:: hydra_zen
+
+.. autosummary::
+   :toctree: generated/
+
+   zen
+   launch
+   wrapper.Zen
+
 
 Instantiating and Resolving Configs
 ***********************************
@@ -110,22 +126,6 @@ hydra_zen.typing
 
    DataclassOptions
    ZenConvert
-
-**************************************
-Creating and Launching Jobs with Hydra
-**************************************
-
-hydra-zen provides users the ability to launch a Hydra job via a 
-Python function instead of from a commandline interface.
-
-.. currentmodule:: hydra_zen
-
-.. autosummary::
-   :toctree: generated/
-
-   launch
-   zen
-   wrapper.Zen
 
 
 .. _valid-types:
