@@ -101,7 +101,7 @@ The application can then be executed using:
 Creating Configurations for Particular "Experiments"
 ====================================================
 
-Suppose that we frequently want to run our application using the following two configurations (which we will refer to as `aplite` and `nglite`, respectively)
+Suppose that we frequently want to run our application using the following two configurations, which we will refer to as `aplite` and `nglite`, respectively.
 
 .. code-block:: console
    :caption: Manually running the so-called `aplite` configuration
@@ -131,7 +131,7 @@ Our objective is to be able run these experiments more concisely, as:
 
 .. code-block:: console
 
-    $ python my_app.py +experiment=<aglite or nginx>
+    $ python my_app.py +experiment=<aplite or nglite>
 
 
 To do this we implement new experiment configurations that:
@@ -182,7 +182,7 @@ Now the configuration for either "experiment" can be specified by-name from the 
 
 .. tab-set::
 
-   .. tab-item:: aplit
+   .. tab-item:: aplite
 
       .. code-block:: console
          :caption: 4 Running the `aplite` experiment
