@@ -21,7 +21,8 @@ Create and Launch a Basic Application with Hydra
 ================================================
 
 In this tutorial we will create a basic application that we can configure and launch 
-using Hydra. Although this project will be trivial, we will be introduced to the 
+using Hydra, within a Python program (the next section of the tutorial will introduce a 
+CLI). Although this project will be trivial, we will be introduced to the 
 overarching design that is used for any Hydra-based project, as well to the 
 core functionality provided by hydra-zen.
 
@@ -71,6 +72,9 @@ Hydra-based application:
 1. A "config", which defines the configurable interface of our application.
 2. A task function, which accepts the populated config, and whose body specifies the code that will be executed when our application is launched.
 
+We will then use `hydra_zen.launch(Config, task_function, overrides=<...>)` to 
+configure and run our task-function from withing a python program.
+
 Once we create this typical Hydra app, we will iterate on it and simplify things by using how hydra-zen's :func:`hydra_zen.zen` wrapper.
 
 Writing the Application
@@ -87,6 +91,9 @@ this file.
     from hydra_zen import make_config, instantiate
     
     Config = make_config("player1", "player2")
+    # A dataclass-type with fields
+    #  - player1: Any
+    #  - player2: Any
     
     def task_function(cfg):
         # cfg: Config
@@ -232,8 +239,6 @@ In the final section, let's see how we can simplify some of our code using speci
 Simplifying Things with :func:`hydra_zen.zen`
 ---------------------------------------------
 
-.. note:: This part of the tutorial requires ``hydra-zen v0.9.0`` or later to be installed.
-
 We can simplify our task function, removing Hydra-specific logic from it, by using :func:`hydra_zen.zen`. 
 
 Let's update our task function in `my_app.py` to be a simple function whose signature determines the fields that will be extracted and instantiated from our config.
@@ -254,9 +259,14 @@ Then we can use :func:`hydra_zen.builds`, instead of :func:`hydra_zen.make_confi
 
        return player1, player2
 
-   # auto-populates the fields of our configs based on the signature of
-   # `task_function`
    Config = builds(new_task_function, populate_full_signature=True)
+   # `builds` auto-populates the fields of our config based on the 
+   # signature of `task_function`
+   #
+   # `Config` is dataclass-type whose fields are
+   #   - player1: str
+   #   - player2: str
+   #   - _target_: str = "my_app.task_function"
 
 
 Wrapping this function as

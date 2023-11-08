@@ -18,43 +18,56 @@ Add a Command Line Interface to Our Application
 In this tutorial we will update our project so that it can be configured and launched 
 from a command line interface (CLI), using Hydra.
 
+In the last section of the tutorial, we
+
+- Defined a task function
+- Created a config for that task function
+- Ran the task function via `hydra_zen.launch(Config, task_function, overrides=<...>)`
+
+In this section, we need to add our config to Hydra's config-store; this enables Hydra to generate a CLI from this config.
 
 Modifying Our Project
 =====================
 
 Open ``my_app.py`` in your editor. We will make the following modifications to it:
 
-1. Use :func:`hydra_zen.store` (`docs <https://mit-ll-responsible-ai.github.io/hydra-zen/generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore>`_) to generate for our task function and to store it in Hydra's global config store.
+1. Use :class:`hydra_zen.ZenStore` to store our config locally.
 2. Add a ``__main__`` clause to our ``my_app.py`` script so that the script runs our task function.
-3. Use :func:`hydra_zen.zen` to wrap the task function and to generate the CLI.
+3. Within ``__main__`` populate Hydra's global config store so that Hydra can generate a CLI using our configs.
+4. Use :func:`hydra_zen.zen` to wrap the task function and to generate the CLI.
 
 Modify your script to match this:
 
 .. code-block:: python
    :caption: Contents of my_app.py:
 
-   from hydra_zen import store, zen
+   from hydra_zen import zen, ZenStore
    
-   # 1) `hydra_zen.store generates a config for our task function
-   #    and stores it locally under the entry-name "my_app"
-   @store(name="my_app")
+   # The same task function as before
    def task_function(player1: str, player2: str):
-       # write the log with the names
        with open("player_log.txt", "w") as f:
            f.write("Game session log:\n")
            f.write(f"Player 1: {player1}\n" f"Player 2: {player2}")
 
        return player1, player2
-      
-   # 2) Executing `python my_app.py [...]` will run our task function
+   
+   Config = builds(new_task_function, populate_full_signature=True)
+   
+   # 1) Create a local config store and store our config
+   store = ZenStore()
+   store(Config, name="my_app")
+
+   # 2) Adding our __main__ clause to our script. 
+   #    Executing `python my_app.py [...]` will generate a CLI for our running
+   #    our task function
    if __name__ == "__main__":
        # 3) We need to add the configs from our local store to Hydra's
-       #    global config store 
+       #    global config store
        store.add_to_hydra_store()
        
-       # 4) Our zen-wrapped task function is used to generate
-       #    the CLI, and to specify which config we want to use
-       #    to configure the app by default
+       # 4) hydra_main generates a CLI based off of the config
+       #    stored under the name "my_app", and will run
+       #    `task_function`
        zen(task_function).hydra_main(config_name="my_app", 
                                      version_base="1.1",
                                      config_path=None,
@@ -134,6 +147,42 @@ program:
 Voilà! As demonstrated, our simple application can now be configured and launched from the 
 command line. It should be noted that we can still launch our app from a Python 
 console, using :func:`~hydra_zen.launch`, as we did :ref:`in the previous tutorial <launch-basic-app>`.
+
+
+Streamlining Our Code
+=====================
+
+:class:`hydra_zen.ZenStore` has :ref:`auto-config capabilities <store-autoconf>` and it 
+can be used as a decorator. This enables us to both create and store a config for our task function in a single line.
+
+.. code-block:: python
+   :caption: Streamlined version of my_app.py:
+
+   from hydra_zen import zen, ZenStore
+   
+   store = ZenStore()
+
+   @store(name="my_app")
+   def task_function(player1: str, player2: str):
+       with open("player_log.txt", "w") as f:
+           f.write("Game session log:\n")
+           f.write(f"Player 1: {player1}\n" f"Player 2: {player2}")
+
+       return player1, player2
+
+   if __name__ == "__main__":
+       store.add_to_hydra_store()
+       zen(task_function).hydra_main(config_name="my_app", 
+                                     version_base="1.1",
+                                     config_path=None,
+                                     )
+
+Here, applying ``@store("my_app")`` to ``task_function`` is equivalent to 
+
+.. code-block:: python
+
+   store(builds(task_function, populate_full_signature=True), name="my_app")
+
 
 Reference Documentation
 =======================
