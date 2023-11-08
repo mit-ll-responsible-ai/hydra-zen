@@ -236,7 +236,7 @@ The following How-To guides were added:
 
 - `How to configure multiple experiments <https://mit-ll-responsible-ai.github.io/hydra-zen/how_to/configuring_experiments.html>`_
 - `How to customize Hydra's configuration <https://mit-ll-responsible-ai.github.io/hydra-zen/how_to/configure_hydra.html>`_
-- `How to configure and run scikit-learn's "Classier Comparison" example <https://mit-ll-responsible-ai.github.io/hydra-zen/how_to/using_scikit_learn.html>`_
+- `How to configure and run scikit-learn's "Classier Comparison" example <https://mit-ll-responsible-ai.github.io/hydra-zen/tutorials/using_scikit_learn.html>`_
 
 
 
