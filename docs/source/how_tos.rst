@@ -27,5 +27,3 @@ objectives.
    how_to/configure_hydra
    how_to/partial_config
    how_to/beartype
-   how_to/using_scikit_learn
-   how_to/pytorch_lightning
