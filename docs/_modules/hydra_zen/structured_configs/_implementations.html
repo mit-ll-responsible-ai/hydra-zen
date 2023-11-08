@@ -1048,19 +1048,14 @@ document.write(`
 
 
 <span class="k">class</span> <span class="nc">BuildsFn</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, hydra_recursive=None, hydra_convert=None, hydra_defaults=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class that can be modified to customize the behavior of `builds`, `just`, and `make_config`. These functions are exposed as class methods of `BuildsFn`.</span>
 
 <span class="sd">    To customize type-refinement support, override `_sanitized_type`.</span>
 <span class="sd">    To customize auto-config support, override `_make_hydra_compatible`.</span>
 <span class="sd">    To customize the ability to resolve import paths, override `_get_obj_path`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;__name__&quot;</span><span class="p">,</span> <span class="s2">&quot;__qualname__&quot;</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">qualname</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="vm">__qualname__</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">qualname</span> <span class="k">if</span> <span class="n">qualname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">name</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_sanitized_type</span><span class="p">(</span>
@@ -1440,7 +1435,7 @@ document.write(`
                         <span class="n">convert_dataclass</span><span class="o">=</span><span class="n">convert_dataclass</span><span class="p">,</span>
                     <span class="p">)</span>
 
-            <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">builds</span><span class="p">(</span>
                 <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">),</span>
                 <span class="o">**</span><span class="n">converted_fields</span><span class="p">,</span>
                 <span class="n">hydra_recursive</span><span class="o">=</span><span class="n">hydra_recursive</span><span class="p">,</span>
@@ -3191,8 +3186,6 @@ document.write(`
             <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]]],</span> <span class="n">out</span>
         <span class="p">)</span>
 
-    <span class="fm">__call__</span> <span class="o">=</span> <span class="n">builds</span>
-
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">just</span><span class="p">(</span>
@@ -3432,7 +3425,7 @@ document.write(`
         <span class="c1"># also check for use of reserved names</span>
         <span class="n">_tmp</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="bp">cls</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">builds</span><span class="p">(</span>
             <span class="nb">dict</span><span class="p">,</span>
             <span class="n">hydra_convert</span><span class="o">=</span><span class="n">hydra_convert</span><span class="p">,</span>
             <span class="n">hydra_recursive</span><span class="o">=</span><span class="n">hydra_recursive</span><span class="p">,</span>
