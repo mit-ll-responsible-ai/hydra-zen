@@ -111,7 +111,7 @@ def check_partial_builds_on_function():
 
     reveal_type(
         conf_f_partial(),
-        expected_text="ZenPartialBuilds[(x: int) -> int] | HydraPartialBuilds[(x: int) -> int]",
+        expected_text="HydraPartialBuilds[(x: int) -> int] | ZenPartialBuilds[(x: int) -> int]",
     )
 
     conf_f_partial_instance = conf_f_partial()
@@ -604,7 +604,7 @@ def check_populate_full_sig():
     conf2 = Conf_f_partial(not_a_valid_arg=1)  # should be ok
     reveal_type(
         conf2,
-        expected_text="ZenPartialBuilds[(x: int, y: str, z: bool = False) -> C] | HydraPartialBuilds[(x: int, y: str, z: bool = False) -> C]",
+        expected_text="HydraPartialBuilds[(x: int, y: str, z: bool = False) -> C] | ZenPartialBuilds[(x: int, y: str, z: bool = False) -> C]",
     )
 
     # specifying `populate_full_signature=False` should disable sig-reflection
@@ -1432,7 +1432,7 @@ def pbuilds_target_pass_through():
 
 
 def check_BuildsFn():
-    my_builds = BuildsFn[int]("my_builds")
+    my_builds = BuildsFn[int].builds
     my_builds(int, 1)
     my_builds(int, "a")  # type: ignore
 
@@ -1441,7 +1441,7 @@ def check_make_custom_reflection():
     def foo(x: int):
         ...
 
-    bb = BuildsFn[int]("a")
+    bb = BuildsFn[int]
 
     pb = make_custom_builds_fn(zen_partial=True, builds_fn=bb)
     assert_type(pb, PBuilds[int])
@@ -1471,7 +1471,7 @@ def check_parameterized_BuildsFn():
     def foo(x: A):
         ...
 
-    bg = BuildsFn[Union[SupportedPrimitive, A]]("a")
+    bg = BuildsFn[Union[SupportedPrimitive, A]].builds
 
     assert_type(bg(A, A()), Type[Builds[Type[A]]])
     assert_type(bg(A, B()), Type[Builds[Type[A]]])
