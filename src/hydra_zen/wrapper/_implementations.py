@@ -4,9 +4,10 @@
 
 import warnings
 from collections import defaultdict
+from contextvars import copy_context
 from copy import deepcopy
-from functools import wraps
-from inspect import Parameter, signature
+from functools import partial, wraps
+from inspect import Parameter, iscoroutinefunction, signature
 from typing import (
     Any,
     Callable,
@@ -139,6 +140,7 @@ class Zen(Generic[P, R]):
         pre_call: PreCall = None,
         unpack_kwargs: bool = False,
         resolve_pre_call: bool = True,
+        run_in_context: bool = False,
     ) -> None:
         """
         Parameters
@@ -148,23 +150,41 @@ class Zen(Generic[P, R]):
 
         unpack_kwargs: bool, optional (default=False)
             If `True` a `**kwargs` field in the wrapped function's signature will be
-            populated by all of the input config entries that are not specified by the
-            rest of the signature (and that are not specified by the `exclude`
-            argument).
+            populated by all of the input config entries that are not specified by the rest
+            of the signature (and that are not specified by the `exclude` argument).
 
         pre_call : Optional[Callable[[Any], Any] | Iterable[Callable[[Any], Any]]]
             One or more functions that will be called with the input config prior
-            to the wrapped functions. An iterable of pre-call functions are called
+            to the wrapped function. An iterable of pre-call functions are called
             from left (low-index) to right (high-index).
 
-        exclude: Optional[str | Iterable[str]]
+            This is useful, e.g., for seeding a RNG prior to the instantiation phase
+            that is triggered when calling the wrapped function.
+
+        resolve_pre_call : bool, (default=True)
+            If `True`, the config passed to the zen-wrapped function has its
+            interpolated fields resolved prior to being passed to any pre-call
+            functions. Otherwise, the interpolation occurs after the pre-call functions
+            are called.
+
+        exclude : Optional[str | Iterable[str]]
             Specifies one or more parameter names in the function's signature
             that will not be extracted from input configs by the zen-wrapped function.
 
             A single string of comma-separated names can be specified.
-        """
-        self.func: Callable[P, R] = __func
 
+        run_in_context : bool, optional (default=False)
+            If `True`, the zen-wrapped function - and the `pre_call` function, if
+            specified - is run in a copied :py:class:`contextvars.Context`; i.e.
+            changes made to any :py:class:`contextvars.ContextVar` will be isolated to
+            that call of the wrapped function.
+
+            `run_in_context` is not supported for async functions.
+        """
+        if run_in_context and iscoroutinefunction(__func):
+            raise TypeError(f"`{run_in_context=} is not supported for async functions.")
+
+        self.func: Callable[P, R] = __func
         try:
             # Must cast to dict so that `self` is pickle-compatible.
             self.parameters: Mapping[str, Parameter] = dict(
@@ -183,11 +203,18 @@ class Zen(Generic[P, R]):
             raise TypeError(
                 f"`resolve_pre_call` must be type `bool` got {resolve_pre_call}"
             )
+
+        if not isinstance(run_in_context, bool):  # pragma: no cover
+            raise TypeError(
+                f"`run_in_context` must be type `bool` got {run_in_context}"
+            )
+
         self._resolve = resolve_pre_call
         self._unpack_kwargs: bool = unpack_kwargs and any(
             p.kind is p.VAR_KEYWORD for p in self.parameters.values()
         )
 
+        self._run_in_context: bool = run_in_context
         self._exclude: Set[str]
 
         if exclude is None:
@@ -216,7 +243,13 @@ class Zen(Generic[P, R]):
             if _f is None:
                 continue
 
-            _f_params = signature(_f).parameters
+            if run_in_context and isinstance(_f, Zen) and _f._run_in_context:
+                raise HydraZenValidationError(
+                    f"zen-wrapped pre_call function {_f!r} cannot specify "
+                    f"`run_in_context=True` when the main wrapper specifies it as well."
+                )
+
+            _f_params = signature(_f).parameters  # type: ignore
 
             if (sum(p.default is p.empty for p in _f_params.values()) > 1) or len(
                 _f_params
@@ -353,8 +386,15 @@ class Zen(Generic[P, R]):
             # resolves all interpolated values in-place
             OmegaConf.resolve(cfg)
 
+        context = copy_context() if self._run_in_context else None
+
         if self.pre_call is not None:
-            self.pre_call(cfg)
+            pre_call = (
+                self.pre_call
+                if context is None
+                else partial(context.run, self.pre_call)
+            )
+            pre_call(cfg)
 
         args_ = list(getattr(cfg, "_args_", []))
 
@@ -377,7 +417,10 @@ class Zen(Generic[P, R]):
                 and isinstance(name, str)
             )
             cfg_kwargs.update({name: cfg[name] for name in names})
-        return self.func(
+
+        func = self.func if context is None else partial(context.run, self.func)
+
+        return func(
             *(self.instantiate(x) if is_instantiable(x) else x for x in args_),
             **{
                 name: self.instantiate(val) if is_instantiable(val) else val
@@ -472,6 +515,7 @@ def zen(
     pre_call: PreCall = ...,
     ZenWrapper: Type[Zen[Any, Any]] = ...,
     resolve_pre_call: bool = ...,
+    run_in_context: bool = ...,
     exclude: Optional[Union[str, Iterable[str]]] = ...,
 ) -> Zen[P, R]:
     ...
@@ -485,6 +529,7 @@ def zen(
     pre_call: PreCall = ...,
     resolve_pre_call: bool = ...,
     ZenWrapper: Type[Zen[Any, Any]] = ...,
+    run_in_context: bool = ...,
     exclude: Optional[Union[str, Iterable[str]]] = ...,
 ) -> Callable[[Callable[P2, R2]], Zen[P2, R2]]:
     ...
@@ -497,6 +542,7 @@ def zen(
     pre_call: PreCall = None,
     exclude: Optional[Union[str, Iterable[str]]] = None,
     resolve_pre_call: bool = True,
+    run_in_context: bool = False,
     ZenWrapper: Type[Zen[Any, Any]] = Zen,
 ) -> Union[Callable[[Callable[P2, R2]], Zen[P2, R2]], Zen[P, R]]:
     r"""zen(func, /, pre_call, ZenWrapper)
@@ -544,6 +590,14 @@ def zen(
         that will not be extracted from input configs by the zen-wrapped function.
 
         A single string of comma-separated names can be specified.
+
+    run_in_context : bool, optional (default=False)
+        If `True`, the zen-wrapped function - and the `pre_call` function, if
+        specified - is run in a copied :py:class:`contextvars.Context`; i.e.
+        changes made to any :py:class:`contextvars.ContextVar` will be isolated to
+        that call of the wrapped function.
+
+        `run_in_context` is not supported for async functions.
 
     ZenWrapper : Type[hydra_zen.wrapper.Zen], optional (default=Zen)
         If specified, a subclass of `Zen` that customizes the behavior of the wrapper.
@@ -746,6 +800,7 @@ def zen(
                 exclude=exclude,
                 unpack_kwargs=unpack_kwargs,
                 resolve_pre_call=resolve_pre_call,
+                run_in_context=run_in_context,
             ),
         )
 
@@ -758,6 +813,7 @@ def zen(
                 exclude=exclude,
                 unpack_kwargs=unpack_kwargs,
                 resolve_pre_call=resolve_pre_call,
+                run_in_context=run_in_context,
             ),
         )
         return out
