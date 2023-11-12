@@ -8,6 +8,7 @@ from typing import Any, Dict, Optional
 import pytest
 
 from hydra_zen import zen
+from hydra_zen.errors import HydraZenValidationError
 
 config: ContextVar[Optional[Dict[str, Any]]] = ContextVar("config", default=None)
 var: ContextVar[Dict[str, Any]] = ContextVar("var", default=dict())
@@ -71,3 +72,16 @@ def test_pre_call_shares_context_with_wrapped_func(run_in_context: bool):
 
     zen(func, pre_call=pre_call, run_in_context=run_in_context)({})
     assert var.get() == {}
+
+
+def test_pre_call_run_in_its_own_context_is_forbidden():
+    def f(x):
+        ...
+
+    with pytest.raises(HydraZenValidationError):
+        zen(f, pre_call=zen(f, run_in_context=True), run_in_context=True)
+
+
+def test_validation():
+    with pytest.raises(TypeError, match="must be type"):
+        zen(lambda x: x, run_in_context=None)  # type: ignore

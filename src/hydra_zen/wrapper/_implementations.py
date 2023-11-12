@@ -185,7 +185,6 @@ class Zen(Generic[P, R]):
             raise TypeError(f"`{run_in_context=} is not supported for async functions.")
 
         self.func: Callable[P, R] = __func
-        self._run_in_context: bool = run_in_context
         try:
             # Must cast to dict so that `self` is pickle-compatible.
             self.parameters: Mapping[str, Parameter] = dict(
@@ -204,11 +203,18 @@ class Zen(Generic[P, R]):
             raise TypeError(
                 f"`resolve_pre_call` must be type `bool` got {resolve_pre_call}"
             )
+
+        if not isinstance(run_in_context, bool):  # pragma: no cover
+            raise TypeError(
+                f"`run_in_context` must be type `bool` got {run_in_context}"
+            )
+
         self._resolve = resolve_pre_call
         self._unpack_kwargs: bool = unpack_kwargs and any(
             p.kind is p.VAR_KEYWORD for p in self.parameters.values()
         )
 
+        self._run_in_context: bool = run_in_context
         self._exclude: Set[str]
 
         if exclude is None:
@@ -237,7 +243,13 @@ class Zen(Generic[P, R]):
             if _f is None:
                 continue
 
-            _f_params = signature(_f).parameters
+            if run_in_context and isinstance(_f, Zen) and _f._run_in_context:
+                raise HydraZenValidationError(
+                    f"zen-wrapped pre_call function {_f!r} cannot specify "
+                    f"`run_in_context=True` when the main wrapper specifies it as well."
+                )
+
+            _f_params = signature(_f).parameters  # type: ignore
 
             if (sum(p.default is p.empty for p in _f_params.values()) > 1) or len(
                 _f_params
