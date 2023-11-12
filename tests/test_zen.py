@@ -625,3 +625,10 @@ zpikl = zen(pikl)
 def test_pickle_compatible():
     loaded = pickle.loads(pickle.dumps(zpikl))
     assert loaded({"x": 3}) == pikl(3)
+
+
+async def test_async_compatible():
+    async def foo(x: int):
+        return x
+
+    assert await zen(foo)(dict(x=builds(int, 22))) == 22

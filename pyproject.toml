@@ -51,7 +51,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest >= 3.8", "hypothesis >= 6.28.0"]
+test = ["pytest >= 3.8", "hypothesis >= 6.28.0", "pytest-trio >= 0.8.0"]
 pydantic = ["pydantic>=1.8.2,<2.0.0"]
 beartype = ["beartype>=0.8.0"]
 
@@ -104,6 +104,7 @@ exclude_lines = [
 
 [tool.pytest.ini_options]
 xfail_strict = true
+trio_mode = true
 
 
 [tool.pyright]
@@ -149,6 +150,7 @@ deps = setuptools
        pytest
        hypothesis
        pytest-xdist
+       pytest-trio
        tzdata
 commands = pytest tests/ {posargs: -n auto --maxprocesses=4}
 
