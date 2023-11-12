@@ -405,9 +405,10 @@ document.write(`
 
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">contextvars</span> <span class="kn">import</span> <span class="n">copy_context</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
-<span class="kn">from</span> <span class="nn">inspect</span> <span class="kn">import</span> <span class="n">Parameter</span><span class="p">,</span> <span class="n">signature</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span><span class="p">,</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">inspect</span> <span class="kn">import</span> <span class="n">Parameter</span><span class="p">,</span> <span class="n">iscoroutinefunction</span><span class="p">,</span> <span class="n">signature</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
@@ -544,6 +545,7 @@ document.write(`
         <span class="n">pre_call</span><span class="p">:</span> <span class="n">PreCall</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">unpack_kwargs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">resolve_pre_call</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">run_in_context</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
@@ -553,23 +555,41 @@ document.write(`
 
 <span class="sd">        unpack_kwargs: bool, optional (default=False)</span>
 <span class="sd">            If `True` a `**kwargs` field in the wrapped function&#39;s signature will be</span>
-<span class="sd">            populated by all of the input config entries that are not specified by the</span>
-<span class="sd">            rest of the signature (and that are not specified by the `exclude`</span>
-<span class="sd">            argument).</span>
+<span class="sd">            populated by all of the input config entries that are not specified by the rest</span>
+<span class="sd">            of the signature (and that are not specified by the `exclude` argument).</span>
 
 <span class="sd">        pre_call : Optional[Callable[[Any], Any] | Iterable[Callable[[Any], Any]]]</span>
 <span class="sd">            One or more functions that will be called with the input config prior</span>
-<span class="sd">            to the wrapped functions. An iterable of pre-call functions are called</span>
+<span class="sd">            to the wrapped function. An iterable of pre-call functions are called</span>
 <span class="sd">            from left (low-index) to right (high-index).</span>
 
-<span class="sd">        exclude: Optional[str | Iterable[str]]</span>
+<span class="sd">            This is useful, e.g., for seeding a RNG prior to the instantiation phase</span>
+<span class="sd">            that is triggered when calling the wrapped function.</span>
+
+<span class="sd">        resolve_pre_call : bool, (default=True)</span>
+<span class="sd">            If `True`, the config passed to the zen-wrapped function has its</span>
+<span class="sd">            interpolated fields resolved prior to being passed to any pre-call</span>
+<span class="sd">            functions. Otherwise, the interpolation occurs after the pre-call functions</span>
+<span class="sd">            are called.</span>
+
+<span class="sd">        exclude : Optional[str | Iterable[str]]</span>
 <span class="sd">            Specifies one or more parameter names in the function&#39;s signature</span>
 <span class="sd">            that will not be extracted from input configs by the zen-wrapped function.</span>
 
 <span class="sd">            A single string of comma-separated names can be specified.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]</span> <span class="o">=</span> <span class="n">__func</span>
 
+<span class="sd">        run_in_context : bool, optional (default=False)</span>
+<span class="sd">            If `True`, the zen-wrapped function - and the `pre_call` function, if</span>
+<span class="sd">            specified - is run in a copied :py:class:`contextvars.Context`; i.e.</span>
+<span class="sd">            changes made to any :py:class:`contextvars.ContextVar` will be isolated to</span>
+<span class="sd">            that call of the wrapped function.</span>
+
+<span class="sd">            `run_in_context` is not supported for async functions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">run_in_context</span> <span class="ow">and</span> <span class="n">iscoroutinefunction</span><span class="p">(</span><span class="n">__func</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">run_in_context</span><span class="si">=}</span><span class="s2"> is not supported for async functions.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]</span> <span class="o">=</span> <span class="n">__func</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># Must cast to dict so that `self` is pickle-compatible.</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
@@ -588,11 +608,18 @@ document.write(`
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;`resolve_pre_call` must be type `bool` got </span><span class="si">{</span><span class="n">resolve_pre_call</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">run_in_context</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;`run_in_context` must be type `bool` got </span><span class="si">{</span><span class="n">run_in_context</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_resolve</span> <span class="o">=</span> <span class="n">resolve_pre_call</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_kwargs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">unpack_kwargs</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span>
             <span class="n">p</span><span class="o">.</span><span class="n">kind</span> <span class="ow">is</span> <span class="n">p</span><span class="o">.</span><span class="n">VAR_KEYWORD</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
         <span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run_in_context</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">run_in_context</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_exclude</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -621,7 +648,13 @@ document.write(`
             <span class="k">if</span> <span class="n">_f</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">continue</span>
 
-            <span class="n">_f_params</span> <span class="o">=</span> <span class="n">signature</span><span class="p">(</span><span class="n">_f</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
+            <span class="k">if</span> <span class="n">run_in_context</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_f</span><span class="p">,</span> <span class="n">Zen</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_f</span><span class="o">.</span><span class="n">_run_in_context</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">HydraZenValidationError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;zen-wrapped pre_call function </span><span class="si">{</span><span class="n">_f</span><span class="si">!r}</span><span class="s2"> cannot specify &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;`run_in_context=True` when the main wrapper specifies it as well.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">_f_params</span> <span class="o">=</span> <span class="n">signature</span><span class="p">(</span><span class="n">_f</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>  <span class="c1"># type: ignore</span>
 
             <span class="k">if</span> <span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="n">p</span><span class="o">.</span><span class="n">empty</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">_f_params</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span>
                 <span class="n">_f_params</span>
@@ -764,8 +797,15 @@ document.write(`
             <span class="c1"># resolves all interpolated values in-place</span>
             <span class="n">OmegaConf</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
 
+        <span class="n">context</span> <span class="o">=</span> <span class="n">copy_context</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_in_context</span> <span class="k">else</span> <span class="kc">None</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_call</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pre_call</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+            <span class="n">pre_call</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pre_call</span>
+                <span class="k">if</span> <span class="n">context</span> <span class="ow">is</span> <span class="kc">None</span>
+                <span class="k">else</span> <span class="n">partial</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_call</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">pre_call</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
 
         <span class="n">args_</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="s2">&quot;_args_&quot;</span><span class="p">,</span> <span class="p">[]))</span>
 
@@ -788,7 +828,10 @@ document.write(`
                 <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
             <span class="p">)</span>
             <span class="n">cfg_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">name</span><span class="p">:</span> <span class="n">cfg</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">})</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span>
+
+        <span class="n">func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="k">if</span> <span class="n">context</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">partial</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span>
             <span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instantiate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_instantiable</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">args_</span><span class="p">),</span>
             <span class="o">**</span><span class="p">{</span>
                 <span class="n">name</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">instantiate</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_instantiable</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">else</span> <span class="n">val</span>
@@ -888,6 +931,7 @@ document.write(`
     <span class="n">pre_call</span><span class="p">:</span> <span class="n">PreCall</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">ZenWrapper</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Zen</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">resolve_pre_call</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">run_in_context</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">exclude</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]:</span>
     <span class="o">...</span>
@@ -901,6 +945,7 @@ document.write(`
     <span class="n">pre_call</span><span class="p">:</span> <span class="n">PreCall</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">resolve_pre_call</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">ZenWrapper</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Zen</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">run_in_context</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">exclude</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Callable</span><span class="p">[</span><span class="n">P2</span><span class="p">,</span> <span class="n">R2</span><span class="p">]],</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P2</span><span class="p">,</span> <span class="n">R2</span><span class="p">]]:</span>
     <span class="o">...</span>
@@ -915,6 +960,7 @@ document.write(`
     <span class="n">pre_call</span><span class="p">:</span> <span class="n">PreCall</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">exclude</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">resolve_pre_call</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">run_in_context</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">ZenWrapper</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Zen</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Zen</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Callable</span><span class="p">[</span><span class="n">P2</span><span class="p">,</span> <span class="n">R2</span><span class="p">]],</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P2</span><span class="p">,</span> <span class="n">R2</span><span class="p">]],</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;zen(func, /, pre_call, ZenWrapper)</span>
@@ -962,6 +1008,14 @@ document.write(`
 <span class="sd">        that will not be extracted from input configs by the zen-wrapped function.</span>
 
 <span class="sd">        A single string of comma-separated names can be specified.</span>
+
+<span class="sd">    run_in_context : bool, optional (default=False)</span>
+<span class="sd">        If `True`, the zen-wrapped function - and the `pre_call` function, if</span>
+<span class="sd">        specified - is run in a copied :py:class:`contextvars.Context`; i.e.</span>
+<span class="sd">        changes made to any :py:class:`contextvars.ContextVar` will be isolated to</span>
+<span class="sd">        that call of the wrapped function.</span>
+
+<span class="sd">        `run_in_context` is not supported for async functions.</span>
 
 <span class="sd">    ZenWrapper : Type[hydra_zen.wrapper.Zen], optional (default=Zen)</span>
 <span class="sd">        If specified, a subclass of `Zen` that customizes the behavior of the wrapper.</span>
@@ -1164,6 +1218,7 @@ document.write(`
                 <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">,</span>
                 <span class="n">unpack_kwargs</span><span class="o">=</span><span class="n">unpack_kwargs</span><span class="p">,</span>
                 <span class="n">resolve_pre_call</span><span class="o">=</span><span class="n">resolve_pre_call</span><span class="p">,</span>
+                <span class="n">run_in_context</span><span class="o">=</span><span class="n">run_in_context</span><span class="p">,</span>
             <span class="p">),</span>
         <span class="p">)</span>
 
@@ -1176,6 +1231,7 @@ document.write(`
                 <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">,</span>
                 <span class="n">unpack_kwargs</span><span class="o">=</span><span class="n">unpack_kwargs</span><span class="p">,</span>
                 <span class="n">resolve_pre_call</span><span class="o">=</span><span class="n">resolve_pre_call</span><span class="p">,</span>
+                <span class="n">run_in_context</span><span class="o">=</span><span class="n">run_in_context</span><span class="p">,</span>
             <span class="p">),</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>

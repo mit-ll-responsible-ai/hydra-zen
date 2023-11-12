@@ -329,6 +329,12 @@ interpolation occurs after the pre-call functions are called.</p>
 that will not be extracted from input configs by the zen-wrapped function.</p>
 <p>A single string of comma-separated names can be specified.</p>
 </dd>
+<dt><strong>run_in_context</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>, the zen-wrapped function - and the <code class="xref py py-obj docutils literal notranslate"><span class="pre">pre_call</span></code> function, if
+specified - is run in a copied <a class="reference external" href="https://docs.python.org/3/library/contextvars.html#contextvars.Context" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">contextvars.Context</span></code></a>; i.e.
+changes made to any <a class="reference external" href="https://docs.python.org/3/library/contextvars.html#contextvars.ContextVar" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">contextvars.ContextVar</span></code></a> will be isolated to
+that call of the wrapped function.</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_in_context</span></code> is not supported for async functions.</p>
+</dd>
 <dt><strong>ZenWrapper</strong><span class="classifier">Type[hydra_zen.wrapper.Zen], optional (default=Zen)</span></dt><dd><p>If specified, a subclass of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Zen</span></code> that customizes the behavior of the wrapper.</p>
 </dd>
 </dl>

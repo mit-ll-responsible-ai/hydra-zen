@@ -245,8 +245,8 @@ document.write(`
 <h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h1>
 <p>This is a record of all past hydra-zen releases and what went into them, in reverse
 chronological order. All previous releases should still be available on pip.</p>
-<section id="rc4-2023-11-07">
-<span id="v0-12-0"></span><h2>0.12.0rc4 - 2023-11-07<a class="headerlink" href="#rc4-2023-11-07" title="Link to this heading">#</a></h2>
+<section id="rc5-2023-11-12">
+<span id="v0-12-0"></span><h2>0.12.0rc5 - 2023-11-12<a class="headerlink" href="#rc5-2023-11-12" title="Link to this heading">#</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This is documentation for an unreleased version of hydra-zen. You can try out this pre-release version using <code class="xref py py-obj docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--pre</span> <span class="pre">hydra-zen</span></code></p>
@@ -297,6 +297,7 @@ chronological order. All previous releases should still be available on pip.</p>
 <li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">BuildsFn</span></code> was introduced to permit customizable auto-config and type-refinement support in config-creation functions. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/553">pull request #553</a>.</p></li>
 <li><p><a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> and <a class="reference internal" href="generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_custom_builds_fn()</span></code></a> now accept a <code class="xref py py-obj docutils literal notranslate"><span class="pre">zen_exclude</span></code> field for excluding parameters from auto-population, either by name or by pattern. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/558">pull request #558</a>.</p></li>
 <li><p><a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> and <a class="reference internal" href="generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-func docutils literal notranslate"><span class="pre">just()</span></code></a> can now configure static methods. Previously the incorrect <code class="docutils literal notranslate"><span class="pre">_target_</span></code> would be resolved. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/566">pull request #566</a></p></li>
+<li><p><a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.zen()</span></code></a> now has first class support for running code in an isolated <a class="reference external" href="https://docs.python.org/3/library/contextvars.html#contextvars.Context" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">contextvars.Context</span></code></a>. This enables users to safely leverage state via <a class="reference external" href="https://docs.python.org/3/library/contextvars.html#contextvars.ContextVar" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">contextvars.ContextVar</span></code></a> in their task functions. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/583">pull request #583</a>.</p></li>
 <li><p>Adds formal support for Python 3.12. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/555">pull request #555</a></p></li>
 <li><p>Several new methods were added to <a class="reference internal" href="generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.ZenStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZenStore</span></code></a>, including the abilities to copy, update, and merge stores. As well as remap the groups of a store’s entries and delete individual entries. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/569">pull request #569</a></p></li>
 </ul>
@@ -1253,7 +1254,7 @@ the config is actually accessed by the store. Thus this decorator pattern does n
   </div>
 <nav class="bd-toc-nav page-toc">
 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rc4-2023-11-07">0.12.0rc4 - 2023-11-07</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rc5-2023-11-12">0.12.0rc5 - 2023-11-12</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#improvements">Improvements</a></li>
 </ul>
 </li>
