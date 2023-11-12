@@ -177,7 +177,7 @@ class Zen(Generic[P, R]):
             If `True`, the zen-wrapped function - and the `pre_call` function, if
             specified - is run in a copied :py:class:`contextvars.Context`; i.e.
             changes made to any :py:class:`contextvars.ContextVar` will be isolated to
-            the context of the function.
+            that call of the wrapped function.
 
             `run_in_context` is not supported for async functions.
         """
@@ -583,7 +583,7 @@ def zen(
         If `True`, the zen-wrapped function - and the `pre_call` function, if
         specified - is run in a copied :py:class:`contextvars.Context`; i.e.
         changes made to any :py:class:`contextvars.ContextVar` will be isolated to
-        the context of the call to the wrapped function.
+        that call of the wrapped function.
 
         `run_in_context` is not supported for async functions.
 
