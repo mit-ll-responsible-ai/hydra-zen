@@ -45,7 +45,7 @@ def test_context_isolation(run_in_context: bool):
         assert var.get() == dict()
 
 
-async def async_func_run_in_context_not_supported():
+def test_async_func_run_in_context_not_supported():
     async def foo():
         ...
 
