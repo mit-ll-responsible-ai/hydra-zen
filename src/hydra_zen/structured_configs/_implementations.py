@@ -1117,7 +1117,9 @@ class BuildsFn(Generic[T]):
             if isinstance(value, pydantic.BaseModel):
                 return cls.builds(type(value), **value.__dict__)
 
-        if isinstance(value, str) or isinstance(value, pydantic.AnyUrl):
+        if isinstance(value, str) or (
+            pydantic is not None and isinstance(value, pydantic.AnyUrl)
+        ):
             # Supports pydantic.AnyURL
             _v = str(value)
             if type(_v) is str:  # pragma: no branch
