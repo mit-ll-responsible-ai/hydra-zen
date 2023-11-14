@@ -1094,7 +1094,7 @@ class BuildsFn(Generic[T]):
 
         # pydantic objects
         pydantic = sys.modules.get("pydantic")
-        if pydantic is not None:
+        if pydantic is not None:  # pragma: no cover
             if isinstance(value, pydantic.fields.FieldInfo):
                 _val = (
                     value.default_factory()  # type: ignore
