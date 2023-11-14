@@ -1,5 +1,6 @@
 # Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+import importlib
 import logging
 import os
 import sys
@@ -37,6 +38,12 @@ _installed = {pkg.key for pkg in pkg_resources.working_set}
 for _module_name in OPTIONAL_TEST_DEPENDENCIES:
     if _module_name not in _installed:
         collect_ignore_glob.append(f"*{_module_name}*.py")
+    else:
+        # Some of hydra-zen's logic for supporting 3rd party libraries
+        # depends on that library being imported. We want to ensure that
+        # we import these when they are available so that the full test
+        # suite runs against these paths being enabled
+        importlib.import_module(_module_name)
 
 if sys.version_info > (3, 6):
     collect_ignore_glob.append("*py36*")
