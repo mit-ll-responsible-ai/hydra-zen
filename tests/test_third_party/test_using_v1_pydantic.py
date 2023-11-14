@@ -17,7 +17,7 @@ from hydra_zen import builds, get_target, instantiate, just, to_yaml
 from hydra_zen.third_party.pydantic import validates_with_pydantic
 
 if pydantic.__version__.startswith("2."):
-    pytest.skip("These tests are for pydantic v1")
+    pytest.skip("These tests are for pydantic v1", allow_module_level=True)
 
 parametrize_pydantic_fields = pytest.mark.parametrize(
     "custom_type, good_val, bad_val",
