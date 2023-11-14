@@ -1094,8 +1094,6 @@ class BuildsFn(Generic[T]):
 
         # pydantic objects
         pydantic = sys.modules.get("pydantic")
-        if pydantic is not None and pydantic.__version__.startswith("2."):
-            assert False
 
         if pydantic is not None:  # pragma: no cover
             if isinstance(value, pydantic.fields.FieldInfo):
