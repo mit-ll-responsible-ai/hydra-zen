@@ -4,6 +4,7 @@ import dataclasses
 from typing import Any, List, Optional
 
 import hypothesis.strategies as st
+import pydantic
 import pytest
 from hydra.errors import InstantiationException
 from hypothesis import given, settings
@@ -14,6 +15,9 @@ from typing_extensions import Literal
 
 from hydra_zen import builds, get_target, instantiate, just, to_yaml
 from hydra_zen.third_party.pydantic import validates_with_pydantic
+
+if pydantic.__version__.startswith("2."):
+    pytest.skip("These tests are for pydantic v1")
 
 parametrize_pydantic_fields = pytest.mark.parametrize(
     "custom_type, good_val, bad_val",
