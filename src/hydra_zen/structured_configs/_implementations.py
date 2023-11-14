@@ -1094,27 +1094,33 @@ class BuildsFn(Generic[T]):
 
         # pydantic objects
         pydantic = sys.modules.get("pydantic")
-        if pydantic is not None and isinstance(value, pydantic.fields.FieldInfo):
-            _val = (
-                value.default_factory()  # type: ignore
-                if value.default_factory is not None  # type: ignore
-                else value.default  # type: ignore
-            )
-            if isinstance(_val, pydantic.fields.UndefinedType):
-                return MISSING
 
-            return cls._make_hydra_compatible(
-                _val,
-                allow_zen_conversion=allow_zen_conversion,
-                error_prefix=error_prefix,
-                field_name=field_name,
-                structured_conf_permitted=structured_conf_permitted,
-                convert_dataclass=convert_dataclass,
-                hydra_convert=hydra_convert,
-                hydra_recursive=hydra_recursive,
-            )
+        if pydantic is not None:  # pragma: no cover
+            if isinstance(value, pydantic.fields.FieldInfo):
+                _val = (
+                    value.default_factory()  # type: ignore
+                    if value.default_factory is not None  # type: ignore
+                    else value.default  # type: ignore
+                )
+                if isinstance(_val, pydantic.fields.UndefinedType):
+                    return MISSING
 
-        if isinstance(value, str):
+                return cls._make_hydra_compatible(
+                    _val,
+                    allow_zen_conversion=allow_zen_conversion,
+                    error_prefix=error_prefix,
+                    field_name=field_name,
+                    structured_conf_permitted=structured_conf_permitted,
+                    convert_dataclass=convert_dataclass,
+                    hydra_convert=hydra_convert,
+                    hydra_recursive=hydra_recursive,
+                )
+            if isinstance(value, pydantic.BaseModel):
+                return cls.builds(type(value), **value.__dict__)
+
+        if isinstance(value, str) or (
+            pydantic is not None and isinstance(value, pydantic.AnyUrl)
+        ):
             # Supports pydantic.AnyURL
             _v = str(value)
             if type(_v) is str:  # pragma: no branch
@@ -2363,7 +2369,7 @@ class BuildsFn(Generic[T]):
             )
 
         _sig_target = cls._get_sig_obj(target)
-
+        pydantic = sys.modules.get("pydantic")
         try:
             # We want to rely on `inspect.signature` logic for raising
             # against an uninspectable sig, before we start inspecting
@@ -2395,7 +2401,14 @@ class BuildsFn(Generic[T]):
             # has inherited from a parent that implements __new__ and
             # the target implements only __init__.
 
-            if _sig_target is not target:
+            if pydantic is not None and (
+                _sig_target is pydantic.BaseModel.__init__
+                # pydantic v2.0
+                or is_dataclass(target)
+                and hasattr(target, "__pydantic_config__")
+            ):
+                pass
+            elif _sig_target is not target:
                 _params = tuple(inspect.signature(_sig_target).parameters.items())
 
                 if (
@@ -2414,19 +2427,26 @@ class BuildsFn(Generic[T]):
 
             target_has_valid_signature: bool = True
 
-        if is_dataclass(target):
+        if is_dataclass(target) or (
+            pydantic is not None
+            and isinstance(target, type)
+            and issubclass(target, pydantic.BaseModel)
+        ):
             # Update `signature_params` so that any param with `default=<factory>`
             # has its default replaced with `<factory>()`
             # If this is a mutable value, `builds` will automatically re-pack
             # it using a default factory
-            _fields = {f.name: f for f in fields(target)}
+            if is_dataclass(target):
+                _fields = {f.name: f for f in fields(target)}
+            else:
+                _fields = target.__fields__  # type: ignore
             _update = {}
             for name, param in signature_params.items():
                 if name not in _fields:
                     # field is InitVar
                     continue
                 f = _fields[name]
-                if f.default_factory is not MISSING:
+                if f.default_factory is not MISSING and f.default_factory is not None:
                     _update[name] = inspect.Parameter(
                         name,
                         param.kind,

@@ -223,6 +223,14 @@ deps = {[testenv]deps}
        pydantic<2.0.0
        beartype
 
+[testenv:pydantic-v2p0-smoketest]
+description = Ensures that importing pydantic 2.0 doesn't break things
+install_command = pip install --upgrade --upgrade-strategy eager {opts} {packages}
+basepython = python3.10
+deps = {[testenv]deps}
+       pydantic>=2.0.0
+
+
 [testenv:pyright]
 description = Ensure that hydra-zen's source code and test suite scan clean
               under pyright, and that hydra-zen's public API has a 100 prcnt

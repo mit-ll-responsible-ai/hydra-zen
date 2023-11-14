@@ -4,16 +4,20 @@ import dataclasses
 from typing import Any, List, Optional
 
 import hypothesis.strategies as st
+import pydantic
 import pytest
 from hydra.errors import InstantiationException
 from hypothesis import given, settings
 from omegaconf import OmegaConf
-from pydantic import AnyUrl, Field, PositiveFloat
+from pydantic import AnyUrl, BaseModel, Field, PositiveFloat
 from pydantic.dataclasses import dataclass as pyd_dataclass
 from typing_extensions import Literal
 
-from hydra_zen import builds, instantiate, just, to_yaml
+from hydra_zen import builds, get_target, instantiate, just, to_yaml
 from hydra_zen.third_party.pydantic import validates_with_pydantic
+
+if pydantic.__version__.startswith("2."):
+    pytest.skip("These tests are for pydantic v1", allow_module_level=True)
 
 parametrize_pydantic_fields = pytest.mark.parametrize(
     "custom_type, good_val, bad_val",
@@ -86,12 +90,19 @@ class PydanticConf:
     y: int = 2
 
 
+class BaseModelConf(BaseModel):
+    x: Literal[1, 2]
+    y: int = 2
+
+
+@pytest.mark.parametrize("Target", [PydanticConf, BaseModelConf])
 @pytest.mark.parametrize("x", [1, 2])
-def test_documented_example_passes(x):
-    HydraConf = builds(PydanticConf, populate_full_signature=True)
+def test_documented_example_passes(Target, x):
+    HydraConf = builds(Target, populate_full_signature=True)
     conf = instantiate(HydraConf, x=x)
-    assert isinstance(conf, PydanticConf)
-    assert conf == PydanticConf(x=x, y=2)
+    assert isinstance(conf, Target)
+    assert conf == Target(x=x, y=2)
+    assert get_target(HydraConf) is Target
 
 
 @settings(max_examples=20)
@@ -151,13 +162,25 @@ class HasDefaultFactory:
     x: Any = Field(default_factory=lambda: [1 + 2j])
 
 
+class BaseModelHasDefault(BaseModel):
+    x: int = Field(default=1)
+
+
+class BaseModelHasDefaultFactory(BaseModel):
+    x: Any = Field(default_factory=lambda: [1 + 2j])
+
+
 @pytest.mark.parametrize(
     "target,kwargs",
     [
         (HasDefault, {}),
+        (BaseModelHasDefault, {}),
         (HasDefaultFactory, {}),
+        (BaseModelHasDefaultFactory, {}),
         (HasDefault, {"x": 12}),
+        (BaseModelHasDefault, {"x": 12}),
         (HasDefaultFactory, {"x": [[-2j, 1 + 1j]]}),
+        (BaseModelHasDefaultFactory, {"x": [[-2j, 1 + 1j]]}),
     ],
 )
 def test_pop_sig_with_pydantic_Field(target, kwargs):
@@ -178,6 +201,25 @@ class Navbar:
 @given(...)
 def test_nested_dataclasses(via_yaml: bool):
     navbar = Navbar(button=("https://example.com",))  # type: ignore
+    conf = just(navbar)
+    if via_yaml:
+        # ensure serializable
+        assert instantiate(OmegaConf.create(to_yaml(conf))) == navbar
+    else:
+        assert instantiate(conf) == navbar
+
+
+class ModelNavbarButton(BaseModel):
+    href: AnyUrl
+
+
+class ModelNavbar(BaseModel):
+    button: ModelNavbarButton
+
+
+@given(...)
+def test_nested_base_models(via_yaml: bool):
+    navbar = ModelNavbar(button=ModelNavbarButton(href="https://example.com"))  # type: ignore
     conf = just(navbar)
     if via_yaml:
         # ensure serializable
