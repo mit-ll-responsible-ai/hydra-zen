@@ -175,6 +175,10 @@ del _lru_cache_type
 del _builtin_function_or_method_type
 
 
+class _Null:
+    ...
+
+
 def _retain_type_info(type_: type, value: Any, hydra_recursive: Optional[bool]):
     # OmegaConf's type-checking occurs before instantiation occurs.
     # This means that, e.g., passing `Builds[int]` to a field `x: int`
