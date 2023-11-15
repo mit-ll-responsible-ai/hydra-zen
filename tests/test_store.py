@@ -988,6 +988,7 @@ def test_merge():
 def test_disable_pop_sig_autoconfig():
     s = ZenStore()
     s(ZenStore, populate_full_signature=False, name="s")
-    assert len(to_yaml(s).splitlines()) == 1
+    config = s[None, "s"]
+    assert len(to_yaml(config).splitlines()) == 1
     sout = instantiate(s[None, "s"])
     assert isinstance(sout, ZenStore)
