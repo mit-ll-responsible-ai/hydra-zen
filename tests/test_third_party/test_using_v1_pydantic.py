@@ -1,6 +1,7 @@
 # Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import dataclasses
+import sys
 from typing import Any, List, Optional
 
 import hypothesis.strategies as st
@@ -26,6 +27,12 @@ parametrize_pydantic_fields = pytest.mark.parametrize(
         (AnyUrl, "http://www.pythonlikeyoumeanit.com", "hello"),
     ],
 )
+
+
+def test_BaseModel():
+    _pydantic = sys.modules.get("pydantic")
+    assert _pydantic is not None
+    assert _pydantic.BaseModel is BaseModel
 
 
 @parametrize_pydantic_fields
