@@ -1108,7 +1108,7 @@ class BuildsFn(Generic[T]):
                 )
 
                 if _check_instance(
-                    "UndefinedType", module="pydantic.fields", value=value
+                    "UndefinedType", module="pydantic.fields", value=_val
                 ):
                     return MISSING
 
