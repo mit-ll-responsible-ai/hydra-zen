@@ -564,6 +564,10 @@ _is_torch_optim_required = functools.partial(
     _check_instance, "required", module="torch.optim.optimizer"
 )
 
+_is_pydantic_BaseModel = functools.partial(
+    _check_instance, "BaseModel", module="pydantic"
+)
+
 
 def _check_for_dynamically_defined_dataclass_type(target_path: str, value: Any) -> None:
     if target_path.startswith("types."):
@@ -1100,7 +1104,7 @@ class BuildsFn(Generic[T]):
         pydantic = sys.modules.get("pydantic")
 
         if pydantic is not None:  # pragma: no cover
-            if isinstance(value, pydantic.fields.FieldInfo):
+            if _check_instance("FieldInfo", module="pydantic.fields", value=value):
                 _val = (
                     value.default_factory()  # type: ignore
                     if value.default_factory is not None  # type: ignore
@@ -1119,11 +1123,11 @@ class BuildsFn(Generic[T]):
                     hydra_convert=hydra_convert,
                     hydra_recursive=hydra_recursive,
                 )
-            if isinstance(value, pydantic.BaseModel):
+            if _is_pydantic_BaseModel(value=value):
                 return cls.builds(type(value), **value.__dict__)
 
-        if isinstance(value, str) or (
-            pydantic is not None and isinstance(value, pydantic.AnyUrl)
+        if isinstance(value, str) or _check_instance(
+            "AnyUrl", module="pydantic", value=value
         ):
             # Supports pydantic.AnyURL
             _v = str(value)
