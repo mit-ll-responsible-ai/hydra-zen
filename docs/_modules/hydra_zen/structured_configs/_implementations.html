@@ -964,6 +964,10 @@ document.write(`
     <span class="n">_check_instance</span><span class="p">,</span> <span class="s2">&quot;required&quot;</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="s2">&quot;torch.optim.optimizer&quot;</span>
 <span class="p">)</span>
 
+<span class="n">_is_pydantic_BaseModel</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
+    <span class="n">_check_instance</span><span class="p">,</span> <span class="s2">&quot;BaseModel&quot;</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="s2">&quot;pydantic&quot;</span>
+<span class="p">)</span>
+
 
 <span class="k">def</span> <span class="nf">_check_for_dynamically_defined_dataclass_type</span><span class="p">(</span><span class="n">target_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">target_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;types.&quot;</span><span class="p">):</span>
@@ -1503,13 +1507,16 @@ document.write(`
         <span class="n">pydantic</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pydantic&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">pydantic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">FieldInfo</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">_check_instance</span><span class="p">(</span><span class="s2">&quot;FieldInfo&quot;</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="s2">&quot;pydantic.fields&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">):</span>
                 <span class="n">_val</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="n">value</span><span class="o">.</span><span class="n">default_factory</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
                     <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">default_factory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># type: ignore</span>
                     <span class="k">else</span> <span class="n">value</span><span class="o">.</span><span class="n">default</span>  <span class="c1"># type: ignore</span>
                 <span class="p">)</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_val</span><span class="p">,</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">UndefinedType</span><span class="p">):</span>
+
+                <span class="k">if</span> <span class="n">_check_instance</span><span class="p">(</span>
+                    <span class="s2">&quot;UndefinedType&quot;</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="s2">&quot;pydantic.fields&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">_val</span>
+                <span class="p">):</span>
                     <span class="k">return</span> <span class="n">MISSING</span>
 
                 <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_make_hydra_compatible</span><span class="p">(</span>
@@ -1522,11 +1529,11 @@ document.write(`
                     <span class="n">hydra_convert</span><span class="o">=</span><span class="n">hydra_convert</span><span class="p">,</span>
                     <span class="n">hydra_recursive</span><span class="o">=</span><span class="n">hydra_recursive</span><span class="p">,</span>
                 <span class="p">)</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">_is_pydantic_BaseModel</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">):</span>
                 <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">builds</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="o">**</span><span class="n">value</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
-            <span class="n">pydantic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">AnyUrl</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="n">_check_instance</span><span class="p">(</span>
+            <span class="s2">&quot;AnyUrl&quot;</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="s2">&quot;pydantic&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span>
         <span class="p">):</span>
             <span class="c1"># Supports pydantic.AnyURL</span>
             <span class="n">_v</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
