@@ -1106,7 +1106,10 @@ class BuildsFn(Generic[T]):
                     if value.default_factory is not None  # type: ignore
                     else value.default  # type: ignore
                 )
-                if isinstance(_val, pydantic.fields.UndefinedType):
+
+                if _check_instance(
+                    "UndefinedType", module="pydantic.fields", value=value
+                ):
                     return MISSING
 
                 return cls._make_hydra_compatible(
