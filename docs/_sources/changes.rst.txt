@@ -11,7 +11,7 @@ chronological order. All previous releases should still be available on pip.
 .. _v0.12.0:
 
 ----------------------
-0.12.0rc5 - 2023-11-12
+0.12.0rc6 - 2023-11-15
 ----------------------
 
 
