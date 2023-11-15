@@ -24,6 +24,7 @@ from hydra_zen import (
     just,
     make_config,
     store as default_store,
+    to_yaml,
 )
 from tests.custom_strategies import new_stores, store_entries
 
@@ -982,3 +983,11 @@ def test_merge():
     assert s3._queue == {(None, "a"), (None, "b"), (None, "c")}
     assert s3._internal_repo[None, "a"] is not s1._internal_repo[None, "a"]
     assert s3._internal_repo[None, "b"] is not s2._internal_repo[None, "b"]
+
+
+def test_disable_pop_sig_autoconfig():
+    s = ZenStore()
+    s(ZenStore, populate_full_signature=False, name="s")
+    assert len(to_yaml(s).splitlines()) == 1
+    sout = instantiate(s[None, "s"])
+    assert isinstance(sout, ZenStore)
