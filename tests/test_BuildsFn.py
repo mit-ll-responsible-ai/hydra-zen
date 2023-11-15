@@ -167,7 +167,7 @@ def test_zen_field():
 
 def test_default_to_config():
     store = ZenStore("my store")(
-        to_config=partial(default_to_config, BuildsFn=MyBuildsFn)
+        to_config=partial(default_to_config, CustomBuildsFn=MyBuildsFn)
     )
     store(A, x=A(x=2), name="blah")
     assert instantiate(store[None, "blah"]) == A(x=A(x=2))
