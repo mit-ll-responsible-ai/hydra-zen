@@ -992,3 +992,10 @@ def test_disable_pop_sig_autoconfig():
     assert len(to_yaml(config).splitlines()) == 1
     sout = instantiate(s[None, "s"])
     assert isinstance(sout, ZenStore)
+
+    s2 = ZenStore()
+    s2(ZenStore, name="s")
+    config2 = s2[None, "s"]
+    assert len(to_yaml(config2).splitlines()) > 1
+    sout2 = instantiate(s2[None, "s"])
+    assert isinstance(sout2, ZenStore)
