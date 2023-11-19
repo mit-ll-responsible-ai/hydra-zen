@@ -40,7 +40,7 @@
 <script>DOCUMENTATION_OPTIONS.pagename = 'how_to/configure_hydra';</script>
 <link href="../genindex.html" rel="index" title="Index"/>
 <link href="../search.html" rel="search" title="Search"/>
-<link href="partial_config.html" rel="next" title="Partially Configure an Object"/>
+<link href="use_callbacks.html" rel="next" title="Use Hydra’s Callbacks to Run Code Before and After Jobs"/>
 <link href="configuring_experiments.html" rel="prev" title="Configure Multiple Experiments"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <meta content="en" name="docsearch:language"/>
@@ -222,6 +222,7 @@ document.write(`
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="configuring_experiments.html">Configure Multiple Experiments</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Customize Hydra’s Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="use_callbacks.html">Use Hydra’s Callbacks to Run Code Before and After Jobs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="partial_config.html">Partially Configure an Object</a></li>
 <li class="toctree-l1"><a class="reference internal" href="beartype.html">Add Enhanced Runtime Type-Checking to a Hydra App</a></li>
 </ul>
@@ -257,7 +258,7 @@ document.write(`
 <div id="searchbox"></div>
 <article class="bd-article" role="main">
 <section id="customize-hydra-s-configuration">
-<h1>Customize Hydra’s Configuration<a class="headerlink" href="#customize-hydra-s-configuration" title="Link to this heading">#</a></h1>
+<span id="hydraconf"></span><h1>Customize Hydra’s Configuration<a class="headerlink" href="#customize-hydra-s-configuration" title="Link to this heading">#</a></h1>
 <p>Hydra is highly configurable. The way that Hydra runs jobs, logs information, manages job directories are among its many configurable components <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. This How-To guide demonstrates how to configure Hydra from within a Python module <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
 <p>To configure Hydra using hydra-zen we must update the default instance of <code class="xref py py-class docutils literal notranslate"><span class="pre">hydra.conf.HydraConf</span></code> (which is a <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataclasses.dataclass()</span></code></a>).
 Thus we can simply create our own <code class="xref py py-class docutils literal notranslate"><span class="pre">hydra.conf.HydraConf</span></code> instance and overwrite store’s entry; <code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenStore</span></code> will automatically place this under the appropriate <code class="xref py py-obj docutils literal notranslate"><span class="pre">group="hydra",</span> <span class="pre">name="config"</span></code> entry in Hydra’s config store.</p>
@@ -320,10 +321,10 @@ our app’s working dir should be job’s the time-stamped output directory.</p>
 <p class="prev-next-title">Configure Multiple Experiments</p>
 </div>
 </a>
-<a class="right-next" href="partial_config.html" title="next page">
+<a class="right-next" href="use_callbacks.html" title="next page">
 <div class="prev-next-info">
 <p class="prev-next-subtitle">next</p>
-<p class="prev-next-title">Partially Configure an Object</p>
+<p class="prev-next-title">Use Hydra’s Callbacks to Run Code Before and After Jobs</p>
 </div>
 <i class="fa-solid fa-angle-right"></i>
 </a>

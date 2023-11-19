@@ -1,6 +1,7 @@
 .. meta::
    :description: Configuring Hydra.
 
+.. _HydraConf:
 
 ===============================
 Customize Hydra's Configuration
