@@ -25,5 +25,6 @@ objectives.
 
    how_to/configuring_experiments
    how_to/configure_hydra
+   how_to/use_callbacks
    how_to/partial_config
    how_to/beartype
