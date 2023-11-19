@@ -14,8 +14,8 @@ turn on performance profiling in a configurable and modular way. These callbacks
 used across applications - independent of our task function and its config.
 
 In this How-To, we will write toy versions of two such callbacks and will incorporate 
-them in our hydra-zen code. First we will hardcode our application to use these 
-callbacks, and afterwards we will see how they can be enabled from the CLI.
+them in our hydra-zen code. First, we will hardcode our application to use these 
+callbacks, and then we will rewrite things so that the callbacks can be enabled from the CLI.
 
 
 Adding basic callback support to an application
@@ -88,7 +88,7 @@ add them to :ref:`Hydra's config <HydraConf>`.
            version_base="1.3",
        )
 
-Now when we run `my_app` we should see that both of our callbacks are running.
+When we run `my_app` we should see that both of our callbacks are running.
 Let's do a multirun over two values of `x`.
 
 .. code-block:: console
@@ -144,14 +144,14 @@ We can disable the `TimeIt` callback.
 Enabling callbacks from the CLI
 ===============================
 
-Suppose we do not want any to be callbacks enabled by default, and that we would like to
-turn callbacks on from the CLI. To do this, we can add our callbacks to a 'callbacks' 
-group in our :class:`~hydra_zen.ZenStore`, and then leverage Hydra's `group@pkg` 
-`override <https://hydra.cc/docs/advanced/override_grammar/basic/>`_.
+Suppose that we do not want our callbacks to be enabled by default, and that we would 
+prefer to turn callbacks on from the CLI. To do this, we can add our callbacks to a 
+'callbacks' group in our :class:`~hydra_zen.ZenStore`, and then leverage Hydra's 
+`group@pkg` `override <https://hydra.cc/docs/advanced/override_grammar/basic/>`_.
 
 
 .. code-block:: python
-   :caption: Modifying __main__ in `my_app.py`
+   :caption: Modifying `__main__` in `my_app.py`
 
    # Config, TimeIt, UploadResultsCallback, and task are unchanged
 
