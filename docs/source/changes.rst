@@ -71,6 +71,9 @@ Improvements
 - Adds formal support for Python 3.12. See :pull:`555`
 - Several new methods were added to :class:`~hydra_zen.ZenStore`, including the abilities to copy, update, and merge stores. As well as remap the groups of a store's entries and delete individual entries. See :pull:`569`
 
+Documentation
+-------------
+- Added How-To: :ref:`callbacks`
 
 .. _v0.11.0:
 
