@@ -11,8 +11,7 @@ Hydra's `callback system <https://hydra.cc/docs/experimental/callbacks/>`_ lets 
 custom code that is triggered by events, such as a job starting and a job completing. 
 This enables us to do things like upload a job's results to cloud storage or 
 turn on performance profiling in a configurable and modular way. These callbacks can be 
-used across applications - independent of the implementation of our task function and 
-its config.
+used across applications - independent of our task function and its config.
 
 In this How-To, we will write toy versions of two such callbacks and will incorporate 
 them in our hydra-zen code. First we will hardcode our application to use these 
