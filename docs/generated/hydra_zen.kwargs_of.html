@@ -294,7 +294,7 @@ document.write(`
 <h1>hydra_zen.kwargs_of<a class="headerlink" href="#hydra-zen-kwargs-of" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="hydra_zen.kwargs_of">
-<span class="sig-prename descclassname"><span class="pre">hydra_zen.</span></span><span class="sig-name descname"><span class="pre">kwargs_of</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_BuildsFn__hydra_target</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_dataclass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs_for_target</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hydra_zen.kwargs_of" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">hydra_zen.</span></span><span class="sig-name descname"><span class="pre">kwargs_of</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_BuildsFn__hydra_target</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_dataclass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zen_exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwarg_overrides</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hydra_zen.kwargs_of" title="Link to this definition">#</a></dt>
 <dd><p>Returns a config whose signature matches that of the provided target.</p>
 <p>Instantiating the config returns a dictionary.</p>
 <div class="admonition note">
@@ -309,6 +309,8 @@ You can try out this pre-release feature using <code class="xref py py-obj docut
 </dd>
 <dt><strong>zen_exclude</strong><span class="classifier">Collection[str | int] | Callable[[str], bool], optional (default=[])</span></dt><dd><p>Specifies parameter names and/or indices, or a function for checking names,
 to exclude those parameters from the config-creation process.</p>
+</dd>
+<dt><strong>**kwarg_overrides</strong><span class="classifier">T</span></dt><dd><p>Named overrides for the parameters’ default values.</p>
 </dd>
 </dl>
 </dd>
