@@ -40,7 +40,7 @@
 <script>DOCUMENTATION_OPTIONS.pagename = 'api_reference';</script>
 <link href="genindex.html" rel="index" title="Index"/>
 <link href="search.html" rel="search" title="Search"/>
-<link href="generated/hydra_zen.make_config.html" rel="next" title="hydra_zen.make_config"/>
+<link href="generated/hydra_zen.builds.html" rel="next" title="hydra_zen.builds"/>
 <link href="explanation/hydrated_dataclass.html" rel="prev" title="Combining Statically-Defined and Dynamically-Generated Configurations"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <meta content="en" name="docsearch:language"/>
@@ -219,10 +219,11 @@ document.write(`
 <div class="sidebar-primary-item"><nav aria-label="Section Navigation" class="bd-docs-nav bd-links">
 <p aria-level="1" class="bd-links__title" role="heading">Section Navigation</p>
 <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.make_config.html">hydra_zen.make_config</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.builds.html">hydra_zen.builds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.just.html">hydra_zen.just</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.kwargs_of.html">hydra_zen.kwargs_of</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.hydrated_dataclass.html">hydra_zen.hydrated_dataclass</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/hydra_zen.make_config.html">hydra_zen.make_config</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="store.html">hydra_zen.store</a></li>
@@ -307,17 +308,20 @@ return the data and class-instances that we need for our application.</p>
 <span id="create-config"></span><h3>Creating Configs<a class="headerlink" href="#creating-configs" title="Link to this heading">#</a></h3>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_config</span></code></a>(*fields_as_args[, ...])</p></td>
-<td><p>Returns a config with user-defined field names and, optionally, associated default values and/or type annotations.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>(hydra_target, /, *pos_args[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>(hydra_target, /, *pos_args[, ...])</p></td>
 <td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds(target,</span> <span class="pre">*args,</span> <span class="pre">**kw)</span></code> returns a Hydra-compatible config that, when instantiated, returns <code class="xref py py-obj docutils literal notranslate"><span class="pre">target(*args,</span> <span class="pre">**kw)</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a>(obj, *[, zen_convert, hydra_recursive, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a>(obj, *[, zen_convert, hydra_recursive, ...])</p></td>
 <td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">just(obj)</span></code> returns a config that, when instantiated, just returns <code class="xref py py-obj docutils literal notranslate"><span class="pre">obj</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.kwargs_of.html#hydra_zen.kwargs_of" title="hydra_zen.kwargs_of"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kwargs_of</span></code></a>(_BuildsFn__hydra_target, *[, ...])</p></td>
+<td><p>Returns a config whose signature matches that of the provided target.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.hydrated_dataclass.html#hydra_zen.hydrated_dataclass" title="hydra_zen.hydrated_dataclass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydrated_dataclass</span></code></a>(target, *pos_args[, ...])</p></td>
 <td><p>A decorator that uses <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> to create a dataclass with the appropriate Hydra-specific fields for specifying a targeted config <a class="reference internal" href="generated/hydra_zen.hydrated_dataclass.html#r8dd265aa7612-1" id="id1"><span>[R8dd265aa7612-1]</span></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_config</span></code></a>(*fields_as_args[, ...])</p></td>
+<td><p>Returns a config with user-defined field names and, optionally, associated default values and/or type annotations.</p></td>
 </tr>
 </tbody>
 </table>
@@ -553,10 +557,10 @@ represents that complex value in a Hydra-compatible way.</p>
 <p class="prev-next-title">Combining Statically-Defined and Dynamically-Generated Configurations</p>
 </div>
 </a>
-<a class="right-next" href="generated/hydra_zen.make_config.html" title="next page">
+<a class="right-next" href="generated/hydra_zen.builds.html" title="next page">
 <div class="prev-next-info">
 <p class="prev-next-subtitle">next</p>
-<p class="prev-next-title">hydra_zen.make_config</p>
+<p class="prev-next-title">hydra_zen.builds</p>
 </div>
 <i class="fa-solid fa-angle-right"></i>
 </a>
