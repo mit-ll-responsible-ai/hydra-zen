@@ -3212,7 +3212,7 @@ class BuildsFn(Generic[T]):
         *,
         zen_dataclass: Optional[DataclassOptions] = None,
         zen_exclude: Literal[None] = ...,
-    ) -> Type[BuildsWithSig[Type[dict[str, Any]], P]]:
+    ) -> Type[BuildsWithSig[Type[Dict[str, Any]], P]]:
         ...
 
     @overload
@@ -3223,7 +3223,7 @@ class BuildsFn(Generic[T]):
         *,
         zen_dataclass: Optional[DataclassOptions] = None,
         zen_exclude: Union[Collection[Union[str, int]], Callable[[str], bool]],
-    ) -> Type[Builds[Type[dict[str, Any]]]]:
+    ) -> Type[Builds[Type[Dict[str, Any]]]]:
         ...
 
     @classmethod
@@ -3236,7 +3236,7 @@ class BuildsFn(Generic[T]):
             None, Collection[Union[str, int]], Callable[[str], bool]
         ] = None,
     ) -> Union[
-        Type[BuildsWithSig[Type[dict[str, Any]], P]], Type[Builds[Type[dict[str, Any]]]]
+        Type[BuildsWithSig[Type[Dict[str, Any]], P]], Type[Builds[Type[Dict[str, Any]]]]
     ]:
         """Returns a config whose signature matches that of the provided target.
 
