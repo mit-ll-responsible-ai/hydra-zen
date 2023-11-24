@@ -3222,7 +3222,7 @@ class BuildsFn(Generic[T]):
         __hydra_target: Callable[P, Any],
         *,
         zen_dataclass: Optional[DataclassOptions] = None,
-        zen_exclude: Union[Collection[Union[str, int]], Callable[[str], bool]],
+        zen_exclude: Union["Collection[Union[str, int]]", Callable[[str], bool]],
     ) -> Type[Builds[Type[Dict[str, Any]]]]:
         ...
 
@@ -3233,7 +3233,7 @@ class BuildsFn(Generic[T]):
         *,
         zen_dataclass: Optional[DataclassOptions] = None,
         zen_exclude: Union[
-            None, Collection[Union[str, int]], Callable[[str], bool]
+            None, "Collection[Union[str, int]]", Callable[[str], bool]
         ] = None,
     ) -> Union[
         Type[BuildsWithSig[Type[Dict[str, Any]], P]], Type[Builds[Type[Dict[str, Any]]]]
