@@ -1607,7 +1607,7 @@ class BuildsFn(Generic[T]):
             :py:func:`dataclasses.make_dataclass` other than `fields`.
             The default value for `unsafe_hash` is `True`.
 
-            The `target` field can be specified to override the `_target_` field
+            `target` can be specified as a string to override the `_target_` field
             set on the dataclass type returned by `builds`.
 
             The `module` field can be specified to enable pickle
