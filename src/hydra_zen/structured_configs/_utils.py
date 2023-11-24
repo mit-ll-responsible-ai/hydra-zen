@@ -367,6 +367,14 @@ def parse_dataclass_options(
                     f"dataclass option `{name}` must be a mapping with string-valued keys "
                     f"that are valid identifiers. Got {val}."
                 )
+        elif name == "target":
+            if not isinstance(val, str) or not all(
+                x.isidentifier() for x in val.split(".")
+            ):
+                raise TypeError(
+                    f"dataclass option `target` must be a string and an import path, "
+                    f"got {val!r}"
+                )
         elif not isinstance(val, bool):
             raise TypeError(
                 f"dataclass option `{name}` must be of type `bool`. Got {val} "
