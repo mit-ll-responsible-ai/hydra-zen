@@ -645,7 +645,9 @@ _MAKE_CONFIG_SETTINGS = AllConvert(dataclass=False, flat_target=False)
 
 
 class BuildsFn(Generic[T]):
-    """A class that can be modified to customize the behavior of `builds`, `just`, and `make_config`. These functions are exposed as class methods of `BuildsFn`.
+    """A class that can be modified to customize the behavior of `builds`, `just`, `kwargs_of, and `make_config`.
+
+    These functions are exposed as class methods of `BuildsFn`.
 
     To customize type-refinement support, override `_sanitized_type`.
     To customize auto-config support, override `_make_hydra_compatible`.
