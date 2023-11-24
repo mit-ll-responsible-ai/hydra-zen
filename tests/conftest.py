@@ -1,6 +1,7 @@
 # Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import importlib
+import importlib.metadata
 import logging
 import os
 import sys
@@ -9,7 +10,6 @@ from copy import deepcopy
 from typing import Dict, Iterable, Optional
 
 import hypothesis.strategies as st
-import pkg_resources
 import pytest
 from hydra.core.config_store import ConfigStore
 from hypothesis import settings
@@ -33,7 +33,9 @@ OPTIONAL_TEST_DEPENDENCIES = (
     "submitit",
 )
 
-_installed = {pkg.key for pkg in pkg_resources.working_set}
+
+_installed = {dist.metadata["Name"] for dist in importlib.metadata.distributions()}
+
 
 for _module_name in OPTIONAL_TEST_DEPENDENCIES:
     if _module_name not in _installed:
