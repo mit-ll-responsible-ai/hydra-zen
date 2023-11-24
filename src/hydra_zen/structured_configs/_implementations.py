@@ -654,6 +654,9 @@ class BuildsFn(Generic[T]):
 
     __slots__ = ()
 
+    _default_dataclass_options_for_kwargs_of: Optional[DataclassOptions] = None
+    """Specifies the default options for `cls.kwargs_of(..., zen_dataclass)"""
+
     @classmethod
     def _sanitized_type(
         cls,
@@ -1985,6 +1988,7 @@ class BuildsFn(Generic[T]):
         _utils.parse_dataclass_options(zen_dataclass)
 
         manual_target_path = zen_dataclass.pop("target", None)
+        target_repr = zen_dataclass.pop("target_repr", True)
 
         if "frozen" in kwargs_for_target:
             warnings.warn(
@@ -2252,7 +2256,7 @@ class BuildsFn(Generic[T]):
                 (
                     TARGET_FIELD_NAME,
                     str,
-                    _utils.field(default=target_path, init=False),
+                    _utils.field(default=target_path, init=False, repr=target_repr),
                 ),
                 (
                     PARTIAL_FIELD_NAME,
@@ -2338,7 +2342,7 @@ class BuildsFn(Generic[T]):
                 (
                     TARGET_FIELD_NAME,
                     str,
-                    _utils.field(default=target_path, init=False),
+                    _utils.field(default=target_path, init=False, repr=target_repr),
                 )
             ]
 
@@ -3198,12 +3202,115 @@ class BuildsFn(Generic[T]):
 
         return cast(Type[DataClass], out)
 
+    @overload
+    @classmethod
+    def kwargs_of(
+        cls,
+        __hydra_target: Callable[P, Any],
+        *,
+        zen_dataclass: Optional[DataclassOptions] = None,
+        zen_exclude: Literal[None] = ...,
+    ) -> Type[BuildsWithSig[Type[dict[str, Any]], P]]:
+        ...
+
+    @overload
+    @classmethod
+    def kwargs_of(
+        cls,
+        __hydra_target: Callable[P, Any],
+        *,
+        zen_dataclass: Optional[DataclassOptions] = None,
+        zen_exclude: Union[Collection[Union[str, int]], Callable[[str], bool]],
+    ) -> Type[Builds[Type[dict[str, Any]]]]:
+        ...
+
+    @classmethod
+    def kwargs_of(
+        cls,
+        __hydra_target: Callable[P, Any],
+        *,
+        zen_dataclass: Optional[DataclassOptions] = None,
+        zen_exclude: Union[
+            None, Collection[Union[str, int]], Callable[[str], bool]
+        ] = None,
+    ) -> Union[
+        Type[BuildsWithSig[Type[dict[str, Any]], P]], Type[Builds[Type[dict[str, Any]]]]
+    ]:
+        """Returns a config whose signature matches that of the provided target.
+
+        Instantiating the config returns a dictionary.
+
+        Parameters
+        ----------
+        __hydra_target : Callable[P, Any]
+            An object with an inspectable signature.
+
+        zen_exclude : Collection[str | int] | Callable[[str], bool], optional (default=[])
+            Specifies parameter names and/or indices, or a function for checking names,
+            to exclude those parameters from the config-creation process.
+
+        Returns
+        -------
+        type[Builds[type[dict[str, Any]]]]
+
+        Examples
+        --------
+        >>> from inspect import signature
+        >>> from hydra_zen import kwargs_of, instantiate
+
+        >>> Config = kwargs_of(lambda x, y: None)
+        >>> config = Config(x=1, y=2)
+        >>> config
+        kwargs_of_lambda(x=1, y=2)
+        >>> instantiate(config)
+        {'x': 1, 'y': 2}
+
+        Excluding the first parameter from the target's signature:
+
+        >>> Config = kwargs_of(lambda *, x, y: None, zen_exclude=[0])
+        >>> signature(Config)
+        <Signature (y: Any) -> None>
+        >>> instantiate(Config(y=88))
+        {'y': 88}
+        """
+        base_zen_detaclass: DataclassOptions = (
+            cls._default_dataclass_options_for_kwargs_of.copy()
+            if cls._default_dataclass_options_for_kwargs_of
+            else {}
+        )
+        if zen_dataclass is None:
+            zen_dataclass = {}
+
+        zen_dataclass = {**base_zen_detaclass, **zen_dataclass}
+        zen_dataclass["target"] = "builtins.dict"
+        zen_dataclass.setdefault(
+            "cls_name", f"kwargs_of_{_utils.safe_name(__hydra_target)}"
+        )
+        zen_dataclass.setdefault("target_repr", False)
+
+        if zen_exclude is None:
+            zen_exclude = ()
+        return cast(
+            Union[
+                Type[BuildsWithSig[Type[dict[str, Any]], P]],
+                Type[Builds[Type[dict[str, Any]]]],
+            ],
+            cls.builds(
+                __hydra_target,
+                populate_full_signature=True,
+                zen_exclude=zen_exclude,
+                zen_dataclass=zen_dataclass,
+            ),
+        )
+
 
 class DefaultBuilds(BuildsFn[SupportedPrimitive]):
+    _default_dataclass_options_for_kwargs_of = {}
     pass
 
 
 builds: Final = DefaultBuilds.builds
+kwargs_of: Final = DefaultBuilds.kwargs_of
 
 
 @dataclass(unsafe_hash=True)
