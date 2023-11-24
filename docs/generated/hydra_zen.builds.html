@@ -345,8 +345,8 @@ specified in <code class="docutils literal notranslate"><span class="pre">**kwar
 <p>This option is not available for objects with inaccessible signatures, such
 as NumPy’s various ufuncs.</p>
 </dd>
-<dt><strong>zen_exclude</strong><span class="classifier">Collection[str] | Callable[[str], bool], optional (default=[])</span></dt><dd><p>Specifies parameter names, or a function for checking names, to exclude
-those parameters from the config-creation process.</p>
+<dt><strong>zen_exclude</strong><span class="classifier">Collection[str | int] | Callable[[str], bool], optional (default=[])</span></dt><dd><p>Specifies parameter names and/or indices, or a function for checking names,
+to exclude those parameters from the config-creation process.</p>
 </dd>
 <dt><strong>Note that inherited fields cannot be excluded.</strong></dt><dd></dd>
 <dt><strong>zen_convert</strong><span class="classifier">Optional[ZenConvert]</span></dt><dd><p>A dictionary that modifies hydra-zen’s value and type conversion behavior.
@@ -623,7 +623,7 @@ incorporated into the config.</p>
 <span class="go">'y': foo</span>
 </pre></div>
 </div>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">zen_exclude</span></code> can be used to either name parameter to be excluded from the
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">zen_exclude</span></code> can be used to name parameter to be excluded from the
 auto-population process:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Conf2</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">bar</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">zen_exclude</span><span class="o">=</span><span class="p">[</span><span class="s2">"y"</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pyaml</span><span class="p">(</span><span class="n">Conf2</span><span class="p">)</span>
@@ -631,7 +631,14 @@ auto-population process:</p>
 <span class="go">x: ???</span>
 </pre></div>
 </div>
-<p>or specify a pattern - via a function - for excluding parameters:</p>
+<p>to exclude parameters by index:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Conf2</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">bar</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">zen_exclude</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pyaml</span><span class="p">(</span><span class="n">Conf2</span><span class="p">)</span>
+<span class="go">_target_: __main__.bar</span>
+<span class="go">x: ???</span>
+</pre></div>
+</div>
+<p>or to specify a pattern - via a function - for excluding parameters:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Conf3</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">bar</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="gp">... </span>               <span class="n">zen_exclude</span><span class="o">=</span><span class="k">lambda</span> <span class="n">name</span><span class="p">:</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"x"</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pyaml</span><span class="p">(</span><span class="n">Conf3</span><span class="p">)</span>
