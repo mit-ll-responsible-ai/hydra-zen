@@ -41,6 +41,7 @@ from hydra_zen import (
     get_target,
     instantiate,
     just,
+    kwargs_of,
     make_config,
     make_custom_builds_fn,
     mutable_value,
@@ -1483,3 +1484,17 @@ def check_target_override():
     builds(int, zen_dataclass={"target": 1})  # type: ignore
     builds(int, zen_dataclass={"target": ["a"]})  # type: ignore
     builds(int, zen_dataclass={"target": "foo.bar"})
+
+
+def check_kwargs_of():
+    def foo(x: int, y: str):
+        ...
+
+    Conf = kwargs_of(foo)
+    reveal_type(
+        Conf,
+        expected_text="type[BuildsWithSig[type[Dict[str, Any]], (x: int, y: str)]]",
+    )
+
+    Conf2 = kwargs_of(foo, zen_exclude=[0])
+    reveal_type(Conf2, expected_text="type[Builds[type[Dict[str, Any]]]]")
