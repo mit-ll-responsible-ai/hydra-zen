@@ -1489,7 +1489,8 @@ class BuildsFn(Generic[T]):
         Type[PartialBuilds[Importable]],
         Type[BuildsWithSig[Type[R], P]],
     ]:
-        """builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, zen_exclude=(), hydra_recursive=None, hydra_convert=None, hydra_defaults=None, builds_bases=(), **kwargs_for_target)
+        """builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, zen_exclude=(), hydra_recursive=None, hydra_convert=None, hydra_defaults=None, builds_bases=(),
+        zen_dataclass=None, **kwargs_for_target)
 
         `builds(target, *args, **kw)` returns a Hydra-compatible config that, when
         instantiated, returns `target(*args, **kw)`.
@@ -1606,7 +1607,10 @@ class BuildsFn(Generic[T]):
             :py:func:`dataclasses.make_dataclass` other than `fields`.
             The default value for `unsafe_hash` is `True`.
 
-            Additionally, the `module` field can be specified to enable pickle
+            The `target` field can be specified to override the `_target_` field
+            set on the dataclass type returned by `builds`.
+
+            The `module` field can be specified to enable pickle
             compatibility. See `hydra_zen.typing.DataclassOptions` for details.
 
         frozen : bool, optional (default=False)
