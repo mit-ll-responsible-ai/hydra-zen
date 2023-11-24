@@ -129,10 +129,10 @@ def safe_name(obj: Any, repr_allowed: bool = True) -> str:
     instead of raising - useful for writing descriptive/dafe error messages."""
 
     if hasattr(obj, "__name__"):
-        return obj.__name__
+        return obj.__name__.replace("<lambda>", "lambda")
 
     if repr_allowed and hasattr(obj, "__repr__"):
-        return repr(obj)
+        return repr(obj).replace("<lambda>", "lambda")
 
     return UNKNOWN_NAME
 

@@ -645,7 +645,9 @@ _MAKE_CONFIG_SETTINGS = AllConvert(dataclass=False, flat_target=False)
 
 
 class BuildsFn(Generic[T]):
-    """A class that can be modified to customize the behavior of `builds`, `just`, and `make_config`. These functions are exposed as class methods of `BuildsFn`.
+    """A class that can be modified to customize the behavior of `builds`, `just`, `kwargs_of, and `make_config`.
+
+    These functions are exposed as class methods of `BuildsFn`.
 
     To customize type-refinement support, override `_sanitized_type`.
     To customize auto-config support, override `_make_hydra_compatible`.
@@ -653,6 +655,9 @@ class BuildsFn(Generic[T]):
     """
 
     __slots__ = ()
+
+    _default_dataclass_options_for_kwargs_of: Optional[DataclassOptions] = None
+    """Specifies the default options for `cls.kwargs_of(..., zen_dataclass)"""
 
     @classmethod
     def _sanitized_type(
@@ -1985,6 +1990,7 @@ class BuildsFn(Generic[T]):
         _utils.parse_dataclass_options(zen_dataclass)
 
         manual_target_path = zen_dataclass.pop("target", None)
+        target_repr = zen_dataclass.pop("target_repr", True)
 
         if "frozen" in kwargs_for_target:
             warnings.warn(
@@ -2252,7 +2258,7 @@ class BuildsFn(Generic[T]):
                 (
                     TARGET_FIELD_NAME,
                     str,
-                    _utils.field(default=target_path, init=False),
+                    _utils.field(default=target_path, init=False, repr=target_repr),
                 ),
                 (
                     PARTIAL_FIELD_NAME,
@@ -2338,7 +2344,7 @@ class BuildsFn(Generic[T]):
                 (
                     TARGET_FIELD_NAME,
                     str,
-                    _utils.field(default=target_path, init=False),
+                    _utils.field(default=target_path, init=False, repr=target_repr),
                 )
             ]
 
@@ -3198,12 +3204,139 @@ class BuildsFn(Generic[T]):
 
         return cast(Type[DataClass], out)
 
+    @overload
+    @classmethod
+    def kwargs_of(
+        cls,
+        __hydra_target: Callable[P, Any],
+        *,
+        zen_dataclass: Optional[DataclassOptions] = ...,
+        zen_exclude: Literal[None] = ...,
+    ) -> Type[BuildsWithSig[Type[Dict[str, Any]], P]]:
+        ...
+
+    @overload
+    @classmethod
+    def kwargs_of(
+        cls,
+        __hydra_target: Callable[P, Any],
+        *,
+        zen_dataclass: Optional[DataclassOptions] = ...,
+        zen_exclude: Union["Collection[Union[str, int]]", Callable[[str], bool]],
+    ) -> Type[Builds[Type[Dict[str, Any]]]]:
+        ...
+
+    @overload
+    @classmethod
+    def kwargs_of(
+        cls,
+        __hydra_target: Callable[P, Any],
+        *,
+        zen_dataclass: Optional[DataclassOptions] = ...,
+        zen_exclude: Union[
+            None, "Collection[Union[str, int]]", Callable[[str], bool]
+        ] = ...,
+        **kwargs_for_target: T,
+    ) -> Type[Builds[Type[Dict[str, Any]]]]:
+        ...
+
+    @classmethod
+    def kwargs_of(
+        cls,
+        __hydra_target: Callable[P, Any],
+        *,
+        zen_dataclass: Optional[DataclassOptions] = None,
+        zen_exclude: Union[
+            None, "Collection[Union[str, int]]", Callable[[str], bool]
+        ] = None,
+        **kwargs_for_target: T,
+    ) -> Union[
+        Type[BuildsWithSig[Type[Dict[str, Any]], P]], Type[Builds[Type[Dict[str, Any]]]]
+    ]:
+        """Returns a config whose signature matches that of the provided target.
+
+        Instantiating the config returns a dictionary.
+
+        .. note::
+
+           ``kwargs_of`` is a new feature as of hydra-zen v0.12.0rc7.
+           You can try out this pre-release feature using `pip install --pre hydra-zen`
+
+        Parameters
+        ----------
+        __hydra_target : Callable[P, Any]
+            An object with an inspectable signature.
+
+        zen_exclude : Collection[str | int] | Callable[[str], bool], optional (default=[])
+            Specifies parameter names and/or indices, or a function for checking names,
+            to exclude those parameters from the config-creation process.
+
+        Returns
+        -------
+        type[Builds[type[dict[str, Any]]]]
+
+        Examples
+        --------
+        >>> from inspect import signature
+        >>> from hydra_zen import kwargs_of, instantiate
+
+        >>> Config = kwargs_of(lambda x, y: None)
+        >>> signature(Config)
+        <Signature (x:Any, y: Any) -> None>
+        >>> config = Config(x=1, y=2)
+        >>> config
+        kwargs_of_lambda(x=1, y=2)
+        >>> instantiate(config)
+        {'x': 1, 'y': 2}
+
+        Excluding the first parameter from the target's signature:
+
+        >>> Config = kwargs_of(lambda *, x, y: None, zen_exclude=[0])
+        >>> signature(Config)
+        <Signature (y: Any) -> None>
+        >>> instantiate(Config(y=88))
+        {'y': 88}
+
+
+        Overwriting a default
+
+        >>> Config = kwargs_of(lambda *, x, y: None, y=22)
+        >>> signature(Config)
+        <Signature (x: Any, y: Any = 22) -> None>
+        """
+        base_zen_detaclass: DataclassOptions = (
+            cls._default_dataclass_options_for_kwargs_of.copy()
+            if cls._default_dataclass_options_for_kwargs_of
+            else {}
+        )
+        if zen_dataclass is None:
+            zen_dataclass = {}
+
+        zen_dataclass = {**base_zen_detaclass, **zen_dataclass}
+        zen_dataclass["target"] = "builtins.dict"
+        zen_dataclass.setdefault(
+            "cls_name", f"kwargs_of_{_utils.safe_name(__hydra_target)}"
+        )
+        zen_dataclass.setdefault("target_repr", False)
+
+        if zen_exclude is None:
+            zen_exclude = ()
+        return cls.builds(  # type: ignore
+            __hydra_target,
+            populate_full_signature=True,
+            zen_exclude=zen_exclude,
+            zen_dataclass=zen_dataclass,
+            **kwargs_for_target,  # type: ignore
+        )
+
 
 class DefaultBuilds(BuildsFn[SupportedPrimitive]):
+    _default_dataclass_options_for_kwargs_of = {}
     pass
 
 
 builds: Final = DefaultBuilds.builds
+kwargs_of: Final = DefaultBuilds.kwargs_of
 
 
 @dataclass(unsafe_hash=True)
