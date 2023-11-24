@@ -575,6 +575,7 @@ class DataclassOptions(_Py312Dataclass, total=False):
 
     module: Optional[str]
     target: str
+    target_repr: bool
 
 
 def _permitted_keys(typed_dict: Any) -> FrozenSet[str]:
