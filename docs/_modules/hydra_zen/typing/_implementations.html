@@ -841,7 +841,8 @@ document.write(`
 <span class="sd">        pickle-compatibility for that dataclass. See the Examples section for</span>
 <span class="sd">        clarification.</span>
 
-<span class="sd">        This is a hydra-zen exclusive feature.</span>
+<span class="sd">    target : str, optional (unspecified by default)</span>
+<span class="sd">        If specified, overrides the `_target_` field set on the resulting dataclass.</span>
 
 <span class="sd">    init : bool, optional (default=True)</span>
 <span class="sd">        If true (the default), a __init__() method will be generated. If the class</span>
@@ -978,7 +979,8 @@ document.write(`
 <span class="sd">    None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">module</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></div>
+    <span class="n">module</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">target</span><span class="p">:</span> <span class="nb">str</span></div>
 
 
 

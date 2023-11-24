@@ -1896,7 +1896,8 @@ document.write(`
         <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
         <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]],</span>
     <span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, zen_exclude=(), hydra_recursive=None, hydra_convert=None, hydra_defaults=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, zen_exclude=(), hydra_recursive=None, hydra_convert=None, hydra_defaults=None, builds_bases=(),</span>
+<span class="sd">        zen_dataclass=None, **kwargs_for_target)</span>
 
 <span class="sd">        `builds(target, *args, **kw)` returns a Hydra-compatible config that, when</span>
 <span class="sd">        instantiated, returns `target(*args, **kw)`.</span>
@@ -2013,7 +2014,10 @@ document.write(`
 <span class="sd">            :py:func:`dataclasses.make_dataclass` other than `fields`.</span>
 <span class="sd">            The default value for `unsafe_hash` is `True`.</span>
 
-<span class="sd">            Additionally, the `module` field can be specified to enable pickle</span>
+<span class="sd">            `target` can be specified as a string to override the `_target_` field</span>
+<span class="sd">            set on the dataclass type returned by `builds`.</span>
+
+<span class="sd">            The `module` field can be specified to enable pickle</span>
 <span class="sd">            compatibility. See `hydra_zen.typing.DataclassOptions` for details.</span>
 
 <span class="sd">        frozen : bool, optional (default=False)</span>
@@ -2387,6 +2391,8 @@ document.write(`
         <span class="c1"># initial validation</span>
         <span class="n">_utils</span><span class="o">.</span><span class="n">parse_dataclass_options</span><span class="p">(</span><span class="n">zen_dataclass</span><span class="p">)</span>
 
+        <span class="n">manual_target_path</span> <span class="o">=</span> <span class="n">zen_dataclass</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="s2">&quot;frozen&quot;</span> <span class="ow">in</span> <span class="n">kwargs_for_target</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="n">HydraZenDeprecationWarning</span><span class="p">(</span>
@@ -2505,16 +2511,19 @@ document.write(`
             <span class="p">)</span>
 
         <span class="n">target_path</span><span class="p">:</span> <span class="nb">str</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="n">zen_convert_settings</span><span class="p">[</span><span class="s2">&quot;flat_target&quot;</span><span class="p">]</span>
-            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">TARGET_FIELD_NAME</span><span class="p">)</span>
-        <span class="p">):</span>
-            <span class="c1"># pass through _target_ field</span>
-            <span class="n">target_path</span> <span class="o">=</span> <span class="n">safe_getattr</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">TARGET_FIELD_NAME</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">manual_target_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">zen_convert_settings</span><span class="p">[</span><span class="s2">&quot;flat_target&quot;</span><span class="p">]</span>
+                <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">TARGET_FIELD_NAME</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="c1"># pass through _target_ field</span>
+                <span class="n">target_path</span> <span class="o">=</span> <span class="n">safe_getattr</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">TARGET_FIELD_NAME</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">target_path</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">target_path</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+            <span class="n">target_path</span> <span class="o">=</span> <span class="n">manual_target_path</span>
 
         <span class="k">if</span> <span class="n">zen_wrappers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">zen_wrappers</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">zen_wrappers</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
