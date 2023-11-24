@@ -50,10 +50,10 @@ def test_zen_basic_usecase():
 
 
 def test_zen_repr():
-    assert repr(zen(lambda x, y: None)) == "zen[<lambda>(x, y)](cfg, /)"
+    assert repr(zen(lambda x, y: None)) == "zen[lambda(x, y)](cfg, /)"
     assert (
         repr(zen(pre_call=lambda x: x)(lambda x, y: None))
-        == "zen[<lambda>(x, y)](cfg, /)"
+        == "zen[lambda(x, y)](cfg, /)"
     )
     assert repr(zen(make_config("x", "y"))) == "zen[Config(x, y)](cfg, /)"
 
