@@ -34,10 +34,11 @@ Creating Configs
 .. autosummary::
    :toctree: generated/
 
-   make_config
    builds
    just
+   kwargs_of
    hydrated_dataclass
+   make_config
 
 
 Storing Configs

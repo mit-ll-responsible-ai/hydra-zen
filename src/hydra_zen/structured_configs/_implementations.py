@@ -3240,6 +3240,11 @@ class BuildsFn(Generic[T]):
 
         Instantiating the config returns a dictionary.
 
+        .. note::
+
+           ``kwargs_of`` is a new feature as of hydra-zen v0.12.0rc7.
+           You can try out this pre-release feature using `pip install --pre hydra-zen`
+
         Parameters
         ----------
         __hydra_target : Callable[P, Any]
@@ -3259,6 +3264,8 @@ class BuildsFn(Generic[T]):
         >>> from hydra_zen import kwargs_of, instantiate
 
         >>> Config = kwargs_of(lambda x, y: None)
+        >>> signature(Config)
+        <Signature (x:Any, y: Any) -> None>
         >>> config = Config(x=1, y=2)
         >>> config
         kwargs_of_lambda(x=1, y=2)
