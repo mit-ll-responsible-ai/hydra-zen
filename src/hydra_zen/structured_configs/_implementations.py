@@ -1489,7 +1489,7 @@ class BuildsFn(Generic[T]):
         Type[PartialBuilds[Importable]],
         Type[BuildsWithSig[Type[R], P]],
     ]:
-        """builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, zen_exclude=(), hydra_recursive=None, hydra_convert=None, hydra_defaults=None, frozen=False, dataclass_name=None, builds_bases=(), **kwargs_for_target)
+        """builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, zen_exclude=(), hydra_recursive=None, hydra_convert=None, hydra_defaults=None, builds_bases=(), **kwargs_for_target)
 
         `builds(target, *args, **kw)` returns a Hydra-compatible config that, when
         instantiated, returns `target(*args, **kw)`.
@@ -1980,6 +1980,8 @@ class BuildsFn(Generic[T]):
         # initial validation
         _utils.parse_dataclass_options(zen_dataclass)
 
+        manual_target_path = zen_dataclass.pop("target", None)
+
         if "frozen" in kwargs_for_target:
             warnings.warn(
                 HydraZenDeprecationWarning(
@@ -2098,16 +2100,19 @@ class BuildsFn(Generic[T]):
             )
 
         target_path: str
-        if (
-            zen_convert_settings["flat_target"]
-            and isinstance(target, type)
-            and is_dataclass(target)
-            and hasattr(target, TARGET_FIELD_NAME)
-        ):
-            # pass through _target_ field
-            target_path = safe_getattr(target, TARGET_FIELD_NAME)
+        if manual_target_path is None:
+            if (
+                zen_convert_settings["flat_target"]
+                and isinstance(target, type)
+                and is_dataclass(target)
+                and hasattr(target, TARGET_FIELD_NAME)
+            ):
+                # pass through _target_ field
+                target_path = safe_getattr(target, TARGET_FIELD_NAME)
+            else:
+                target_path = cls._get_obj_path(target)
         else:
-            target_path = cls._get_obj_path(target)
+            target_path = manual_target_path
 
         if zen_wrappers is not None:
             if not isinstance(zen_wrappers, Sequence) or isinstance(zen_wrappers, str):
