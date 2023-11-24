@@ -41,3 +41,8 @@ def test_dataclass_options_via_cls_defaults():
 
     Conf2 = Moo.kwargs_of((lambda: None))
     assert Conf2.__name__ == "bar"
+
+
+def test_kwarg_override():
+    Config = kwargs_of(lambda *, x, y: None, y=22)
+    assert instantiate(Config(x=1)) == {"x": 1, "y": 22}

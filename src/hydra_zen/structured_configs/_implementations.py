@@ -3210,7 +3210,7 @@ class BuildsFn(Generic[T]):
         cls,
         __hydra_target: Callable[P, Any],
         *,
-        zen_dataclass: Optional[DataclassOptions] = None,
+        zen_dataclass: Optional[DataclassOptions] = ...,
         zen_exclude: Literal[None] = ...,
     ) -> Type[BuildsWithSig[Type[Dict[str, Any]], P]]:
         ...
@@ -3221,8 +3221,22 @@ class BuildsFn(Generic[T]):
         cls,
         __hydra_target: Callable[P, Any],
         *,
-        zen_dataclass: Optional[DataclassOptions] = None,
+        zen_dataclass: Optional[DataclassOptions] = ...,
         zen_exclude: Union["Collection[Union[str, int]]", Callable[[str], bool]],
+    ) -> Type[Builds[Type[Dict[str, Any]]]]:
+        ...
+
+    @overload
+    @classmethod
+    def kwargs_of(
+        cls,
+        __hydra_target: Callable[P, Any],
+        *,
+        zen_dataclass: Optional[DataclassOptions] = ...,
+        zen_exclude: Union[
+            None, "Collection[Union[str, int]]", Callable[[str], bool]
+        ] = ...,
+        **kwargs_for_target: T,
     ) -> Type[Builds[Type[Dict[str, Any]]]]:
         ...
 
@@ -3235,6 +3249,7 @@ class BuildsFn(Generic[T]):
         zen_exclude: Union[
             None, "Collection[Union[str, int]]", Callable[[str], bool]
         ] = None,
+        **kwargs_for_target: T,
     ) -> Union[
         Type[BuildsWithSig[Type[Dict[str, Any]], P]], Type[Builds[Type[Dict[str, Any]]]]
     ]:
@@ -3281,6 +3296,13 @@ class BuildsFn(Generic[T]):
         <Signature (y: Any) -> None>
         >>> instantiate(Config(y=88))
         {'y': 88}
+
+
+        Overwriting a default
+
+        >>> Config = kwargs_of(lambda *, x, y: None, y=22)
+        >>> signature(Config)
+        <Signature (x: Any, y: Any = 22) -> None>
         """
         base_zen_detaclass: DataclassOptions = (
             cls._default_dataclass_options_for_kwargs_of.copy()
@@ -3299,17 +3321,12 @@ class BuildsFn(Generic[T]):
 
         if zen_exclude is None:
             zen_exclude = ()
-        return cast(
-            Union[
-                Type[BuildsWithSig[Type[Dict[str, Any]], P]],
-                Type[Builds[Type[Dict[str, Any]]]],
-            ],
-            cls.builds(
-                __hydra_target,
-                populate_full_signature=True,
-                zen_exclude=zen_exclude,
-                zen_dataclass=zen_dataclass,
-            ),
+        return cls.builds(  # type: ignore
+            __hydra_target,
+            populate_full_signature=True,
+            zen_exclude=zen_exclude,
+            zen_dataclass=zen_dataclass,
+            **kwargs_for_target,  # type: ignore
         )
 
 
