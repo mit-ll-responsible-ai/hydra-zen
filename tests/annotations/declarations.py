@@ -1477,3 +1477,9 @@ def check_parameterized_BuildsFn():
     assert_type(bg(A, B()), Type[Builds[Type[A]]])
     assert_type(bg(A, B(), zen_partial=True), Type[PartialBuilds[Type[A]]])
     bg(A, C())  # type: ignore
+
+
+def check_target_override():
+    builds(int, zen_dataclass={"target": 1})  # type: ignore
+    builds(int, zen_dataclass={"target": ["a"]})  # type: ignore
+    builds(int, zen_dataclass={"target": "foo.bar"})

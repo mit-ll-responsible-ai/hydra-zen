@@ -435,7 +435,8 @@ class DataclassOptions(_Py312Dataclass, total=False):
         pickle-compatibility for that dataclass. See the Examples section for
         clarification.
 
-        This is a hydra-zen exclusive feature.
+    target : str, optional (unspecified by default)
+        If specified, overrides the `_target_` field set on the resulting dataclass.
 
     init : bool, optional (default=True)
         If true (the default), a __init__() method will be generated. If the class
@@ -573,6 +574,7 @@ class DataclassOptions(_Py312Dataclass, total=False):
     """
 
     module: Optional[str]
+    target: str
 
 
 def _permitted_keys(typed_dict: Any) -> FrozenSet[str]:
