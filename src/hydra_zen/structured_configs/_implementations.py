@@ -3301,8 +3301,8 @@ class BuildsFn(Generic[T]):
             zen_exclude = ()
         return cast(
             Union[
-                Type[BuildsWithSig[Type[dict[str, Any]], P]],
-                Type[Builds[Type[dict[str, Any]]]],
+                Type[BuildsWithSig[Type[Dict[str, Any]], P]],
+                Type[Builds[Type[Dict[str, Any]]]],
             ],
             cls.builds(
                 __hydra_target,
