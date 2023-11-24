@@ -25,6 +25,10 @@ def foo(x=1, y=2):
     raise AssertionError("I should not get called")
 
 
+def passthrough(x):
+    return x
+
+
 @pytest.mark.parametrize(
     "target",
     [
@@ -33,11 +37,25 @@ def foo(x=1, y=2):
         builds(foo, populate_full_signature=True),
     ],
 )
-def test_manual(target):
-    assert instantiate(
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {},
+        {"x": 1},
+        # overrides default with different value
+        pytest.param({"x": 2}, marks=pytest.mark.xfail),
+        # exercise zen_processing branch
+        {"zen_wrappers": passthrough},
+    ],
+)
+def test_manual(target, kwargs):
+    out = instantiate(
         builds(
             target,
             populate_full_signature=True,
             zen_dataclass={"target": "builtins.dict"},
+            **kwargs,
         )
-    ) == dict(x=1, y=2)
+    )
+    assert isinstance(out, dict)
+    assert out == dict(x=1, y=2)
