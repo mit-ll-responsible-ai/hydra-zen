@@ -1498,3 +1498,11 @@ def check_kwargs_of():
 
     Conf2 = kwargs_of(foo, zen_exclude=[0])
     reveal_type(Conf2, expected_text="type[Builds[type[Dict[str, Any]]]]")
+
+    Conf3 = kwargs_of(foo, x=1)
+    reveal_type(Conf3, expected_text="type[Builds[type[Dict[str, Any]]]]")
+
+    class NotSupported:
+        ...
+
+    Conf3 = kwargs_of(foo, x=NotSupported())  # type: ignore
