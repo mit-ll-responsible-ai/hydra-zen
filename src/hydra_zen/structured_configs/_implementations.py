@@ -3236,7 +3236,7 @@ class BuildsFn(Generic[T]):
         zen_exclude: Union[
             None, "Collection[Union[str, int]]", Callable[[str], bool]
         ] = ...,
-        **kwargs_for_target: T,
+        **kwarg_overrides: T,
     ) -> Type[Builds[Type[Dict[str, Any]]]]:
         ...
 
@@ -3249,7 +3249,7 @@ class BuildsFn(Generic[T]):
         zen_exclude: Union[
             None, "Collection[Union[str, int]]", Callable[[str], bool]
         ] = None,
-        **kwargs_for_target: T,
+        **kwarg_overrides: T,
     ) -> Union[
         Type[BuildsWithSig[Type[Dict[str, Any]], P]], Type[Builds[Type[Dict[str, Any]]]]
     ]:
@@ -3270,6 +3270,9 @@ class BuildsFn(Generic[T]):
         zen_exclude : Collection[str | int] | Callable[[str], bool], optional (default=[])
             Specifies parameter names and/or indices, or a function for checking names,
             to exclude those parameters from the config-creation process.
+
+        **kwarg_overrides : T
+            Named overrides for the parameters' default values.
 
         Returns
         -------
@@ -3326,7 +3329,7 @@ class BuildsFn(Generic[T]):
             populate_full_signature=True,
             zen_exclude=zen_exclude,
             zen_dataclass=zen_dataclass,
-            **kwargs_for_target,  # type: ignore
+            **kwarg_overrides,  # type: ignore
         )
 
 
