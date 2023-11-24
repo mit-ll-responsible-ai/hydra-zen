@@ -67,7 +67,7 @@ Improvements
 - :class:`~hydra_zen.BuildsFn` was introduced to permit customizable auto-config and type-refinement support in config-creation functions. See :pull:`553`.
 - :func:`~hydra_zen.builds` and :func:`~hydra_zen.make_custom_builds_fn` now accept a `zen_exclude` field for excluding parameters from auto-population, either by name, position-index, or by pattern. See :pull:`558`.
 - :func:`~hydra_zen.builds` and :func:`~hydra_zen.just` can now configure static methods. Previously the incorrect ``_target_`` would be resolved. See :pull:`566`
-- :func:`~hydra_zen.kwargs_of` is a new config-creation function that lets you generate a stand-along config from an object's signature. See :pull:`598`.
+- :func:`~hydra_zen.kwargs_of` is a new config-creation function that lets you generate a standalone config from an object's signature. See :pull:`598`.
 - Users can now manually specify the ``_target_`` entry of a config produced via :func:`~hydra_zen.builds`. See :pull:`597`.
 - :func:`hydra_zen.zen` now has first class support for running code in an isolated :py:class:`contextvars.Context`. This enables users to safely leverage state via :py:class:`contextvars.ContextVar` in their task functions. See :pull:`583`.
 - Adds formal support for Python 3.12. See :pull:`555`
