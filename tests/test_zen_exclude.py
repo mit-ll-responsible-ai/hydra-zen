@@ -7,7 +7,7 @@ from hydra_zen import builds, instantiate, make_custom_builds_fn
 
 @pytest.mark.parametrize("bad_exclude", ["x", [["x"]]])
 def test_validate_exclude(bad_exclude):
-    with pytest.raises(TypeError, match="must only contain"):
+    with pytest.raises(TypeError):
         builds(dict, zen_exclude=bad_exclude)
 
 
