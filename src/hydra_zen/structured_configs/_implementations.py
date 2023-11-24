@@ -1556,9 +1556,9 @@ class BuildsFn(Generic[T]):
             This option is not available for objects with inaccessible signatures, such
             as NumPy's various ufuncs.
 
-        zen_exclude : Collection[str] | Callable[[str], bool], optional (default=[])
-            Specifies parameter names, or a function for checking names, to exclude
-            those parameters from the config-creation process.
+        zen_exclude : Collection[str | int] | Callable[[str], bool], optional (default=[])
+            Specifies parameter names and/or indices, or a function for checking names,
+            to exclude those parameters from the config-creation process.
 
         Note that inherited fields cannot be excluded.
         zen_convert : Optional[ZenConvert]
@@ -1815,7 +1815,7 @@ class BuildsFn(Generic[T]):
         x: ???
         'y': foo
 
-        `zen_exclude` can be used to either name parameter to be excluded from the
+        `zen_exclude` can be used to name parameter to be excluded from the
         auto-population process:
 
         >>> Conf2 = builds(bar, populate_full_signature=True, zen_exclude=["y"])
@@ -1823,7 +1823,14 @@ class BuildsFn(Generic[T]):
         _target_: __main__.bar
         x: ???
 
-        or specify a pattern - via a function - for excluding parameters:
+        to exclude parameters by index:
+
+        >>> Conf2 = builds(bar, populate_full_signature=True, zen_exclude=[-1])
+        >>> pyaml(Conf2)
+        _target_: __main__.bar
+        x: ???
+
+        or to specify a pattern - via a function - for excluding parameters:
 
         >>> Conf3 = builds(bar, populate_full_signature=True,
         ...                zen_exclude=lambda name: name.startswith("x"))
@@ -2027,20 +2034,32 @@ class BuildsFn(Generic[T]):
 
         del pos_args
 
-        zen_exclude: Callable[[str], bool] = kwargs_for_target.pop(
-            "zen_exclude", frozenset()
-        )
+        zen_exclude: Union[
+            Callable[[str], bool], Collection[Union[str, int]]
+        ] = kwargs_for_target.pop("zen_exclude", frozenset())
+        zen_index_exclude: set[int] = set()
 
         if (
             not isinstance(zen_exclude, Collection) or isinstance(zen_exclude, str)
         ) and not callable(zen_exclude):
             raise TypeError(
-                f"`zen_exclude` must be a non-string collection of strings, or "
-                f"callable[[str], bool]. Got {zen_exclude}"
+                f"`zen_exclude` must be a non-string collection of strings and/or ints"
+                f" or callable[[str], bool]. Got {zen_exclude}"
             )
 
         if isinstance(zen_exclude, Collection):
-            zen_exclude = set(zen_exclude).__contains__
+            _strings = []
+            for item in zen_exclude:
+                if isinstance(item, int):
+                    zen_index_exclude.add(item)
+                elif isinstance(item, str):
+                    _strings.append(item)
+                else:
+                    raise TypeError(
+                        f"`zen_exclude` must only contain ints or "
+                        f"strings. Got {zen_exclude}"
+                    )
+            zen_exclude = frozenset(_strings).__contains__
 
         if not callable(target):
             raise TypeError(
@@ -2050,7 +2069,8 @@ class BuildsFn(Generic[T]):
 
         if not isinstance(populate_full_signature, bool):
             raise TypeError(
-                f"`populate_full_signature` must be a boolean type, got: {populate_full_signature}"
+                f"`populate_full_signature` must be a boolean type, got: "
+                f"{populate_full_signature}"
             )
 
         if zen_partial is not None and not isinstance(zen_partial, bool):
@@ -2621,6 +2641,9 @@ class BuildsFn(Generic[T]):
             if not zen_exclude(name)
         }
 
+        # support negative indices
+        zen_index_exclude = {ind % len(signature_params) for ind in zen_index_exclude}
+
         if populate_full_signature is True:
             # Populate dataclass fields based on the target's signature.
             #
@@ -2639,7 +2662,7 @@ class BuildsFn(Generic[T]):
             _seen: Set[str] = set()
 
             for n, param in enumerate(signature_params.values()):
-                if zen_exclude(param.name):
+                if n in zen_index_exclude or zen_exclude(param.name):
                     continue
 
                 if n + 1 <= len(_pos_args):
