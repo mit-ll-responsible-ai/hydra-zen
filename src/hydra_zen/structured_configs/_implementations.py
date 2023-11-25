@@ -3368,7 +3368,7 @@ class ConfigPath:
     _target_: str = field(default=BuildsFn._get_obj_path(Path), init=False)
     CBuildsFn: InitVar[Type[BuildsFn]]
 
-    def __post_init__(self, CBuildsFn: Type[BuildsFn]):
+    def __post_init__(self, CBuildsFn: Type[BuildsFn]):  # pragma: no cover
         del CBuildsFn
 
 
