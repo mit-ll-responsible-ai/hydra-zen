@@ -451,6 +451,7 @@ document.write(`
     <span class="n">ParamSpec</span><span class="p">,</span>
     <span class="n">ParamSpecArgs</span><span class="p">,</span>
     <span class="n">ParamSpecKwargs</span><span class="p">,</span>
+    <span class="n">Protocol</span><span class="p">,</span>
     <span class="n">TypeAlias</span><span class="p">,</span>
     <span class="n">Unpack</span><span class="p">,</span>
     <span class="n">_AnnotatedAlias</span><span class="p">,</span>
@@ -542,9 +543,15 @@ document.write(`
 <span class="c1"># default zen_convert settings for `builds` and `hydrated_dataclass`</span>
 <span class="n">_BUILDS_CONVERT_SETTINGS</span> <span class="o">=</span> <span class="n">AllConvert</span><span class="p">(</span><span class="n">dataclass</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">flat_target</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
+
 <span class="c1"># stores type -&gt; value-conversion-fn</span>
 <span class="c1"># for types with specialized support from hydra-zen</span>
-<span class="n">ZEN_VALUE_CONVERSION</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">class</span> <span class="nc">_ConversionFn</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="s2">&quot;Type[BuildsFn[Any]]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="o">...</span>
+
+
+<span class="n">ZEN_VALUE_CONVERSION</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="n">_ConversionFn</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
 <span class="c1"># signature param-types</span>
 <span class="n">_POSITIONAL_ONLY</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">POSITIONAL_ONLY</span>
@@ -1496,7 +1503,7 @@ document.write(`
             <span class="n">type_</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">resolved_value</span><span class="p">)</span>
             <span class="n">conversion_fn</span> <span class="o">=</span> <span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="n">type_</span><span class="p">]</span>
 
-            <span class="n">resolved_value</span> <span class="o">=</span> <span class="n">conversion_fn</span><span class="p">(</span><span class="n">resolved_value</span><span class="p">)</span>
+            <span class="n">resolved_value</span> <span class="o">=</span> <span class="n">conversion_fn</span><span class="p">(</span><span class="n">resolved_value</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="o">=</span><span class="bp">cls</span><span class="p">)</span>
             <span class="n">type_of_value</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">resolved_value</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">type_of_value</span> <span class="ow">in</span> <span class="n">HYDRA_SUPPORTED_PRIMITIVES</span> <span class="ow">or</span> <span class="p">(</span>
@@ -2542,7 +2549,9 @@ document.write(`
                 <span class="c1"># We are intentionally keeping each condition branched</span>
                 <span class="c1"># so that test-coverage will be checked for each one</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">wrapper</span><span class="p">,</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">):</span>
-                    <span class="n">wrapper</span> <span class="o">=</span> <span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">](</span><span class="n">wrapper</span><span class="p">)</span>
+                    <span class="n">wrapper</span> <span class="o">=</span> <span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">](</span>
+                        <span class="n">wrapper</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="o">=</span><span class="bp">cls</span>
+                    <span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">is_builds</span><span class="p">(</span><span class="n">wrapper</span><span class="p">):</span>
                     <span class="c1"># If Hydra&#39;s locate function starts supporting importing literals</span>
@@ -3754,12 +3763,20 @@ document.write(`
     <span class="n">real</span><span class="p">:</span> <span class="n">Any</span>
     <span class="n">imag</span><span class="p">:</span> <span class="n">Any</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">BuildsFn</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="nb">complex</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">CBuildsFn</span>
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">ConfigPath</span><span class="p">:</span>
     <span class="n">_args_</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">BuildsFn</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="n">Path</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="k">del</span> <span class="n">CBuildsFn</span>
 
 
 <span class="nd">@overload</span>
@@ -3899,8 +3916,13 @@ document.write(`
     <span class="k">return</span> <span class="n">BuildsFunction</span><span class="o">.</span><span class="n">_mutable_value</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">zen_convert</span><span class="o">=</span><span class="n">zen_convert</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">convert_complex</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">complex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]:</span>
-    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="nb">complex</span><span class="p">]],</span> <span class="n">ConfigComplex</span><span class="p">(</span><span class="n">real</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="n">imag</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">imag</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">convert_complex</span><span class="p">(</span>
+    <span class="n">value</span><span class="p">:</span> <span class="nb">complex</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]:</span>
+    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
+        <span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="nb">complex</span><span class="p">]],</span>
+        <span class="n">ConfigComplex</span><span class="p">(</span><span class="n">real</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="n">imag</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="o">=</span><span class="n">CBuildsFn</span><span class="p">),</span>
+    <span class="p">)</span>
 
 
 <span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="nb">complex</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert_complex</span>
@@ -3908,27 +3930,32 @@ document.write(`
 
 <span class="k">if</span> <span class="n">Path</span> <span class="ow">in</span> <span class="n">ZEN_SUPPORTED_PRIMITIVES</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
 
-    <span class="k">def</span> <span class="nf">convert_path</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Path</span><span class="p">]]:</span>
-        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Path</span><span class="p">]],</span> <span class="n">ConfigPath</span><span class="p">(</span><span class="n">_args_</span><span class="o">=</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">),)))</span>
+    <span class="k">def</span> <span class="nf">convert_path</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Path</span><span class="p">]]:</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
+            <span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Path</span><span class="p">]],</span> <span class="n">ConfigPath</span><span class="p">(</span><span class="n">_args_</span><span class="o">=</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">),),</span> <span class="n">CBuildsFn</span><span class="o">=</span><span class="n">CBuildsFn</span><span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert_path</span>
     <span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="n">PosixPath</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert_path</span>
     <span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="n">WindowsPath</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert_path</span>
 
 
-<span class="k">def</span> <span class="nf">_unpack_partial</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Partial</span><span class="p">[</span><span class="n">_T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">]]:</span>
+<span class="k">def</span> <span class="nf">_unpack_partial</span><span class="p">(</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">Partial</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">]]:</span>
     <span class="n">target</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="n">value</span><span class="o">.</span><span class="n">func</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">builds</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="o">*</span><span class="n">value</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">value</span><span class="o">.</span><span class="n">keywords</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)()</span>
+    <span class="k">return</span> <span class="n">CBuildsFn</span><span class="o">.</span><span class="n">builds</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="o">*</span><span class="n">value</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">value</span><span class="o">.</span><span class="n">keywords</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)()</span>
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">ConfigFromTuple</span><span class="p">:</span>
     <span class="n">_args_</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_args_</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">BuildsFn</span><span class="o">.</span><span class="n">_make_hydra_compatible</span><span class="p">(</span>
+            <span class="n">CBuildsFn</span><span class="o">.</span><span class="n">_make_hydra_compatible</span><span class="p">(</span>
                 <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_args_</span><span class="p">),</span>
                 <span class="n">convert_dataclass</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">allow_zen_conversion</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -3941,10 +3968,11 @@ document.write(`
 <span class="k">class</span> <span class="nc">ConfigFromDict</span><span class="p">:</span>
     <span class="n">_args_</span><span class="p">:</span> <span class="n">Any</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_args_</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">BuildsFn</span><span class="o">.</span><span class="n">_make_hydra_compatible</span><span class="p">(</span>
+            <span class="n">CBuildsFn</span><span class="o">.</span><span class="n">_make_hydra_compatible</span><span class="p">(</span>
                 <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_args_</span><span class="p">),</span>
                 <span class="n">convert_dataclass</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">allow_zen_conversion</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -3960,8 +3988,12 @@ document.write(`
     <span class="n">step</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">BuildsFn</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="nb">range</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">_args_</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">(),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">stop</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">CBuildsFn</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_args_</span> <span class="o">=</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
 
 
@@ -3983,8 +4015,11 @@ document.write(`
 <span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="nb">bytearray</span><span class="p">]</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
     <span class="n">ConfigFromTuple</span><span class="p">,</span> <span class="n">_target_</span><span class="o">=</span><span class="n">BuildsFn</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="nb">bytearray</span><span class="p">)</span>
 <span class="p">)</span>
-<span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="nb">range</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">value</span><span class="p">:</span> <span class="n">ConfigRange</span><span class="p">(</span>
-    <span class="n">value</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">step</span>
+<span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="nb">range</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">value</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">ConfigRange</span><span class="p">(</span>
+    <span class="n">value</span><span class="o">.</span><span class="n">start</span><span class="p">,</span>
+    <span class="n">value</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span>
+    <span class="n">value</span><span class="o">.</span><span class="n">step</span><span class="p">,</span>
+    <span class="n">CBuildsFn</span><span class="o">=</span><span class="n">CBuildsFn</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="n">Counter</span><span class="p">]</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
     <span class="n">ConfigFromDict</span><span class="p">,</span> <span class="n">_target_</span><span class="o">=</span><span class="n">BuildsFn</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="n">Counter</span><span class="p">)</span>
