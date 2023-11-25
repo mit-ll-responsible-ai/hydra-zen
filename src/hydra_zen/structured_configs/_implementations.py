@@ -3358,7 +3358,7 @@ class ConfigComplex:
     _target_: str = field(default=BuildsFn._get_obj_path(complex), init=False)
     CBuildsFn: InitVar[Type[BuildsFn[Any]]]
 
-    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]):
+    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]) -> None:
         del CBuildsFn
 
 
@@ -3368,7 +3368,7 @@ class ConfigPath:
     _target_: str = field(default=BuildsFn._get_obj_path(Path), init=False)
     CBuildsFn: InitVar[Type[BuildsFn[Any]]]
 
-    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]):  # pragma: no cover
+    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]) -> None:  # pragma: no cover
         del CBuildsFn
 
 
@@ -3543,7 +3543,7 @@ class ConfigFromTuple:
     _target_: str
     CBuildsFn: InitVar[Type[BuildsFn[Any]]]
 
-    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]):
+    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]) -> None:
         self._args_ = (
             CBuildsFn._make_hydra_compatible(
                 tuple(self._args_),
@@ -3560,7 +3560,7 @@ class ConfigFromDict:
     _target_: str
     CBuildsFn: InitVar[Type[BuildsFn[Any]]]
 
-    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]):
+    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]) -> None:
         self._args_ = (
             CBuildsFn._make_hydra_compatible(
                 dict(self._args_),
@@ -3580,7 +3580,9 @@ class ConfigRange:
     _args_: Tuple[int, ...] = field(default=(), init=False, repr=False)
     CBuildsFn: InitVar[Type[BuildsFn[Any]]]
 
-    def __post_init__(self, start, stop, step, CBuildsFn: Type[BuildsFn[Any]]):
+    def __post_init__(
+        self, start: int, stop: int, step: int, CBuildsFn: Type[BuildsFn[Any]]
+    ) -> None:
         del CBuildsFn
         self._args_ = (start, stop, step)
 
