@@ -50,6 +50,7 @@ from typing_extensions import (
     ParamSpec,
     ParamSpecArgs,
     ParamSpecKwargs,
+    Protocol,
     TypeAlias,
     Unpack,
     _AnnotatedAlias,
@@ -141,9 +142,15 @@ _JUST_CONVERT_SETTINGS = AllConvert(dataclass=True, flat_target=False)
 # default zen_convert settings for `builds` and `hydrated_dataclass`
 _BUILDS_CONVERT_SETTINGS = AllConvert(dataclass=True, flat_target=True)
 
+
 # stores type -> value-conversion-fn
 # for types with specialized support from hydra-zen
-ZEN_VALUE_CONVERSION: Dict[type, Callable[[Any], Any]] = {}
+class _ConversionFn(Protocol):
+    def __call__(self, __x: Any, CBuildsFn: "Type[BuildsFn[Any]]") -> Any:
+        ...
+
+
+ZEN_VALUE_CONVERSION: Dict[type, _ConversionFn] = {}
 
 # signature param-types
 _POSITIONAL_ONLY: Final = inspect.Parameter.POSITIONAL_ONLY
@@ -1089,7 +1096,7 @@ class BuildsFn(Generic[T]):
             type_ = type(resolved_value)
             conversion_fn = ZEN_VALUE_CONVERSION[type_]
 
-            resolved_value = conversion_fn(resolved_value)
+            resolved_value = conversion_fn(resolved_value, CBuildsFn=cls)
             type_of_value = type(resolved_value)
 
         if type_of_value in HYDRA_SUPPORTED_PRIMITIVES or (
@@ -2135,7 +2142,9 @@ class BuildsFn(Generic[T]):
                 # We are intentionally keeping each condition branched
                 # so that test-coverage will be checked for each one
                 if isinstance(wrapper, functools.partial):
-                    wrapper = ZEN_VALUE_CONVERSION[functools.partial](wrapper)
+                    wrapper = ZEN_VALUE_CONVERSION[functools.partial](
+                        wrapper, CBuildsFn=cls
+                    )
 
                 if is_builds(wrapper):
                     # If Hydra's locate function starts supporting importing literals
@@ -3347,12 +3356,20 @@ class ConfigComplex:
     real: Any
     imag: Any
     _target_: str = field(default=BuildsFn._get_obj_path(complex), init=False)
+    CBuildsFn: InitVar[Type[BuildsFn[Any]]]
+
+    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]) -> None:
+        del CBuildsFn
 
 
 @dataclass(unsafe_hash=True)
 class ConfigPath:
     _args_: Tuple[str]
     _target_: str = field(default=BuildsFn._get_obj_path(Path), init=False)
+    CBuildsFn: InitVar[Type[BuildsFn[Any]]]
+
+    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]) -> None:  # pragma: no cover
+        del CBuildsFn
 
 
 @overload
@@ -3489,8 +3506,13 @@ def mutable_value(
     return BuildsFunction._mutable_value(x, zen_convert=zen_convert)
 
 
-def convert_complex(value: complex) -> Builds[Type[complex]]:
-    return cast(Builds[Type[complex]], ConfigComplex(real=value.real, imag=value.imag))
+def convert_complex(
+    value: complex, CBuildsFn: Type[BuildsFn[Any]]
+) -> Builds[Type[complex]]:
+    return cast(
+        Builds[Type[complex]],
+        ConfigComplex(real=value.real, imag=value.imag, CBuildsFn=CBuildsFn),
+    )
 
 
 ZEN_VALUE_CONVERSION[complex] = convert_complex
@@ -3498,27 +3520,32 @@ ZEN_VALUE_CONVERSION[complex] = convert_complex
 
 if Path in ZEN_SUPPORTED_PRIMITIVES:  # pragma: no cover
 
-    def convert_path(value: Path) -> Builds[Type[Path]]:
-        return cast(Builds[Type[Path]], ConfigPath(_args_=(str(value),)))
+    def convert_path(value: Path, CBuildsFn: Type[BuildsFn[Any]]) -> Builds[Type[Path]]:
+        return cast(
+            Builds[Type[Path]], ConfigPath(_args_=(str(value),), CBuildsFn=CBuildsFn)
+        )
 
     ZEN_VALUE_CONVERSION[Path] = convert_path
     ZEN_VALUE_CONVERSION[PosixPath] = convert_path
     ZEN_VALUE_CONVERSION[WindowsPath] = convert_path
 
 
-def _unpack_partial(value: Partial[_T]) -> PartialBuilds[Type[_T]]:
+def _unpack_partial(
+    value: Partial[_T], CBuildsFn: InitVar[Type[BuildsFn[Any]]]
+) -> PartialBuilds[Type[_T]]:
     target = cast(Type[_T], value.func)
-    return builds(target, *value.args, **value.keywords, zen_partial=True)()
+    return CBuildsFn.builds(target, *value.args, **value.keywords, zen_partial=True)()
 
 
 @dataclass(unsafe_hash=True)
 class ConfigFromTuple:
     _args_: Tuple[Any, ...]
     _target_: str
+    CBuildsFn: InitVar[Type[BuildsFn[Any]]]
 
-    def __post_init__(self):
+    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]) -> None:
         self._args_ = (
-            BuildsFn._make_hydra_compatible(
+            CBuildsFn._make_hydra_compatible(
                 tuple(self._args_),
                 convert_dataclass=True,
                 allow_zen_conversion=True,
@@ -3531,10 +3558,11 @@ class ConfigFromTuple:
 class ConfigFromDict:
     _args_: Any
     _target_: str
+    CBuildsFn: InitVar[Type[BuildsFn[Any]]]
 
-    def __post_init__(self):
+    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]) -> None:
         self._args_ = (
-            BuildsFn._make_hydra_compatible(
+            CBuildsFn._make_hydra_compatible(
                 dict(self._args_),
                 convert_dataclass=True,
                 allow_zen_conversion=True,
@@ -3550,8 +3578,12 @@ class ConfigRange:
     step: InitVar[int]
     _target_: str = field(default=BuildsFn._get_obj_path(range), init=False)
     _args_: Tuple[int, ...] = field(default=(), init=False, repr=False)
+    CBuildsFn: InitVar[Type[BuildsFn[Any]]]
 
-    def __post_init__(self, start, stop, step):
+    def __post_init__(
+        self, start: int, stop: int, step: int, CBuildsFn: Type[BuildsFn[Any]]
+    ) -> None:
+        del CBuildsFn
         self._args_ = (start, stop, step)
 
 
@@ -3573,8 +3605,11 @@ if bytes in ZEN_SUPPORTED_PRIMITIVES:  # pragma: no cover
 ZEN_VALUE_CONVERSION[bytearray] = partial(
     ConfigFromTuple, _target_=BuildsFn._get_obj_path(bytearray)
 )
-ZEN_VALUE_CONVERSION[range] = lambda value: ConfigRange(
-    value.start, value.stop, value.step
+ZEN_VALUE_CONVERSION[range] = lambda value, CBuildsFn: ConfigRange(
+    value.start,
+    value.stop,
+    value.step,
+    CBuildsFn=CBuildsFn,
 )
 ZEN_VALUE_CONVERSION[Counter] = partial(
     ConfigFromDict, _target_=BuildsFn._get_obj_path(Counter)

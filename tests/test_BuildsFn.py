@@ -1,6 +1,6 @@
 # Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-
+from collections import deque
 from functools import partial
 from inspect import signature
 from typing import Any, List, Union
@@ -17,6 +17,7 @@ from hydra_zen import (
     just,
     make_config,
     make_custom_builds_fn,
+    to_yaml,
 )
 from hydra_zen.errors import HydraZenUnsupportedPrimitiveError
 from hydra_zen.typing import DataclassOptions, SupportedPrimitive
@@ -30,6 +31,9 @@ class A:
 
     def __eq__(self, __value: object) -> bool:
         return isinstance(__value, type(self)) and __value.x == self.x
+
+    def __hash__(self) -> int:
+        return hash(self.x) + hash(self.__class__.__name__)
 
     @staticmethod
     def static():
@@ -171,3 +175,19 @@ def test_default_to_config():
     )
     store(A, x=A(x=2), name="blah")
     assert instantiate(store[None, "blah"]) == A(x=A(x=2))
+
+
+@pytest.mark.parametrize(
+    "obj",
+    [
+        deque([A(x=1), A(x=2)]),
+        partial(foo, x=A(x=1)),
+    ],
+)
+def test_zen_conversion_uses_custom_builds(obj):
+    Conf = MyBuildsFn.just(obj)
+    to_yaml(Conf)
+    if not isinstance(obj, partial):
+        assert instantiate(Conf) == obj
+    else:
+        assert instantiate(Conf)() == obj()
