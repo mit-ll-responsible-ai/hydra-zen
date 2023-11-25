@@ -3356,9 +3356,9 @@ class ConfigComplex:
     real: Any
     imag: Any
     _target_: str = field(default=BuildsFn._get_obj_path(complex), init=False)
-    CBuildsFn: InitVar[Type[BuildsFn]]
+    CBuildsFn: InitVar[Type[BuildsFn[Any]]]
 
-    def __post_init__(self, CBuildsFn: Type[BuildsFn]):
+    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]):
         del CBuildsFn
 
 
@@ -3366,9 +3366,9 @@ class ConfigComplex:
 class ConfigPath:
     _args_: Tuple[str]
     _target_: str = field(default=BuildsFn._get_obj_path(Path), init=False)
-    CBuildsFn: InitVar[Type[BuildsFn]]
+    CBuildsFn: InitVar[Type[BuildsFn[Any]]]
 
-    def __post_init__(self, CBuildsFn: Type[BuildsFn]):  # pragma: no cover
+    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]):  # pragma: no cover
         del CBuildsFn
 
 
@@ -3531,7 +3531,7 @@ if Path in ZEN_SUPPORTED_PRIMITIVES:  # pragma: no cover
 
 
 def _unpack_partial(
-    value: Partial[_T], CBuildsFn: InitVar[Type[BuildsFn]]
+    value: Partial[_T], CBuildsFn: InitVar[Type[BuildsFn[Any]]]
 ) -> PartialBuilds[Type[_T]]:
     target = cast(Type[_T], value.func)
     return CBuildsFn.builds(target, *value.args, **value.keywords, zen_partial=True)()
@@ -3541,9 +3541,9 @@ def _unpack_partial(
 class ConfigFromTuple:
     _args_: Tuple[Any, ...]
     _target_: str
-    CBuildsFn: InitVar[Type[BuildsFn]]
+    CBuildsFn: InitVar[Type[BuildsFn[Any]]]
 
-    def __post_init__(self, CBuildsFn: Type[BuildsFn]):
+    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]):
         self._args_ = (
             CBuildsFn._make_hydra_compatible(
                 tuple(self._args_),
@@ -3558,9 +3558,9 @@ class ConfigFromTuple:
 class ConfigFromDict:
     _args_: Any
     _target_: str
-    CBuildsFn: InitVar[Type[BuildsFn]]
+    CBuildsFn: InitVar[Type[BuildsFn[Any]]]
 
-    def __post_init__(self, CBuildsFn: Type[BuildsFn]):
+    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]):
         self._args_ = (
             CBuildsFn._make_hydra_compatible(
                 dict(self._args_),
@@ -3578,9 +3578,9 @@ class ConfigRange:
     step: InitVar[int]
     _target_: str = field(default=BuildsFn._get_obj_path(range), init=False)
     _args_: Tuple[int, ...] = field(default=(), init=False, repr=False)
-    CBuildsFn: InitVar[Type[BuildsFn]]
+    CBuildsFn: InitVar[Type[BuildsFn[Any]]]
 
-    def __post_init__(self, start, stop, step, CBuildsFn: Type[BuildsFn]):
+    def __post_init__(self, start, stop, step, CBuildsFn: Type[BuildsFn[Any]]):
         del CBuildsFn
         self._args_ = (start, stop, step)
 
