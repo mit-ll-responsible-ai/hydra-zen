@@ -1506,3 +1506,23 @@ def check_kwargs_of():
         ...
 
     Conf3 = kwargs_of(foo, x=NotSupported())  # type: ignore
+
+
+def check_CustomConfigType():
+    from hydra_zen import BuildsFn
+    from hydra_zen.typing import CustomConfigType
+
+    class MyType:
+        ...
+
+    class BadType:
+        ...
+
+    class MyBuilds(BuildsFn[CustomConfigType[MyType]]):
+        ...
+
+    builds = MyBuilds.builds
+
+    builds(dict, x=MyType(), y=[1, MyType()])
+    builds(dict, x=BadType(), y=[1, MyType()])  # type: ignore
+    builds(dict, x=MyType(), y=[1, BadType()])  # type: ignore
