@@ -644,6 +644,34 @@ document.write(`
 <span class="sd">&quot;&quot;&quot;Describes types that are natively supported by hydra-zen&#39;s config-creation</span>
 <span class="sd">functions.&quot;&quot;&quot;</span>
 
+<span class="n">CustomConfigType</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span>
+    <span class="n">T2</span><span class="p">,</span>
+    <span class="n">HydraSupportedType</span><span class="p">,</span>
+    <span class="n">Tuple</span><span class="p">[</span><span class="s2">&quot;CustomConfigType[T2]&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+    <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;CustomConfigType[T2]&quot;</span><span class="p">],</span>
+    <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="s2">&quot;CustomConfigType[T2]&quot;</span><span class="p">],</span>
+<span class="p">]</span>
+<span class="sd">&quot;&quot;&quot;The type `CustomConfigType[MyType]` describes: `MyType`, all hydra-zen config-compatible types, and all hydra-zen compatible containers containing said types.</span>
+
+<span class="sd">This is use for parameterizing `hydra_zen.BuildsFn` with custom type information. Example::</span>
+
+<span class="sd">   from hydra_zen import BuildsFn</span>
+<span class="sd">   from hydra_zen.typing import CustomConfigType</span>
+
+<span class="sd">   class MyType: ...</span>
+<span class="sd">   class BadType: ...</span>
+
+<span class="sd">   class MyBuilds(BuildsFn[CustomConfigType[MyType]]):</span>
+<span class="sd">       ...</span>
+
+<span class="sd">   builds = MyBuilds.builds</span>
+
+<span class="sd">   builds(dict, x=MyType(), y=[1, MyType()])  # type-checker: OK</span>
+<span class="sd">   builds(dict, x=BadType(), y=[1, MyType()]) # type-checker: Bad!</span>
+<span class="sd">   builds(dict, x=MyType(), y=[1, BadType()]) # type-checker: Bad!</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
 <span class="n">ZenWrapper</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span>
     <span class="kc">None</span><span class="p">,</span>
     <span class="n">Builds</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">T4</span><span class="p">],</span> <span class="n">T4</span><span class="p">]],</span>
