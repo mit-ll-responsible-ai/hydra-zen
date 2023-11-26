@@ -3,6 +3,7 @@
 
 from ._implementations import (
     Builds,
+    CustomConfigType,
     DataclassOptions,
     HydraPartialBuilds,
     HydraSupportedType,
@@ -18,6 +19,7 @@ from ._implementations import (
 
 __all__ = [
     "Builds",
+    "CustomConfigType",
     "DataclassOptions",
     "Just",
     "Partial",

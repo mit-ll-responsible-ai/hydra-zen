@@ -652,13 +652,83 @@ _MAKE_CONFIG_SETTINGS = AllConvert(dataclass=False, flat_target=False)
 
 
 class BuildsFn(Generic[T]):
-    """A class that can be modified to customize the behavior of `builds`, `just`, `kwargs_of, and `make_config`.
+    """A class that can be modified to customize the behavior of `builds`, `just`, `kwargs_of`, and `make_config`.
 
     These functions are exposed as class methods of `BuildsFn`.
 
-    To customize type-refinement support, override `_sanitized_type`.
-    To customize auto-config support, override `_make_hydra_compatible`.
-    To customize the ability to resolve import paths, override `_get_obj_path`.
+    - To customize type-refinement support, override `_sanitized_type`.
+    - To customize auto-config support, override `_make_hydra_compatible`.
+    - To customize the ability to resolve import paths, override `_get_obj_path`.
+
+    Notes
+    -----
+    Adding type-checking support for a custom type:
+
+    To parameterize `BuildsFn` with, e.g., support for the custom types `MyTypeA` and `MyTypeB`, use::
+
+       from typing import Union
+       from hydra_zen.typing import CustomConfigType
+
+       class MyTypeA: ...
+       class MyTypeB: ...
+
+       class MyBuilds(BuildsFn[CustomConfigType[Union[MyTypeA, MyTypeB]]]):
+           ...
+
+    Examples
+    --------
+    Suppose you wrote the following type::
+
+       class Quaternion:
+           def __init__(
+               self,
+               real: float = 0.0,
+               i: float = 0.0,
+               j: float = 0.0,
+               k: float = 0.0,
+           ):
+               self._data = (real, i, j, k)
+
+           def __repr__(self):
+               return "Q" + repr(self._data)
+
+    and you want hydra-zen's config-creation functions to be able to automatically
+    know how to make configs from instances of this type. You do so by creating your
+    own subclass of :class:`~hydra_zen.BuildsFn`::
+
+       from typing import Any
+       from hydra_zen import BuildsFn
+
+       class CustomBuilds(BuildsFn[CustomConfigType[Quaternion]]):
+           @classmethod
+           def _make_hydra_compatible(cls, value: Any, **k) -> HydraSupportedType:
+               if isinstance(value, Quaternion):
+                   real, i, j, k = value._data
+                   return cls.builds(Quaternion, real=real, i=i, j=j, k=k)
+               return super()._make_hydra_compatible(value, **k)
+
+    Now you use the config-creation functions that are provided by `CustomBuilds` instead of those provided by `hydra_zen`::
+
+       builds = CustomBuilds.builds
+       just = CustomBuilds.just
+       kwargs_of = CustomBuilds.kwargs_of
+       make_config = CustomBuilds.make_config
+
+    E.g.
+
+    >>> from hydra_zen import to_yaml
+    >>> Config = just([Quaternion(1.0), Quaternion(0.0, -12.0)])
+    >>> print(to_yaml(Config))
+    - _target_: __main__.Quaternion
+      real: 1.0
+      i: 0.0
+      j: 0.0
+      k: 0.0
+    - _target_: __main__.Quaternion
+      real: 0.0
+      i: -12.0
+      j: 0.0
+      k: 0.0
     """
 
     __slots__ = ()
@@ -983,7 +1053,7 @@ class BuildsFn(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = None,
         zen_dataclass: Optional[DataclassOptions] = None,
     ) -> HydraSupportedType:
-        """Converts `value` to Hydra-supported type if necessary and possible. Otherwise
+        """Converts `value` to Hydra-supported type or to a config whose fields are recursively supported by `_make_hydra_compatible`. Otherwise
         raises `HydraZenUnsupportedPrimitiveError`.
 
         Override this method to add support for adding auto-config support to custom
