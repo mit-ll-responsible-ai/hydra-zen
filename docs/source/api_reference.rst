@@ -37,6 +37,7 @@ Creating Configs
    builds
    just
    kwargs_of
+   BuildsFn
    hydrated_dataclass
    make_config
 

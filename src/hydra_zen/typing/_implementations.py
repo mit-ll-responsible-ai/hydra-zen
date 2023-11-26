@@ -243,6 +243,34 @@ SupportedPrimitive: TypeAlias = Union[
 """Describes types that are natively supported by hydra-zen's config-creation
 functions."""
 
+CustomConfigType: TypeAlias = Union[
+    T2,
+    HydraSupportedType,
+    Tuple["CustomConfigType[T2]", ...],
+    Sequence["CustomConfigType[T2]"],
+    Mapping[Any, "CustomConfigType[T2]"],
+]
+"""The type `CustomConfigType[MyType]` describes: `MyType`, all hydra-zen config-compatible types, and all hydra-zen compatible containers containing said types.
+
+This is use for parameterizing `hydra_zen.BuildsFn` with custom type information. Example::
+
+   from hydra_zen import BuildsFn
+   from hydra_zen.typing import CustomConfigType
+
+   class MyType: ...
+   class BadType: ...
+
+   class MyBuilds(BuildsFn[CustomConfigType[MyType]]):
+       ...
+
+   builds = MyBuilds.builds
+
+   builds(dict, x=MyType(), y=[1, MyType()])  # type-checker: OK
+   builds(dict, x=BadType(), y=[1, MyType()]) # type-checker: Bad!
+   builds(dict, x=MyType(), y=[1, BadType()]) # type-checker: Bad!
+"""
+
+
 ZenWrapper: TypeAlias = Union[
     None,
     Builds[Callable[[T4], T4]],

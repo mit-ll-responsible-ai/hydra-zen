@@ -20,7 +20,7 @@ from hydra_zen import (
     to_yaml,
 )
 from hydra_zen.errors import HydraZenUnsupportedPrimitiveError
-from hydra_zen.typing import DataclassOptions, SupportedPrimitive
+from hydra_zen.typing import CustomConfigType, DataclassOptions, SupportedPrimitive
 from hydra_zen.typing._implementations import DataclassOptions
 from hydra_zen.wrapper import default_to_config
 
@@ -191,3 +191,17 @@ def test_zen_conversion_uses_custom_builds(obj):
         assert instantiate(Conf) == obj
     else:
         assert instantiate(Conf)() == obj()
+
+
+def test_parameterization_example():
+    # just make sure that there are no runtime issues with CustomConfigType
+    from hydra_zen import BuildsFn
+
+    class MyType:
+        ...
+
+    class MyBuilds(BuildsFn[CustomConfigType[MyType]]):
+        ...
+
+    builds = MyBuilds.builds
+    assert instantiate(builds(dict, x=1)) == dict(x=1)
