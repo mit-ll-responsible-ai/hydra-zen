@@ -707,7 +707,7 @@ class BuildsFn(Generic[T]):
                    return cls.builds(Quaternion, real=real, i=i, j=j, k=k)
                return super()._make_hydra_compatible(value, **k)
 
-    Now you use the config-creation that are provided by `CustomBuilds`::
+    Now you use the config-creation functions that are provided by `CustomBuilds` instead of those provided by `hydra_zen`::
 
        builds = CustomBuilds.builds
        just = CustomBuilds.just
