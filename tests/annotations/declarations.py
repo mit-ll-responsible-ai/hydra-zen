@@ -1545,6 +1545,11 @@ def check_kwargs_of():
         expected_text="type[Builds[type[Dict[str, Any]]]]",
     )
 
+    reveal_type(
+        kwargs_of(bar, x=1, zen_exclude=(0,)),
+        expected_text="type[Builds[type[Dict[str, Any]]]]",
+    )
+
 
 def check_CustomConfigType():
     from hydra_zen import BuildsFn
