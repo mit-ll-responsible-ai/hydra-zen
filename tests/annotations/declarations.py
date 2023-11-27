@@ -1507,6 +1507,44 @@ def check_kwargs_of():
 
     Conf3 = kwargs_of(foo, x=NotSupported())  # type: ignore
 
+    def bar(x: int, y: str, z: bool):
+        ...
+
+    reveal_type(
+        kwargs_of(bar, zen_exclude=()),
+        expected_text="type[BuildsWithSig[type[Dict[str, Any]], (x: int, y: str, z: bool)]]",
+    )
+
+    reveal_type(
+        kwargs_of(bar, zen_exclude=(0,)),
+        expected_text="type[BuildsWithSig[type[Dict[str, Any]], (y: str, z: bool)]]",
+    )
+
+    reveal_type(
+        kwargs_of(bar, zen_exclude=(0, 1)),
+        expected_text="type[BuildsWithSig[type[Dict[str, Any]], (z: bool)]]",
+    )
+
+    reveal_type(
+        kwargs_of(bar, zen_exclude=(0, 1, 2)),
+        expected_text="type[BuildsWithSig[type[Dict[str, Any]], ()]]",
+    )
+
+    reveal_type(
+        kwargs_of(bar, zen_exclude=(0, 1, 2, 3)),
+        expected_text="type[Builds[type[Dict[str, Any]]]]",
+    )
+
+    reveal_type(
+        kwargs_of(bar, zen_exclude=(1,)),
+        expected_text="type[Builds[type[Dict[str, Any]]]]",
+    )
+
+    reveal_type(
+        kwargs_of(bar, zen_exclude=[0]),
+        expected_text="type[Builds[type[Dict[str, Any]]]]",
+    )
+
 
 def check_CustomConfigType():
     from hydra_zen import BuildsFn
