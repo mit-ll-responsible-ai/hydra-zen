@@ -45,6 +45,7 @@ from typing import (
 from omegaconf import DictConfig, ListConfig
 from typing_extensions import (
     Annotated,
+    Concatenate,
     Final,
     Literal,
     ParamSpec,
@@ -3282,6 +3283,53 @@ class BuildsFn(Generic[T]):
             )
 
         return cast(Type[DataClass], out)
+
+    # cover zen_exclude=() -> (1, 2, 3)
+    @overload
+    @classmethod
+    def kwargs_of(
+        cls,
+        __hydra_target: Callable[P, Any],
+        *,
+        zen_dataclass: Optional[DataclassOptions] = ...,
+        zen_exclude: Tuple[()],
+    ) -> Type[BuildsWithSig[Type[Dict[str, Any]], P]]:
+        ...
+
+    @overload
+    @classmethod
+    def kwargs_of(
+        cls,
+        __hydra_target: Callable[Concatenate[Any, P], Any],
+        *,
+        zen_dataclass: Optional[DataclassOptions] = ...,
+        zen_exclude: Tuple[Literal[0]],
+    ) -> Type[BuildsWithSig[Type[Dict[str, Any]], P]]:
+        ...
+
+    @overload
+    @classmethod
+    def kwargs_of(
+        cls,
+        __hydra_target: Callable[Concatenate[Any, Any, P], Any],
+        *,
+        zen_dataclass: Optional[DataclassOptions] = ...,
+        zen_exclude: Tuple[Literal[0], Literal[1]],
+    ) -> Type[BuildsWithSig[Type[Dict[str, Any]], P]]:
+        ...
+
+    @overload
+    @classmethod
+    def kwargs_of(
+        cls,
+        __hydra_target: Callable[Concatenate[Any, Any, Any, P], Any],
+        *,
+        zen_dataclass: Optional[DataclassOptions] = ...,
+        zen_exclude: Tuple[Literal[0], Literal[1], Literal[2]],
+    ) -> Type[BuildsWithSig[Type[Dict[str, Any]], P]]:
+        ...
+
+    # no zen-exclude
 
     @overload
     @classmethod
