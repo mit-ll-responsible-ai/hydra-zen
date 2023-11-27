@@ -337,8 +337,8 @@ to exclude those parameters from the config-creation process.</p>
 </pre></div>
 </div>
 <p>Excluding the first parameter from the target’s signature:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Config</span> <span class="o">=</span> <span class="n">kwargs_of</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="n">zen_exclude</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">signature</span><span class="p">(</span><span class="n">Config</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Config</span> <span class="o">=</span> <span class="n">kwargs_of</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="n">zen_exclude</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signature</span><span class="p">(</span><span class="n">Config</span><span class="p">)</span>  <span class="c1"># note: type checkers sees that x is removed as well</span>
 <span class="go">&lt;Signature (y: Any) -&gt; None&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Config</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">88</span><span class="p">))</span>
 <span class="go">{'y': 88}</span>

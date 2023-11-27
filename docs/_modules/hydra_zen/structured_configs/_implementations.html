@@ -3839,8 +3839,8 @@ document.write(`
 
 <span class="sd">        Excluding the first parameter from the target&#39;s signature:</span>
 
-<span class="sd">        &gt;&gt;&gt; Config = kwargs_of(lambda *, x, y: None, zen_exclude=[0])</span>
-<span class="sd">        &gt;&gt;&gt; signature(Config)</span>
+<span class="sd">        &gt;&gt;&gt; Config = kwargs_of(lambda *, x, y: None, zen_exclude=(0,))</span>
+<span class="sd">        &gt;&gt;&gt; signature(Config)  # note: type checkers sees that x is removed as well</span>
 <span class="sd">        &lt;Signature (y: Any) -&gt; None&gt;</span>
 <span class="sd">        &gt;&gt;&gt; instantiate(Config(y=88))</span>
 <span class="sd">        {&#39;y&#39;: 88}</span>

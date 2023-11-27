@@ -245,8 +245,8 @@ document.write(`
 <h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h1>
 <p>This is a record of all past hydra-zen releases and what went into them, in reverse
 chronological order. All previous releases should still be available on pip.</p>
-<section id="rc8-2023-11-25">
-<span id="v0-12-0"></span><h2>0.12.0rc8 - 2023-11-25<a class="headerlink" href="#rc8-2023-11-25" title="Link to this heading">#</a></h2>
+<section id="rc9-2023-11-26">
+<span id="v0-12-0"></span><h2>0.12.0rc9 - 2023-11-26<a class="headerlink" href="#rc9-2023-11-26" title="Link to this heading">#</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This is documentation for an unreleased version of hydra-zen. You can try out this pre-release version using <code class="xref py py-obj docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--pre</span> <span class="pre">hydra-zen</span></code></p>
@@ -257,7 +257,7 @@ chronological order. All previous releases should still be available on pip.</p>
 <div class="literal-block-wrapper docutils container" id="id51">
 <div class="code-block-caption"><span class="caption-text">Basic structure for adding custom auto-config support for a type.</span><a class="headerlink" href="#id51" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="generated/hydra_zen.BuildsFn.html#hydra_zen.BuildsFn" title="hydra_zen.structured_configs._implementations.BuildsFn"><span class="n">BuildsFn</span></a>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">SupportedPrimitive</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">CustomConfigType</span>
 
 <span class="c1"># We want builds/just/make_config to be able to automatically</span>
 <span class="c1"># configure instances of `SomeType`</span>
@@ -267,7 +267,7 @@ chronological order. All previous releases should still be available on pip.</p>
 <span class="c1"># The type parameter provided to `BuildsFn[...]` updates the type</span>
 <span class="c1"># annotations of the config-creation functions so that type-checkers</span>
 <span class="c1"># know that `SomeType` is now supported.</span>
-<span class="k">class</span> <span class="nc">CustomBuilds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="generated/hydra_zen.BuildsFn.html#hydra_zen.BuildsFn" title="hydra_zen.structured_configs._implementations.BuildsFn"><span class="n">BuildsFn</span></a><span class="p">[</span><span class="n">SomeType</span> <span class="o">|</span> <span class="n">SupportedPrimitive</span><span class="p">]):</span>
+<span class="k">class</span> <span class="nc">CustomBuilds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="generated/hydra_zen.BuildsFn.html#hydra_zen.BuildsFn" title="hydra_zen.structured_configs._implementations.BuildsFn"><span class="n">BuildsFn</span></a><span class="p">[</span><span class="n">CustomConfigType</span><span class="p">[</span><span class="n">SomeType</span><span class="p">]]):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    - To customize type-refinement support, override `_sanitized_type`.</span>
 <span class="sd">    - To customize auto-config support, override `_make_hydra_compatible`.</span>
@@ -1262,7 +1262,7 @@ the config is actually accessed by the store. Thus this decorator pattern does n
   </div>
 <nav class="bd-toc-nav page-toc">
 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rc8-2023-11-25">0.12.0rc8 - 2023-11-25</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rc9-2023-11-26">0.12.0rc9 - 2023-11-26</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#improvements">Improvements</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a></li>
 </ul>
