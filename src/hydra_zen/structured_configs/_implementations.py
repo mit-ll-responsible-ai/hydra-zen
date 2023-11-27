@@ -3421,8 +3421,8 @@ class BuildsFn(Generic[T]):
 
         Excluding the first parameter from the target's signature:
 
-        >>> Config = kwargs_of(lambda *, x, y: None, zen_exclude=[0])
-        >>> signature(Config)
+        >>> Config = kwargs_of(lambda *, x, y: None, zen_exclude=(0,))
+        >>> signature(Config)  # note: type checkers sees that x is removed as well
         <Signature (y: Any) -> None>
         >>> instantiate(Config(y=88))
         {'y': 88}

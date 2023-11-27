@@ -11,7 +11,7 @@ chronological order. All previous releases should still be available on pip.
 .. _v0.12.0:
 
 ----------------------
-0.12.0rc8 - 2023-11-25
+0.12.0rc9 - 2023-11-26
 ----------------------
 
 
@@ -27,7 +27,7 @@ Here is a stripped-down example.
    :caption: Basic structure for adding custom auto-config support for a type.
 
    from hydra_zen import BuildsFn
-   from hydra_zen.typing import SupportedPrimitive
+   from hydra_zen.typing import CustomConfigType
    
    # We want builds/just/make_config to be able to automatically
    # configure instances of `SomeType`
@@ -37,7 +37,7 @@ Here is a stripped-down example.
    # The type parameter provided to `BuildsFn[...]` updates the type
    # annotations of the config-creation functions so that type-checkers
    # know that `SomeType` is now supported.
-   class CustomBuilds(BuildsFn[SomeType | SupportedPrimitive]):
+   class CustomBuilds(BuildsFn[CustomConfigType[SomeType]]):
        """
        - To customize type-refinement support, override `_sanitized_type`.
        - To customize auto-config support, override `_make_hydra_compatible`.
