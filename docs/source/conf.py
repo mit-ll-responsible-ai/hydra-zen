@@ -116,6 +116,22 @@ favicons = [
     "hydra_zen_favicon_64x64.png",
 ]
 
+favicons = [
+    {"rel": "icon", "href": "hydra_zen_favicon_64x64.ico"},
+    {
+        "rel": "icon",
+        "sizes": "32x32",
+        "href": "hydra_zen_favicon_32x32.png",
+        "type": "image/png",
+    },
+    {
+        "rel": "icon",
+        "sizes": "64x64",
+        "href": "hydra_zen_favicon_64x64.png",
+        "type": "image/png",
+    },
+]
+
 
 def setup(app):
     app.add_js_file(
