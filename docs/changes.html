@@ -294,8 +294,8 @@ chronological order. All previous releases should still be available on pip.</p>
 </div>
 </div>
 <p>For more details and examples, see <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/553">pull request #553</a>.</p>
-<section id="improvements">
-<h3>Improvements<a class="headerlink" href="#improvements" title="Link to this heading">#</a></h3>
+<section id="new-features">
+<h3>New Features<a class="headerlink" href="#new-features" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="generated/hydra_zen.BuildsFn.html#hydra_zen.BuildsFn" title="hydra_zen.BuildsFn"><code class="xref py py-class docutils literal notranslate"><span class="pre">BuildsFn</span></code></a> was introduced to permit customizable auto-config and type-refinement support in config-creation functions. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/553">pull request #553</a>.</p></li>
 <li><p><a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> and <a class="reference internal" href="generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_custom_builds_fn()</span></code></a> now accept a <code class="xref py py-obj docutils literal notranslate"><span class="pre">zen_exclude</span></code> field for excluding parameters from auto-population, either by name, position-index, or by pattern. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/558">pull request #558</a>.</p></li>
@@ -305,6 +305,7 @@ chronological order. All previous releases should still be available on pip.</p>
 <li><p><a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.zen()</span></code></a> now has first class support for running code in an isolated <a class="reference external" href="https://docs.python.org/3/library/contextvars.html#contextvars.Context" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">contextvars.Context</span></code></a>. This enables users to safely leverage state via <a class="reference external" href="https://docs.python.org/3/library/contextvars.html#contextvars.ContextVar" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">contextvars.ContextVar</span></code></a> in their task functions. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/583">pull request #583</a>.</p></li>
 <li><p>Adds formal support for Python 3.12. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/555">pull request #555</a></p></li>
 <li><p>Several new methods were added to <a class="reference internal" href="generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.ZenStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZenStore</span></code></a>, including the abilities to copy, update, and merge stores. As well as remap the groups of a store’s entries and delete individual entries. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/569">pull request #569</a></p></li>
+<li><p>Auto-config support added for <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.timedelta</span></code></a>.</p></li>
 </ul>
 </section>
 <section id="documentation">
@@ -345,8 +346,8 @@ logic from hydra-zen’s source code, and to improve the behavior of
 </pre></div>
 </div>
 </section>
-<section id="id2">
-<h3>Improvements<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<section id="improvements">
+<h3>Improvements<a class="headerlink" href="#improvements" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-func docutils literal notranslate"><span class="pre">builds()</span></code></a> now has a transitive property that enables iterative build patterns. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/455">pull request #455</a></p></li>
 <li><p><a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-func docutils literal notranslate"><span class="pre">zen()</span></code></a>’s instantiation phase has been improved so that dataclass objects and stdlib containers are returned instead of omegaconf objects. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/448">pull request #448</a>.</p></li>
@@ -384,17 +385,17 @@ logic from hydra-zen’s source code, and to improve the behavior of
 </ul>
 </section>
 <section id="v0-10-2">
-<span id="id3"></span><h2>0.10.2 - 2023-07-04<a class="headerlink" href="#v0-10-2" title="Link to this heading">#</a></h2>
+<span id="id2"></span><h2>0.10.2 - 2023-07-04<a class="headerlink" href="#v0-10-2" title="Link to this heading">#</a></h2>
 <p>This patch circumvents an upstream bug in pyright, which was causing pyright 1.1.305+ to report the return type of <a class="reference internal" href="generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.make_custom_builds_fn()</span></code></a> as “Unknown”.</p>
 </section>
 <section id="v0-10-1">
-<span id="id4"></span><h2>0.10.1 - 2023-05-23<a class="headerlink" href="#v0-10-1" title="Link to this heading">#</a></h2>
+<span id="id3"></span><h2>0.10.1 - 2023-05-23<a class="headerlink" href="#v0-10-1" title="Link to this heading">#</a></h2>
 <p>Bans <code class="docutils literal notranslate"><span class="pre">typing-extension</span> <span class="pre">v4.6.0</span></code> which has a breaking bug in it.</p>
 </section>
 <section id="v0-10-0">
-<span id="id5"></span><h2>0.10.0 - 2023-03-05<a class="headerlink" href="#v0-10-0" title="Link to this heading">#</a></h2>
-<section id="id6">
-<h3>Release Highlights<a class="headerlink" href="#id6" title="Link to this heading">#</a></h3>
+<span id="id4"></span><h2>0.10.0 - 2023-03-05<a class="headerlink" href="#v0-10-0" title="Link to this heading">#</a></h2>
+<section id="id5">
+<h3>Release Highlights<a class="headerlink" href="#id5" title="Link to this heading">#</a></h3>
 <p><a class="reference internal" href="generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.launch()</span></code></a> now accepts non-string values for its overrides, and it
 accepts a dictionary for improved ergonomics. Previously, users had to form Hydra
 CLI-compatible strings when calling <code class="xref py py-obj docutils literal notranslate"><span class="pre">launch</span></code>, now overrides can be passed to the
@@ -448,8 +449,8 @@ improved launch</label><div class="sd-tab-content docutils">
 </div>
 </div>
 </section>
-<section id="id7">
-<h3>Improvements<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
+<section id="id6">
+<h3>Improvements<a class="headerlink" href="#id6" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.launch()</span></code></a> now supports dictionary overrides and will automatically convert basic Python types to CLI-compatible strings. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/313">pull request #313</a>.</p></li>
 <li><p><a class="reference internal" href="generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.ZenStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">hydra_zen.ZenStore</span></code></a> now provides specialized support for storing instances/subclasses of <code class="xref py py-obj docutils literal notranslate"><span class="pre">HydraConf</span></code>. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/issues/395">issue #395</a>.</p></li>
@@ -469,24 +470,24 @@ improved launch</label><div class="sd-tab-content docutils">
 </ul>
 </section>
 <section id="v0-9-1">
-<span id="id8"></span><h2>0.9.1 - 2023-01-13<a class="headerlink" href="#v0-9-1" title="Link to this heading">#</a></h2>
-<section id="id9">
-<h3>Improvements<a class="headerlink" href="#id9" title="Link to this heading">#</a></h3>
+<span id="id7"></span><h2>0.9.1 - 2023-01-13<a class="headerlink" href="#v0-9-1" title="Link to this heading">#</a></h2>
+<section id="id8">
+<h3>Improvements<a class="headerlink" href="#id8" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.zen()</span></code></a> now returns pickle-compatible wrapped functions. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/384">pull request #384</a>.</p></li>
 </ul>
 </section>
-<section id="id10">
-<h3>Bug Fixes<a class="headerlink" href="#id10" title="Link to this heading">#</a></h3>
+<section id="id9">
+<h3>Bug Fixes<a class="headerlink" href="#id9" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.zen()</span></code></a>’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_main</span></code> method now handles string <code class="xref py py-obj docutils literal notranslate"><span class="pre">config_path</span></code> entries properly (only for Hydra 1.3.0+). Previously Hydra could not find the path to the wrapped task function. hydra-zen will warn users that a string <code class="xref py py-obj docutils literal notranslate"><span class="pre">config_path</span></code> is not supported via <a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydra_zen.zen()</span></code></a> for Hydra 1.2 and earlier. See <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/384">pull request #384</a>.</p></li>
 </ul>
 </section>
 </section>
 <section id="v0-9-0">
-<span id="id11"></span><h2>0.9.0 - 2022-12-30<a class="headerlink" href="#v0-9-0" title="Link to this heading">#</a></h2>
-<section id="id12">
-<h3>Release Highlights<a class="headerlink" href="#id12" title="Link to this heading">#</a></h3>
+<span id="id10"></span><h2>0.9.0 - 2022-12-30<a class="headerlink" href="#v0-9-0" title="Link to this heading">#</a></h2>
+<section id="id11">
+<h3>Release Highlights<a class="headerlink" href="#id11" title="Link to this heading">#</a></h3>
 <p>This release introduces <a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-func docutils literal notranslate"><span class="pre">zen()</span></code></a> and <a class="reference internal" href="generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.ZenStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZenStore</span></code></a>, which enable hydra-zen users to eliminate Hydra-specific boilerplate code from their projects and to utilize new patterns and best practices for working with config stores.</p>
 <p>The wrapper <a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code></a> will automatically extract, resolve, and instantiate
 fields from a config in order to call the function that it has wrapped, thus saving the
@@ -558,7 +559,7 @@ capabilities: it will automatically apply <code class="xref py py-func docutils 
 </pre></div>
 </div>
 </div>
-<p>The store can also be populated using a decorator pattern <a class="footnote-reference brackets" href="#id50" id="id13" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, e.g.</p>
+<p>The store can also be populated using a decorator pattern <a class="footnote-reference brackets" href="#id50" id="id12" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, e.g.</p>
 <div class="literal-block-wrapper docutils container" id="id58">
 <div class="code-block-caption"><span class="caption-text">Using <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.store</span></code> as a decorator to auto-configure and store objects.</span><a class="headerlink" href="#id58" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a>
@@ -589,8 +590,8 @@ capabilities: it will automatically apply <code class="xref py py-func docutils 
 </div>
 </div>
 </section>
-<section id="new-features">
-<h3>New Features<a class="headerlink" href="#new-features" title="Link to this heading">#</a></h3>
+<section id="id13">
+<h3>New Features<a class="headerlink" href="#id13" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>hydra-zen now supports Python 3.11</p></li>
 <li><p>Adds the <a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-func docutils literal notranslate"><span class="pre">zen()</span></code></a> decorator (see <a class="reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/310">pull request #310</a>)</p></li>
@@ -1237,7 +1238,7 @@ hydra-zen will maintain a wide window of compatibility with Hydra versions; we t
 <h2>Footnotes<a class="headerlink" href="#footnotes" title="Link to this heading">#</a></h2>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id50" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a href="#id13" role="doc-backlink">1</a><span class="fn-bracket">]</span></span>
+<span class="label"><span class="fn-bracket">[</span><a href="#id12" role="doc-backlink">1</a><span class="fn-bracket">]</span></span>
 <p>The config creation process associated with the decorator is deferred until
 the config is actually accessed by the store. Thus this decorator pattern does not add substantial runtime overhead to library code until Hydra capabilities are actually utilized.</p>
 </aside>
@@ -1265,13 +1266,13 @@ the config is actually accessed by the store. Thus this decorator pattern does n
 <nav class="bd-toc-nav page-toc">
 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rc9-2023-11-26">0.12.0rc9 - 2023-11-26</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#improvements">Improvements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#new-features">New Features</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-11-0">0.11.0 - 2023-07-13</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#release-highlights">Release Highlights</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Improvements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#improvements">Improvements</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bug-fixes">Bug Fixes</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compatibility-breaking-changes">Compatibility-Breaking Changes</a></li>
 </ul>
@@ -1280,19 +1281,19 @@ the config is actually accessed by the store. Thus this decorator pattern does n
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-10-2">0.10.2 - 2023-07-04</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-10-1">0.10.1 - 2023-05-23</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-10-0">0.10.0 - 2023-03-05</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">Release Highlights</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">Improvements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Release Highlights</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">Improvements</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation-2023-01-22">Documentation - 2023-01-22</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-9-1">0.9.1 - 2023-01-13</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">Improvements</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">Bug Fixes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">Improvements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">Bug Fixes</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-9-0">0.9.0 - 2022-12-30</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">Release Highlights</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#new-features">New Features</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">Release Highlights</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">New Features</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">Improvements</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">Bug Fixes</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deprecations">Deprecations</a></li>

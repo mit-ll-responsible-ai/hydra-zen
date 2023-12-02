@@ -227,6 +227,7 @@ hydra-zen provides specialized auto-config support for values of the following t
 - :py:class:`complex`
 - :py:class:`collections.Counter`
 - :py:class:`collections.deque`
+- :py:class:`datetime.timedelta`
 - :py:func:`functools.partial` (note: not compatible with pickling)
 - :py:class:`pathlib.Path` (*support provided for OmegaConf < 2.2.1*)
 - :py:class:`pathlib.PosixPath`

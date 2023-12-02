@@ -424,6 +424,7 @@ document.write(`
     <span class="n">is_dataclass</span><span class="p">,</span>
     <span class="n">make_dataclass</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timedelta</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
@@ -4134,6 +4135,22 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_args_</span> <span class="o">=</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
 
 
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">ConfigTimeDelta</span><span class="p">:</span>
+    <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
+    <span class="n">days</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">microseconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">milliseconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">minutes</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">hours</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">weeks</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">BuildsFn</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="n">timedelta</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">CBuildsFn</span>
+
+
 <span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="nb">set</span><span class="p">]</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
     <span class="n">ConfigFromTuple</span><span class="p">,</span> <span class="n">_target_</span><span class="o">=</span><span class="n">BuildsFn</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
 <span class="p">)</span>
@@ -4156,6 +4173,12 @@ document.write(`
     <span class="n">value</span><span class="o">.</span><span class="n">start</span><span class="p">,</span>
     <span class="n">value</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span>
     <span class="n">value</span><span class="o">.</span><span class="n">step</span><span class="p">,</span>
+    <span class="n">CBuildsFn</span><span class="o">=</span><span class="n">CBuildsFn</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="n">timedelta</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">value</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">ConfigTimeDelta</span><span class="p">(</span>
+    <span class="n">days</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">days</span><span class="p">,</span>
+    <span class="n">seconds</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">seconds</span><span class="p">,</span>
+    <span class="n">microseconds</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">microseconds</span><span class="p">,</span>
     <span class="n">CBuildsFn</span><span class="o">=</span><span class="n">CBuildsFn</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="n">Counter</span><span class="p">]</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
