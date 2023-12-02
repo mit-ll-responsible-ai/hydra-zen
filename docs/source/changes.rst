@@ -62,7 +62,7 @@ Here is a stripped-down example.
 
 For more details and examples, see :pull:`553`.
 
-New Featuers
+New Features
 ------------
 - :class:`~hydra_zen.BuildsFn` was introduced to permit customizable auto-config and type-refinement support in config-creation functions. See :pull:`553`.
 - :func:`~hydra_zen.builds` and :func:`~hydra_zen.make_custom_builds_fn` now accept a `zen_exclude` field for excluding parameters from auto-population, either by name, position-index, or by pattern. See :pull:`558`.
