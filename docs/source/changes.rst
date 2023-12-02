@@ -62,7 +62,7 @@ Here is a stripped-down example.
 
 For more details and examples, see :pull:`553`.
 
-Improvements
+New Features
 ------------
 - :class:`~hydra_zen.BuildsFn` was introduced to permit customizable auto-config and type-refinement support in config-creation functions. See :pull:`553`.
 - :func:`~hydra_zen.builds` and :func:`~hydra_zen.make_custom_builds_fn` now accept a `zen_exclude` field for excluding parameters from auto-population, either by name, position-index, or by pattern. See :pull:`558`.
@@ -72,6 +72,7 @@ Improvements
 - :func:`hydra_zen.zen` now has first class support for running code in an isolated :py:class:`contextvars.Context`. This enables users to safely leverage state via :py:class:`contextvars.ContextVar` in their task functions. See :pull:`583`.
 - Adds formal support for Python 3.12. See :pull:`555`
 - Several new methods were added to :class:`~hydra_zen.ZenStore`, including the abilities to copy, update, and merge stores. As well as remap the groups of a store's entries and delete individual entries. See :pull:`569`
+- Auto-config support added for :py:class:`datetime.timedelta`.
 
 Documentation
 -------------

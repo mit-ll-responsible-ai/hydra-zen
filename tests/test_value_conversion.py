@@ -5,6 +5,7 @@ import pickle
 import string
 from collections import Counter, deque
 from dataclasses import dataclass, field
+from datetime import timedelta
 from enum import Enum
 from functools import partial
 from pathlib import Path
@@ -68,6 +69,7 @@ class Shake(Enum):
         deque,
         range,
         Counter,
+        timedelta,
     ),
 )
 @settings(
