@@ -16,6 +16,7 @@ from dataclasses import (  # use this for runtime checks
     is_dataclass,
     make_dataclass,
 )
+from datetime import timedelta
 from enum import Enum
 from functools import partial
 from itertools import chain
@@ -3705,6 +3706,22 @@ class ConfigRange:
         self._args_ = (start, stop, step)
 
 
+@dataclass(unsafe_hash=True)
+class ConfigTimeDelta:
+    CBuildsFn: InitVar[Type[BuildsFn[Any]]]
+    days: float = 0.0
+    seconds: float = 0.0
+    microseconds: float = 0.0
+    milliseconds: float = 0.0
+    minutes: float = 0.0
+    hours: float = 0.0
+    weeks: float = 0.0
+    _target_: str = field(default=BuildsFn._get_obj_path(timedelta), init=False)
+
+    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]) -> None:
+        del CBuildsFn
+
+
 ZEN_VALUE_CONVERSION[set] = partial(
     ConfigFromTuple, _target_=BuildsFn._get_obj_path(set)
 )
@@ -3727,6 +3744,12 @@ ZEN_VALUE_CONVERSION[range] = lambda value, CBuildsFn: ConfigRange(
     value.start,
     value.stop,
     value.step,
+    CBuildsFn=CBuildsFn,
+)
+ZEN_VALUE_CONVERSION[timedelta] = lambda value, CBuildsFn: ConfigTimeDelta(
+    days=value.days,
+    seconds=value.seconds,
+    microseconds=value.microseconds,
     CBuildsFn=CBuildsFn,
 )
 ZEN_VALUE_CONVERSION[Counter] = partial(

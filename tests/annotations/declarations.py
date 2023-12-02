@@ -14,6 +14,7 @@
 
 from collections import Counter, deque
 from dataclasses import dataclass
+from datetime import timedelta
 from enum import Enum
 from functools import partial
 from pathlib import Path
@@ -170,6 +171,7 @@ def check_just():
     reveal_type(just(partial(f, 1)), expected_text="Just[partial[int]]")
     reveal_type(just(set([1, 2, 3])), expected_text="Builds[type[set[int]]]")
     reveal_type(just(range(10)), expected_text="Builds[type[range]]")
+    reveal_type(just(timedelta(10)), expected_text="Builds[type[timedelta]]")
 
     partiald_f = instantiate(just(partial(f, 1)))
     reveal_type(partiald_f, expected_text="partial[int]")

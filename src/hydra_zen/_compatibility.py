@@ -1,6 +1,7 @@
 # Copyright (c) 2023 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 from collections import Counter, deque
+from datetime import timedelta
 from enum import Enum
 from functools import partial
 from pathlib import Path, PosixPath, WindowsPath
@@ -68,6 +69,7 @@ ZEN_SUPPORTED_PRIMITIVES: FrozenSet[type] = frozenset(
         deque,
         Counter,
         range,
+        timedelta,
     }
 )
 
