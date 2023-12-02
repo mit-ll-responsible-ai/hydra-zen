@@ -6,6 +6,7 @@
 import sys
 import types
 from dataclasses import MISSING
+from datetime import timedelta
 from enum import Enum
 from pathlib import Path, PosixPath, WindowsPath
 from typing import (
@@ -211,6 +212,8 @@ _SupportedViaBuilds = Union[
     Partial[Any],
     range,
     Set[Any],
+    timedelta,
+    types.SimpleNamespace,
 ]
 
 _SupportedPrimitive: TypeAlias = Union[
