@@ -85,14 +85,14 @@ following code. Here, we define our single-layer neural network and the `lightni
    
            self.model = model
    
-       def forward(self, x):
+       def forward(self, x):  # type: ignore
            return self.model(x)
    
        def configure_optimizers(self):
            # provide optimizer with model parameters
            return self.optim(self.parameters())
    
-       def training_step(self, batch, batch_idx):
+       def training_step(self, batch, batch_idx):  # type: ignore
            x, y = batch
            # compute |cos(x) - model(x)|^2
            return F.mse_loss(self.model(x), y)
