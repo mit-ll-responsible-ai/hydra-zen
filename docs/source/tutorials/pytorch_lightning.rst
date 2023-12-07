@@ -85,7 +85,7 @@ following code. Here, we define our single-layer neural network and the `lightni
    
            self.model = model
    
-       def forward(self, x):
+       def forward(self, x):  # type: ignore
            return self.model(x)
    
        def configure_optimizers(self):
