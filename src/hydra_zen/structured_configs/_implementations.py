@@ -3385,11 +3385,6 @@ class BuildsFn(Generic[T]):
 
         Instantiating the config returns a dictionary.
 
-        .. note::
-
-           ``kwargs_of`` is a new feature as of hydra-zen v0.12.0rc7.
-           You can try out this pre-release feature using `pip install --pre hydra-zen`
-
         Parameters
         ----------
         __hydra_target : Callable[P, Any]
