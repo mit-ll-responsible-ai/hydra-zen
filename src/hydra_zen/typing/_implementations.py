@@ -439,7 +439,7 @@ else:  # pragma: no cover
 
 
 class StrictDataclassOptions(_StrictDataclassOptions):
-    cls_name: Required[str]
+    cls_name: Required[str]  # type: ignore
 
 
 class DataclassOptions(_Py312Dataclass, total=False):
