@@ -10,12 +10,10 @@ chronological order. All previous releases should still be available on pip.
 
 .. _v0.12.0:
 
-----------------------
-0.12.0rc9 - 2023-11-26
-----------------------
+-------------------
+0.12.0 - 2023-12-07
+-------------------
 
-
-.. note:: This is documentation for an unreleased version of hydra-zen. You can try out this pre-release version using `pip install --pre hydra-zen`
 
 This release makes hydra-zen's :ref:`auto-config <additional-types>` and :ref:`type-refinement <type-support>` capabilities fully customizable and extensible, while still preserving static type-checking 🎉.
 
