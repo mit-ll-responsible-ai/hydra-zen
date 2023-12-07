@@ -44,10 +44,10 @@ add them to :ref:`Hydra's config <HydraConf>`.
 
    # Defining our callbacks
    class TimeIt(Callback):
-       def on_job_start(self, **kw) -> None:
+       def on_job_start(self, **kw) -> None:  # type: ignore
            self._start = time.time()
    
-       def on_job_end(self, **kw) -> None:
+       def on_job_end(self, **kw) -> None:  # type: ignore
            print(f"TimeIt: Took {round(time.time() - self._start, 2)} seconds")
    
    
@@ -55,7 +55,7 @@ add them to :ref:`Hydra's config <HydraConf>`.
        def __init__(self, *, bucket: str = "s3:/") -> None:
            self.bucket = bucket
    
-       def on_job_end(self, config: Config, **kwargs) -> None:
+       def on_job_end(self, config: Config, **kwargs) -> None:  # type: ignore
            # Leverage access to the job's config to create a distinct file path.
            path = f"file_{config.x}.txt"
            print(f"UploadResultsCallback: Job ended, uploading results to {self.bucket}/{path}")
