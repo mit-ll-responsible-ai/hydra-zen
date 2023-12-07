@@ -79,7 +79,7 @@ F = TypeVar("F")
 _UNSPECIFIED_: Any = object()
 
 
-_SUPPORTED_INSTANTIATION_TYPES: Tuple[Any, ...] = (dict, DictConfig, list, ListConfig)  # type: ignore
+_SUPPORTED_INSTANTIATION_TYPES: Tuple[Any, ...] = (dict, DictConfig, list, ListConfig)
 
 ConfigLike: TypeAlias = Union[
     DataClass_,
