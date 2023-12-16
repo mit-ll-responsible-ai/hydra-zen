@@ -103,8 +103,7 @@ def is_old_partial_builds(x: Any) -> bool:  # pragma: no cover
             safe_getattr(x, "_partial_target_")
         ):
             return True
-        else:
-            # ensures we cover this branch in tests
+        else:  # pragma: no cover
             return False
     return False
 
