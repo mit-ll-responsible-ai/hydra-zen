@@ -295,13 +295,13 @@ not leverage runtime checking of it types. Create a script called <code class="d
 containing the following code.</p>
 <div class="literal-block-wrapper docutils container" id="id3">
 <div class="code-block-caption"><span class="caption-text">2: Creating toy example of library code. Contents of <code class="docutils literal notranslate"><span class="pre">toy_library.py</span></code>.</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#module-typing" title="typing"><span class="nn">typing</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Union" title="typing.Union"><span class="n">Union</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="typing.Sequence"><span class="n">Sequence</span></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#module-typing" title="typing"><span class="nn">typing</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Union" title="typing.Union"><span class="n">Union</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="typing.Sequence"><span class="n">Sequence</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.TypeAlias" title="typing.TypeAlias"><span class="n">TypeAlias</span></a>
 
 <span class="kn">from</span> <span class="nn">beartype.vale</span> <span class="kn">import</span> <span class="n">Is</span>
 <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="typing.Annotated"><span class="n">Annotated</span></a>
 
 
-<span class="n">PositiveInt</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="typing.Annotated"><span class="n">Annotated</span></a><span class="p">[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">Is</span><span class="p">[</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">]]</span>
+<span class="n">PositiveInt</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.TypeAlias" title="typing.TypeAlias"><span class="n">TypeAlias</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="typing.Annotated"><span class="n">Annotated</span></a><span class="p">[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">Is</span><span class="p">[</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">]]</span>
 
 
 <span class="k">def</span> <span class="nf">process_age</span><span class="p">(</span><span class="n">age</span><span class="p">:</span> <span class="n">PositiveInt</span><span class="p">):</span>
@@ -313,17 +313,9 @@ containing the following code.</p>
 </pre></div>
 </div>
 </div>
-<p>Note that the annotation</p>
+<p>Note that the annotation <code class="xref py py-obj docutils literal notranslate"><span class="pre">PositiveInt</span></code> indicates that an associated value should not only be an <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, but also have a non-negative value. Whereas</p>
 <div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text">Annotation of <code class="docutils literal notranslate"><span class="pre">age</span></code></span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">PositiveInt</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">Is</span><span class="p">[</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">]]</span>
-</pre></div>
-</div>
-</div>
-<p>indicates that an associated value should not only be an <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, but also have a
-non-negative value. Whereas</p>
-<div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-text">Annotation of <code class="docutils literal notranslate"><span class="pre">shape</span></code></span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
+<div class="code-block-caption"><span class="caption-text">Annotation of <code class="docutils literal notranslate"><span class="pre">shape</span></code></span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Union</span><span class="p">[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">]]</span>
 </pre></div>
 </div>
@@ -334,8 +326,8 @@ etc.) of ints.</p>
 their configs so that beartype will validate their configured values upon
 instantiation.</p>
 <p>Open a Python console – or Jupyter notebook – in the same directory as <code class="docutils literal notranslate"><span class="pre">toy_library.py</span></code> and create the following configs.</p>
-<div class="literal-block-wrapper docutils container" id="id6">
-<div class="code-block-caption"><span class="caption-text">3: Creating configs that include beartype validation.</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">3: Creating configs that include beartype validation.</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">toy_library</span> <span class="kn">import</span> <span class="n">process_age</span><span class="p">,</span> <span class="n">process_shape</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><span class="n">make_custom_builds_fn</span></a>
@@ -354,8 +346,8 @@ instantiation.</p>
 </div>
 <p>Finally, let’s check that our configured values are validated as-expected.
 In the same console, verify that you can replicate the following behavior.</p>
-<div class="literal-block-wrapper docutils container" id="id7">
-<div class="code-block-caption"><span class="caption-text">4: Test that the type-checker catches bad configured values.</span><a class="headerlink" href="#id7" title="Link to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">4: Test that the type-checker catches bad configured values.</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a>
 
 <span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">(</span><span class="n">ConfAge</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>  <span class="c1"># OK</span>

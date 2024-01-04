@@ -42,13 +42,13 @@ containing the following code.
 .. code-block:: python
    :caption: 2: Creating toy example of library code. Contents of ``toy_library.py``.
 
-   from typing import Union, Sequence
+   from typing import Union, Sequence, TypeAlias
    
    from beartype.vale import Is
    from typing_extensions import Annotated
    
    
-   PositiveInt = Annotated[int, Is[lambda x: x >= 0]]
+   PositiveInt: TypeAlias = Annotated[int, Is[lambda x: x >= 0]]
    
    
    def process_age(age: PositiveInt):
@@ -58,15 +58,7 @@ containing the following code.
    def process_shape(shape: Union[int, Sequence[int]]):
        return shape
 
-Note that the annotation
-
-.. code-block:: python
-   :caption: Annotation of ``age``
-
-   PositiveInt = Annotated[int, Is[lambda x: x >= 0]]
-
-indicates that an associated value should not only be an :class:`int`, but also have a 
-non-negative value. Whereas
+Note that the annotation `PositiveInt` indicates that an associated value should not only be an :class:`int`, but also have a non-negative value. Whereas
 
 .. code-block:: python
    :caption: Annotation of ``shape``
