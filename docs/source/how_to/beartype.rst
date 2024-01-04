@@ -42,13 +42,13 @@ containing the following code.
 .. code-block:: python
    :caption: 2: Creating toy example of library code. Contents of ``toy_library.py``.
 
-   from typing import Union, Sequence
+   from typing import Union, Sequence, TypeAlias
    
    from beartype.vale import Is
    from typing_extensions import Annotated
    
    
-   PositiveInt = Annotated[int, Is[lambda x: x >= 0]]
+   PositiveInt: TypeAlias = Annotated[int, Is[lambda x: x >= 0]]
    
    
    def process_age(age: PositiveInt):
