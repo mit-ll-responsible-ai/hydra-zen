@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Massachusetts Institute of Technology
+# Copyright (c) 2024 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 # mypy: disable-error-code=empty-body
 
