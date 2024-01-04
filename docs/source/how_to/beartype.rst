@@ -58,15 +58,7 @@ containing the following code.
    def process_shape(shape: Union[int, Sequence[int]]):
        return shape
 
-Note that the annotation
-
-.. code-block:: python
-   :caption: Annotation of ``age``
-
-   PositiveInt = Annotated[int, Is[lambda x: x >= 0]]
-
-indicates that an associated value should not only be an :class:`int`, but also have a 
-non-negative value. Whereas
+Note that the annotation `PositiveInt` indicates that an associated value should not only be an :class:`int`, but also have a non-negative value. Whereas
 
 .. code-block:: python
    :caption: Annotation of ``shape``
