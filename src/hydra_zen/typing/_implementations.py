@@ -143,6 +143,11 @@ class HasTarget(Protocol):
 
 
 @runtime_checkable
+class HasTargetInst(Protocol):
+    _target_: str
+
+
+@runtime_checkable
 class Builds(DataClass, Protocol[T]):
     _target_: ClassVar[str]
 

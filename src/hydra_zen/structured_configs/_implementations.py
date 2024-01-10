@@ -94,6 +94,7 @@ from hydra_zen.typing._implementations import (
     DefaultsList,
     Field,
     HasTarget,
+    HasTargetInst,
     HydraSupportedType,
     InstOrType,
     Just as JustT,
@@ -3489,6 +3490,11 @@ class ConfigPath:
 
 @overload
 def get_target(obj: InstOrType[Builds[_T]]) -> _T:
+    ...
+
+
+@overload
+def get_target(obj: HasTargetInst) -> Any:
     ...
 
 
