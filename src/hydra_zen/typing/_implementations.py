@@ -139,6 +139,11 @@ class DataClass(DataClass_, Protocol):
 
 @runtime_checkable
 class HasTarget(Protocol):
+    _target_: ClassVar[str]
+
+
+@runtime_checkable
+class HasTargetInst(Protocol):
     _target_: str
 
 
