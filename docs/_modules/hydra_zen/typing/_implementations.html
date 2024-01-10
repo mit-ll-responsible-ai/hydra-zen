@@ -547,6 +547,11 @@ document.write(`
 
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span> <span class="nc">HasTarget</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="n">_target_</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
+
+<span class="nd">@runtime_checkable</span>
+<span class="k">class</span> <span class="nc">HasTargetInst</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span>
 
 

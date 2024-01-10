@@ -461,6 +461,7 @@ document.write(`
     <span class="n">ParamSpecArgs</span><span class="p">,</span>
     <span class="n">ParamSpecKwargs</span><span class="p">,</span>
     <span class="n">Protocol</span><span class="p">,</span>
+    <span class="n">Self</span><span class="p">,</span>
     <span class="n">TypeAlias</span><span class="p">,</span>
     <span class="n">Unpack</span><span class="p">,</span>
     <span class="n">_AnnotatedAlias</span><span class="p">,</span>
@@ -501,6 +502,7 @@ document.write(`
     <span class="n">DefaultsList</span><span class="p">,</span>
     <span class="n">Field</span><span class="p">,</span>
     <span class="n">HasTarget</span><span class="p">,</span>
+    <span class="n">HasTargetInst</span><span class="p">,</span>
     <span class="n">HydraSupportedType</span><span class="p">,</span>
     <span class="n">InstOrType</span><span class="p">,</span>
     <span class="n">Just</span> <span class="k">as</span> <span class="n">JustT</span><span class="p">,</span>
@@ -1774,7 +1776,7 @@ document.write(`
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]],</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -1795,7 +1797,7 @@ document.write(`
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -1817,7 +1819,7 @@ document.write(`
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">AnyBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
         <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -1840,7 +1842,7 @@ document.write(`
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
         <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -1863,7 +1865,7 @@ document.write(`
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">AnyBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
         <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -1886,7 +1888,7 @@ document.write(`
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
         <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -1909,7 +1911,7 @@ document.write(`
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">AnyBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
         <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -1932,7 +1934,7 @@ document.write(`
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
         <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -1955,7 +1957,7 @@ document.write(`
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">Importable</span><span class="p">],</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
         <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">],</span>
@@ -1980,7 +1982,7 @@ document.write(`
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Importable</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="n">Type</span><span class="p">[</span><span class="n">AnyBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">Any</span><span class="p">],</span>
         <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(),</span>
@@ -3714,7 +3716,7 @@ document.write(`
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -3725,7 +3727,7 @@ document.write(`
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">Concatenate</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">P</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -3736,7 +3738,7 @@ document.write(`
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">Concatenate</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">P</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -3747,7 +3749,7 @@ document.write(`
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">Concatenate</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">P</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -3760,7 +3762,7 @@ document.write(`
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -3771,7 +3773,7 @@ document.write(`
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -3782,7 +3784,7 @@ document.write(`
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -3795,7 +3797,7 @@ document.write(`
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3918,13 +3920,18 @@ document.write(`
 
 
 <span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">HasTargetInst</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">HasTarget</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
     <span class="o">...</span>
 
 
 <div class="viewcode-block" id="get_target">
 <a class="viewcode-back" href="../../../generated/hydra_zen.get_target.html#hydra_zen.get_target">[docs]</a>
-<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">HasTarget</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">HasTarget</span><span class="p">,</span> <span class="n">HasTargetInst</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the target-object from a targeted config.</span>
 
