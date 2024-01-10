@@ -53,6 +53,7 @@ from typing_extensions import (
     ParamSpecArgs,
     ParamSpecKwargs,
     Protocol,
+    Self,
     TypeAlias,
     Unpack,
     _AnnotatedAlias,
@@ -93,6 +94,7 @@ from hydra_zen.typing._implementations import (
     DefaultsList,
     Field,
     HasTarget,
+    HasTargetInst,
     HydraSupportedType,
     InstOrType,
     Just as JustT,
@@ -1349,7 +1351,7 @@ class BuildsFn(Generic[T]):
     @overload
     @classmethod
     def builds(
-        cls,
+        cls: Type[Self],
         __hydra_target: Type[BuildsWithSig[Type[R], P]],
         *,
         zen_partial: Literal[False, None] = ...,
@@ -1370,7 +1372,7 @@ class BuildsFn(Generic[T]):
     @overload
     @classmethod
     def builds(
-        cls,
+        cls: Type[Self],
         __hydra_target: Callable[P, R],
         *,
         zen_partial: Literal[False, None] = ...,
@@ -1392,7 +1394,7 @@ class BuildsFn(Generic[T]):
     @overload
     @classmethod
     def builds(
-        cls,
+        cls: Type[Self],
         __hydra_target: Type[AnyBuilds[Importable]],
         *pos_args: T,
         zen_partial: Literal[False, None] = ...,
@@ -1415,7 +1417,7 @@ class BuildsFn(Generic[T]):
     @overload
     @classmethod
     def builds(
-        cls,
+        cls: Type[Self],
         __hydra_target: Importable,
         *pos_args: T,
         zen_partial: Literal[False, None] = ...,
@@ -1438,7 +1440,7 @@ class BuildsFn(Generic[T]):
     @overload
     @classmethod
     def builds(
-        cls,
+        cls: Type[Self],
         __hydra_target: Type[AnyBuilds[Importable]],
         *pos_args: T,
         zen_partial: Literal[True] = ...,
@@ -1461,7 +1463,7 @@ class BuildsFn(Generic[T]):
     @overload
     @classmethod
     def builds(
-        cls,
+        cls: Type[Self],
         __hydra_target: Importable,
         *pos_args: T,
         zen_partial: Literal[True] = ...,
@@ -1484,7 +1486,7 @@ class BuildsFn(Generic[T]):
     @overload
     @classmethod
     def builds(
-        cls,
+        cls: Type[Self],
         __hydra_target: Type[AnyBuilds[Importable]],
         *pos_args: T,
         zen_partial: Optional[bool] = ...,
@@ -1507,7 +1509,7 @@ class BuildsFn(Generic[T]):
     @overload
     @classmethod
     def builds(
-        cls,
+        cls: Type[Self],
         __hydra_target: Importable,
         *pos_args: T,
         zen_partial: Optional[bool] = ...,
@@ -1530,7 +1532,7 @@ class BuildsFn(Generic[T]):
     @overload
     @classmethod
     def builds(
-        cls,
+        cls: Type[Self],
         __hydra_target: Union[Callable[P, R], Type[Builds[Importable]], Importable],
         *pos_args: T,
         zen_partial: Optional[bool],
@@ -1555,7 +1557,7 @@ class BuildsFn(Generic[T]):
 
     @classmethod
     def builds(
-        cls,
+        cls: Type[Self],
         *pos_args: Union[Importable, Callable[P, R], Type[AnyBuilds[Importable]], Any],
         zen_partial: Optional[bool] = None,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
@@ -3289,7 +3291,7 @@ class BuildsFn(Generic[T]):
     @overload
     @classmethod
     def kwargs_of(
-        cls,
+        cls: Type[Self],
         __hydra_target: Callable[P, Any],
         *,
         zen_dataclass: Optional[DataclassOptions] = ...,
@@ -3300,7 +3302,7 @@ class BuildsFn(Generic[T]):
     @overload
     @classmethod
     def kwargs_of(
-        cls,
+        cls: Type[Self],
         __hydra_target: Callable[Concatenate[Any, P], Any],
         *,
         zen_dataclass: Optional[DataclassOptions] = ...,
@@ -3311,7 +3313,7 @@ class BuildsFn(Generic[T]):
     @overload
     @classmethod
     def kwargs_of(
-        cls,
+        cls: Type[Self],
         __hydra_target: Callable[Concatenate[Any, Any, P], Any],
         *,
         zen_dataclass: Optional[DataclassOptions] = ...,
@@ -3322,7 +3324,7 @@ class BuildsFn(Generic[T]):
     @overload
     @classmethod
     def kwargs_of(
-        cls,
+        cls: Type[Self],
         __hydra_target: Callable[Concatenate[Any, Any, Any, P], Any],
         *,
         zen_dataclass: Optional[DataclassOptions] = ...,
@@ -3335,7 +3337,7 @@ class BuildsFn(Generic[T]):
     @overload
     @classmethod
     def kwargs_of(
-        cls,
+        cls: Type[Self],
         __hydra_target: Callable[P, Any],
         *,
         zen_dataclass: Optional[DataclassOptions] = ...,
@@ -3346,7 +3348,7 @@ class BuildsFn(Generic[T]):
     @overload
     @classmethod
     def kwargs_of(
-        cls,
+        cls: Type[Self],
         __hydra_target: Callable[P, Any],
         *,
         zen_dataclass: Optional[DataclassOptions] = ...,
@@ -3357,7 +3359,7 @@ class BuildsFn(Generic[T]):
     @overload
     @classmethod
     def kwargs_of(
-        cls,
+        cls: Type[Self],
         __hydra_target: Callable[P, Any],
         *,
         zen_dataclass: Optional[DataclassOptions] = ...,
@@ -3370,7 +3372,7 @@ class BuildsFn(Generic[T]):
 
     @classmethod
     def kwargs_of(
-        cls,
+        cls: Type[Self],
         __hydra_target: Callable[P, Any],
         *,
         zen_dataclass: Optional[DataclassOptions] = None,
@@ -3492,11 +3494,16 @@ def get_target(obj: InstOrType[Builds[_T]]) -> _T:
 
 
 @overload
+def get_target(obj: HasTargetInst) -> Any:
+    ...
+
+
+@overload
 def get_target(obj: HasTarget) -> Any:
     ...
 
 
-def get_target(obj: HasTarget) -> Any:
+def get_target(obj: Union[HasTarget, HasTargetInst]) -> Any:
     """
     Returns the target-object from a targeted config.
 
