@@ -3503,7 +3503,7 @@ def get_target(obj: HasTarget) -> Any:
     ...
 
 
-def get_target(obj: HasTarget) -> Any:
+def get_target(obj: Union[HasTarget, HasTargetInst]) -> Any:
     """
     Returns the target-object from a targeted config.
 
