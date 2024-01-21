@@ -11,6 +11,13 @@ chronological order. All previous releases should still be available on pip.
 .. _v0.12.0:
 
 -------------------
+0.12.1 - 2024-01-21
+-------------------
+
+Minor improvements to the type annotations for :func:`hydra_zen.get_target` for 
+compatibility with pyright 1.1.345+.
+
+-------------------
 0.12.0 - 2023-12-07
 -------------------
 
