@@ -296,7 +296,9 @@ ZenWrappers: TypeAlias = Union[ZenWrapper[T4], Sequence[ZenWrapper[T4]]]
 
 
 DefaultsList = List[
-    Union[str, DataClass_, Mapping[str, Union[None, str, Sequence[str]]]]
+    Union[
+        str, DataClass_, Type[DataClass_], Mapping[str, Union[None, str, Sequence[str]]]
+    ]
 ]
 
 

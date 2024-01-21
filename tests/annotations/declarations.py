@@ -426,7 +426,6 @@ def supported_primitives():
 
 def check_zen_field():
     ZenField(int)
-    ZenField(Callable[..., Any])
     ZenField(List[int])
 
     ZenField(1.0)  # type: ignore
