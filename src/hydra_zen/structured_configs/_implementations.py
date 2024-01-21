@@ -3542,7 +3542,7 @@ def get_target(obj: Union[HasTarget, HasTargetInst]) -> Any:
     ... class A:
     ...     _target_: str = "builtins.dict"
 
-    >>> get_target(A)
+    >>> get_target(A())
     <class 'dict'>
 
     and for configs loaded from yamls.
