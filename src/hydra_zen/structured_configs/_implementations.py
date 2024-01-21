@@ -853,7 +853,7 @@ class BuildsFn(Generic[T]):
                 if optional_type is Any:  # Union[Any, T] is just Any
                     return Any
 
-                return Union[optional_type, NoneType]
+                return cast(type, Union[optional_type, NoneType])
 
             if origin is list or origin is List:
                 if args:
@@ -2276,7 +2276,8 @@ class BuildsFn(Generic[T]):
                     " You can manually create a dataclass to utilize this name in a structured config."
                 )
 
-        target_field: List[Union[Tuple[str, Type[Any]], Tuple[str, Type[Any], Any]]]
+        # list[tuple[str, type] | tuple[str, type, Any]]
+        target_field: List[Union[Tuple[str, Any], Tuple[str, Any, Any]]]
 
         # zen_partial behavior:
         #
@@ -2406,7 +2407,7 @@ class BuildsFn(Generic[T]):
                             ZEN_WRAPPERS_FIELD_NAME,
                             Union[
                                 Union[str, Builds[Any]],
-                                Tuple[Union[str, Builds[Any]], ...],
+                                Tuple[Union[str, Builds[Any]], Any],
                             ],
                             _utils.field(default=validated_wrappers[0], init=False),
                         ),
@@ -2417,7 +2418,7 @@ class BuildsFn(Generic[T]):
                             ZEN_WRAPPERS_FIELD_NAME,
                             Union[
                                 Union[str, Builds[Any]],
-                                Tuple[Union[str, Builds[Any]], ...],
+                                Tuple[Union[str, Builds[Any]], Any],
                             ],
                             _utils.field(default=validated_wrappers, init=False),
                         ),
