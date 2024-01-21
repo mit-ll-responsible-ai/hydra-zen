@@ -1271,7 +1271,7 @@ document.write(`
                 <span class="k">if</span> <span class="n">optional_type</span> <span class="ow">is</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># Union[Any, T] is just Any</span>
                     <span class="k">return</span> <span class="n">Any</span>
 
-                <span class="k">return</span> <span class="n">Union</span><span class="p">[</span><span class="n">optional_type</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]</span>
+                <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">optional_type</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">])</span>
 
             <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="nb">list</span> <span class="ow">or</span> <span class="n">origin</span> <span class="ow">is</span> <span class="n">List</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
@@ -2701,7 +2701,8 @@ document.write(`
                     <span class="s2">&quot; You can manually create a dataclass to utilize this name in a structured config.&quot;</span>
                 <span class="p">)</span>
 
-        <span class="n">target_field</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]]</span>
+        <span class="c1"># list[tuple[str, type] | tuple[str, type, Any]]</span>
+        <span class="n">target_field</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span>
 
         <span class="c1"># zen_partial behavior:</span>
         <span class="c1">#</span>
@@ -2831,7 +2832,7 @@ document.write(`
                             <span class="n">ZEN_WRAPPERS_FIELD_NAME</span><span class="p">,</span>
                             <span class="n">Union</span><span class="p">[</span>
                                 <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
-                                <span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="o">...</span><span class="p">],</span>
+                                <span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">Any</span><span class="p">],</span>
                             <span class="p">],</span>
                             <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">validated_wrappers</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
                         <span class="p">),</span>
@@ -2842,7 +2843,7 @@ document.write(`
                             <span class="n">ZEN_WRAPPERS_FIELD_NAME</span><span class="p">,</span>
                             <span class="n">Union</span><span class="p">[</span>
                                 <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
-                                <span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="o">...</span><span class="p">],</span>
+                                <span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">Any</span><span class="p">],</span>
                             <span class="p">],</span>
                             <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">validated_wrappers</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
                         <span class="p">),</span>
@@ -3970,7 +3971,7 @@ document.write(`
 <span class="sd">    ... class A:</span>
 <span class="sd">    ...     _target_: str = &quot;builtins.dict&quot;</span>
 
-<span class="sd">    &gt;&gt;&gt; get_target(A)</span>
+<span class="sd">    &gt;&gt;&gt; get_target(A())</span>
 <span class="sd">    &lt;class &#39;dict&#39;&gt;</span>
 
 <span class="sd">    and for configs loaded from yamls.</span>
