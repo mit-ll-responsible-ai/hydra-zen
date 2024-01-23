@@ -2195,11 +2195,12 @@ class BuildsFn(Generic[T]):
             if (
                 zen_convert_settings["flat_target"]
                 and isinstance(target, type)
+                and is_builds(target)
                 and is_dataclass(target)
-                and hasattr(target, TARGET_FIELD_NAME)
             ):
                 # pass through _target_ field
-                target_path = safe_getattr(target, TARGET_FIELD_NAME)
+                target_path = get_target_path(target)
+                assert isinstance(target_path, str)
             else:
                 target_path = cls._get_obj_path(target)
         else:
@@ -2500,7 +2501,7 @@ class BuildsFn(Generic[T]):
             # We want to rely on `inspect.signature` logic for raising
             # against an uninspectable sig, before we start inspecting
             # class-specific attributes below.
-            signature_params = dict(inspect.signature(target).parameters)
+            signature_params = dict(inspect.signature(target).parameters)  # type: ignore
         except ValueError:
             if populate_full_signature:
                 raise ValueError(
@@ -3489,6 +3490,43 @@ class ConfigPath:
         del CBuildsFn
 
 
+def get_target_path(obj: Union[HasTarget, HasTargetInst]) -> Any:
+    """
+    Returns the target-object from a targeted config.
+
+    Parameters
+    ----------
+    obj : HasTarget
+        An object with a ``_target_`` attribute.
+
+    Returns
+    -------
+    target_str : str
+        The import path stored on the config object.
+
+    Raises
+    ------
+    TypeError: ``obj`` does not have a ``_target_`` attribute.
+    """
+    if is_old_partial_builds(obj):
+        # obj._partial_target_ is `Just[obj]`
+        return get_target(getattr(obj, "_partial_target_"))
+    elif uses_zen_processing(obj):
+        field_name = ZEN_TARGET_FIELD_NAME
+    elif is_just(obj):
+        field_name = JUST_FIELD_NAME
+    elif is_builds(obj):
+        field_name = TARGET_FIELD_NAME
+    else:
+        raise TypeError(
+            f"`obj` must specify a target; i.e. it must have an attribute named"
+            f" {TARGET_FIELD_NAME} or named {ZEN_PARTIAL_FIELD_NAME} that"
+            f" points to a target-object or target-string"
+        )
+    target = safe_getattr(obj, field_name)
+    return target
+
+
 @overload
 def get_target(obj: InstOrType[Builds[_T]]) -> _T:
     ...
@@ -3516,6 +3554,10 @@ def get_target(obj: Union[HasTarget, HasTargetInst]) -> Any:
     Returns
     -------
     target : Any
+        The target object of the config.
+
+        Note that this will import the object using the import
+        path specified by the config.
 
     Raises
     ------
@@ -3562,22 +3604,7 @@ def get_target(obj: Union[HasTarget, HasTargetInst]) -> Any:
     >>> get_target(loaded_conf)  # type: ignore
     __main__.B
     """
-    if is_old_partial_builds(obj):
-        # obj._partial_target_ is `Just[obj]`
-        return get_target(getattr(obj, "_partial_target_"))
-    elif uses_zen_processing(obj):
-        field_name = ZEN_TARGET_FIELD_NAME
-    elif is_just(obj):
-        field_name = JUST_FIELD_NAME
-    elif is_builds(obj):
-        field_name = TARGET_FIELD_NAME
-    else:
-        raise TypeError(
-            f"`obj` must specify a target; i.e. it must have an attribute named"
-            f" {TARGET_FIELD_NAME} or named {ZEN_PARTIAL_FIELD_NAME} that"
-            f" points to a target-object or target-string"
-        )
-    target = safe_getattr(obj, field_name)
+    target = get_target_path(obj=obj)
 
     if isinstance(target, str):
         target = get_obj(path=target)

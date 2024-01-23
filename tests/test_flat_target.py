@@ -3,6 +3,7 @@
 
 
 from dataclasses import dataclass
+from functools import partial
 
 import pytest
 
@@ -64,3 +65,17 @@ def test_store_hydrated():
     assert instantiate(store[None, "a"])(x=10, y=22) == (10, 22)
     assert instantiate(store[None, "b"])(x=2) == (2, -1)
     assert instantiate(store[None, "c"])() == (-1, 2)
+
+
+def test_supports_meta_fields_via_inheritance():
+    A = builds(dict, x=1, zen_meta={"META": 2})
+    B = builds(A, x="${META}", builds_bases=(A,))
+    assert instantiate(B) == {"x": 2}
+
+
+def test_supports_meta_fields_with_partial_via_inheritance():
+    A = builds(dict, x=1, zen_partial=True, zen_meta={"META": 2})
+    B = builds(A, x="${META}", builds_bases=(A,))
+    obj = instantiate(B)
+    assert isinstance(obj, partial)
+    assert obj() == {"x": 2}
