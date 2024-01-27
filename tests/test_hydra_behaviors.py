@@ -155,8 +155,7 @@ def test_object_convert():
 )
 def test_object_convert_hydrated():
     @hydrated_dataclass(dict, hydra_convert="object")
-    class A:
-        ...
+    class A: ...
 
     assert A._convert_ == "object"  # type: ignore
 

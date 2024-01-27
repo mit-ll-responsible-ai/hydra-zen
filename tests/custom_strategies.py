@@ -188,11 +188,11 @@ def new_stores(draw: st.DrawFn, deferred_hydra_store: Optional[bool] = None):
     name = draw(st.none() | st.sampled_from(["foo", "bar", "baz"]))
     return ZenStore(
         name,
-        deferred_hydra_store=draw(
-            st.booleans().map(lambda x: not x), label="deferred_hydra_store"
-        )
-        if deferred_hydra_store is None
-        else deferred_hydra_store,
+        deferred_hydra_store=(
+            draw(st.booleans().map(lambda x: not x), label="deferred_hydra_store")
+            if deferred_hydra_store is None
+            else deferred_hydra_store
+        ),
         overwrite_ok=draw(st.booleans(), label="overwrite_ok"),
         deferred_to_config=draw(
             st.booleans().map(lambda x: not x), label="deferred_to_config"

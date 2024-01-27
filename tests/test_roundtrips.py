@@ -191,8 +191,7 @@ def test_get_target_roundtrip(x, fn):
     assert is_same(x, get_target(loaded))
 
 
-def f_get_target_roundtrip2():
-    ...
+def f_get_target_roundtrip2(): ...
 
 
 @pytest.mark.filterwarnings("ignore:A structured config was supplied for")

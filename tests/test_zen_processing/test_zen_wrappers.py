@@ -25,8 +25,7 @@ T = TypeVar("T", bound=Callable)
 class TrackedFunc(Protocol):
     tracked_id: int
 
-    def __call__(self, obj: T) -> T:
-        ...
+    def __call__(self, obj: T) -> T: ...
 
 
 def _coordinate_meta_fields_for_interpolation(wrappers, zen_meta):

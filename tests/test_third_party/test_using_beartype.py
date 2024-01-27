@@ -9,8 +9,7 @@ from typing_extensions import Annotated
 from hydra_zen.third_party.beartype import validates_with_beartype
 
 
-def func(x: int) -> float:
-    ...
+def func(x: int) -> float: ...
 
 
 @pytest.mark.parametrize(

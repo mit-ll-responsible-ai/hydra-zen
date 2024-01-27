@@ -250,8 +250,8 @@ description = Applies auto-flake (e.g. remove unsused imports), black, and isort
 skip_install=true
 deps =
     autoflake
-    black
-    isort
+    black==24.1.0
+    isort==5.13.2
 commands =
     autoflake --recursive --in-place --remove-duplicate-keys --remove-unused-variables src/ tests/
     isort src/ tests/
@@ -262,9 +262,9 @@ description = Ensures that source materials code and docs and test suite adhere 
               formatting and code-quality standards.
 skip_install=true
 basepython=python3.10
-deps=black
-     isort
-     flake8
+deps=black==24.1.0
+     isort==5.13.2
+     flake8==7.0.0
      pytest
      codespell
 commands=

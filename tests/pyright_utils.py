@@ -409,9 +409,9 @@ def pyright_analyze(
         pyright_config["pythonVersion"] = python_version
 
     if report_unnecessary_type_ignore_comment is not None:
-        pyright_config[
-            "reportUnnecessaryTypeIgnoreComment"
-        ] = report_unnecessary_type_ignore_comment
+        pyright_config["reportUnnecessaryTypeIgnoreComment"] = (
+            report_unnecessary_type_ignore_comment
+        )
 
     if type_checking_mode is not None:
         pyright_config["typeCheckingMode"] = type_checking_mode

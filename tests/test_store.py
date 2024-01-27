@@ -382,8 +382,7 @@ def test_store_param_validation(bad_val, field_name: str):
 
 
 @dataclass
-class DC:
-    ...
+class DC: ...
 
 
 dc = DC()
@@ -528,8 +527,7 @@ def test_deferred_to_config(name, group):
 
 
 def test_self_partialing_preserves_subclass():
-    class SubStore(ZenStore):
-        ...
+    class SubStore(ZenStore): ...
 
     s1 = SubStore()
     s2 = s1()
@@ -732,8 +730,7 @@ def test_entry_access_cannot_mutate_store(store: ZenStore, getter):
     assert all(e in new_entries for e in entries)
 
 
-class CustomHydraConf(HydraConf):
-    ...
+class CustomHydraConf(HydraConf): ...
 
 
 @pytest.mark.parametrize("conf", [CustomHydraConf, HydraConf()])
