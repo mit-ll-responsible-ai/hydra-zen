@@ -150,8 +150,7 @@ _BUILDS_CONVERT_SETTINGS = AllConvert(dataclass=True, flat_target=True)
 # stores type -> value-conversion-fn
 # for types with specialized support from hydra-zen
 class _ConversionFn(Protocol):
-    def __call__(self, __x: Any, CBuildsFn: "Type[BuildsFn[Any]]") -> Any:
-        ...
+    def __call__(self, __x: Any, CBuildsFn: "Type[BuildsFn[Any]]") -> Any: ...
 
 
 ZEN_VALUE_CONVERSION: Dict[type, _ConversionFn] = {}
@@ -1366,8 +1365,7 @@ class BuildsFn(Generic[T]):
         zen_dataclass: Optional[DataclassOptions] = None,
         frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
-    ) -> Type[BuildsWithSig[Type[R], P]]:
-        ...
+    ) -> Type[BuildsWithSig[Type[R], P]]: ...
 
     @overload
     @classmethod
@@ -1387,8 +1385,7 @@ class BuildsFn(Generic[T]):
         zen_dataclass: Optional[DataclassOptions] = None,
         frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
-    ) -> Type[BuildsWithSig[Type[R], P]]:
-        ...
+    ) -> Type[BuildsWithSig[Type[R], P]]: ...
 
     # partial=False, pop-sig=bool
     @overload
@@ -1410,8 +1407,7 @@ class BuildsFn(Generic[T]):
         frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[Builds[Importable]]:
-        ...
+    ) -> Type[Builds[Importable]]: ...
 
     # partial=False, pop-sig=bool
     @overload
@@ -1433,8 +1429,7 @@ class BuildsFn(Generic[T]):
         frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[Builds[Importable]]:
-        ...
+    ) -> Type[Builds[Importable]]: ...
 
     # partial=True, pop-sig=bool
     @overload
@@ -1456,8 +1451,7 @@ class BuildsFn(Generic[T]):
         frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[PartialBuilds[Importable]]:
-        ...
+    ) -> Type[PartialBuilds[Importable]]: ...
 
     # partial=True, pop-sig=bool
     @overload
@@ -1479,8 +1473,7 @@ class BuildsFn(Generic[T]):
         frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[PartialBuilds[Importable]]:
-        ...
+    ) -> Type[PartialBuilds[Importable]]: ...
 
     # partial=bool, pop-sig=False
     @overload
@@ -1502,8 +1495,7 @@ class BuildsFn(Generic[T]):
         frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]:
-        ...
+    ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]: ...
 
     # partial=bool, pop-sig=False
     @overload
@@ -1525,8 +1517,7 @@ class BuildsFn(Generic[T]):
         frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]:
-        ...
+    ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]: ...
 
     # partial=bool, pop-sig=bool
     @overload
@@ -1552,8 +1543,7 @@ class BuildsFn(Generic[T]):
         Type[Builds[Importable]],
         Type[PartialBuilds[Importable]],
         Type[BuildsWithSig[Type[R], P]],
-    ]:
-        ...
+    ]: ...
 
     @classmethod
     def builds(
@@ -2127,9 +2117,9 @@ class BuildsFn(Generic[T]):
 
         del pos_args
 
-        zen_exclude: Union[
-            Callable[[str], bool], Collection[Union[str, int]]
-        ] = kwargs_for_target.pop("zen_exclude", frozenset())
+        zen_exclude: Union[Callable[[str], bool], Collection[Union[str, int]]] = (
+            kwargs_for_target.pop("zen_exclude", frozenset())
+        )
         zen_index_exclude: set[int] = set()
 
         if (
@@ -2291,12 +2281,12 @@ class BuildsFn(Generic[T]):
         # If _partial_=True is inherited but zen-processing is used
         #    then set _partial_=False, _zen_partial=zen_partial
         #
-        base_hydra_partial: Optional[
-            bool
-        ] = None  # state of closest parent with _partial_
-        base_zen_partial: Optional[
-            bool
-        ] = None  # state of closest parent with _zen_partial
+        base_hydra_partial: Optional[bool] = (
+            None  # state of closest parent with _partial_
+        )
+        base_zen_partial: Optional[bool] = (
+            None  # state of closest parent with _zen_partial
+        )
 
         # reflects state of closest parent that has partial field specified
         parent_partial: Optional[bool] = None
@@ -2938,8 +2928,7 @@ class BuildsFn(Generic[T]):
         hydra_recursive: Optional[bool] = ...,
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
-    ) -> TP:
-        ...
+    ) -> TP: ...
 
     @overload
     @classmethod
@@ -2951,8 +2940,7 @@ class BuildsFn(Generic[T]):
         hydra_recursive: Optional[bool] = ...,
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
-    ) -> "ConfigComplex":
-        ...
+    ) -> "ConfigComplex": ...
 
     @overload
     @classmethod
@@ -2964,8 +2952,7 @@ class BuildsFn(Generic[T]):
         hydra_recursive: Optional[bool] = ...,
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
-    ) -> JustT[TC]:
-        ...
+    ) -> JustT[TC]: ...
 
     @overload
     @classmethod
@@ -2977,8 +2964,7 @@ class BuildsFn(Generic[T]):
         hydra_recursive: Optional[bool] = ...,
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
-    ) -> Builds[Type[TB]]:
-        ...
+    ) -> Builds[Type[TB]]: ...
 
     @overload
     @classmethod
@@ -2990,8 +2976,7 @@ class BuildsFn(Generic[T]):
         hydra_recursive: Optional[bool] = ...,
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
-    ) -> Type[Builds[Type[TD]]]:
-        ...
+    ) -> Type[Builds[Type[TD]]]: ...
 
     @overload
     @classmethod
@@ -3003,8 +2988,7 @@ class BuildsFn(Generic[T]):
         hydra_recursive: Optional[bool] = ...,
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
-    ) -> Any:
-        ...
+    ) -> Any: ...
 
     @overload
     @classmethod
@@ -3016,8 +3000,7 @@ class BuildsFn(Generic[T]):
         hydra_recursive: Optional[bool] = ...,
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
-    ) -> Any:
-        ...
+    ) -> Any: ...
 
     @classmethod
     def just(
@@ -3297,8 +3280,7 @@ class BuildsFn(Generic[T]):
         *,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_exclude: Tuple[()],
-    ) -> Type[BuildsWithSig[Type[Dict[str, Any]], P]]:
-        ...
+    ) -> Type[BuildsWithSig[Type[Dict[str, Any]], P]]: ...
 
     @overload
     @classmethod
@@ -3308,8 +3290,7 @@ class BuildsFn(Generic[T]):
         *,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_exclude: Tuple[Literal[0]],
-    ) -> Type[BuildsWithSig[Type[Dict[str, Any]], P]]:
-        ...
+    ) -> Type[BuildsWithSig[Type[Dict[str, Any]], P]]: ...
 
     @overload
     @classmethod
@@ -3319,8 +3300,7 @@ class BuildsFn(Generic[T]):
         *,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_exclude: Tuple[Literal[0], Literal[1]],
-    ) -> Type[BuildsWithSig[Type[Dict[str, Any]], P]]:
-        ...
+    ) -> Type[BuildsWithSig[Type[Dict[str, Any]], P]]: ...
 
     @overload
     @classmethod
@@ -3330,8 +3310,7 @@ class BuildsFn(Generic[T]):
         *,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_exclude: Tuple[Literal[0], Literal[1], Literal[2]],
-    ) -> Type[BuildsWithSig[Type[Dict[str, Any]], P]]:
-        ...
+    ) -> Type[BuildsWithSig[Type[Dict[str, Any]], P]]: ...
 
     # no zen-exclude
 
@@ -3343,8 +3322,7 @@ class BuildsFn(Generic[T]):
         *,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_exclude: Literal[None] = ...,
-    ) -> Type[BuildsWithSig[Type[Dict[str, Any]], P]]:
-        ...
+    ) -> Type[BuildsWithSig[Type[Dict[str, Any]], P]]: ...
 
     @overload
     @classmethod
@@ -3354,8 +3332,7 @@ class BuildsFn(Generic[T]):
         *,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_exclude: Union["Collection[Union[str, int]]", Callable[[str], bool]],
-    ) -> Type[Builds[Type[Dict[str, Any]]]]:
-        ...
+    ) -> Type[Builds[Type[Dict[str, Any]]]]: ...
 
     @overload
     @classmethod
@@ -3368,8 +3345,7 @@ class BuildsFn(Generic[T]):
             None, "Collection[Union[str, int]]", Callable[[str], bool]
         ] = ...,
         **kwarg_overrides: T,
-    ) -> Type[Builds[Type[Dict[str, Any]]]]:
-        ...
+    ) -> Type[Builds[Type[Dict[str, Any]]]]: ...
 
     @classmethod
     def kwargs_of(
@@ -3490,18 +3466,15 @@ class ConfigPath:
 
 
 @overload
-def get_target(obj: InstOrType[Builds[_T]]) -> _T:
-    ...
+def get_target(obj: InstOrType[Builds[_T]]) -> _T: ...
 
 
 @overload
-def get_target(obj: HasTargetInst) -> Any:
-    ...
+def get_target(obj: HasTargetInst) -> Any: ...
 
 
 @overload
-def get_target(obj: HasTarget) -> Any:
-    ...
+def get_target(obj: HasTarget) -> Any: ...
 
 
 def get_target(obj: Union[HasTarget, HasTargetInst]) -> Any:

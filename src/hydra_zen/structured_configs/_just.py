@@ -30,8 +30,7 @@ def just(
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
-) -> TP:
-    ...
+) -> TP: ...
 
 
 @overload
@@ -42,8 +41,7 @@ def just(
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
-) -> ConfigComplex:
-    ...
+) -> ConfigComplex: ...
 
 
 @overload
@@ -54,8 +52,7 @@ def just(
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
-) -> Just[TC]:
-    ...
+) -> Just[TC]: ...
 
 
 @overload
@@ -66,8 +63,7 @@ def just(
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
-) -> Builds[Type[TB]]:
-    ...
+) -> Builds[Type[TB]]: ...
 
 
 @overload
@@ -78,8 +74,7 @@ def just(
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
-) -> Type[Builds[Type[TD]]]:
-    ...
+) -> Type[Builds[Type[TD]]]: ...
 
 
 @overload
@@ -90,8 +85,7 @@ def just(
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
-) -> Any:
-    ...
+) -> Any: ...
 
 
 @overload
@@ -102,8 +96,7 @@ def just(
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
-) -> Any:
-    ...
+) -> Any: ...
 
 
 def just(

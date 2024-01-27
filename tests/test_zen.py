@@ -341,8 +341,7 @@ def test_zen_validation_cfg_missing_parameter(cfg, func):
 @given(bad_config=everything_except((dict, str)))
 def test_zen_validate_bad_config(bad_config):
     @zen
-    def f(*a, **k):
-        ...
+    def f(*a, **k): ...
 
     with pytest.raises(
         HydraZenValidationError,

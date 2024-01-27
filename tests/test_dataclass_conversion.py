@@ -420,14 +420,12 @@ def f(x=HasDefault()):
 
 def test_hydrated_dataclass():
     @hydrated_dataclass(f, populate_full_signature=True)
-    class A:
-        ...
+    class A: ...
 
     @hydrated_dataclass(
         f, populate_full_signature=True, zen_convert={"dataclass": False}
     )
-    class B:
-        ...
+    class B: ...
 
     out_a = instantiate(A)
     assert isinstance(out_a, HasDefault)

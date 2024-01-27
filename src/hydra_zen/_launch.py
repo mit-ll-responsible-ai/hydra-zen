@@ -172,8 +172,7 @@ def launch(
     job_name: str = ...,
     with_log_configuration: bool = ...,
     **override_kwargs: OverrideValues,
-) -> JobReturn:
-    ...
+) -> JobReturn: ...
 
 
 @overload
@@ -188,8 +187,7 @@ def launch(
     job_name: str = ...,
     with_log_configuration: bool = ...,
     **override_kwargs: OverrideValues,
-) -> Any:
-    ...
+) -> Any: ...
 
 
 def launch(

@@ -7,17 +7,14 @@ from omegaconf import DictConfig
 from hydra_zen import ZenStore, builds, launch, make_config, to_yaml, zen
 
 
-def relu():
-    ...
+def relu(): ...
 
 
-def selu():
-    ...
+def selu(): ...
 
 
 class Model:
-    def __init__(self, activation_fn=relu):
-        ...
+    def __init__(self, activation_fn=relu): ...
 
 
 def app(zen_cfg: DictConfig, model: Model) -> None:

@@ -64,8 +64,7 @@ def make_custom_builds_fn(
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     builds_fn: InstOrType[BuildsFn[T]] = DefaultBuilds,
-) -> FullBuilds[T]:
-    ...
+) -> FullBuilds[T]: ...
 
 
 # partial=True, pop-sig=bool
@@ -83,8 +82,7 @@ def make_custom_builds_fn(
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     builds_fn: InstOrType[BuildsFn[T]] = DefaultBuilds,
-) -> PBuilds[T]:
-    ...
+) -> PBuilds[T]: ...
 
 
 # partial=False, pop-sig=False
@@ -102,8 +100,7 @@ def make_custom_builds_fn(
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     builds_fn: InstOrType[BuildsFn[T]] = DefaultBuilds,
-) -> StdBuilds[T]:
-    ...
+) -> StdBuilds[T]: ...
 
 
 # partial=False, pop-sig=bool
@@ -121,8 +118,7 @@ def make_custom_builds_fn(
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     builds_fn: InstOrType[BuildsFn[T]] = DefaultBuilds,
-) -> Union[FullBuilds[T], StdBuilds[T]]:
-    ...
+) -> Union[FullBuilds[T], StdBuilds[T]]: ...
 
 
 # partial=bool, pop-sig=False
@@ -140,8 +136,7 @@ def make_custom_builds_fn(
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     builds_fn: InstOrType[BuildsFn[T]] = DefaultBuilds,
-) -> Union[PBuilds[T], StdBuilds[T]]:
-    ...
+) -> Union[PBuilds[T], StdBuilds[T]]: ...
 
 
 # partial=bool, pop-sig=bool
@@ -159,8 +154,11 @@ def make_custom_builds_fn(
     frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     builds_fn: InstOrType[BuildsFn[T]] = DefaultBuilds,
-) -> Union[FullBuilds[T], PBuilds[T], StdBuilds[T],]:
-    ...
+) -> Union[
+    FullBuilds[T],
+    PBuilds[T],
+    StdBuilds[T],
+]: ...
 
 
 def make_custom_builds_fn(
@@ -176,7 +174,11 @@ def make_custom_builds_fn(
     frozen: bool = False,
     zen_convert: Optional[ZenConvert] = None,
     builds_fn: InstOrType[BuildsFn[T]] = DefaultBuilds,
-) -> Union[FullBuilds[T], PBuilds[T], StdBuilds[T],]:
+) -> Union[
+    FullBuilds[T],
+    PBuilds[T],
+    StdBuilds[T],
+]:
     """Returns the `builds` function, but with customized default values.
 
     E.g. ``make_custom_builds_fn(hydra_convert='all')`` will return a version

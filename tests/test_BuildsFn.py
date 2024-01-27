@@ -40,8 +40,7 @@ class A:
         return 11
 
 
-class B:
-    ...
+class B: ...
 
 
 class MyBuildsFn(
@@ -144,8 +143,7 @@ def test_make_custom_builds():
     assert instantiate(new_pbuilds(foo))() == A(5)
 
 
-def bar(x: B):
-    ...
+def bar(x: B): ...
 
 
 def test_sanitized_type_override():
@@ -197,11 +195,9 @@ def test_parameterization_example():
     # just make sure that there are no runtime issues with CustomConfigType
     from hydra_zen import BuildsFn
 
-    class MyType:
-        ...
+    class MyType: ...
 
-    class MyBuilds(BuildsFn[CustomConfigType[MyType]]):
-        ...
+    class MyBuilds(BuildsFn[CustomConfigType[MyType]]): ...
 
     builds = MyBuilds.builds
     assert instantiate(builds(dict, x=1)) == dict(x=1)

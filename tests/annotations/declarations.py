@@ -154,8 +154,7 @@ def check_just():
     def f(x: int) -> int:
         return x
 
-    class A:
-        ...
+    class A: ...
 
     # test just(...)
     reveal_type(just(f), expected_text="Just[(x: int) -> int]")
@@ -179,8 +178,7 @@ def check_just():
 
     # test dataclass conversion
     @dataclass
-    class B:
-        ...
+    class B: ...
 
     reveal_type(just(B), expected_text="Just[type[B]]")
     reveal_type(just(B()), expected_text="type[Builds[type[B]]]")
@@ -462,8 +460,7 @@ def check_base_annotations():
     make_custom_builds_fn(builds_bases=(A,))  # type: ignore
 
 
-def make_hydra_partial(x: T) -> HydraPartialBuilds[T]:
-    ...
+def make_hydra_partial(x: T) -> HydraPartialBuilds[T]: ...
 
 
 def check_HydraPartialBuilds():
@@ -479,11 +476,9 @@ def check_partial_protocol():
 
 
 def check_partial_protocol_harder():
-    def f() -> int:
-        ...
+    def f() -> int: ...
 
-    def g(x: str) -> bool:
-        ...
+    def g(x: str) -> bool: ...
 
     x: Partial[int] = partial(f)
     y: Partial[bool] = partial(g, x="a")
@@ -515,11 +510,9 @@ def check_target_annotation():
 
 
 def check_protocols():
-    def f() -> Type[ZenPartialBuilds[Type[int]]]:
-        ...
+    def f() -> Type[ZenPartialBuilds[Type[int]]]: ...
 
-    def g() -> Type[HydraPartialBuilds[Type[int]]]:
-        ...
+    def g() -> Type[HydraPartialBuilds[Type[int]]]: ...
 
     reveal_type(builds(int)._target_, expected_text="str")
     reveal_type(builds(int)()._target_, expected_text="str")
@@ -812,8 +805,7 @@ def check_overloads_arent_too_restrictive():
         dataclass_name: Optional[str],
         **kwargs_for_target: Any,
     ):
-        def func(x: int) -> str:
-            ...
+        def func(x: int) -> str: ...
 
         bout = builds(
             func,
@@ -1077,8 +1069,7 @@ def check_launch():
 
 def check_instantiate():
     @dataclass
-    class Cfg:
-        ...
+    class Cfg: ...
 
     assert_type(instantiate(DictConfig({})), Any)
     assert_type(instantiate({}), Any)
@@ -1090,8 +1081,7 @@ def check_instantiate():
 
 def check_zen():
     @zen
-    def zen_f(x: int) -> str:
-        ...
+    def zen_f(x: int) -> str: ...
 
     assert_type(zen_f({"a": 1}), str)
     assert_type(zen_f(DictConfig({"a": 1})), str)
@@ -1104,8 +1094,7 @@ def check_zen():
     reveal_type(zen_f.func, expected_text="(x: int) -> str")
 
     @zen(pre_call=None)
-    def zen_f2(x: int) -> str:
-        ...
+    def zen_f2(x: int) -> str: ...
 
     assert_type(zen_f2({"a": 1}), str)
     assert_type(zen_f2(DictConfig({"a": 1})), str)
@@ -1114,21 +1103,17 @@ def check_zen():
     zen_f2(1)  # type: ignore
     reveal_type(zen_f2.func, expected_text="(x: int) -> str")
 
-    class MyZen(Zen):
-        ...
+    class MyZen(Zen): ...
 
     @zen(ZenWrapper=MyZen)
-    def zen_rewrapped(x: int) -> str:
-        ...
+    def zen_rewrapped(x: int) -> str: ...
 
     reveal_type(zen_rewrapped, expected_text="Zen[(x: int), str]")
 
     @zen(unpack_kwargs=True)
-    def unpacks_kw(**kw):
-        ...
+    def unpacks_kw(**kw): ...
 
-    def f(x: int):
-        ...
+    def f(x: int): ...
 
     zen_rewrapped2 = zen(f, ZenWrapper=MyZen)
 
@@ -1136,55 +1121,44 @@ def check_zen():
 
     # valid pre-call
     @zen(pre_call=lambda cfg: None)
-    def h1():
-        ...
+    def h1(): ...
 
     @zen(pre_call=[lambda cfg: None])
-    def h2():
-        ...
+    def h2(): ...
 
     okay = zen(lambda x, y: None)
 
     @zen(pre_call=zen(lambda x, y: None))
-    def h3():
-        ...
+    def h3(): ...
 
     # bad pre-call
 
     @zen(pre_call=1)  # type: ignore
-    def g1():
-        ...
+    def g1(): ...
 
     @zen(pre_call=lambda x, y: None)  # type: ignore
-    def g2():
-        ...
+    def g2(): ...
 
     @zen(pre_call=[lambda x, y: None])  # type: ignore
-    def g3():
-        ...
+    def g3(): ...
 
     # valid excludes
     @zen(exclude="a")
-    def p1():
-        ...
+    def p1(): ...
 
     @zen(exclude=("a" for _ in range(1)))
-    def p2():
-        ...
+    def p2(): ...
 
     @zen(exclude=1)  # type: ignore
-    def p3():
-        ...
+    def p3(): ...
 
 
 def check_store():
     @store
-    def f(x: int, y: int) -> str:
-        ...
+    def f(x: int, y: int) -> str: ...
 
     @store(name="hi")
-    def f2(x: int, y: int) -> str:
-        ...
+    def f2(x: int, y: int) -> str: ...
 
     reveal_type(f, expected_text="(x: int, y: int) -> str")
     reveal_type(f2, expected_text="(x: int, y: int) -> str")
@@ -1196,12 +1170,10 @@ def check_store():
     apple_store = store(group="apple")
 
     @apple_store
-    def a1(x: int) -> bool:
-        ...
+    def a1(x: int) -> bool: ...
 
     @apple_store(name="hello")
-    def a2(x: int) -> bool:
-        ...
+    def a2(x: int) -> bool: ...
 
     reveal_type(a1, expected_text="(x: int) -> bool")
     reveal_type(a2, expected_text="(x: int) -> bool")
@@ -1211,8 +1183,7 @@ def check_store():
     reveal_type(apple_store(name="bye")(a1), expected_text="(x: int) -> bool")
 
     @store(f)  # type: ignore
-    def bad(x: int, y: int) -> str:
-        ...
+    def bad(x: int, y: int) -> str: ...
 
     # checking that store type-checks against to_config
     store(1)  # type: ignore
@@ -1238,8 +1209,7 @@ def check_store():
     store(A)
     store(A(1))
 
-    class SubStore(ZenStore):
-        ...
+    class SubStore(ZenStore): ...
 
     substore = SubStore()
     substore1 = substore(a=1)
@@ -1292,8 +1262,7 @@ def test_zen_dataclass(ff: FullBuilds, ss: StdBuilds, pp: PBuilds):
 
 
 def builds_target_pass_through():
-    def foo(x: int) -> str:
-        ...
+    def foo(x: int) -> str: ...
 
     _c1 = builds(foo, x=1)
     c1 = builds(_c1, x=2)
@@ -1327,8 +1296,7 @@ def builds_target_pass_through():
 
 
 def sbuilds_target_pass_through():
-    def foo(x: int) -> str:
-        ...
+    def foo(x: int) -> str: ...
 
     sbuilds = make_custom_builds_fn()
     tmp1 = sbuilds(foo, x=1)  # pyright has bug when evaluating these inline
@@ -1363,8 +1331,7 @@ def sbuilds_target_pass_through():
 
 
 def fbuilds_target_pass_through():
-    def foo(x: int) -> str:
-        ...
+    def foo(x: int) -> str: ...
 
     fbuilds = make_custom_builds_fn(populate_full_signature=True)
     tmp1 = fbuilds(foo, x=1)
@@ -1399,8 +1366,7 @@ def fbuilds_target_pass_through():
 
 
 def pbuilds_target_pass_through():
-    def foo(x: int) -> str:
-        ...
+    def foo(x: int) -> str: ...
 
     pbuilds = make_custom_builds_fn(zen_partial=True)
     tmp1 = pbuilds(foo, x=1)
@@ -1440,8 +1406,7 @@ def check_BuildsFn():
 
 
 def check_make_custom_reflection():
-    def foo(x: int):
-        ...
+    def foo(x: int): ...
 
     bb = BuildsFn[int]
 
@@ -1461,17 +1426,13 @@ def check_make_custom_reflection():
 
 
 def check_parameterized_BuildsFn():
-    class A:
-        ...
+    class A: ...
 
-    class B(A):
-        ...
+    class B(A): ...
 
-    class C:
-        ...
+    class C: ...
 
-    def foo(x: A):
-        ...
+    def foo(x: A): ...
 
     bg = BuildsFn[Union[SupportedPrimitive, A]].builds
 
@@ -1488,8 +1449,7 @@ def check_target_override():
 
 
 def check_kwargs_of():
-    def foo(x: int, y: str):
-        ...
+    def foo(x: int, y: str): ...
 
     Conf = kwargs_of(foo)
     reveal_type(
@@ -1503,13 +1463,11 @@ def check_kwargs_of():
     Conf3 = kwargs_of(foo, x=1)
     reveal_type(Conf3, expected_text="type[Builds[type[Dict[str, Any]]]]")
 
-    class NotSupported:
-        ...
+    class NotSupported: ...
 
     Conf3 = kwargs_of(foo, x=NotSupported())  # type: ignore
 
-    def bar(x: int, y: str, z: bool):
-        ...
+    def bar(x: int, y: str, z: bool): ...
 
     reveal_type(
         kwargs_of(bar, zen_exclude=()),
@@ -1556,14 +1514,11 @@ def check_CustomConfigType():
     from hydra_zen import BuildsFn
     from hydra_zen.typing import CustomConfigType
 
-    class MyType:
-        ...
+    class MyType: ...
 
-    class BadType:
-        ...
+    class BadType: ...
 
-    class MyBuilds(BuildsFn[CustomConfigType[MyType]]):
-        ...
+    class MyBuilds(BuildsFn[CustomConfigType[MyType]]): ...
 
     builds = MyBuilds.builds
 
