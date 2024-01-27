@@ -53,8 +53,7 @@ def test_safe_getattr_with_slots(obj, field, expected):
     assert safe_getattr(obj, field) == expected
 
 
-def func(x):
-    ...
+def func(x): ...
 
 
 @pytest.mark.filterwarnings("ignore:A structured config was supplied for")

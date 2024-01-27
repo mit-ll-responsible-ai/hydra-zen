@@ -19,8 +19,7 @@ def requires_A(x: int):
     pass
 
 
-def g(x: int, y: float) -> str:
-    ...
+def g(x: int, y: float) -> str: ...
 
 
 def behaviors():

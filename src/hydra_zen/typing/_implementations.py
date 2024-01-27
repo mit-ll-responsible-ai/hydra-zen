@@ -96,26 +96,21 @@ class Partial(Protocol[T2]):
     __call__: Callable[..., T2]
 
     @property
-    def func(self) -> Callable[..., T2]:
-        ...
+    def func(self) -> Callable[..., T2]: ...
 
     @property
-    def args(self) -> Tuple[Any, ...]:
-        ...
+    def args(self) -> Tuple[Any, ...]: ...
 
     @property
-    def keywords(self) -> Dict[str, Any]:
-        ...
+    def keywords(self) -> Dict[str, Any]: ...
 
     def __new__(
         cls: Type[Self], __func: Callable[..., T2], *args: Any, **kwargs: Any
-    ) -> Self:
-        ...
+    ) -> Self: ...
 
     if TYPE_CHECKING and sys.version_info >= (3, 9):  # pragma: no cover
 
-        def __class_getitem__(cls, item: Any) -> types.GenericAlias:
-            ...
+        def __class_getitem__(cls, item: Any) -> types.GenericAlias: ...
 
 
 InterpStr = NewType("InterpStr", str)
@@ -127,14 +122,11 @@ class DataClass_(Protocol):
 
 
 class DataClass(DataClass_, Protocol):
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        ...
+    def __init__(self, *args: Any, **kwargs: Any) -> None: ...
 
-    def __getattribute__(self, __name: str) -> Any:
-        ...
+    def __getattribute__(self, __name: str) -> Any: ...
 
-    def __setattr__(self, __name: str, __value: Any) -> None:
-        ...
+    def __setattr__(self, __name: str, __value: Any) -> None: ...
 
 
 @runtime_checkable
@@ -153,8 +145,7 @@ class Builds(DataClass, Protocol[T]):
 
 
 class BuildsWithSig(Builds[T], Protocol[T, P]):
-    def __init__(self, *args: P.args, **kwds: P.kwargs):
-        ...
+    def __init__(self, *args: P.args, **kwds: P.kwargs): ...
 
 
 @runtime_checkable
@@ -178,8 +169,7 @@ class ZenPartialBuilds(Builds[T], ZenPartialMixin[T], Protocol[T]):
 
 
 @runtime_checkable
-class HydraPartialBuilds(Builds[T], HydraPartialMixin[T], Protocol[T]):
-    ...
+class HydraPartialBuilds(Builds[T], HydraPartialMixin[T], Protocol[T]): ...
 
 
 # Necessary, but not sufficient, check for PartialBuilds; useful for creating
