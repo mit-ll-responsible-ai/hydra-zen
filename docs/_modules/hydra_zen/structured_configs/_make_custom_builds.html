@@ -464,8 +464,7 @@ document.write(`
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">builds_fn</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">T</span><span class="p">]]</span> <span class="o">=</span> <span class="n">DefaultBuilds</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FullBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
-    <span class="o">...</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FullBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span> <span class="o">...</span>
 
 
 <span class="c1"># partial=True, pop-sig=bool</span>
@@ -483,8 +482,7 @@ document.write(`
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">builds_fn</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">T</span><span class="p">]]</span> <span class="o">=</span> <span class="n">DefaultBuilds</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
-    <span class="o">...</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span> <span class="o">...</span>
 
 
 <span class="c1"># partial=False, pop-sig=False</span>
@@ -502,8 +500,7 @@ document.write(`
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">builds_fn</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">T</span><span class="p">]]</span> <span class="o">=</span> <span class="n">DefaultBuilds</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StdBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
-    <span class="o">...</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StdBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span> <span class="o">...</span>
 
 
 <span class="c1"># partial=False, pop-sig=bool</span>
@@ -521,8 +518,7 @@ document.write(`
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">builds_fn</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">T</span><span class="p">]]</span> <span class="o">=</span> <span class="n">DefaultBuilds</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">FullBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">StdBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">]]:</span>
-    <span class="o">...</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">FullBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">StdBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">]]:</span> <span class="o">...</span>
 
 
 <span class="c1"># partial=bool, pop-sig=False</span>
@@ -540,8 +536,7 @@ document.write(`
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">builds_fn</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">T</span><span class="p">]]</span> <span class="o">=</span> <span class="n">DefaultBuilds</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">PBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">StdBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">]]:</span>
-    <span class="o">...</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">PBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">StdBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">]]:</span> <span class="o">...</span>
 
 
 <span class="c1"># partial=bool, pop-sig=bool</span>
@@ -559,8 +554,11 @@ document.write(`
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">builds_fn</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">T</span><span class="p">]]</span> <span class="o">=</span> <span class="n">DefaultBuilds</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">FullBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">PBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">StdBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],]:</span>
-    <span class="o">...</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
+    <span class="n">FullBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
+    <span class="n">PBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
+    <span class="n">StdBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
+<span class="p">]:</span> <span class="o">...</span>
 
 
 <div class="viewcode-block" id="make_custom_builds_fn">
@@ -578,7 +576,11 @@ document.write(`
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">builds_fn</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">T</span><span class="p">]]</span> <span class="o">=</span> <span class="n">DefaultBuilds</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">FullBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">PBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">StdBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
+    <span class="n">FullBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
+    <span class="n">PBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
+    <span class="n">StdBuilds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
+<span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the `builds` function, but with customized default values.</span>
 
 <span class="sd">    E.g. ``make_custom_builds_fn(hydra_convert=&#39;all&#39;)`` will return a version</span>

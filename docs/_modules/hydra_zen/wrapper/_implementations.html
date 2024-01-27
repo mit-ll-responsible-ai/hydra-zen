@@ -936,8 +936,7 @@ document.write(`
     <span class="n">resolve_pre_call</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">run_in_context</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">exclude</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]:</span>
-    <span class="o">...</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]:</span> <span class="o">...</span>
 
 
 <span class="nd">@overload</span>
@@ -950,8 +949,7 @@ document.write(`
     <span class="n">ZenWrapper</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Zen</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">run_in_context</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">exclude</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Callable</span><span class="p">[</span><span class="n">P2</span><span class="p">,</span> <span class="n">R2</span><span class="p">]],</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P2</span><span class="p">,</span> <span class="n">R2</span><span class="p">]]:</span>
-    <span class="o">...</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Callable</span><span class="p">[</span><span class="n">P2</span><span class="p">,</span> <span class="n">R2</span><span class="p">]],</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P2</span><span class="p">,</span> <span class="n">R2</span><span class="p">]]:</span> <span class="o">...</span>
 
 
 <div class="viewcode-block" id="zen">
@@ -1882,8 +1880,7 @@ document.write(`
         <span class="n">provider</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">to_config</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">F</span><span class="p">],</span> <span class="n">Node</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_to_config</span><span class="p">,</span>
         <span class="o">**</span><span class="n">to_config_kw</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">F</span><span class="p">:</span>
-        <span class="o">...</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">F</span><span class="p">:</span> <span class="o">...</span>
 
     <span class="nd">@overload</span>
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
@@ -1896,8 +1893,7 @@ document.write(`
         <span class="n">provider</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">to_config</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Node</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="o">**</span><span class="n">to_config_kw</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-        <span class="o">...</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span> <span class="o">...</span>
 
 <div class="viewcode-block" id="ZenStore.__call__">
 <a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.__call__">[docs]</a>
@@ -2314,12 +2310,10 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="nd">@overload</span>
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">NodeName</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Node</span><span class="p">:</span>
-        <span class="o">...</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">NodeName</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Node</span><span class="p">:</span> <span class="o">...</span>
 
     <span class="nd">@overload</span>
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">GroupName</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">NodeName</span><span class="p">],</span> <span class="n">Node</span><span class="p">]:</span>
-        <span class="o">...</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">GroupName</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">NodeName</span><span class="p">],</span> <span class="n">Node</span><span class="p">]:</span> <span class="o">...</span>
 
 <div class="viewcode-block" id="ZenStore.__getitem__">
 <a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.__getitem__">[docs]</a>

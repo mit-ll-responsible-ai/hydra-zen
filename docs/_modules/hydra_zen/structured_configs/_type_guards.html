@@ -487,8 +487,7 @@ document.write(`
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
 
-    <span class="k">def</span> <span class="nf">is_dataclass</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">]]]:</span>
-        <span class="o">...</span>
+    <span class="k">def</span> <span class="nf">is_dataclass</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">]]]:</span> <span class="o">...</span>
 
 <span class="k">else</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">is_dataclass</span>
