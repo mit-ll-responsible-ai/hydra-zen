@@ -3,7 +3,7 @@
 from collections import deque
 from functools import partial
 from inspect import signature
-from typing import Any, List, Union
+from typing import Any, Union
 
 import pytest
 from typing_extensions import Literal
@@ -20,7 +20,7 @@ from hydra_zen import (
     to_yaml,
 )
 from hydra_zen.errors import HydraZenUnsupportedPrimitiveError
-from hydra_zen.typing import CustomConfigType, DataclassOptions, SupportedPrimitive
+from hydra_zen.typing import CustomConfigType, DataclassOptions
 from hydra_zen.typing._implementations import DataclassOptions
 from hydra_zen.wrapper import default_to_config
 
@@ -43,9 +43,7 @@ class A:
 class B: ...
 
 
-class MyBuildsFn(
-    BuildsFn[Union[SupportedPrimitive, A, List[Union[SupportedPrimitive, A]]]]
-):
+class MyBuildsFn(BuildsFn[CustomConfigType[A]]):
     @classmethod
     def _make_hydra_compatible(
         cls,
@@ -201,3 +199,9 @@ def test_parameterization_example():
 
     builds = MyBuilds.builds
     assert instantiate(builds(dict, x=1)) == dict(x=1)
+
+
+def test_partial_supported():
+    Cfg = MyBuildsFn.builds(dict, x=partial(A, x=2))
+    to_yaml(Cfg)
+    assert instantiate(Cfg)["x"]() == A(x=2)

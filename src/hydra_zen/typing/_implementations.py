@@ -247,6 +247,7 @@ CustomConfigType: TypeAlias = Union[
     Tuple["CustomConfigType[T2]", ...],
     Sequence["CustomConfigType[T2]"],
     Mapping[Any, "CustomConfigType[T2]"],
+    Partial["CustomConfigType[T2]"],
 ]
 """The type `CustomConfigType[MyType]` describes: `MyType`, all hydra-zen config-compatible types, and all hydra-zen compatible containers containing said types.
 
