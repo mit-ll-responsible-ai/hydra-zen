@@ -59,8 +59,7 @@ class StdBuilds(Generic[T]):
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-    ) -> Type[BuildsWithSig[Type[R], P]]:
-        ...
+    ) -> Type[BuildsWithSig[Type[R], P]]: ...
 
     # partial=False, pop-sig=True; no *args, **kwargs, nor builds_bases
     @overload
@@ -80,8 +79,7 @@ class StdBuilds(Generic[T]):
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-    ) -> Type[BuildsWithSig[Type[R], P]]:
-        ...
+    ) -> Type[BuildsWithSig[Type[R], P]]: ...
 
     # partial=False, pop-sig=bool
     @overload
@@ -102,8 +100,7 @@ class StdBuilds(Generic[T]):
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[Builds[Importable]]:
-        ...
+    ) -> Type[Builds[Importable]]: ...
 
     @overload
     def __call__(
@@ -123,8 +120,7 @@ class StdBuilds(Generic[T]):
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[Builds[Importable]]:
-        ...
+    ) -> Type[Builds[Importable]]: ...
 
     # partial=True, pop-sig=bool
     @overload
@@ -145,8 +141,7 @@ class StdBuilds(Generic[T]):
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[PartialBuilds[Importable]]:
-        ...
+    ) -> Type[PartialBuilds[Importable]]: ...
 
     @overload
     def __call__(
@@ -166,8 +161,7 @@ class StdBuilds(Generic[T]):
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[PartialBuilds[Importable]]:
-        ...
+    ) -> Type[PartialBuilds[Importable]]: ...
 
     # partial=bool, pop-sig=False
     @overload
@@ -188,8 +182,10 @@ class StdBuilds(Generic[T]):
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]],]:
-        ...
+    ) -> Union[
+        Type[Builds[Importable]],
+        Type[PartialBuilds[Importable]],
+    ]: ...
 
     @overload
     def __call__(
@@ -209,8 +205,10 @@ class StdBuilds(Generic[T]):
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]],]:
-        ...
+    ) -> Union[
+        Type[Builds[Importable]],
+        Type[PartialBuilds[Importable]],
+    ]: ...
 
     # partial=bool, pop-sig=bool
     @overload
@@ -235,8 +233,7 @@ class StdBuilds(Generic[T]):
         Type[Builds[Importable]],
         Type[PartialBuilds[Importable]],
         Type[BuildsWithSig[Type[R], P]],
-    ]:
-        ...
+    ]: ...
 
     def __call__(
         self,
@@ -285,8 +282,7 @@ class FullBuilds(Generic[T]):
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-    ) -> Type[BuildsWithSig[Type[R], P]]:
-        ...
+    ) -> Type[BuildsWithSig[Type[R], P]]: ...
 
     @overload
     def __call__(
@@ -305,8 +301,7 @@ class FullBuilds(Generic[T]):
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-    ) -> Type[Builds[Importable]]:
-        ...
+    ) -> Type[Builds[Importable]]: ...
 
     @overload
     def __call__(
@@ -325,8 +320,7 @@ class FullBuilds(Generic[T]):
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-    ) -> Type[BuildsWithSig[Type[R], P]]:
-        ...
+    ) -> Type[BuildsWithSig[Type[R], P]]: ...
 
     @overload
     def __call__(
@@ -346,8 +340,7 @@ class FullBuilds(Generic[T]):
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[Builds[Importable]]:
-        ...
+    ) -> Type[Builds[Importable]]: ...
 
     @overload
     def __call__(
@@ -367,8 +360,7 @@ class FullBuilds(Generic[T]):
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[Builds[Importable]]:
-        ...
+    ) -> Type[Builds[Importable]]: ...
 
     # partial=True, pop-sig=bool
     @overload
@@ -389,8 +381,7 @@ class FullBuilds(Generic[T]):
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[PartialBuilds[Importable]]:
-        ...
+    ) -> Type[PartialBuilds[Importable]]: ...
 
     @overload
     def __call__(
@@ -410,8 +401,7 @@ class FullBuilds(Generic[T]):
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[PartialBuilds[Importable]]:
-        ...
+    ) -> Type[PartialBuilds[Importable]]: ...
 
     # partial=bool, pop-sig=False
     @overload
@@ -432,8 +422,7 @@ class FullBuilds(Generic[T]):
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]:
-        ...
+    ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]: ...
 
     @overload
     def __call__(
@@ -453,8 +442,7 @@ class FullBuilds(Generic[T]):
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]:
-        ...
+    ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]: ...
 
     # partial=bool, pop-sig=bool
     @overload
@@ -479,8 +467,7 @@ class FullBuilds(Generic[T]):
         Type[Builds[Importable]],
         Type[PartialBuilds[Importable]],
         Type[BuildsWithSig[Type[R], P]],
-    ]:
-        ...
+    ]: ...
 
     def __call__(
         self,
@@ -534,8 +521,7 @@ class PBuilds(Generic[T]):
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[PartialBuilds[Importable]]:
-        ...
+    ) -> Type[PartialBuilds[Importable]]: ...
 
     @overload
     def __call__(
@@ -555,8 +541,7 @@ class PBuilds(Generic[T]):
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[PartialBuilds[Importable]]:
-        ...
+    ) -> Type[PartialBuilds[Importable]]: ...
 
     # partial=False, pop-sig=True; no *args, **kwargs, nor builds_bases
     @overload
@@ -576,8 +561,7 @@ class PBuilds(Generic[T]):
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-    ) -> Type[BuildsWithSig[Type[R], P]]:
-        ...
+    ) -> Type[BuildsWithSig[Type[R], P]]: ...
 
     @overload
     def __call__(
@@ -596,8 +580,7 @@ class PBuilds(Generic[T]):
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-    ) -> Type[BuildsWithSig[Type[R], P]]:
-        ...
+    ) -> Type[BuildsWithSig[Type[R], P]]: ...
 
     # partial=bool, pop-sig=False
     @overload
@@ -618,8 +601,10 @@ class PBuilds(Generic[T]):
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]],]:
-        ...
+    ) -> Union[
+        Type[Builds[Importable]],
+        Type[PartialBuilds[Importable]],
+    ]: ...
 
     @overload
     def __call__(
@@ -639,8 +624,10 @@ class PBuilds(Generic[T]):
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]],]:
-        ...
+    ) -> Union[
+        Type[Builds[Importable]],
+        Type[PartialBuilds[Importable]],
+    ]: ...
 
     # partial=bool, pop-sig=bool
     @overload
@@ -665,8 +652,7 @@ class PBuilds(Generic[T]):
         Type[Builds[Importable]],
         Type[PartialBuilds[Importable]],
         Type[BuildsWithSig[Type[R], P]],
-    ]:
-        ...
+    ]: ...
 
     def __call__(
         self,

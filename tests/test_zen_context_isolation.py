@@ -47,8 +47,7 @@ def test_context_isolation(run_in_context: bool):
 
 
 def test_async_func_run_in_context_not_supported():
-    async def foo():
-        ...
+    async def foo(): ...
 
     with pytest.raises(TypeError, match="not supported"):
         zen(foo, run_in_context=True)
@@ -75,8 +74,7 @@ def test_pre_call_shares_context_with_wrapped_func(run_in_context: bool):
 
 
 def test_pre_call_run_in_its_own_context_is_forbidden():
-    def f(x):
-        ...
+    def f(x): ...
 
     with pytest.raises(HydraZenValidationError):
         zen(f, pre_call=zen(f, run_in_context=True), run_in_context=True)

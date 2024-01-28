@@ -521,8 +521,7 @@ def zen(
     resolve_pre_call: bool = ...,
     run_in_context: bool = ...,
     exclude: Optional[Union[str, Iterable[str]]] = ...,
-) -> Zen[P, R]:
-    ...
+) -> Zen[P, R]: ...
 
 
 @overload
@@ -535,8 +534,7 @@ def zen(
     ZenWrapper: Type[Zen[Any, Any]] = ...,
     run_in_context: bool = ...,
     exclude: Optional[Union[str, Iterable[str]]] = ...,
-) -> Callable[[Callable[P2, R2]], Zen[P2, R2]]:
-    ...
+) -> Callable[[Callable[P2, R2]], Zen[P2, R2]]: ...
 
 
 def zen(
@@ -1453,8 +1451,7 @@ class ZenStore:
         provider: Optional[str] = ...,
         to_config: Callable[[F], Node] = default_to_config,
         **to_config_kw: Any,
-    ) -> F:
-        ...
+    ) -> F: ...
 
     @overload
     def __call__(
@@ -1467,8 +1464,7 @@ class ZenStore:
         provider: Optional[str] = ...,
         to_config: Callable[[Any], Node] = ...,
         **to_config_kw: Any,
-    ) -> Self:
-        ...
+    ) -> Self: ...
 
     def __call__(self: Self, __target: Optional[F] = None, **kw: Any) -> Union[F, Self]:
         """__call__(target : Optional[T] = None, /, name: NodeName | Callable[[Any], NodeName]] = ..., group: GroupName | Callable[[T], GroupName]] = None, package: Optional[str | Callable[[T], str]]] | None], provider: Optional[str], to_config: Callable[[T], Node] = ..., **to_config_kw: Any) -> T | ZenStore
@@ -1864,12 +1860,10 @@ class ZenStore:
         return self
 
     @overload
-    def __getitem__(self, key: Tuple[GroupName, NodeName]) -> Node:
-        ...
+    def __getitem__(self, key: Tuple[GroupName, NodeName]) -> Node: ...
 
     @overload
-    def __getitem__(self, key: GroupName) -> Dict[Tuple[GroupName, NodeName], Node]:
-        ...
+    def __getitem__(self, key: GroupName) -> Dict[Tuple[GroupName, NodeName], Node]: ...
 
     def __getitem__(self, key: Union[GroupName, Tuple[GroupName, NodeName]]) -> Node:
         """Access a entry's config node by specifying `(group, name)`. Or, access a
