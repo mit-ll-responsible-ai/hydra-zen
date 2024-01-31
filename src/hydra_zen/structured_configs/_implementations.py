@@ -701,6 +701,7 @@ class BuildsFn(Generic[T]):
 
        from typing import Any
        from hydra_zen import BuildsFn
+       from hydra_zen.typing import CustomConfigType, HydraSupportedType
 
        class CustomBuilds(BuildsFn[CustomConfigType[Quaternion]]):
            @classmethod
