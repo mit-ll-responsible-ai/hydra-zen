@@ -335,6 +335,7 @@ know how to make configs from instances of this type. You do so by creating your
 own subclass of <a class="reference internal" href="#hydra_zen.BuildsFn" title="hydra_zen.BuildsFn"><code class="xref py py-class docutils literal notranslate"><span class="pre">BuildsFn</span></code></a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
 <span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">BuildsFn</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">CustomConfigType</span><span class="p">,</span> <span class="n">HydraSupportedType</span>
 
 <span class="k">class</span> <span class="nc">CustomBuilds</span><span class="p">(</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">CustomConfigType</span><span class="p">[</span><span class="n">Quaternion</span><span class="p">]]):</span>
     <span class="nd">@classmethod</span>
