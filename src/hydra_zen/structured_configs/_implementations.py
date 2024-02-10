@@ -626,7 +626,7 @@ class ZenField:
     make_config: create a config with customized field names, default values, and annotations.
     """
 
-    hint: type[Any] = Any
+    hint: Type[Any] = Any
     default: Union[Any, Field[Any]] = _utils.field(default=NOTHING)
     name: Union[str, Type[NOTHING]] = NOTHING
     zen_convert: InitVar[Optional[ZenConvert]] = None
@@ -748,7 +748,7 @@ class BuildsFn(Generic[T]):
         primitive_only: bool = False,
         wrap_optional: bool = False,
         nested: bool = False,
-    ) -> type[Any]:
+    ) -> Type[Any]:
         """Broadens a type annotation until it is compatible with Hydra.
 
         Override this to change how `builds` refines the type annotations
