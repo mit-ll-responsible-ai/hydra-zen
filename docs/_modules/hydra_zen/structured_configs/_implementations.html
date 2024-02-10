@@ -1031,7 +1031,7 @@ document.write(`
 <span class="sd">    make_config: create a config with customized field names, default values, and annotations.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">hint</span><span class="p">:</span> <span class="nb">type</span> <span class="o">=</span> <span class="n">Any</span>
+    <span class="n">hint</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">Any</span>
     <span class="n">default</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Field</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">NOTHING</span><span class="p">)</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">NOTHING</span><span class="p">]]</span> <span class="o">=</span> <span class="n">NOTHING</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1158,7 +1158,7 @@ document.write(`
         <span class="n">primitive_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">wrap_optional</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">nested</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># is really type[Any]</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Broadens a type annotation until it is compatible with Hydra.</span>
 
 <span class="sd">        Override this to change how `builds` refines the type annotations</span>
