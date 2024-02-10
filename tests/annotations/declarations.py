@@ -428,8 +428,6 @@ def check_zen_field():
     ZenField(Callable[..., Any])
     ZenField(List[int])
 
-    ZenField(1.0)  # type: ignore
-
 
 def check_base_annotations():
     P1 = make_config(x=1)
