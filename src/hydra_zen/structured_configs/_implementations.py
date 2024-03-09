@@ -3627,7 +3627,7 @@ if Path in ZEN_SUPPORTED_PRIMITIVES:  # pragma: no cover
 
 
 def _unpack_partial(
-    value: Partial[_T], CBuildsFn: InitVar[Type[BuildsFn[Any]]]
+    value: Partial[_T], CBuildsFn: Type[BuildsFn[Any]]
 ) -> PartialBuilds[Type[_T]]:
     target = cast(Type[_T], value.func)
     return CBuildsFn.builds(target, *value.args, **value.keywords, zen_partial=True)()
