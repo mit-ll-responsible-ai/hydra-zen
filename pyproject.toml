@@ -155,7 +155,7 @@ deps = setuptools
 commands = pytest tests/ {posargs: -n auto --maxprocesses=4}
 
 [testenv:py38]
-{[testenv]deps}
+deps = {[testenv]deps}
        importlib-resources<6.2.0
 basepython = python3.8
 
