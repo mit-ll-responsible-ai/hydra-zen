@@ -18,7 +18,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.8, 3.9, "3.10", 3.11, 3.12]
+        python-version: [3.9, "3.10", 3.11, 3.12]
       fail-fast: false
 
     steps:
@@ -122,7 +122,21 @@ jobs:
     - name: Test with tox
       run: tox -e min-deps
 
-
+  python-38:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox tox-gh-actions
+    - name: Test with tox
+      run: tox -e v38
+      
   test-against-pre-releases-of-dependencies:
     runs-on: ubuntu-latest
     steps:
