@@ -3466,6 +3466,43 @@ class ConfigPath:
         del CBuildsFn
 
 
+def get_target_path(obj: Union[HasTarget, HasTargetInst]) -> Any:
+    """
+    Returns the import-path from a targeted config.
+
+    Parameters
+    ----------
+    obj : HasTarget
+        An object with a ``_target_`` attribute.
+
+    Returns
+    -------
+    target_str : str
+        The import path stored on the config object.
+
+    Raises
+    ------
+    TypeError: ``obj`` does not have a ``_target_`` attribute.
+    """
+    if is_old_partial_builds(obj):
+        # obj._partial_target_ is `Just[obj]`
+        return get_target(getattr(obj, "_partial_target_"))
+    elif uses_zen_processing(obj):
+        field_name = ZEN_TARGET_FIELD_NAME
+    elif is_just(obj):
+        field_name = JUST_FIELD_NAME
+    elif is_builds(obj):
+        field_name = TARGET_FIELD_NAME
+    else:
+        raise TypeError(
+            f"`obj` must specify a target; i.e. it must have an attribute named"
+            f" {TARGET_FIELD_NAME} or named {ZEN_PARTIAL_FIELD_NAME} that"
+            f" points to a target-object or target-string"
+        )
+    target = safe_getattr(obj, field_name)
+    return target
+
+
 @overload
 def get_target(obj: InstOrType[Builds[_T]]) -> _T: ...
 
