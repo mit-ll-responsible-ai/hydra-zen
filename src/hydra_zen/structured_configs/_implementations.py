@@ -3469,7 +3469,7 @@ class ConfigPath:
 
 def get_target_path(obj: Union[HasTarget, HasTargetInst]) -> Any:
     """
-    Returns the target-object from a targeted config.
+    Returns the import-path from a targeted config.
 
     Parameters
     ----------
