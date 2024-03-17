@@ -626,7 +626,7 @@ class ZenField:
     make_config: create a config with customized field names, default values, and annotations.
     """
 
-    hint: type = Any
+    hint: Any = Any
     default: Union[Any, Field[Any]] = _utils.field(default=NOTHING)
     name: Union[str, Type[NOTHING]] = NOTHING
     zen_convert: InitVar[Optional[ZenConvert]] = None
@@ -701,6 +701,7 @@ class BuildsFn(Generic[T]):
 
        from typing import Any
        from hydra_zen import BuildsFn
+       from hydra_zen.typing import CustomConfigType, HydraSupportedType
 
        class CustomBuilds(BuildsFn[CustomConfigType[Quaternion]]):
            @classmethod
@@ -747,7 +748,7 @@ class BuildsFn(Generic[T]):
         primitive_only: bool = False,
         wrap_optional: bool = False,
         nested: bool = False,
-    ) -> type:
+    ) -> Any:  # is really type[Any]
         """Broadens a type annotation until it is compatible with Hydra.
 
         Override this to change how `builds` refines the type annotations
@@ -3653,7 +3654,7 @@ if Path in ZEN_SUPPORTED_PRIMITIVES:  # pragma: no cover
 
 
 def _unpack_partial(
-    value: Partial[_T], CBuildsFn: InitVar[Type[BuildsFn[Any]]]
+    value: Partial[_T], CBuildsFn: Type[BuildsFn[Any]]
 ) -> PartialBuilds[Type[_T]]:
     target = cast(Type[_T], value.func)
     return CBuildsFn.builds(target, *value.args, **value.keywords, zen_partial=True)()

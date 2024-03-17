@@ -56,6 +56,7 @@ from hydra_zen.structured_configs._implementations import (
 )
 from hydra_zen.typing import (
     Builds,
+    CustomConfigType,
     HydraPartialBuilds,
     Partial,
     PartialBuilds,
@@ -425,8 +426,6 @@ def supported_primitives():
 def check_zen_field():
     ZenField(int)
     ZenField(List[int])
-
-    ZenField(1.0)  # type: ignore
 
 
 def check_base_annotations():
@@ -1511,9 +1510,6 @@ def check_kwargs_of():
 
 
 def check_CustomConfigType():
-    from hydra_zen import BuildsFn
-    from hydra_zen.typing import CustomConfigType
-
     class MyType: ...
 
     class BadType: ...
@@ -1522,6 +1518,9 @@ def check_CustomConfigType():
 
     builds = MyBuilds.builds
 
-    builds(dict, x=MyType(), y=[1, MyType()])
+    builds(dict, x=MyType(), y=[1, MyType()], z={"a": MyType()})
+    builds(dict, x=partial(MyType))
     builds(dict, x=BadType(), y=[1, MyType()])  # type: ignore
     builds(dict, x=MyType(), y=[1, BadType()])  # type: ignore
+    builds(dict, z={"a": BadType()})  # type: ignore
+    builds(dict, x=partial(BadType))  # type: ignore
