@@ -2603,11 +2603,12 @@ document.write(`
             <span class="k">if</span> <span class="p">(</span>
                 <span class="n">zen_convert_settings</span><span class="p">[</span><span class="s2">&quot;flat_target&quot;</span><span class="p">]</span>
                 <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="n">is_builds</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
                 <span class="ow">and</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-                <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">TARGET_FIELD_NAME</span><span class="p">)</span>
             <span class="p">):</span>
                 <span class="c1"># pass through _target_ field</span>
-                <span class="n">target_path</span> <span class="o">=</span> <span class="n">safe_getattr</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">TARGET_FIELD_NAME</span><span class="p">)</span>
+                <span class="n">target_path</span> <span class="o">=</span> <span class="n">get_target_path</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target_path</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">target_path</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -2908,7 +2909,7 @@ document.write(`
             <span class="c1"># We want to rely on `inspect.signature` logic for raising</span>
             <span class="c1"># against an uninspectable sig, before we start inspecting</span>
             <span class="c1"># class-specific attributes below.</span>
-            <span class="n">signature_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span>
+            <span class="n">signature_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">populate_full_signature</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -3884,6 +3885,43 @@ document.write(`
         <span class="k">del</span> <span class="n">CBuildsFn</span>
 
 
+<span class="k">def</span> <span class="nf">get_target_path</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">HasTarget</span><span class="p">,</span> <span class="n">HasTargetInst</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the import-path from a targeted config.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    obj : HasTarget</span>
+<span class="sd">        An object with a ``_target_`` attribute.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    target_str : str</span>
+<span class="sd">        The import path stored on the config object.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    TypeError: ``obj`` does not have a ``_target_`` attribute.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">is_old_partial_builds</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="c1"># obj._partial_target_ is `Just[obj]`</span>
+        <span class="k">return</span> <span class="n">get_target</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;_partial_target_&quot;</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">uses_zen_processing</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="n">field_name</span> <span class="o">=</span> <span class="n">ZEN_TARGET_FIELD_NAME</span>
+    <span class="k">elif</span> <span class="n">is_just</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="n">field_name</span> <span class="o">=</span> <span class="n">JUST_FIELD_NAME</span>
+    <span class="k">elif</span> <span class="n">is_builds</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="n">field_name</span> <span class="o">=</span> <span class="n">TARGET_FIELD_NAME</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;`obj` must specify a target; i.e. it must have an attribute named&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">TARGET_FIELD_NAME</span><span class="si">}</span><span class="s2"> or named </span><span class="si">{</span><span class="n">ZEN_PARTIAL_FIELD_NAME</span><span class="si">}</span><span class="s2"> that&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot; points to a target-object or target-string&quot;</span>
+        <span class="p">)</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="n">safe_getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">field_name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">target</span>
+
+
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">_T</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span> <span class="o">...</span>
 
@@ -3910,6 +3948,10 @@ document.write(`
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    target : Any</span>
+<span class="sd">        The target object of the config.</span>
+
+<span class="sd">        Note that this will import the object using the import</span>
+<span class="sd">        path specified by the config.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -3956,22 +3998,7 @@ document.write(`
 <span class="sd">    &gt;&gt;&gt; get_target(loaded_conf)  # type: ignore</span>
 <span class="sd">    __main__.B</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">is_old_partial_builds</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-        <span class="c1"># obj._partial_target_ is `Just[obj]`</span>
-        <span class="k">return</span> <span class="n">get_target</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;_partial_target_&quot;</span><span class="p">))</span>
-    <span class="k">elif</span> <span class="n">uses_zen_processing</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-        <span class="n">field_name</span> <span class="o">=</span> <span class="n">ZEN_TARGET_FIELD_NAME</span>
-    <span class="k">elif</span> <span class="n">is_just</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-        <span class="n">field_name</span> <span class="o">=</span> <span class="n">JUST_FIELD_NAME</span>
-    <span class="k">elif</span> <span class="n">is_builds</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-        <span class="n">field_name</span> <span class="o">=</span> <span class="n">TARGET_FIELD_NAME</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;`obj` must specify a target; i.e. it must have an attribute named&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">TARGET_FIELD_NAME</span><span class="si">}</span><span class="s2"> or named </span><span class="si">{</span><span class="n">ZEN_PARTIAL_FIELD_NAME</span><span class="si">}</span><span class="s2"> that&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot; points to a target-object or target-string&quot;</span>
-        <span class="p">)</span>
-    <span class="n">target</span> <span class="o">=</span> <span class="n">safe_getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">field_name</span><span class="p">)</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="n">get_target_path</span><span class="p">(</span><span class="n">obj</span><span class="o">=</span><span class="n">obj</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">target</span> <span class="o">=</span> <span class="n">get_obj</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
