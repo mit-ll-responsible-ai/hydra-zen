@@ -154,7 +154,7 @@ deps = setuptools
        tzdata
 commands = pytest tests/ {posargs: -n auto --maxprocesses=4}
 
-[testenv:py38]
+[testenv:v38]
 deps = {[testenv]deps}
        importlib-resources<6.2.0
 basepython = python3.8
