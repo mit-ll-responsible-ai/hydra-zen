@@ -1,5 +1,6 @@
 # Copyright (c) 2024 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+import functools
 import inspect
 from typing import Any, Callable, TypeVar, cast
 
@@ -237,3 +238,88 @@ def prototype():
         x: "Literal[1] | A"
 
     instantiate(builds(A, x=builds(A, x=2)))
+
+
+def parsing_stuff():
+    import inspect
+
+    def constructor_as_fn(cls):
+        """Makes a shim around a class constructor so that it is compatible with pydantic validation.
+
+        Notes
+        -----
+        `pydantic.validate_call` mishandles class constructors; it expects that
+        `cls`/`self` should be passed explicitly to the constructor. This shim
+        corrects that.
+        """
+
+        @functools.wraps(cls)
+        def wrapper_function(*args, **kwargs):
+            return cls(*args, **kwargs)
+
+        if not getattr(cls, "__annotations__", None):
+            sig = inspect.signature(cls)
+            wrapper_function.__annotations__ = {
+                k: v.annotation for k, v in sig.parameters.items()
+            }
+
+        return wrapper_function
+
+    import pydantic as pyd
+
+    val = pyd.validate_call(
+        config={"arbitrary_types_allowed": True}, validate_return=False
+    )
+
+    def get_signature(x: Any):
+        try:
+            return inspect.signature(x)
+        except Exception:
+            return None
+
+    def with_pydantic_parsing(target):
+        if inspect.isbuiltin(target):
+            return target
+
+        if inspect.isclass(target):
+            if not (get_signature(target)):
+                return target
+            return val(constructor_as_fn(target))
+
+        return val(target)
+
+    class B:
+        # __annotations__ = {"x": int}
+
+        def __init__(self, x: int) -> None:
+            self.x = x
+
+        def __repr__(self) -> str:
+            return f"B(x={self.x})"
+
+        @classmethod
+        def from_dict(cls, x: int):
+            return cls(x)
+
+        @staticmethod
+        def from_dict2(x: int):
+            return B(x)
+
+    import dataclasses
+
+    @dataclasses.dataclass
+    class A:
+        x: int | str
+
+    def func(x):
+        return x
+
+    def bar(x: int):
+        return x
+
+    with_pydantic_parsing(func)(1)
+    with_pydantic_parsing(bar)(1)
+    with_pydantic_parsing(B.from_dict)(x=1)
+    with_pydantic_parsing(B.from_dict2)(x=11)
+    with_pydantic_parsing(A)(x=1)
+    with_pydantic_parsing(B)(x=1)
