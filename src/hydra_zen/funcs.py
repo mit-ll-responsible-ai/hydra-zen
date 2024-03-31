@@ -49,6 +49,7 @@ def zen_processing(
     _zen_partial: bool = False,
     _zen_exclude: _tp.Sequence[str] = tuple(),
     _zen_wrappers: _tp.Union[_WrapperConf, _tp.Sequence[_WrapperConf]] = tuple(),
+    _zen_target_wrapper: _tp.Union[None, _Wrapper] = None,
     **kwargs: _tp.Any,
 ) -> _tp.Any:
     if isinstance(_zen_wrappers, str) or not isinstance(_zen_wrappers, _tp.Sequence):
@@ -81,6 +82,8 @@ def zen_processing(
         resolved_wrappers.append(resolved)
 
     obj = get_obj(path=_zen_target)
+    if _zen_target_wrapper is not None:
+        obj = _zen_target_wrapper(obj)
 
     # first wrapper listed should be called first
     # [f1, f2, f3, ...] ->
