@@ -135,86 +135,64 @@ def validates_with_pydantic(
     return cast(_T, obj)
 
 
-def parsing_stuff():
-    import inspect
+def _constructor_as_fn(cls):
+    """Makes a shim around a class constructor so that it is compatible with pydantic validation.
 
-    def constructor_as_fn(cls):
-        """Makes a shim around a class constructor so that it is compatible with pydantic validation.
+    Notes
+    -----
+    `pydantic.validate_call` mishandles class constructors; it expects that
+    `cls`/`self` should be passed explicitly to the constructor. This shim
+    corrects that.
+    """
 
-        Notes
-        -----
-        `pydantic.validate_call` mishandles class constructors; it expects that
-        `cls`/`self` should be passed explicitly to the constructor. This shim
-        corrects that.
-        """
+    @functools.wraps(cls)
+    def wrapper_function(*args, **kwargs):
+        return cls(*args, **kwargs)
 
-        @functools.wraps(cls)
-        def wrapper_function(*args, **kwargs):
-            return cls(*args, **kwargs)
+    annotations = getattr(cls, "__annotations__", {})
 
-        if not getattr(cls, "__annotations__", None):
-            sig = inspect.signature(cls)
-            wrapper_function.__annotations__ = {
-                k: v.annotation for k, v in sig.parameters.items()
-            }
+    # In a case like:
+    # class A:
+    #   x: int
+    #   def __init__(self, y: int): ...
+    #
+    #  y will not be in __annotations__ but it should be in the signature,
+    #  so we add it to the annotations.
 
-        return wrapper_function
+    sig = inspect.signature(cls)
+    for p, v in sig.parameters.items():
+        if p not in annotations:
+            annotations[p] = v.annotation
+    wrapper_function.__annotations__ = annotations
 
-    import pydantic as pyd
+    return wrapper_function
 
-    val = pyd.validate_call(
+
+if _pyd.__version__ >= "2":
+    _validator = _pyd.validate_call(
         config={"arbitrary_types_allowed": True}, validate_return=False
     )
+else:
+    _validator = _pyd.validate_arguments(
+        config={"arbitrary_types_allowed": True, "validate_return": False}
+    )
 
-    def get_signature(x: Any):
-        try:
-            return inspect.signature(x)
-        except Exception:
-            return None
 
-    def with_pydantic_parsing(target):
-        if inspect.isbuiltin(target):
-            return target
+def _get_signature(x: Any):
+    try:
+        return inspect.signature(x)
+    except Exception:
+        return None
 
-        if inspect.isclass(target):
-            if not (get_signature(target)):
-                return target
-            return val(constructor_as_fn(target))
 
-        return val(target)
+def with_pydantic_parsing(target: _T) -> _T:
+    if inspect.isbuiltin(target):
+        return target
 
-    class B:
-        # __annotations__ = {"x": int}
+    if not (_get_signature(target)):
+        return target
 
-        def __init__(self, x: int) -> None:
-            self.x = x
+    if inspect.isclass(target):
+        return cast(_T, _validator(_constructor_as_fn(target)))
 
-        def __repr__(self) -> str:
-            return f"B(x={self.x})"
-
-        @classmethod
-        def from_dict(cls, x: int):
-            return cls(x)
-
-        @staticmethod
-        def from_dict2(x: int):
-            return B(x)
-
-    import dataclasses
-
-    @dataclasses.dataclass
-    class A:
-        x: int | str
-
-    def func(x):
-        return x
-
-    def bar(x: int):
-        return x
-
-    with_pydantic_parsing(func)(1)
-    with_pydantic_parsing(bar)(1)
-    with_pydantic_parsing(B.from_dict)(x=1)
-    with_pydantic_parsing(B.from_dict2)(x=11)
-    with_pydantic_parsing(A)(x=1)
-    with_pydantic_parsing(B)(x=1)
+    return _validator(target)
