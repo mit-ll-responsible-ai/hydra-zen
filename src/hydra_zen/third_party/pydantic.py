@@ -11,11 +11,18 @@ _T = TypeVar("_T", bound=Callable[..., Any])
 __all__ = ["validates_with_pydantic"]
 
 
-_default_validator = _pyd.validate_arguments(config={"arbitrary_types_allowed": True})
+if _pyd.__version__ >= "2":
+    _validator = _pyd.validate_call(
+        config={"arbitrary_types_allowed": True}, validate_return=False
+    )
+else:
+    _validator = _pyd.validate_arguments(
+        config={"arbitrary_types_allowed": True, "validate_return": False}
+    )
 
 
 def validates_with_pydantic(
-    obj: _T, *, validator: Callable[[_T], _T] = _default_validator
+    obj: _T, *, validator: Callable[[_T], _T] = _validator
 ) -> _T:
     """Enables runtime type-checking of values, via the library ``pydantic``.
 
@@ -166,16 +173,6 @@ def _constructor_as_fn(cls):
     wrapper_function.__annotations__ = annotations
 
     return wrapper_function
-
-
-if _pyd.__version__ >= "2":
-    _validator = _pyd.validate_call(
-        config={"arbitrary_types_allowed": True}, validate_return=False
-    )
-else:
-    _validator = _pyd.validate_arguments(
-        config={"arbitrary_types_allowed": True, "validate_return": False}
-    )
 
 
 def _get_signature(x: Any):
