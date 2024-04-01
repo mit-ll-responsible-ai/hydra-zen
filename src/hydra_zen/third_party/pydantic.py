@@ -62,9 +62,7 @@ def _get_signature(x: Any) -> Union[None, inspect.Signature]:
         return None
 
 
-def with_pydantic_parsing(
-    target: _T, *, parser: Callable[[_T], _T] = _default_parser
-) -> _T:
+def pydantic_parser(target: _T, *, parser: Callable[[_T], _T] = _default_parser) -> _T:
     """A target-wrapper that adds pydantic parsing to the target.
 
     This can be passed to `instantiate` as a `_target_wrapper_` to add pydantic parsing
@@ -85,7 +83,7 @@ def with_pydantic_parsing(
     .. code-block:: python
 
        from hydra_zen import builds, instantiate
-       from hydra_zen.third_party.pydantic import with_pydantic_parsing
+       from hydra_zen.third_party.pydantic import pydantic_parser
 
        from pydantic import PositiveInt
 
@@ -94,18 +92,19 @@ def with_pydantic_parsing(
        good_conf = builds(f, x=10)
        bad_conf = builds(f, x=-3)
 
-    >>> instantiate(good_conf, _target_wrapper_=with_pydantic_parsing)
+    >>> instantiate(good_conf, _target_wrapper_=pydantic_parser)
     10
-    >>> instantiate(bad_conf, _target_wrapper_=with_pydantic_parsing)
+    >>> instantiate(bad_conf, _target_wrapper_=pydantic_parser)
     ValidationError: 1 validation error for f (...)
 
     This also enables type conversion / parsing. E.g. Hydra can
     only produce lists from the CLI, but this parsing layer can
-    convert them based on the annotated type.
+    convert them based on the annotated type. (Note: this only
+    works for pydantic v2 and higher.)
 
     >>> def g(x: tuple): return x
     >>> conf = builds(g, x=[1, 2, 3])
-    >>> instantiate(conf, _target_wrapper_=with_pydantic_parsing)
+    >>> instantiate(conf, _target_wrapper_=pydantic_parser)
     (1, 2, 3)
     """
     if inspect.isbuiltin(target):

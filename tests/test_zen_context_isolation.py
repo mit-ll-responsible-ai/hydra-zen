@@ -3,7 +3,8 @@
 
 import random
 from contextvars import ContextVar
-from typing import Any, Dict, Optional
+from dataclasses import dataclass
+from typing import Any, Dict, Optional, Type
 
 import pytest
 
@@ -23,6 +24,19 @@ def clean_context_vars():
     var.set({})
 
 
+@dataclass
+class TrackCall:
+    num_calls: int = 0
+
+    def __post_init__(self):
+        self.funcs = []
+
+    def __call__(self, fn) -> Any:
+        self.num_calls += 1
+        self.funcs.append(fn)
+        return fn
+
+
 @pytest.mark.parametrize(
     "run_in_context",
     [
@@ -30,7 +44,14 @@ def clean_context_vars():
         pytest.param(False, marks=pytest.mark.xfail),
     ],
 )
-def test_context_isolation(run_in_context: bool):
+@pytest.mark.parametrize(
+    "wrapper",
+    [
+        None,
+        TrackCall,
+    ],
+)
+def test_context_isolation(run_in_context: bool, wrapper: Optional[Type[TrackCall]]):
     def foo(x: str, zen_cfg):
         config.set(zen_cfg)
         conf = var.get().copy()
@@ -38,12 +59,20 @@ def test_context_isolation(run_in_context: bool):
         var.set(conf)
         assert len(conf) == 1
 
-    zfoo = zen(foo, run_in_context=run_in_context)
+    if wrapper is not None:
+        wr = wrapper()
+    else:
+        wr = None
+
+    zfoo = zen(foo, run_in_context=run_in_context, instantiation_wrapper=wr)
 
     for letter in "ab":
         zfoo(dict(x=letter))
         assert config.get() is None
         assert var.get() == dict()
+
+    if isinstance(wr, TrackCall):
+        assert wr.num_calls == 2
 
 
 def test_async_func_run_in_context_not_supported():

@@ -74,6 +74,7 @@ P = ParamSpec("P")
 P2 = ParamSpec("P2")
 R2 = TypeVar("R2")
 F = TypeVar("F")
+F2 = TypeVar("F2", bound=Callable[..., Any])
 
 
 _UNSPECIFIED_: Any = object()
@@ -111,6 +112,10 @@ def _flat_call(x: Iterable[Callable[P, Any]]) -> Callable[P, None]:
     return f
 
 
+def _identity(x: F2) -> F2:
+    return x
+
+
 class Zen(Generic[P, R]):
     """Implements the wrapping logic that is exposed by `hydra_zen.zen`
 
@@ -145,6 +150,7 @@ class Zen(Generic[P, R]):
         unpack_kwargs: bool = False,
         resolve_pre_call: bool = True,
         run_in_context: bool = False,
+        instantiation_wrapper: Union[None, Callable[[F2], F2]] = None,
     ) -> None:
         """
         Parameters
@@ -212,6 +218,8 @@ class Zen(Generic[P, R]):
             raise TypeError(
                 f"`run_in_context` must be type `bool` got {run_in_context}"
             )
+
+        self._instantiation_wrapper = instantiation_wrapper
 
         self._resolve = resolve_pre_call
         self._unpack_kwargs: bool = unpack_kwargs and any(
@@ -353,12 +361,12 @@ class Zen(Generic[P, R]):
                 f"`cfg` is missing the following fields: {', '.join(missing_params)}"
             )
 
-    @staticmethod
-    def instantiate(__c: Any) -> Any:
+    def instantiate(self, __c: Any) -> Any:
         """Instantiates each config that is extracted by `zen` before calling the wrapped function.
 
         Overwrite this to change `ZenWrapper`'s instantiation behavior."""
-        __c = instantiate(__c)
+        __c = instantiate(__c, _target_wrapper_=self._instantiation_wrapper)
+
         if isinstance(__c, (ListConfig, DictConfig)):
             return OmegaConf.to_object(__c)
         else:
@@ -422,7 +430,13 @@ class Zen(Generic[P, R]):
             )
             cfg_kwargs.update({name: cfg[name] for name in names})
 
-        func = self.func if context is None else partial(context.run, self.func)
+        wrapper = self._instantiation_wrapper or _identity
+
+        func: Callable[P, R] = (
+            wrapper(self.func)  # type: ignore
+            if context is None
+            else partial(context.run, wrapper(self.func))  # type: ignore
+        )
 
         return func(
             *(self.instantiate(x) if is_instantiable(x) else x for x in args_),
@@ -521,6 +535,7 @@ def zen(
     resolve_pre_call: bool = ...,
     run_in_context: bool = ...,
     exclude: Optional[Union[str, Iterable[str]]] = ...,
+    instantiation_wrapper: Optional[Callable[[F2], F2]] = ...,
 ) -> Zen[P, R]: ...
 
 
@@ -534,6 +549,7 @@ def zen(
     ZenWrapper: Type[Zen[Any, Any]] = ...,
     run_in_context: bool = ...,
     exclude: Optional[Union[str, Iterable[str]]] = ...,
+    instantiation_wrapper: Optional[Callable[[F2], F2]] = ...,
 ) -> Callable[[Callable[P2, R2]], Zen[P2, R2]]: ...
 
 
@@ -546,6 +562,7 @@ def zen(
     resolve_pre_call: bool = True,
     run_in_context: bool = False,
     ZenWrapper: Type[Zen[Any, Any]] = Zen,
+    instantiation_wrapper: Optional[Callable[[F2], F2]] = None,
 ) -> Union[Callable[[Callable[P2, R2]], Zen[P2, R2]], Zen[P, R]]:
     r"""zen(func, /, pre_call, ZenWrapper)
 
@@ -603,6 +620,13 @@ def zen(
 
     ZenWrapper : Type[hydra_zen.wrapper.Zen], optional (default=Zen)
         If specified, a subclass of `Zen` that customizes the behavior of the wrapper.
+
+    instantiation_wrapper : Optional[Callable[[F2], F2]], optional (default=None)
+        If specified, a function that wraps the task function and all
+        instantiation-targets before they are called.
+
+        This can be used to introduce a layer of validation or logging
+        to all instantiation calls in your application.
 
     Returns
     -------
@@ -803,6 +827,7 @@ def zen(
                 unpack_kwargs=unpack_kwargs,
                 resolve_pre_call=resolve_pre_call,
                 run_in_context=run_in_context,
+                instantiation_wrapper=instantiation_wrapper,
             ),
         )
 
@@ -816,6 +841,7 @@ def zen(
                 unpack_kwargs=unpack_kwargs,
                 resolve_pre_call=resolve_pre_call,
                 run_in_context=run_in_context,
+                instantiation_wrapper=instantiation_wrapper,
             ),
         )
         return out

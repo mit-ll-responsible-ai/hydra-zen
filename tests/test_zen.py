@@ -238,13 +238,14 @@ def test_no_resolve():
     assert out2 == dict(x=1, y=1)
 
 
-def test_zen_works_on_partiald_funcs():
+@pytest.mark.parametrize("wrapper", [None, lambda x: x])
+def test_zen_works_on_partiald_funcs(wrapper):
     from functools import partial
 
     def f(x: int, y: str):
         return x, y
 
-    zen_pf = zen(partial(f, x=1))
+    zen_pf = zen(partial(f, x=1), instantiation_wrapper=wrapper)
 
     with pytest.raises(
         HydraZenValidationError,
@@ -258,9 +259,14 @@ def test_zen_works_on_partiald_funcs():
     assert zen_pf(make_config(x=2, y="a")) == (2, "a")
 
 
-@given(x=st.integers(-5, 5), y=st.integers(-5, 5), unpack_kw=st.booleans())
-def test_zen_cfg_passthrough(x: int, y: int, unpack_kw: bool):
-    @zen(unpack_kwargs=unpack_kw)
+@given(
+    x=st.integers(-5, 5),
+    y=st.integers(-5, 5),
+    unpack_kw=st.booleans(),
+    wrapper=st.sampled_from([None, lambda x: x]),
+)
+def test_zen_cfg_passthrough(x: int, y: int, unpack_kw: bool, wrapper):
+    @zen(unpack_kwargs=unpack_kw, instantiation_wrapper=wrapper)
     def f(x: int, zen_cfg, **kw):
         return (x, zen_cfg)
 
@@ -631,3 +637,40 @@ async def test_async_compatible():
         return x
 
     assert await zen(foo)(dict(x=builds(int, 22))) == 22
+
+
+@dataclass
+class TrackCall:
+    num_calls: int = 0
+
+    def __post_init__(self):
+        self.funcs = []
+
+    def __call__(self, fn) -> Any:
+        self.num_calls += 1
+        self.funcs.append(fn)
+        return fn
+
+
+async def test_instantiation_wrapper():
+    def foo(x: int):
+        return x
+
+    async def goo(x: int):
+        return x
+
+    tracker1 = TrackCall()
+    assert zen(foo, instantiation_wrapper=tracker1)(dict(x=builds(int, 21))) == 21
+    assert tracker1.num_calls == 2
+    assert tracker1.funcs == [foo, int]
+
+    # test decorator pattern
+    tracker2 = TrackCall()
+    assert zen(instantiation_wrapper=tracker2)(foo)(dict(x=builds(int, 22))) == 22
+    assert tracker2.num_calls == 2
+    assert tracker2.funcs == [foo, int]
+
+    tracker3 = TrackCall()
+    assert await zen(goo, instantiation_wrapper=tracker3)(dict(x=builds(int, 23))) == 23
+    assert tracker1.num_calls == 2
+    assert tracker1.funcs == [foo, int]
