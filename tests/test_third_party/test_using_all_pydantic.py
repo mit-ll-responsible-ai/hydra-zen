@@ -9,9 +9,10 @@ from typing import Any, Callable, Dict, Generic, Sequence, Tuple, TypeVar
 import pydantic
 import pytest
 from hydra.errors import InstantiationException
+from pydantic import PositiveInt
 
-from hydra_zen import BuildsFn, instantiate
-from hydra_zen.third_party.pydantic import with_pydantic_parsing
+from hydra_zen import BuildsFn, instantiate, zen
+from hydra_zen.third_party.pydantic import pydantic_parser
 
 T = TypeVar("T")
 
@@ -24,7 +25,7 @@ class MyBuilds(BuildsFn):
 
 builds = MyBuilds.builds
 just = MyBuilds.just
-instantiate = partial(instantiate, _target_wrapper_=with_pydantic_parsing)
+instantiate = partial(instantiate, _target_wrapper_=pydantic_parser)
 
 
 class Parent:
@@ -198,3 +199,50 @@ def test_conversion_support(obj: Param):
     cfg = builds(obj.target, *obj.args, **obj.kwargs)
     out = instantiate(cfg)
     assert out == obj.expected
+
+
+def int_(yoo: PositiveInt):
+    return yoo
+
+
+def pos(xoo: PositiveInt):
+    return xoo
+
+
+def test_with_zen():
+    assert zen(pos, instantiation_wrapper=pydantic_parser)(dict(xoo=3)) == 3
+
+    # test parsing on zen-wrapped function
+    with pytest.raises(
+        (InstantiationException, pydantic.ValidationError),
+        match="xoo",
+    ):
+        zen(pos, instantiation_wrapper=pydantic_parser)(dict(xoo=-3))
+
+    good_cfg = builds(int_, yoo=8)
+
+    assert zen(pos, instantiation_wrapper=pydantic_parser)(dict(xoo=good_cfg)) == 8
+
+    # test parsing on config passed to zen-wrapped function
+    bad_cfg = builds(int_, yoo=-9)
+
+    with pytest.raises(
+        (InstantiationException, pydantic.ValidationError),
+        match="yoo",
+    ):
+        zen(pos, instantiation_wrapper=pydantic_parser)(dict(xoo=bad_cfg))
+
+
+async def async_func(xoo: int):
+    return xoo
+
+
+async def test_async_support():
+    out = await zen(async_func, instantiation_wrapper=pydantic_parser)(dict(xoo=1))
+    assert out == 1
+
+    with pytest.raises(
+        (InstantiationException, pydantic.ValidationError),
+        match="xoo",
+    ):
+        await zen(async_func, instantiation_wrapper=pydantic_parser)(dict(xoo="aaa"))
