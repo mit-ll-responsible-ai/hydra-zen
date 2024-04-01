@@ -4,7 +4,7 @@ import inspect
 from dataclasses import dataclass, field
 from functools import partial
 from pathlib import Path
-from typing import Any, Callable, Dict, Sequence, Tuple
+from typing import Any, Callable, Dict, Generic, Sequence, Tuple, TypeVar
 
 import pydantic
 import pytest
@@ -12,6 +12,8 @@ from hydra.errors import InstantiationException
 
 from hydra_zen import BuildsFn, instantiate
 from hydra_zen.third_party.pydantic import with_pydantic_parsing
+
+T = TypeVar("T")
 
 
 class MyBuilds(BuildsFn):
@@ -25,7 +27,7 @@ just = MyBuilds.just
 instantiate = partial(instantiate, _target_wrapper_=with_pydantic_parsing)
 
 
-class A:
+class Parent:
     y: str  # intentional: populates __annotations__
 
     def __init__(self, xoo: int) -> None:
@@ -37,15 +39,15 @@ class A:
         return self.__dict__ == value.__dict__
 
     @classmethod
-    def classmthd(cls, xoo: int) -> "A":
+    def classmthd(cls, xoo: int) -> "Parent":
         return cls(xoo)
 
     @staticmethod
-    def staticmthd(xoo: int) -> "A":
-        return A(xoo)
+    def staticmthd(xoo: int) -> "Parent":
+        return Parent(xoo)
 
 
-class B(A):
+class Child(Parent):
     def __init__(self, xoo: int, zoo: float) -> None:
         super().__init__(xoo)
         self.zoo = zoo
@@ -63,16 +65,32 @@ class UsesNew:
         return self.__dict__ == value.__dict__
 
 
+class HasGeneric(Generic[T]):
+    def __init__(self, xoo: T):
+        self.xoo = xoo
+
+    def __repr__(self) -> str:
+        return f"HasGeneric(xoo={self.xoo})"
+
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, type(self)):
+            return False
+        return self.xoo == value.xoo
+
+
 @dataclass
 class Param:
     target: Callable[..., Any]
     args: Sequence[Any] = field(default_factory=list)
     kwargs: Dict[str, Any] = field(default_factory=dict)
     msg: str = ""
+    expected: Any = None
 
 
-def p(target: Callable[..., Any], *args, msg: str = "", **kwargs) -> Param:
-    return Param(target, args, kwargs)
+def p(
+    target: Callable[..., Any], *args, msg: str = "", expected: Any = None, **kwargs
+) -> Param:
+    return Param(target, args, kwargs, expected=expected, msg=msg)
 
 
 def no_annotate(xoo):
@@ -92,13 +110,15 @@ class ADataClass:
 @pytest.mark.parametrize(
     "obj",
     [
-        p(A, xoo=10),
-        p(B, xoo=11, zoo=3.14),
+        p(Parent, xoo=10),
+        p(Child, xoo=11, zoo=3.14),
         p(UsesNew, xoo=20),
+        p(HasGeneric[int], xoo=21),
+        p(HasGeneric, xoo="aa"),
         p(no_annotate, xoo=21),
         p(func, xoo=22),
-        p(A.classmthd, xoo=23),
-        p(A.staticmthd, xoo=24),
+        p(Parent.classmthd, xoo=23),
+        p(Parent.staticmthd, xoo=24),
         p(partial(func, xoo=25)),
         p(ADataClass, yee="yee", zaa=True),
         p(len, [1, 2, 3]),  # func, no signature
@@ -121,15 +141,15 @@ def test_roundtrip(obj: Param, use_meta_feature: bool):
 @pytest.mark.parametrize(
     "obj",
     [
-        p(A, xoo="aa", msg="xoo"),
-        p(B, xoo=10, zoo="aa", msg="zoo"),
+        p(Parent, xoo="aa", msg="xoo"),
+        p(Child, xoo=10, zoo="aa", msg="zoo"),
         p(UsesNew, xoo="aa", msg="xoo"),
         pytest.param(
             p(no_annotate, xoo="aa"),
             marks=pytest.mark.xfail(reason="no annotation"),
         ),
-        p(A.classmthd, xoo="a", msg="xoo"),
-        p(A.staticmthd, xoo="bv", msg="xoo"),
+        p(Parent.classmthd, xoo="a", msg="xoo"),
+        p(Parent.staticmthd, xoo="bv", msg="xoo"),
         p(func, xoo=[1], msg="xoo"),
         p(ADataClass, yee="yee", zaa=(1,), msg="zaa"),
     ],
@@ -162,6 +182,19 @@ def h(x: Path):
     return x
 
 
-def test_conversion_support():
-    assert instantiate(builds(g, x=builds(A2, x=[1, 2, 3]))) == A2(x=(1, 2, 3))
-    assert instantiate(builds(h, x=".")) == Path(".")
+@pytest.mark.parametrize(
+    "obj",
+    [
+        pytest.param(
+            p(g, x=builds(A2, x=[1, 2, 3]), expected=A2(x=(1, 2, 3))),
+            marks=pytest.mark.skipif(
+                pydantic.VERSION < "2.0", reason="pydantic>=2.0 required"
+            ),
+        ),
+        p(h, x=".", expected=Path(".")),
+    ],
+)
+def test_conversion_support(obj: Param):
+    cfg = builds(obj.target, *obj.args, **obj.kwargs)
+    out = instantiate(cfg)
+    assert out == obj.expected

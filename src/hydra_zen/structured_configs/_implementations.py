@@ -121,6 +121,7 @@ from ._globals import (
 )
 from ._type_guards import (
     is_builds,
+    is_generic_type,
     is_just,
     is_old_partial_builds,
     safe_getattr,
@@ -950,6 +951,9 @@ class BuildsFn(Generic[T]):
         name = _utils.safe_name(target, repr_allowed=False)
 
         if name == _utils.UNKNOWN_NAME:
+            if is_generic_type(target):
+                return cls._get_obj_path(target.__origin__)
+
             raise AttributeError(f"{target} does not have a `__name__` attribute")
 
         module = getattr(target, "__module__", None)
@@ -1141,7 +1145,7 @@ class BuildsFn(Generic[T]):
                         not is_dataclass(value)
                         or (convert_dataclass and not is_builds(value))
                     )
-                    and inspect.isclass(value)
+                    and (inspect.isclass(value) or is_generic_type(value))
                 )
                 or inspect.ismethod(value)
                 or isinstance(value, _BUILTIN_TYPES)

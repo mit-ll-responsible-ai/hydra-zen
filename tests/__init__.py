@@ -9,6 +9,7 @@ from typing import Any
 import hypothesis.strategies as st
 
 from hydra_zen import to_yaml
+from hydra_zen.structured_configs._type_guards import is_generic_type
 from hydra_zen.structured_configs._utils import is_classmethod
 
 valid_hydra_literals = st.sampled_from(
@@ -25,6 +26,11 @@ def everything_except(*excluded_types: type):
 
 
 def is_same(new, original):
+    if is_generic_type(original):
+        original = original.__origin__
+    if is_generic_type(new):
+        new = new.__origin__
+
     if isinstance(original, functools.partial):
         if not isinstance(new, functools.partial):
             return False
