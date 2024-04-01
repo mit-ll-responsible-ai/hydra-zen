@@ -64,7 +64,7 @@ def _call_target(
     full_key: str,
     *,
     target_wrapper: Callable[[F], F],
-) -> Any:
+) -> Any:  # pragma: no cover
     """Call target (type) with args and kwargs."""
     import functools
 
