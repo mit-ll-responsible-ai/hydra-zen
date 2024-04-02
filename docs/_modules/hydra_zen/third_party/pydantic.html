@@ -462,6 +462,8 @@ document.write(`
         <span class="k">return</span> <span class="kc">None</span>
 
 
+<div class="viewcode-block" id="pydantic_parser">
+<a class="viewcode-back" href="../../../generated/hydra_zen.third_party.pydantic.pydantic_parser.html#hydra_zen.third_party.pydantic.pydantic_parser">[docs]</a>
 <span class="k">def</span> <span class="nf">pydantic_parser</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">parser</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_T</span><span class="p">],</span> <span class="n">_T</span><span class="p">]</span> <span class="o">=</span> <span class="n">_default_parser</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A target-wrapper that adds pydantic parsing to the target.</span>
 
@@ -516,7 +518,8 @@ document.write(`
     <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">_T</span><span class="p">,</span> <span class="n">parser</span><span class="p">(</span><span class="n">_constructor_as_fn</span><span class="p">(</span><span class="n">target</span><span class="p">)))</span>
 
-    <span class="k">return</span> <span class="n">parser</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">parser</span><span class="p">(</span><span class="n">target</span><span class="p">)</span></div>
+
 
 
 <div class="viewcode-block" id="validates_with_pydantic">
