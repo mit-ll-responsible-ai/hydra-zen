@@ -16,7 +16,7 @@ chronological order. All previous releases should still be available on pip.
 
 .. note:: This is documentation for an pre-release version of hydra-zen. You can install this pre-release via `pip install --pre hydra-zen`
 
-This release makes it possible to use pydantic's runtime type-checking and parsing throughout your hydra-zen app 🚀🚀🚀
+This release makes it possible to use `pydantic's <https://docs.pydantic.dev/latest/>`_ runtime type-checking and parsing throughout your hydra-zen app 🚀🚀🚀
 
 Check it out:
 
@@ -52,7 +52,7 @@ Check it out:
 In a vanilla hydra-zen app we would not be able to create a `Path` instance from the 
 CLI, nor would the `PositiveInt` annotation provide any sort of runtime constraint. But 
 by specifying `instantiation_wrapper=pydantic_parser`, we can pass in a string-path 
-from the CLI, and it will be parsed as a `Path` instance.
+from the CLI, and it will be parsed as a `Path` instance
 
 .. code-block:: console
    :caption: Providing a string-`path` at the CLI gets parsed as a `Path` instance.
@@ -61,7 +61,7 @@ from the CLI, and it will be parsed as a `Path` instance.
    path=WindowsPath('foo.txt') age=10
 
 
-and attempting to pass in a negative value for `age` will raise a `ValidationError`:
+and attempting to pass in a negative value for `age` will raise a `ValidationError`
 
 .. code-block:: console
    :caption: The `PositiveInt` annotation enforces that `age` must be greater non-negative.
@@ -78,11 +78,11 @@ This also means that types like `Literal`, which are not supported by Hydra, can
 
 Critically, this pydantic-mediation parsing occurs not just for `main`, but 
 (recursively) for all config-targets that are instantiated in the process of calling 
-`main` via `zen`. This means that even deeply-nested values are validated against their
-annotated types by pydantic.
+`main` via `~hydra_zen.zen`. This means that even deeply-nested values are validated 
+against their annotated types by pydantic.
 
 More generally, you can add an arbitrary wrapping layer to all targets instantiated by 
-`zen`, which is how the aforementioned pydantic parsing is implemented.
+`~hydra_zen.zen`, which is how the aforementioned pydantic parsing is implemented.
 
 See :pull:`666` for more details and to see how to completely disable Hydra's 
 type-checking in favor of pydantic's.
@@ -92,7 +92,7 @@ New Features
 - Adds :func:`hydra_zen.third_party.pydantic.pydantic_parser`. See :pull:`666`.
 - Adds `_target_wrapper_` as a new, optional argument to `hydra_zen.instantiate`, which enables users to add a custom wrapper to be applied recursively to all targets during instantiation. See :pull:`666`.
 - Adds an optional `instantiation_wrapper` to `hydra_zen.zen` (and `hydra_zen.wrappers.Zen`) that will apply a custom wrapper to all targets during instantiation performed by `zen`. See :pull:`666`.
-- Adds autoconfig support for `hydra_zen.wrapper.Zen`. I.e. the output of `zen` can now be passed to `just` and `builds` to generate Hydra-compatible configs. See :pull:`666`.
+- Adds autoconfig support for `hydra_zen.wrapper.Zen`. I.e. the output of `zen` can now be passed to `~hydra_zen.just` and `~hydra_zen.builds` to generate Hydra-compatible configs. See :pull:`666`.
 - Improved support for passing parameterized generics to `hydra_zen.builds` and `hydra_zen.just`. See :pull:`666`.
 
 Bug Fixes
