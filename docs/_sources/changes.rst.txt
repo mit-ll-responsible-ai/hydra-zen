@@ -14,6 +14,8 @@ chronological order. All previous releases should still be available on pip.
 0.13.0rc1 - 2024-04-01
 ----------------------
 
+.. note:: This is documentation for an pre-release version of hydra-zen. You can install this pre-release via `pip install --pre hydra-zen`
+
 This release makes it possible to use pydantic's runtime type-checking and parsing throughout your hydra-zen app 🚀🚀🚀
 
 Check it out:
