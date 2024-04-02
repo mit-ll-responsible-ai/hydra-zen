@@ -951,7 +951,7 @@ class BuildsFn(Generic[T]):
         name = _utils.safe_name(target, repr_allowed=False)
 
         if name == _utils.UNKNOWN_NAME:
-            if is_generic_type(target):
+            if is_generic_type(target):  # pragma: no cover
                 return cls._get_obj_path(target.__origin__)
 
             raise AttributeError(f"{target} does not have a `__name__` attribute")
@@ -1074,6 +1074,8 @@ class BuildsFn(Generic[T]):
             `dataclasses.MISSING`. As well as lists, tuples, dicts, and omegaconf
             containers containing the above.
         """
+        from hydra_zen.wrapper import Zen
+
         # Common primitives supported by Hydra.
         # We check exhaustively for all Hydra-supported primitives below but seek to
         # speedup checks for common types here.
@@ -1163,6 +1165,25 @@ class BuildsFn(Generic[T]):
                 )
             return out
 
+        if isinstance(value, Zen):
+            pre_call = [cls.just(f) for f in value._pre_call_iterable if f]
+            if not pre_call:
+                pre_call = None
+
+            elif len(pre_call) == 1:
+                pre_call = pre_call[0]
+
+            return cls.builds(
+                type(value),
+                value.func,
+                exclude=list(value._exclude),
+                pre_call=pre_call,
+                unpack_kwargs=value._unpack_kwargs,
+                resolve_pre_call=value._resolve,
+                run_in_context=value._run_in_context,
+                instantiation_wrapper=value._instantiation_wrapper,
+                populate_full_signature=True,
+            )
         resolved_value = value
         type_of_value = type(resolved_value)
 

@@ -190,6 +190,13 @@ class Zen(Generic[P, R]):
             that call of the wrapped function.
 
             `run_in_context` is not supported for async functions.
+
+        instantiation_wrapper : Optional[Callable[[F2], F2]], optional (default=None)
+            If specified, a function that wraps the task function and all
+            instantiation-targets before they are called.
+
+            This can be used to introduce a layer of validation or logging
+            to all instantiation calls in your application.
         """
         if run_in_context and iscoroutinefunction(__func):
             raise TypeError(f"`{run_in_context=} is not supported for async functions.")
