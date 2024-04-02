@@ -1167,10 +1167,9 @@ class BuildsFn(Generic[T]):
 
         if isinstance(value, Zen):
             pre_call = [cls.just(f) for f in value._pre_call_iterable if f]
-            if not pre_call:
+            if not pre_call:  # pragma: no cover
                 pre_call = None
-
-            elif len(pre_call) == 1:
+            elif len(pre_call) == 1:  # pragma: no cover
                 pre_call = pre_call[0]
 
             return cls.builds(

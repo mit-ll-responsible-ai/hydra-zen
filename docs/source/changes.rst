@@ -39,13 +39,13 @@ Check it out:
        store(main)
        store.add_to_hydra_store()
    
-       zen(main, 
-           instantiation_wrapper=pydantic_parser,
-      ).hydra_main(
-           config_name="main",
-           config_path=None,
-           version_base="1.3",
-       )
+zen(main, 
+   instantiation_wrapper=pydantic_parser,
+).hydra_main(
+   config_name="main",
+   config_path=None,
+   version_base="1.3",
+)
 
 In a vanilla hydra-zen app, we would not be able to create a `Path` instance from the 
 CLI, and the `PositiveInt` annotation would be a mere suggestion rather than a 
