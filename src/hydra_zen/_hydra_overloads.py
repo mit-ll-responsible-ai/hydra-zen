@@ -19,11 +19,24 @@ E.g.
 """
 
 # pyright: strict
+# pyright: reportPrivateUsage=false
 
 import pathlib
 from dataclasses import is_dataclass
-from functools import wraps
-from typing import IO, Any, Callable, Dict, List, Type, TypeVar, Union, cast, overload
+from functools import partial, wraps
+from typing import (
+    IO,
+    Any,
+    Callable,
+    Dict,
+    List,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    cast,
+    overload,
+)
 
 from hydra.utils import instantiate as hydra_instantiate
 from omegaconf import MISSING, DictConfig, ListConfig, OmegaConf
@@ -43,39 +56,130 @@ T = TypeVar("T")
 F = TypeVar("F", bound=Callable[..., Any])
 
 
+def _call_target(
+    _target_: F,
+    _partial_: bool,
+    args: Tuple[Any, ...],
+    kwargs: Dict[str, Any],
+    full_key: str,
+    *,
+    target_wrapper: Callable[[F], F],
+) -> Any:  # pragma: no cover
+    """Call target (type) with args and kwargs."""
+    import functools
+
+    from hydra._internal.instantiate._instantiate2 import (
+        _convert_target_to_string,
+        _extract_pos_args,
+    )
+    from hydra.errors import InstantiationException
+    from omegaconf import OmegaConf
+
+    from hydra_zen.funcs import zen_processing
+
+    try:
+        args, kwargs = _extract_pos_args(args, kwargs)
+        # detaching configs from parent.
+        # At this time, everything is resolved and the parent link can cause
+        # issues when serializing objects in some scenarios.
+        for arg in args:
+            if OmegaConf.is_config(arg):
+                arg._set_parent(None)
+        for v in kwargs.values():
+            if OmegaConf.is_config(v):
+                v._set_parent(None)
+    except Exception as e:
+        msg = (
+            f"Error in collecting args and kwargs for '{_convert_target_to_string(_target_)}':"
+            + f"\n{repr(e)}"
+        )
+        if full_key:
+            msg += f"\nfull_key: {full_key}"
+
+        raise InstantiationException(msg) from e
+
+    orig_target = _target_
+    if _target_ is zen_processing:
+        kwargs["_zen_target_wrapper"] = target_wrapper
+    else:
+        _target_ = target_wrapper(_target_)
+
+    if _partial_:
+        try:
+            return functools.partial(_target_, *args, **kwargs)
+        except Exception as e:
+            msg = (
+                f"Error in creating partial({_convert_target_to_string(orig_target)}, ...) object:"
+                + f"\n{repr(e)}"
+            )
+            if full_key:
+                msg += f"\nfull_key: {full_key}"
+            raise InstantiationException(msg) from e
+    else:
+        try:
+            return _target_(*args, **kwargs)
+        except Exception as e:
+            msg = f"Error in call to target '{_convert_target_to_string(orig_target)}':\n{repr(e)}"
+            if full_key:
+                msg += f"\nfull_key: {full_key}"
+            raise InstantiationException(msg) from e
+
+
 class _TightBind:  # pragma: no cover
     ...
 
 
 @overload
-def instantiate(config: _TightBind, *args: Any, **kwargs: Any) -> Any: ...
+def instantiate(
+    config: _TightBind,
+    *args: Any,
+    _target_wrapper_: Union[Callable[[F], F], None] = ...,
+    **kwargs: Any,
+) -> Any: ...
 
 
 @overload
 def instantiate(
-    config: InstOrType[ConfigPath], *args: Any, **kwargs: Any
+    config: InstOrType[ConfigPath],
+    *args: Any,
+    _target_wrapper_: Union[Callable[[F], F], None] = ...,
+    **kwargs: Any,
 ) -> pathlib.Path: ...
 
 
 @overload
 def instantiate(
-    config: InstOrType[ConfigComplex], *args: Any, **kwargs: Any
+    config: InstOrType[ConfigComplex],
+    *args: Any,
+    _target_wrapper_: Union[Callable[[F], F], None] = ...,
+    **kwargs: Any,
 ) -> complex: ...
 
 
 @overload
-def instantiate(config: InstOrType[Just[T]], *args: Any, **kwargs: Any) -> T: ...
+def instantiate(
+    config: InstOrType[Just[T]],
+    *args: Any,
+    _target_wrapper_: Union[Callable[[F], F], None] = ...,
+    **kwargs: Any,
+) -> T: ...
 
 
 @overload
 def instantiate(
-    config: InstOrType[IsPartial[Callable[..., T]]], *args: Any, **kwargs: Any
+    config: InstOrType[IsPartial[Callable[..., T]]],
+    *args: Any,
+    _target_wrapper_: Union[Callable[[F], F], None] = ...,
+    **kwargs: Any,
 ) -> Partial[T]: ...
 
 
 @overload
 def instantiate(
-    config: InstOrType[Builds[Callable[..., T]]], *args: Any, **kwargs: Any
+    config: InstOrType[Builds[Callable[..., T]]],
+    *args: Any,
+    _target_wrapper_: Union[Callable[[F], F], None] = ...,
+    **kwargs: Any,
 ) -> T: ...
 
 
@@ -91,11 +195,17 @@ def instantiate(
         List[Any],
     ],
     *args: Any,
+    _target_wrapper_: Union[Callable[[F], F], None] = ...,
     **kwargs: Any,
 ) -> Any: ...
 
 
-def instantiate(config: Any, *args: Any, **kwargs: Any) -> Any:
+def instantiate(
+    config: Any,
+    *args: Any,
+    _target_wrapper_: Union[Callable[[F], F], None] = None,
+    **kwargs: Any,
+) -> Any:
     """
     Instantiates the target of a targeted config.
 
@@ -115,6 +225,15 @@ def instantiate(config: Any, *args: Any, **kwargs: Any) -> Any:
     **kwargs : Any
         Override values, specified by-name. Take priority over
         the named values provided by ``config``.
+
+    _target_wrapper_ : Callable[[F], F] | None, optional (default=None)
+        If specified, this wrapper is applied to _all_ targets during
+        instantiation. This can be used to add custom validation/parsing
+        to the config-instantiation process.
+
+        I.e., For any target reached during recursive instantiation,
+        `_target_wrapper_(target)(*args, **kwargs)` will be called rather than
+        `target(*args, **kwargs)`.
 
     Returns
     -------
@@ -208,7 +327,20 @@ def instantiate(config: Any, *args: Any, **kwargs: Any) -> Any:
     Only a subset of primitive types are supported by Hydra's validation system [2]_.
     See :ref:`data-val` for more general data validation capabilities via hydra-zen.
     """
-    return hydra_instantiate(config, *args, **kwargs)
+    if _target_wrapper_ is None:
+        return hydra_instantiate(config, *args, **kwargs)
+
+    from hydra._internal.instantiate import _instantiate2 as inst
+
+    old = inst._call_target
+    try:
+        new_call_target = cast(
+            F, partial(_call_target, target_wrapper=_target_wrapper_)
+        )
+        inst._call_target = new_call_target
+        return hydra_instantiate(config, *args, **kwargs)
+    finally:
+        inst._call_target = old
 
 
 def _apply_just(fn: F) -> F:

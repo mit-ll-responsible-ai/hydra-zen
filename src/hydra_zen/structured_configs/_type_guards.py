@@ -3,7 +3,7 @@
 # pyright: strict
 from dataclasses import MISSING
 from functools import partial
-from typing import TYPE_CHECKING, Any, Type, Union
+from typing import TYPE_CHECKING, Any, Protocol, Type, Union
 
 from typing_extensions import TypeGuard
 
@@ -227,3 +227,16 @@ def is_partial_builds(x: Any) -> TypeGuard[PartialBuilds[Any]]:
             and (safe_getattr(x, ZEN_PARTIAL_FIELD_NAME, False) is True)
         )
     return False
+
+
+class HasOrigin(Protocol):
+    __origin__: Type[Any]
+
+
+def is_generic_type(x: Any) -> TypeGuard[HasOrigin]:
+    return (
+        hasattr(x, "__origin__")
+        and hasattr(x, "__args__")
+        and hasattr(x, "__parameters__")
+        and isinstance(x.__origin__, type)
+    )

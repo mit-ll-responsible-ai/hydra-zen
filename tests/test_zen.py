@@ -12,7 +12,7 @@ import pytest
 from hypothesis import example, given, strategies as st
 from omegaconf import DictConfig
 
-from hydra_zen import builds, make_config, to_yaml, zen
+from hydra_zen import builds, instantiate, just, make_config, to_yaml, zen
 from hydra_zen._compatibility import HYDRA_VERSION
 from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.wrapper import Zen
@@ -58,6 +58,10 @@ def test_zen_repr():
     assert repr(zen(make_config("x", "y"))) == "zen[Config(x, y)](cfg, /)"
 
 
+def func(x=-2, y=2, **kw):
+    return x, y
+
+
 @pytest.mark.parametrize(
     "exclude,expected",
     [
@@ -69,9 +73,13 @@ def test_zen_repr():
         (["x", "y"], (-2, 2)),
     ],
 )
-@given(unpack_kw=st.booleans())
-def test_zen_excluded_param(exclude, expected, unpack_kw):
-    zenf = zen(lambda x=-2, y=2, **kw: (x, y), exclude=exclude, unpack_kwargs=unpack_kw)
+@given(unpack_kw=st.booleans(), serialize_zen=st.booleans())
+def test_zen_excluded_param(exclude, expected, unpack_kw, serialize_zen: bool):
+    zenf = zen(func, exclude=exclude, unpack_kwargs=unpack_kw)
+    if serialize_zen:
+        cfg = just(zenf)
+        to_yaml(cfg)
+        zenf = instantiate(cfg)
     conf = dict(x=1, y=0)
     assert zenf(conf) == expected
 
@@ -238,13 +246,14 @@ def test_no_resolve():
     assert out2 == dict(x=1, y=1)
 
 
-def test_zen_works_on_partiald_funcs():
+@pytest.mark.parametrize("wrapper", [None, lambda x: x])
+def test_zen_works_on_partiald_funcs(wrapper):
     from functools import partial
 
     def f(x: int, y: str):
         return x, y
 
-    zen_pf = zen(partial(f, x=1))
+    zen_pf = zen(partial(f, x=1), instantiation_wrapper=wrapper)
 
     with pytest.raises(
         HydraZenValidationError,
@@ -258,9 +267,14 @@ def test_zen_works_on_partiald_funcs():
     assert zen_pf(make_config(x=2, y="a")) == (2, "a")
 
 
-@given(x=st.integers(-5, 5), y=st.integers(-5, 5), unpack_kw=st.booleans())
-def test_zen_cfg_passthrough(x: int, y: int, unpack_kw: bool):
-    @zen(unpack_kwargs=unpack_kw)
+@given(
+    x=st.integers(-5, 5),
+    y=st.integers(-5, 5),
+    unpack_kw=st.booleans(),
+    wrapper=st.sampled_from([None, lambda x: x]),
+)
+def test_zen_cfg_passthrough(x: int, y: int, unpack_kw: bool, wrapper):
+    @zen(unpack_kwargs=unpack_kw, instantiation_wrapper=wrapper)
     def f(x: int, zen_cfg, **kw):
         return (x, zen_cfg)
 
@@ -631,3 +645,81 @@ async def test_async_compatible():
         return x
 
     assert await zen(foo)(dict(x=builds(int, 22))) == 22
+
+
+@dataclass
+class TrackCall:
+    num_calls: int = 0
+
+    def __post_init__(self):
+        self.funcs = []
+
+    def __call__(self, fn) -> Any:
+        self.num_calls += 1
+        self.funcs.append(fn)
+        return fn
+
+
+async def test_instantiation_wrapper():
+    def foo(x: int):
+        return x
+
+    async def goo(x: int):
+        return x
+
+    tracker1 = TrackCall()
+    assert zen(foo, instantiation_wrapper=tracker1)(dict(x=builds(int, 21))) == 21
+    assert tracker1.num_calls == 2
+    assert tracker1.funcs == [foo, int]
+
+    # test decorator pattern
+    tracker2 = TrackCall()
+    assert zen(instantiation_wrapper=tracker2)(foo)(dict(x=builds(int, 22))) == 22
+    assert tracker2.num_calls == 2
+    assert tracker2.funcs == [foo, int]
+
+    tracker3 = TrackCall()
+    assert await zen(goo, instantiation_wrapper=tracker3)(dict(x=builds(int, 23))) == 23
+    assert tracker1.num_calls == 2
+    assert tracker1.funcs == [foo, int]
+
+
+def foo(x: int):
+    return x
+
+
+def pre_call(cfg):
+    return cfg
+
+
+@given(
+    pre_call=st.sampled_from([None, TrackCall]),
+    unpack_kwargs=st.booleans(),
+    resolve_pre_call=st.booleans(),
+    instantiation_wrapper=st.sampled_from([None, TrackCall]),
+    run_in_context=st.booleans(),
+    exclude=st.none() | st.sampled_from(["x"]),
+)
+def test_zen_autoconfig(
+    pre_call,
+    unpack_kwargs,
+    resolve_pre_call,
+    instantiation_wrapper,
+    run_in_context,
+    exclude,
+):
+    cfg = make_config(x=builds(int, 1))
+    zen_f = zen(
+        foo,
+        pre_call=pre_call,
+        unpack_kwargs=unpack_kwargs,
+        resolve_pre_call=resolve_pre_call,
+        instantiation_wrapper=instantiation_wrapper,
+        run_in_context=run_in_context,
+        exclude=exclude,
+    )
+    cfg = just(zen_f)
+    to_yaml(cfg)
+    new_zen_f = instantiate(cfg)
+
+    assert new_zen_f.__dict__ == zen_f.__dict__

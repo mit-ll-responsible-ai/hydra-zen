@@ -11,7 +11,7 @@ import statistics
 import string
 from collections import Counter, defaultdict, deque
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Generic, List, Optional, TypeVar
 
 import hypothesis.strategies as st
 import pytest
@@ -22,6 +22,8 @@ from hydra_zen import builds, get_target, hydrated_dataclass, instantiate, just,
 from hydra_zen.structured_configs._type_guards import is_builds
 from tests import is_same, valid_hydra_literals
 from tests.custom_strategies import valid_builds_args
+
+T = TypeVar("T")
 
 arbitrary_kwargs = st.dictionaries(
     keys=st.text(alphabet=string.ascii_letters, min_size=1, max_size=1),
@@ -121,6 +123,10 @@ class LocalClass:
         return
 
 
+class GenericClass(Generic[T]):
+    pass
+
+
 def local_function():
     pass
 
@@ -129,6 +135,8 @@ a_bunch_of_objects = [
     local_function,
     LocalClass,
     LocalClass.a_class_method,
+    GenericClass,
+    GenericClass[int],
     int,
     str,
     list,
