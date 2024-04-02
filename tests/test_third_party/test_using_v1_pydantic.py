@@ -51,15 +51,13 @@ def test_pydantic_specific_fields_function(custom_type, good_val, bad_val):
 @parametrize_pydantic_fields
 def test_pydantic_specific_fields_class(custom_type, good_val, bad_val):
     class A:
-        def __init__(self, x) -> None:
+        def __init__(self, x: custom_type) -> None:
             pass
 
-    A.__init__.__annotations__["x"] = custom_type
-    validates_with_pydantic(A)
+    validates_with_pydantic(A)(good_val)
 
-    A(good_val)
     with pytest.raises(Exception):
-        A(bad_val)
+        validates_with_pydantic(A)(bad_val)
 
 
 def test_custom_validation_config():

@@ -14,7 +14,7 @@ chronological order. All previous releases should still be available on pip.
 0.13.0rc1 - 2024-04-01
 ----------------------
 
-How cool would it be to have  Hydra's CLI grammar, hydra-zen's config-creation ergonomics, and **pydantic's runtime type-checking & value-parsing** all in one place? Turns out that it is pretty cool 😎.
+This release makes it possible to use pydantic's runtime type-checking and parsing throughout your hydra-zen app 🚀🚀🚀
 
 Check it out:
 
@@ -39,18 +39,18 @@ Check it out:
        store(main)
        store.add_to_hydra_store()
    
-zen(main, 
-   instantiation_wrapper=pydantic_parser,
-).hydra_main(
-   config_name="main",
-   config_path=None,
-   version_base="1.3",
-)
+       zen(main, 
+          instantiation_wrapper=pydantic_parser,
+       ).hydra_main(
+          config_name="main",
+          config_path=None,
+          version_base="1.3",
+       )
 
-In a vanilla hydra-zen app, we would not be able to create a `Path` instance from the 
-CLI, and the `PositiveInt` annotation would be a mere suggestion rather than a 
-requirement. But by specifying `instantiation_wrapper=pydantic_parser`, we can pass in 
-a string-path from the CLI, and it will be parsed as a `Path` instance.
+In a vanilla hydra-zen app we would not be able to create a `Path` instance from the 
+CLI, nor would the `PositiveInt` annotation provide any sort of runtime constraint. But 
+by specifying `instantiation_wrapper=pydantic_parser`, we can pass in a string-path 
+from the CLI, and it will be parsed as a `Path` instance.
 
 .. code-block:: console
    :caption: Providing a string-`path` at the CLI gets parsed as a `Path` instance.
@@ -59,7 +59,7 @@ a string-path from the CLI, and it will be parsed as a `Path` instance.
    path=WindowsPath('foo.txt') age=10
 
 
-Attempting to pass in a negative value for `age` will raise a `ValidationError`:
+and attempting to pass in a negative value for `age` will raise a `ValidationError`:
 
 .. code-block:: console
    :caption: The `PositiveInt` annotation enforces that `age` must be greater non-negative.
@@ -71,6 +71,9 @@ Attempting to pass in a negative value for `age` will raise a `ValidationError`:
    age
      Input should be greater than 0 [type=greater_than, input_value=-11, input_type=int]
 
+
+This also means that types like `Literal`, which are not supported by Hydra, can be leveraged in your apps.
+
 Critically, this pydantic-mediation parsing occurs not just for `main`, but 
 (recursively) for all config-targets that are instantiated in the process of calling 
 `main` via `zen`. This means that even deeply-nested values are validated against their
@@ -79,13 +82,17 @@ annotated types by pydantic.
 More generally, you can add an arbitrary wrapping layer to all targets instantiated by 
 `zen`, which is how the aforementioned pydantic parsing is implemented.
 
+See :pull:`666` for more details and to see how to completely disable Hydra's 
+type-checking in favor of pydantic's.
+
 New Features
 ------------
 - Adds :func:`hydra_zen.third_party.pydantic.pydantic_parser`. See :pull:`666`.
 - Adds `_target_wrapper_` as a new, optional argument to `hydra_zen.instantiate`, which enables users to add a custom wrapper to be applied recursively to all targets during instantiation. See :pull:`666`.
 - Adds an optional `instantiation_wrapper` to `hydra_zen.zen` (and `hydra_zen.wrappers.Zen`) that will apply a custom wrapper to all targets during instantiation performed by `zen`. See :pull:`666`.
 - Adds autoconfig support for `hydra_zen.wrapper.Zen`. I.e. the output of `zen` can now be passed to `just` and `builds` to generate Hydra-compatible configs. See :pull:`666`.
-  
+- Improved support for passing parameterized generics to `hydra_zen.builds` and `hydra_zen.just`. See :pull:`666`.
+
 Bug Fixes
 ---------
 - Fixes incompatibility between zen-processing features (e.g. ``zen_meta``) and iterative-build patterns. See :pull:`638`.
