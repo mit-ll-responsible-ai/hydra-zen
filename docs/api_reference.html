@@ -368,7 +368,7 @@ Python function instead of from a commandline interface.</p>
 <h3>Instantiating and Resolving Configs<a class="headerlink" href="#instantiating-and-resolving-configs" title="Link to this heading">#</a></h3>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">instantiate</span></code></a>(config, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">instantiate</span></code></a>(config, *args[, _target_wrapper_])</p></td>
 <td><p>Instantiates the target of a targeted config.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.get_target.html#hydra_zen.get_target" title="hydra_zen.get_target"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_target</span></code></a>(obj)</p></td>
@@ -542,7 +542,10 @@ represents that complex value in a Hydra-compatible way.</p>
 <td><p>Enables runtime type-checking of values, via the library <code class="docutils literal notranslate"><span class="pre">beartype</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/hydra_zen.third_party.pydantic.validates_with_pydantic.html#hydra_zen.third_party.pydantic.validates_with_pydantic" title="hydra_zen.third_party.pydantic.validates_with_pydantic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pydantic.validates_with_pydantic</span></code></a>(obj, *[, ...])</p></td>
-<td><p>Enables runtime type-checking of values, via the library <code class="docutils literal notranslate"><span class="pre">pydantic</span></code>.</p></td>
+<td><p><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.13.0.</span></p>
+</div>
+</p></td>
 </tr>
 </tbody>
 </table>

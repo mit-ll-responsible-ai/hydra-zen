@@ -337,6 +337,11 @@ that call of the wrapped function.</p>
 </dd>
 <dt><strong>ZenWrapper</strong><span class="classifier">Type[hydra_zen.wrapper.Zen], optional (default=Zen)</span></dt><dd><p>If specified, a subclass of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Zen</span></code> that customizes the behavior of the wrapper.</p>
 </dd>
+<dt><strong>instantiation_wrapper</strong><span class="classifier">Optional[Callable[[F2], F2]], optional (default=None)</span></dt><dd><p>If specified, a function that wraps the task function and all
+instantiation-targets before they are called.</p>
+<p>This can be used to introduce a layer of validation or logging
+to all instantiation calls in your application.</p>
+</dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

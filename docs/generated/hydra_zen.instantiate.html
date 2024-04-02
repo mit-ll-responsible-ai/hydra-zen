@@ -293,13 +293,13 @@ document.write(`
 <h1>hydra_zen.instantiate<a class="headerlink" href="#hydra-zen-instantiate" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="hydra_zen.instantiate">
-<span class="sig-prename descclassname"><span class="pre">hydra_zen.</span></span><span class="sig-name descname"><span class="pre">instantiate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/_hydra_overloads.html#instantiate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.instantiate" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">hydra_zen.</span></span><span class="sig-name descname"><span class="pre">instantiate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_target_wrapper_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/_hydra_overloads.html#instantiate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.instantiate" title="Link to this definition">#</a></dt>
 <dd><p>Instantiates the target of a targeted config.</p>
 <p>This is an alias of <code class="xref py py-func docutils literal notranslate"><span class="pre">hydra.utils.instantiate()</span></code> <a class="reference internal" href="#rfffea48737d8-1" id="id1">[1]</a>.</p>
 <p>By default, <a class="reference internal" href="#hydra_zen.instantiate" title="hydra_zen.instantiate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">instantiate</span></code></a> will recursively instantiate nested configurations <a class="reference internal" href="#rfffea48737d8-1" id="id2">[1]</a>.</p>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
+<dd class="field-odd"><dl>
 <dt><strong>config</strong><span class="classifier">Builds[Type[T] | Callable[…, T]]</span></dt><dd><p>The targeted config whose target will be instantiated/called.</p>
 </dd>
 <dt><strong>*args: Any</strong></dt><dd><p>Override values, specified by-position. Take priority over
@@ -307,6 +307,13 @@ the positional values provided by <code class="docutils literal notranslate"><sp
 </dd>
 <dt><strong>**kwargs</strong><span class="classifier">Any</span></dt><dd><p>Override values, specified by-name. Take priority over
 the named values provided by <code class="docutils literal notranslate"><span class="pre">config</span></code>.</p>
+</dd>
+<dt><strong>_target_wrapper_</strong><span class="classifier">Callable[[F], F] | None, optional (default=None)</span></dt><dd><p>If specified, this wrapper is applied to _all_ targets during
+instantiation. This can be used to add custom validation/parsing
+to the config-instantiation process.</p>
+<p>I.e., For any target reached during recursive instantiation,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">_target_wrapper_(target)(*args,</span> <span class="pre">**kwargs)</span></code> will be called rather than
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">target(*args,</span> <span class="pre">**kwargs)</span></code>.</p>
 </dd>
 </dl>
 </dd>

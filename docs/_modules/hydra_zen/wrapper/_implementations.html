@@ -474,6 +474,7 @@ document.write(`
 <span class="n">P2</span> <span class="o">=</span> <span class="n">ParamSpec</span><span class="p">(</span><span class="s2">&quot;P2&quot;</span><span class="p">)</span>
 <span class="n">R2</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;R2&quot;</span><span class="p">)</span>
 <span class="n">F</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;F&quot;</span><span class="p">)</span>
+<span class="n">F2</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;F2&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
 
 
 <span class="n">_UNSPECIFIED_</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="nb">object</span><span class="p">()</span>
@@ -509,6 +510,10 @@ document.write(`
             <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">f</span>
+
+
+<span class="k">def</span> <span class="nf">_identity</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">F2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">F2</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">x</span>
 
 
 <div class="viewcode-block" id="Zen">
@@ -549,6 +554,7 @@ document.write(`
         <span class="n">unpack_kwargs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">resolve_pre_call</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">run_in_context</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">instantiation_wrapper</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">F2</span><span class="p">],</span> <span class="n">F2</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
@@ -588,6 +594,13 @@ document.write(`
 <span class="sd">            that call of the wrapped function.</span>
 
 <span class="sd">            `run_in_context` is not supported for async functions.</span>
+
+<span class="sd">        instantiation_wrapper : Optional[Callable[[F2], F2]], optional (default=None)</span>
+<span class="sd">            If specified, a function that wraps the task function and all</span>
+<span class="sd">            instantiation-targets before they are called.</span>
+
+<span class="sd">            This can be used to introduce a layer of validation or logging</span>
+<span class="sd">            to all instantiation calls in your application.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">run_in_context</span> <span class="ow">and</span> <span class="n">iscoroutinefunction</span><span class="p">(</span><span class="n">__func</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">run_in_context</span><span class="si">=}</span><span class="s2"> is not supported for async functions.&quot;</span><span class="p">)</span>
@@ -616,6 +629,8 @@ document.write(`
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;`run_in_context` must be type `bool` got </span><span class="si">{</span><span class="n">run_in_context</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_instantiation_wrapper</span> <span class="o">=</span> <span class="n">instantiation_wrapper</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_resolve</span> <span class="o">=</span> <span class="n">resolve_pre_call</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_kwargs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">unpack_kwargs</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span>
@@ -761,12 +776,12 @@ document.write(`
             <span class="p">)</span></div>
 
 
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">instantiate</span><span class="p">(</span><span class="n">__c</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">instantiate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__c</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiates each config that is extracted by `zen` before calling the wrapped function.</span>
 
 <span class="sd">        Overwrite this to change `ZenWrapper`&#39;s instantiation behavior.&quot;&quot;&quot;</span>
-        <span class="n">__c</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">__c</span><span class="p">)</span>
+        <span class="n">__c</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">__c</span><span class="p">,</span> <span class="n">_target_wrapper_</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_instantiation_wrapper</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">__c</span><span class="p">,</span> <span class="p">(</span><span class="n">ListConfig</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">)):</span>
             <span class="k">return</span> <span class="n">OmegaConf</span><span class="o">.</span><span class="n">to_object</span><span class="p">(</span><span class="n">__c</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -832,7 +847,13 @@ document.write(`
             <span class="p">)</span>
             <span class="n">cfg_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">name</span><span class="p">:</span> <span class="n">cfg</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">})</span>
 
-        <span class="n">func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="k">if</span> <span class="n">context</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">partial</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">)</span>
+        <span class="n">wrapper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instantiation_wrapper</span> <span class="ow">or</span> <span class="n">_identity</span>
+
+        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+            <span class="k">if</span> <span class="n">context</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="n">partial</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
+        <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">func</span><span class="p">(</span>
             <span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instantiate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_instantiable</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">args_</span><span class="p">),</span>
@@ -936,6 +957,7 @@ document.write(`
     <span class="n">resolve_pre_call</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">run_in_context</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">exclude</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">instantiation_wrapper</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">F2</span><span class="p">],</span> <span class="n">F2</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]:</span> <span class="o">...</span>
 
 
@@ -949,6 +971,7 @@ document.write(`
     <span class="n">ZenWrapper</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Zen</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">run_in_context</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">exclude</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">instantiation_wrapper</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">F2</span><span class="p">],</span> <span class="n">F2</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Callable</span><span class="p">[</span><span class="n">P2</span><span class="p">,</span> <span class="n">R2</span><span class="p">]],</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P2</span><span class="p">,</span> <span class="n">R2</span><span class="p">]]:</span> <span class="o">...</span>
 
 
@@ -963,6 +986,7 @@ document.write(`
     <span class="n">resolve_pre_call</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">run_in_context</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">ZenWrapper</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Zen</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Zen</span><span class="p">,</span>
+    <span class="n">instantiation_wrapper</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">F2</span><span class="p">],</span> <span class="n">F2</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Callable</span><span class="p">[</span><span class="n">P2</span><span class="p">,</span> <span class="n">R2</span><span class="p">]],</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P2</span><span class="p">,</span> <span class="n">R2</span><span class="p">]],</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;zen(func, /, pre_call, ZenWrapper)</span>
 
@@ -1020,6 +1044,13 @@ document.write(`
 
 <span class="sd">    ZenWrapper : Type[hydra_zen.wrapper.Zen], optional (default=Zen)</span>
 <span class="sd">        If specified, a subclass of `Zen` that customizes the behavior of the wrapper.</span>
+
+<span class="sd">    instantiation_wrapper : Optional[Callable[[F2], F2]], optional (default=None)</span>
+<span class="sd">        If specified, a function that wraps the task function and all</span>
+<span class="sd">        instantiation-targets before they are called.</span>
+
+<span class="sd">        This can be used to introduce a layer of validation or logging</span>
+<span class="sd">        to all instantiation calls in your application.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1220,6 +1251,7 @@ document.write(`
                 <span class="n">unpack_kwargs</span><span class="o">=</span><span class="n">unpack_kwargs</span><span class="p">,</span>
                 <span class="n">resolve_pre_call</span><span class="o">=</span><span class="n">resolve_pre_call</span><span class="p">,</span>
                 <span class="n">run_in_context</span><span class="o">=</span><span class="n">run_in_context</span><span class="p">,</span>
+                <span class="n">instantiation_wrapper</span><span class="o">=</span><span class="n">instantiation_wrapper</span><span class="p">,</span>
             <span class="p">),</span>
         <span class="p">)</span>
 
@@ -1233,6 +1265,7 @@ document.write(`
                 <span class="n">unpack_kwargs</span><span class="o">=</span><span class="n">unpack_kwargs</span><span class="p">,</span>
                 <span class="n">resolve_pre_call</span><span class="o">=</span><span class="n">resolve_pre_call</span><span class="p">,</span>
                 <span class="n">run_in_context</span><span class="o">=</span><span class="n">run_in_context</span><span class="p">,</span>
+                <span class="n">instantiation_wrapper</span><span class="o">=</span><span class="n">instantiation_wrapper</span><span class="p">,</span>
             <span class="p">),</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>

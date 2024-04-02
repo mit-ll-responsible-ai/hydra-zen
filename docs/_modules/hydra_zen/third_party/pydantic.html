@@ -400,8 +400,10 @@ document.write(`
   <h1>Source code for hydra_zen.third_party.pydantic</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) 2024 Massachusetts Institute of Technology</span>
 <span class="c1"># SPDX-License-Identifier: MIT</span>
+<span class="c1"># pyright: reportUnnecessaryTypeIgnoreComment=false</span>
+<span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="kn">import</span> <span class="nn">pydantic</span> <span class="k">as</span> <span class="nn">_pyd</span>
 
@@ -410,130 +412,124 @@ document.write(`
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;validates_with_pydantic&quot;</span><span class="p">]</span>
 
 
-<span class="n">_default_validator</span> <span class="o">=</span> <span class="n">_pyd</span><span class="o">.</span><span class="n">validate_arguments</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+<span class="k">if</span> <span class="n">_pyd</span><span class="o">.</span><span class="n">__version__</span> <span class="o">&gt;=</span> <span class="s2">&quot;2.0&quot;</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="n">_default_parser</span> <span class="o">=</span> <span class="n">_pyd</span><span class="o">.</span><span class="n">validate_call</span><span class="p">(</span>
+        <span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span> <span class="n">validate_return</span><span class="o">=</span><span class="kc">False</span>  <span class="c1"># type: ignore</span>
+    <span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="n">_default_parser</span> <span class="o">=</span> <span class="n">_pyd</span><span class="o">.</span><span class="n">validate_arguments</span><span class="p">(</span>
+        <span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arbitrary_types_allowed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;validate_return&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>  <span class="c1"># type: ignore</span>
+    <span class="p">)</span>
 
 
-<div class="viewcode-block" id="validates_with_pydantic">
-<a class="viewcode-back" href="../../../generated/hydra_zen.third_party.pydantic.validates_with_pydantic.html#hydra_zen.third_party.pydantic.validates_with_pydantic">[docs]</a>
-<span class="k">def</span> <span class="nf">validates_with_pydantic</span><span class="p">(</span>
-    <span class="n">obj</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">validator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_T</span><span class="p">],</span> <span class="n">_T</span><span class="p">]</span> <span class="o">=</span> <span class="n">_default_validator</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enables runtime type-checking of values, via the library ``pydantic``.</span>
+<span class="k">def</span> <span class="nf">_constructor_as_fn</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Makes a shim around a class constructor so that it is compatible with pydantic validation.</span>
 
-<span class="sd">    I.e. ``obj = validates_with_beartype(obj)`` adds runtime type-checking</span>
-<span class="sd">    to all calls of ``obj(*args, **kwargs)``, based on the type-annotations specified</span>
-<span class="sd">    in the signature of ``obj``.</span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    `pydantic.validate_call` mishandles class constructors; it expects that</span>
+<span class="sd">    `cls`/`self` should be passed explicitly to the constructor. This shim</span>
+<span class="sd">    corrects that.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-<span class="sd">    This leverages ``pydantic.validate_arguments``, which is currently a</span>
-<span class="sd">    beta [1]_ feature in pydantic.</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper_function</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="n">annotations</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s2">&quot;__annotations__&quot;</span><span class="p">,</span> <span class="p">{})</span>
+
+    <span class="c1"># In a case like:</span>
+    <span class="c1"># class A:</span>
+    <span class="c1">#   x: int</span>
+    <span class="c1">#   def __init__(self, y: int): ...</span>
+    <span class="c1">#</span>
+    <span class="c1">#  y will not be in __annotations__ but it should be in the signature,</span>
+    <span class="c1">#  so we add it to the annotations.</span>
+
+    <span class="n">sig</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sig</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">p</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">annotations</span><span class="p">:</span>
+            <span class="n">annotations</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">annotation</span>
+    <span class="n">wrapper_function</span><span class="o">.</span><span class="vm">__annotations__</span> <span class="o">=</span> <span class="n">annotations</span>
+
+    <span class="k">return</span> <span class="n">wrapper_function</span>
+
+
+<span class="k">def</span> <span class="nf">_get_signature</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Signature</span><span class="p">]:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span> <span class="nf">pydantic_parser</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">parser</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_T</span><span class="p">],</span> <span class="n">_T</span><span class="p">]</span> <span class="o">=</span> <span class="n">_default_parser</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A target-wrapper that adds pydantic parsing to the target.</span>
+
+<span class="sd">    This can be passed to `instantiate` as a `_target_wrapper_` to add pydantic parsing</span>
+<span class="sd">    to the (recursive) instantiation of the target.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    obj : Callable</span>
+<span class="sd">    target : Callable</span>
 
-<span class="sd">    validator : Type[pydantic.validate_arguments], optional</span>
+<span class="sd">    parser : Type[pydantic.validate_arguments], optional</span>
 <span class="sd">        A configured instance of pydantic&#39;s validation decorator.</span>
 
 <span class="sd">        The default validator that we provide specifies:</span>
 <span class="sd">           - arbitrary_types_allowed: True</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    obj_w_validation : Callable</span>
-<span class="sd">        A wrapped function or a class whose init-method has been</span>
-<span class="sd">        wrapped in-place</span>
-
-<span class="sd">    See Also</span>
-<span class="sd">    --------</span>
-<span class="sd">    hydra_zen.third_party.beartype.validates_with_beartype</span>
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    pydantic must be installed [2]_ as a separate dependency to leverage this validator.</span>
-<span class="sd">    Using ``validates_with_pydantic`` as a ``zen_wrapper`` will create a dependency on</span>
-<span class="sd">    pydantic among resulting yamls: these yamls will also be validated by pydantic</span>
-<span class="sd">    upon instantiation.</span>
-
-<span class="sd">    It is recommended that `validates_with_pydantic` be used in conjunction with</span>
-<span class="sd">    the following `builds` settings:</span>
-
-<span class="sd">      - ``hydra_convert=&quot;all&quot;``: to ensure omegaconf containers are converted to std-lib types</span>
-
-<span class="sd">    Users should be aware of pydantic&#39;s data conversion strategy [3]_; pydantic</span>
-<span class="sd">    may cast data so that it will conform to its annotated type.</span>
-
-<span class="sd">    References</span>
-<span class="sd">    ----------</span>
-<span class="sd">    .. [1] https://pydantic-docs.helpmanual.io/usage/validation_decorator/</span>
-<span class="sd">    .. [2] https://pydantic-docs.helpmanual.io/install/</span>
-<span class="sd">    .. [3] https://pydantic-docs.helpmanual.io/usage/models/#data-conversion</span>
-
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    **Basic usage**</span>
+<span class="sd">    .. code-block:: python</span>
 
-<span class="sd">    &gt;&gt;&gt; from hydra_zen.third_party.pydantic import validates_with_pydantic</span>
-<span class="sd">    &gt;&gt;&gt; from pydantic import PositiveInt</span>
+<span class="sd">       from hydra_zen import builds, instantiate</span>
+<span class="sd">       from hydra_zen.third_party.pydantic import pydantic_parser</span>
 
-<span class="sd">    &gt;&gt;&gt; def f(x: PositiveInt): return x</span>
+<span class="sd">       from pydantic import PositiveInt</span>
 
-<span class="sd">    &gt;&gt;&gt; f(-100)  # bad value passes</span>
-<span class="sd">    -100</span>
+<span class="sd">       def f(x: PositiveInt): return x</span>
 
-<span class="sd">    &gt;&gt;&gt; val_f = validates_with_pydantic(f)  # f + validation</span>
-<span class="sd">    &gt;&gt;&gt; val_f(-100)  # bad value gets caught</span>
-<span class="sd">    ValidationError: 1 validation error for F (...)</span>
+<span class="sd">       good_conf = builds(f, x=10)</span>
+<span class="sd">       bad_conf = builds(f, x=-3)</span>
 
-<span class="sd">    Applying `validates_with_pydantic` to a class-object will wrap its ``__init__``</span>
-<span class="sd">    method in-place.</span>
-
-<span class="sd">    &gt;&gt;&gt; class A:</span>
-<span class="sd">    ...     def __init__(self, x: PositiveInt): ...</span>
-<span class="sd">    &gt;&gt;&gt; validates_with_pydantic(A)  # wrapping occurs in-place</span>
-<span class="sd">    __main__.A</span>
-<span class="sd">    &gt;&gt;&gt; A(-10)</span>
-<span class="sd">    ValidationError: 1 validation error for Init</span>
-
-<span class="sd">    **Adding pydantic validation to configs**</span>
-
-<span class="sd">    This is designed to be used with the ``zen_wrappers`` feature of `builds`.</span>
-
-<span class="sd">    &gt;&gt;&gt; from hydra_zen import builds, instantiate</span>
-<span class="sd">    &gt;&gt;&gt; # instantiations of `conf` will be validated by pydantic</span>
-<span class="sd">    &gt;&gt;&gt; conf = builds(</span>
-<span class="sd">    ...     f,</span>
-<span class="sd">    ...     zen_wrappers=validates_with_pydantic,</span>
-<span class="sd">    ...     # recommended builds-settings for pydantic-validation</span>
-<span class="sd">    ...     populate_full_signature=True,</span>
-<span class="sd">    ...     hydra_convert=&quot;all&quot;,</span>
-<span class="sd">    ... )</span>
-<span class="sd">    &gt;&gt;&gt; instantiate(conf, x=10)</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(good_conf, _target_wrapper_=pydantic_parser)</span>
 <span class="sd">    10</span>
-<span class="sd">    &gt;&gt;&gt; instantiate(conf, x=-2)</span>
-<span class="sd">    ValidationError: 1 validation error for F (...)</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(bad_conf, _target_wrapper_=pydantic_parser)</span>
+<span class="sd">    ValidationError: 1 validation error for f (...)</span>
 
-<span class="sd">    Note that pydantic&#39;s data-coercion ensures smooth compatibility with Hydra.</span>
-<span class="sd">    I.e. lists will be coerced to the appropriate annotated sequence type.</span>
+<span class="sd">    This also enables type conversion / parsing. E.g. Hydra can</span>
+<span class="sd">    only produce lists from the CLI, but this parsing layer can</span>
+<span class="sd">    convert them based on the annotated type. (Note: this only</span>
+<span class="sd">    works for pydantic v2 and higher.)</span>
 
-<span class="sd">    &gt;&gt;&gt; def g(x: tuple): return x  # note the annotation</span>
-<span class="sd">    &gt;&gt;&gt; validates_with_pydantic(g)([1, 2, 3])  # input: list, output: tuple</span>
+<span class="sd">    &gt;&gt;&gt; def g(x: tuple): return x</span>
+<span class="sd">    &gt;&gt;&gt; conf = builds(g, x=[1, 2, 3])</span>
+<span class="sd">    &gt;&gt;&gt; instantiate(conf, _target_wrapper_=pydantic_parser)</span>
 <span class="sd">    (1, 2, 3)</span>
-
-<span class="sd">    Consider using :func:`~hydra_zen.make_custom_builds_fn` to add validation to</span>
-<span class="sd">    all configs.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="s2">&quot;__init__&quot;</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="fm">__init__</span><span class="p">,</span> <span class="s2">&quot;validate&quot;</span><span class="p">):</span>
-            <span class="c1"># already decorated by pydantic</span>
-            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">_T</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
-        <span class="n">obj</span><span class="o">.</span><span class="fm">__init__</span> <span class="o">=</span> <span class="n">validator</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;validate&quot;</span><span class="p">):</span>
-            <span class="c1"># already decorated by pydantic</span>
-            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">_T</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
-        <span class="n">obj</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">_T</span><span class="p">,</span> <span class="n">validator</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isbuiltin</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">target</span>
 
-    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">_T</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span></div>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">_get_signature</span><span class="p">(</span><span class="n">target</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="n">target</span>
+
+    <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">_T</span><span class="p">,</span> <span class="n">parser</span><span class="p">(</span><span class="n">_constructor_as_fn</span><span class="p">(</span><span class="n">target</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="n">parser</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="validates_with_pydantic">
+<a class="viewcode-back" href="../../../generated/hydra_zen.third_party.pydantic.validates_with_pydantic.html#hydra_zen.third_party.pydantic.validates_with_pydantic">[docs]</a>
+<span class="k">def</span> <span class="nf">validates_with_pydantic</span><span class="p">(</span>
+    <span class="n">obj</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">validator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_T</span><span class="p">],</span> <span class="n">_T</span><span class="p">]</span> <span class="o">=</span> <span class="n">_default_parser</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    .. deprecated:: 0.13.0</span>
+
+<span class="sd">       Use `hydra_zen.third_party.pydantic.pydantic_parser` instead.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">pydantic_parser</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">parser</span><span class="o">=</span><span class="n">validator</span><span class="p">)</span></div>
 
 </pre></div>
 
