@@ -226,7 +226,7 @@ def instantiate(
         Override values, specified by-name. Take priority over
         the named values provided by ``config``.
 
-    _target_wrapper_ Callable[[F], F] | None, optional (default=None)
+    _target_wrapper_ : Callable[[F], F] | None, optional (default=None)
         If specified, this wrapper is applied to _all_ targets during
         instantiation. This can be used to add custom validation/parsing
         to the config-instantiation process.
