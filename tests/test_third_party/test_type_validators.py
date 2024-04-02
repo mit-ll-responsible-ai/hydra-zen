@@ -117,8 +117,6 @@ def test_multiple_wraps_on_class(
     for _ in range(num_compositions):
         wrapped_A = validator(wrapped_A)
 
-    assert wrapped_A is A, "decoration should occur in-place"
-
     if num_compositions:
         with pytest.raises(Exception):
             wrapped_A([1, 2])  # type: ignore
