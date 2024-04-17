@@ -222,7 +222,7 @@ You can read more about hydra-zen's config store and its auto-config capabilitie
 
 .. admonition:: Attention, Hydra users:
 
-  If you are already use Hydra, let's cut to the chase: **the most important benefit of using hydra-zen is that it automatically and dynamically generates structured configs for you**.
+  If you are already using Hydra, let's cut to the chase: **the most important benefit of using hydra-zen is that it automatically and dynamically generates structured configs for you**.
   
 
   .. code-block:: python
