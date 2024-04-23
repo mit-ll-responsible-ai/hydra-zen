@@ -1458,7 +1458,7 @@ document.write(`
 
         <span class="k">if</span> <span class="n">cast</span> <span class="ow">in</span> <span class="p">{</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">dict</span><span class="p">}:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_sanitize_collection</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">convert_dataclass</span><span class="o">=</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;dataclass&quot;</span><span class="p">])</span>
-            <span class="k">return</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
         <span class="k">return</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">x</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BuildsFn._make_hydra_compatible">
