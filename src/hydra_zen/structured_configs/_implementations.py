@@ -1044,7 +1044,7 @@ class BuildsFn(Generic[T]):
 
         if cast in {list, tuple, dict}:
             x = cls._sanitize_collection(x, convert_dataclass=settings["dataclass"])
-            return field(default_factory=lambda: cast(x))
+            return field(default_factory=lambda: cast(x))  # type: ignore
         return field(default_factory=lambda: x)
 
     @classmethod
