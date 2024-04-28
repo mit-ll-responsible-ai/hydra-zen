@@ -104,8 +104,8 @@ def zen_processing(
 
 
 def as_default_dict(
-    dict_: _tp.DefaultDict[_tp.Any, _tp.Any], *, default_factory: _tp.Any
-):
+    dict_: _tp.Dict[_tp.Any, _tp.Any], *, default_factory: _tp.Any
+) -> _tp.DefaultDict[_tp.Any, _tp.Any]:
     from collections import defaultdict
 
     obj = defaultdict(default_factory)
