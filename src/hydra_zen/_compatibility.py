@@ -1,6 +1,6 @@
 # Copyright (c) 2024 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-from collections import Counter, deque
+from collections import Counter, defaultdict, deque
 from datetime import timedelta
 from enum import Enum
 from functools import partial
@@ -70,6 +70,7 @@ ZEN_SUPPORTED_PRIMITIVES: FrozenSet[type] = frozenset(
         Counter,
         range,
         timedelta,
+        defaultdict,
     }
 )
 
