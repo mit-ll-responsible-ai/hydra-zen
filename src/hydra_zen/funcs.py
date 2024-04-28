@@ -101,3 +101,13 @@ def zen_processing(
     if _zen_partial is True:
         return _functools.partial(obj, *args, **kwargs)
     return obj(*args, **kwargs)
+
+
+def as_default_dict(
+    dict_: _tp.Dict[_tp.Any, _tp.Any], *, default_factory: _tp.Any
+) -> _tp.DefaultDict[_tp.Any, _tp.Any]:
+    from collections import defaultdict
+
+    obj = defaultdict(default_factory)
+    obj.update(dict_)
+    return obj

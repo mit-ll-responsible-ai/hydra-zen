@@ -4,7 +4,7 @@ import functools
 import inspect
 import sys
 import warnings
-from collections import Counter, deque
+from collections import Counter, defaultdict, deque
 from collections.abc import Collection
 from dataclasses import (  # use this for runtime checks
     MISSING,
@@ -72,7 +72,7 @@ from hydra_zen.errors import (
     HydraZenUnsupportedPrimitiveError,
     HydraZenValidationError,
 )
-from hydra_zen.funcs import get_obj
+from hydra_zen.funcs import as_default_dict, get_obj
 from hydra_zen.structured_configs import _utils
 from hydra_zen.structured_configs._type_guards import safe_getattr
 from hydra_zen.typing import (
@@ -3749,6 +3749,30 @@ class ConfigTimeDelta:
     def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]) -> None:
         del CBuildsFn
 
+
+@dataclass(unsafe_hash=True)
+class ConfigFromDefaultDict:
+    dict_: Dict[Any, Any]
+    default_factory: Any = field(init=False)
+    CBuildsFn: InitVar[Type[BuildsFn[Any]]]
+    _target_: str = BuildsFn._get_obj_path(as_default_dict)
+
+    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]) -> None:
+        assert isinstance(self.dict_, defaultdict)
+        self.default_factory = CBuildsFn.just(self.dict_.default_factory)
+        out = CBuildsFn._make_hydra_compatible(
+            dict(self.dict_),
+            convert_dataclass=True,
+            allow_zen_conversion=True,
+            structured_conf_permitted=True,
+        )
+        assert isinstance(out, dict)
+        self.dict_ = out
+
+
+ZEN_VALUE_CONVERSION[defaultdict] = lambda dict_, CBuildsFn: ConfigFromDefaultDict(
+    dict_, CBuildsFn
+)
 
 ZEN_VALUE_CONVERSION[set] = partial(
     ConfigFromTuple, _target_=BuildsFn._get_obj_path(set)
