@@ -1377,6 +1377,7 @@ class ZenStore:
         "_deferred_store",
         "_overwrite_ok",
         "_warn_node_kwarg",
+        "_disable_hydra_type_checking",
     )
 
     def __init__(
@@ -1387,6 +1388,7 @@ class ZenStore:
         deferred_hydra_store: bool = True,
         overwrite_ok: bool = False,
         warn_node_kwarg: bool = True,
+        disable_hydra_type_checking: bool = False,
     ) -> None:
         """
         Parameters
@@ -1414,6 +1416,13 @@ class ZenStore:
             This helps to protect users from mistakenly self-partializing a store
             with `store(node=Config)` instead of actually storing the node with
             `store(Config)`.
+
+        disable_hydra_type_checking : bool, optional (default=False)
+            If `True`, all dataclass configs will be converted to annotation-less
+            configs before being added to Hydra's config store.
+
+            This can be useful when using dataclasses with custom annotations that are not supported by Hydra's type-checking system, and when you want to use
+            an alternative type-checking system (e.g. Pydantic) instead.
         """
         if not isinstance(deferred_to_config, bool):
             raise TypeError(
@@ -1426,6 +1435,12 @@ class ZenStore:
         if not isinstance(deferred_hydra_store, bool):
             raise TypeError(
                 f"deferred_hydra_store must be a bool, got {deferred_hydra_store}"
+            )
+
+        if not isinstance(disable_hydra_type_checking, bool):
+            raise TypeError(
+                f"`disable_hydra_type_checking` must be a bool, got "
+                f"{disable_hydra_type_checking}"
             )
 
         self.name: str = "custom_store" if name is None else name
@@ -1443,6 +1458,7 @@ class ZenStore:
         self._defaults: _StoreCallSig = defaults.copy()
 
         self._warn_node_kwarg = warn_node_kwarg
+        self._disable_hydra_type_checking = disable_hydra_type_checking
 
     def __repr__(self) -> str:
         # TODO: nicer repr?
@@ -1566,6 +1582,7 @@ class ZenStore:
                 deferred_hydra_store=self._deferred_store,
                 overwrite_ok=self._overwrite_ok,
                 warn_node_kwarg=self._warn_node_kwarg,
+                disable_hydra_type_checking=self._disable_hydra_type_checking,
             )
             _s._defaults = self._defaults.copy()
 
@@ -2110,6 +2127,10 @@ class ZenStore:
                     f"Hydra config store entry already exists. Specify "
                     f"`overwrite_ok=True` to enable replacing config store entries"
                 )
+            if self._disable_hydra_type_checking:
+                entry = entry.copy()
+                entry["node"] = destructure(entry["node"])
+
             _store(**entry)
             self._queue.discard(key)
 
@@ -2135,3 +2156,12 @@ store: ZenStore = ZenStore(
     deferred_to_config=True,
     deferred_hydra_store=True,
 )
+
+
+def destructure(x: Any) -> Any:
+    if is_dataclass(x):
+        # Recursively converts:
+        # dataclass -> omegaconf-dict (backed by dataclass types)
+        #           -> dict -> omegaconf dict (no types)
+        return OmegaConf.create(OmegaConf.to_container(OmegaConf.create(x)))  # type: ignore
+    return x
