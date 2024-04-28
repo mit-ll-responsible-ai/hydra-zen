@@ -144,7 +144,7 @@ Brange2 = pik_blds(dict, x=range(2), zen_dataclass={"cls_name": "Brange2"})
 Bcounter = pik_blds(dict, x=Counter("apple"), zen_dataclass={"cls_name": "Bcounter"})
 x = defaultdict(list)
 x.update({1: [1, 2]})
-Bdefaultdict = pik_blds(dict, x=x, zen_dataclass={"cls_name": "Bcounter"})
+Bdefaultdict = pik_blds(dict, x=x, zen_dataclass={"cls_name": "Bdefaultdict"})
 
 
 @pytest.mark.parametrize(
