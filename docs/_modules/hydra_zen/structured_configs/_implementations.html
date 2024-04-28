@@ -404,7 +404,7 @@ document.write(`
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">deque</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">deque</span>
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Collection</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># use this for runtime checks</span>
     <span class="n">MISSING</span><span class="p">,</span>
@@ -472,7 +472,7 @@ document.write(`
     <span class="n">HydraZenUnsupportedPrimitiveError</span><span class="p">,</span>
     <span class="n">HydraZenValidationError</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.funcs</span> <span class="kn">import</span> <span class="n">get_obj</span>
+<span class="kn">from</span> <span class="nn">hydra_zen.funcs</span> <span class="kn">import</span> <span class="n">as_default_dict</span><span class="p">,</span> <span class="n">get_obj</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.structured_configs</span> <span class="kn">import</span> <span class="n">_utils</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.structured_configs._type_guards</span> <span class="kn">import</span> <span class="n">safe_getattr</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="p">(</span>
@@ -4170,6 +4170,30 @@ document.write(`
     <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">del</span> <span class="n">CBuildsFn</span>
 
+
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">ConfigFromDefaultDict</span><span class="p">:</span>
+    <span class="n">dict_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="n">default_factory</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
+    <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">BuildsFn</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="n">as_default_dict</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dict_</span><span class="p">,</span> <span class="n">defaultdict</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_factory</span> <span class="o">=</span> <span class="n">CBuildsFn</span><span class="o">.</span><span class="n">just</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dict_</span><span class="o">.</span><span class="n">default_factory</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">CBuildsFn</span><span class="o">.</span><span class="n">_make_hydra_compatible</span><span class="p">(</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dict_</span><span class="p">),</span>
+            <span class="n">convert_dataclass</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">allow_zen_conversion</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">structured_conf_permitted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dict_</span> <span class="o">=</span> <span class="n">out</span>
+
+
+<span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="n">defaultdict</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">dict_</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">ConfigFromDefaultDict</span><span class="p">(</span>
+    <span class="n">dict_</span><span class="p">,</span> <span class="n">CBuildsFn</span>
+<span class="p">)</span>
 
 <span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="nb">set</span><span class="p">]</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
     <span class="n">ConfigFromTuple</span><span class="p">,</span> <span class="n">_target_</span><span class="o">=</span><span class="n">BuildsFn</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>

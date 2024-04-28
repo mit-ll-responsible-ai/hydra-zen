@@ -226,6 +226,7 @@ hydra-zen provides specialized auto-config support for values of the following t
 - :py:class:`bytearray`
 - :py:class:`complex`
 - :py:class:`collections.Counter`
+- :py:class:`collections.defaultdict`
 - :py:class:`collections.deque`
 - :py:class:`datetime.timedelta`
 - :py:func:`functools.partial` (note: not compatible with pickling)
