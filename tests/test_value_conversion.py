@@ -3,7 +3,7 @@
 import inspect
 import pickle
 import string
-from collections import Counter, deque
+from collections import Counter, defaultdict, deque
 from dataclasses import dataclass, field
 from datetime import timedelta
 from enum import Enum
@@ -142,6 +142,9 @@ Bdeque = pik_blds(dict, x=deque([1j, 2]), zen_dataclass={"cls_name": "Bdeque"})
 Brange = pik_blds(dict, x=range(1, 10, 3), zen_dataclass={"cls_name": "Brange"})
 Brange2 = pik_blds(dict, x=range(2), zen_dataclass={"cls_name": "Brange2"})
 Bcounter = pik_blds(dict, x=Counter("apple"), zen_dataclass={"cls_name": "Bcounter"})
+x = defaultdict(list)
+x.update({1: [1, 2]})
+Bdefaultdict = pik_blds(dict, x=x, zen_dataclass={"cls_name": "Bcounter"})
 
 
 @pytest.mark.parametrize(
@@ -164,6 +167,7 @@ Bcounter = pik_blds(dict, x=Counter("apple"), zen_dataclass={"cls_name": "Bcount
         Brange,
         Brange2,
         Bcounter,
+        Bdefaultdict,
     ],
 )
 def test_pickle_compatibility(Config):
@@ -190,6 +194,7 @@ def test_pickle_compatibility(Config):
         Brange,
         Brange2,
         Bcounter,
+        Bdefaultdict,
     ],
 )
 def test_unsafe_hash_default(Config):
@@ -412,3 +417,13 @@ def test_known_failcase_hydra_2350():
     actual = instantiate(Conf, x={"b": 2})
     expected = {"b": 2}
     assert actual == expected, actual
+
+
+def test_default_dict():
+    x = defaultdict(list)
+    x.update({1: [1 + 2j, 2]})
+    Conf = builds(dict, x=x)
+    actual = instantiate(Conf)["x"]
+    assert actual == x
+    assert isinstance(actual, defaultdict)
+    assert actual.default_factory is list
