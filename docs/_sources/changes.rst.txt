@@ -10,11 +10,10 @@ chronological order. All previous releases should still be available on pip.
 
 .. _v0.13.0:
 
-----------------------
-0.13.0rc1 - 2024-04-01
-----------------------
+-------------------
+0.13.0 - 2024-04-29
+-------------------
 
-.. note:: This is documentation for an pre-release version of hydra-zen. You can install this pre-release via `pip install --pre hydra-zen`
 
 This release makes it possible to use `pydantic's <https://docs.pydantic.dev/latest/>`_ runtime type-checking and parsing throughout your hydra-zen app 🚀🚀🚀
 
@@ -92,12 +91,18 @@ New Features
 - Adds :func:`hydra_zen.third_party.pydantic.pydantic_parser`. See :pull:`666`.
 - Adds `_target_wrapper_` as a new, optional argument to `hydra_zen.instantiate`, which enables users to add a custom wrapper to be applied recursively to all targets during instantiation. See :pull:`666`.
 - Adds an optional `instantiation_wrapper` to `hydra_zen.zen` (and `hydra_zen.wrappers.Zen`) that will apply a custom wrapper to all targets during instantiation performed by `zen`. See :pull:`666`.
+- Adds :ref:`autoconfig <additional-types>` support for :py:class:`collections.defaultdict`. See :pull:`681`.
 - Adds autoconfig support for `hydra_zen.wrapper.Zen`. I.e. the output of `zen` can now be passed to `~hydra_zen.just` and `~hydra_zen.builds` to generate Hydra-compatible configs. See :pull:`666`.
 - Improved support for passing parameterized generics to `hydra_zen.builds` and `hydra_zen.just`. See :pull:`666`.
 
 Bug Fixes
 ---------
 - Fixes incompatibility between zen-processing features (e.g. ``zen_meta``) and iterative-build patterns. See :pull:`638`.
+
+Documentation
+-------------
+
+Added How-To: :ref:`pydantic-parsing`
 
 
 .. _v0.12.0:

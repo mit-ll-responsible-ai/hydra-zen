@@ -237,6 +237,7 @@ hydra-zen provides specialized auto-config support for values of the following t
 - :py:class:`set`
 - :py:class:`frozenset`
 - :py:func:`dataclasses.dataclass` (note: not compatible with pickling)
+- `hydra_zen.wrapper.Zen`
 
 hydra-zen also provides auto-config support for some third-pary libraries:
 
@@ -264,3 +265,4 @@ Although Hydra provides some runtime type-checking functionality, it only suppor
 
    beartype.validates_with_beartype
    pydantic.validates_with_pydantic
+   pydantic.pydantic_parser
