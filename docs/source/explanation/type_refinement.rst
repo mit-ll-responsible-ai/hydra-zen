@@ -11,6 +11,8 @@ modify their code's type annotations. Furthermore, hydra-zen preserves
 type information such that third-party type checkers can be used to provide more 
 robust support for more general type annotations.
 
+.. _hydra-type-support:
+
 Hydra's Limited Type Support
 ----------------------------
 
