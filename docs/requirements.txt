@@ -7,4 +7,4 @@ sphinx-codeautolink==0.15.1
 sphinx_favicon==1.0.1
 # third-party utilities
 beartype==0.18.5
-pydantic==2.7.0
+pydantic==2.7.1
