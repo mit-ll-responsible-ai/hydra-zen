@@ -9,6 +9,9 @@
   <a>
     <img src="https://img.shields.io/badge/python-3.8%20&#8208;%203.12-blue.svg" alt="Python version support" />
   </a>
+  <a href="https://anaconda.org/conda-forge/hydra-zen">
+    <img src="https://img.shields.io/conda/vn/conda-forge/hydra-zen.svg?logo=conda-forge&label=conda-forge&color=3A3A3A" alt="Conda-forge" />
+  </a>
   <a href="https://github.com/mit-ll-responsible-ai/hydra-zen/actions?query=workflow%3ATests+branch%3Amain">
     <img src="https://github.com/mit-ll-responsible-ai/hydra-zen/workflows/Tests/badge.svg" alt="GitHub Actions" />
   <a href="https://github.com/mit-ll-responsible-ai/hydra-zen/actions?query=workflow%3ATests+branch%3Amain">
