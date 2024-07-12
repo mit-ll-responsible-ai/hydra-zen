@@ -923,12 +923,17 @@ document.write(`
 
 <span class="k">def</span> <span class="nf">_is_ufunc</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="c1"># checks without importing numpy</span>
-    <span class="n">numpy</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;numpy&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">numpy</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">numpy</span> <span class="o">:=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;numpy&quot;</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
         <span class="c1"># we do actually cover this branch some runs of our CI,</span>
         <span class="c1"># but our coverage job installs numpy</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ufunc</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_is_numpy_array_func_dispatcher</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">numpy</span> <span class="o">:=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;numpy&quot;</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">))</span>
 
 
 <span class="k">def</span> <span class="nf">_check_instance</span><span class="p">(</span><span class="o">*</span><span class="n">target_types</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="s2">&quot;Any&quot;</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
@@ -938,8 +943,7 @@ document.write(`
 <span class="sd">    Returns `False` if module/target type doesn&#39;t exists (e.g. not installed).</span>
 <span class="sd">    This is useful for gracefully handling specialized logic for optional dependencies.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">mod</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">mod</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">mod</span> <span class="o">:=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">module</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
 
     <span class="n">types</span> <span class="o">=</span> <span class="p">[]</span>
@@ -957,10 +961,6 @@ document.write(`
         <span class="c1"># handle singleton checking</span>
         <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">value</span> <span class="ow">is</span> <span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">types</span><span class="p">)</span>
 
-
-<span class="n">_is_numpy_array_func_dispatcher</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
-    <span class="n">_check_instance</span><span class="p">,</span> <span class="s2">&quot;_ArrayFunctionDispatcher&quot;</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="s2">&quot;numpy.core._multiarray_umath&quot;</span>
-<span class="p">)</span>
 
 <span class="n">_is_jax_compiled_func</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
     <span class="n">_check_instance</span><span class="p">,</span> <span class="s2">&quot;CompiledFunction&quot;</span><span class="p">,</span> <span class="s2">&quot;PjitFunction&quot;</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="s2">&quot;jaxlib.xla_extension&quot;</span>
