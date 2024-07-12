@@ -5,7 +5,7 @@
 
 import sys
 import types
-from dataclasses import MISSING
+from dataclasses import _MISSING_TYPE  # pyright: ignore[reportPrivateUsage]
 from datetime import timedelta
 from enum import Enum
 from pathlib import Path, PosixPath, WindowsPath
@@ -193,7 +193,7 @@ HydraSupportedType = Union[
     ListConfig,
     DictConfig,
     Enum,
-    Literal[MISSING],
+    _MISSING_TYPE,
     # Even thought this is redundant with Sequence, it seems to
     # be needed for pyright to do proper checking of tuple contents
     Tuple["HydraSupportedType", ...],
@@ -248,6 +248,7 @@ CustomConfigType: TypeAlias = Union[
     Sequence["CustomConfigType[T2]"],
     Mapping[Any, "CustomConfigType[T2]"],
     Partial["CustomConfigType[T2]"],
+    Partial[T2],
 ]
 """The type `CustomConfigType[MyType]` describes: `MyType`, all hydra-zen config-compatible types, and all hydra-zen compatible containers containing said types.
 
