@@ -1590,13 +1590,13 @@ document.write(`
 
             <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">builds</span><span class="p">(</span>
                 <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">),</span>
-                <span class="n">value</span><span class="o">.</span><span class="n">func</span><span class="p">,</span>
-                <span class="n">exclude</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">_exclude</span><span class="p">),</span>
-                <span class="n">pre_call</span><span class="o">=</span><span class="n">pre_call</span><span class="p">,</span>
-                <span class="n">unpack_kwargs</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">_unpack_kwargs</span><span class="p">,</span>
-                <span class="n">resolve_pre_call</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">_resolve</span><span class="p">,</span>
-                <span class="n">run_in_context</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">_run_in_context</span><span class="p">,</span>
-                <span class="n">instantiation_wrapper</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">_instantiation_wrapper</span><span class="p">,</span>
+                <span class="n">value</span><span class="o">.</span><span class="n">func</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+                <span class="n">exclude</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">_exclude</span><span class="p">),</span>  <span class="c1"># type: ignore</span>
+                <span class="n">pre_call</span><span class="o">=</span><span class="n">pre_call</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+                <span class="n">unpack_kwargs</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">_unpack_kwargs</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+                <span class="n">resolve_pre_call</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">_resolve</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+                <span class="n">run_in_context</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">_run_in_context</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+                <span class="n">instantiation_wrapper</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">_instantiation_wrapper</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
                 <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="n">resolved_value</span> <span class="o">=</span> <span class="n">value</span>
@@ -3634,7 +3634,7 @@ document.write(`
         <span class="p">]</span>
 
         <span class="n">config_fields</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-            <span class="p">[</span>
+            <span class="p">[</span>  <span class="c1"># type: ignore</span>
                 <span class="p">(</span>
                     <span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
                     <span class="p">(</span>
@@ -3872,7 +3872,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">builds</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
             <span class="n">__hydra_target</span><span class="p">,</span>
             <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">zen_exclude</span><span class="o">=</span><span class="n">zen_exclude</span><span class="p">,</span>
+            <span class="n">zen_exclude</span><span class="o">=</span><span class="n">zen_exclude</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
             <span class="n">zen_dataclass</span><span class="o">=</span><span class="n">zen_dataclass</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwarg_overrides</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
         <span class="p">)</span></div>

@@ -405,7 +405,7 @@ document.write(`
 
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">types</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">MISSING</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">_MISSING_TYPE</span>  <span class="c1"># pyright: ignore[reportPrivateUsage]</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timedelta</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span><span class="p">,</span> <span class="n">PosixPath</span><span class="p">,</span> <span class="n">WindowsPath</span>
@@ -593,7 +593,7 @@ document.write(`
     <span class="n">ListConfig</span><span class="p">,</span>
     <span class="n">DictConfig</span><span class="p">,</span>
     <span class="n">Enum</span><span class="p">,</span>
-    <span class="n">Literal</span><span class="p">[</span><span class="n">MISSING</span><span class="p">],</span>
+    <span class="n">_MISSING_TYPE</span><span class="p">,</span>
     <span class="c1"># Even thought this is redundant with Sequence, it seems to</span>
     <span class="c1"># be needed for pyright to do proper checking of tuple contents</span>
     <span class="n">Tuple</span><span class="p">[</span><span class="s2">&quot;HydraSupportedType&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
@@ -648,6 +648,7 @@ document.write(`
     <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;CustomConfigType[T2]&quot;</span><span class="p">],</span>
     <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="s2">&quot;CustomConfigType[T2]&quot;</span><span class="p">],</span>
     <span class="n">Partial</span><span class="p">[</span><span class="s2">&quot;CustomConfigType[T2]&quot;</span><span class="p">],</span>
+    <span class="n">Partial</span><span class="p">[</span><span class="n">T2</span><span class="p">],</span>
 <span class="p">]</span>
 <span class="sd">&quot;&quot;&quot;The type `CustomConfigType[MyType]` describes: `MyType`, all hydra-zen config-compatible types, and all hydra-zen compatible containers containing said types.</span>
 
