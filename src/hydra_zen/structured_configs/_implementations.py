@@ -520,12 +520,17 @@ class Just:
 
 def _is_ufunc(value: Any) -> bool:
     # checks without importing numpy
-    numpy = sys.modules.get("numpy")
-    if numpy is None:  # pragma: no cover
+    if (numpy := sys.modules.get("numpy")) is None:  # pragma: no cover
         # we do actually cover this branch some runs of our CI,
         # but our coverage job installs numpy
         return False
     return isinstance(value, numpy.ufunc)
+
+
+def _is_numpy_array_func_dispatcher(value: Any) -> bool:
+    if (numpy := sys.modules.get("numpy")) is None:  # pragma: no cover
+        return False
+    return isinstance(value, type(numpy.sum))
 
 
 def _check_instance(*target_types: str, value: "Any", module: str):  # pragma: no cover
@@ -535,8 +540,7 @@ def _check_instance(*target_types: str, value: "Any", module: str):  # pragma: n
     Returns `False` if module/target type doesn't exists (e.g. not installed).
     This is useful for gracefully handling specialized logic for optional dependencies.
     """
-    mod = sys.modules.get(module)
-    if mod is None:
+    if (mod := sys.modules.get(module)) is None:
         return False
 
     types = []
@@ -554,10 +558,6 @@ def _check_instance(*target_types: str, value: "Any", module: str):  # pragma: n
         # handle singleton checking
         return any(value is t for t in types)
 
-
-_is_numpy_array_func_dispatcher = functools.partial(
-    _check_instance, "_ArrayFunctionDispatcher", module="numpy.core._multiarray_umath"
-)
 
 _is_jax_compiled_func = functools.partial(
     _check_instance, "CompiledFunction", "PjitFunction", module="jaxlib.xla_extension"
@@ -1174,13 +1174,13 @@ class BuildsFn(Generic[T]):
 
             return cls.builds(
                 type(value),
-                value.func,
-                exclude=list(value._exclude),
-                pre_call=pre_call,
-                unpack_kwargs=value._unpack_kwargs,
-                resolve_pre_call=value._resolve,
-                run_in_context=value._run_in_context,
-                instantiation_wrapper=value._instantiation_wrapper,
+                value.func,  # type: ignore
+                exclude=list(value._exclude),  # type: ignore
+                pre_call=pre_call,  # type: ignore
+                unpack_kwargs=value._unpack_kwargs,  # type: ignore
+                resolve_pre_call=value._resolve,  # type: ignore
+                run_in_context=value._run_in_context,  # type: ignore
+                instantiation_wrapper=value._instantiation_wrapper,  # type: ignore
                 populate_full_signature=True,
             )
         resolved_value = value
@@ -3217,7 +3217,7 @@ class BuildsFn(Generic[T]):
         ]
 
         config_fields.extend(
-            [
+            [  # type: ignore
                 (
                     str(f.name),
                     (
@@ -3455,7 +3455,7 @@ class BuildsFn(Generic[T]):
         return cls.builds(  # type: ignore
             __hydra_target,
             populate_full_signature=True,
-            zen_exclude=zen_exclude,
+            zen_exclude=zen_exclude,  # type: ignore
             zen_dataclass=zen_dataclass,
             **kwarg_overrides,  # type: ignore
         )
