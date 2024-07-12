@@ -1174,13 +1174,13 @@ class BuildsFn(Generic[T]):
 
             return cls.builds(
                 type(value),
-                value.func,
-                exclude=list(value._exclude),
-                pre_call=pre_call,
-                unpack_kwargs=value._unpack_kwargs,
-                resolve_pre_call=value._resolve,
-                run_in_context=value._run_in_context,
-                instantiation_wrapper=value._instantiation_wrapper,
+                value.func,  # type: ignore
+                exclude=list(value._exclude),  # type: ignore
+                pre_call=pre_call,  # type: ignore
+                unpack_kwargs=value._unpack_kwargs,  # type: ignore
+                resolve_pre_call=value._resolve,  # type: ignore
+                run_in_context=value._run_in_context,  # type: ignore
+                instantiation_wrapper=value._instantiation_wrapper,  # type: ignore
                 populate_full_signature=True,
             )
         resolved_value = value
@@ -3217,7 +3217,7 @@ class BuildsFn(Generic[T]):
         ]
 
         config_fields.extend(
-            [
+            [  # type: ignore
                 (
                     str(f.name),
                     (
@@ -3455,7 +3455,7 @@ class BuildsFn(Generic[T]):
         return cls.builds(  # type: ignore
             __hydra_target,
             populate_full_signature=True,
-            zen_exclude=zen_exclude,
+            zen_exclude=zen_exclude,  # type: ignore
             zen_dataclass=zen_dataclass,
             **kwarg_overrides,  # type: ignore
         )
