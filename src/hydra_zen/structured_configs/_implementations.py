@@ -520,7 +520,7 @@ class Just:
 
 def _is_ufunc(value: Any) -> bool:
     # checks without importing numpy
-    if (numpy := sys.modules.get("numpy")) is None:
+    if (numpy := sys.modules.get("numpy")) is None:  # pragma: no cover
         # we do actually cover this branch some runs of our CI,
         # but our coverage job installs numpy
         return False
