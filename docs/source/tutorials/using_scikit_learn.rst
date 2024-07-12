@@ -417,13 +417,14 @@ stored in job directories and plot the results.
        row = i // 10
        col = i % 10
        # ax[row, col].set_axis_off()
-       ax[row, col].imshow(img)
+       _ax = ax[row, col]  # type: ignore
+       _ax.imshow(img)
 
        if row == 0:
-           ax[row, col].set_title(cname)
+           _ax.set_title(cname)
 
        if col == 0:
-           ax[row, col].set_ylabel(dname)
+           _ax.set_ylabel(dname)
 
 The resulting figure should be:
 

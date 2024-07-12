@@ -520,12 +520,17 @@ class Just:
 
 def _is_ufunc(value: Any) -> bool:
     # checks without importing numpy
-    numpy = sys.modules.get("numpy")
-    if numpy is None:  # pragma: no cover
+    if (numpy := sys.modules.get("numpy")) is None:  # pragma: no cover
         # we do actually cover this branch some runs of our CI,
         # but our coverage job installs numpy
         return False
     return isinstance(value, numpy.ufunc)
+
+
+def _is_numpy_array_func_dispatcher(value: Any) -> bool:
+    if (numpy := sys.modules.get("numpy")) is None:  # pragma: no cover
+        return False
+    return isinstance(value, type(numpy.sum))
 
 
 def _check_instance(*target_types: str, value: "Any", module: str):  # pragma: no cover
@@ -535,8 +540,7 @@ def _check_instance(*target_types: str, value: "Any", module: str):  # pragma: n
     Returns `False` if module/target type doesn't exists (e.g. not installed).
     This is useful for gracefully handling specialized logic for optional dependencies.
     """
-    mod = sys.modules.get(module)
-    if mod is None:
+    if (mod := sys.modules.get(module)) is None:
         return False
 
     types = []
@@ -554,10 +558,6 @@ def _check_instance(*target_types: str, value: "Any", module: str):  # pragma: n
         # handle singleton checking
         return any(value is t for t in types)
 
-
-_is_numpy_array_func_dispatcher = functools.partial(
-    _check_instance, "_ArrayFunctionDispatcher", module="numpy.core._multiarray_umath"
-)
 
 _is_jax_compiled_func = functools.partial(
     _check_instance, "CompiledFunction", "PjitFunction", module="jaxlib.xla_extension"
