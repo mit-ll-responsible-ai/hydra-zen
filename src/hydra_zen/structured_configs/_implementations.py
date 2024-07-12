@@ -948,6 +948,20 @@ class BuildsFn(Generic[T]):
 
         Override this to control how `builds` determines the _target_ field
         in the configs that it produces."""
+
+        def patched_safe_name(obj: Any, repr_allowed: bool = True):
+            if not hasattr(obj, "__qualname__"):
+                return _utils.safe_name(obj, repr_allowed=repr_allowed)
+
+            name = _utils.safe_name(obj, repr_allowed=repr_allowed)
+            qualname = obj.__qualname__
+            assert isinstance(qualname, str)
+
+            if name != qualname and qualname.endswith("." + name):
+                return qualname
+
+            return name
+
         name = _utils.safe_name(target, repr_allowed=False)
 
         if name == _utils.UNKNOWN_NAME:
@@ -986,7 +1000,7 @@ class BuildsFn(Generic[T]):
 
         if not _utils.is_classmethod(target):
             if (
-                inspect.isfunction(target)
+                (inspect.isfunction(target) or isinstance(target, type))
                 and isinstance(qualname, str)
                 and "." in qualname
                 and all(x.isidentifier() for x in qualname.split("."))
