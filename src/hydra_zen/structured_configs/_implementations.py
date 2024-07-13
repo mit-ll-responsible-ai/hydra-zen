@@ -1051,7 +1051,7 @@ class BuildsFn(Generic[T]):
     @classmethod
     def _make_hydra_compatible(
         cls,
-        value: Any,
+        value: object,
         *,
         allow_zen_conversion: bool = True,
         error_prefix: str = "",
@@ -1081,7 +1081,7 @@ class BuildsFn(Generic[T]):
         # We check exhaustively for all Hydra-supported primitives below but seek to
         # speedup checks for common types here.
         if value is None or type(value) in {str, int, bool, float}:
-            return value
+            return cast(Union[None, str, int, float, bool], value)
 
         # non-str collection
         if hasattr(value, "__iter__"):
@@ -1205,7 +1205,7 @@ class BuildsFn(Generic[T]):
                 or isinstance(resolved_value, (Enum, ListConfig, DictConfig))
             )
         ):
-            return resolved_value
+            return resolved_value  # type: ignore
 
         # pydantic objects
         pydantic = sys.modules.get("pydantic")
