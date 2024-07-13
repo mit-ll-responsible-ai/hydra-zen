@@ -1367,6 +1367,7 @@ document.write(`
 
 <span class="sd">        Override this to control how `builds` determines the _target_ field</span>
 <span class="sd">        in the configs that it produces.&quot;&quot;&quot;</span>
+
         <span class="n">name</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">safe_name</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">repr_allowed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="n">_utils</span><span class="o">.</span><span class="n">UNKNOWN_NAME</span><span class="p">:</span>
@@ -1405,12 +1406,14 @@ document.write(`
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_utils</span><span class="o">.</span><span class="n">is_classmethod</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
             <span class="k">if</span> <span class="p">(</span>
-                <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+                <span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="nb">type</span><span class="p">))</span>
                 <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">qualname</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
                 <span class="ow">and</span> <span class="s2">&quot;.&quot;</span> <span class="ow">in</span> <span class="n">qualname</span>
                 <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">isidentifier</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">qualname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">))</span>
             <span class="p">):</span>
-                <span class="c1"># this looks like it is a staticmethod. E.g. qualname: SomeClass.func</span>
+                <span class="c1"># This looks like it is a staticmethod or a class defined within</span>
+                <span class="c1"># a class namespace. E.g. qualname: SomeClass.func or</span>
+                <span class="c1"># SomeClass.NestedClass</span>
                 <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">module</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">qualname</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">module</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1472,7 +1475,7 @@ document.write(`
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_make_hydra_compatible</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
-        <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">allow_zen_conversion</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">error_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -1502,7 +1505,7 @@ document.write(`
         <span class="c1"># We check exhaustively for all Hydra-supported primitives below but seek to</span>
         <span class="c1"># speedup checks for common types here.</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="p">{</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">float</span><span class="p">}:</span>
-            <span class="k">return</span> <span class="n">value</span>
+            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">],</span> <span class="n">value</span><span class="p">)</span>
 
         <span class="c1"># non-str collection</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;__iter__&quot;</span><span class="p">):</span>
@@ -1626,7 +1629,7 @@ document.write(`
                 <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resolved_value</span><span class="p">,</span> <span class="p">(</span><span class="n">Enum</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">))</span>
             <span class="p">)</span>
         <span class="p">):</span>
-            <span class="k">return</span> <span class="n">resolved_value</span>
+            <span class="k">return</span> <span class="n">resolved_value</span>  <span class="c1"># type: ignore</span>
 
         <span class="c1"># pydantic objects</span>
         <span class="n">pydantic</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pydantic&quot;</span><span class="p">)</span>
