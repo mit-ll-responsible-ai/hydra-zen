@@ -948,6 +948,7 @@ class BuildsFn(Generic[T]):
 
         Override this to control how `builds` determines the _target_ field
         in the configs that it produces."""
+
         name = _utils.safe_name(target, repr_allowed=False)
 
         if name == _utils.UNKNOWN_NAME:
@@ -986,12 +987,14 @@ class BuildsFn(Generic[T]):
 
         if not _utils.is_classmethod(target):
             if (
-                inspect.isfunction(target)
+                (inspect.isfunction(target) or isinstance(target, type))
                 and isinstance(qualname, str)
                 and "." in qualname
                 and all(x.isidentifier() for x in qualname.split("."))
             ):
-                # this looks like it is a staticmethod. E.g. qualname: SomeClass.func
+                # This looks like it is a staticmethod or a class defined within
+                # a class namespace. E.g. qualname: SomeClass.func or
+                # SomeClass.NestedClass
                 return f"{module}.{qualname}"
             return f"{module}.{name}"
         else:
@@ -1050,7 +1053,7 @@ class BuildsFn(Generic[T]):
     @classmethod
     def _make_hydra_compatible(
         cls,
-        value: Any,
+        value: object,
         *,
         allow_zen_conversion: bool = True,
         error_prefix: str = "",
@@ -1080,7 +1083,7 @@ class BuildsFn(Generic[T]):
         # We check exhaustively for all Hydra-supported primitives below but seek to
         # speedup checks for common types here.
         if value is None or type(value) in {str, int, bool, float}:
-            return value
+            return cast(Union[None, str, int, float, bool], value)
 
         # non-str collection
         if hasattr(value, "__iter__"):
@@ -1204,7 +1207,7 @@ class BuildsFn(Generic[T]):
                 or isinstance(resolved_value, (Enum, ListConfig, DictConfig))
             )
         ):
-            return resolved_value
+            return resolved_value  # type: ignore
 
         # pydantic objects
         pydantic = sys.modules.get("pydantic")

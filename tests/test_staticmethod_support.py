@@ -1,6 +1,8 @@
 # Copyright (c) 2024 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
+from dataclasses import dataclass
+
 import pytest
 
 from hydra_zen import builds, instantiate, just
@@ -10,6 +12,10 @@ class A1:
     @staticmethod
     def foo(x: int):
         return "A.foo" * x
+
+    @dataclass(frozen=True)
+    class Foo:
+        y: int
 
 
 class B1(A1):
@@ -21,12 +27,29 @@ class C1(A1):
     def foo(x: int):
         return "C.foo" * x
 
+    @dataclass
+    class Foo:
+        y: int
+
+        def __post_init__(self):
+            self.y = self.y * 2
+
 
 class A2:
     class B2:
         @staticmethod
         def f():
             return "nested"
+
+        @dataclass(frozen=True)
+        class Foo:
+            y: int
+
+
+def test_builds_inner_class():
+    assert instantiate(builds(A1.Foo, 2)).y == 2
+    assert instantiate(builds(B1.Foo, 3)).y == 3
+    assert instantiate(builds(C1.Foo, 4)).y == 8
 
 
 def test_builds_static_methods():
@@ -35,7 +58,7 @@ def test_builds_static_methods():
     assert instantiate(builds(C1.foo, 4)) == "C.foo" * 4
 
 
-@pytest.mark.parametrize("obj", [C1.foo, A2.B2.f])
+@pytest.mark.parametrize("obj", [C1.foo, A2.B2.f, A1.Foo, A2.B2.Foo])
 def test_just_static_method(obj):
     assert instantiate(just(obj)) is obj
 
