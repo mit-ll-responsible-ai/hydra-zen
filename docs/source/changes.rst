@@ -17,7 +17,7 @@ chronological order. All previous releases should still be available on pip.
 .. note:: This is documentation for an pre-release version of hydra-zen. You can install this pre-release via `pip install --pre hydra-zen`
 
 - Adds compatibility with NumPy 2.0.0.
-- :func:`~hydra_zen.builds` and `~hydra_zen.just` now support classes defined within classes as targets. See :pull:`708` for details.
+- :func:`~hydra_zen.builds` and `~hydra_zen.just` now support classes defined within classes as targets. See :pull:`708`.
 
 .. _v0.13.0:
 
