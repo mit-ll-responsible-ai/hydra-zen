@@ -992,7 +992,9 @@ class BuildsFn(Generic[T]):
                 and "." in qualname
                 and all(x.isidentifier() for x in qualname.split("."))
             ):
-                # this looks like it is a staticmethod. E.g. qualname: SomeClass.func
+                # This looks like it is a staticmethod or a class defined within
+                # a class namespace. E.g. qualname: SomeClass.func or
+                # SomeClass.NestedClass
                 return f"{module}.{qualname}"
             return f"{module}.{name}"
         else:
