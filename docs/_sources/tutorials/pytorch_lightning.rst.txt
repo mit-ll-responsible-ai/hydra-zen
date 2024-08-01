@@ -51,7 +51,7 @@ following code. Here, we define our single-layer neural network and the `lightni
    import torch as tr
    import torch.nn as nn
    import torch.nn.functional as F
-   from torch.optim import Optimizer
+   from torch.optim import Optimizer  # type: ignore
    from torch.utils.data import DataLoader, TensorDataset
    
    from hydra_zen.typing import Partial
@@ -156,7 +156,7 @@ and trainer. We'll also define the task function that trains and tests our model
    import pytorch_lightning as pl
    from hydra_zen import builds, make_config, make_custom_builds_fn, zen
    import torch as tr
-   from torch.optim import Adam
+   from torch.optim import Adam  # type: ignore
    from torch.utils.data import DataLoader
    
    from zen_model import UniversalFuncModule, train_and_eval, single_layer_nn
