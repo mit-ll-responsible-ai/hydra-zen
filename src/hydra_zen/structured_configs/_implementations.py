@@ -903,7 +903,7 @@ class BuildsFn(Generic[T]):
                 if has_ellipses:
                     return Tuple[_unique_type, ...]
                 else:
-                    return Tuple[(_unique_type,) * len(args)]  # type: ignore
+                    return Tuple[(_unique_type,) * len(args)]
 
             return Any
 

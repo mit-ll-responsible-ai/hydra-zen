@@ -285,7 +285,7 @@ class FullBuilds(Generic[T]):
     ) -> Type[BuildsWithSig[Type[R], P]]: ...
 
     @overload
-    def __call__(
+    def __call__(  # pyright: ignore[reportOverlappingOverload]
         self,
         __hydra_target: Type[AnyBuilds[Importable]],
         *,
