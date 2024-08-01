@@ -17,7 +17,7 @@ configured fields, and flag bad inputs in our code. That this config is immutabl
 
    from hydra_zen import hydrated_dataclass 
 
-   from torch.optim import Adam
+   from torch.optim import Adam  # type: ignore
 
    @hydrated_dataclass(target=Adam, zen_partial=True, frozen=True)
    class BuildsAdam:
