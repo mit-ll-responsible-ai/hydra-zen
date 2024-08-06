@@ -1,4 +1,4 @@
-sphinx==7.4.7
+sphinx==8.0.2
 pydata-sphinx-theme==0.15.4
 numpydoc==1.7.0
 sphinx-copybutton==0.5.2
