@@ -480,34 +480,8 @@ Designed to specify fields in <a class="reference internal" href="hydra_zen.make
 <dt><strong>name</strong><span class="classifier">str, optional</span></dt><dd></dd>
 </dl>
 </dd>
-</dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<dl class="simple">
-<dt><a class="reference internal" href="hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_config</span></code></a></dt><dd><p>create a config with customized field names, default values, and annotations.</p>
-</dd>
-</dl>
-</div>
-<p class="rubric">Notes</p>
-<p><code class="docutils literal notranslate"><span class="pre">default</span></code> will be returned as an instance of <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.Field" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataclasses.Field</span></code></a>.
-Mutable values (e.g. lists or dictionaries) passed to <code class="docutils literal notranslate"><span class="pre">default</span></code> will automatically
-be “packaged” in a default-factory function <a class="reference internal" href="#r52d5414ac616-1" id="id1">[1]</a>.</p>
-<p>A type passed to <code class="docutils literal notranslate"><span class="pre">hint</span></code> will automatically be “broadened” such that the resulting
-type is compatible with Hydra’s set of supported type annotations <a class="reference internal" href="#r52d5414ac616-2" id="id2">[2]</a>.</p>
-<p class="rubric">References</p>
-<div role="list" class="citation-list">
-<div class="citation" id="r52d5414ac616-1" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p><a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#default-factory-functions">https://docs.python.org/3/library/dataclasses.html#default-factory-functions</a></p>
-</div>
-<div class="citation" id="r52d5414ac616-2" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
-<p><a class="reference external" href="https://hydra.cc/docs/next/tutorials/structured_config/intro/#structured-configs-supports">https://hydra.cc/docs/next/tutorials/structured_config/intro/#structured-configs-supports</a></p>
-</div>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Attributes<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
 <dt><strong>zen_convert</strong></dt><dd></dd>
 </dl>
 </dd>
@@ -531,6 +505,30 @@ type is compatible with Hydra’s set of supported type annotations <a class="re
 </tr>
 </tbody>
 </table>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_config</span></code></a></dt><dd><p>create a config with customized field names, default values, and annotations.</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">Notes</p>
+<p><code class="docutils literal notranslate"><span class="pre">default</span></code> will be returned as an instance of <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.Field" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dataclasses.Field</span></code></a>.
+Mutable values (e.g. lists or dictionaries) passed to <code class="docutils literal notranslate"><span class="pre">default</span></code> will automatically
+be “packaged” in a default-factory function <a class="reference internal" href="#r52d5414ac616-1" id="id1">[1]</a>.</p>
+<p>A type passed to <code class="docutils literal notranslate"><span class="pre">hint</span></code> will automatically be “broadened” such that the resulting
+type is compatible with Hydra’s set of supported type annotations <a class="reference internal" href="#r52d5414ac616-2" id="id2">[2]</a>.</p>
+<p class="rubric">References</p>
+<div role="list" class="citation-list">
+<div class="citation" id="r52d5414ac616-1" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://docs.python.org/3/library/dataclasses.html#default-factory-functions">https://docs.python.org/3/library/dataclasses.html#default-factory-functions</a></p>
+</div>
+<div class="citation" id="r52d5414ac616-2" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://hydra.cc/docs/next/tutorials/structured_config/intro/#structured-configs-supports">https://hydra.cc/docs/next/tutorials/structured_config/intro/#structured-configs-supports</a></p>
+</div>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="hydra_zen.ZenField.__init__">

@@ -303,6 +303,24 @@ document.write(`
 <li><p>To customize auto-config support, override <a class="reference internal" href="#hydra_zen.BuildsFn._make_hydra_compatible" title="hydra_zen.BuildsFn._make_hydra_compatible"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_make_hydra_compatible</span></code></a>.</p></li>
 <li><p>To customize the ability to resolve import paths, override <a class="reference internal" href="#hydra_zen.BuildsFn._get_obj_path" title="hydra_zen.BuildsFn._get_obj_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_get_obj_path</span></code></a>.</p></li>
 </ul>
+<p class="rubric">Methods</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code>(hydra_target, /, *pos_args[, ...])</p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds(target,</span> <span class="pre">*args,</span> <span class="pre">**kw)</span></code> returns a Hydra-compatible config that, when instantiated, returns <code class="xref py py-obj docutils literal notranslate"><span class="pre">target(*args,</span> <span class="pre">**kw)</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code>(obj, *[, zen_convert, hydra_recursive, ...])</p></td>
+<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">just(obj)</span></code> returns a config that, when instantiated, just returns <code class="xref py py-obj docutils literal notranslate"><span class="pre">obj</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">kwargs_of</span></code>(_BuildsFn__hydra_target, *[, ...])</p></td>
+<td><p>Returns a config whose signature matches that of the provided target.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_config</span></code>(*fields_as_args[, ...])</p></td>
+<td><p>Returns a config with user-defined field names and, optionally, associated default values and/or type annotations.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <p class="rubric">Notes</p>
 <p>Adding type-checking support for a custom type:</p>
 <p>To parameterize <a class="reference internal" href="#hydra_zen.BuildsFn" title="hydra_zen.BuildsFn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BuildsFn</span></code></a> with, e.g., support for the custom types <code class="xref py py-obj docutils literal notranslate"><span class="pre">MyTypeA</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">MyTypeB</span></code>, use:</p>
@@ -370,24 +388,6 @@ own subclass of <a class="reference internal" href="#hydra_zen.BuildsFn" title="
 <span class="go">  j: 0.0</span>
 <span class="go">  k: 0.0</span>
 </pre></div>
-</div>
-<p class="rubric">Methods</p>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code>(hydra_target, /, *pos_args[, ...])</p></td>
-<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds(target,</span> <span class="pre">*args,</span> <span class="pre">**kw)</span></code> returns a Hydra-compatible config that, when instantiated, returns <code class="xref py py-obj docutils literal notranslate"><span class="pre">target(*args,</span> <span class="pre">**kw)</span></code>.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code>(obj, *[, zen_convert, hydra_recursive, ...])</p></td>
-<td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">just(obj)</span></code> returns a config that, when instantiated, just returns <code class="xref py py-obj docutils literal notranslate"><span class="pre">obj</span></code>.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">kwargs_of</span></code>(_BuildsFn__hydra_target, *[, ...])</p></td>
-<td><p>Returns a config whose signature matches that of the provided target.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_config</span></code>(*fields_as_args[, ...])</p></td>
-<td><p>Returns a config with user-defined field names and, optionally, associated default values and/or type annotations.</p></td>
-</tr>
-</tbody>
-</table>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="hydra_zen.BuildsFn._sanitized_type">

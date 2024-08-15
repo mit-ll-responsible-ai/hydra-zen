@@ -301,6 +301,56 @@ document.write(`
 store entries are overwritted, <a class="reference internal" href="#hydra_zen.ZenStore" title="hydra_zen.ZenStore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenStore</span></code></a> instances are isolated, do not populate
 the global store unless instructed to, and they protect users from unwittingly
 overwriting store entries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">groups</span></code></dt><dd><p>Returns a sorted list of the groups registered with this store</p>
+</dd>
+<dt><strong>name</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hydra_zen.ZenStore.__call__" title="hydra_zen.ZenStore.__call__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code></a>(target, /, name, NodeName]] = ..., ...)</p></td>
+<td><p>Store a config or <a class="reference internal" href="#self-partial"><span class="std std-ref">customize the default values</span></a> of the store.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hydra_zen.ZenStore.add_to_hydra_store" title="hydra_zen.ZenStore.add_to_hydra_store"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_to_hydra_store</span></code></a>([overwrite_ok])</p></td>
+<td><p>Adds all of this store's enqueued entries to Hydra's global config store.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hydra_zen.ZenStore.copy" title="hydra_zen.ZenStore.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>([store_name])</p></td>
+<td><p>Returns a copy of the store with the same overridden defaults.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hydra_zen.ZenStore.copy_with_mapped_groups" title="hydra_zen.ZenStore.copy_with_mapped_groups"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy_with_mapped_groups</span></code></a>(...[, store_name, ...])</p></td>
+<td><p>Create a copy of a store whose entries' groups have been updated according to the provided mapping.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hydra_zen.ZenStore.enqueue_all" title="hydra_zen.ZenStore.enqueue_all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">enqueue_all</span></code></a>()</p></td>
+<td><p>Add all of the store's entries to the queue to be added to hydra's store.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hydra_zen.ZenStore.get_entry" title="hydra_zen.ZenStore.get_entry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_entry</span></code></a>(group, name)</p></td>
+<td><p>Access a store entry, which is a mapping that specifies the entry's name, group, package, provider, and node.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hydra_zen.ZenStore.has_enqueued" title="hydra_zen.ZenStore.has_enqueued"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_enqueued</span></code></a>()</p></td>
+<td><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> if this store has entries that have not yet been added to Hydra's config store.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hydra_zen.ZenStore.merge" title="hydra_zen.ZenStore.merge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge</span></code></a>(_ZenStore__other[, store_name])</p></td>
+<td><p>Create a new store by merging two stores.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hydra_zen.ZenStore.update" title="hydra_zen.ZenStore.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>(_ZenStore__other)</p></td>
+<td><p>Updates the store inplace with redundant entries being overwritten.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p><strong>delete_entry</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
 <p class="rubric">Notes</p>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.store</span></code> is available as a pre-instantiated globally-available store,
 which is initialized as:</p>
@@ -607,56 +657,6 @@ partial defaults for the <code class="xref py py-obj docutils literal notranslat
 <p>A store can be copied, updated, and merged. Its entries can have their groups
 remapped, and individual entries can be deleted. See the docs for the corresponding
 methods for details and examples.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Attributes<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">groups</span></code></dt><dd><p>Returns a sorted list of the groups registered with this store</p>
-</dd>
-<dt><strong>name</strong></dt><dd></dd>
-</dl>
-</dd>
-</dl>
-<p class="rubric">Methods</p>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hydra_zen.ZenStore.__call__" title="hydra_zen.ZenStore.__call__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code></a>(target, /, name, NodeName]] = ..., ...)</p></td>
-<td><p>Store a config or <a class="reference internal" href="#self-partial"><span class="std std-ref">customize the default values</span></a> of the store.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hydra_zen.ZenStore.add_to_hydra_store" title="hydra_zen.ZenStore.add_to_hydra_store"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_to_hydra_store</span></code></a>([overwrite_ok])</p></td>
-<td><p>Adds all of this store's enqueued entries to Hydra's global config store.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hydra_zen.ZenStore.copy" title="hydra_zen.ZenStore.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>([store_name])</p></td>
-<td><p>Returns a copy of the store with the same overridden defaults.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hydra_zen.ZenStore.copy_with_mapped_groups" title="hydra_zen.ZenStore.copy_with_mapped_groups"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy_with_mapped_groups</span></code></a>(...[, store_name, ...])</p></td>
-<td><p>Create a copy of a store whose entries' groups have been updated according to the provided mapping.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hydra_zen.ZenStore.enqueue_all" title="hydra_zen.ZenStore.enqueue_all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">enqueue_all</span></code></a>()</p></td>
-<td><p>Add all of the store's entries to the queue to be added to hydra's store.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hydra_zen.ZenStore.get_entry" title="hydra_zen.ZenStore.get_entry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_entry</span></code></a>(group, name)</p></td>
-<td><p>Access a store entry, which is a mapping that specifies the entry's name, group, package, provider, and node.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hydra_zen.ZenStore.has_enqueued" title="hydra_zen.ZenStore.has_enqueued"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_enqueued</span></code></a>()</p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> if this store has entries that have not yet been added to Hydra's config store.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hydra_zen.ZenStore.merge" title="hydra_zen.ZenStore.merge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge</span></code></a>(_ZenStore__other[, store_name])</p></td>
-<td><p>Create a new store by merging two stores.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hydra_zen.ZenStore.update" title="hydra_zen.ZenStore.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>(_ZenStore__other)</p></td>
-<td><p>Updates the store inplace with redundant entries being overwritten.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="pst-scrollable-table-container"><table class="table">
-<tbody>
-<tr class="row-odd"><td><p><strong>delete_entry</strong></p></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="hydra_zen.ZenStore.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deferred_to_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deferred_hydra_store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite_ok</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warn_node_kwarg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/wrapper/_implementations.html#ZenStore.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.ZenStore.__init__" title="Link to this definition">#</a></dt>
