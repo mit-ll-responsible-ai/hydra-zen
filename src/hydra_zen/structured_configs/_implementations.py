@@ -527,7 +527,7 @@ def _is_ufunc(value: Any) -> bool:
     return isinstance(value, numpy.ufunc)
 
 
-def _is_jax_ufunc(value: Any) -> bool:
+def _is_jax_ufunc(value: Any) -> bool:  # pragma: no cover
     # checks without importing numpy
     if (jnp := sys.modules.get("jax.numpy")) is None:  # pragma: no cover
         return False
