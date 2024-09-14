@@ -3386,9 +3386,9 @@ class BuildsFn(Generic[T]):
         cls: Type[Self],
         __hydra_target: Union[
             Callable[P, Any],
-            Callable[Concatenate[Any, P]],
-            Callable[Concatenate[Any, Any, P]],
-            Callable[Concatenate[Any, Any, Any, P]],
+            Callable[Concatenate[Any, P], Any],
+            Callable[Concatenate[Any, Any, P], Any],
+            Callable[Concatenate[Any, Any, Any, P], Any],
         ],
         *,
         zen_dataclass: Optional[DataclassOptions] = None,
