@@ -527,6 +527,13 @@ def _is_ufunc(value: Any) -> bool:
     return isinstance(value, numpy.ufunc)
 
 
+def _is_jax_ufunc(value: Any) -> bool:
+    # checks without importing numpy
+    if (jnp := sys.modules.get("jax.numpy")) is None:  # pragma: no cover
+        return False
+    return isinstance(value, jnp.ufunc)
+
+
 def _is_numpy_array_func_dispatcher(value: Any) -> bool:
     if (numpy := sys.modules.get("numpy")) is None:  # pragma: no cover
         return False
@@ -1157,6 +1164,7 @@ class BuildsFn(Generic[T]):
                 or _is_ufunc(value)
                 or _is_numpy_array_func_dispatcher(value=value)
                 or _is_jax_compiled_func(value=value)
+                or _is_jax_ufunc(value=value)
             )
         ):
             # `value` is importable callable -- create config that will import
