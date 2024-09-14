@@ -1576,7 +1576,13 @@ class BuildsFn(Generic[T]):
     @classmethod
     def builds(
         cls: Type[Self],
-        *pos_args: Union[Importable, Callable[P, R], Type[AnyBuilds[Importable]], Any],
+        *pos_args: Union[
+            Importable,
+            Callable[P, R],
+            Type[AnyBuilds[Importable]],
+            Type[BuildsWithSig[Type[R], P]],
+            Any,
+        ],
         zen_partial: Optional[bool] = None,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
         zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
