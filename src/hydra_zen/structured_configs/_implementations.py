@@ -1047,7 +1047,7 @@ class BuildsFn(Generic[T]):
 
         if cast in {list, tuple, dict}:
             x = cls._sanitize_collection(x, convert_dataclass=settings["dataclass"])
-            return field(default_factory=lambda: cast(x))  # type: ignore
+            return field(default_factory=lambda: cast(x))
         return field(default_factory=lambda: x)
 
     @classmethod
@@ -2584,7 +2584,7 @@ class BuildsFn(Generic[T]):
             if is_dataclass(target):
                 _fields = {f.name: f for f in fields(target)}
             else:
-                _fields = target.__fields__  # type: ignore
+                _fields = target.__fields__
             _update = {}
             for name, param in signature_params.items():
                 if name not in _fields:
@@ -3379,7 +3379,12 @@ class BuildsFn(Generic[T]):
     @classmethod
     def kwargs_of(
         cls: Type[Self],
-        __hydra_target: Callable[P, Any],
+        __hydra_target: Union[
+            Callable[P, Any],
+            Callable[Concatenate[Any, P]],
+            Callable[Concatenate[Any, Any, P]],
+            Callable[Concatenate[Any, Any, Any, P]],
+        ],
         *,
         zen_dataclass: Optional[DataclassOptions] = None,
         zen_exclude: Union[
