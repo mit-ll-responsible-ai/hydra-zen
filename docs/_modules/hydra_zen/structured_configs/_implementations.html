@@ -936,6 +936,13 @@ document.write(`
     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ufunc</span><span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">_is_jax_ufunc</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="c1"># checks without importing numpy</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">jnp</span> <span class="o">:=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;jax.numpy&quot;</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ufunc</span><span class="p">)</span>
+
+
 <span class="k">def</span> <span class="nf">_is_numpy_array_func_dispatcher</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">numpy</span> <span class="o">:=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;numpy&quot;</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
         <span class="k">return</span> <span class="kc">False</span>
@@ -1467,7 +1474,7 @@ document.write(`
 
         <span class="k">if</span> <span class="n">cast</span> <span class="ow">in</span> <span class="p">{</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">dict</span><span class="p">}:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_sanitize_collection</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">convert_dataclass</span><span class="o">=</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;dataclass&quot;</span><span class="p">])</span>
-            <span class="k">return</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
+            <span class="k">return</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">x</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BuildsFn._make_hydra_compatible">
@@ -1579,6 +1586,7 @@ document.write(`
                 <span class="ow">or</span> <span class="n">_is_ufunc</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
                 <span class="ow">or</span> <span class="n">_is_numpy_array_func_dispatcher</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
                 <span class="ow">or</span> <span class="n">_is_jax_compiled_func</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="n">_is_jax_ufunc</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
             <span class="p">)</span>
         <span class="p">):</span>
             <span class="c1"># `value` is importable callable -- create config that will import</span>
@@ -1999,7 +2007,13 @@ document.write(`
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
-        <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Importable</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="n">Type</span><span class="p">[</span><span class="n">AnyBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
+            <span class="n">Importable</span><span class="p">,</span>
+            <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span>
+            <span class="n">Type</span><span class="p">[</span><span class="n">AnyBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
+            <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]],</span>
+            <span class="n">Any</span><span class="p">,</span>
+        <span class="p">],</span>
         <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(),</span>
         <span class="n">zen_meta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SupportedPrimitive</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3007,7 +3021,7 @@ document.write(`
             <span class="k">if</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
                 <span class="n">_fields</span> <span class="o">=</span> <span class="p">{</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">(</span><span class="n">target</span><span class="p">)}</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">_fields</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">__fields__</span>  <span class="c1"># type: ignore</span>
+                <span class="n">_fields</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">__fields__</span>
             <span class="n">_update</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">signature_params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_fields</span><span class="p">:</span>
@@ -3802,7 +3816,12 @@ document.write(`
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
-        <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
+            <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+            <span class="n">Callable</span><span class="p">[</span><span class="n">Concatenate</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">P</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
+            <span class="n">Callable</span><span class="p">[</span><span class="n">Concatenate</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">P</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
+            <span class="n">Callable</span><span class="p">[</span><span class="n">Concatenate</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">P</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">zen_exclude</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
