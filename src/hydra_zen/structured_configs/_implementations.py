@@ -527,6 +527,13 @@ def _is_ufunc(value: Any) -> bool:
     return isinstance(value, numpy.ufunc)
 
 
+def _is_jax_ufunc(value: Any) -> bool:  # pragma: no cover
+    # checks without importing numpy
+    if (jnp := sys.modules.get("jax.numpy")) is None:  # pragma: no cover
+        return False
+    return isinstance(value, jnp.ufunc)
+
+
 def _is_numpy_array_func_dispatcher(value: Any) -> bool:
     if (numpy := sys.modules.get("numpy")) is None:  # pragma: no cover
         return False
@@ -1047,7 +1054,7 @@ class BuildsFn(Generic[T]):
 
         if cast in {list, tuple, dict}:
             x = cls._sanitize_collection(x, convert_dataclass=settings["dataclass"])
-            return field(default_factory=lambda: cast(x))  # type: ignore
+            return field(default_factory=lambda: cast(x))
         return field(default_factory=lambda: x)
 
     @classmethod
@@ -1157,6 +1164,7 @@ class BuildsFn(Generic[T]):
                 or _is_ufunc(value)
                 or _is_numpy_array_func_dispatcher(value=value)
                 or _is_jax_compiled_func(value=value)
+                or _is_jax_ufunc(value=value)
             )
         ):
             # `value` is importable callable -- create config that will import
@@ -1576,7 +1584,13 @@ class BuildsFn(Generic[T]):
     @classmethod
     def builds(
         cls: Type[Self],
-        *pos_args: Union[Importable, Callable[P, R], Type[AnyBuilds[Importable]], Any],
+        *pos_args: Union[
+            Importable,
+            Callable[P, R],
+            Type[AnyBuilds[Importable]],
+            Type[BuildsWithSig[Type[R], P]],
+            Any,
+        ],
         zen_partial: Optional[bool] = None,
         zen_wrappers: ZenWrappers[Callable[..., Any]] = tuple(),
         zen_meta: Optional[Mapping[str, SupportedPrimitive]] = None,
@@ -2584,7 +2598,7 @@ class BuildsFn(Generic[T]):
             if is_dataclass(target):
                 _fields = {f.name: f for f in fields(target)}
             else:
-                _fields = target.__fields__  # type: ignore
+                _fields = target.__fields__
             _update = {}
             for name, param in signature_params.items():
                 if name not in _fields:
@@ -3379,7 +3393,12 @@ class BuildsFn(Generic[T]):
     @classmethod
     def kwargs_of(
         cls: Type[Self],
-        __hydra_target: Callable[P, Any],
+        __hydra_target: Union[
+            Callable[P, Any],
+            Callable[Concatenate[Any, P], Any],
+            Callable[Concatenate[Any, Any, P], Any],
+            Callable[Concatenate[Any, Any, Any, P], Any],
+        ],
         *,
         zen_dataclass: Optional[DataclassOptions] = None,
         zen_exclude: Union[

@@ -243,8 +243,10 @@ hydra-zen also provides auto-config support for some third-pary libraries:
 
 - `pydantic.dataclasses.dataclass`
 - `pydantic.Field`
-- `pydantic.Field`
 - `torch.optim.optimizer.required` (i.e. the default parameter for `lr` in `Optimizer`)
+- `numpy.ufunc` and nunmpy array dispatchers (e.g. `np.sum`)
+- `jax.numpy.ufunc` and jax compiled functions (e.g. `jax.vmap`)
+
 
 
 *********************

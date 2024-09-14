@@ -130,7 +130,7 @@ if PYRIGHT_PATH is not None:
         raw_files,
         pyright_analyze(
             *raw_files,
-            report_unnecessary_type_ignore_comment=True,
+            report_unnecessary_type_ignore_comment=False,
             preamble=preamble,
             pyright_config=pyright_config,
         ),

@@ -237,7 +237,12 @@ class StdBuilds(Generic[T]):
 
     def __call__(
         self,
-        __hydra_target: Union[Callable[P, R], Type[Builds[Importable]], Importable],
+        __hydra_target: Union[
+            Callable[P, R],
+            Type[Builds[Importable]],
+            Importable,
+            Type[BuildsWithSig[Type[R], P]],
+        ],
         *pos_args: T,
         zen_partial: Optional[bool] = None,
         populate_full_signature: bool = False,
@@ -476,6 +481,7 @@ class FullBuilds(Generic[T]):
             Importable,
             Type[Builds[Importable]],
             Type[PartialBuilds[Importable]],
+            Type[BuildsWithSig[Type[R], P]],
         ],
         *pos_args: T,
         zen_partial: Optional[bool] = None,
@@ -656,7 +662,12 @@ class PBuilds(Generic[T]):
 
     def __call__(
         self,
-        __hydra_target: Union[Callable[P, R], Type[AnyBuilds[Importable]], Importable],
+        __hydra_target: Union[
+            Callable[P, R],
+            Type[AnyBuilds[Importable]],
+            Importable,
+            Type[BuildsWithSig[Type[R], P]],
+        ],
         *pos_args: T,
         zen_partial: Optional[bool] = True,
         populate_full_signature: bool = False,
