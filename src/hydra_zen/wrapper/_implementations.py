@@ -338,7 +338,7 @@ class Zen(Generic[P, R]):
             p.kind is p.POSITIONAL_ONLY for p in self.parameters.values()
         )
 
-        _args_ = getattr(cfg, "_args_", [])
+        _args_: List[Any] = getattr(cfg, "_args_", [])
 
         if not isinstance(_args_, Sequence):
             raise HydraZenValidationError(
@@ -1603,12 +1603,12 @@ class ZenStore:
                     if "provider" not in kw:  # pragma: no branch
                         provider = "hydra_zen"
 
-            _name: NodeName = name(__target) if callable(name) else name
+            _name: NodeName = name(__target) if callable(name) else name  # type: ignore
             if not isinstance(_name, str):
                 raise TypeError(f"`name` must be a string, got {_name}")
             del name
 
-            _group: GroupName = group(__target) if callable(group) else group
+            _group: GroupName = group(__target) if callable(group) else group  # type: ignore
             if _group is not None and not isinstance(_group, str):
                 raise TypeError(f"`group` must be a string or None, got {_group}")
             del group
