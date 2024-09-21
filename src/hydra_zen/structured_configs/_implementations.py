@@ -1926,8 +1926,8 @@ class BuildsFn(Generic[T]):
 
         >>> def bar(x: bool, y: str = 'foo'): return x, y
 
-        The following config will have a signature that matches ``f``; the
-        annotations and default values of the parameters of ``f`` are explicitly
+        The following config will have a signature that matches ``bar``; the
+        annotations and default values of the parameters of ``bar`` are explicitly
         incorporated into the config.
 
         >>> # signature: `Builds_bar(x: bool, y: str = 'foo')`
