@@ -332,7 +332,7 @@ overwriting store entries.</p>
 <td><p>Access a store entry, which is a mapping that specifies the entry's name, group, package, provider, and node.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#hydra_zen.ZenStore.has_enqueued" title="hydra_zen.ZenStore.has_enqueued"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_enqueued</span></code></a>()</p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> if this store has entries that have not yet been added to Hydra's config store.</p></td>
+<td><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> if this store has entries that have not yet been added to Hydra's config store.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#hydra_zen.ZenStore.merge" title="hydra_zen.ZenStore.merge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge</span></code></a>(_ZenStore__other[, store_name])</p></td>
 <td><p>Create a new store by merging two stores.</p></td>
@@ -492,7 +492,7 @@ may be specified for the entry as well.</p>
 </pre></div>
 </div>
 <p>A store’s entries are keyed by their <code class="xref py py-obj docutils literal notranslate"><span class="pre">(group,</span> <span class="pre">name)</span></code> pairs (the default group is
-<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>).</p>
+<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>).</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span><span class="p">[</span><span class="s2">"profiles"</span><span class="p">,</span> <span class="s2">"roger"</span><span class="p">]</span>  <span class="c1"># (group, name) -&gt; config node</span>
 <span class="go">{'name': 'Roger', age: 24}</span>
 </pre></div>
@@ -665,17 +665,17 @@ methods for details and examples.</p>
 <dd class="field-odd"><dl>
 <dt><strong>name</strong><span class="classifier">Optional[str]</span></dt><dd><p>The name for this store.</p>
 </dd>
-<dt><strong>deferred_to_config</strong><span class="classifier">bool, default=True</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> (default), this store will a not apply <code class="xref py py-obj docutils literal notranslate"><span class="pre">to_config</span></code> to the
+<dt><strong>deferred_to_config</strong><span class="classifier">bool, default=True</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> (default), this store will a not apply <code class="xref py py-obj docutils literal notranslate"><span class="pre">to_config</span></code> to the
 target until that specific entry is accessed by the store.</p>
 </dd>
-<dt><strong>deferred_hydra_store</strong><span class="classifier">bool, default=True</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> (default), this store will not add entries to Hydra’s global
+<dt><strong>deferred_hydra_store</strong><span class="classifier">bool, default=True</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> (default), this store will not add entries to Hydra’s global
 config store until <code class="xref py py-obj docutils literal notranslate"><span class="pre">store.add_to_hydra_store</span></code> is called explicitly.</p>
 </dd>
-<dt><strong>overwrite_ok</strong><span class="classifier">bool, default=False</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a> (default), attempting to overwrite entries in this store and
+<dt><strong>overwrite_ok</strong><span class="classifier">bool, default=False</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a> (default), attempting to overwrite entries in this store and
 trying to use this store to overwrite entries in Hydra’s global store
-will raise a <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a>.</p>
+will raise a <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a>.</p>
 </dd>
-<dt><strong>warn_node_kwarg: bool, default=True</strong></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> specifying a <code class="xref py py-obj docutils literal notranslate"><span class="pre">node</span></code> kwarg in <a class="reference internal" href="#hydra_zen.ZenStore.__call__" title="hydra_zen.ZenStore.__call__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenStore.__call__</span></code></a> will emit a
+<dt><strong>warn_node_kwarg: bool, default=True</strong></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> specifying a <code class="xref py py-obj docutils literal notranslate"><span class="pre">node</span></code> kwarg in <a class="reference internal" href="#hydra_zen.ZenStore.__call__" title="hydra_zen.ZenStore.__call__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenStore.__call__</span></code></a> will emit a
 warning.</p>
 <p>This helps to protect users from mistakenly self-partializing a store
 with <code class="xref py py-obj docutils literal notranslate"><span class="pre">store(node=Config)</span></code> instead of actually storing the node with
@@ -701,7 +701,7 @@ mirrored store instance with updated default arguments.</p>
 <p>Store entries are keyed off of <code class="xref py py-obj docutils literal notranslate"><span class="pre">(group,</span> <span class="pre">name)</span></code>.</p>
 </dd>
 <dt><strong>group</strong><span class="classifier">Optional[GroupName | Callable[[T], GroupName]]</span></dt><dd><p>The entry’s group’s name, or a callable that will be called as
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">(obj)</span> <span class="pre">-&gt;</span> <span class="pre">entry-group</span></code>. The default is <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>. Subgroups can be
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">(obj)</span> <span class="pre">-&gt;</span> <span class="pre">entry-group</span></code>. The default is <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>. Subgroups can be
 specified using / within the group name.</p>
 <p>Store entries are keyed off of <code class="xref py py-obj docutils literal notranslate"><span class="pre">(group,</span> <span class="pre">name)</span></code>.</p>
 </dd>
@@ -712,7 +712,7 @@ as the entry’s node.</p>
 <p>By default the call to <code class="xref py py-obj docutils literal notranslate"><span class="pre">to_config</span></code> is deferred until the entry
 is actually accessed by the store.</p>
 </dd>
-<dt><strong>package</strong><span class="classifier">Optional[str | Callable[[Any], str]]</span></dt><dd><p>The entry’s package. Default is <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>.</p>
+<dt><strong>package</strong><span class="classifier">Optional[str | Callable[[Any], str]]</span></dt><dd><p>The entry’s package. Default is <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>.</p>
 </dd>
 <dt><strong>provider</strong><span class="classifier">Optional[str]</span></dt><dd><p>An optional provider name for the entry.</p>
 </dd>
@@ -779,7 +779,7 @@ including nodes within subgroups.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>overwrite_ok</strong><span class="classifier">Optional[bool]</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>, this method raises <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a> if an entry in Hydra’s config
+<dt><strong>overwrite_ok</strong><span class="classifier">Optional[bool]</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>, this method raises <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a> if an entry in Hydra’s config
 store will be overwritten. Defaults to the value of <code class="xref py py-obj docutils literal notranslate"><span class="pre">overwrite_ok</span></code>
 specified when initializing this store.</p>
 </dd>
@@ -999,7 +999,7 @@ is not advised.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="hydra_zen.ZenStore.has_enqueued">
 <span class="sig-name descname"><span class="pre">has_enqueued</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/wrapper/_implementations.html#ZenStore.has_enqueued"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.ZenStore.has_enqueued" title="Link to this definition">#</a></dt>
-<dd><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> if this store has entries that have not yet been added to
+<dd><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> if this store has entries that have not yet been added to
 Hydra’s config store.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1085,7 +1085,7 @@ Mutating a node in an entry may have unintended consequences and is not advised.
 <dl class="py method">
 <dt class="sig sig-object py" id="hydra_zen.ZenStore.__eq__">
 <span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_ZenStore__o</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/wrapper/_implementations.html#ZenStore.__eq__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.ZenStore.__eq__" title="Link to this definition">#</a></dt>
-<dd><p>Returns <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> if two stores share identical internal repos and queues.</p>
+<dd><p>Returns <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> if two stores share identical internal repos and queues.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">ZenStore</span></a>
 <span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">store1</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.wrapper._implementations.ZenStore"><span class="n">ZenStore</span></a><span class="p">()</span>
