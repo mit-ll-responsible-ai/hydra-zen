@@ -507,7 +507,7 @@ Without auto-config</label><div class="sd-tab-content docutils">
     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
 
-<span class="k">if</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/reference/import.html#name__" title="__name__"><span class="vm">__name__</span></a> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">hydra.conf</span> <span class="kn">import</span> <span class="n">HydraConf</span><span class="p">,</span> <span class="n">JobConf</span>
     <span class="c1"># Configure Hydra to change the working dir to match that of the output dir</span>
     <span class="n">store</span><span class="p">(</span><span class="n">HydraConf</span><span class="p">(</span><span class="n">job</span><span class="o">=</span><span class="n">JobConf</span><span class="p">(</span><span class="n">chdir</span><span class="o">=</span><span class="kc">True</span><span class="p">)),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"config"</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s2">"hydra"</span><span class="p">)</span>
