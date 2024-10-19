@@ -148,7 +148,7 @@ description = Runs test suite parallelized in the specified python enviornment a
 passenv = *
 deps = setuptools
        pytest
-       hypothesis
+       hypothesis==6.113.0
        pytest-xdist
        pytest-trio
        tzdata
