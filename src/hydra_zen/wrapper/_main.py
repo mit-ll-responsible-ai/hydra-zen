@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import copy
 import functools
 import sys
@@ -14,8 +16,15 @@ from omegaconf import DictConfig, OmegaConf, open_dict, read_write
 
 import hydra_zen as hz
 
+_UNSPECIFIED_: Any = object()
 
-def run_job(config_name: str | None, task_function: TaskFunction):
+
+def run_job(
+    task_function: TaskFunction,
+    config_path: str | None = _UNSPECIFIED_,
+    config_name: str | None = None,
+    version_base: str | None = _UNSPECIFIED_,
+):
     args_parser = get_args_parser()
     args = args_parser.parse_args()
 
@@ -27,32 +36,18 @@ def run_job(config_name: str | None, task_function: TaskFunction):
         assert gh.hydra is not None
 
         if args.help:
-            gh.hydra.app_help(
-                config_name=config_name, args_parser=args_parser, args=args
-            )
+            gh.hydra.app_help(config_name=config_name, args_parser=args_parser, args=args)
             sys.exit(0)
         has_show_cfg = args.cfg is not None
         if args.resolve and (not has_show_cfg and not args.help):
-            raise ValueError(
-                "The --resolve flag can only be used in conjunction with --cfg or --help"
-            )
+            raise ValueError("The --resolve flag can only be used in conjunction with --cfg or --help")
         if args.hydra_help:
-            gh.hydra.hydra_help(
-                config_name=config_name, args_parser=args_parser, args=args
-            )
+            gh.hydra.hydra_help(config_name=config_name, args_parser=args_parser, args=args)
             sys.exit(0)
 
-        num_commands = (
-            args.run
-            + has_show_cfg
-            + args.multirun
-            + args.shell_completion
-            + (args.info is not None)
-        )
+        num_commands = args.run + has_show_cfg + args.multirun + args.shell_completion + (args.info is not None)
         if num_commands > 1:
-            raise ValueError(
-                "Only one of --run, --multirun, --cfg, --info and --shell_completion can be specified"
-            )
+            raise ValueError("Only one of --run, --multirun, --cfg, --info and --shell_completion can be specified")
         if num_commands == 0:
             args.run = True
 
@@ -116,12 +111,14 @@ def run_job(config_name: str | None, task_function: TaskFunction):
 
 
 def zen_main(
+    config_path: str | None = _UNSPECIFIED_,
     config_name: str | None = None,
-):
+    version_base: str | None = _UNSPECIFIED_,
+) -> Callable[[Any], Any]:
     def main_decorator(task_function: TaskFunction) -> Callable[[], None]:
         @functools.wraps(task_function)
         def decorated_main() -> Any:
-            return run_job(config_name, task_function)
+            return run_job(task_function, config_path=config_path, config_name=config_name, version_base=version_base)
 
         return decorated_main
 
@@ -129,6 +126,7 @@ def zen_main(
 
 
 if __name__ == "__main__":
+    import hydra_zen as hz
 
     def task(hi=1, foo=2):
         print(hi, foo)
@@ -136,4 +134,4 @@ if __name__ == "__main__":
     hz.store(hz.make_config(foo=3), name="config")
     hz.store.add_to_hydra_store()
 
-    zen_main(config_name="config")(hz.zen(task))()
+    zen_main(config_name="config", config_path=None, version_base=None)(hz.zen(task))()
