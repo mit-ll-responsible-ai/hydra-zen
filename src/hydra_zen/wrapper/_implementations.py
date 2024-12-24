@@ -61,6 +61,7 @@ from hydra_zen.typing._implementations import (
 
 from ..structured_configs._type_guards import is_dataclass
 from ..structured_configs._utils import safe_name
+from ._main import zen_main
 
 if TYPE_CHECKING:
     from hydra_zen import BuildsFn
@@ -459,6 +460,7 @@ class Zen(Generic[P, R]):
         config_path: Optional[str] = _UNSPECIFIED_,
         config_name: Optional[str] = None,
         version_base: Optional[str] = _UNSPECIFIED_,
+        silent: bool = False,
     ) -> Callable[[Any], Any]:
         """
         Generates a Hydra-CLI for the wrapped function. Equivalent to `hydra.main(zen(func), [...])()`
@@ -529,6 +531,9 @@ class Zen(Generic[P, R]):
         if version_base is not _UNSPECIFIED_:  # pragma: no cover
             kw["version_base"] = version_base
 
+        if silent:
+            return zen_main(**kw)(target)()
+    
         return hydra.main(**kw)(target)()
 
 
