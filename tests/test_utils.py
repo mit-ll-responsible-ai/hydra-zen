@@ -160,7 +160,7 @@ NoneType: TypeAlias = None
         (callable, Any),
         (frozenset, Any),
         (List, List),
-        (Tuple, (Any if OMEGACONF_VERSION < Version(2, 2, 3) else Tuple)),
+        (Tuple, Tuple),
         (Dict, Dict),
         (T, Any),
         (List[T], List[Any]),

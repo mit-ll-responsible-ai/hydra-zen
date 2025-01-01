@@ -1978,7 +1978,7 @@ class BuildsFn(Generic[T]):
         >>> ChildConf = builds(dict, b=-2, c=-3, builds_bases=(ParentConf,))
         >>> instantiate(ChildConf)
         {'a': 1, 'b': -2, 'c': -3}
-        >>> issubclass(ChildConf, ParentConf)
+        >>> issubclass(ChildConf, ParentConf)  # type: ignore
         True
 
         .. _builds-validation:

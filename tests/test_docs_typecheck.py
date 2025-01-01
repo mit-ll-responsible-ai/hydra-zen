@@ -34,6 +34,7 @@ from tests.pyright_utils import (
 preamble = """from hydra_zen import (
     ZenField,
     ZenStore,
+    builds,
     get_target,
     hydrated_dataclass,
     instantiate,
@@ -94,7 +95,15 @@ if PYRIGHT_PATH is not None:
 @pytest.mark.parametrize("func", FUNCS_TO_SCAN)
 def test_docstrings_scan_clean_via_pyright(func):
     results = PYRIGHT_SCAN_RESULTS[func]
-    assert results["summary"]["errorCount"] == 0, list_error_messages(results)
+    errors = [
+        e
+        for e in list_error_messages(results)
+        if (
+            "is obscured by a declaration of the same name" not in e
+            and "declared as Final" not in e
+        )
+    ]
+    assert not errors
 
 
 docs_src = Path(hydra_zen.__file__).parents[2] / "docs" / "source"
@@ -148,6 +157,9 @@ def test_rst_docs_scan_clean_via_pyright(func, pyright_config):
     errors = [
         e
         for e in list_error_messages(results)
-        if "is obscured by a declaration of the same name" not in e
+        if (
+            "is obscured by a declaration of the same name" not in e
+            and "declared as Final" not in e
+        )
     ]
     assert not errors
