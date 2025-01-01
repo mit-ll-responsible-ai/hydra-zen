@@ -3488,8 +3488,8 @@ class DefaultBuilds(BuildsFn[SupportedPrimitive]):
     pass
 
 
-builds = DefaultBuilds.builds
-kwargs_of = DefaultBuilds.kwargs_of
+builds: Final = DefaultBuilds.builds
+kwargs_of: Final = DefaultBuilds.kwargs_of
 
 
 @dataclass(unsafe_hash=True)
