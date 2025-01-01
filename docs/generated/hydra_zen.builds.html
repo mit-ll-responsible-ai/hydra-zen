@@ -653,7 +653,7 @@ compose configs via class inheritance.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ChildConf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">,</span> <span class="n">b</span><span class="o">=-</span><span class="mi">2</span><span class="p">,</span> <span class="n">c</span><span class="o">=-</span><span class="mi">3</span><span class="p">,</span> <span class="n">builds_bases</span><span class="o">=</span><span class="p">(</span><span class="n">ParentConf</span><span class="p">,))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">ChildConf</span><span class="p">)</span>
 <span class="go">{'a': 1, 'b': -2, 'c': -3}</span>
-<span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#issubclass" title="issubclass"><span class="nb">issubclass</span></a><span class="p">(</span><span class="n">ChildConf</span><span class="p">,</span> <span class="n">ParentConf</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#issubclass" title="issubclass"><span class="nb">issubclass</span></a><span class="p">(</span><span class="n">ChildConf</span><span class="p">,</span> <span class="n">ParentConf</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
 <span class="go">True</span>
 </pre></div>
 </div>

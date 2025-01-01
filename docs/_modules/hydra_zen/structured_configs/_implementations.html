@@ -384,7 +384,7 @@
                 <article class="bd-article">
                   
   <h1>Source code for hydra_zen.structured_configs._implementations</h1><div class="highlight"><pre>
-<span></span><span class="c1"># Copyright (c) 2024 Massachusetts Institute of Technology</span>
+<span></span><span class="c1"># Copyright (c) 2025 Massachusetts Institute of Technology</span>
 <span class="c1"># SPDX-License-Identifier: MIT</span>
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
@@ -1454,7 +1454,7 @@
 
         <span class="k">if</span> <span class="n">cast</span> <span class="ow">in</span> <span class="p">{</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">dict</span><span class="p">}:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_sanitize_collection</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">convert_dataclass</span><span class="o">=</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;dataclass&quot;</span><span class="p">])</span>
-            <span class="k">return</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
         <span class="k">return</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">x</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BuildsFn._make_hydra_compatible">
@@ -2381,7 +2381,7 @@
 <span class="sd">        &gt;&gt;&gt; ChildConf = builds(dict, b=-2, c=-3, builds_bases=(ParentConf,))</span>
 <span class="sd">        &gt;&gt;&gt; instantiate(ChildConf)</span>
 <span class="sd">        {&#39;a&#39;: 1, &#39;b&#39;: -2, &#39;c&#39;: -3}</span>
-<span class="sd">        &gt;&gt;&gt; issubclass(ChildConf, ParentConf)</span>
+<span class="sd">        &gt;&gt;&gt; issubclass(ChildConf, ParentConf)  # type: ignore</span>
 <span class="sd">        True</span>
 
 <span class="sd">        .. _builds-validation:</span>
@@ -3001,7 +3001,7 @@
             <span class="k">if</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
                 <span class="n">_fields</span> <span class="o">=</span> <span class="p">{</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">(</span><span class="n">target</span><span class="p">)}</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">_fields</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">__fields__</span>
+                <span class="n">_fields</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">__fields__</span>  <span class="c1"># type: ignore</span>
             <span class="n">_update</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">signature_params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_fields</span><span class="p">:</span>
