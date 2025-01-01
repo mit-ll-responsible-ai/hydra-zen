@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Massachusetts Institute of Technology
+# Copyright (c) 2025 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import functools
 import inspect
@@ -1054,7 +1054,7 @@ class BuildsFn(Generic[T]):
 
         if cast in {list, tuple, dict}:
             x = cls._sanitize_collection(x, convert_dataclass=settings["dataclass"])
-            return field(default_factory=lambda: cast(x))
+            return field(default_factory=lambda: cast(x))  # type: ignore
         return field(default_factory=lambda: x)
 
     @classmethod
@@ -1978,7 +1978,7 @@ class BuildsFn(Generic[T]):
         >>> ChildConf = builds(dict, b=-2, c=-3, builds_bases=(ParentConf,))
         >>> instantiate(ChildConf)
         {'a': 1, 'b': -2, 'c': -3}
-        >>> issubclass(ChildConf, ParentConf)
+        >>> issubclass(ChildConf, ParentConf)  # type: ignore
         True
 
         .. _builds-validation:
@@ -2598,7 +2598,7 @@ class BuildsFn(Generic[T]):
             if is_dataclass(target):
                 _fields = {f.name: f for f in fields(target)}
             else:
-                _fields = target.__fields__
+                _fields = target.__fields__  # type: ignore
             _update = {}
             for name, param in signature_params.items():
                 if name not in _fields:

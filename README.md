@@ -7,7 +7,7 @@
     <img src="https://img.shields.io/pypi/v/hydra-zen.svg" alt="PyPI" />
   </a>
   <a>
-    <img src="https://img.shields.io/badge/python-3.8%20&#8208;%203.12-blue.svg" alt="Python version support" />
+    <img src="https://img.shields.io/badge/python-3.9%20&#8208;%203.12-blue.svg" alt="Python version support" />
   </a>
   <a href="https://anaconda.org/conda-forge/hydra-zen">
     <img src="https://img.shields.io/conda/vn/conda-forge/hydra-zen.svg?logo=conda-forge&label=conda-forge&color=3A3A3A" alt="Conda-forge" />
@@ -85,7 +85,7 @@ Using `hydra-zen` for your research? Please cite the following publication:
 
 DISTRIBUTION STATEMENT A. Approved for public release: distribution unlimited.
 
-© 2024 MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+© 2025 MASSACHUSETTS INSTITUTE OF TECHNOLOGY
     
     Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014)
     SPDX-License-Identifier: MIT

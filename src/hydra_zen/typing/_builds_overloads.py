@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Massachusetts Institute of Technology
+# Copyright (c) 2025 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
 # Stores overloads for `builds` with different default-values for signature
@@ -290,7 +290,7 @@ class FullBuilds(Generic[T]):
     ) -> Type[BuildsWithSig[Type[R], P]]: ...
 
     @overload
-    def __call__(  # pyright: ignore[reportOverlappingOverload]
+    def __call__(
         self,
         __hydra_target: Type[AnyBuilds[Importable]],
         *,

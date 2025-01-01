@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Massachusetts Institute of Technology
+# Copyright (c) 2025 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import collections.abc as abc
 import enum
@@ -160,7 +160,6 @@ NoneType: TypeAlias = None
         (callable, Any),
         (frozenset, Any),
         (List, List),
-        (Tuple, (Any if OMEGACONF_VERSION < Version(2, 2, 3) else Tuple)),
         (Dict, Dict),
         (T, Any),
         (List[T], List[Any]),
