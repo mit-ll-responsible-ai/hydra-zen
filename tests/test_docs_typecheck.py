@@ -34,7 +34,6 @@ from tests.pyright_utils import (
 preamble = """from hydra_zen import (
     ZenField,
     ZenStore,
-    builds,
     get_target,
     hydrated_dataclass,
     instantiate,
