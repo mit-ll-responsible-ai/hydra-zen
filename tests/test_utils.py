@@ -160,7 +160,6 @@ NoneType: TypeAlias = None
         (callable, Any),
         (frozenset, Any),
         (List, List),
-        (Tuple, Tuple),
         (Dict, Dict),
         (T, Any),
         (List[T], List[Any]),
