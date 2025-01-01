@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Massachusetts Institute of Technology
+# Copyright (c) 2025 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
 from typing import Any, Callable, FrozenSet, Optional, Type, TypeVar, Union, overload

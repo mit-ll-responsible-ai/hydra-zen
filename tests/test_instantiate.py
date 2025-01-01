@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Massachusetts Institute of Technology
+# Copyright (c) 2025 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 from dataclasses import dataclass
 from typing import Any
