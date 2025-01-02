@@ -9,15 +9,15 @@ from dataclasses import InitVar, dataclass, field as dataclass_field, make_datac
 from inspect import signature
 from pathlib import Path, PosixPath, WindowsPath
 from typing import (
+    Annotated,
     Any,
     Callable,
     Dict,
+    Final,
     List,
     NewType,
     Optional,
-    Set,
     Tuple,
-    Type,
     TypeVar,
     Union,
 )
@@ -33,8 +33,6 @@ from omegaconf.errors import (
     KeyValidationError,
 )
 from typing_extensions import (
-    Annotated,
-    Final,
     Literal,
     ParamSpec,
     Protocol,
@@ -113,8 +111,8 @@ def test_fuzz_safename(obj):
 def test_mutable_values():
     @dataclass
     class A:
-        a_list: List[int] = mutable_value([1, 2, 3])
-        a_dict: Dict[str, int] = mutable_value(dict(a=1))
+        a_list: list[int] = mutable_value([1, 2, 3])
+        a_dict: dict[str, int] = mutable_value(dict(a=1))
 
     a = A()
     assert a.a_dict == {"a": 1}
@@ -159,22 +157,22 @@ NoneType: TypeAlias = None
         (dict, (Dict if OMEGACONF_VERSION < Version(2, 2, 3) else dict)),
         (callable, Any),
         (frozenset, Any),
-        (List, List),
-        (Dict, Dict),
+        (List, list),
+        (Dict, dict),
         (T, Any),
-        (List[T], List[Any]),
-        (Tuple[T, T], Tuple[Any, Any]),
+        (List[T], list[Any]),
+        (Tuple[T, T], tuple[Any, Any]),
         (Callable[P, int], Any),
         (P, Any),
         (P.args, Any),  # type: ignore
         (P.kwargs, Any),  # type: ignore
         (Ts, Any),
         (SomeProtocol[T], Any),
-        (Tuple[Unpack[Ts]], Tuple[Any, ...]),
-        (Tuple[Unpack[Ts], int], Tuple[Any, ...]),
+        (tuple[Unpack[Ts]], tuple[Any, ...]),
+        (tuple[Unpack[Ts], int], tuple[Any, ...]),
         pytest.param(
-            Tuple[str, Unpack[Ts]],
-            Tuple[Any, ...],
+            tuple[str, Unpack[Ts]],
+            tuple[Any, ...],
             marks=[
                 pytest.mark.xfail(
                     HYDRA_VERSION < Version(1, 2, 0),
@@ -183,8 +181,8 @@ NoneType: TypeAlias = None
             ],
         ),
         pytest.param(
-            Tuple[str, Unpack[Ts], int],
-            Tuple[Any, ...],
+            tuple[str, Unpack[Ts], int],
+            tuple[Any, ...],
             marks=[
                 pytest.mark.xfail(
                     HYDRA_VERSION < Version(1, 2, 0),
@@ -193,18 +191,18 @@ NoneType: TypeAlias = None
             ],
         ),
         (Annotated[int, int], int),
-        (Annotated[Tuple[str, str], int], Tuple[str, str]),
+        (Annotated[tuple[str, str], int], tuple[str, str]),
         (Annotated[Builds, int], Any),
         (NewType("I", int), int),
-        (NewType("S", Tuple[str, str]), Tuple[str, str]),
+        (NewType("S", tuple[str, str]), tuple[str, str]),
         (Self, Any),  # type: ignore
         (Literal[1, 2], Any),  # unsupported generics
-        (Type[int], Any),
+        (type[int], Any),
         (Builds, Any),
         (Builds[int], Any),
-        (Type[Builds[int]], Any),
-        (Set, Any),
-        (Set[int], Any),
+        (type[Builds[int]], Any),
+        (set, Any),
+        (set[int], Any),
         (Final[int], Any),
         (Callable, Any),
         (Callable[[int], int], Any),
@@ -215,53 +213,56 @@ NoneType: TypeAlias = None
         (Union[NoneType, frozenset], Any),
         (Union[NoneType, int], Optional[int]),  # supported Optional
         (Optional[Color], Optional[Color]),
-        (Optional[List[Color]], Optional[List[Color]]),
+        (Optional[list[Color]], Optional[list[Color]]),
         (
-            Optional[List[List[int]]],
-            Optional[List[List[int]]],
+            Optional[list[list[int]]],
+            Optional[list[list[int]]],
         ),
-        (List[int], List[int]),  # supported containers
-        (List[frozenset], List[Any]),
+        (list[int], list[int]),  # supported containers
+        (list[frozenset], list[Any]),
         (
-            List[List[int]],
-            List[List[int]],
+            list[list[int]],
+            list[list[int]],
         ),
-        (List[Tuple[int, int]], List[Any]),
-        (List[T], List[Any]),
-        (Dict[str, float], Dict[str, float]),
-        (Dict[C, int], Dict[Any, int]),
-        (Dict[str, C], Dict[str, Any]),
-        (Dict[C, C], Dict[Any, Any]),
+        (list[tuple[int, int]], list[Any]),
+        (list[T], list[Any]),
+        (dict[str, float], dict[str, float]),
+        (dict[C, int], dict[Any, int]),
+        (dict[str, C], dict[str, Any]),
+        (dict[C, C], dict[Any, Any]),
         (
-            Dict[str, List[int]],
-            Dict[str, List[int]],
+            dict[str, list[int]],
+            dict[str, list[int]],
         ),
-        (Tuple[str], Tuple[str]),
-        (Tuple[str, ...], Tuple[str, ...]),
-        (Tuple[str, str, str], Tuple[str, str, str]),
+        (tuple[str], tuple[str]),
+        (tuple[str, ...], tuple[str, ...]),
+        (tuple[str, str, str], tuple[str, str, str]),
         (
-            Tuple[List[int]],
-            (Tuple[List[int]]),
+            tuple[list[int]],
+            (tuple[list[int]]),
         ),
-        (Union[NoneType, Tuple[int, int]], Optional[Tuple[int, int]]),
-        (Union[Tuple[int, int], NoneType], Optional[Tuple[int, int]]),
+        (Union[NoneType, tuple[int, int]], Optional[tuple[int, int]]),
+        (Union[tuple[int, int], NoneType], Optional[tuple[int, int]]),
         (
-            List[Dict[str, List[int]]],
-            List[Dict[str, List[int]]],
+            list[dict[str, list[int]]],
+            list[dict[str, list[int]]],
         ),
         (
-            List[List[Type[int]]],
-            List[List[Any]],
+            list[list[type[int]]],
+            list[list[Any]],
         ),
-        (Tuple[Tuple[int, ...], ...], Tuple[Any, ...]),
-        (Optional[Tuple[Tuple[int, ...], ...]], Optional[Tuple[Any, ...]]),
-        (InitVar[List[frozenset]], Any if sys.version_info < (3, 8) else List[Any]),
+        (tuple[tuple[int, ...], ...], tuple[Any, ...]),
+        (Optional[tuple[tuple[int, ...], ...]], Optional[tuple[Any, ...]]),
+        (InitVar[list[frozenset]], Any if sys.version_info < (3, 8) else list[Any]),
     ],
 )
 def test_sanitized_type_expected_behavior(in_type, expected_type):
     assert DefaultBuilds._sanitized_type(in_type) == expected_type, in_type
 
-    if in_type != expected_type:
+    if in_type != expected_type and (in_type, expected_type) not in [
+        (List, list),
+        (Dict, dict),
+    ]:
         # In cases where we change the type, it should be because omegaconf
         # doesn't support that annotation.
         # This check will help catch cases where omegaconf/hydra has added support for
@@ -293,7 +294,11 @@ def test_sanitized_type_expected_behavior(in_type, expected_type):
 
 
 def test_tuple_annotation_normalization():
-    assert DefaultBuilds._sanitized_type(Tuple[int, str, int]) is Tuple[Any, Any, Any]
+    x = DefaultBuilds._sanitized_type(Tuple[int, str, int])
+    assert tuple[Any, Any, Any] == tuple[Any, Any, Any], "yee"
+    assert (
+        DefaultBuilds._sanitized_type(Tuple[int, str, int]) == tuple[Any, Any, Any]
+    ), x
 
 
 def f_list(x: List):

@@ -1,7 +1,7 @@
 # Copyright (c) 2025 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
-from typing import Any, Callable, FrozenSet, Optional, Type, TypeVar, Union, overload
+from typing import Any, Callable, Optional, TypeVar, Union, overload
 
 from typing_extensions import Literal
 
@@ -17,7 +17,7 @@ T = TypeVar("T")
 TD = TypeVar("TD", bound=DataClass_)
 TC = TypeVar("TC", bound=Callable[..., Any])
 TP = TypeVar("TP", bound=_HydraPrimitive)
-TB = TypeVar("TB", bound=Union[_SupportedViaBuilds, FrozenSet[Any]])
+TB = TypeVar("TB", bound=Union[_SupportedViaBuilds, frozenset[Any]])
 
 __all__ = ["just"]
 
@@ -63,7 +63,7 @@ def just(
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
-) -> Builds[Type[TB]]: ...
+) -> Builds[type[TB]]: ...
 
 
 @overload
@@ -74,7 +74,7 @@ def just(
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
-) -> Type[Builds[Type[TD]]]: ...
+) -> type[Builds[type[TD]]]: ...
 
 
 @overload

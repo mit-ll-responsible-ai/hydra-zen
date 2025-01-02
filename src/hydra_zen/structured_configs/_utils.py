@@ -2,29 +2,13 @@
 # SPDX-License-Identifier: MIT
 import inspect
 import warnings
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import MISSING, field as _field, is_dataclass
 from keyword import iskeyword
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    FrozenSet,
-    Iterable,
-    List,
-    Mapping,
-    Optional,
-    Sequence,
-    Set,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-    cast,
-    overload,
-)
+from typing import Any, Callable, Final, Optional, TypeVar, Union, cast, overload
 
 from omegaconf import II, DictConfig, ListConfig
-from typing_extensions import Final, Literal, TypeGuard
+from typing_extensions import Literal, TypeGuard
 
 from hydra_zen._compatibility import HYDRA_SUPPORTS_OBJECT_CONVERT
 from hydra_zen.errors import HydraZenValidationError
@@ -39,7 +23,7 @@ from hydra_zen.typing._implementations import (
     convert_types,
 )
 
-COMMON_MODULES_WITH_OBFUSCATED_IMPORTS: Tuple[str, ...] = (
+COMMON_MODULES_WITH_OBFUSCATED_IMPORTS: tuple[str, ...] = (
     "random",
     "numpy",
     "numpy.random",
@@ -48,8 +32,8 @@ COMMON_MODULES_WITH_OBFUSCATED_IMPORTS: Tuple[str, ...] = (
     "torch",
 )
 UNKNOWN_NAME: Final[str] = "<unknown>"
-KNOWN_MUTABLE_TYPES: Set[
-    Union[Type[List[Any]], Type[Dict[Any, Any]], Type[Set[Any]]]
+KNOWN_MUTABLE_TYPES: set[
+    Union[type[list[Any]], type[dict[Any, Any]], type[set[Any]]]
 ] = {list, dict, set}
 
 T = TypeVar("T")
@@ -274,11 +258,11 @@ def merge_settings(
     return settings
 
 
-_DATACLASS_OPTION_KEYS: FrozenSet[str] = (
+_DATACLASS_OPTION_KEYS: frozenset[str] = (
     DataclassOptions.__required_keys__ | DataclassOptions.__optional_keys__
 )
 
-_STRICT_DATACLASS_OPTION_KEYS: FrozenSet[str] = (
+_STRICT_DATACLASS_OPTION_KEYS: frozenset[str] = (
     StrictDataclassOptions.__required_keys__ | StrictDataclassOptions.__optional_keys__
 )
 _STRICT_DATACLASS_OPTION_KEYS.copy()

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 from dataclasses import MISSING, InitVar, dataclass, field
 from pathlib import Path
-from typing import Any, Callable, List, Type, TypeVar
+from typing import Any, Callable, TypeVar
 
 import hypothesis.strategies as st
 import pytest
@@ -279,7 +279,7 @@ def test_no_dataclass_conversion(
     ],
 )
 def test_yes_dataclass_conversion(
-    config_maker: Callable[[TDataClass], Builds[Type[TDataClass]]],
+    config_maker: Callable[[TDataClass], Builds[type[TDataClass]]],
     dataclass_obj: TDataClass,
 ):
     out = config_maker(dataclass_obj)
@@ -352,9 +352,9 @@ def test_builds_with_positional_arg():
     ],
 )
 def test_recursive_dataclass_conversion(
-    config_maker: Callable[[List[TDataClass]], List[Builds[Type[TDataClass]]]],
+    config_maker: Callable[[list[TDataClass]], list[Builds[type[TDataClass]]]],
     dataclass_obj: TDataClass,
-    as_container: Callable[[T], List[T]],
+    as_container: Callable[[T], list[T]],
 ):
     out = config_maker(as_container(dataclass_obj))[1]  # type: ignore
     inst_out = instantiate(out)

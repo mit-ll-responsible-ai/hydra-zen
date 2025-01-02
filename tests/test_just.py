@@ -24,7 +24,7 @@ def f(x: int):
     pass
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def func_with_cache(x: int):
     pass
 

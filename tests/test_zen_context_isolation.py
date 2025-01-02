@@ -4,15 +4,15 @@
 import random
 from contextvars import ContextVar
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Type
+from typing import Any, Optional
 
 import pytest
 
 from hydra_zen import zen
 from hydra_zen.errors import HydraZenValidationError
 
-config: ContextVar[Optional[Dict[str, Any]]] = ContextVar("config", default=None)
-var: ContextVar[Dict[str, Any]] = ContextVar("var", default=dict())
+config: ContextVar[Optional[dict[str, Any]]] = ContextVar("config", default=None)
+var: ContextVar[dict[str, Any]] = ContextVar("var", default=dict())
 
 
 @pytest.fixture(autouse=True)
@@ -51,7 +51,7 @@ class TrackCall:
         TrackCall,
     ],
 )
-def test_context_isolation(run_in_context: bool, wrapper: Optional[Type[TrackCall]]):
+def test_context_isolation(run_in_context: bool, wrapper: Optional[type[TrackCall]]):
     def foo(x: str, zen_cfg):
         config.set(zen_cfg)
         conf = var.get().copy()

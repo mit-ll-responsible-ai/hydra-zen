@@ -13,7 +13,7 @@ import time
 from collections import Counter, defaultdict
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, DefaultDict, Dict, List, Optional, Union
+from typing import Any, DefaultDict, Optional, Union
 
 from typing_extensions import Literal, NotRequired, TypedDict
 
@@ -60,7 +60,7 @@ class PyrightOutput(TypedDict):
 
     version: str
     time: str
-    generalDiagnostics: List[Diagnostic]
+    generalDiagnostics: list[Diagnostic]
     summary: Summary
 
 
@@ -105,7 +105,7 @@ def get_docstring_examples(doc: str) -> str:
 
     # contains input lines of docstring examples with all indentation
     # and REPL markers removed
-    src_lines: List[str] = []
+    src_lines: list[str] = []
 
     for source, indent in docstring_re.findall(doc):
         source: str
@@ -151,16 +151,16 @@ def rst_to_code(src: str) -> str:
        '''
 
     """
-    block: Optional[List[str]] = None  # lines in code block
+    block: Optional[list[str]] = None  # lines in code block
     indentation: Optional[str] = None  # leading whitespace before .. code-block
     preamble: Optional[str] = None  # python or pycon
     n = -float("inf")  # line no in code block
-    blocks: List[str] = []  # respective code blocks, each ready for processing
+    blocks: list[str] = []  # respective code blocks, each ready for processing
 
     def add_block(
-        block: Optional[List[str]],
+        block: Optional[list[str]],
         preamble: Optional[str],
-        blocks: List[str],
+        blocks: list[str],
     ):
         if block:
             block_str = "\n".join(block) + "\n"
@@ -218,14 +218,14 @@ def rst_to_code(src: str) -> str:
 
 def pyright_analyze(
     *code_objs_and_or_paths: Any,
-    pyright_config: Optional[Dict[str, Any]] = None,
+    pyright_config: Optional[dict[str, Any]] = None,
     scan_docstring: bool = False,
     path_to_pyright: Union[Path, None] = PYRIGHT_PATH,
     preamble: str = "",
     python_version: Optional[str] = None,
     report_unnecessary_type_ignore_comment: Optional[bool] = None,
     type_checking_mode: Optional[Literal["basic", "strict"]] = None,
-) -> List[PyrightOutput]:
+) -> list[PyrightOutput]:
     r"""
     Scan one or more Python objects, docstrings, or files with pyright.
 
@@ -416,7 +416,7 @@ def pyright_analyze(
     if type_checking_mode is not None:
         pyright_config["typeCheckingMode"] = type_checking_mode
 
-    sources: List[Optional[str]] = []
+    sources: list[Optional[str]] = []
     for code_or_path in code_objs_and_or_paths:
         if scan_docstring and (
             isinstance(code_or_path, (Path, str))
@@ -455,7 +455,7 @@ def pyright_analyze(
             if preamble and not preamble.endswith("\n"):
                 preamble = preamble + "\n"
             if not scan_docstring:
-                source = preamble + textwrap.dedent((inspect.getsource(code_or_path)))
+                source = preamble + textwrap.dedent(inspect.getsource(code_or_path))
             else:
                 docstring = inspect.getdoc(code_or_path)
                 assert docstring is not None
@@ -500,7 +500,7 @@ def pyright_analyze(
 
     out = scan["generalDiagnostics"]
 
-    diagnostics_by_file: DefaultDict[int, List[Diagnostic]] = defaultdict(list)
+    diagnostics_by_file: DefaultDict[int, list[Diagnostic]] = defaultdict(list)
 
     for item in out:
         file_path = Path(item["file"])
@@ -509,7 +509,7 @@ def pyright_analyze(
         diagnostic["file"] = file_path.name
         diagnostics_by_file[file_index].append(diagnostic)
 
-    results: List[PyrightOutput] = []
+    results: list[PyrightOutput] = []
 
     for n in range(len(code_objs_and_or_paths)):
         severities = Counter(d["severity"] for d in diagnostics_by_file[n])
@@ -531,7 +531,7 @@ def pyright_analyze(
     return results
 
 
-def list_error_messages(results: PyrightOutput) -> List[str]:
+def list_error_messages(results: PyrightOutput) -> list[str]:
     """A convenience function that returns a list of error messages reported by pyright."""
     return [
         f"(line start) {e['range']['start']['line']}: {e['message']}"

@@ -4,7 +4,7 @@ import inspect
 import string
 from enum import Enum
 from itertools import chain
-from typing import Any, Callable, Tuple, Union, get_type_hints
+from typing import Any, Callable, Union, get_type_hints
 
 import hypothesis.strategies as st
 import pytest
@@ -93,7 +93,7 @@ def test_validate_redundant_args(
         st.sampled_from(string.ascii_lowercase), min_size=2, max_size=2, unique=True
     ).map(lambda x: (x[0], ZenField(name=x[1])))
 )
-def test_validate_conflicting_kwarg_name(name_and_field: Tuple[str, ZenField]):
+def test_validate_conflicting_kwarg_name(name_and_field: tuple[str, ZenField]):
     name, misnamed_field = name_and_field
     with pytest.raises(ValueError):
         make_config(**{name: misnamed_field})
@@ -115,7 +115,7 @@ def test_to_yaml_validates_hydra_compat_types():
 @example(str)
 @example(bool)
 @example(builds(int))
-@example(Tuple[int, str, bool])
+@example(tuple[int, str, bool])
 @example(Callable[[int], int])
 @example(Union[Callable, int])
 @given(hint=st.from_type(type))

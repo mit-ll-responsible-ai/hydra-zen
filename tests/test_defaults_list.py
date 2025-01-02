@@ -3,7 +3,7 @@
 
 import random
 from functools import partial
-from typing import Any, Callable, List
+from typing import Any, Callable
 
 import hypothesis.strategies as st
 import pytest
@@ -30,7 +30,7 @@ from hydra_zen.errors import HydraZenValidationError
     ],
 )
 def test_hydra_defaults_work_as_expected(
-    fn: Callable, default: Any, overrides: List[str], version_base
+    fn: Callable, default: Any, overrides: list[str], version_base
 ):
     config_store = ConfigStore.instance()
     config_store.store(group="x", name="a", node=builds(int, 10))

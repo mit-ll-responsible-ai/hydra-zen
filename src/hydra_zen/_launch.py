@@ -2,18 +2,14 @@
 # SPDX-License-Identifier: MIT
 import warnings
 from collections import UserList
+from collections.abc import Mapping
 from dataclasses import fields, is_dataclass
 from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
-    Dict,
     Generic,
-    List,
-    Mapping,
     Optional,
-    Tuple,
-    Type,
     TypeVar,
     Union,
     cast,
@@ -34,7 +30,7 @@ from hydra_zen._hydra_overloads import instantiate
 from hydra_zen.typing._implementations import DataClass_, InstOrType
 
 T = TypeVar("T", bound=Any)
-HydraPrimitives: TypeAlias = Union[None, int, float, bool, str, Dict[str, str]]
+HydraPrimitives: TypeAlias = Union[None, int, float, bool, str, dict[str, str]]
 
 if TYPE_CHECKING:  # pragma: no cover
     # branching needed to deal with pyright type-completeness complaints
@@ -54,16 +50,12 @@ class hydra_list(TUserList, Generic[T1]):
     """Signals that a sequence is provided as a single configured value (i.e. it is not
     to be iterated over during a multirun)"""
 
-    pass
-
 
 T2 = TypeVar("T2", bound=Union[HydraPrimitives, hydra_list[HydraPrimitives]])
 
 
 class multirun(TUserList, Generic[T2]):
     """Signals that a sequence is to be iterated over in a multirun"""
-
-    pass
 
 
 def _safe_name(x: Any) -> str:
@@ -73,7 +65,7 @@ def _safe_name(x: Any) -> str:
 def value_check(
     name: str,
     value: T,
-    type_: Union[type, Tuple[type, ...]],
+    type_: Union[type, tuple[type, ...]],
 ) -> T:
     """
     For internal use only.
@@ -108,7 +100,7 @@ OverrideValues: TypeAlias = Union[
 OverrideDict: TypeAlias = Mapping[str, OverrideValues]
 
 
-def _process_dict_overrides(overrides: OverrideDict) -> List[str]:
+def _process_dict_overrides(overrides: OverrideDict) -> list[str]:
     """Convert dict overrides to a list of Hydra CLI compatible args"""
     launch_overrides = []
     for k, v in overrides.items():
@@ -128,7 +120,7 @@ def _process_dict_overrides(overrides: OverrideDict) -> List[str]:
 
 
 def _store_config(
-    cfg: Union[DataClass_, Type[DataClass_], DictConfig, ListConfig, Mapping[Any, Any]],
+    cfg: Union[DataClass_, type[DataClass_], DictConfig, ListConfig, Mapping[Any, Any]],
     config_name: str = "hydra_launch",
 ) -> str:
     """Stores configuration object in Hydra's ConfigStore.
@@ -164,9 +156,9 @@ def _store_config(
 def launch(
     config: Union[InstOrType[DataClass_], Mapping[str, Any]],
     task_function: Callable[[Any], Any],
-    overrides: Optional[Union[OverrideDict, List[str]]] = ...,
+    overrides: Optional[Union[OverrideDict, list[str]]] = ...,
     multirun: Literal[False] = ...,
-    version_base: Optional[Union[str, Type[_NotSet]]] = ...,
+    version_base: Optional[Union[str, type[_NotSet]]] = ...,
     to_dictconfig: bool = ...,
     config_name: str = ...,
     job_name: str = ...,
@@ -179,9 +171,9 @@ def launch(
 def launch(
     config: Union[InstOrType[DataClass_], Mapping[str, Any]],
     task_function: Callable[[Any], Any],
-    overrides: Optional[Union[OverrideDict, List[str]]] = ...,
+    overrides: Optional[Union[OverrideDict, list[str]]] = ...,
     multirun: Literal[True] = ...,
-    version_base: Optional[Union[str, Type[_NotSet]]] = ...,
+    version_base: Optional[Union[str, type[_NotSet]]] = ...,
     to_dictconfig: bool = ...,
     config_name: str = ...,
     job_name: str = ...,
@@ -193,9 +185,9 @@ def launch(
 def launch(
     config: Union[InstOrType[DataClass_], Mapping[str, Any]],
     task_function: Callable[[Any], Any],
-    overrides: Optional[Union[OverrideDict, List[str]]] = None,
+    overrides: Optional[Union[OverrideDict, list[str]]] = None,
     multirun: bool = False,
-    version_base: Optional[Union[str, Type[_NotSet]]] = _NotSet,
+    version_base: Optional[Union[str, type[_NotSet]]] = _NotSet,
     to_dictconfig: bool = False,
     config_name: str = "zen_launch",
     job_name: str = "zen_launch",

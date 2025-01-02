@@ -1,21 +1,12 @@
 # Copyright (c) 2025 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
+from collections.abc import Mapping
+
 # Stores overloads for `builds` with different default-values for signature
 # pyright: strict
 # pragma: no cover
-from typing import (
-    Any,
-    Callable,
-    Generic,
-    Mapping,
-    Optional,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-    overload,
-)
+from typing import Any, Callable, Generic, Optional, TypeVar, Union, overload
 
 from typing_extensions import Literal, ParamSpec
 
@@ -45,7 +36,7 @@ class StdBuilds(Generic[T]):
     @overload
     def __call__(
         self,
-        __hydra_target: Type[BuildsWithSig[Type[R], P]],
+        __hydra_target: type[BuildsWithSig[type[R], P]],
         *,
         zen_partial: Literal[False, None] = ...,
         populate_full_signature: Literal[True],
@@ -55,11 +46,11 @@ class StdBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[()] = ...,
+        builds_bases: tuple[()] = ...,
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-    ) -> Type[BuildsWithSig[Type[R], P]]: ...
+    ) -> type[BuildsWithSig[type[R], P]]: ...
 
     # partial=False, pop-sig=True; no *args, **kwargs, nor builds_bases
     @overload
@@ -75,17 +66,17 @@ class StdBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[()] = ...,
+        builds_bases: tuple[()] = ...,
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-    ) -> Type[BuildsWithSig[Type[R], P]]: ...
+    ) -> type[BuildsWithSig[type[R], P]]: ...
 
     # partial=False, pop-sig=bool
     @overload
     def __call__(
         self,
-        __hydra_target: Type[AnyBuilds[Importable]],
+        __hydra_target: type[AnyBuilds[Importable]],
         *pos_args: T,
         zen_partial: Literal[False, None] = ...,
         populate_full_signature: bool = ...,
@@ -95,12 +86,12 @@ class StdBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[Builds[Importable]]: ...
+    ) -> type[Builds[Importable]]: ...
 
     @overload
     def __call__(
@@ -115,18 +106,18 @@ class StdBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[Builds[Importable]]: ...
+    ) -> type[Builds[Importable]]: ...
 
     # partial=True, pop-sig=bool
     @overload
     def __call__(
         self,
-        __hydra_target: Type[AnyBuilds[Importable]],
+        __hydra_target: type[AnyBuilds[Importable]],
         *pos_args: T,
         zen_partial: Literal[True] = ...,
         populate_full_signature: bool = ...,
@@ -136,12 +127,12 @@ class StdBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[PartialBuilds[Importable]]: ...
+    ) -> type[PartialBuilds[Importable]]: ...
 
     @overload
     def __call__(
@@ -156,18 +147,18 @@ class StdBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[PartialBuilds[Importable]]: ...
+    ) -> type[PartialBuilds[Importable]]: ...
 
     # partial=bool, pop-sig=False
     @overload
     def __call__(
         self,
-        __hydra_target: Type[AnyBuilds[Importable]],
+        __hydra_target: type[AnyBuilds[Importable]],
         *pos_args: T,
         zen_partial: Optional[bool] = ...,
         populate_full_signature: Literal[False] = ...,
@@ -177,14 +168,14 @@ class StdBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
     ) -> Union[
-        Type[Builds[Importable]],
-        Type[PartialBuilds[Importable]],
+        type[Builds[Importable]],
+        type[PartialBuilds[Importable]],
     ]: ...
 
     @overload
@@ -200,21 +191,21 @@ class StdBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
     ) -> Union[
-        Type[Builds[Importable]],
-        Type[PartialBuilds[Importable]],
+        type[Builds[Importable]],
+        type[PartialBuilds[Importable]],
     ]: ...
 
     # partial=bool, pop-sig=bool
     @overload
     def __call__(
         self,
-        __hydra_target: Union[Callable[P, R], Type[AnyBuilds[Importable]], Importable],
+        __hydra_target: Union[Callable[P, R], type[AnyBuilds[Importable]], Importable],
         *pos_args: T,
         zen_partial: Optional[bool],
         populate_full_signature: bool = ...,
@@ -224,24 +215,24 @@ class StdBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
     ) -> Union[
-        Type[Builds[Importable]],
-        Type[PartialBuilds[Importable]],
-        Type[BuildsWithSig[Type[R], P]],
+        type[Builds[Importable]],
+        type[PartialBuilds[Importable]],
+        type[BuildsWithSig[type[R], P]],
     ]: ...
 
     def __call__(
         self,
         __hydra_target: Union[
             Callable[P, R],
-            Type[Builds[Importable]],
+            type[Builds[Importable]],
             Importable,
-            Type[BuildsWithSig[Type[R], P]],
+            type[BuildsWithSig[type[R], P]],
         ],
         *pos_args: T,
         zen_partial: Optional[bool] = None,
@@ -252,15 +243,15 @@ class StdBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
         hydra_defaults: Optional[DefaultsList] = None,
         frozen: bool = False,
-        builds_bases: Union[Tuple[Type[DataClass_], ...], Tuple[()]] = (),
+        builds_bases: Union[tuple[type[DataClass_], ...], tuple[()]] = (),
         dataclass_name: Optional[str] = None,
         zen_dataclass: Optional[DataclassOptions] = None,
         zen_convert: Optional[ZenConvert] = None,
         **kwargs_for_target: T,
     ) -> Union[
-        Type[Builds[Importable]],
-        Type[PartialBuilds[Importable]],
-        Type[BuildsWithSig[Type[R], P]],
+        type[Builds[Importable]],
+        type[PartialBuilds[Importable]],
+        type[BuildsWithSig[type[R], P]],
     ]:  # pragma: no cover
         ...
 
@@ -273,7 +264,7 @@ class FullBuilds(Generic[T]):
     @overload
     def __call__(
         self,
-        __hydra_target: Type[BuildsWithSig[Type[R], P]],
+        __hydra_target: type[BuildsWithSig[type[R], P]],
         *,
         zen_partial: Literal[False, None] = ...,
         populate_full_signature: Literal[True] = ...,
@@ -283,16 +274,16 @@ class FullBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[()] = ...,
+        builds_bases: tuple[()] = ...,
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-    ) -> Type[BuildsWithSig[Type[R], P]]: ...
+    ) -> type[BuildsWithSig[type[R], P]]: ...
 
     @overload
     def __call__(
         self,
-        __hydra_target: Type[AnyBuilds[Importable]],
+        __hydra_target: type[AnyBuilds[Importable]],
         *,
         zen_partial: Literal[False, None] = ...,
         populate_full_signature: Literal[True] = ...,
@@ -302,11 +293,11 @@ class FullBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[()] = ...,
+        builds_bases: tuple[()] = ...,
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-    ) -> Type[Builds[Importable]]: ...
+    ) -> type[Builds[Importable]]: ...
 
     @overload
     def __call__(
@@ -321,16 +312,16 @@ class FullBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[()] = ...,
+        builds_bases: tuple[()] = ...,
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-    ) -> Type[BuildsWithSig[Type[R], P]]: ...
+    ) -> type[BuildsWithSig[type[R], P]]: ...
 
     @overload
     def __call__(
         self,
-        __hydra_target: Type[Union[AnyBuilds[Importable], PartialBuilds[Importable]]],
+        __hydra_target: type[Union[AnyBuilds[Importable], PartialBuilds[Importable]]],
         *pos_args: T,
         zen_partial: Literal[False, None] = ...,
         populate_full_signature: bool = ...,
@@ -340,12 +331,12 @@ class FullBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[Builds[Importable]]: ...
+    ) -> type[Builds[Importable]]: ...
 
     @overload
     def __call__(
@@ -360,18 +351,18 @@ class FullBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[Builds[Importable]]: ...
+    ) -> type[Builds[Importable]]: ...
 
     # partial=True, pop-sig=bool
     @overload
     def __call__(
         self,
-        __hydra_target: Type[AnyBuilds[Importable]],
+        __hydra_target: type[AnyBuilds[Importable]],
         *pos_args: T,
         zen_partial: Literal[True] = ...,
         populate_full_signature: bool = ...,
@@ -381,12 +372,12 @@ class FullBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[PartialBuilds[Importable]]: ...
+    ) -> type[PartialBuilds[Importable]]: ...
 
     @overload
     def __call__(
@@ -401,18 +392,18 @@ class FullBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[PartialBuilds[Importable]]: ...
+    ) -> type[PartialBuilds[Importable]]: ...
 
     # partial=bool, pop-sig=False
     @overload
     def __call__(
         self,
-        __hydra_target: Type[AnyBuilds[Importable]],
+        __hydra_target: type[AnyBuilds[Importable]],
         *pos_args: T,
         zen_partial: Optional[bool] = ...,
         populate_full_signature: Literal[False],
@@ -422,12 +413,12 @@ class FullBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         frozen: bool = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         dataclass_name: Optional[str] = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]: ...
+    ) -> Union[type[Builds[Importable]], type[PartialBuilds[Importable]]]: ...
 
     @overload
     def __call__(
@@ -442,18 +433,18 @@ class FullBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         frozen: bool = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         dataclass_name: Optional[str] = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]: ...
+    ) -> Union[type[Builds[Importable]], type[PartialBuilds[Importable]]]: ...
 
     # partial=bool, pop-sig=bool
     @overload
     def __call__(
         self,
-        __hydra_target: Union[Callable[P, R], Type[AnyBuilds[Importable]], Importable],
+        __hydra_target: Union[Callable[P, R], type[AnyBuilds[Importable]], Importable],
         *pos_args: T,
         zen_partial: Optional[bool],
         populate_full_signature: bool = ...,
@@ -463,15 +454,15 @@ class FullBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         frozen: bool = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         dataclass_name: Optional[str] = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
     ) -> Union[
-        Type[Builds[Importable]],
-        Type[PartialBuilds[Importable]],
-        Type[BuildsWithSig[Type[R], P]],
+        type[Builds[Importable]],
+        type[PartialBuilds[Importable]],
+        type[BuildsWithSig[type[R], P]],
     ]: ...
 
     def __call__(
@@ -479,9 +470,9 @@ class FullBuilds(Generic[T]):
         __hydra_target: Union[
             Callable[P, R],
             Importable,
-            Type[Builds[Importable]],
-            Type[PartialBuilds[Importable]],
-            Type[BuildsWithSig[Type[R], P]],
+            type[Builds[Importable]],
+            type[PartialBuilds[Importable]],
+            type[BuildsWithSig[type[R], P]],
         ],
         *pos_args: T,
         zen_partial: Optional[bool] = None,
@@ -492,15 +483,15 @@ class FullBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
         hydra_defaults: Optional[DefaultsList] = None,
         frozen: bool = False,
-        builds_bases: Union[Tuple[Type[DataClass_], ...], Tuple[()]] = (),
+        builds_bases: Union[tuple[type[DataClass_], ...], tuple[()]] = (),
         dataclass_name: Optional[str] = None,
         zen_dataclass: Optional[DataclassOptions] = None,
         zen_convert: Optional[ZenConvert] = None,
         **kwargs_for_target: T,
     ) -> Union[
-        Type[Builds[Importable]],
-        Type[PartialBuilds[Importable]],
-        Type[BuildsWithSig[Type[R], P]],
+        type[Builds[Importable]],
+        type[PartialBuilds[Importable]],
+        type[BuildsWithSig[type[R], P]],
     ]:  # pragma: no cover
         ...
 
@@ -512,7 +503,7 @@ class PBuilds(Generic[T]):
     @overload
     def __call__(
         self,
-        __hydra_target: Type[AnyBuilds[Importable]],
+        __hydra_target: type[AnyBuilds[Importable]],
         *pos_args: T,
         zen_partial: Literal[True] = ...,
         populate_full_signature: bool = ...,
@@ -522,12 +513,12 @@ class PBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[PartialBuilds[Importable]]: ...
+    ) -> type[PartialBuilds[Importable]]: ...
 
     @overload
     def __call__(
@@ -542,18 +533,18 @@ class PBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[PartialBuilds[Importable]]: ...
+    ) -> type[PartialBuilds[Importable]]: ...
 
     # partial=False, pop-sig=True; no *args, **kwargs, nor builds_bases
     @overload
     def __call__(
         self,
-        __hydra_target: Type[BuildsWithSig[Type[R], P]],
+        __hydra_target: type[BuildsWithSig[type[R], P]],
         *,
         zen_partial: Literal[False, None],
         populate_full_signature: Literal[True],
@@ -563,11 +554,11 @@ class PBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[()] = ...,
+        builds_bases: tuple[()] = ...,
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-    ) -> Type[BuildsWithSig[Type[R], P]]: ...
+    ) -> type[BuildsWithSig[type[R], P]]: ...
 
     @overload
     def __call__(
@@ -582,17 +573,17 @@ class PBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[()] = ...,
+        builds_bases: tuple[()] = ...,
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
-    ) -> Type[BuildsWithSig[Type[R], P]]: ...
+    ) -> type[BuildsWithSig[type[R], P]]: ...
 
     # partial=bool, pop-sig=False
     @overload
     def __call__(
         self,
-        __hydra_target: Type[AnyBuilds[Importable]],
+        __hydra_target: type[AnyBuilds[Importable]],
         *pos_args: T,
         zen_partial: Optional[bool] = ...,
         populate_full_signature: Literal[False] = ...,
@@ -602,14 +593,14 @@ class PBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
     ) -> Union[
-        Type[Builds[Importable]],
-        Type[PartialBuilds[Importable]],
+        type[Builds[Importable]],
+        type[PartialBuilds[Importable]],
     ]: ...
 
     @overload
@@ -625,14 +616,14 @@ class PBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
     ) -> Union[
-        Type[Builds[Importable]],
-        Type[PartialBuilds[Importable]],
+        type[Builds[Importable]],
+        type[PartialBuilds[Importable]],
     ]: ...
 
     # partial=bool, pop-sig=bool
@@ -649,24 +640,24 @@ class PBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         frozen: bool = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
     ) -> Union[
-        Type[Builds[Importable]],
-        Type[PartialBuilds[Importable]],
-        Type[BuildsWithSig[Type[R], P]],
+        type[Builds[Importable]],
+        type[PartialBuilds[Importable]],
+        type[BuildsWithSig[type[R], P]],
     ]: ...
 
     def __call__(
         self,
         __hydra_target: Union[
             Callable[P, R],
-            Type[AnyBuilds[Importable]],
+            type[AnyBuilds[Importable]],
             Importable,
-            Type[BuildsWithSig[Type[R], P]],
+            type[BuildsWithSig[type[R], P]],
         ],
         *pos_args: T,
         zen_partial: Optional[bool] = True,
@@ -677,14 +668,14 @@ class PBuilds(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all"]] = None,
         hydra_defaults: Optional[DefaultsList] = None,
         frozen: bool = False,
-        builds_bases: Union[Tuple[Type[DataClass_], ...], Tuple[()]] = (),
+        builds_bases: Union[tuple[type[DataClass_], ...], tuple[()]] = (),
         dataclass_name: Optional[str] = None,
         zen_dataclass: Optional[DataclassOptions] = None,
         zen_convert: Optional[ZenConvert] = None,
         **kwargs_for_target: T,
     ) -> Union[
-        Type[Builds[Importable]],
-        Type[PartialBuilds[Importable]],
-        Type[BuildsWithSig[Type[R], P]],
+        type[Builds[Importable]],
+        type[PartialBuilds[Importable]],
+        type[BuildsWithSig[type[R], P]],
     ]:  # pragma: no cover
         ...

@@ -16,7 +16,7 @@ def make_table(*cols: str) -> str:
         lines.append(
             "| "
             + "| ".join(
-                (li if li else "") + " " * (longest[n] - len((li if li else "")) + 1)
+                (li if li else "") + " " * (longest[n] - len(li if li else "") + 1)
                 for n, li in enumerate(ll)
             )
             + "|"

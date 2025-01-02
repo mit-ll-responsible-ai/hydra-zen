@@ -1,23 +1,13 @@
 # Copyright (c) 2025 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import inspect
-import sys
 from abc import ABC
 from collections import Counter
+from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import Enum
 from inspect import Parameter
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    List,
-    Mapping,
-    Optional,
-    Tuple,
-    Type,
-    get_type_hints,
-)
+from typing import Any, Callable, Optional, get_type_hints
 
 import hypothesis.strategies as st
 import pytest
@@ -190,14 +180,14 @@ def a_func(
     x: int,
     y: str,
     z: bool,
-    a_tuple: Tuple[str] = ("hi",),
+    a_tuple: tuple[str] = ("hi",),
     optional: Optional[int] = None,
     inferred_optional_str: str = None,
     inferred_optional_any: Mapping = None,
     default: float = 100.0,
     a_function: Callable = func,
-    a_class: Type[Dict] = dict,
-    a_dataclass: Type[ADataClass] = ADataClass,
+    a_class: type[dict] = dict,
+    a_dataclass: type[ADataClass] = ADataClass,
 ):
     pass
 
@@ -208,14 +198,14 @@ class AClass:
         x: int,
         y: str,
         z: bool,
-        a_tuple: Tuple[str] = ("hi",),
+        a_tuple: tuple[str] = ("hi",),
         optional: Optional[int] = None,
         inferred_optional_str: str = None,
         inferred_optional_any: Mapping = None,
         default: float = 100.0,
         a_function: Callable = func,
-        a_class: Type[Dict] = dict,
-        a_dataclass: Type[ADataClass] = ADataClass,
+        a_class: type[dict] = dict,
+        a_dataclass: type[ADataClass] = ADataClass,
     ):
         pass
 
@@ -225,14 +215,14 @@ class AClass:
         x: int,
         y: str,
         z: bool,
-        a_tuple: Tuple[str] = ("hi",),
+        a_tuple: tuple[str] = ("hi",),
         optional: Optional[int] = None,
         inferred_optional_str: str = None,
         inferred_optional_any: Mapping = None,
         default: float = 100.0,
         a_function: Callable = func,
-        a_class: Type[Dict] = dict,
-        a_dataclass: Type[ADataClass] = ADataClass,
+        a_class: type[dict] = dict,
+        a_dataclass: type[ADataClass] = ADataClass,
     ):
         pass
 
@@ -243,14 +233,14 @@ class AMetaClass(ABC):
         x: int,
         y: str,
         z: bool,
-        a_tuple: Tuple[str] = ("hi",),
+        a_tuple: tuple[str] = ("hi",),
         optional: Optional[int] = None,
         inferred_optional_str: str = None,
         inferred_optional_any: Mapping = None,
         default: float = 100.0,
         a_function: Callable = func,
-        a_class: Type[Dict] = dict,
-        a_dataclass: Type[ADataClass] = ADataClass,
+        a_class: type[dict] = dict,
+        a_dataclass: type[ADataClass] = ADataClass,
     ):
         pass
 
@@ -277,7 +267,7 @@ def test_builds_partial_with_full_sig_excludes_non_specified_params(
         (var_name, name_to_type[var_name], user_specified_values[var_name])
         for var_name in sorted(user_specified_values)
     ] + [
-        ("a_tuple", Tuple[str], ("hi",)),
+        ("a_tuple", tuple[str], ("hi",)),
         ("optional", Optional[int], None),
         ("inferred_optional_str", Optional[str], None),
         ("inferred_optional_any", Any, None),
@@ -390,7 +380,7 @@ def test_builds_widens_non_dataclass_type_with_target():
     assert hints["x"] is Any
 
 
-def func_with_list_annotation(x: List[int]):
+def func_with_list_annotation(x: list[int]):
     return x
 
 
@@ -432,7 +422,7 @@ def test_type_widening_for_interpolated_field():
     assert get_type_hints(C2)["x"] is Any
 
 
-def use_data(data: List[float]):
+def use_data(data: list[float]):
     return data
 
 
@@ -557,10 +547,9 @@ def test_Counter():
     assert instantiate(builds(Counter, [1, 1, 2, 1])) == Counter([1, 1, 2, 1])
     assert instantiate(builds(Counter, a=1, b=2)) == Counter(a=1, b=2)
 
-    if sys.version_info > (3, 8):
-        with pytest.raises(TypeError):
-            # signature: Counter(iterable=None, /, **kwds)
-            builds(Counter, [1], [2])
+    with pytest.raises(TypeError):
+        # signature: Counter(iterable=None, /, **kwds)
+        builds(Counter, [1], [2])
 
 
 def f_x(x: int):

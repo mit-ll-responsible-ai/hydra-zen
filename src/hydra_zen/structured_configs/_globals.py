@@ -1,9 +1,7 @@
 # Copyright (c) 2025 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 # pyright: strict
-from typing import FrozenSet
-
-from typing_extensions import Final
+from typing import Final
 
 from hydra_zen.funcs import zen_processing
 
@@ -24,7 +22,7 @@ _names = [
 ]
 
 
-HYDRA_FIELD_NAMES: FrozenSet[str] = frozenset(_names)
+HYDRA_FIELD_NAMES: frozenset[str] = frozenset(_names)
 
 del _names
 
