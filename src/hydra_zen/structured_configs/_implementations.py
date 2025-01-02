@@ -525,7 +525,8 @@ def hydrated_dataclass(
             },
             zen_convert=zen_convert,
         )
-
+        if decorated_obj.__doc__ is not None:  # pragma: no cover
+            out.__doc__ = decorated_obj.__doc__
         return out
 
     return wrapper
