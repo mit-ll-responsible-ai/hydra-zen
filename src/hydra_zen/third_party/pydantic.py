@@ -108,10 +108,14 @@ def pydantic_parser(target: _T, *, parser: Callable[[_T], _T] = _default_parser)
     (1, 2, 3)
     """
     if inspect.isbuiltin(target):
-        return target
+        return cast(_T, target)
+
+    if isinstance(target, type) and issubclass(target, _pyd.BaseModel):
+        # this already applies pydantic parsing
+        return cast(_T, target)
 
     if not (_get_signature(target)):
-        return target
+        return cast(_T, target)
 
     if inspect.isclass(target):
         return cast(_T, parser(_constructor_as_fn(target)))
