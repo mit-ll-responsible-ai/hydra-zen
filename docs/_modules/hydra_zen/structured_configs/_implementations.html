@@ -392,7 +392,7 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">deque</span>
-<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Collection</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># use this for runtime checks</span>
     <span class="n">MISSING</span><span class="p">,</span>
     <span class="n">Field</span> <span class="k">as</span> <span class="n">_Field</span><span class="p">,</span>
@@ -409,16 +409,14 @@
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span><span class="p">,</span> <span class="n">PosixPath</span><span class="p">,</span> <span class="n">WindowsPath</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Annotated</span><span class="p">,</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
     <span class="n">Dict</span><span class="p">,</span>
-    <span class="n">FrozenSet</span><span class="p">,</span>
+    <span class="n">Final</span><span class="p">,</span>
     <span class="n">Generic</span><span class="p">,</span>
     <span class="n">List</span><span class="p">,</span>
-    <span class="n">Mapping</span><span class="p">,</span>
     <span class="n">Optional</span><span class="p">,</span>
-    <span class="n">Sequence</span><span class="p">,</span>
-    <span class="n">Set</span><span class="p">,</span>
     <span class="n">Tuple</span><span class="p">,</span>
     <span class="n">Type</span><span class="p">,</span>
     <span class="n">TypeVar</span><span class="p">,</span>
@@ -432,9 +430,7 @@
 
 <span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">,</span> <span class="n">_utils</span> <span class="k">as</span> <span class="n">_omegaconf_utils</span>
 <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">Annotated</span><span class="p">,</span>
     <span class="n">Concatenate</span><span class="p">,</span>
-    <span class="n">Final</span><span class="p">,</span>
     <span class="n">Literal</span><span class="p">,</span>
     <span class="n">ParamSpec</span><span class="p">,</span>
     <span class="n">ParamSpecArgs</span><span class="p">,</span>
@@ -450,9 +446,7 @@
 <span class="kn">from</span> <span class="nn">hydra_zen._compatibility</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">HYDRA_SUPPORTED_PRIMITIVE_TYPES</span><span class="p">,</span>
     <span class="n">HYDRA_SUPPORTED_PRIMITIVES</span><span class="p">,</span>
-    <span class="n">OMEGACONF_VERSION</span><span class="p">,</span>
     <span class="n">ZEN_SUPPORTED_PRIMITIVES</span><span class="p">,</span>
-    <span class="n">Version</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">hydra_zen.errors</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">HydraZenDeprecationWarning</span><span class="p">,</span>
@@ -524,10 +518,10 @@
 <span class="n">TD</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TD&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">DataClass_</span><span class="p">)</span>
 <span class="n">TC</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TC&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
 <span class="n">TP</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TP&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">_HydraPrimitive</span><span class="p">)</span>
-<span class="n">TB</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TB&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Union</span><span class="p">[</span><span class="n">_SupportedViaBuilds</span><span class="p">,</span> <span class="n">FrozenSet</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span>
+<span class="n">TB</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TB&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Union</span><span class="p">[</span><span class="n">_SupportedViaBuilds</span><span class="p">,</span> <span class="nb">frozenset</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span>
 
 <span class="n">Importable</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Importable&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
-<span class="n">Field_Entry</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">Field</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
+<span class="n">Field_Entry</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">Field</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
 
 <span class="n">_JUST_CONVERT_SETTINGS</span> <span class="o">=</span> <span class="n">AllConvert</span><span class="p">(</span><span class="n">dataclass</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">flat_target</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
@@ -541,7 +535,7 @@
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="s2">&quot;Type[BuildsFn[Any]]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span> <span class="o">...</span>
 
 
-<span class="n">ZEN_VALUE_CONVERSION</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="n">_ConversionFn</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">ZEN_VALUE_CONVERSION</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="n">_ConversionFn</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
 <span class="c1"># signature param-types</span>
 <span class="n">_POSITIONAL_ONLY</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">POSITIONAL_ONLY</span>
@@ -648,7 +642,7 @@
     <span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">slots</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">weakref_slot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">]],</span> <span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">]]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">type</span><span class="p">[</span><span class="n">_T</span><span class="p">]],</span> <span class="nb">type</span><span class="p">[</span><span class="n">_T</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A decorator that uses `builds` to create a dataclass with the appropriate</span>
 <span class="sd">    Hydra-specific fields for specifying a targeted config [1]_.</span>
 
@@ -890,7 +884,7 @@
                 <span class="ow">and</span> <span class="ow">not</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_zen_&quot;</span><span class="p">)</span>
             <span class="p">}</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="n">out</span> <span class="o">=</span> <span class="n">DefaultBuilds</span><span class="o">.</span><span class="n">builds</span><span class="p">(</span>
             <span class="n">target</span><span class="p">,</span>
@@ -1054,7 +1048,7 @@
 
     <span class="n">hint</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">Any</span>
     <span class="n">default</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Field</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">NOTHING</span><span class="p">)</span>
-    <span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">NOTHING</span><span class="p">]]</span> <span class="o">=</span> <span class="n">NOTHING</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">[</span><span class="n">NOTHING</span><span class="p">]]</span> <span class="o">=</span> <span class="n">NOTHING</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">_builds_fn</span><span class="p">:</span> <span class="s2">&quot;Union[BuildsFn[Any], Type[BuildsFn[Any]]]&quot;</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">DefaultBuilds</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
 
@@ -1231,12 +1225,6 @@
                 <span class="n">nested</span><span class="o">=</span><span class="n">nested</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">OMEGACONF_VERSION</span> <span class="o">&lt;</span> <span class="n">Version</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">type_</span> <span class="o">=</span> <span class="p">{</span><span class="nb">list</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">,</span> <span class="nb">dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">type_</span><span class="p">,</span> <span class="n">type_</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-                <span class="k">pass</span>
-
         <span class="c1"># Warning: mutating `type_` will mutate the signature being inspected</span>
         <span class="c1"># Even calling deepcopy(`type_`) silently fails to prevent this.</span>
         <span class="n">origin</span> <span class="o">=</span> <span class="n">get_origin</span><span class="p">(</span><span class="n">type_</span><span class="p">)</span>
@@ -1273,7 +1261,7 @@
                     <span class="c1"># isn&#39;t Optional[&lt;type&gt;]</span>
                     <span class="k">return</span> <span class="n">Any</span>
 
-                <span class="n">args</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span> <span class="n">args</span><span class="p">)</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span> <span class="n">args</span><span class="p">)</span>
 
                 <span class="n">optional_type</span><span class="p">,</span> <span class="n">none_type</span> <span class="o">=</span> <span class="n">args</span>
                 <span class="k">if</span> <span class="n">none_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NoneType</span><span class="p">:</span>
@@ -1288,10 +1276,10 @@
 
             <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="nb">list</span> <span class="ow">or</span> <span class="n">origin</span> <span class="ow">is</span> <span class="n">List</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">List</span><span class="p">[</span>
+                    <span class="k">return</span> <span class="nb">list</span><span class="p">[</span>
                         <span class="bp">cls</span><span class="o">.</span><span class="n">_sanitized_type</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">primitive_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">nested</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                     <span class="p">]</span>
-                <span class="k">return</span> <span class="n">List</span>
+                <span class="k">return</span> <span class="nb">list</span>
 
             <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="nb">dict</span> <span class="ow">or</span> <span class="n">origin</span> <span class="ow">is</span> <span class="n">Dict</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
@@ -1301,8 +1289,8 @@
                     <span class="n">ValueType</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_sanitized_type</span><span class="p">(</span>
                         <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">primitive_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">nested</span><span class="o">=</span><span class="kc">True</span>
                     <span class="p">)</span>
-                    <span class="k">return</span> <span class="n">Dict</span><span class="p">[</span><span class="n">KeyType</span><span class="p">,</span> <span class="n">ValueType</span><span class="p">]</span>
-                <span class="k">return</span> <span class="n">Dict</span>
+                    <span class="k">return</span> <span class="nb">dict</span><span class="p">[</span><span class="n">KeyType</span><span class="p">,</span> <span class="n">ValueType</span><span class="p">]</span>
+                <span class="k">return</span> <span class="nb">dict</span>
 
             <span class="k">if</span> <span class="p">(</span><span class="n">origin</span> <span class="ow">is</span> <span class="nb">tuple</span> <span class="ow">or</span> <span class="n">origin</span> <span class="ow">is</span> <span class="n">Tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">nested</span><span class="p">:</span>
                 <span class="c1"># hydra silently supports tuples of homogeneous types</span>
@@ -1312,14 +1300,14 @@
                 <span class="c1">#</span>
                 <span class="c1"># Otherwise we preserve the annotation as accurately as possible</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">Any</span> <span class="k">if</span> <span class="n">OMEGACONF_VERSION</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="k">else</span> <span class="n">Tuple</span>
+                    <span class="k">return</span> <span class="nb">tuple</span>
 
-                <span class="n">args</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">args</span><span class="p">)</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">args</span><span class="p">)</span>
                 <span class="n">unique_args</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">get_origin</span><span class="p">(</span><span class="n">tp</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Unpack</span> <span class="k">for</span> <span class="n">tp</span> <span class="ow">in</span> <span class="n">unique_args</span><span class="p">):</span>
                     <span class="c1"># E.g. Tuple[*Ts]</span>
-                    <span class="k">return</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+                    <span class="k">return</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
 
                 <span class="n">has_ellipses</span> <span class="o">=</span> <span class="bp">Ellipsis</span> <span class="ow">in</span> <span class="n">unique_args</span>
 
@@ -1331,9 +1319,9 @@
                 <span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">has_ellipses</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">_unique_type</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+                    <span class="k">return</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_unique_type</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">Tuple</span><span class="p">[(</span><span class="n">_unique_type</span><span class="p">,)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)]</span>
+                    <span class="k">return</span> <span class="nb">tuple</span><span class="p">[(</span><span class="n">_unique_type</span><span class="p">,)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)]</span>
 
             <span class="k">return</span> <span class="n">Any</span>
 
@@ -1358,8 +1346,6 @@
             <span class="ow">or</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">type_</span><span class="p">)</span>
             <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">type_</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">type_</span><span class="p">,</span> <span class="n">Enum</span><span class="p">))</span>
         <span class="p">):</span>
-            <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span> <span class="ow">and</span> <span class="n">type_</span> <span class="ow">is</span> <span class="n">Dict</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-                <span class="n">type_</span> <span class="o">=</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="n">wrap_optional</span> <span class="ow">and</span> <span class="n">type_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
                 <span class="c1"># normally get_type_hints automatically resolves Optional[...]</span>
@@ -1816,8 +1802,8 @@
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
-        <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]],</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
+        <span class="n">__hydra_target</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]],</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">populate_full_signature</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">],</span>
@@ -1827,16 +1813,16 @@
         <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">hydra_defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DefaultsList</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-        <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[()]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">builds_bases</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[()]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]]:</span> <span class="o">...</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]]:</span> <span class="o">...</span>
 
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -1847,18 +1833,18 @@
         <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">hydra_defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DefaultsList</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-        <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[()]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">builds_bases</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[()]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]]:</span> <span class="o">...</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]]:</span> <span class="o">...</span>
 
     <span class="c1"># partial=False, pop-sig=bool</span>
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
-        <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">AnyBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
+        <span class="n">__hydra_target</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">AnyBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
         <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -1868,18 +1854,18 @@
         <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">hydra_defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DefaultsList</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-        <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">builds_bases</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span> <span class="o">...</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span> <span class="o">...</span>
 
     <span class="c1"># partial=False, pop-sig=bool</span>
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
         <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -1890,19 +1876,19 @@
         <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">hydra_defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DefaultsList</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-        <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">builds_bases</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span> <span class="o">...</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span> <span class="o">...</span>
 
     <span class="c1"># partial=True, pop-sig=bool</span>
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
-        <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">AnyBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
+        <span class="n">__hydra_target</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">AnyBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
         <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -1912,18 +1898,18 @@
         <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">hydra_defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DefaultsList</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-        <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">builds_bases</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span> <span class="o">...</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span> <span class="o">...</span>
 
     <span class="c1"># partial=True, pop-sig=bool</span>
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
         <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -1934,19 +1920,19 @@
         <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">hydra_defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DefaultsList</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-        <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">builds_bases</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span> <span class="o">...</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]:</span> <span class="o">...</span>
 
     <span class="c1"># partial=bool, pop-sig=False</span>
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
-        <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">AnyBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
+        <span class="n">__hydra_target</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">AnyBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
         <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">populate_full_signature</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -1956,18 +1942,18 @@
         <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">hydra_defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DefaultsList</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-        <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">builds_bases</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]]:</span> <span class="o">...</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="nb">type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]]:</span> <span class="o">...</span>
 
     <span class="c1"># partial=bool, pop-sig=False</span>
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
         <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -1978,19 +1964,19 @@
         <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">hydra_defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DefaultsList</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-        <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">builds_bases</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]]:</span> <span class="o">...</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="nb">type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]]]:</span> <span class="o">...</span>
 
     <span class="c1"># partial=bool, pop-sig=bool</span>
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
-        <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">Importable</span><span class="p">],</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
+        <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="nb">type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">Importable</span><span class="p">],</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
         <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">],</span>
         <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -2000,25 +1986,25 @@
         <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">hydra_defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DefaultsList</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">dataclass_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-        <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+        <span class="n">builds_bases</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
-        <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
-        <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]],</span>
+        <span class="nb">type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
+        <span class="nb">type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
+        <span class="nb">type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]],</span>
     <span class="p">]:</span> <span class="o">...</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
             <span class="n">Importable</span><span class="p">,</span>
             <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span>
-            <span class="n">Type</span><span class="p">[</span><span class="n">AnyBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
-            <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]],</span>
+            <span class="nb">type</span><span class="p">[</span><span class="n">AnyBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
+            <span class="nb">type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]],</span>
             <span class="n">Any</span><span class="p">,</span>
         <span class="p">],</span>
         <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2029,13 +2015,13 @@
         <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">hydra_defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DefaultsList</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[()]]</span> <span class="o">=</span> <span class="p">(),</span>
+        <span class="n">builds_bases</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">[()]]</span> <span class="o">=</span> <span class="p">(),</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs_for_target</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
-        <span class="n">Type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
-        <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]],</span>
+        <span class="nb">type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
+        <span class="nb">type</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
+        <span class="nb">type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]],</span>
     <span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, zen_exclude=(), hydra_recursive=None, hydra_convert=None, hydra_defaults=None, builds_bases=(),</span>
 <span class="sd">        zen_dataclass=None, **kwargs_for_target)</span>
@@ -2740,7 +2726,7 @@
                 <span class="p">)</span>
 
         <span class="c1"># list[tuple[str, type] | tuple[str, type, Any]]</span>
-        <span class="n">target_field</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span>
+        <span class="n">target_field</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span>
 
         <span class="c1"># zen_partial behavior:</span>
         <span class="c1">#</span>
@@ -2850,7 +2836,7 @@
                 <span class="n">target_field</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="p">(</span>
                         <span class="n">META_FIELD_NAME</span><span class="p">,</span>
-                        <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+                        <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
                         <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">zen_meta</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
                     <span class="p">),</span>
                 <span class="p">)</span>
@@ -2870,7 +2856,7 @@
                             <span class="n">ZEN_WRAPPERS_FIELD_NAME</span><span class="p">,</span>
                             <span class="n">Union</span><span class="p">[</span>
                                 <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
-                                <span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">Any</span><span class="p">],</span>
+                                <span class="nb">tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">Any</span><span class="p">],</span>
                             <span class="p">],</span>
                             <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">validated_wrappers</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
                         <span class="p">),</span>
@@ -2881,7 +2867,7 @@
                             <span class="n">ZEN_WRAPPERS_FIELD_NAME</span><span class="p">,</span>
                             <span class="n">Union</span><span class="p">[</span>
                                 <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
-                                <span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">Any</span><span class="p">],</span>
+                                <span class="nb">tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">Any</span><span class="p">],</span>
                             <span class="p">],</span>
                             <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">validated_wrappers</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
                         <span class="p">),</span>
@@ -2930,7 +2916,7 @@
             <span class="n">base_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="p">(</span>
                     <span class="n">DEFAULTS_LIST_FIELD_NAME</span><span class="p">,</span>
-                    <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+                    <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
                     <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span>
                         <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">hydra_defaults</span><span class="p">),</span>
                         <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -2942,7 +2928,7 @@
             <span class="n">base_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="p">(</span>
                     <span class="n">POS_ARG_FIELD_NAME</span><span class="p">,</span>
-                    <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+                    <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
                     <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span>
                         <span class="n">default</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span>
                             <span class="bp">cls</span><span class="o">.</span><span class="n">_make_hydra_compatible</span><span class="p">(</span>
@@ -2971,7 +2957,7 @@
                     <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2"> does not have an inspectable signature. &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;`builds(</span><span class="si">{</span><span class="n">_utils</span><span class="o">.</span><span class="n">safe_name</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2">, populate_full_signature=True)` is not supported&quot;</span>
                 <span class="p">)</span>
-            <span class="n">signature_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">signature_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="c1"># We will turn off signature validation for objects that didn&#39;t have</span>
             <span class="c1"># a valid signature. This will enable us to do things like `build(dict, a=1)`</span>
             <span class="n">target_has_valid_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
@@ -3065,9 +3051,9 @@
             <span class="ne">NameError</span><span class="p">,</span>  <span class="c1"># Unresolvable forward reference</span>
             <span class="ne">AttributeError</span><span class="p">,</span>  <span class="c1"># Class doesn&#39;t have &quot;__new__&quot; or &quot;__init__&quot;</span>
         <span class="p">):</span>
-            <span class="n">type_hints</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">type_hints</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="n">sig_by_kind</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">sig_by_kind</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">_POSITIONAL_ONLY</span><span class="p">:</span> <span class="p">[],</span>
             <span class="n">_POSITIONAL_OR_KEYWORD</span><span class="p">:</span> <span class="p">[],</span>
             <span class="n">_VAR_POSITIONAL</span><span class="p">:</span> <span class="p">[],</span>
@@ -3080,7 +3066,7 @@
 
         <span class="c1"># these are the names of the only parameters in the signature of `target` that can</span>
         <span class="c1"># be referenced by name</span>
-        <span class="n">nameable_params_in_sig</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">nameable_params_in_sig</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">p</span><span class="o">.</span><span class="n">name</span>
             <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">chain</span><span class="p">(</span>
                 <span class="n">sig_by_kind</span><span class="p">[</span><span class="n">_POSITIONAL_OR_KEYWORD</span><span class="p">],</span> <span class="n">sig_by_kind</span><span class="p">[</span><span class="n">_KEYWORD_ONLY</span><span class="p">]</span>
@@ -3102,7 +3088,7 @@
                 <span class="k">if</span> <span class="n">_pos_args</span><span class="p">:</span>
                     <span class="k">break</span>
 
-        <span class="n">fields_set_by_bases</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">fields_set_by_bases</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">_field</span><span class="o">.</span><span class="n">name</span>
             <span class="k">for</span> <span class="n">_base</span> <span class="ow">in</span> <span class="n">builds_bases</span>
             <span class="k">for</span> <span class="n">_field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">(</span><span class="n">_base</span><span class="p">)</span>
@@ -3197,7 +3183,7 @@
         <span class="c1">#    and is resolved to one of the type annotations supported by hydra if possible,</span>
         <span class="c1">#    otherwise, is Any</span>
         <span class="c1">#  - arg-value: mutable values are automatically specified using default-factory</span>
-        <span class="n">user_specified_named_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">user_specified_named_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">name</span><span class="p">:</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">type_hints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">Any</span><span class="p">),</span> <span class="n">value</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs_for_target</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">zen_exclude</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
@@ -3218,10 +3204,10 @@
             <span class="c1">#</span>
             <span class="c1"># Parameter ordering should only differ from the target&#39;s signature</span>
             <span class="c1"># if the user specified a value for a parameter that had no default</span>
-            <span class="n">_fields_with_default_values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Field_Entry</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">_fields_with_default_values</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Field_Entry</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
             <span class="c1"># we need to keep track of what user-specified params we have set</span>
-            <span class="n">_seen</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="n">_seen</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
             <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">signature_params</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
                 <span class="k">if</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">zen_index_exclude</span> <span class="ow">or</span> <span class="n">zen_exclude</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
@@ -3319,8 +3305,8 @@
                 <span class="k">del</span> <span class="n">field_</span>
 
         <span class="c1"># sanitize all types and configured values</span>
-        <span class="n">sanitized_base_fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span>
-            <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Field</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
+        <span class="n">sanitized_base_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span>
+            <span class="n">Union</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Field</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
         <span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">base_fields</span><span class="p">:</span>
@@ -3388,7 +3374,7 @@
         <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
-            <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]]],</span> <span class="n">out</span>
+            <span class="n">Union</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]]],</span> <span class="n">out</span>
         <span class="p">)</span>
 
     <span class="nd">@overload</span>
@@ -3437,7 +3423,7 @@
         <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">TB</span><span class="p">]]:</span> <span class="o">...</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Builds</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">TB</span><span class="p">]]:</span> <span class="o">...</span>
 
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
@@ -3449,7 +3435,7 @@
         <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">TD</span><span class="p">]]]:</span> <span class="o">...</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">TD</span><span class="p">]]]:</span> <span class="o">...</span>
 
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
@@ -3521,10 +3507,10 @@
         <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">hydra_defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DefaultsList</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">bases</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
+        <span class="n">bases</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
         <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">fields_as_kwargs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">],</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataClass</span><span class="p">]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">DataClass</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a config with user-defined field names and, optionally,</span>
 <span class="sd">        associated default values and/or type annotations.</span>
@@ -3631,7 +3617,7 @@
             <span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_tmp</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fields_as_kwargs</span><span class="p">},</span>
         <span class="p">)</span>
 
-        <span class="n">normalized_fields</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">normalized_fields</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="k">for</span> <span class="n">_field</span> <span class="ow">in</span> <span class="n">fields_as_args</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_field</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -3657,7 +3643,7 @@
                 <span class="n">normalized_fields</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
         <span class="c1"># fields without defaults must come first</span>
-        <span class="n">config_fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">config_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="n">f</span><span class="o">.</span><span class="n">hint</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">normalized_fields</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="n">NOTHING</span>
@@ -3710,7 +3696,7 @@
             <span class="n">config_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="p">(</span>
                     <span class="n">DEFAULTS_LIST_FIELD_NAME</span><span class="p">,</span>
-                    <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+                    <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
                     <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span>
                         <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">hydra_defaults</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span>
                     <span class="p">),</span>
@@ -3742,75 +3728,75 @@
                 <span class="sa">f</span><span class="s2">&quot;conflicting configs.&quot;</span>
             <span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">Type</span><span class="p">[</span><span class="n">DataClass</span><span class="p">],</span> <span class="n">out</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="nb">type</span><span class="p">[</span><span class="n">DataClass</span><span class="p">],</span> <span class="n">out</span><span class="p">)</span>
 
     <span class="c1"># cover zen_exclude=() -&gt; (1, 2, 3)</span>
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-        <span class="n">zen_exclude</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[()],</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">P</span><span class="p">]]:</span> <span class="o">...</span>
+        <span class="n">zen_exclude</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[()],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">P</span><span class="p">]]:</span> <span class="o">...</span>
 
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">Concatenate</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">P</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-        <span class="n">zen_exclude</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">P</span><span class="p">]]:</span> <span class="o">...</span>
+        <span class="n">zen_exclude</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">P</span><span class="p">]]:</span> <span class="o">...</span>
 
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">Concatenate</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">P</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-        <span class="n">zen_exclude</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Literal</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">P</span><span class="p">]]:</span> <span class="o">...</span>
+        <span class="n">zen_exclude</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Literal</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">P</span><span class="p">]]:</span> <span class="o">...</span>
 
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">Concatenate</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">P</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-        <span class="n">zen_exclude</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Literal</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">Literal</span><span class="p">[</span><span class="mi">2</span><span class="p">]],</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">P</span><span class="p">]]:</span> <span class="o">...</span>
+        <span class="n">zen_exclude</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Literal</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">Literal</span><span class="p">[</span><span class="mi">2</span><span class="p">]],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">P</span><span class="p">]]:</span> <span class="o">...</span>
 
     <span class="c1"># no zen-exclude</span>
 
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">zen_exclude</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">P</span><span class="p">]]:</span> <span class="o">...</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">P</span><span class="p">]]:</span> <span class="o">...</span>
 
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="n">zen_exclude</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;Collection[Union[str, int]]&quot;</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]],</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]]:</span> <span class="o">...</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]]:</span> <span class="o">...</span>
 
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -3818,11 +3804,11 @@
             <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Collection[Union[str, int]]&quot;</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span>
         <span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwarg_overrides</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]]:</span> <span class="o">...</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]]:</span> <span class="o">...</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
             <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
             <span class="n">Callable</span><span class="p">[</span><span class="n">Concatenate</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">P</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
@@ -3836,7 +3822,7 @@
         <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwarg_overrides</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
-        <span class="n">Type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">P</span><span class="p">]],</span> <span class="n">Type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]]</span>
+        <span class="nb">type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">P</span><span class="p">]],</span> <span class="nb">type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]]</span>
     <span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a config whose signature matches that of the provided target.</span>
 
@@ -3916,7 +3902,6 @@
 
 <span class="k">class</span> <span class="nc">DefaultBuilds</span><span class="p">(</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">SupportedPrimitive</span><span class="p">]):</span>
     <span class="n">_default_dataclass_options_for_kwargs_of</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">pass</span>
 
 
 <span class="n">builds</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="n">DefaultBuilds</span><span class="o">.</span><span class="n">builds</span>
@@ -3928,19 +3913,19 @@
     <span class="n">real</span><span class="p">:</span> <span class="n">Any</span>
     <span class="n">imag</span><span class="p">:</span> <span class="n">Any</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">BuildsFn</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="nb">complex</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
+    <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">del</span> <span class="n">CBuildsFn</span>
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">ConfigPath</span><span class="p">:</span>
-    <span class="n">_args_</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">_args_</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">BuildsFn</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="n">Path</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
+    <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
         <span class="k">del</span> <span class="n">CBuildsFn</span>
 
 
@@ -4074,7 +4059,7 @@
     <span class="n">x</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">BuildsFunction</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+    <span class="n">BuildsFunction</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Used to set a mutable object as a default value for a field</span>
 <span class="sd">    in a dataclass.</span>
@@ -4110,10 +4095,10 @@
 
 
 <span class="k">def</span> <span class="nf">convert_complex</span><span class="p">(</span>
-    <span class="n">value</span><span class="p">:</span> <span class="nb">complex</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]:</span>
+    <span class="n">value</span><span class="p">:</span> <span class="nb">complex</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Builds</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]:</span>
     <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
-        <span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="nb">complex</span><span class="p">]],</span>
+        <span class="n">Builds</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="nb">complex</span><span class="p">]],</span>
         <span class="n">ConfigComplex</span><span class="p">(</span><span class="n">real</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="n">imag</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="o">=</span><span class="n">CBuildsFn</span><span class="p">),</span>
     <span class="p">)</span>
 
@@ -4123,9 +4108,9 @@
 
 <span class="k">if</span> <span class="n">Path</span> <span class="ow">in</span> <span class="n">ZEN_SUPPORTED_PRIMITIVES</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
 
-    <span class="k">def</span> <span class="nf">convert_path</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Path</span><span class="p">]]:</span>
+    <span class="k">def</span> <span class="nf">convert_path</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Builds</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">Path</span><span class="p">]]:</span>
         <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
-            <span class="n">Builds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Path</span><span class="p">]],</span> <span class="n">ConfigPath</span><span class="p">(</span><span class="n">_args_</span><span class="o">=</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">),),</span> <span class="n">CBuildsFn</span><span class="o">=</span><span class="n">CBuildsFn</span><span class="p">)</span>
+            <span class="n">Builds</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">Path</span><span class="p">]],</span> <span class="n">ConfigPath</span><span class="p">(</span><span class="n">_args_</span><span class="o">=</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">),),</span> <span class="n">CBuildsFn</span><span class="o">=</span><span class="n">CBuildsFn</span><span class="p">)</span>
         <span class="p">)</span>
 
     <span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert_path</span>
@@ -4134,19 +4119,19 @@
 
 
 <span class="k">def</span> <span class="nf">_unpack_partial</span><span class="p">(</span>
-    <span class="n">value</span><span class="p">:</span> <span class="n">Partial</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">]]:</span>
-    <span class="n">target</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Type</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="n">value</span><span class="o">.</span><span class="n">func</span><span class="p">)</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">Partial</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PartialBuilds</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">_T</span><span class="p">]]:</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">type</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="n">value</span><span class="o">.</span><span class="n">func</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">CBuildsFn</span><span class="o">.</span><span class="n">builds</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="o">*</span><span class="n">value</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">value</span><span class="o">.</span><span class="n">keywords</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)()</span>
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">ConfigFromTuple</span><span class="p">:</span>
-    <span class="n">_args_</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+    <span class="n">_args_</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
+    <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_args_</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">CBuildsFn</span><span class="o">.</span><span class="n">_make_hydra_compatible</span><span class="p">(</span>
                 <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_args_</span><span class="p">),</span>
@@ -4161,9 +4146,9 @@
 <span class="k">class</span> <span class="nc">ConfigFromDict</span><span class="p">:</span>
     <span class="n">_args_</span><span class="p">:</span> <span class="n">Any</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
+    <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_args_</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">CBuildsFn</span><span class="o">.</span><span class="n">_make_hydra_compatible</span><span class="p">(</span>
                 <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_args_</span><span class="p">),</span>
@@ -4180,11 +4165,11 @@
     <span class="n">stop</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
     <span class="n">step</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">BuildsFn</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="nb">range</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">_args_</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">(),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
+    <span class="n">_args_</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">(),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
 
     <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">stop</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">stop</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">del</span> <span class="n">CBuildsFn</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_args_</span> <span class="o">=</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
@@ -4192,7 +4177,7 @@
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">ConfigTimeDelta</span><span class="p">:</span>
-    <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
+    <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
     <span class="n">days</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="n">seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="n">microseconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -4202,18 +4187,18 @@
     <span class="n">weeks</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">BuildsFn</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="n">timedelta</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">del</span> <span class="n">CBuildsFn</span>
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">ConfigFromDefaultDict</span><span class="p">:</span>
-    <span class="n">dict_</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
     <span class="n">default_factory</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
+    <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">BuildsFn</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="n">as_default_dict</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dict_</span><span class="p">,</span> <span class="n">defaultdict</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_factory</span> <span class="o">=</span> <span class="n">CBuildsFn</span><span class="o">.</span><span class="n">just</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dict_</span><span class="o">.</span><span class="n">default_factory</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">CBuildsFn</span><span class="o">.</span><span class="n">_make_hydra_compatible</span><span class="p">(</span>
