@@ -22,7 +22,8 @@ chronological order. All previous releases should still be available on pip.
 - Adds compatibility with NumPy 2.0.0.
 - Adds compatibility with jax 0.4.32+
 - :func:`~hydra_zen.builds` and `~hydra_zen.just` now support classes defined within classes as targets. See :pull:`708`.
-- The `hydrated_dataclass` decorator now respects the docstring of the class that it decorates.
+- The `hydrated_dataclass` decorator now respects the docstring of the class that it decorates. See :issue:`750`.
+- Fixes a bug where `pydantic_parser` cannot be passed a `pydantic.BaseModel` as a target. See :issue:`723`.
 
 .. _v0.13.0:
 

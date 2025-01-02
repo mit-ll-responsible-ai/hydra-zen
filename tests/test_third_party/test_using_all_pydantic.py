@@ -9,7 +9,7 @@ from typing import Any, Callable, Dict, Generic, Sequence, Tuple, TypeVar
 import pydantic
 import pytest
 from hydra.errors import InstantiationException
-from pydantic import PositiveInt
+from pydantic import BaseModel, PositiveInt
 
 from hydra_zen import BuildsFn, instantiate, zen
 from hydra_zen.third_party.pydantic import pydantic_parser
@@ -108,6 +108,10 @@ class ADataClass:
     zaa: bool
 
 
+class PydanticModel(BaseModel):
+    xoo: int
+
+
 @pytest.mark.parametrize(
     "obj",
     [
@@ -124,6 +128,7 @@ class ADataClass:
         p(ADataClass, yee="yee", zaa=True),
         p(len, [1, 2, 3]),  # func, no signature
         p(dict, a=1, b=2),  # class, no signature
+        p(PydanticModel, xoo=1),
     ],
 )
 @pytest.mark.parametrize("use_meta_feature", [True, False])
