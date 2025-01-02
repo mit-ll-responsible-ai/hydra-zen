@@ -39,7 +39,7 @@ def test_dataclass_options_via_cls_defaults():
     Conf1 = kwargs_of((lambda: None), zen_dataclass={"cls_name": "foo"})
     assert Conf1.__name__ == "foo"
 
-    Conf2 = Moo.kwargs_of((lambda: None))
+    Conf2 = Moo.kwargs_of(lambda: None)
     assert Conf2.__name__ == "bar"
 
 

@@ -1,6 +1,6 @@
 # Copyright (c) 2025 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-from typing import Optional, Tuple, Type, Union
+from typing import Optional, Union
 
 from typing_extensions import Literal
 
@@ -32,10 +32,10 @@ def make_config(
     hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = None,
     hydra_defaults: Optional[DefaultsList] = None,
     zen_dataclass: Optional[DataclassOptions] = None,
-    bases: Tuple[Type[DataClass_], ...] = (),
+    bases: tuple[type[DataClass_], ...] = (),
     zen_convert: Optional[ZenConvert] = None,
     **fields_as_kwargs: Union[SupportedPrimitive, ZenField],
-) -> Type[DataClass]:
+) -> type[DataClass]:
     """
     Returns a config with user-defined field names and, optionally,
     associated default values and/or type annotations.

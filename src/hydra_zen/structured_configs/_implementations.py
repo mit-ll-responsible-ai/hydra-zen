@@ -6,7 +6,7 @@ import pathlib
 import sys
 import warnings
 from collections import Counter, defaultdict, deque
-from collections.abc import Collection
+from collections.abc import Collection, Mapping, Sequence
 from dataclasses import (  # use this for runtime checks
     MISSING,
     Field as _Field,
@@ -23,16 +23,14 @@ from functools import partial
 from itertools import chain
 from pathlib import Path, PosixPath, WindowsPath
 from typing import (
+    Annotated,
     Any,
     Callable,
     Dict,
-    FrozenSet,
+    Final,
     Generic,
     List,
-    Mapping,
     Optional,
-    Sequence,
-    Set,
     Tuple,
     Type,
     TypeVar,
@@ -46,9 +44,7 @@ from typing import (
 
 from omegaconf import DictConfig, ListConfig, _utils as _omegaconf_utils
 from typing_extensions import (
-    Annotated,
     Concatenate,
-    Final,
     Literal,
     ParamSpec,
     ParamSpecArgs,
@@ -64,9 +60,7 @@ from typing_extensions import (
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVE_TYPES,
     HYDRA_SUPPORTED_PRIMITIVES,
-    OMEGACONF_VERSION,
     ZEN_SUPPORTED_PRIMITIVES,
-    Version,
 )
 from hydra_zen.errors import (
     HydraZenDeprecationWarning,
@@ -138,10 +132,10 @@ R = TypeVar("R")
 TD = TypeVar("TD", bound=DataClass_)
 TC = TypeVar("TC", bound=Callable[..., Any])
 TP = TypeVar("TP", bound=_HydraPrimitive)
-TB = TypeVar("TB", bound=Union[_SupportedViaBuilds, FrozenSet[Any]])
+TB = TypeVar("TB", bound=Union[_SupportedViaBuilds, frozenset[Any]])
 
 Importable = TypeVar("Importable", bound=Callable[..., Any])
-Field_Entry: TypeAlias = Tuple[str, type, Field[Any]]
+Field_Entry: TypeAlias = tuple[str, type, Field[Any]]
 
 _JUST_CONVERT_SETTINGS = AllConvert(dataclass=True, flat_target=False)
 
@@ -155,7 +149,7 @@ class _ConversionFn(Protocol):
     def __call__(self, __x: Any, CBuildsFn: "Type[BuildsFn[Any]]") -> Any: ...
 
 
-ZEN_VALUE_CONVERSION: Dict[type, _ConversionFn] = {}
+ZEN_VALUE_CONVERSION: dict[type, _ConversionFn] = {}
 
 # signature param-types
 _POSITIONAL_ONLY: Final = inspect.Parameter.POSITIONAL_ONLY
@@ -260,7 +254,7 @@ def hydrated_dataclass(
     kw_only: bool = False,
     slots: bool = False,
     weakref_slot: bool = False,
-) -> Callable[[Type[_T]], Type[_T]]:
+) -> Callable[[type[_T]], type[_T]]:
     """A decorator that uses `builds` to create a dataclass with the appropriate
     Hydra-specific fields for specifying a targeted config [1]_.
 
@@ -502,7 +496,7 @@ def hydrated_dataclass(
                 and not f.name.startswith("_zen_")
             }
         else:
-            kwargs: Dict[str, Any] = {}
+            kwargs: dict[str, Any] = {}
 
         out = DefaultBuilds.builds(
             target,
@@ -663,7 +657,7 @@ class ZenField:
 
     hint: Any = Any
     default: Union[Any, Field[Any]] = _utils.field(default=NOTHING)
-    name: Union[str, Type[NOTHING]] = NOTHING
+    name: Union[str, type[NOTHING]] = NOTHING
     zen_convert: InitVar[Optional[ZenConvert]] = None
     _builds_fn: "Union[BuildsFn[Any], Type[BuildsFn[Any]]]" = _utils.field(default_factory=lambda: DefaultBuilds)  # type: ignore
 
@@ -835,12 +829,6 @@ class BuildsFn(Generic[T]):
                 nested=nested,
             )
 
-        if OMEGACONF_VERSION < Version(2, 2, 3):  # pragma: no cover
-            try:
-                type_ = {list: List, tuple: Tuple, dict: Dict}.get(type_, type_)
-            except TypeError:
-                pass
-
         # Warning: mutating `type_` will mutate the signature being inspected
         # Even calling deepcopy(`type_`) silently fails to prevent this.
         origin = get_origin(type_)
@@ -877,7 +865,7 @@ class BuildsFn(Generic[T]):
                     # isn't Optional[<type>]
                     return Any
 
-                args = cast(Tuple[type, type], args)
+                args = cast(tuple[type, type], args)
 
                 optional_type, none_type = args
                 if none_type is not NoneType:
@@ -892,10 +880,10 @@ class BuildsFn(Generic[T]):
 
             if origin is list or origin is List:
                 if args:
-                    return List[
+                    return list[
                         cls._sanitized_type(args[0], primitive_only=False, nested=True)
                     ]
-                return List
+                return list
 
             if origin is dict or origin is Dict:
                 if args:
@@ -905,8 +893,8 @@ class BuildsFn(Generic[T]):
                     ValueType = cls._sanitized_type(
                         args[1], primitive_only=False, nested=True
                     )
-                    return Dict[KeyType, ValueType]
-                return Dict
+                    return dict[KeyType, ValueType]
+                return dict
 
             if (origin is tuple or origin is Tuple) and not nested:
                 # hydra silently supports tuples of homogeneous types
@@ -916,14 +904,14 @@ class BuildsFn(Generic[T]):
                 #
                 # Otherwise we preserve the annotation as accurately as possible
                 if not args:
-                    return Any if OMEGACONF_VERSION < (2, 2, 3) else Tuple
+                    return tuple
 
-                args = cast(Tuple[type, ...], args)
+                args = cast(tuple[type, ...], args)
                 unique_args = set(args)
 
                 if any(get_origin(tp) is Unpack for tp in unique_args):
                     # E.g. Tuple[*Ts]
-                    return Tuple[Any, ...]
+                    return tuple[Any, ...]
 
                 has_ellipses = Ellipsis in unique_args
 
@@ -935,9 +923,9 @@ class BuildsFn(Generic[T]):
                 )
 
                 if has_ellipses:
-                    return Tuple[_unique_type, ...]
+                    return tuple[_unique_type, ...]
                 else:
-                    return Tuple[(_unique_type,) * len(args)]
+                    return tuple[(_unique_type,) * len(args)]
 
             return Any
 
@@ -962,8 +950,6 @@ class BuildsFn(Generic[T]):
             or is_dataclass(type_)
             or (isinstance(type_, type) and issubclass(type_, Enum))
         ):
-            if sys.version_info[:2] == (3, 6) and type_ is Dict:  # pragma: no cover
-                type_ = Dict[Any, Any]
 
             if wrap_optional and type_ is not Any:  # pragma: no cover
                 # normally get_type_hints automatically resolves Optional[...]
@@ -1413,8 +1399,8 @@ class BuildsFn(Generic[T]):
     @overload
     @classmethod
     def builds(
-        cls: Type[Self],
-        __hydra_target: Type[BuildsWithSig[Type[R], P]],
+        cls: type[Self],
+        __hydra_target: type[BuildsWithSig[type[R], P]],
         *,
         zen_partial: Literal[False, None] = ...,
         populate_full_signature: Literal[True],
@@ -1424,16 +1410,16 @@ class BuildsFn(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[()] = ...,
+        builds_bases: tuple[()] = ...,
         zen_dataclass: Optional[DataclassOptions] = None,
         frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
-    ) -> Type[BuildsWithSig[Type[R], P]]: ...
+    ) -> type[BuildsWithSig[type[R], P]]: ...
 
     @overload
     @classmethod
     def builds(
-        cls: Type[Self],
+        cls: type[Self],
         __hydra_target: Callable[P, R],
         *,
         zen_partial: Literal[False, None] = ...,
@@ -1444,18 +1430,18 @@ class BuildsFn(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[()] = ...,
+        builds_bases: tuple[()] = ...,
         zen_dataclass: Optional[DataclassOptions] = None,
         frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
-    ) -> Type[BuildsWithSig[Type[R], P]]: ...
+    ) -> type[BuildsWithSig[type[R], P]]: ...
 
     # partial=False, pop-sig=bool
     @overload
     @classmethod
     def builds(
-        cls: Type[Self],
-        __hydra_target: Type[AnyBuilds[Importable]],
+        cls: type[Self],
+        __hydra_target: type[AnyBuilds[Importable]],
         *pos_args: T,
         zen_partial: Literal[False, None] = ...,
         populate_full_signature: bool = ...,
@@ -1465,18 +1451,18 @@ class BuildsFn(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         zen_dataclass: Optional[DataclassOptions] = None,
         frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[Builds[Importable]]: ...
+    ) -> type[Builds[Importable]]: ...
 
     # partial=False, pop-sig=bool
     @overload
     @classmethod
     def builds(
-        cls: Type[Self],
+        cls: type[Self],
         __hydra_target: Importable,
         *pos_args: T,
         zen_partial: Literal[False, None] = ...,
@@ -1487,19 +1473,19 @@ class BuildsFn(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         zen_dataclass: Optional[DataclassOptions] = None,
         frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[Builds[Importable]]: ...
+    ) -> type[Builds[Importable]]: ...
 
     # partial=True, pop-sig=bool
     @overload
     @classmethod
     def builds(
-        cls: Type[Self],
-        __hydra_target: Type[AnyBuilds[Importable]],
+        cls: type[Self],
+        __hydra_target: type[AnyBuilds[Importable]],
         *pos_args: T,
         zen_partial: Literal[True] = ...,
         populate_full_signature: bool = ...,
@@ -1509,18 +1495,18 @@ class BuildsFn(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         zen_dataclass: Optional[DataclassOptions] = None,
         frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[PartialBuilds[Importable]]: ...
+    ) -> type[PartialBuilds[Importable]]: ...
 
     # partial=True, pop-sig=bool
     @overload
     @classmethod
     def builds(
-        cls: Type[Self],
+        cls: type[Self],
         __hydra_target: Importable,
         *pos_args: T,
         zen_partial: Literal[True] = ...,
@@ -1531,19 +1517,19 @@ class BuildsFn(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         zen_dataclass: Optional[DataclassOptions] = None,
         frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Type[PartialBuilds[Importable]]: ...
+    ) -> type[PartialBuilds[Importable]]: ...
 
     # partial=bool, pop-sig=False
     @overload
     @classmethod
     def builds(
-        cls: Type[Self],
-        __hydra_target: Type[AnyBuilds[Importable]],
+        cls: type[Self],
+        __hydra_target: type[AnyBuilds[Importable]],
         *pos_args: T,
         zen_partial: Optional[bool] = ...,
         populate_full_signature: Literal[False] = ...,
@@ -1553,18 +1539,18 @@ class BuildsFn(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         zen_dataclass: Optional[DataclassOptions] = None,
         frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]: ...
+    ) -> Union[type[Builds[Importable]], type[PartialBuilds[Importable]]]: ...
 
     # partial=bool, pop-sig=False
     @overload
     @classmethod
     def builds(
-        cls: Type[Self],
+        cls: type[Self],
         __hydra_target: Importable,
         *pos_args: T,
         zen_partial: Optional[bool] = ...,
@@ -1575,19 +1561,19 @@ class BuildsFn(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         zen_dataclass: Optional[DataclassOptions] = None,
         frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
-    ) -> Union[Type[Builds[Importable]], Type[PartialBuilds[Importable]]]: ...
+    ) -> Union[type[Builds[Importable]], type[PartialBuilds[Importable]]]: ...
 
     # partial=bool, pop-sig=bool
     @overload
     @classmethod
     def builds(
-        cls: Type[Self],
-        __hydra_target: Union[Callable[P, R], Type[Builds[Importable]], Importable],
+        cls: type[Self],
+        __hydra_target: Union[Callable[P, R], type[Builds[Importable]], Importable],
         *pos_args: T,
         zen_partial: Optional[bool],
         populate_full_signature: bool = ...,
@@ -1597,25 +1583,25 @@ class BuildsFn(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
         dataclass_name: Optional[str] = ...,
-        builds_bases: Tuple[Type[DataClass_], ...] = ...,
+        builds_bases: tuple[type[DataClass_], ...] = ...,
         zen_dataclass: Optional[DataclassOptions] = None,
         frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
     ) -> Union[
-        Type[Builds[Importable]],
-        Type[PartialBuilds[Importable]],
-        Type[BuildsWithSig[Type[R], P]],
+        type[Builds[Importable]],
+        type[PartialBuilds[Importable]],
+        type[BuildsWithSig[type[R], P]],
     ]: ...
 
     @classmethod
     def builds(
-        cls: Type[Self],
+        cls: type[Self],
         *pos_args: Union[
             Importable,
             Callable[P, R],
-            Type[AnyBuilds[Importable]],
-            Type[BuildsWithSig[Type[R], P]],
+            type[AnyBuilds[Importable]],
+            type[BuildsWithSig[type[R], P]],
             Any,
         ],
         zen_partial: Optional[bool] = None,
@@ -1626,13 +1612,13 @@ class BuildsFn(Generic[T]):
         hydra_recursive: Optional[bool] = None,
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = None,
         hydra_defaults: Optional[DefaultsList] = None,
-        builds_bases: Union[Tuple[Type[DataClass_], ...], Tuple[()]] = (),
+        builds_bases: Union[tuple[type[DataClass_], ...], tuple[()]] = (),
         zen_dataclass: Optional[DataclassOptions] = None,
         **kwargs_for_target: Any,
     ) -> Union[
-        Type[Builds[Importable]],
-        Type[PartialBuilds[Importable]],
-        Type[BuildsWithSig[Type[R], P]],
+        type[Builds[Importable]],
+        type[PartialBuilds[Importable]],
+        type[BuildsWithSig[type[R], P]],
     ]:
         """builds(hydra_target, /, *pos_args, zen_partial=None, zen_wrappers=(), zen_meta=None, populate_full_signature=False, zen_exclude=(), hydra_recursive=None, hydra_convert=None, hydra_defaults=None, builds_bases=(),
         zen_dataclass=None, **kwargs_for_target)
@@ -2337,7 +2323,7 @@ class BuildsFn(Generic[T]):
                 )
 
         # list[tuple[str, type] | tuple[str, type, Any]]
-        target_field: List[Union[Tuple[str, Any], Tuple[str, Any, Any]]]
+        target_field: list[Union[tuple[str, Any], tuple[str, Any, Any]]]
 
         # zen_partial behavior:
         #
@@ -2447,7 +2433,7 @@ class BuildsFn(Generic[T]):
                 target_field.append(
                     (
                         META_FIELD_NAME,
-                        Tuple[str, ...],
+                        tuple[str, ...],
                         _utils.field(default=tuple(zen_meta), init=False),
                     ),
                 )
@@ -2467,7 +2453,7 @@ class BuildsFn(Generic[T]):
                             ZEN_WRAPPERS_FIELD_NAME,
                             Union[
                                 Union[str, Builds[Any]],
-                                Tuple[Union[str, Builds[Any]], Any],
+                                tuple[Union[str, Builds[Any]], Any],
                             ],
                             _utils.field(default=validated_wrappers[0], init=False),
                         ),
@@ -2478,7 +2464,7 @@ class BuildsFn(Generic[T]):
                             ZEN_WRAPPERS_FIELD_NAME,
                             Union[
                                 Union[str, Builds[Any]],
-                                Tuple[Union[str, Builds[Any]], Any],
+                                tuple[Union[str, Builds[Any]], Any],
                             ],
                             _utils.field(default=validated_wrappers, init=False),
                         ),
@@ -2527,7 +2513,7 @@ class BuildsFn(Generic[T]):
             base_fields.append(
                 (
                     DEFAULTS_LIST_FIELD_NAME,
-                    List[Any],
+                    list[Any],
                     _utils.field(
                         default_factory=lambda: list(hydra_defaults),
                         init=False,
@@ -2539,7 +2525,7 @@ class BuildsFn(Generic[T]):
             base_fields.append(
                 (
                     POS_ARG_FIELD_NAME,
-                    Tuple[Any, ...],
+                    tuple[Any, ...],
                     _utils.field(
                         default=tuple(
                             cls._make_hydra_compatible(
@@ -2568,7 +2554,7 @@ class BuildsFn(Generic[T]):
                     + f"{target} does not have an inspectable signature. "
                     f"`builds({_utils.safe_name(target)}, populate_full_signature=True)` is not supported"
                 )
-            signature_params: Dict[str, inspect.Parameter] = {}
+            signature_params: dict[str, inspect.Parameter] = {}
             # We will turn off signature validation for objects that didn't have
             # a valid signature. This will enable us to do things like `build(dict, a=1)`
             target_has_valid_signature: bool = False
@@ -2662,9 +2648,9 @@ class BuildsFn(Generic[T]):
             NameError,  # Unresolvable forward reference
             AttributeError,  # Class doesn't have "__new__" or "__init__"
         ):
-            type_hints: Dict[str, Any] = {}
+            type_hints: dict[str, Any] = {}
 
-        sig_by_kind: Dict[Any, List[inspect.Parameter]] = {
+        sig_by_kind: dict[Any, list[inspect.Parameter]] = {
             _POSITIONAL_ONLY: [],
             _POSITIONAL_OR_KEYWORD: [],
             _VAR_POSITIONAL: [],
@@ -2677,7 +2663,7 @@ class BuildsFn(Generic[T]):
 
         # these are the names of the only parameters in the signature of `target` that can
         # be referenced by name
-        nameable_params_in_sig: Set[str] = {
+        nameable_params_in_sig: set[str] = {
             p.name
             for p in chain(
                 sig_by_kind[_POSITIONAL_OR_KEYWORD], sig_by_kind[_KEYWORD_ONLY]
@@ -2699,7 +2685,7 @@ class BuildsFn(Generic[T]):
                 if _pos_args:
                     break
 
-        fields_set_by_bases: Set[str] = {
+        fields_set_by_bases: set[str] = {
             _field.name
             for _base in builds_bases
             for _field in fields(_base)
@@ -2794,7 +2780,7 @@ class BuildsFn(Generic[T]):
         #    and is resolved to one of the type annotations supported by hydra if possible,
         #    otherwise, is Any
         #  - arg-value: mutable values are automatically specified using default-factory
-        user_specified_named_params: Dict[str, Tuple[str, type, Any]] = {
+        user_specified_named_params: dict[str, tuple[str, type, Any]] = {
             name: (name, type_hints.get(name, Any), value)
             for name, value in kwargs_for_target.items()
             if not zen_exclude(name)
@@ -2815,10 +2801,10 @@ class BuildsFn(Generic[T]):
             #
             # Parameter ordering should only differ from the target's signature
             # if the user specified a value for a parameter that had no default
-            _fields_with_default_values: List[Field_Entry] = []
+            _fields_with_default_values: list[Field_Entry] = []
 
             # we need to keep track of what user-specified params we have set
-            _seen: Set[str] = set()
+            _seen: set[str] = set()
 
             for n, param in enumerate(signature_params.values()):
                 if n in zen_index_exclude or zen_exclude(param.name):
@@ -2916,8 +2902,8 @@ class BuildsFn(Generic[T]):
                 del field_
 
         # sanitize all types and configured values
-        sanitized_base_fields: List[
-            Union[Tuple[str, Any], Tuple[str, Any, Field[Any]]]
+        sanitized_base_fields: list[
+            Union[tuple[str, Any], tuple[str, Any, Field[Any]]]
         ] = []
 
         for item in base_fields:
@@ -2985,7 +2971,7 @@ class BuildsFn(Generic[T]):
         )
 
         return cast(
-            Union[Type[Builds[Importable]], Type[BuildsWithSig[Type[R], P]]], out
+            Union[type[Builds[Importable]], type[BuildsWithSig[type[R], P]]], out
         )
 
     @overload
@@ -3034,7 +3020,7 @@ class BuildsFn(Generic[T]):
         hydra_recursive: Optional[bool] = ...,
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
-    ) -> Builds[Type[TB]]: ...
+    ) -> Builds[type[TB]]: ...
 
     @overload
     @classmethod
@@ -3046,7 +3032,7 @@ class BuildsFn(Generic[T]):
         hydra_recursive: Optional[bool] = ...,
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         zen_dataclass: Optional[DataclassOptions] = ...,
-    ) -> Type[Builds[Type[TD]]]: ...
+    ) -> type[Builds[type[TD]]]: ...
 
     @overload
     @classmethod
@@ -3118,10 +3104,10 @@ class BuildsFn(Generic[T]):
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = None,
         hydra_defaults: Optional[DefaultsList] = None,
         zen_dataclass: Optional[DataclassOptions] = None,
-        bases: Tuple[Type[DataClass_], ...] = (),
+        bases: tuple[type[DataClass_], ...] = (),
         zen_convert: Optional[ZenConvert] = None,
         **fields_as_kwargs: Union[T, ZenField],
-    ) -> Type[DataClass]:
+    ) -> type[DataClass]:
         """
         Returns a config with user-defined field names and, optionally,
         associated default values and/or type annotations.
@@ -3228,7 +3214,7 @@ class BuildsFn(Generic[T]):
             **{k: _tmp for k in fields_as_kwargs},
         )
 
-        normalized_fields: Dict[str, ZenField] = {}
+        normalized_fields: dict[str, ZenField] = {}
 
         for _field in fields_as_args:
             if isinstance(_field, str):
@@ -3254,7 +3240,7 @@ class BuildsFn(Generic[T]):
                 normalized_fields[name] = value
 
         # fields without defaults must come first
-        config_fields: List[Union[Tuple[str, type], Tuple[str, type, Any]]] = [
+        config_fields: list[Union[tuple[str, type], tuple[str, type, Any]]] = [
             (str(f.name), f.hint)
             for f in normalized_fields.values()
             if f.default is NOTHING
@@ -3307,7 +3293,7 @@ class BuildsFn(Generic[T]):
             config_fields.append(
                 (
                     DEFAULTS_LIST_FIELD_NAME,
-                    List[Any],
+                    list[Any],
                     _utils.field(
                         default_factory=lambda: list(hydra_defaults), init=False
                     ),
@@ -3339,75 +3325,75 @@ class BuildsFn(Generic[T]):
                 f"conflicting configs."
             )
 
-        return cast(Type[DataClass], out)
+        return cast(type[DataClass], out)
 
     # cover zen_exclude=() -> (1, 2, 3)
     @overload
     @classmethod
     def kwargs_of(
-        cls: Type[Self],
+        cls: type[Self],
         __hydra_target: Callable[P, Any],
         *,
         zen_dataclass: Optional[DataclassOptions] = ...,
-        zen_exclude: Tuple[()],
-    ) -> Type[BuildsWithSig[Type[Dict[str, Any]], P]]: ...
+        zen_exclude: tuple[()],
+    ) -> type[BuildsWithSig[type[dict[str, Any]], P]]: ...
 
     @overload
     @classmethod
     def kwargs_of(
-        cls: Type[Self],
+        cls: type[Self],
         __hydra_target: Callable[Concatenate[Any, P], Any],
         *,
         zen_dataclass: Optional[DataclassOptions] = ...,
-        zen_exclude: Tuple[Literal[0]],
-    ) -> Type[BuildsWithSig[Type[Dict[str, Any]], P]]: ...
+        zen_exclude: tuple[Literal[0]],
+    ) -> type[BuildsWithSig[type[dict[str, Any]], P]]: ...
 
     @overload
     @classmethod
     def kwargs_of(
-        cls: Type[Self],
+        cls: type[Self],
         __hydra_target: Callable[Concatenate[Any, Any, P], Any],
         *,
         zen_dataclass: Optional[DataclassOptions] = ...,
-        zen_exclude: Tuple[Literal[0], Literal[1]],
-    ) -> Type[BuildsWithSig[Type[Dict[str, Any]], P]]: ...
+        zen_exclude: tuple[Literal[0], Literal[1]],
+    ) -> type[BuildsWithSig[type[dict[str, Any]], P]]: ...
 
     @overload
     @classmethod
     def kwargs_of(
-        cls: Type[Self],
+        cls: type[Self],
         __hydra_target: Callable[Concatenate[Any, Any, Any, P], Any],
         *,
         zen_dataclass: Optional[DataclassOptions] = ...,
-        zen_exclude: Tuple[Literal[0], Literal[1], Literal[2]],
-    ) -> Type[BuildsWithSig[Type[Dict[str, Any]], P]]: ...
+        zen_exclude: tuple[Literal[0], Literal[1], Literal[2]],
+    ) -> type[BuildsWithSig[type[dict[str, Any]], P]]: ...
 
     # no zen-exclude
 
     @overload
     @classmethod
     def kwargs_of(
-        cls: Type[Self],
+        cls: type[Self],
         __hydra_target: Callable[P, Any],
         *,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_exclude: Literal[None] = ...,
-    ) -> Type[BuildsWithSig[Type[Dict[str, Any]], P]]: ...
+    ) -> type[BuildsWithSig[type[dict[str, Any]], P]]: ...
 
     @overload
     @classmethod
     def kwargs_of(
-        cls: Type[Self],
+        cls: type[Self],
         __hydra_target: Callable[P, Any],
         *,
         zen_dataclass: Optional[DataclassOptions] = ...,
         zen_exclude: Union["Collection[Union[str, int]]", Callable[[str], bool]],
-    ) -> Type[Builds[Type[Dict[str, Any]]]]: ...
+    ) -> type[Builds[type[dict[str, Any]]]]: ...
 
     @overload
     @classmethod
     def kwargs_of(
-        cls: Type[Self],
+        cls: type[Self],
         __hydra_target: Callable[P, Any],
         *,
         zen_dataclass: Optional[DataclassOptions] = ...,
@@ -3415,11 +3401,11 @@ class BuildsFn(Generic[T]):
             None, "Collection[Union[str, int]]", Callable[[str], bool]
         ] = ...,
         **kwarg_overrides: T,
-    ) -> Type[Builds[Type[Dict[str, Any]]]]: ...
+    ) -> type[Builds[type[dict[str, Any]]]]: ...
 
     @classmethod
     def kwargs_of(
-        cls: Type[Self],
+        cls: type[Self],
         __hydra_target: Union[
             Callable[P, Any],
             Callable[Concatenate[Any, P], Any],
@@ -3433,7 +3419,7 @@ class BuildsFn(Generic[T]):
         ] = None,
         **kwarg_overrides: T,
     ) -> Union[
-        Type[BuildsWithSig[Type[Dict[str, Any]], P]], Type[Builds[Type[Dict[str, Any]]]]
+        type[BuildsWithSig[type[dict[str, Any]], P]], type[Builds[type[dict[str, Any]]]]
     ]:
         """Returns a config whose signature matches that of the provided target.
 
@@ -3512,7 +3498,6 @@ class BuildsFn(Generic[T]):
 
 class DefaultBuilds(BuildsFn[SupportedPrimitive]):
     _default_dataclass_options_for_kwargs_of = {}
-    pass
 
 
 builds: Final = DefaultBuilds.builds
@@ -3524,19 +3509,19 @@ class ConfigComplex:
     real: Any
     imag: Any
     _target_: str = field(default=BuildsFn._get_obj_path(complex), init=False)
-    CBuildsFn: InitVar[Type[BuildsFn[Any]]]
+    CBuildsFn: InitVar[type[BuildsFn[Any]]]
 
-    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]) -> None:
+    def __post_init__(self, CBuildsFn: type[BuildsFn[Any]]) -> None:
         del CBuildsFn
 
 
 @dataclass(unsafe_hash=True)
 class ConfigPath:
-    _args_: Tuple[str]
+    _args_: tuple[str]
     _target_: str = field(default=BuildsFn._get_obj_path(Path), init=False)
-    CBuildsFn: InitVar[Type[BuildsFn[Any]]]
+    CBuildsFn: InitVar[type[BuildsFn[Any]]]
 
-    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]) -> None:  # pragma: no cover
+    def __post_init__(self, CBuildsFn: type[BuildsFn[Any]]) -> None:  # pragma: no cover
         del CBuildsFn
 
 
@@ -3667,7 +3652,7 @@ def mutable_value(
     x: _T,
     *,
     zen_convert: Optional[ZenConvert] = None,
-    BuildsFunction: Type[BuildsFn[Any]] = BuildsFn[Any],
+    BuildsFunction: type[BuildsFn[Any]] = BuildsFn[Any],
 ) -> _T:
     """Used to set a mutable object as a default value for a field
     in a dataclass.
@@ -3703,10 +3688,10 @@ def mutable_value(
 
 
 def convert_complex(
-    value: complex, CBuildsFn: Type[BuildsFn[Any]]
-) -> Builds[Type[complex]]:
+    value: complex, CBuildsFn: type[BuildsFn[Any]]
+) -> Builds[type[complex]]:
     return cast(
-        Builds[Type[complex]],
+        Builds[type[complex]],
         ConfigComplex(real=value.real, imag=value.imag, CBuildsFn=CBuildsFn),
     )
 
@@ -3716,9 +3701,9 @@ ZEN_VALUE_CONVERSION[complex] = convert_complex
 
 if Path in ZEN_SUPPORTED_PRIMITIVES:  # pragma: no cover
 
-    def convert_path(value: Path, CBuildsFn: Type[BuildsFn[Any]]) -> Builds[Type[Path]]:
+    def convert_path(value: Path, CBuildsFn: type[BuildsFn[Any]]) -> Builds[type[Path]]:
         return cast(
-            Builds[Type[Path]], ConfigPath(_args_=(str(value),), CBuildsFn=CBuildsFn)
+            Builds[type[Path]], ConfigPath(_args_=(str(value),), CBuildsFn=CBuildsFn)
         )
 
     ZEN_VALUE_CONVERSION[Path] = convert_path
@@ -3727,19 +3712,19 @@ if Path in ZEN_SUPPORTED_PRIMITIVES:  # pragma: no cover
 
 
 def _unpack_partial(
-    value: Partial[_T], CBuildsFn: Type[BuildsFn[Any]]
-) -> PartialBuilds[Type[_T]]:
-    target = cast(Type[_T], value.func)
+    value: Partial[_T], CBuildsFn: type[BuildsFn[Any]]
+) -> PartialBuilds[type[_T]]:
+    target = cast(type[_T], value.func)
     return CBuildsFn.builds(target, *value.args, **value.keywords, zen_partial=True)()
 
 
 @dataclass(unsafe_hash=True)
 class ConfigFromTuple:
-    _args_: Tuple[Any, ...]
+    _args_: tuple[Any, ...]
     _target_: str
-    CBuildsFn: InitVar[Type[BuildsFn[Any]]]
+    CBuildsFn: InitVar[type[BuildsFn[Any]]]
 
-    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]) -> None:
+    def __post_init__(self, CBuildsFn: type[BuildsFn[Any]]) -> None:
         self._args_ = (
             CBuildsFn._make_hydra_compatible(
                 tuple(self._args_),
@@ -3754,9 +3739,9 @@ class ConfigFromTuple:
 class ConfigFromDict:
     _args_: Any
     _target_: str
-    CBuildsFn: InitVar[Type[BuildsFn[Any]]]
+    CBuildsFn: InitVar[type[BuildsFn[Any]]]
 
-    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]) -> None:
+    def __post_init__(self, CBuildsFn: type[BuildsFn[Any]]) -> None:
         self._args_ = (
             CBuildsFn._make_hydra_compatible(
                 dict(self._args_),
@@ -3773,11 +3758,11 @@ class ConfigRange:
     stop: InitVar[int]
     step: InitVar[int]
     _target_: str = field(default=BuildsFn._get_obj_path(range), init=False)
-    _args_: Tuple[int, ...] = field(default=(), init=False, repr=False)
-    CBuildsFn: InitVar[Type[BuildsFn[Any]]]
+    _args_: tuple[int, ...] = field(default=(), init=False, repr=False)
+    CBuildsFn: InitVar[type[BuildsFn[Any]]]
 
     def __post_init__(
-        self, start: int, stop: int, step: int, CBuildsFn: Type[BuildsFn[Any]]
+        self, start: int, stop: int, step: int, CBuildsFn: type[BuildsFn[Any]]
     ) -> None:
         del CBuildsFn
         self._args_ = (start, stop, step)
@@ -3785,7 +3770,7 @@ class ConfigRange:
 
 @dataclass(unsafe_hash=True)
 class ConfigTimeDelta:
-    CBuildsFn: InitVar[Type[BuildsFn[Any]]]
+    CBuildsFn: InitVar[type[BuildsFn[Any]]]
     days: float = 0.0
     seconds: float = 0.0
     microseconds: float = 0.0
@@ -3795,18 +3780,18 @@ class ConfigTimeDelta:
     weeks: float = 0.0
     _target_: str = field(default=BuildsFn._get_obj_path(timedelta), init=False)
 
-    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]) -> None:
+    def __post_init__(self, CBuildsFn: type[BuildsFn[Any]]) -> None:
         del CBuildsFn
 
 
 @dataclass(unsafe_hash=True)
 class ConfigFromDefaultDict:
-    dict_: Dict[Any, Any]
+    dict_: dict[Any, Any]
     default_factory: Any = field(init=False)
-    CBuildsFn: InitVar[Type[BuildsFn[Any]]]
+    CBuildsFn: InitVar[type[BuildsFn[Any]]]
     _target_: str = BuildsFn._get_obj_path(as_default_dict)
 
-    def __post_init__(self, CBuildsFn: Type[BuildsFn[Any]]) -> None:
+    def __post_init__(self, CBuildsFn: type[BuildsFn[Any]]) -> None:
         assert isinstance(self.dict_, defaultdict)
         self.default_factory = CBuildsFn.just(self.dict_.default_factory)
         out = CBuildsFn._make_hydra_compatible(

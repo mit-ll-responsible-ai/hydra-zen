@@ -24,19 +24,7 @@ E.g.
 import pathlib
 from dataclasses import is_dataclass
 from functools import partial, wraps
-from typing import (
-    IO,
-    Any,
-    Callable,
-    Dict,
-    List,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-    cast,
-    overload,
-)
+from typing import IO, Any, Callable, TypeVar, Union, cast, overload
 
 from hydra.utils import instantiate as hydra_instantiate
 from omegaconf import MISSING, DictConfig, ListConfig, OmegaConf
@@ -59,8 +47,8 @@ F = TypeVar("F", bound=Callable[..., Any])
 def _call_target(
     _target_: F,
     _partial_: bool,
-    args: Tuple[Any, ...],
-    kwargs: Dict[str, Any],
+    args: tuple[Any, ...],
+    kwargs: dict[str, Any],
     full_key: str,
     *,
     target_wrapper: Callable[[F], F],
@@ -190,9 +178,9 @@ def instantiate(
         ListConfig,
         DictConfig,
         DataClass_,
-        Type[DataClass_],
-        Dict[Any, Any],
-        List[Any],
+        type[DataClass_],
+        dict[Any, Any],
+        list[Any],
     ],
     *args: Any,
     _target_wrapper_: Union[Callable[[F], F], None] = ...,

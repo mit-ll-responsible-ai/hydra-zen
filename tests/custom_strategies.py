@@ -1,18 +1,8 @@
 # Copyright (c) 2025 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import string
-from typing import (
-    Any,
-    Deque,
-    Dict,
-    List,
-    Optional,
-    Sequence,
-    Tuple,
-    TypeVar,
-    Union,
-    cast,
-)
+from collections.abc import Sequence
+from typing import Any, Deque, Optional, TypeVar, Union, cast
 
 import hypothesis.strategies as st
 
@@ -23,8 +13,8 @@ from hydra_zen.typing._implementations import ZenConvert
 
 __all__ = ["valid_builds_args", "partitions", "everything_except"]
 
-_Sequence = Union[List, Tuple, Deque]
-T = TypeVar("T", bound=Union[_Sequence, Dict[str, Any]])
+_Sequence = Union[list, tuple, Deque]
+T = TypeVar("T", bound=Union[_Sequence, dict[str, Any]])
 
 
 def _wrapper(obj):
@@ -42,7 +32,7 @@ wrapper_strat = single_wrapper_strat | st.lists(single_wrapper_strat)
 slots_strat = st.booleans()
 
 
-def _compat_slots(conf: Dict[str, Any]):
+def _compat_slots(conf: dict[str, Any]):
     # dataclass has some hard rules about a frozen dataclass inheriting
     # from a non-frozen one anf vice versa. Let's avoid this
 
@@ -96,7 +86,7 @@ _valid_builds_strats = dict(
 )
 
 
-def _compat_frozen(conf: Dict[str, Any]):
+def _compat_frozen(conf: dict[str, Any]):
     # dataclass has some hard rules about a frozen dataclass inheriting
     # from a non-frozen one anf vice versa. Let's avoid this
     if conf.get("frozen", None) is True and conf.get("builds_bases", ()):
@@ -129,7 +119,7 @@ def valid_builds_args(*required: str, excluded: Sequence[str] = ()):
 
 
 @st.composite
-def _partition(draw: st.DrawFn, collection: T, ordered: bool) -> Tuple[T, T]:
+def _partition(draw: st.DrawFn, collection: T, ordered: bool) -> tuple[T, T]:
     if isinstance(collection, dict):
         keys = list(collection)
     else:
@@ -150,11 +140,11 @@ def _partition(draw: st.DrawFn, collection: T, ordered: bool) -> Tuple[T, T]:
 
 def partitions(
     collection: Union[T, st.SearchStrategy[T]], ordered: bool = True
-) -> st.SearchStrategy[Tuple[T, T]]:
+) -> st.SearchStrategy[tuple[T, T]]:
     """Randomly partitions a collection or dictionary into two partitions."""
     if isinstance(collection, st.SearchStrategy):
         return collection.flatmap(lambda x: _partition(x, ordered=ordered))
-    return cast(st.SearchStrategy[Tuple[T, T]], _partition(collection, ordered))
+    return cast(st.SearchStrategy[tuple[T, T]], _partition(collection, ordered))
 
 
 def everything_except(excluded_types):

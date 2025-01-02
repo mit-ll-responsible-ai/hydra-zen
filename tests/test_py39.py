@@ -1,7 +1,7 @@
 # Copyright (c) 2025 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 from dataclasses import dataclass
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import pytest
 from omegaconf import OmegaConf
@@ -12,9 +12,9 @@ from hydra_zen import DefaultBuilds
 @pytest.mark.parametrize(
     "in_type, expected_type",
     [
-        (list[int], List[int]),
-        (tuple[str, str], Tuple[str, str]),
-        (dict[str, int], Dict[str, int]),
+        (list[int], list[int]),
+        (tuple[str, str], tuple[str, str]),
+        (dict[str, int], dict[str, int]),
         (set[str], Any),
     ],
 )

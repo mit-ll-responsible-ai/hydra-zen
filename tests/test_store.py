@@ -3,11 +3,12 @@
 import os
 import re
 import sys
+from collections.abc import Hashable
 from contextlib import contextmanager
 from copy import deepcopy
 from dataclasses import dataclass
 from functools import partial
-from typing import Any, Callable, Hashable, Optional
+from typing import Any, Callable, Optional
 
 import hypothesis.strategies as st
 import pytest

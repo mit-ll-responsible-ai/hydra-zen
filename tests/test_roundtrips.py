@@ -11,7 +11,7 @@ import statistics
 import string
 from collections import Counter, defaultdict, deque
 from dataclasses import dataclass
-from typing import Any, Dict, Generic, List, Optional, TypeVar
+from typing import Any, Generic, Optional, TypeVar
 
 import hypothesis.strategies as st
 import pytest
@@ -52,8 +52,8 @@ def test_builds_roundtrip(kwargs, full_sig: bool):
     full_sig=st.booleans(),
 )
 def test_builds_kwargs_roundtrip_with_partial(
-    partial_kwargs: Dict[str, Any],
-    call_kwargs: Dict[str, Any],
+    partial_kwargs: dict[str, Any],
+    call_kwargs: dict[str, Any],
     full_sig: bool,
 ):
     partial_struct = instantiate(
@@ -75,8 +75,8 @@ def test_builds_kwargs_roundtrip_with_partial(
     full_sig=st.booleans(),
 )
 def test_builds_args_roundtrip_with_partial(
-    partial_args: List[Any],
-    call_args: List[Any],
+    partial_args: list[Any],
+    call_args: list[Any],
     full_sig: bool,
 ):
     partial_struct = instantiate(

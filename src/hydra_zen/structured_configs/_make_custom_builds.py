@@ -3,14 +3,13 @@
 # pyright: strict
 import inspect
 import warnings
+from collections.abc import Collection, Mapping
 from functools import wraps
 from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
-    Collection,
-    Dict,
-    Mapping,
+    Final,
     Optional,
     TypeVar,
     Union,
@@ -18,7 +17,7 @@ from typing import (
     overload,
 )
 
-from typing_extensions import Final, Literal
+from typing_extensions import Literal
 
 from hydra_zen.errors import HydraZenDeprecationWarning
 from hydra_zen.typing import DataclassOptions, ZenWrappers
@@ -32,7 +31,7 @@ __all__ = ["make_custom_builds_fn"]
 
 
 _builds_sig = inspect.signature(builds)
-__BUILDS_DEFAULTS: Final[Dict[str, Any]] = {
+__BUILDS_DEFAULTS: Final[dict[str, Any]] = {
     name: p.default
     for name, p in _builds_sig.parameters.items()
     if p.kind is p.KEYWORD_ONLY
@@ -337,7 +336,7 @@ def make_custom_builds_fn(
 
     @wraps(fn)
     def wrapped(*args: Any, **kwargs: Any) -> Any:
-        merged_kwargs: Dict[str, Any] = {}
+        merged_kwargs: dict[str, Any] = {}
         _dataclass: Optional[DataclassOptions] = kwargs.pop("zen_dataclass", None)
 
         if _dataclass is None:

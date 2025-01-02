@@ -5,11 +5,10 @@ from datetime import timedelta
 from enum import Enum
 from functools import partial
 from pathlib import Path, PosixPath, WindowsPath
-from typing import FrozenSet, NamedTuple
+from typing import Final, NamedTuple
 
 import hydra
 import omegaconf
-from typing_extensions import Final
 
 NoneType = type(None)
 
@@ -59,7 +58,7 @@ HYDRA_SUPPORTED_PRIMITIVES = frozenset(
         WindowsPath,
     }
 )
-ZEN_SUPPORTED_PRIMITIVES: FrozenSet[type] = frozenset(
+ZEN_SUPPORTED_PRIMITIVES: frozenset[type] = frozenset(
     {
         set,
         frozenset,

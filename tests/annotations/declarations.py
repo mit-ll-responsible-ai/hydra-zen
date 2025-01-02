@@ -18,18 +18,7 @@ from datetime import timedelta
 from enum import Enum
 from functools import partial
 from pathlib import Path
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    List,
-    Mapping,
-    Optional,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import Any, Callable, List, Mapping, Optional, Tuple, Type, TypeVar, Union
 
 from hydra.core.utils import JobReturn
 from omegaconf import MISSING, DictConfig, ListConfig
@@ -1216,10 +1205,10 @@ def check_store():
 
     assert_type(substore1, SubStore)
 
-    assert_type(x, Dict[str, int])
+    assert_type(x, dict[str, int])
 
     # check __getitem__
-    assert_type(store["group"], Dict[Tuple[Optional[str], str], Any])
+    assert_type(store["group"], dict[Tuple[Optional[str], str], Any])
     assert_type(store[None, "name"], Any)
     assert_type(store["group", "name"], Any)
     store["name", "group", "bad"]  # type: ignore
@@ -1453,14 +1442,14 @@ def check_kwargs_of():
     Conf = kwargs_of(foo)
     reveal_type(
         Conf,
-        expected_text="type[BuildsWithSig[type[Dict[str, Any]], (x: int, y: str)]]",
+        expected_text="type[BuildsWithSig[type[dict[str, Any]], (x: int, y: str)]]",
     )
 
     Conf2 = kwargs_of(foo, zen_exclude=[0])
-    reveal_type(Conf2, expected_text="type[Builds[type[Dict[str, Any]]]]")
+    reveal_type(Conf2, expected_text="type[Builds[type[dict[str, Any]]]]")
 
     Conf3 = kwargs_of(foo, x=1)
-    reveal_type(Conf3, expected_text="type[Builds[type[Dict[str, Any]]]]")
+    reveal_type(Conf3, expected_text="type[Builds[type[dict[str, Any]]]]")
 
     class NotSupported: ...
 
@@ -1470,42 +1459,42 @@ def check_kwargs_of():
 
     reveal_type(
         kwargs_of(bar, zen_exclude=()),
-        expected_text="type[BuildsWithSig[type[Dict[str, Any]], (x: int, y: str, z: bool)]]",
+        expected_text="type[BuildsWithSig[type[dict[str, Any]], (x: int, y: str, z: bool)]]",
     )
 
     reveal_type(
         kwargs_of(bar, zen_exclude=(0,)),
-        expected_text="type[BuildsWithSig[type[Dict[str, Any]], (y: str, z: bool)]]",
+        expected_text="type[BuildsWithSig[type[dict[str, Any]], (y: str, z: bool)]]",
     )
 
     reveal_type(
         kwargs_of(bar, zen_exclude=(0, 1)),
-        expected_text="type[BuildsWithSig[type[Dict[str, Any]], (z: bool)]]",
+        expected_text="type[BuildsWithSig[type[dict[str, Any]], (z: bool)]]",
     )
 
     reveal_type(
         kwargs_of(bar, zen_exclude=(0, 1, 2)),
-        expected_text="type[BuildsWithSig[type[Dict[str, Any]], ()]]",
+        expected_text="type[BuildsWithSig[type[dict[str, Any]], ()]]",
     )
 
     reveal_type(
         kwargs_of(bar, zen_exclude=(0, 1, 2, 3)),
-        expected_text="type[Builds[type[Dict[str, Any]]]]",
+        expected_text="type[Builds[type[dict[str, Any]]]]",
     )
 
     reveal_type(
         kwargs_of(bar, zen_exclude=(1,)),
-        expected_text="type[Builds[type[Dict[str, Any]]]]",
+        expected_text="type[Builds[type[dict[str, Any]]]]",
     )
 
     reveal_type(
         kwargs_of(bar, zen_exclude=[0]),
-        expected_text="type[Builds[type[Dict[str, Any]]]]",
+        expected_text="type[Builds[type[dict[str, Any]]]]",
     )
 
     reveal_type(
         kwargs_of(bar, x=1, zen_exclude=(0,)),
-        expected_text="type[Builds[type[Dict[str, Any]]]]",
+        expected_text="type[Builds[type[dict[str, Any]]]]",
     )
 
 

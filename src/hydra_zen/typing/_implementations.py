@@ -5,6 +5,7 @@
 
 import sys
 import types
+from collections.abc import ByteString, Mapping, Sequence
 from dataclasses import _MISSING_TYPE  # pyright: ignore[reportPrivateUsage]
 from datetime import timedelta
 from enum import Enum
@@ -12,26 +13,17 @@ from pathlib import Path, PosixPath, WindowsPath
 from typing import (
     TYPE_CHECKING,
     Any,
-    ByteString,
     Callable,
     ClassVar,
-    Dict,
-    FrozenSet,
-    List,
-    Mapping,
+    Final,
     NewType,
     Optional,
-    Sequence,
-    Set,
-    Tuple,
-    Type,
     TypeVar,
     Union,
 )
 
 from omegaconf import DictConfig, ListConfig
 from typing_extensions import (
-    Final,
     Literal,
     ParamSpec,
     Protocol,
@@ -70,7 +62,7 @@ T3 = TypeVar("T3")
 T4 = TypeVar("T4", bound=Callable[..., Any])
 
 
-InstOrType: TypeAlias = Union[T, Type[T]]
+InstOrType: TypeAlias = Union[T, type[T]]
 
 
 if TYPE_CHECKING:
@@ -79,7 +71,7 @@ else:
 
     class Field(Protocol[T2]):
         name: str
-        type: Type[T2]
+        type: type[T2]
         default: T2
         default_factory: Callable[[], T2]
         repr: bool
@@ -99,13 +91,13 @@ class Partial(Protocol[T2]):
     def func(self) -> Callable[..., T2]: ...
 
     @property
-    def args(self) -> Tuple[Any, ...]: ...
+    def args(self) -> tuple[Any, ...]: ...
 
     @property
-    def keywords(self) -> Dict[str, Any]: ...
+    def keywords(self) -> dict[str, Any]: ...
 
     def __new__(
-        cls: Type[Self], __func: Callable[..., T2], *args: Any, **kwargs: Any
+        cls: type[Self], __func: Callable[..., T2], *args: Any, **kwargs: Any
     ) -> Self: ...
 
     if TYPE_CHECKING and sys.version_info >= (3, 9):  # pragma: no cover
@@ -118,7 +110,7 @@ InterpStr = NewType("InterpStr", str)
 
 class DataClass_(Protocol):
     # doesn't provide __init__, __getattribute__, etc.
-    __dataclass_fields__: ClassVar[Dict[str, Field[Any]]]
+    __dataclass_fields__: ClassVar[dict[str, Field[Any]]]
 
 
 class DataClass(DataClass_, Protocol):
@@ -189,14 +181,14 @@ _HydraPrimitive: TypeAlias = Union[
 HydraSupportedType = Union[
     _HydraPrimitive,
     DataClass_,
-    Type[DataClass_],
+    type[DataClass_],
     ListConfig,
     DictConfig,
     Enum,
     _MISSING_TYPE,
     # Even thought this is redundant with Sequence, it seems to
     # be needed for pyright to do proper checking of tuple contents
-    Tuple["HydraSupportedType", ...],
+    tuple["HydraSupportedType", ...],
     Sequence["HydraSupportedType"],
     Mapping[Any, "HydraSupportedType"],
 ]
@@ -206,7 +198,7 @@ configs provided to Hydra."""
 _SupportedViaBuilds = Union[
     Partial[Any],
     range,
-    Set[Any],
+    set[Any],
     timedelta,
     types.SimpleNamespace,
 ]
@@ -226,10 +218,10 @@ _SupportedPrimitive: TypeAlias = Union[
 
 SupportedPrimitive: TypeAlias = Union[
     _SupportedPrimitive,
-    FrozenSet["SupportedPrimitive"],
+    frozenset["SupportedPrimitive"],
     # Even thought this is redundant with Sequence, it seems to
     # be needed for pyright to do proper checking of tuple contents
-    Tuple["SupportedPrimitive", ...],
+    tuple["SupportedPrimitive", ...],
     # Mutable generic containers need to be invariant, so
     # we have to settle for Sequence/Mapping. While this
     # is overly permissive in terms of sequence-type, it
@@ -244,7 +236,7 @@ functions."""
 CustomConfigType: TypeAlias = Union[
     T2,
     HydraSupportedType,
-    Tuple["CustomConfigType[T2]", ...],
+    tuple["CustomConfigType[T2]", ...],
     Sequence["CustomConfigType[T2]"],
     Mapping[Any, "CustomConfigType[T2]"],
     Partial["CustomConfigType[T2]"],
@@ -276,9 +268,9 @@ ZenWrapper: TypeAlias = Union[
     Builds[Callable[[T4], T4]],
     PartialBuilds[Callable[[T4], T4]],
     Just[Callable[[T4], T4]],
-    Type[Builds[Callable[[T4], T4]]],
-    Type[PartialBuilds[Callable[[T4], T4]]],
-    Type[Just[Callable[[T4], T4]]],
+    type[Builds[Callable[[T4], T4]]],
+    type[PartialBuilds[Callable[[T4], T4]]],
+    type[Just[Callable[[T4], T4]]],
     Callable[[T4], T4],
     str,
 ]
@@ -287,9 +279,9 @@ ZenWrapper: TypeAlias = Union[
 ZenWrappers: TypeAlias = Union[ZenWrapper[T4], Sequence[ZenWrapper[T4]]]
 
 
-DefaultsList = List[
+DefaultsList = list[
     Union[
-        str, DataClass_, Type[DataClass_], Mapping[str, Union[None, str, Sequence[str]]]
+        str, DataClass_, type[DataClass_], Mapping[str, Union[None, str, Sequence[str]]]
     ]
 ]
 
@@ -402,8 +394,8 @@ class ZenConvert(TypedDict, total=False):
 
 class _AllPyDataclassOptions(TypedDict, total=False):
     cls_name: str
-    namespace: Optional[Dict[str, Any]]
-    bases: Tuple[Type[DataClass_], ...]
+    namespace: Optional[dict[str, Any]]
+    bases: tuple[type[DataClass_], ...]
     init: bool
     repr: bool
     eq: bool
@@ -608,7 +600,7 @@ class DataclassOptions(_Py312Dataclass, total=False):
     target_repr: bool
 
 
-def _permitted_keys(typed_dict: Any) -> FrozenSet[str]:
+def _permitted_keys(typed_dict: Any) -> frozenset[str]:
     return typed_dict.__required_keys__ | typed_dict.__optional_keys__
 
 

@@ -1,7 +1,7 @@
 # Copyright (c) 2025 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 
@@ -54,7 +54,7 @@ from hydra_zen.typing import ZenConvert, DataclassOptions
 
 # We use this to cache pyright scan results
 # so that we can report their results via parameterized tests
-PYRIGHT_SCAN_RESULTS: Dict[Any, PyrightOutput] = {}
+PYRIGHT_SCAN_RESULTS: dict[Any, PyrightOutput] = {}
 
 
 FUNCS_TO_SCAN = [

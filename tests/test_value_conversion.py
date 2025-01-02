@@ -4,12 +4,13 @@ import inspect
 import pickle
 import string
 from collections import Counter, defaultdict, deque
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import timedelta
 from enum import Enum
 from functools import partial
 from pathlib import Path
-from typing import Any, Callable, Dict, FrozenSet, Iterable, List, Set, Union
+from typing import Any, Callable, Union
 
 import hypothesis.strategies as st
 import pytest
@@ -53,15 +54,15 @@ class Shake(Enum):
         str,
         type(None),
         Shake,
-        List[Union[int, List[int], Dict[int, int]]],
-        Dict[int, Union[int, List[int], Dict[int, int]]],
+        list[Union[int, list[int], dict[int, int]]],
+        dict[int, Union[int, list[int], dict[int, int]]],
         ListConfig,
         DictConfig,
         # hydra-zen supported primitives
         set,
         frozenset,
-        FrozenSet[Union[int, complex]],
-        Set[Union[int, complex, Path]],
+        frozenset[Union[int, complex]],
+        set[Union[int, complex, Path]],
         complex,
         Path,
         bytes,
@@ -128,7 +129,7 @@ Blist = pik_blds(dict, x=[1, {"a": 2}], zen_dataclass={"cls_name": "Blist"})
 Blistconfig = pik_blds(
     dict, x=ListConfig([1, {"a": 2}]), zen_dataclass={"cls_name": "Blistconfig"}
 )
-Bset = pik_blds(dict, x=set([1, 2]), zen_dataclass={"cls_name": "Bset"})
+Bset = pik_blds(dict, x={1, 2}, zen_dataclass={"cls_name": "Bset"})
 Bfrozenset = pik_blds(
     dict, x=frozenset([1j, 2j]), zen_dataclass={"cls_name": "Bfrozenset"}
 )
@@ -327,8 +328,8 @@ def test_zen_supported_primitives_arent_supported_by_hydra(type_, data: st.DataO
 @dataclass
 class A_builds_populate_sig_with_default_factory:
     z: Any
-    x_list: List[int] = field(default_factory=lambda: list([1, 0, 1, 0, 1]))
-    x_dict: Dict[str, int] = field(default_factory=lambda: dict({"K_DEFAULT": 10101}))
+    x_list: list[int] = field(default_factory=lambda: list([1, 0, 1, 0, 1]))
+    x_dict: dict[str, int] = field(default_factory=lambda: dict({"K_DEFAULT": 10101}))
     y: bool = False
 
 
@@ -380,7 +381,7 @@ def test_builds_populate_sig_with_default_factory(
 class A_auto_config_for_dataclass_fields:
     complex_factory: Any = mutable_value(1 + 2j)
     complex_: complex = 2 + 4j
-    list_of_stuff: List[Any] = field(
+    list_of_stuff: list[Any] = field(
         default_factory=lambda: list([1 + 2j, Path.home()])
     )
     fn_factory: Callable[[Iterable[int]], int] = field(default_factory=lambda: sum)

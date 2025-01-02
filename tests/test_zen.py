@@ -6,7 +6,7 @@ import pickle
 import random
 import sys
 from dataclasses import dataclass
-from typing import Any, Tuple
+from typing import Any
 
 import pytest
 from hypothesis import example, given, strategies as st
@@ -288,7 +288,7 @@ def test_custom_zen_wrapper(x, wrap_mode):
     class MyZen(Zen):
         CFG_NAME: str = "secret_cfg"
 
-        def __call__(self, cfg) -> Tuple[Any, str]:
+        def __call__(self, cfg) -> tuple[Any, str]:
             return (super().__call__(cfg), "moo")
 
     if wrap_mode == "decorator":

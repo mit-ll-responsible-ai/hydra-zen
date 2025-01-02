@@ -92,7 +92,7 @@ expected3 = expected2
 
 
 def strip_interspacing(x: str):
-    return "\n".join((s for s in x.splitlines() if s))
+    return "\n".join(s for s in x.splitlines() if s)
 
 
 @pytest.mark.parametrize(

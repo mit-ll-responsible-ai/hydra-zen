@@ -4,6 +4,7 @@
 
 import warnings
 from collections import defaultdict
+from collections.abc import Generator, Iterable, Mapping, Sequence
 from contextvars import copy_context
 from copy import deepcopy
 from functools import partial, wraps
@@ -13,18 +14,9 @@ from typing import (
     Any,
     Callable,
     DefaultDict,
-    Dict,
-    FrozenSet,
-    Generator,
+    Final,
     Generic,
-    Iterable,
-    List,
-    Mapping,
     Optional,
-    Sequence,
-    Set,
-    Tuple,
-    Type,
     TypeVar,
     Union,
     cast,
@@ -36,7 +28,6 @@ from hydra.conf import HydraConf
 from hydra.core.config_store import ConfigStore
 from omegaconf import DictConfig, ListConfig, OmegaConf
 from typing_extensions import (
-    Final,
     Literal,
     ParamSpec,
     Protocol,
@@ -80,12 +71,12 @@ F2 = TypeVar("F2", bound=Callable[..., Any])
 _UNSPECIFIED_: Any = object()
 
 
-_SUPPORTED_INSTANTIATION_TYPES: Tuple[Any, ...] = (dict, DictConfig, list, ListConfig)
+_SUPPORTED_INSTANTIATION_TYPES: tuple[Any, ...] = (dict, DictConfig, list, ListConfig)
 
 ConfigLike: TypeAlias = Union[
     DataClass_,
-    Type[DataClass_],
-    Dict[Any, Any],
+    type[DataClass_],
+    dict[Any, Any],
     DictConfig,
 ]
 
@@ -234,7 +225,7 @@ class Zen(Generic[P, R]):
         )
 
         self._run_in_context: bool = run_in_context
-        self._exclude: Set[str]
+        self._exclude: set[str]
 
         if exclude is None:
             self._exclude = set()
@@ -286,9 +277,9 @@ class Zen(Generic[P, R]):
         self,
         cfg: Union[
             DataClass_,
-            Type[DataClass_],
-            Dict[Any, Any],
-            List[Any],
+            type[DataClass_],
+            dict[Any, Any],
+            list[Any],
             ListConfig,
             DictConfig,
             str,
@@ -338,7 +329,7 @@ class Zen(Generic[P, R]):
             p.kind is p.POSITIONAL_ONLY for p in self.parameters.values()
         )
 
-        _args_: List[Any] = getattr(cfg, "_args_", [])
+        _args_: list[Any] = getattr(cfg, "_args_", [])
 
         if not isinstance(_args_, Sequence):
             raise HydraZenValidationError(
@@ -352,7 +343,7 @@ class Zen(Generic[P, R]):
                 f"arguments via `_args_`."
             )
 
-        missing_params: List[str] = []
+        missing_params: list[str] = []
         for name, param in self.parameters.items():
             if name in self._exclude:
                 continue
@@ -538,7 +529,7 @@ def zen(
     *,
     unpack_kwargs: bool = ...,
     pre_call: PreCall = ...,
-    ZenWrapper: Type[Zen[Any, Any]] = ...,
+    ZenWrapper: type[Zen[Any, Any]] = ...,
     resolve_pre_call: bool = ...,
     run_in_context: bool = ...,
     exclude: Optional[Union[str, Iterable[str]]] = ...,
@@ -553,7 +544,7 @@ def zen(
     unpack_kwargs: bool = ...,
     pre_call: PreCall = ...,
     resolve_pre_call: bool = ...,
-    ZenWrapper: Type[Zen[Any, Any]] = ...,
+    ZenWrapper: type[Zen[Any, Any]] = ...,
     run_in_context: bool = ...,
     exclude: Optional[Union[str, Iterable[str]]] = ...,
     instantiation_wrapper: Optional[Callable[[F2], F2]] = ...,
@@ -568,7 +559,7 @@ def zen(
     exclude: Optional[Union[str, Iterable[str]]] = None,
     resolve_pre_call: bool = True,
     run_in_context: bool = False,
-    ZenWrapper: Type[Zen[Any, Any]] = Zen,
+    ZenWrapper: type[Zen[Any, Any]] = Zen,
     instantiation_wrapper: Optional[Callable[[F2], F2]] = None,
 ) -> Union[Callable[[Callable[P2, R2]], Zen[P2, R2]], Zen[P, R]]:
     r"""zen(func, /, pre_call, ZenWrapper)
@@ -860,14 +851,14 @@ def default_to_config(
     target: Union[
         Callable[..., Any],
         DataClass_,
-        List[Any],
-        Dict[Any, Any],
+        list[Any],
+        dict[Any, Any],
         ListConfig,
         DictConfig,
     ],
-    CustomBuildsFn: Type["BuildsFn[Any]"] = DefaultBuilds,
+    CustomBuildsFn: type["BuildsFn[Any]"] = DefaultBuilds,
     **kw: Any,
-) -> Union[DataClass_, Type[DataClass_], ListConfig, DictConfig]:
+) -> Union[DataClass_, type[DataClass_], ListConfig, DictConfig]:
     """Creates a config that describes `target`.
 
     This function is designed to selectively apply `hydra_zen.builds` or
@@ -957,7 +948,7 @@ def default_to_config(
     else:
         t = cast(Callable[..., Any], target)
         kw.setdefault("populate_full_signature", True)
-        return cast(Type[DataClass_], CustomBuildsFn.builds(t, **kw))
+        return cast(type[DataClass_], CustomBuildsFn.builds(t, **kw))
 
 
 class _HasName(Protocol):
@@ -986,7 +977,7 @@ class _StoreCallSig(TypedDict):
     group: Union[GroupName, Callable[[Any], GroupName]]
     package: Optional[Union[str, Callable[[Any], str]]]
     provider: Optional[str]
-    __kw: Dict[str, Any]  # kwargs passed to to_config
+    __kw: dict[str, Any]  # kwargs passed to to_config
     to_config: Callable[[Any], Any]
 
 
@@ -1000,7 +991,7 @@ defaults: Final = _StoreCallSig(
     __kw={},
 )
 
-_DEFAULT_KEYS: Final[FrozenSet[str]] = frozenset(
+_DEFAULT_KEYS: Final[frozenset[str]] = frozenset(
     _StoreCallSig.__required_keys__ - {"__kw"}
 )
 
@@ -1009,7 +1000,7 @@ class _Deferred:
     __slots__ = ("to_config", "target", "kw")
 
     def __init__(
-        self, to_config: Callable[[F], Node], target: F, kw: Dict[str, Any]
+        self, to_config: Callable[[F], Node], target: F, kw: dict[str, Any]
     ) -> None:
         self.to_config = to_config
         self.target = target
@@ -1432,9 +1423,9 @@ class ZenStore:
 
         # The following attributes are mirrored across store instances that are
         # created via the 'self-partialing' process
-        self._internal_repo: Dict[Tuple[GroupName, NodeName], StoreEntry] = {}
+        self._internal_repo: dict[tuple[GroupName, NodeName], StoreEntry] = {}
         # Internal repo entries that have yet to be added to Hydra's config store
-        self._queue: Set[Tuple[GroupName, NodeName]] = set()
+        self._queue: set[tuple[GroupName, NodeName]] = set()
 
         self._deferred_to_config = deferred_to_config
         self._deferred_store = deferred_hydra_store
@@ -1446,7 +1437,7 @@ class ZenStore:
 
     def __repr__(self) -> str:
         # TODO: nicer repr?
-        groups_contents: DefaultDict[Optional[str], List[str]] = defaultdict(list)
+        groups_contents: DefaultDict[Optional[str], list[str]] = defaultdict(list)
         for grp, name in self._internal_repo:
             groups_contents[grp].append(name)
 
@@ -1751,13 +1742,13 @@ class ZenStore:
     @property
     def groups(self) -> Sequence[GroupName]:
         """Returns a sorted list of the groups registered with this store"""
-        set_: Set[GroupName] = set(group for group, _ in self._internal_repo)
+        set_: set[GroupName] = {group for group, _ in self._internal_repo}
         if None in set_:
             set_.remove(None)
-            no_none = cast(Set[str], set_)
+            no_none = cast(set[str], set_)
             return [None] + sorted(no_none)
         else:
-            no_none = cast(Set[str], set_)
+            no_none = cast(set[str], set_)
             return sorted(no_none)
 
     def enqueue_all(self) -> None:
@@ -1893,12 +1884,12 @@ class ZenStore:
         return self
 
     @overload
-    def __getitem__(self, key: Tuple[GroupName, NodeName]) -> Node: ...
+    def __getitem__(self, key: tuple[GroupName, NodeName]) -> Node: ...
 
     @overload
-    def __getitem__(self, key: GroupName) -> Dict[Tuple[GroupName, NodeName], Node]: ...
+    def __getitem__(self, key: GroupName) -> dict[tuple[GroupName, NodeName], Node]: ...
 
-    def __getitem__(self, key: Union[GroupName, Tuple[GroupName, NodeName]]) -> Node:
+    def __getitem__(self, key: Union[GroupName, tuple[GroupName, NodeName]]) -> Node:
         """Access a entry's config node by specifying `(group, name)`. Or, access a
         mapping of `(group, name) -> node` for all nodes in a specified group,
         including nodes within subgroups.
@@ -1951,7 +1942,7 @@ class ZenStore:
             }
         return _resolve_node(self._internal_repo[key], copy=False)["node"]
 
-    def __delitem__(self, key: Tuple[GroupName, NodeName]) -> None:
+    def __delitem__(self, key: tuple[GroupName, NodeName]) -> None:
         del self._internal_repo[key]
         self._queue.discard(key)
 
@@ -2011,7 +2002,7 @@ class ZenStore:
         if not self._deferred_store:
             self.add_to_hydra_store()
 
-    def __contains__(self, key: Union[GroupName, Tuple[GroupName, NodeName]]) -> bool:
+    def __contains__(self, key: Union[GroupName, tuple[GroupName, NodeName]]) -> bool:
         """Checks if group or (group, node-name) exists in zen-store."""
         if key is None:
             return any(k[0] is None for k in self._internal_repo)  # pragma: no branch

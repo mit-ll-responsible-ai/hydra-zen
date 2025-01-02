@@ -3,12 +3,11 @@
 
 import inspect
 from collections import deque
+from collections.abc import Sequence
 from functools import wraps
 from typing import (
     Callable,
     NamedTuple,
-    Sequence,
-    Type,
     TypeVar,
     Union,
     cast,
@@ -25,7 +24,7 @@ _T = TypeVar("_T", bound=Callable)
 __all__ = ["coerce_sequences"]
 
 
-def _is_namedtuple_type(x) -> TypeGuard[Type[NamedTuple]]:  # pragma: no cover
+def _is_namedtuple_type(x) -> TypeGuard[type[NamedTuple]]:  # pragma: no cover
     try:
         bases = x.__bases__
         fields = x._fields

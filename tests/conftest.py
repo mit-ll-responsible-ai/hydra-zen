@@ -6,8 +6,9 @@ import logging
 import os
 import sys
 import tempfile
+from collections.abc import Iterable
 from copy import deepcopy
-from typing import Dict, Iterable, Optional
+from typing import Optional
 
 import hypothesis.strategies as st
 import pytest
@@ -47,17 +48,7 @@ for _module_name in OPTIONAL_TEST_DEPENDENCIES:
         # suite runs against these paths being enabled
         importlib.import_module(_module_name)
 
-if sys.version_info > (3, 6):
-    collect_ignore_glob.append("*py36*")
-
-if sys.version_info < (3, 7):
-    collect_ignore_glob.append("**/*test_sequence_coercion.py")
-
-if sys.version_info < (3, 8):
-    collect_ignore_glob.append("*py38*")
-
-if sys.version_info < (3, 9):
-    collect_ignore_glob.append("*py39*")
+collect_ignore_glob.append("*py36*")
 
 if sys.version_info < (3, 10):
     collect_ignore_glob.append("*py310*")
@@ -87,7 +78,7 @@ def clean_store() -> Iterable[dict]:
 
 
 @pytest.fixture()
-def version_base() -> Dict[str, Optional[str]]:
+def version_base() -> dict[str, Optional[str]]:
     """Return version_base according to local version, or empty dict for versions
     preceding version_base"""
     return (

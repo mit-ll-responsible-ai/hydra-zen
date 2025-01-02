@@ -3,7 +3,7 @@
 # pyright: strict
 from dataclasses import MISSING
 from functools import partial
-from typing import TYPE_CHECKING, Any, Protocol, Type, Union
+from typing import TYPE_CHECKING, Any, Protocol, Union
 
 from typing_extensions import TypeGuard
 
@@ -87,7 +87,7 @@ def is_just(x: Any) -> TypeGuard[Just[Any]]:
 
 if TYPE_CHECKING:  # pragma: no cover
 
-    def is_dataclass(obj: Any) -> TypeGuard[Union[DataClass_, Type[DataClass_]]]: ...
+    def is_dataclass(obj: Any) -> TypeGuard[Union[DataClass_, type[DataClass_]]]: ...
 
 else:
     from dataclasses import is_dataclass
@@ -230,7 +230,7 @@ def is_partial_builds(x: Any) -> TypeGuard[PartialBuilds[Any]]:
 
 
 class HasOrigin(Protocol):
-    __origin__: Type[Any]
+    __origin__: type[Any]
 
 
 def is_generic_type(x: Any) -> TypeGuard[HasOrigin]:

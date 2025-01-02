@@ -1,7 +1,7 @@
 # Copyright (c) 2025 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 from dataclasses import dataclass
-from typing import Any, List, Tuple
+from typing import Any
 
 import hypothesis.strategies as st
 import pytest
@@ -93,7 +93,7 @@ class A:
     ],
 )
 def test_hydra_convert(
-    convert: str, expected_types: List[type], via_hydrated_dataclass: bool
+    convert: str, expected_types: list[type], via_hydrated_dataclass: bool
 ):
     """Tests that the `hydra_convert` parameter produces the expected/documented
     behavior in hydra."""
@@ -198,7 +198,7 @@ def test_recursive(recursive: bool, via_hydrated_dataclass: bool):
         assert out == {"x": {"_target_": target_path, "y": 1}}
 
 
-def f(x: Tuple[int]):
+def f(x: tuple[int]):
     return x
 
 
@@ -211,7 +211,7 @@ def g(x: C):
     return x
 
 
-def g2(x: List[C]):
+def g2(x: list[C]):
     return x
 
 
