@@ -8,16 +8,22 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse 
 chronological order. All previous releases should still be available on pip.
 
-.. _v0.13.0:
+.. _v0.14.0:
 
 ----------------------
-0.13.1rc1 - 2024-07-13
+0.14.0rc1 - 2025-01-02
 ----------------------
 
 .. note:: This is documentation for an pre-release version of hydra-zen. You can install this pre-release via `pip install --pre hydra-zen`
 
+- Drops support for Python 3.8
+- Adds support for Python 3.13
+- Minimum supported version of omegaconf is increased from 2.2.1 to 2.2.3
 - Adds compatibility with NumPy 2.0.0.
+- Adds compatibility with jax 0.4.32+
 - :func:`~hydra_zen.builds` and `~hydra_zen.just` now support classes defined within classes as targets. See :pull:`708`.
+- The `hydrated_dataclass` decorator now respects the docstring of the class that it decorates. See :issue:`750`.
+- Fixes a bug where `pydantic_parser` cannot be passed a `pydantic.BaseModel` as a target. See :issue:`723`.
 
 .. _v0.13.0:
 

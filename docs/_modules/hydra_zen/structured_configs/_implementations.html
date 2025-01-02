@@ -913,7 +913,8 @@
             <span class="p">},</span>
             <span class="n">zen_convert</span><span class="o">=</span><span class="n">zen_convert</span><span class="p">,</span>
         <span class="p">)</span>
-
+        <span class="k">if</span> <span class="n">decorated_obj</span><span class="o">.</span><span class="vm">__doc__</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="n">out</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">decorated_obj</span><span class="o">.</span><span class="vm">__doc__</span>
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="k">return</span> <span class="n">wrapper</span></div>

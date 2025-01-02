@@ -496,10 +496,14 @@
 <span class="sd">    (1, 2, 3)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isbuiltin</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">target</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">_T</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">_pyd</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+        <span class="c1"># this already applies pydantic parsing</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">_T</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">_get_signature</span><span class="p">(</span><span class="n">target</span><span class="p">)):</span>
-        <span class="k">return</span> <span class="n">target</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">_T</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">_T</span><span class="p">,</span> <span class="n">parser</span><span class="p">(</span><span class="n">_constructor_as_fn</span><span class="p">(</span><span class="n">target</span><span class="p">)))</span>
