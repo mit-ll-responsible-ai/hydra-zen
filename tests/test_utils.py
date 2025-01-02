@@ -43,12 +43,7 @@ from typing_extensions import (
 )
 
 from hydra_zen import DefaultBuilds, builds, instantiate, mutable_value
-from hydra_zen._compatibility import (
-    HYDRA_VERSION,
-    OMEGACONF_VERSION,
-    Version,
-    _get_version,
-)
+from hydra_zen._compatibility import HYDRA_VERSION, Version, _get_version
 from hydra_zen.structured_configs._utils import (
     StrictDataclassOptions,
     field,
@@ -152,9 +147,9 @@ NoneType: TypeAlias = None
         (C, Any),  # unsupported primitives
         (type(None), Any),
         (set, Any),
-        (list, (List if OMEGACONF_VERSION < Version(2, 2, 3) else list)),
-        (tuple, (Any if OMEGACONF_VERSION < Version(2, 2, 3) else tuple)),
-        (dict, (Dict if OMEGACONF_VERSION < Version(2, 2, 3) else dict)),
+        (list, list),
+        (tuple, tuple),
+        (dict, dict),
         (callable, Any),
         (frozenset, Any),
         (List, list),

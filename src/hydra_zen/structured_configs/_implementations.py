@@ -60,9 +60,7 @@ from typing_extensions import (
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVE_TYPES,
     HYDRA_SUPPORTED_PRIMITIVES,
-    OMEGACONF_VERSION,
     ZEN_SUPPORTED_PRIMITIVES,
-    Version,
 )
 from hydra_zen.errors import (
     HydraZenDeprecationWarning,
@@ -831,12 +829,6 @@ class BuildsFn(Generic[T]):
                 nested=nested,
             )
 
-        if OMEGACONF_VERSION < Version(2, 2, 3):  # pragma: no cover
-            try:
-                type_ = {list: List, tuple: Tuple, dict: Dict}.get(type_, type_)
-            except TypeError:
-                pass
-
         # Warning: mutating `type_` will mutate the signature being inspected
         # Even calling deepcopy(`type_`) silently fails to prevent this.
         origin = get_origin(type_)
@@ -912,7 +904,7 @@ class BuildsFn(Generic[T]):
                 #
                 # Otherwise we preserve the annotation as accurately as possible
                 if not args:
-                    return Any if OMEGACONF_VERSION < (2, 2, 3) else tuple
+                    return tuple
 
                 args = cast(tuple[type, ...], args)
                 unique_args = set(args)
