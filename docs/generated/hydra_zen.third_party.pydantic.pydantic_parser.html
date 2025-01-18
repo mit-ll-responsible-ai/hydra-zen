@@ -25,9 +25,9 @@
 <!-- Loaded before other Sphinx assets -->
 <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
-<link href="../_static/pygments.css?v=a746c00c" rel="stylesheet" type="text/css">
+<link href="../_static/pygments.css?v=8f2a1f02" rel="stylesheet" type="text/css">
 <link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
-<link href="../_static/sphinx-codeautolink.css?v=125d5c1c" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css"/>
 <link href="../_static/sphinx-design.min.css?v=95c83b7e" rel="stylesheet" type="text/css"/>
 <!-- So that users can add custom icons -->
 <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -302,12 +302,12 @@ to the (recursive) instantiation of the target.</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a>
-<span class="kn">from</span> <span class="nn">hydra_zen.third_party.pydantic</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.third_party.pydantic.pydantic_parser.html#hydra_zen.third_party.pydantic.pydantic_parser" title="hydra_zen.third_party.pydantic.pydantic_parser"><span class="n">pydantic_parser</span></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.third_party.pydantic</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.third_party.pydantic.pydantic_parser.html#hydra_zen.third_party.pydantic.pydantic_parser" title="hydra_zen.third_party.pydantic.pydantic_parser"><span class="n">pydantic_parser</span></a>
 
-<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">PositiveInt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">PositiveInt</span>
 
-<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">PositiveInt</span><span class="p">):</span> <span class="k">return</span> <span class="n">x</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">PositiveInt</span><span class="p">):</span> <span class="k">return</span> <span class="n">x</span>
 
 <span class="n">good_conf</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">bad_conf</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mi">3</span><span class="p">)</span>
@@ -323,7 +323,7 @@ to the (recursive) instantiation of the target.</p>
 only produce lists from the CLI, but this parsing layer can
 convert them based on the annotated type. (Note: this only
 works for pydantic v2 and higher.)</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="tuple"><span class="nb">tuple</span></a><span class="p">):</span> <span class="k">return</span> <span class="n">x</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">g</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="tuple"><span class="nb">tuple</span></a><span class="p">):</span> <span class="k">return</span> <span class="n">x</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">_target_wrapper_</span><span class="o">=</span><span class="n">pydantic_parser</span><span class="p">)</span>
 <span class="go">(1, 2, 3)</span>

@@ -26,9 +26,9 @@
 <!-- Loaded before other Sphinx assets -->
 <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
-<link href="../_static/pygments.css?v=a746c00c" rel="stylesheet" type="text/css">
+<link href="../_static/pygments.css?v=8f2a1f02" rel="stylesheet" type="text/css">
 <link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
-<link href="../_static/sphinx-codeautolink.css?v=125d5c1c" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css"/>
 <link href="../_static/sphinx-design.min.css?v=95c83b7e" rel="stylesheet" type="text/css"/>
 <!-- So that users can add custom icons -->
 <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -260,20 +260,20 @@ And, suppose that there are particular database-server configurations that we wa
 <p>First, we well create configs for our two servers and our two databases and we will add them to <a class="reference internal" href="../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.ZenStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">hydra-zen's</span> <span class="pre">config</span> <span class="pre">store</span></code></a>.</p>
 <div class="literal-block-wrapper docutils container" id="id3">
 <div class="code-block-caption"><span class="caption-text">Contents of <code class="xref py py-obj docutils literal notranslate"><span class="pre">my_app.py</span></code></span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a>
 
-<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">store</span><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <span class="n">store</span><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a>
 
 <span class="c1"># 1. Creating and storing basic configs</span>
 
 <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="nd">@dataclass</span></a>
-<span class="k">class</span> <span class="nc">Server</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Server</span><span class="p">:</span>
     <span class="n">name</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a>
     <span class="n">port</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a>
 
 
 <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="nd">@dataclass</span></a>
-<span class="k">class</span> <span class="nc">Database</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Database</span><span class="p">:</span>
     <span class="n">name</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a>
 
 <span class="c1"># For convenience:</span>
@@ -295,8 +295,8 @@ And, suppose that there are particular database-server configurations that we wa
 
 
 <span class="c1"># 2. Defining our app's task function and the top-level config</span>
-<span class="k">def</span> <span class="nf">task</span><span class="p">(</span><span class="n">db</span><span class="p">:</span> <span class="n">Database</span><span class="p">,</span> <span class="n">server</span><span class="p">:</span> <span class="n">Server</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a>
+<span class="k">def</span><span class="w"> </span><span class="nf">task</span><span class="p">(</span><span class="n">db</span><span class="p">:</span> <span class="n">Database</span><span class="p">,</span> <span class="n">server</span><span class="p">:</span> <span class="n">Server</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a>
 
     <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="sa">f</span><span class="s2">"db:</span><span class="se">\n</span><span class="si">{</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">(</span><span class="n">db</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="sa">f</span><span class="s2">"server:</span><span class="se">\n</span><span class="si">{</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">(</span><span class="n">server</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
@@ -374,7 +374,7 @@ And, suppose that there are particular database-server configurations that we wa
 <div class="code-block-caption"><span class="caption-text">3: Adding experiment configs (an addition to <code class="xref py py-obj docutils literal notranslate"><span class="pre">my_app.py</span></code>)</span><a class="headerlink" href="#id7" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># add the following before the __main__ clause of `my_app.py`</span>
 
-<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a>
 
 <span class="c1"># the experiment configs:</span>
 <span class="c1"># - must be stored under the _global_ package</span>

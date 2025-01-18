@@ -29,9 +29,9 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-codeautolink.css?v=125d5c1c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-codeautolink.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
@@ -387,11 +387,11 @@
 <span></span><span class="c1"># Copyright (c) 2025 Massachusetts Institute of Technology</span>
 <span class="c1"># SPDX-License-Identifier: MIT</span>
 <span class="c1"># pyright: strict</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Mapping</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Mapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TYPE_CHECKING</span><span class="p">,</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
@@ -403,15 +403,15 @@
     <span class="n">overload</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Literal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
 
-<span class="kn">from</span> <span class="nn">hydra_zen.errors</span> <span class="kn">import</span> <span class="n">HydraZenDeprecationWarning</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">DataclassOptions</span><span class="p">,</span> <span class="n">ZenWrappers</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing._builds_overloads</span> <span class="kn">import</span> <span class="n">FullBuilds</span><span class="p">,</span> <span class="n">PBuilds</span><span class="p">,</span> <span class="n">StdBuilds</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">InstOrType</span><span class="p">,</span> <span class="n">ZenConvert</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">HydraZenDeprecationWarning</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataclassOptions</span><span class="p">,</span> <span class="n">ZenWrappers</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.typing._builds_overloads</span><span class="w"> </span><span class="kn">import</span> <span class="n">FullBuilds</span><span class="p">,</span> <span class="n">PBuilds</span><span class="p">,</span> <span class="n">StdBuilds</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.typing._implementations</span><span class="w"> </span><span class="kn">import</span> <span class="n">InstOrType</span><span class="p">,</span> <span class="n">ZenConvert</span>
 
-<span class="kn">from</span> <span class="nn">._implementations</span> <span class="kn">import</span> <span class="n">BuildsFn</span><span class="p">,</span> <span class="n">DefaultBuilds</span><span class="p">,</span> <span class="n">builds</span>
-<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">parse_dataclass_options</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._implementations</span><span class="w"> </span><span class="kn">import</span> <span class="n">BuildsFn</span><span class="p">,</span> <span class="n">DefaultBuilds</span><span class="p">,</span> <span class="n">builds</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_dataclass_options</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;make_custom_builds_fn&quot;</span><span class="p">]</span>
 
@@ -436,7 +436,7 @@
 
 <span class="c1"># partial=False, pop-sig=True</span>
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">make_custom_builds_fn</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_custom_builds_fn</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -454,7 +454,7 @@
 
 <span class="c1"># partial=True, pop-sig=bool</span>
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">make_custom_builds_fn</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_custom_builds_fn</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">],</span>
     <span class="n">zen_wrappers</span><span class="p">:</span> <span class="n">ZenWrappers</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -472,7 +472,7 @@
 
 <span class="c1"># partial=False, pop-sig=False</span>
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">make_custom_builds_fn</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_custom_builds_fn</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -490,7 +490,7 @@
 
 <span class="c1"># partial=False, pop-sig=bool</span>
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">make_custom_builds_fn</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_custom_builds_fn</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -508,7 +508,7 @@
 
 <span class="c1"># partial=bool, pop-sig=False</span>
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">make_custom_builds_fn</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_custom_builds_fn</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -526,7 +526,7 @@
 
 <span class="c1"># partial=bool, pop-sig=bool</span>
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">make_custom_builds_fn</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_custom_builds_fn</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -548,7 +548,7 @@
 
 <div class="viewcode-block" id="make_custom_builds_fn">
 <a class="viewcode-back" href="../../../generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn">[docs]</a>
-<span class="k">def</span> <span class="nf">make_custom_builds_fn</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_custom_builds_fn</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">populate_full_signature</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -723,7 +723,7 @@
     <span class="n">_zen_dataclass</span> <span class="o">=</span> <span class="n">parse_dataclass_options</span><span class="p">(</span><span class="n">_zen_dataclass</span><span class="p">)</span>
 
     <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="n">merged_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;zen_dataclass&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 

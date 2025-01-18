@@ -29,9 +29,9 @@
   <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-codeautolink.css?v=125d5c1c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-codeautolink.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
@@ -386,11 +386,11 @@
   <h1>Source code for hydra_zen._launch</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) 2025 Massachusetts Institute of Technology</span>
 <span class="c1"># SPDX-License-Identifier: MIT</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">UserList</span>
-<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Mapping</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">fields</span><span class="p">,</span> <span class="n">is_dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserList</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">fields</span><span class="p">,</span> <span class="n">is_dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TYPE_CHECKING</span><span class="p">,</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
@@ -402,18 +402,18 @@
     <span class="n">overload</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">hydra</span> <span class="kn">import</span> <span class="n">initialize</span>
-<span class="kn">from</span> <span class="nn">hydra._internal.callbacks</span> <span class="kn">import</span> <span class="n">Callbacks</span>
-<span class="kn">from</span> <span class="nn">hydra.core.config_store</span> <span class="kn">import</span> <span class="n">ConfigStore</span>
-<span class="kn">from</span> <span class="nn">hydra.core.global_hydra</span> <span class="kn">import</span> <span class="n">GlobalHydra</span>
-<span class="kn">from</span> <span class="nn">hydra.core.utils</span> <span class="kn">import</span> <span class="n">JobReturn</span><span class="p">,</span> <span class="n">run_job</span>
-<span class="kn">from</span> <span class="nn">hydra.plugins.sweeper</span> <span class="kn">import</span> <span class="n">Sweeper</span>
-<span class="kn">from</span> <span class="nn">hydra.types</span> <span class="kn">import</span> <span class="n">HydraContext</span><span class="p">,</span> <span class="n">RunMode</span>
-<span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">,</span> <span class="n">OmegaConf</span>
-<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">TypeAlias</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra</span><span class="w"> </span><span class="kn">import</span> <span class="n">initialize</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra._internal.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callbacks</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra.core.config_store</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigStore</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra.core.global_hydra</span><span class="w"> </span><span class="kn">import</span> <span class="n">GlobalHydra</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra.core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">JobReturn</span><span class="p">,</span> <span class="n">run_job</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra.plugins.sweeper</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sweeper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">HydraContext</span><span class="p">,</span> <span class="n">RunMode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">omegaconf</span><span class="w"> </span><span class="kn">import</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">,</span> <span class="n">OmegaConf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">TypeAlias</span>
 
-<span class="kn">from</span> <span class="nn">hydra_zen._hydra_overloads</span> <span class="kn">import</span> <span class="n">instantiate</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass_</span><span class="p">,</span> <span class="n">InstOrType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen._hydra_overloads</span><span class="w"> </span><span class="kn">import</span> <span class="n">instantiate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.typing._implementations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataClass_</span><span class="p">,</span> <span class="n">InstOrType</span>
 
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Any</span><span class="p">)</span>
 <span class="n">HydraPrimitives</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
@@ -425,14 +425,14 @@
     <span class="n">TUserList</span> <span class="o">=</span> <span class="n">UserList</span>
 
 
-<span class="k">class</span> <span class="nc">_NotSet</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_NotSet</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="k">pass</span>
 
 
 <span class="n">T1</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T1&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">HydraPrimitives</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">hydra_list</span><span class="p">(</span><span class="n">TUserList</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">T1</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">hydra_list</span><span class="p">(</span><span class="n">TUserList</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">T1</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Signals that a sequence is provided as a single configured value (i.e. it is not</span>
 <span class="sd">    to be iterated over during a multirun)&quot;&quot;&quot;</span>
 
@@ -440,15 +440,15 @@
 <span class="n">T2</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T2&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Union</span><span class="p">[</span><span class="n">HydraPrimitives</span><span class="p">,</span> <span class="n">hydra_list</span><span class="p">[</span><span class="n">HydraPrimitives</span><span class="p">]])</span>
 
 
-<span class="k">class</span> <span class="nc">multirun</span><span class="p">(</span><span class="n">TUserList</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">T2</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">multirun</span><span class="p">(</span><span class="n">TUserList</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">T2</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Signals that a sequence is to be iterated over in a multirun&quot;&quot;&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">_safe_name</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_safe_name</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;__name__&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">value_check</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">value_check</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">value</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
     <span class="n">type_</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="o">...</span><span class="p">]],</span>
@@ -486,7 +486,7 @@
 <span class="n">OverrideDict</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">OverrideValues</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_process_dict_overrides</span><span class="p">(</span><span class="n">overrides</span><span class="p">:</span> <span class="n">OverrideDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_process_dict_overrides</span><span class="p">(</span><span class="n">overrides</span><span class="p">:</span> <span class="n">OverrideDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert dict overrides to a list of Hydra CLI compatible args&quot;&quot;&quot;</span>
     <span class="n">launch_overrides</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">overrides</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -505,7 +505,7 @@
     <span class="k">return</span> <span class="n">launch_overrides</span>
 
 
-<span class="k">def</span> <span class="nf">_store_config</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_store_config</span><span class="p">(</span>
     <span class="n">cfg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">,</span> <span class="nb">type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
     <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;hydra_launch&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -539,7 +539,7 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">launch</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">InstOrType</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
     <span class="n">task_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
     <span class="n">overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">OverrideDict</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -554,7 +554,7 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">launch</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">InstOrType</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
     <span class="n">task_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
     <span class="n">overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">OverrideDict</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -570,7 +570,7 @@
 
 <div class="viewcode-block" id="launch">
 <a class="viewcode-back" href="../../generated/hydra_zen.launch.html#hydra_zen.launch">[docs]</a>
-<span class="k">def</span> <span class="nf">launch</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">InstOrType</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
     <span class="n">task_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
     <span class="n">overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">OverrideDict</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>

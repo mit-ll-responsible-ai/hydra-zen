@@ -25,9 +25,9 @@
 <!-- Loaded before other Sphinx assets -->
 <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
-<link href="../_static/pygments.css?v=a746c00c" rel="stylesheet" type="text/css">
+<link href="../_static/pygments.css?v=8f2a1f02" rel="stylesheet" type="text/css">
 <link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
-<link href="../_static/sphinx-codeautolink.css?v=125d5c1c" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css"/>
 <link href="../_static/sphinx-design.min.css?v=95c83b7e" rel="stylesheet" type="text/css"/>
 <!-- So that users can add custom icons -->
 <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -313,16 +313,16 @@ by this function.</p>
 </dl>
 <p class="rubric">Examples</p>
 <p>Lists and dictionaries</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen.wrapper</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.wrapper.default_to_config.html#hydra_zen.wrapper.default_to_config" title="hydra_zen.wrapper.default_to_config"><span class="n">default_to_config</span></a>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.wrapper</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.wrapper.default_to_config.html#hydra_zen.wrapper.default_to_config" title="hydra_zen.wrapper.default_to_config"><span class="n">default_to_config</span></a>
 <span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.wrapper.default_to_config.html#hydra_zen.wrapper.default_to_config" title="hydra_zen.wrapper.default_to_config"><span class="n">default_to_config</span></a><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="p">{</span><span class="s2">"z"</span><span class="p">:</span> <span class="mi">2</span><span class="o">+</span><span class="mi">2</span><span class="n">j</span><span class="p">}])</span>
 <span class="go">[1, {'z': ConfigComplex(real=2.0, imag=2.0, _target_='builtins.complex')}]</span>
 </pre></div>
 </div>
 <p>Dataclass types</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a>
 <span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="nd">@dataclass</span></a>
-<span class="gp">... </span><span class="k">class</span> <span class="nc">A</span><span class="p">:</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">A</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a>
 <span class="gp">... </span>    <span class="n">y</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a>
 </pre></div>
@@ -335,8 +335,8 @@ by this function.</p>
 </pre></div>
 </div>
 <p>A function</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">):</span> <span class="o">...</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">func</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">):</span> <span class="o">...</span>
 <span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">(</span><span class="n">default_to_config</span><span class="p">(</span><span class="n">func</span><span class="p">)))</span>
 <span class="go">_target_: __main__.func</span>
 <span class="go">x: ???</span>

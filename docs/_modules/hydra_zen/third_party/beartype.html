@@ -29,9 +29,9 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-codeautolink.css?v=125d5c1c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-codeautolink.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
@@ -386,12 +386,12 @@
   <h1>Source code for hydra_zen.third_party.beartype</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) 2025 Massachusetts Institute of Technology</span>
 <span class="c1"># SPDX-License-Identifier: MIT</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">cast</span>
 
-<span class="kn">import</span> <span class="nn">beartype</span> <span class="k">as</span> <span class="nn">bt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">beartype</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bt</span>
 
-<span class="kn">from</span> <span class="nn">hydra_zen._utils.coerce</span> <span class="kn">import</span> <span class="n">coerce_sequences</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen._utils.coerce</span><span class="w"> </span><span class="kn">import</span> <span class="n">coerce_sequences</span>
 
 <span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
 
@@ -400,7 +400,7 @@
 
 <div class="viewcode-block" id="validates_with_beartype">
 <a class="viewcode-back" href="../../../generated/hydra_zen.third_party.beartype.validates_with_beartype.html#hydra_zen.third_party.beartype.validates_with_beartype">[docs]</a>
-<span class="k">def</span> <span class="nf">validates_with_beartype</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">_T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">validates_with_beartype</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">_T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Enables runtime type-checking of values, via the library ``beartype``.</span>
 
 <span class="sd">    I.e. ``obj = validates_with_beartype(obj)`` adds runtime type-checking</span>

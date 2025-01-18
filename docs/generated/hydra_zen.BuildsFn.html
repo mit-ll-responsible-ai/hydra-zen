@@ -25,9 +25,9 @@
 <!-- Loaded before other Sphinx assets -->
 <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
-<link href="../_static/pygments.css?v=a746c00c" rel="stylesheet" type="text/css">
+<link href="../_static/pygments.css?v=8f2a1f02" rel="stylesheet" type="text/css">
 <link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
-<link href="../_static/sphinx-codeautolink.css?v=125d5c1c" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css"/>
 <link href="../_static/sphinx-design.min.css?v=95c83b7e" rel="stylesheet" type="text/css"/>
 <!-- So that users can add custom icons -->
 <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -311,20 +311,20 @@
 <p class="rubric">Notes</p>
 <p>Adding type-checking support for a custom type:</p>
 <p>To parameterize <a class="reference internal" href="#hydra_zen.BuildsFn" title="hydra_zen.BuildsFn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BuildsFn</span></code></a> with, e.g., support for the custom types <code class="xref py py-obj docutils literal notranslate"><span class="pre">MyTypeA</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">MyTypeB</span></code>, use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">CustomConfigType</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">CustomConfigType</span>
 
-<span class="k">class</span> <span class="nc">MyTypeA</span><span class="p">:</span> <span class="o">...</span>
-<span class="k">class</span> <span class="nc">MyTypeB</span><span class="p">:</span> <span class="o">...</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyTypeA</span><span class="p">:</span> <span class="o">...</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyTypeB</span><span class="p">:</span> <span class="o">...</span>
 
-<span class="k">class</span> <span class="nc">MyBuilds</span><span class="p">(</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">CustomConfigType</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">MyTypeA</span><span class="p">,</span> <span class="n">MyTypeB</span><span class="p">]]]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyBuilds</span><span class="p">(</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">CustomConfigType</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">MyTypeA</span><span class="p">,</span> <span class="n">MyTypeB</span><span class="p">]]]):</span>
     <span class="o">...</span>
 </pre></div>
 </div>
 <p class="rubric">Examples</p>
 <p>Suppose you wrote the following type:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Quaternion</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Quaternion</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">real</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="n">i</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -333,20 +333,20 @@
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">real</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">"Q"</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>and you want hydra-zen’s config-creation functions to be able to automatically
 know how to make configs from instances of this type. You do so by creating your
 own subclass of <a class="reference internal" href="#hydra_zen.BuildsFn" title="hydra_zen.BuildsFn"><code class="xref py py-class docutils literal notranslate"><span class="pre">BuildsFn</span></code></a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
-<span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">BuildsFn</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">CustomConfigType</span><span class="p">,</span> <span class="n">HydraSupportedType</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <span class="n">BuildsFn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">CustomConfigType</span><span class="p">,</span> <span class="n">HydraSupportedType</span>
 
-<span class="k">class</span> <span class="nc">CustomBuilds</span><span class="p">(</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">CustomConfigType</span><span class="p">[</span><span class="n">Quaternion</span><span class="p">]]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomBuilds</span><span class="p">(</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">CustomConfigType</span><span class="p">[</span><span class="n">Quaternion</span><span class="p">]]):</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_make_hydra_compatible</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">k</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HydraSupportedType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_hydra_compatible</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">k</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HydraSupportedType</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Quaternion</span><span class="p">):</span>
             <span class="n">real</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">_data</span>
             <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">builds</span><span class="p">(</span><span class="n">Quaternion</span><span class="p">,</span> <span class="n">real</span><span class="o">=</span><span class="n">real</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
@@ -361,7 +361,7 @@ own subclass of <a class="reference internal" href="#hydra_zen.BuildsFn" title="
 </pre></div>
 </div>
 <p>E.g.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Config</span> <span class="o">=</span> <span class="n">just</span><span class="p">([</span><span class="n">Quaternion</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">Quaternion</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">12.0</span><span class="p">)])</span>
 <span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">(</span><span class="n">Config</span><span class="p">))</span>
 <span class="go">- _target_: __main__.Quaternion</span>

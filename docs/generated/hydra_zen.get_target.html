@@ -25,9 +25,9 @@
 <!-- Loaded before other Sphinx assets -->
 <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
-<link href="../_static/pygments.css?v=a746c00c" rel="stylesheet" type="text/css">
+<link href="../_static/pygments.css?v=8f2a1f02" rel="stylesheet" type="text/css">
 <link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
-<link href="../_static/sphinx-codeautolink.css?v=125d5c1c" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css"/>
 <link href="../_static/sphinx-design.min.css?v=95c83b7e" rel="stylesheet" type="text/css"/>
 <!-- So that users can add custom icons -->
 <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -309,7 +309,7 @@ path specified by the config.</p>
 <p><strong>Basic usage</strong></p>
 <p><a class="reference internal" href="#hydra_zen.get_target" title="hydra_zen.get_target"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_target</span></code></a> works on all variety of configs produced by <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> and
 <a class="reference internal" href="hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code></a>.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><span class="n">just</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.get_target.html#hydra_zen.get_target" title="hydra_zen.get_target"><span class="n">get_target</span></a>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><span class="n">just</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.get_target.html#hydra_zen.get_target" title="hydra_zen.get_target"><span class="n">get_target</span></a>
 <span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.get_target.html#hydra_zen.get_target" title="hydra_zen.get_target"><span class="n">get_target</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">))</span>
 <span class="go">&lt;class 'int'&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.get_target.html#hydra_zen.get_target" title="hydra_zen.get_target"><span class="n">get_target</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
@@ -319,9 +319,9 @@ path specified by the config.</p>
 </pre></div>
 </div>
 <p>It works for manually-defined configs:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a>
 <span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="nd">@dataclass</span></a>
-<span class="gp">... </span><span class="k">class</span> <span class="nc">A</span><span class="p">:</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">A</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">_target_</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a> <span class="o">=</span> <span class="s2">"builtins.dict"</span>
 </pre></div>
 </div>
@@ -330,10 +330,10 @@ path specified by the config.</p>
 </pre></div>
 </div>
 <p>and for configs loaded from yamls.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.load_from_yaml.html#hydra_zen.load_from_yaml" title="hydra_zen.load_from_yaml"><span class="n">load_from_yaml</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.save_as_yaml.html#hydra_zen.save_as_yaml" title="hydra_zen.save_as_yaml"><span class="n">save_as_yaml</span></a>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.load_from_yaml.html#hydra_zen.load_from_yaml" title="hydra_zen.load_from_yaml"><span class="n">load_from_yaml</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.save_as_yaml.html#hydra_zen.save_as_yaml" title="hydra_zen.save_as_yaml"><span class="n">save_as_yaml</span></a>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">B</span><span class="p">:</span> <span class="k">pass</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">B</span><span class="p">:</span> <span class="k">pass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
 </pre></div>
 </div>

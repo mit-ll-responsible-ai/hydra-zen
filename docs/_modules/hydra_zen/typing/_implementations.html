@@ -29,9 +29,9 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-codeautolink.css?v=125d5c1c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-codeautolink.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
@@ -389,14 +389,14 @@
 
 <span class="c1"># pyright: strict</span>
 
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">types</span>
-<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">ByteString</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">_MISSING_TYPE</span>  <span class="c1"># pyright: ignore[reportPrivateUsage]</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timedelta</span>
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span><span class="p">,</span> <span class="n">PosixPath</span><span class="p">,</span> <span class="n">WindowsPath</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">types</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ByteString</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">_MISSING_TYPE</span>  <span class="c1"># pyright: ignore[reportPrivateUsage]</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span><span class="p">,</span> <span class="n">PosixPath</span><span class="p">,</span> <span class="n">WindowsPath</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TYPE_CHECKING</span><span class="p">,</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
@@ -408,8 +408,8 @@
     <span class="n">Union</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span>
-<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">omegaconf</span><span class="w"> </span><span class="kn">import</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Literal</span><span class="p">,</span>
     <span class="n">ParamSpec</span><span class="p">,</span>
     <span class="n">Protocol</span><span class="p">,</span>
@@ -437,7 +437,7 @@
 <span class="n">R</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;R&quot;</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">EmptyDict</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EmptyDict</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
     <span class="k">pass</span>
 
 
@@ -452,10 +452,10 @@
 
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">Field</span>  <span class="c1"># provided by typestub but not generic at runtime</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span>  <span class="c1"># provided by typestub but not generic at runtime</span>
 <span class="k">else</span><span class="p">:</span>
 
-    <span class="k">class</span> <span class="nc">Field</span><span class="p">(</span><span class="n">Protocol</span><span class="p">[</span><span class="n">T2</span><span class="p">]):</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Field</span><span class="p">(</span><span class="n">Protocol</span><span class="p">[</span><span class="n">T2</span><span class="p">]):</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
         <span class="nb">type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">T2</span><span class="p">]</span>
         <span class="n">default</span><span class="p">:</span> <span class="n">T2</span>
@@ -468,86 +468,86 @@
 
 
 <span class="nd">@runtime_checkable</span>
-<span class="k">class</span> <span class="nc">Partial</span><span class="p">(</span><span class="n">Protocol</span><span class="p">[</span><span class="n">T2</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Partial</span><span class="p">(</span><span class="n">Protocol</span><span class="p">[</span><span class="n">T2</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A protocol that matches against `functools.partial`&quot;&quot;&quot;</span>
 
     <span class="fm">__call__</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">T2</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">T2</span><span class="p">]:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">func</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">T2</span><span class="p">]:</span> <span class="o">...</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">args</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">args</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span> <span class="o">...</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">keywords</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">keywords</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span> <span class="o">...</span>
 
-    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__new__</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span> <span class="n">__func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">T2</span><span class="p">],</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span> <span class="o">...</span>
 
     <span class="k">if</span> <span class="n">TYPE_CHECKING</span> <span class="ow">and</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
 
-        <span class="k">def</span> <span class="nf">__class_getitem__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">types</span><span class="o">.</span><span class="n">GenericAlias</span><span class="p">:</span> <span class="o">...</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">__class_getitem__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">types</span><span class="o">.</span><span class="n">GenericAlias</span><span class="p">:</span> <span class="o">...</span>
 
 
 <span class="n">InterpStr</span> <span class="o">=</span> <span class="n">NewType</span><span class="p">(</span><span class="s2">&quot;InterpStr&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">DataClass_</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DataClass_</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
     <span class="c1"># doesn&#39;t provide __init__, __getattribute__, etc.</span>
     <span class="n">__dataclass_fields__</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Field</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
 
 
-<span class="k">class</span> <span class="nc">DataClass</span><span class="p">(</span><span class="n">DataClass_</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DataClass</span><span class="p">(</span><span class="n">DataClass_</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 
-    <span class="k">def</span> <span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span> <span class="o">...</span>
 
-    <span class="k">def</span> <span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">__value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">__value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 
 
 <span class="nd">@runtime_checkable</span>
-<span class="k">class</span> <span class="nc">HasTarget</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HasTarget</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 
 
 <span class="nd">@runtime_checkable</span>
-<span class="k">class</span> <span class="nc">HasTargetInst</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HasTargetInst</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span>
 
 
 <span class="nd">@runtime_checkable</span>
-<span class="k">class</span> <span class="nc">Builds</span><span class="p">(</span><span class="n">DataClass</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Builds</span><span class="p">(</span><span class="n">DataClass</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 
 
-<span class="k">class</span> <span class="nc">BuildsWithSig</span><span class="p">(</span><span class="n">Builds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">Protocol</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="n">P</span><span class="p">]):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">P</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">P</span><span class="o">.</span><span class="n">kwargs</span><span class="p">):</span> <span class="o">...</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BuildsWithSig</span><span class="p">(</span><span class="n">Builds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">Protocol</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="n">P</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">P</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">:</span> <span class="n">P</span><span class="o">.</span><span class="n">kwargs</span><span class="p">):</span> <span class="o">...</span>
 
 
 <span class="nd">@runtime_checkable</span>
-<span class="k">class</span> <span class="nc">Just</span><span class="p">(</span><span class="n">Builds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">Protocol</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Just</span><span class="p">(</span><span class="n">Builds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">Protocol</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># interpolated string for importing obj</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;hydra_zen.funcs.get_obj&quot;</span>
 
 
-<span class="k">class</span> <span class="nc">ZenPartialMixin</span><span class="p">(</span><span class="n">Protocol</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZenPartialMixin</span><span class="p">(</span><span class="n">Protocol</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
     <span class="n">_zen_target</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="n">_zen_partial</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">True</span>
 
 
-<span class="k">class</span> <span class="nc">HydraPartialMixin</span><span class="p">(</span><span class="n">Protocol</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HydraPartialMixin</span><span class="p">(</span><span class="n">Protocol</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
     <span class="n">_partial_</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">True</span>
 
 
 <span class="nd">@runtime_checkable</span>
-<span class="k">class</span> <span class="nc">ZenPartialBuilds</span><span class="p">(</span><span class="n">Builds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">ZenPartialMixin</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">Protocol</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZenPartialBuilds</span><span class="p">(</span><span class="n">Builds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">ZenPartialMixin</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">Protocol</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;hydra_zen.funcs.zen_processing&quot;</span>
 
 
 <span class="nd">@runtime_checkable</span>
-<span class="k">class</span> <span class="nc">HydraPartialBuilds</span><span class="p">(</span><span class="n">Builds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">HydraPartialMixin</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">Protocol</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span> <span class="o">...</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HydraPartialBuilds</span><span class="p">(</span><span class="n">Builds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">HydraPartialMixin</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">Protocol</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span> <span class="o">...</span>
 
 
 <span class="c1"># Necessary, but not sufficient, check for PartialBuilds; useful for creating</span>
@@ -673,7 +673,7 @@
 
 
 <span class="c1"># Lists all zen-convert settings and their types. Not part of public API</span>
-<span class="k">class</span> <span class="nc">AllConvert</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AllConvert</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="n">dataclass</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">flat_target</span><span class="p">:</span> <span class="nb">bool</span>
 
@@ -687,7 +687,7 @@
 
 
 <span class="c1"># TODO: make immutable</span>
-<span class="k">class</span> <span class="nc">StoreEntry</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">StoreEntry</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">NodeName</span>
     <span class="n">group</span><span class="p">:</span> <span class="n">GroupName</span>
     <span class="n">package</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
@@ -697,7 +697,7 @@
 
 <div class="viewcode-block" id="ZenConvert">
 <a class="viewcode-back" href="../../../generated/hydra_zen.typing.ZenConvert.html#hydra_zen.typing.ZenConvert">[docs]</a>
-<span class="k">class</span> <span class="nc">ZenConvert</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZenConvert</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A TypedDict that provides a type-checked interface for specifying zen-convert</span>
 <span class="sd">    options that configure the hydra-zen config-creation functions (e.g., `builds`,</span>
 <span class="sd">    `just`, and `make_config`).</span>
@@ -781,7 +781,7 @@
 
 
 
-<span class="k">class</span> <span class="nc">_AllPyDataclassOptions</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_AllPyDataclassOptions</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">cls_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">namespace</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
     <span class="n">bases</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span>
@@ -793,18 +793,18 @@
     <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span>
 
 
-<span class="k">class</span> <span class="nc">_Py310Dataclass</span><span class="p">(</span><span class="n">_AllPyDataclassOptions</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_Py310Dataclass</span><span class="p">(</span><span class="n">_AllPyDataclassOptions</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="c1"># py310+</span>
     <span class="n">match_args</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">slots</span><span class="p">:</span> <span class="nb">bool</span>
 
 
-<span class="k">class</span> <span class="nc">_Py311Dataclass</span><span class="p">(</span><span class="n">_Py310Dataclass</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_Py311Dataclass</span><span class="p">(</span><span class="n">_Py310Dataclass</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">weakref_slot</span><span class="p">:</span> <span class="nb">bool</span>
 
 
-<span class="k">class</span> <span class="nc">_Py312Dataclass</span><span class="p">(</span><span class="n">_Py311Dataclass</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_Py312Dataclass</span><span class="p">(</span><span class="n">_Py311Dataclass</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">module</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 
 
@@ -818,13 +818,13 @@
     <span class="n">_StrictDataclassOptions</span> <span class="o">=</span> <span class="n">_Py312Dataclass</span>
 
 
-<span class="k">class</span> <span class="nc">StrictDataclassOptions</span><span class="p">(</span><span class="n">_StrictDataclassOptions</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">StrictDataclassOptions</span><span class="p">(</span><span class="n">_StrictDataclassOptions</span><span class="p">):</span>
     <span class="n">cls_name</span><span class="p">:</span> <span class="n">Required</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
 
 
 <div class="viewcode-block" id="DataclassOptions">
 <a class="viewcode-back" href="../../../generated/hydra_zen.typing.DataclassOptions.html#hydra_zen.typing.DataclassOptions">[docs]</a>
-<span class="k">class</span> <span class="nc">DataclassOptions</span><span class="p">(</span><span class="n">_Py312Dataclass</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DataclassOptions</span><span class="p">(</span><span class="n">_Py312Dataclass</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Specifies dataclass-creation options via `builds`, `just` et al.</span>
 
 <span class="sd">    Note that, unlike :func:`dataclasses.make_dataclass`, the default value for</span>
@@ -992,7 +992,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">_permitted_keys</span><span class="p">(</span><span class="n">typed_dict</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_permitted_keys</span><span class="p">(</span><span class="n">typed_dict</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
     <span class="k">return</span> <span class="n">typed_dict</span><span class="o">.</span><span class="n">__required_keys__</span> <span class="o">|</span> <span class="n">typed_dict</span><span class="o">.</span><span class="n">__optional_keys__</span>
 
 

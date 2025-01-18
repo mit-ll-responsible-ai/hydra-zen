@@ -29,9 +29,9 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-codeautolink.css?v=125d5c1c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-codeautolink.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
@@ -387,18 +387,18 @@
 <span></span><span class="c1"># Copyright (c) 2025 Massachusetts Institute of Technology</span>
 <span class="c1"># SPDX-License-Identifier: MIT</span>
 <span class="c1"># pyright: strict</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">MISSING</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">MISSING</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">TypeGuard</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">TypeGuard</span>
 
-<span class="kn">from</span> <span class="nn">hydra_zen.funcs</span> <span class="kn">import</span> <span class="n">get_obj</span><span class="p">,</span> <span class="n">zen_processing</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.structured_configs._utils</span> <span class="kn">import</span> <span class="n">safe_name</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">Builds</span><span class="p">,</span> <span class="n">Just</span><span class="p">,</span> <span class="n">PartialBuilds</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass_</span><span class="p">,</span> <span class="n">HasTarget</span><span class="p">,</span> <span class="n">HasTargetInst</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.funcs</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_obj</span><span class="p">,</span> <span class="n">zen_processing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.structured_configs._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">safe_name</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Builds</span><span class="p">,</span> <span class="n">Just</span><span class="p">,</span> <span class="n">PartialBuilds</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.typing._implementations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataClass_</span><span class="p">,</span> <span class="n">HasTarget</span><span class="p">,</span> <span class="n">HasTargetInst</span>
 
-<span class="kn">from</span> <span class="nn">._globals</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._globals</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">JUST_FIELD_NAME</span><span class="p">,</span>
     <span class="n">PARTIAL_FIELD_NAME</span><span class="p">,</span>
     <span class="n">TARGET_FIELD_NAME</span><span class="p">,</span>
@@ -422,7 +422,7 @@
 <span class="c1"># These are not part of the public API for now, but they may be in the future.</span>
 
 
-<span class="k">def</span> <span class="nf">safe_getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">default</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">safe_getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">default</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
     <span class="c1"># We must access slotted class-attributes from a dataclass type</span>
     <span class="c1"># via its `__dataclass_fields__`. Otherwise we will get a member</span>
     <span class="c1"># descriptor</span>
@@ -452,15 +452,15 @@
     <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="o">*</span><span class="n">default</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_target</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">HasTarget</span><span class="p">,</span> <span class="n">HasTargetInst</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_target</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">HasTarget</span><span class="p">,</span> <span class="n">HasTargetInst</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">safe_getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">TARGET_FIELD_NAME</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">is_builds</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_builds</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
     <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">TARGET_FIELD_NAME</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">is_just</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_just</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
     <span class="k">if</span> <span class="n">is_builds</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">JUST_FIELD_NAME</span><span class="p">):</span>
         <span class="n">attr</span> <span class="o">=</span> <span class="n">_get_target</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">attr</span> <span class="o">==</span> <span class="n">_get_target</span><span class="p">(</span><span class="n">Just</span><span class="p">)</span> <span class="ow">or</span> <span class="n">attr</span> <span class="ow">is</span> <span class="n">get_obj</span><span class="p">:</span>
@@ -473,13 +473,13 @@
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
 
-    <span class="k">def</span> <span class="nf">is_dataclass</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">,</span> <span class="nb">type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">]]]:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_dataclass</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">,</span> <span class="nb">type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">]]]:</span> <span class="o">...</span>
 
 <span class="k">else</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">is_dataclass</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_dataclass</span>
 
 
-<span class="k">def</span> <span class="nf">is_old_partial_builds</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_old_partial_builds</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="c1"># We don&#39;t care about coverage here.</span>
     <span class="c1"># This will only be used in `get_target` and we&#39;ll be sure to cover that branch</span>
     <span class="k">if</span> <span class="n">is_builds</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;_partial_target_&quot;</span><span class="p">):</span>
@@ -495,7 +495,7 @@
 
 <div class="viewcode-block" id="uses_zen_processing">
 <a class="viewcode-back" href="../../../generated/hydra_zen.uses_zen_processing.html#hydra_zen.uses_zen_processing">[docs]</a>
-<span class="k">def</span> <span class="nf">uses_zen_processing</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">uses_zen_processing</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns `True` if the input is a targeted structured config that relies on</span>
 <span class="sd">    zen-processing features during its instantiation process. See notes for more details</span>
 
@@ -557,7 +557,7 @@
 
 <div class="viewcode-block" id="is_partial_builds">
 <a class="viewcode-back" href="../../../generated/hydra_zen.is_partial_builds.html#hydra_zen.is_partial_builds">[docs]</a>
-<span class="k">def</span> <span class="nf">is_partial_builds</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_partial_builds</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">PartialBuilds</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns `True` if the input is a targeted structured config that entails partial</span>
 <span class="sd">    instantiation, either via `_partial_=True` [1]_ or via `_zen_partial=True`.</span>
@@ -621,11 +621,11 @@
 
 
 
-<span class="k">class</span> <span class="nc">HasOrigin</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HasOrigin</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
     <span class="n">__origin__</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">is_generic_type</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">HasOrigin</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_generic_type</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeGuard</span><span class="p">[</span><span class="n">HasOrigin</span><span class="p">]:</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="nb">hasattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;__origin__&quot;</span><span class="p">)</span>
         <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;__args__&quot;</span><span class="p">)</span>

@@ -25,9 +25,9 @@
 <!-- Loaded before other Sphinx assets -->
 <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
-<link href="../_static/pygments.css?v=a746c00c" rel="stylesheet" type="text/css">
+<link href="../_static/pygments.css?v=8f2a1f02" rel="stylesheet" type="text/css">
 <link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
-<link href="../_static/sphinx-codeautolink.css?v=125d5c1c" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css"/>
 <link href="../_static/sphinx-design.min.css?v=95c83b7e" rel="stylesheet" type="text/css"/>
 <!-- So that users can add custom icons -->
 <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -350,7 +350,7 @@ compatibility. See <a class="reference internal" href="hydra_zen.typing.Dataclas
 </dl>
 </div>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><span class="n">make_custom_builds_fn</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><span class="n">make_custom_builds_fn</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a>
 </pre></div>
 </div>
 <p><strong>Basic usage</strong></p>
@@ -375,7 +375,7 @@ for <code class="docutils literal notranslate"><span class="pre">zen_partial</sp
 whenever our configs are being instantiated; then the following settings
 for <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> would be handy.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Note: beartype must be installed to use this feature</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen.third_party.beartype</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.third_party.beartype.validates_with_beartype.html#hydra_zen.third_party.beartype.validates_with_beartype" title="hydra_zen.third_party.beartype.validates_with_beartype"><span class="n">validates_with_beartype</span></a>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.third_party.beartype</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.third_party.beartype.validates_with_beartype.html#hydra_zen.third_party.beartype.validates_with_beartype" title="hydra_zen.third_party.beartype.validates_with_beartype"><span class="n">validates_with_beartype</span></a>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">build_a_bear</span> <span class="o">=</span> <span class="n">make_custom_builds_fn</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">hydra_convert</span><span class="o">=</span><span class="s2">"all"</span><span class="p">,</span>
@@ -385,8 +385,8 @@ for <a class="reference internal" href="hydra_zen.builds.html#hydra_zen.builds" 
 </div>
 <p>Now all configs produced via <code class="docutils literal notranslate"><span class="pre">build_a_bear</span></code> will include type-checking
 during instantiation.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Literal</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">]):</span> <span class="k">return</span> <span class="n">x</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">]):</span> <span class="k">return</span> <span class="n">x</span>
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">build_a_bear</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>  <span class="c1"># a conf that includes `validates_with_beartype`</span>

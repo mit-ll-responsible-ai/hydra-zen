@@ -26,9 +26,9 @@
 <!-- Loaded before other Sphinx assets -->
 <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
-<link href="../_static/pygments.css?v=a746c00c" rel="stylesheet" type="text/css">
+<link href="../_static/pygments.css?v=8f2a1f02" rel="stylesheet" type="text/css">
 <link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
-<link href="../_static/sphinx-codeautolink.css?v=125d5c1c" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css"/>
 <link href="../_static/sphinx-design.min.css?v=95c83b7e" rel="stylesheet" type="text/css"/>
 <!-- So that users can add custom icons -->
 <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -249,12 +249,12 @@ to <a class="reference external" href="https://docs.python.org/3/library/datacla
 (i.e. immutable) config, which is designed to partially configure the class
 <code class="docutils literal notranslate"><span class="pre">torch.optim.Adam</span></code>. Here, static tooling can “see” the types associated with the
 configured fields, and flag bad inputs in our code. That this config is immutable is also salient to static analysis.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.hydrated_dataclass.html#hydra_zen.hydrated_dataclass" title="hydra_zen.hydrated_dataclass"><span class="n">hydrated_dataclass</span></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.hydrated_dataclass.html#hydra_zen.hydrated_dataclass" title="hydra_zen.hydrated_dataclass"><span class="n">hydrated_dataclass</span></a>
 
-<span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">Adam</span>  <span class="c1"># type: ignore</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.optim</span><span class="w"> </span><span class="kn">import</span> <span class="n">Adam</span>  <span class="c1"># type: ignore</span>
 
 <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.hydrated_dataclass.html#hydra_zen.hydrated_dataclass" title="hydra_zen.hydrated_dataclass"><span class="nd">@hydrated_dataclass</span></a><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">Adam</span><span class="p">,</span> <span class="n">zen_partial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">BuildsAdam</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BuildsAdam</span><span class="p">:</span>
     <span class="n">lr</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#float" title="float"><span class="nb">float</span></a> <span class="o">=</span> <span class="mf">0.01</span>
     <span class="n">momentum</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#float" title="float"><span class="nb">float</span></a> <span class="o">=</span> <span class="mf">0.9</span>
 
@@ -266,7 +266,7 @@ configured fields, and flag bad inputs in our code. That this config is immutabl
 <span class="n">conf</span><span class="o">.</span><span class="n">lr</span> <span class="o">=</span> <span class="mf">10.0</span>  <span class="c1"># type: ignore</span>
 </pre></div>
 </div>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a>
 <span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">(</span><span class="n">BuildsAdam</span><span class="p">)</span>
 <span class="go">functools.partial(&lt;class Adam&gt;, lr=0.01, momentum=0.9)</span>
 </pre></div>
@@ -279,7 +279,7 @@ code will raise an error during the creation of <code class="docutils literal no
 <span class="c1"># and will raise a TypeError</span>
 
 <span class="nd">@hydrated_dataclass</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">Adam</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">BuildsAdam</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BuildsAdam</span><span class="p">:</span>
     <span class="n">momtum</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#float" title="float"><span class="nb">float</span></a> <span class="o">=</span> <span class="mf">0.9</span>  <span class="c1"># &lt;- typo causes TypeError upon constructing config</span>
 </pre></div>
 </div>

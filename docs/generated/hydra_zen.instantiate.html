@@ -25,9 +25,9 @@
 <!-- Loaded before other Sphinx assets -->
 <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
-<link href="../_static/pygments.css?v=a746c00c" rel="stylesheet" type="text/css">
+<link href="../_static/pygments.css?v=8f2a1f02" rel="stylesheet" type="text/css">
 <link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
-<link href="../_static/sphinx-codeautolink.css?v=125d5c1c" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css"/>
 <link href="../_static/sphinx-design.min.css?v=95c83b7e" rel="stylesheet" type="text/css"/>
 <!-- So that users can add custom icons -->
 <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -353,7 +353,7 @@ values to be set in a self-referential and dynamic manner <a class="reference in
 </div>
 </div>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><span class="n">just</span></a>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><span class="n">just</span></a>
 </pre></div>
 </div>
 <p><strong>Basic Usage</strong></p>
@@ -364,7 +364,7 @@ values to be set in a self-referential and dynamic manner <a class="reference in
 </pre></div>
 </div>
 <p>Instantiating a config that targets a function.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">z</span><span class="p">):</span> <span class="k">return</span> <span class="n">z</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">z</span><span class="p">):</span> <span class="k">return</span> <span class="n">z</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ConfF</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">22</span><span class="p">)</span>  <span class="c1"># a targeted config</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">ConfF</span><span class="p">)</span>  <span class="c1"># calls `f(z=22)`</span>
 <span class="go">22</span>
@@ -387,7 +387,7 @@ values to be set in a self-referential and dynamic manner <a class="reference in
 interpolated variables among configs <a class="reference internal" href="#rfffea48737d8-4" id="id10">[4]</a>. Let’s make a config
 where multiple fields reference the field <code class="docutils literal notranslate"><span class="pre">name</span></code> via absolute
 interpolation.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">(</span><span class="s2">"name"</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="s2">"$</span><span class="si">{name}</span><span class="s2">"</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">builds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"$</span><span class="si">{name}</span><span class="s2">"</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -397,7 +397,7 @@ interpolation.</p>
 </pre></div>
 </div>
 <p><strong>Runtime Data Validation via Hydra</strong></p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#float" title="float"><span class="nb">float</span></a><span class="p">):</span> <span class="k">return</span> <span class="n">x</span>  <span class="c1"># note the annotation: float</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">g</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#float" title="float"><span class="nb">float</span></a><span class="p">):</span> <span class="k">return</span> <span class="n">x</span>  <span class="c1"># note the annotation: float</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Conf_g</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instantiate</span><span class="p">(</span><span class="n">Conf_g</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
 <span class="go">1.0</span>

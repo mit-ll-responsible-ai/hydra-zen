@@ -29,9 +29,9 @@
   <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-codeautolink.css?v=125d5c1c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-codeautolink.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
@@ -407,21 +407,21 @@
 <span class="c1"># pyright: strict</span>
 <span class="c1"># pyright: reportPrivateUsage=false</span>
 
-<span class="kn">import</span> <span class="nn">pathlib</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">is_dataclass</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span><span class="p">,</span> <span class="n">wraps</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">IO</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span><span class="p">,</span> <span class="n">overload</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span><span class="p">,</span> <span class="n">wraps</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">IO</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span><span class="p">,</span> <span class="n">overload</span>
 
-<span class="kn">from</span> <span class="nn">hydra.utils</span> <span class="kn">import</span> <span class="n">instantiate</span> <span class="k">as</span> <span class="n">hydra_instantiate</span>
-<span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">MISSING</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">,</span> <span class="n">OmegaConf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">instantiate</span> <span class="k">as</span> <span class="n">hydra_instantiate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">omegaconf</span><span class="w"> </span><span class="kn">import</span> <span class="n">MISSING</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">,</span> <span class="n">OmegaConf</span>
 
-<span class="kn">from</span> <span class="nn">.structured_configs._implementations</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.structured_configs._implementations</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ConfigComplex</span><span class="p">,</span>
     <span class="n">ConfigPath</span><span class="p">,</span>
     <span class="n">DefaultBuilds</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.typing</span> <span class="kn">import</span> <span class="n">Builds</span><span class="p">,</span> <span class="n">Just</span><span class="p">,</span> <span class="n">Partial</span>
-<span class="kn">from</span> <span class="nn">.typing._implementations</span> <span class="kn">import</span> <span class="n">DataClass_</span><span class="p">,</span> <span class="n">HasTarget</span><span class="p">,</span> <span class="n">InstOrType</span><span class="p">,</span> <span class="n">IsPartial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Builds</span><span class="p">,</span> <span class="n">Just</span><span class="p">,</span> <span class="n">Partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.typing._implementations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataClass_</span><span class="p">,</span> <span class="n">HasTarget</span><span class="p">,</span> <span class="n">InstOrType</span><span class="p">,</span> <span class="n">IsPartial</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;instantiate&quot;</span><span class="p">,</span> <span class="s2">&quot;to_yaml&quot;</span><span class="p">,</span> <span class="s2">&quot;save_as_yaml&quot;</span><span class="p">,</span> <span class="s2">&quot;load_from_yaml&quot;</span><span class="p">,</span> <span class="s2">&quot;MISSING&quot;</span><span class="p">]</span>
 
@@ -430,7 +430,7 @@
 <span class="n">F</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;F&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
 
 
-<span class="k">def</span> <span class="nf">_call_target</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_call_target</span><span class="p">(</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="n">F</span><span class="p">,</span>
     <span class="n">_partial_</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
@@ -440,16 +440,16 @@
     <span class="n">target_wrapper</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">F</span><span class="p">],</span> <span class="n">F</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Call target (type) with args and kwargs.&quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">functools</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
 
-    <span class="kn">from</span> <span class="nn">hydra._internal.instantiate._instantiate2</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">hydra._internal.instantiate._instantiate2</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">_convert_target_to_string</span><span class="p">,</span>
         <span class="n">_extract_pos_args</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="kn">from</span> <span class="nn">hydra.errors</span> <span class="kn">import</span> <span class="n">InstantiationException</span>
-    <span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">OmegaConf</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">hydra.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">InstantiationException</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">omegaconf</span><span class="w"> </span><span class="kn">import</span> <span class="n">OmegaConf</span>
 
-    <span class="kn">from</span> <span class="nn">hydra_zen.funcs</span> <span class="kn">import</span> <span class="n">zen_processing</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.funcs</span><span class="w"> </span><span class="kn">import</span> <span class="n">zen_processing</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="n">_extract_pos_args</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
@@ -470,7 +470,7 @@
         <span class="k">if</span> <span class="n">full_key</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">full_key: </span><span class="si">{</span><span class="n">full_key</span><span class="si">}</span><span class="s2">&quot;</span>
 
-        <span class="k">raise</span> <span class="n">InstantiationException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+        <span class="k">raise</span> <span class="n">InstantiationException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 
     <span class="n">orig_target</span> <span class="o">=</span> <span class="n">_target_</span>
     <span class="k">if</span> <span class="n">_target_</span> <span class="ow">is</span> <span class="n">zen_processing</span><span class="p">:</span>
@@ -488,7 +488,7 @@
             <span class="p">)</span>
             <span class="k">if</span> <span class="n">full_key</span><span class="p">:</span>
                 <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">full_key: </span><span class="si">{</span><span class="n">full_key</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="k">raise</span> <span class="n">InstantiationException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="k">raise</span> <span class="n">InstantiationException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">_target_</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -496,15 +496,15 @@
             <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Error in call to target &#39;</span><span class="si">{</span><span class="n">_convert_target_to_string</span><span class="p">(</span><span class="n">orig_target</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;:</span><span class="se">\n</span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="k">if</span> <span class="n">full_key</span><span class="p">:</span>
                 <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">full_key: </span><span class="si">{</span><span class="n">full_key</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="k">raise</span> <span class="n">InstantiationException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="k">raise</span> <span class="n">InstantiationException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 
 
-<span class="k">class</span> <span class="nc">_TightBind</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_TightBind</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="o">...</span>
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">instantiate</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">instantiate</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">_TightBind</span><span class="p">,</span>
     <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">_target_wrapper_</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">F</span><span class="p">],</span> <span class="n">F</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -513,7 +513,7 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">instantiate</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">instantiate</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">ConfigPath</span><span class="p">],</span>
     <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">_target_wrapper_</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">F</span><span class="p">],</span> <span class="n">F</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -522,7 +522,7 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">instantiate</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">instantiate</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">ConfigComplex</span><span class="p">],</span>
     <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">_target_wrapper_</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">F</span><span class="p">],</span> <span class="n">F</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -531,7 +531,7 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">instantiate</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">instantiate</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">Just</span><span class="p">[</span><span class="n">T</span><span class="p">]],</span>
     <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">_target_wrapper_</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">F</span><span class="p">],</span> <span class="n">F</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -540,7 +540,7 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">instantiate</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">instantiate</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">IsPartial</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">T</span><span class="p">]]],</span>
     <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">_target_wrapper_</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">F</span><span class="p">],</span> <span class="n">F</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -549,7 +549,7 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">instantiate</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">instantiate</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">T</span><span class="p">]]],</span>
     <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">_target_wrapper_</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">F</span><span class="p">],</span> <span class="n">F</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
@@ -558,7 +558,7 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">instantiate</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">instantiate</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
         <span class="n">HasTarget</span><span class="p">,</span>
         <span class="n">ListConfig</span><span class="p">,</span>
@@ -576,7 +576,7 @@
 
 <div class="viewcode-block" id="instantiate">
 <a class="viewcode-back" href="../../generated/hydra_zen.instantiate.html#hydra_zen.instantiate">[docs]</a>
-<span class="k">def</span> <span class="nf">instantiate</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">instantiate</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">_target_wrapper_</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">F</span><span class="p">],</span> <span class="n">F</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -706,7 +706,7 @@
     <span class="k">if</span> <span class="n">_target_wrapper_</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">hydra_instantiate</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="kn">from</span> <span class="nn">hydra._internal.instantiate</span> <span class="kn">import</span> <span class="n">_instantiate2</span> <span class="k">as</span> <span class="n">inst</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">hydra._internal.instantiate</span><span class="w"> </span><span class="kn">import</span> <span class="n">_instantiate2</span> <span class="k">as</span> <span class="n">inst</span>
 
     <span class="n">old</span> <span class="o">=</span> <span class="n">inst</span><span class="o">.</span><span class="n">_call_target</span>
     <span class="k">try</span><span class="p">:</span>
@@ -720,9 +720,9 @@
 
 
 
-<span class="k">def</span> <span class="nf">_apply_just</span><span class="p">(</span><span class="n">fn</span><span class="p">:</span> <span class="n">F</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">F</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_apply_just</span><span class="p">(</span><span class="n">fn</span><span class="p">:</span> <span class="n">F</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">F</span><span class="p">:</span>
     <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
             <span class="n">cfg</span> <span class="o">=</span> <span class="n">DefaultBuilds</span><span class="o">.</span><span class="n">just</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -733,7 +733,7 @@
 <div class="viewcode-block" id="to_yaml">
 <a class="viewcode-back" href="../../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml">[docs]</a>
 <span class="nd">@_apply_just</span>
-<span class="k">def</span> <span class="nf">to_yaml</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">resolve</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">sort_keys</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">to_yaml</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">resolve</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">sort_keys</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Serialize a config as a yaml-formatted string.</span>
 
@@ -826,7 +826,7 @@
 <div class="viewcode-block" id="save_as_yaml">
 <a class="viewcode-back" href="../../generated/hydra_zen.save_as_yaml.html#hydra_zen.save_as_yaml">[docs]</a>
 <span class="nd">@_apply_just</span>
-<span class="k">def</span> <span class="nf">save_as_yaml</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_as_yaml</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="n">IO</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">resolve</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -873,7 +873,7 @@
 
 <div class="viewcode-block" id="load_from_yaml">
 <a class="viewcode-back" href="../../generated/hydra_zen.load_from_yaml.html#hydra_zen.load_from_yaml">[docs]</a>
-<span class="k">def</span> <span class="nf">load_from_yaml</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_from_yaml</span><span class="p">(</span>
     <span class="n">file_</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="n">IO</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>

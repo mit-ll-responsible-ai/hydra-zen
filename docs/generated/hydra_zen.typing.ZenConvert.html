@@ -25,9 +25,9 @@
 <!-- Loaded before other Sphinx assets -->
 <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
-<link href="../_static/pygments.css?v=a746c00c" rel="stylesheet" type="text/css">
+<link href="../_static/pygments.css?v=8f2a1f02" rel="stylesheet" type="text/css">
 <link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
-<link href="../_static/sphinx-codeautolink.css?v=125d5c1c" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css"/>
 <link href="../_static/sphinx-design.min.css?v=95c83b7e" rel="stylesheet" type="text/css"/>
 <!-- So that users can add custom icons -->
 <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -311,7 +311,7 @@ compatible with a dataclass instance whose type possesses an <code class="xref p
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.typing.ZenConvert.html#hydra_zen.typing.ZenConvert" title="hydra_zen.typing._implementations.ZenConvert"><span class="n">ZenConvert</span></a> <span class="k">as</span> <span class="n">zc</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.typing</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.typing.ZenConvert.html#hydra_zen.typing.ZenConvert" title="hydra_zen.typing._implementations.ZenConvert"><span class="n">ZenConvert</span></a> <span class="k">as</span> <span class="n">zc</span>
 <span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.typing.ZenConvert.html#hydra_zen.typing.ZenConvert" title="hydra_zen.typing._implementations.ZenConvert"><span class="n">zc</span></a><span class="p">()</span>
 <span class="go">{}</span>
 <span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.typing.ZenConvert.html#hydra_zen.typing.ZenConvert" title="hydra_zen.typing._implementations.ZenConvert"><span class="n">zc</span></a><span class="p">(</span><span class="n">dataclass</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -322,11 +322,11 @@ compatible with a dataclass instance whose type possesses an <code class="xref p
 </pre></div>
 </div>
 <p><strong>Configuring dataclass auto-config behaviors</strong></p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a> <span class="k">as</span> <span class="n">I</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><span class="n">just</span></a>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a> <span class="k">as</span> <span class="n">I</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.just.html#hydra_zen.just" title="hydra_zen.just"><span class="n">just</span></a>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a>
 <span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="nd">@dataclass</span></a>
-<span class="gp">... </span><span class="k">class</span> <span class="nc">B</span><span class="p">:</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">B</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">B</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
@@ -358,7 +358,7 @@ compatible with a dataclass instance whose type possesses an <code class="xref p
 </div>
 <p>A dataclass with a <code class="xref py py-obj docutils literal notranslate"><span class="pre">_target_</span></code> field will not be converted:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@dataclass</span>
-<span class="gp">... </span><span class="k">class</span> <span class="nc">BuildsStr</span><span class="p">:</span>
+<span class="gp">... </span><span class="k">class</span><span class="w"> </span><span class="nc">BuildsStr</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">_target_</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a> <span class="o">=</span> <span class="s1">'builtins.str'</span>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">BuildsStr</span> <span class="ow">is</span> <span class="n">just</span><span class="p">(</span><span class="n">BuildsStr</span><span class="p">)</span>

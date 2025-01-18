@@ -26,9 +26,9 @@
 <!-- Loaded before other Sphinx assets -->
 <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
-<link href="../_static/pygments.css?v=a746c00c" rel="stylesheet" type="text/css">
+<link href="../_static/pygments.css?v=8f2a1f02" rel="stylesheet" type="text/css">
 <link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
-<link href="../_static/sphinx-codeautolink.css?v=125d5c1c" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css"/>
 <link href="../_static/sphinx-design.min.css?v=95c83b7e" rel="stylesheet" type="text/css"/>
 <!-- So that users can add custom icons -->
 <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -272,8 +272,8 @@ instantiate it, and then update its costume.</p>
 <p>We will incorporate the following code in <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code>.</p>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Defining the wrapper</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">halloween_update</span><span class="p">(</span><span class="n">CharClass</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">halloween_update</span><span class="p">(</span><span class="n">CharClass</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># instantiate the Character</span>
         <span class="n">char</span> <span class="o">=</span> <span class="n">CharClass</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -295,10 +295,10 @@ tutorial-readers, created ourselves. See <a class="reference internal" href="hie
 </div>
 <div class="literal-block-wrapper docutils container" id="id2">
 <div class="code-block-caption"><span class="caption-text">Testing out the wrapper</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">game_library</span> <span class="kn">import</span> <span class="n">Character</span><span class="p">,</span> <span class="n">inventory</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">game_library</span><span class="w"> </span><span class="kn">import</span> <span class="n">Character</span><span class="p">,</span> <span class="n">inventory</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">halloween_update</span><span class="p">(</span><span class="n">CharClass</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">halloween_update</span><span class="p">(</span><span class="n">CharClass</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="gp">... </span>        <span class="c1"># instantiate the Character</span>
 <span class="gp">... </span>        <span class="n">char</span> <span class="o">=</span> <span class="n">CharClass</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 <span class="gp">...</span>
@@ -341,16 +341,16 @@ its costume updated for the holiday. Verify that you see the following behaviors
 over. Modify your <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code> script to match the following code.</p>
 <div class="literal-block-wrapper docutils container" id="id3">
 <div class="code-block-caption"><span class="caption-text">Contents of <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code></span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">store</span><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><span class="n">make_custom_builds_fn</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <span class="n">store</span><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><span class="n">make_custom_builds_fn</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a>
 
-<span class="kn">from</span> <span class="nn">game_library</span> <span class="kn">import</span> <span class="n">inventory</span><span class="p">,</span> <span class="n">Character</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">game_library</span><span class="w"> </span><span class="kn">import</span> <span class="n">inventory</span><span class="p">,</span> <span class="n">Character</span>
 
 <span class="n">builds</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><span class="n">make_custom_builds_fn</span></a><span class="p">(</span><span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 
 <span class="c1"># 1. Added our wrapper</span>
-<span class="k">def</span> <span class="nf">halloween_update</span><span class="p">(</span><span class="n">CharClass</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">halloween_update</span><span class="p">(</span><span class="n">CharClass</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># instantiate the Character</span>
         <span class="n">char</span> <span class="o">=</span> <span class="n">CharClass</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -403,7 +403,7 @@ over. Modify your <code class="docutils literal notranslate"><span class="pre">m
 <span class="c1"># It instructs Hydra to use the player config that named 'base' in our</span>
 <span class="c1"># config store as the default config for our app.</span>
 <span class="nd">@store</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"my_app"</span><span class="p">,</span>  <span class="n">hydra_defaults</span><span class="o">=</span><span class="p">[</span><span class="s2">"_self_"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"player"</span><span class="p">:</span> <span class="s2">"base"</span><span class="p">}])</span>
-<span class="k">def</span> <span class="nf">task_function</span><span class="p">(</span><span class="n">player</span><span class="p">:</span> <span class="n">Character</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">task_function</span><span class="p">(</span><span class="n">player</span><span class="p">:</span> <span class="n">Character</span><span class="p">):</span>
 
     <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">player</span><span class="p">)</span>
 
@@ -463,8 +463,8 @@ behavior shown below.</p>
 <h3>Inspecting the Results<a class="headerlink" href="#inspecting-the-results" title="Link to this heading">#</a></h3>
 <p>Hydra will document our use of <code class="xref py py-func docutils literal notranslate"><span class="pre">halloween_update()</span></code> in the <code class="docutils literal notranslate"><span class="pre">config.yaml</span></code> for our
 job. To inspect the config for our most-recent job, let’s open a Python terminal in the same directory as <code class="docutils literal notranslate"><span class="pre">my_app.py</span></code> and run the following code</p>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pathlib.html#module-pathlib" title="pathlib"><span class="nn">pathlib</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path"><span class="n">Path</span></a>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">print_file</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path"><span class="n">x</span></a><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path"><span class="n">Path</span></a><span class="p">):</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pathlib.html#module-pathlib" title="pathlib"><span class="nn">pathlib</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path"><span class="n">Path</span></a>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">print_file</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path"><span class="n">x</span></a><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path"><span class="n">Path</span></a><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">with</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path.open" title="pathlib.Path.open"><span class="n">x</span><span class="o">.</span><span class="n">open</span></a><span class="p">(</span><span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
 <span class="gp">... </span>        <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
 

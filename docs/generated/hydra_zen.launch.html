@@ -25,9 +25,9 @@
 <!-- Loaded before other Sphinx assets -->
 <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
-<link href="../_static/pygments.css?v=a746c00c" rel="stylesheet" type="text/css">
+<link href="../_static/pygments.css?v=8f2a1f02" rel="stylesheet" type="text/css">
 <link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
-<link href="../_static/sphinx-codeautolink.css?v=125d5c1c" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css"/>
 <link href="../_static/sphinx-design.min.css?v=95c83b7e" rel="stylesheet" type="text/css"/>
 <!-- So that users can add custom icons -->
 <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -369,7 +369,7 @@ following attributes</p>
 <p class="rubric">Examples</p>
 <p><strong>Basic usage</strong></p>
 <p>Let’s define and launch a trivial Hydra app.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><span class="n">launch</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><span class="n">launch</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a>
 </pre></div>
 </div>
 <p>First, we will define a config, which determines the configurable interface to our
@@ -381,7 +381,7 @@ two configurable parameters: <code class="docutils literal notranslate"><span cl
 <p>Our task function accepts the config as an input and uses it to run some generic functionality.
 For simplicity’s sake, let’s design this task function to: convert the job’s config to a
 yaml-formatted string, print it, and then return the string.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">task_fn</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">task_fn</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">out</span> <span class="o">=</span> <span class="n">to_yaml</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>  <span class="c1"># task's input config, converted to yaml-string</span>
 <span class="gp">... </span>    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="k">return</span> <span class="n">out</span>
@@ -469,8 +469,8 @@ Let’s launch a multirun that sweeps over three configurations</p>
 </div>
 <p><strong>Using hydra_zen.multirun</strong></p>
 <p>Multi-run values can be specified directly, without having to form a quoted multi-run string, by using the <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen.multi_run</span></code> list to store the values.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/random.html#module-random" title="random"><span class="nn">random</span></a>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><span class="n">launch</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">,</span> <span class="n">multirun</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/random.html#module-random" title="random"><span class="nn">random</span></a>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><span class="n">launch</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">,</span> <span class="n">multirun</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">values_for_experiment</span> <span class="o">=</span> <span class="p">[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/random.html#random.uniform" title="random.uniform"><span class="n">random</span><span class="o">.</span><span class="n">uniform</span></a><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#range" title="range"><span class="nb">range</span></a><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
 </pre></div>
 </div>

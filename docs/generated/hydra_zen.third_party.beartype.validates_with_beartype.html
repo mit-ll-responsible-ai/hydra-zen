@@ -25,9 +25,9 @@
 <!-- Loaded before other Sphinx assets -->
 <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
-<link href="../_static/pygments.css?v=a746c00c" rel="stylesheet" type="text/css">
+<link href="../_static/pygments.css?v=8f2a1f02" rel="stylesheet" type="text/css">
 <link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
-<link href="../_static/sphinx-codeautolink.css?v=125d5c1c" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css"/>
 <link href="../_static/sphinx-design.min.css?v=95c83b7e" rel="stylesheet" type="text/css"/>
 <!-- So that users can add custom icons -->
 <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -335,11 +335,11 @@ cast to a tuple. See the Examples section for more details.</p>
 </div>
 <p class="rubric">Examples</p>
 <p><strong>Basic usage</strong></p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen.third_party.beartype</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.third_party.beartype.validates_with_beartype.html#hydra_zen.third_party.beartype.validates_with_beartype" title="hydra_zen.third_party.beartype.validates_with_beartype"><span class="n">validates_with_beartype</span></a>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.third_party.beartype</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.third_party.beartype.validates_with_beartype.html#hydra_zen.third_party.beartype.validates_with_beartype" title="hydra_zen.third_party.beartype.validates_with_beartype"><span class="n">validates_with_beartype</span></a>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">beartype.cave</span> <span class="kn">import</span> <span class="n">ScalarTypes</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">ScalarTypes</span><span class="p">):</span> <span class="k">return</span> <span class="n">x</span>  <span class="c1"># a scalar is any real-valued number</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">beartype.cave</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalarTypes</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">ScalarTypes</span><span class="p">):</span> <span class="k">return</span> <span class="n">x</span>  <span class="c1"># a scalar is any real-valued number</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>  <span class="c1"># doesn't catch bad input</span>
 <span class="go">[1, 2]</span>
 </pre></div>
@@ -351,8 +351,8 @@ cast to a tuple. See the Examples section for more details.</p>
 </div>
 <p>Applying <a class="reference internal" href="#hydra_zen.third_party.beartype.validates_with_beartype" title="hydra_zen.third_party.beartype.validates_with_beartype"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validates_with_beartype</span></code></a> to a class-object will wrap its <code class="docutils literal notranslate"><span class="pre">__init__</span></code>
 method in-place.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">A</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">ScalarTypes</span><span class="p">):</span> <span class="o">...</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">A</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">ScalarTypes</span><span class="p">):</span> <span class="o">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">validates_with_beartype</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>  <span class="c1"># wrapping occurs in-place</span>
 <span class="go">__main__.A</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
@@ -361,7 +361,7 @@ method in-place.</p>
 </div>
 <p><strong>Adding beartype validation to configs</strong></p>
 <p>This is designed to be used with the <code class="docutils literal notranslate"><span class="pre">zen_wrappers</span></code> feature of <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code>.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a>
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Conf</span> <span class="o">=</span> <span class="n">builds</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">zen_wrappers</span><span class="o">=</span><span class="n">validates_with_beartype</span><span class="p">)</span>
@@ -380,7 +380,7 @@ all configs.</p>
 <p><strong>Sequence-coercion behavior for compatibility with Hydra</strong></p>
 <p>Note that sequence-coercion is enabled to ensure smooth compatibility with Hydra,
 as Hydra will interpret all (non-string) sequential data structures as lists.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="tuple"><span class="nb">tuple</span></a><span class="p">):</span> <span class="k">return</span> <span class="n">x</span>  <span class="c1"># note the annotation</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">g</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="tuple"><span class="nb">tuple</span></a><span class="p">):</span> <span class="k">return</span> <span class="n">x</span>  <span class="c1"># note the annotation</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
 <span class="go">[1, 2, 3]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">validates_with_beartype</span><span class="p">(</span><span class="n">g</span><span class="p">)([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>  <span class="c1"># input: list, output: tuple</span>

@@ -29,9 +29,9 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-codeautolink.css?v=125d5c1c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-codeautolink.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
@@ -386,14 +386,14 @@
   <h1>Source code for hydra_zen.structured_configs._implementations</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) 2025 Massachusetts Institute of Technology</span>
 <span class="c1"># SPDX-License-Identifier: MIT</span>
-<span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">import</span> <span class="nn">pathlib</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">deque</span>
-<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># use this for runtime checks</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">deque</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>  <span class="c1"># use this for runtime checks</span>
     <span class="n">MISSING</span><span class="p">,</span>
     <span class="n">Field</span> <span class="k">as</span> <span class="n">_Field</span><span class="p">,</span>
     <span class="n">InitVar</span><span class="p">,</span>
@@ -403,12 +403,12 @@
     <span class="n">is_dataclass</span><span class="p">,</span>
     <span class="n">make_dataclass</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timedelta</span>
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span><span class="p">,</span> <span class="n">PosixPath</span><span class="p">,</span> <span class="n">WindowsPath</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">chain</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span><span class="p">,</span> <span class="n">PosixPath</span><span class="p">,</span> <span class="n">WindowsPath</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Annotated</span><span class="p">,</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
@@ -428,8 +428,8 @@
     <span class="n">overload</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">,</span> <span class="n">_utils</span> <span class="k">as</span> <span class="n">_omegaconf_utils</span>
-<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">omegaconf</span><span class="w"> </span><span class="kn">import</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">,</span> <span class="n">_utils</span> <span class="k">as</span> <span class="n">_omegaconf_utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Concatenate</span><span class="p">,</span>
     <span class="n">Literal</span><span class="p">,</span>
     <span class="n">ParamSpec</span><span class="p">,</span>
@@ -443,20 +443,20 @@
     <span class="n">dataclass_transform</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">hydra_zen._compatibility</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen._compatibility</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">HYDRA_SUPPORTED_PRIMITIVE_TYPES</span><span class="p">,</span>
     <span class="n">HYDRA_SUPPORTED_PRIMITIVES</span><span class="p">,</span>
     <span class="n">ZEN_SUPPORTED_PRIMITIVES</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.errors</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.errors</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">HydraZenDeprecationWarning</span><span class="p">,</span>
     <span class="n">HydraZenUnsupportedPrimitiveError</span><span class="p">,</span>
     <span class="n">HydraZenValidationError</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.funcs</span> <span class="kn">import</span> <span class="n">as_default_dict</span><span class="p">,</span> <span class="n">get_obj</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.structured_configs</span> <span class="kn">import</span> <span class="n">_utils</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.structured_configs._type_guards</span> <span class="kn">import</span> <span class="n">safe_getattr</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.funcs</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_default_dict</span><span class="p">,</span> <span class="n">get_obj</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.structured_configs</span><span class="w"> </span><span class="kn">import</span> <span class="n">_utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.structured_configs._type_guards</span><span class="w"> </span><span class="kn">import</span> <span class="n">safe_getattr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Builds</span><span class="p">,</span>
     <span class="n">DataclassOptions</span><span class="p">,</span>
     <span class="n">PartialBuilds</span><span class="p">,</span>
@@ -464,7 +464,7 @@
     <span class="n">ZenConvert</span><span class="p">,</span>
     <span class="n">ZenWrappers</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.typing._implementations</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AllConvert</span><span class="p">,</span>
     <span class="n">AnyBuilds</span><span class="p">,</span>
     <span class="n">Builds</span><span class="p">,</span>
@@ -485,7 +485,7 @@
     <span class="n">_SupportedViaBuilds</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">._globals</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._globals</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">CONVERT_FIELD_NAME</span><span class="p">,</span>
     <span class="n">DEFAULTS_LIST_FIELD_NAME</span><span class="p">,</span>
     <span class="n">HYDRA_FIELD_NAMES</span><span class="p">,</span>
@@ -500,7 +500,7 @@
     <span class="n">ZEN_TARGET_FIELD_NAME</span><span class="p">,</span>
     <span class="n">ZEN_WRAPPERS_FIELD_NAME</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">._type_guards</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._type_guards</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">is_builds</span><span class="p">,</span>
     <span class="n">is_generic_type</span><span class="p">,</span>
     <span class="n">is_just</span><span class="p">,</span>
@@ -508,7 +508,7 @@
     <span class="n">safe_getattr</span><span class="p">,</span>
     <span class="n">uses_zen_processing</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">merge_settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">merge_settings</span>
 
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
 <span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T&quot;</span><span class="p">)</span>
@@ -531,8 +531,8 @@
 
 <span class="c1"># stores type -&gt; value-conversion-fn</span>
 <span class="c1"># for types with specialized support from hydra-zen</span>
-<span class="k">class</span> <span class="nc">_ConversionFn</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="s2">&quot;Type[BuildsFn[Any]]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span> <span class="o">...</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_ConversionFn</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="s2">&quot;Type[BuildsFn[Any]]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span> <span class="o">...</span>
 
 
 <span class="n">ZEN_VALUE_CONVERSION</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="n">_ConversionFn</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
@@ -573,7 +573,7 @@
 <span class="n">_original_yaml_loader</span> <span class="o">=</span> <span class="n">_omegaconf_utils</span><span class="o">.</span><span class="n">get_yaml_loader</span>
 
 
-<span class="k">def</span> <span class="nf">_patched_yaml_loader</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_patched_yaml_loader</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="n">loader</span> <span class="o">=</span> <span class="n">_original_yaml_loader</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">loader</span><span class="o">.</span><span class="n">add_constructor</span><span class="p">(</span>
         <span class="s2">&quot;tag:yaml.org,2002:python/object/apply:pathlib._local.Path&quot;</span><span class="p">,</span>
@@ -593,7 +593,7 @@
 <span class="n">_omegaconf_utils</span><span class="o">.</span><span class="n">get_yaml_loader</span> <span class="o">=</span> <span class="n">_patched_yaml_loader</span>
 
 
-<span class="k">def</span> <span class="nf">_retain_type_info</span><span class="p">(</span><span class="n">type_</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_retain_type_info</span><span class="p">(</span><span class="n">type_</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]):</span>
     <span class="c1"># OmegaConf&#39;s type-checking occurs before instantiation occurs.</span>
     <span class="c1"># This means that, e.g., passing `Builds[int]` to a field `x: int`</span>
     <span class="c1"># will fail Hydra&#39;s type-checking upon instantiation, even though</span>
@@ -622,7 +622,7 @@
 <div class="viewcode-block" id="hydrated_dataclass">
 <a class="viewcode-back" href="../../../generated/hydra_zen.hydrated_dataclass.html#hydra_zen.hydrated_dataclass">[docs]</a>
 <span class="nd">@dataclass_transform</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">hydrated_dataclass</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">hydrated_dataclass</span><span class="p">(</span>
     <span class="n">target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
     <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">SupportedPrimitive</span><span class="p">,</span>
     <span class="n">zen_partial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -845,7 +845,7 @@
 <span class="sd">    For more detailed examples, refer to `builds`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">decorated_obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="n">decorated_obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">decorated_obj</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
                 <span class="s2">&quot;Class instances are not supported by `hydrated_dataclass`.&quot;</span>
@@ -922,14 +922,14 @@
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Just</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Just</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Just[T] is a config that returns T when instantiated.&quot;&quot;&quot;</span>
 
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;hydra_zen.funcs.get_obj&quot;</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_is_ufunc</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_ufunc</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="c1"># checks without importing numpy</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">numpy</span> <span class="o">:=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;numpy&quot;</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
         <span class="c1"># we do actually cover this branch some runs of our CI,</span>
@@ -938,20 +938,20 @@
     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ufunc</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_is_jax_ufunc</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_jax_ufunc</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="c1"># checks without importing numpy</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">jnp</span> <span class="o">:=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;jax.numpy&quot;</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ufunc</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_is_numpy_array_func_dispatcher</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_numpy_array_func_dispatcher</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">numpy</span> <span class="o">:=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;numpy&quot;</span><span class="p">))</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">_check_instance</span><span class="p">(</span><span class="o">*</span><span class="n">target_types</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="s2">&quot;Any&quot;</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_instance</span><span class="p">(</span><span class="o">*</span><span class="n">target_types</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="s2">&quot;Any&quot;</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks if value is an instance of any of the target types imported</span>
 <span class="sd">    from the specified module.</span>
 
@@ -994,7 +994,7 @@
 <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_check_for_dynamically_defined_dataclass_type</span><span class="p">(</span><span class="n">target_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_for_dynamically_defined_dataclass_type</span><span class="p">(</span><span class="n">target_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">target_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;types.&quot;</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">HydraZenUnsupportedPrimitiveError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Configuring </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">: Cannot auto-config an instance of a &quot;</span>
@@ -1004,15 +1004,15 @@
         <span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">NOTHING</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NOTHING</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;`NOTHING` cannot be instantiated&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="ZenField">
 <a class="viewcode-back" href="../../../generated/hydra_zen.ZenField.html#hydra_zen.ZenField">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ZenField</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZenField</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    ZenField(hint=Any, default=&lt;class &#39;NOTHING&#39;&gt;, name=&lt;class &#39;NOTHING&#39;&gt;)</span>
 
@@ -1053,7 +1053,7 @@
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">_builds_fn</span><span class="p">:</span> <span class="s2">&quot;Union[BuildsFn[Any], Type[BuildsFn[Any]]]&quot;</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">DefaultBuilds</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1078,7 +1078,7 @@
 
 <div class="viewcode-block" id="BuildsFn">
 <a class="viewcode-back" href="../../../generated/hydra_zen.BuildsFn.html#hydra_zen.BuildsFn">[docs]</a>
-<span class="k">class</span> <span class="nc">BuildsFn</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BuildsFn</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class that can be modified to customize the behavior of `builds`, `just`, `kwargs_of`, and `make_config`.</span>
 
 <span class="sd">    These functions are exposed as class methods of `BuildsFn`.</span>
@@ -1167,7 +1167,7 @@
 <div class="viewcode-block" id="BuildsFn._sanitized_type">
 <a class="viewcode-back" href="../../../generated/hydra_zen.BuildsFn.html#hydra_zen.BuildsFn._sanitized_type">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_sanitized_type</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sanitized_type</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">type_</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1363,7 +1363,7 @@
 <div class="viewcode-block" id="BuildsFn._get_obj_path">
 <a class="viewcode-back" href="../../../generated/hydra_zen.BuildsFn.html#hydra_zen.BuildsFn._get_obj_path">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_get_obj_path</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_obj_path</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Used to get the `_target_` value for the resulting config.</span>
 
 <span class="sd">        Override this to control how `builds` determines the _target_ field</span>
@@ -1427,11 +1427,11 @@
 
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_just</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Just</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_just</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Just</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">Just</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_mutable_value</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_mutable_value</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Used to set a mutable object as a default value for a field</span>
 <span class="sd">        in a dataclass.</span>
 
@@ -1474,7 +1474,7 @@
 <div class="viewcode-block" id="BuildsFn._make_hydra_compatible">
 <a class="viewcode-back" href="../../../generated/hydra_zen.BuildsFn.html#hydra_zen.BuildsFn._make_hydra_compatible">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_make_hydra_compatible</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_hydra_compatible</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">value</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1500,7 +1500,7 @@
 <span class="sd">            `dataclasses.MISSING`. As well as lists, tuples, dicts, and omegaconf</span>
 <span class="sd">            containers containing the above.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">hydra_zen.wrapper</span> <span class="kn">import</span> <span class="n">Zen</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.wrapper</span><span class="w"> </span><span class="kn">import</span> <span class="n">Zen</span>
 
         <span class="c1"># Common primitives supported by Hydra.</span>
         <span class="c1"># We check exhaustively for all Hydra-supported primitives below but seek to</span>
@@ -1699,7 +1699,7 @@
 
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_sanitize_collection</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sanitize_collection</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">x</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1742,7 +1742,7 @@
             <span class="k">return</span> <span class="n">x</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_sanitized_field</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sanitized_field</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
         <span class="n">init</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -1776,7 +1776,7 @@
         <span class="k">return</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="n">init</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_get_sig_obj</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_sig_obj</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the signature object for `target`.</span>
 
 <span class="sd">        `inspect.signature` has inconsistent/buggy behaviors across</span>
@@ -1802,7 +1802,7 @@
     <span class="c1"># partial=False, pop-sig=True; no *args, **kwargs, nor builds_bases</span>
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">builds</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1822,7 +1822,7 @@
 
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">builds</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1843,7 +1843,7 @@
     <span class="c1"># partial=False, pop-sig=bool</span>
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">builds</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">AnyBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
@@ -1865,7 +1865,7 @@
     <span class="c1"># partial=False, pop-sig=bool</span>
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">builds</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
@@ -1887,7 +1887,7 @@
     <span class="c1"># partial=True, pop-sig=bool</span>
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">builds</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">AnyBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
@@ -1909,7 +1909,7 @@
     <span class="c1"># partial=True, pop-sig=bool</span>
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">builds</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
@@ -1931,7 +1931,7 @@
     <span class="c1"># partial=bool, pop-sig=False</span>
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">builds</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">AnyBuilds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
@@ -1953,7 +1953,7 @@
     <span class="c1"># partial=bool, pop-sig=False</span>
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">builds</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Importable</span><span class="p">,</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
@@ -1975,7 +1975,7 @@
     <span class="c1"># partial=bool, pop-sig=bool</span>
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">builds</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="nb">type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="n">Importable</span><span class="p">],</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
@@ -1999,7 +1999,7 @@
     <span class="p">]:</span> <span class="o">...</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">builds</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">builds</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="o">*</span><span class="n">pos_args</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
             <span class="n">Importable</span><span class="p">,</span>
@@ -3380,7 +3380,7 @@
 
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">just</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">just</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">obj</span><span class="p">:</span> <span class="n">TP</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -3392,7 +3392,7 @@
 
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">just</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">just</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">obj</span><span class="p">:</span> <span class="nb">complex</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -3404,7 +3404,7 @@
 
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">just</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">just</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">obj</span><span class="p">:</span> <span class="n">TC</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -3416,7 +3416,7 @@
 
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">just</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">just</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">obj</span><span class="p">:</span> <span class="n">TB</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -3428,7 +3428,7 @@
 
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">just</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">just</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">obj</span><span class="p">:</span> <span class="n">TD</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -3440,7 +3440,7 @@
 
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">just</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">just</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">obj</span><span class="p">:</span> <span class="n">DataClass_</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -3452,7 +3452,7 @@
 
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">just</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">just</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -3463,7 +3463,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span> <span class="o">...</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">just</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">just</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -3501,7 +3501,7 @@
         <span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">make_config</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_config</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="o">*</span><span class="n">fields_as_args</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">],</span>
         <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3734,7 +3734,7 @@
     <span class="c1"># cover zen_exclude=() -&gt; (1, 2, 3)</span>
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">kwargs_of</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -3744,7 +3744,7 @@
 
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">kwargs_of</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">Concatenate</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">P</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -3754,7 +3754,7 @@
 
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">kwargs_of</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">Concatenate</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">P</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -3764,7 +3764,7 @@
 
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">kwargs_of</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">Concatenate</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">P</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -3776,7 +3776,7 @@
 
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">kwargs_of</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -3786,7 +3786,7 @@
 
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">kwargs_of</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -3796,7 +3796,7 @@
 
     <span class="nd">@overload</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">kwargs_of</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -3808,7 +3808,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]]:</span> <span class="o">...</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">kwargs_of</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">kwargs_of</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">__hydra_target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
             <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
@@ -3901,7 +3901,7 @@
 
 
 
-<span class="k">class</span> <span class="nc">DefaultBuilds</span><span class="p">(</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">SupportedPrimitive</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DefaultBuilds</span><span class="p">(</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">SupportedPrimitive</span><span class="p">]):</span>
     <span class="n">_default_dataclass_options_for_kwargs_of</span> <span class="o">=</span> <span class="p">{}</span>
 
 
@@ -3910,27 +3910,27 @@
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ConfigComplex</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigComplex</span><span class="p">:</span>
     <span class="n">real</span><span class="p">:</span> <span class="n">Any</span>
     <span class="n">imag</span><span class="p">:</span> <span class="n">Any</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">BuildsFn</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="nb">complex</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">del</span> <span class="n">CBuildsFn</span>
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ConfigPath</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigPath</span><span class="p">:</span>
     <span class="n">_args_</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">BuildsFn</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="n">Path</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
         <span class="k">del</span> <span class="n">CBuildsFn</span>
 
 
-<span class="k">def</span> <span class="nf">get_target_path</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">HasTarget</span><span class="p">,</span> <span class="n">HasTargetInst</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_target_path</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">HasTarget</span><span class="p">,</span> <span class="n">HasTargetInst</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the import-path from a targeted config.</span>
 
@@ -3968,20 +3968,20 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">_T</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span> <span class="o">...</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">InstOrType</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">_T</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span> <span class="o">...</span>
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">HasTargetInst</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span> <span class="o">...</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">HasTargetInst</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span> <span class="o">...</span>
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">HasTarget</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span> <span class="o">...</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">HasTarget</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span> <span class="o">...</span>
 
 
 <div class="viewcode-block" id="get_target">
 <a class="viewcode-back" href="../../../generated/hydra_zen.get_target.html#hydra_zen.get_target">[docs]</a>
-<span class="k">def</span> <span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">HasTarget</span><span class="p">,</span> <span class="n">HasTargetInst</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_target</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">HasTarget</span><span class="p">,</span> <span class="n">HasTargetInst</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the target-object from a targeted config.</span>
 
@@ -4056,7 +4056,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">mutable_value</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mutable_value</span><span class="p">(</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -4095,7 +4095,7 @@
     <span class="k">return</span> <span class="n">BuildsFunction</span><span class="o">.</span><span class="n">_mutable_value</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">zen_convert</span><span class="o">=</span><span class="n">zen_convert</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">convert_complex</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">convert_complex</span><span class="p">(</span>
     <span class="n">value</span><span class="p">:</span> <span class="nb">complex</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Builds</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]:</span>
     <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
@@ -4109,7 +4109,7 @@
 
 <span class="k">if</span> <span class="n">Path</span> <span class="ow">in</span> <span class="n">ZEN_SUPPORTED_PRIMITIVES</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
 
-    <span class="k">def</span> <span class="nf">convert_path</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Builds</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">Path</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">convert_path</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Builds</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">Path</span><span class="p">]]:</span>
         <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
             <span class="n">Builds</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">Path</span><span class="p">]],</span> <span class="n">ConfigPath</span><span class="p">(</span><span class="n">_args_</span><span class="o">=</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">),),</span> <span class="n">CBuildsFn</span><span class="o">=</span><span class="n">CBuildsFn</span><span class="p">)</span>
         <span class="p">)</span>
@@ -4119,7 +4119,7 @@
     <span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="n">WindowsPath</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert_path</span>
 
 
-<span class="k">def</span> <span class="nf">_unpack_partial</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_unpack_partial</span><span class="p">(</span>
     <span class="n">value</span><span class="p">:</span> <span class="n">Partial</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PartialBuilds</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">_T</span><span class="p">]]:</span>
     <span class="n">target</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">type</span><span class="p">[</span><span class="n">_T</span><span class="p">],</span> <span class="n">value</span><span class="o">.</span><span class="n">func</span><span class="p">)</span>
@@ -4127,12 +4127,12 @@
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ConfigFromTuple</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigFromTuple</span><span class="p">:</span>
     <span class="n">_args_</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_args_</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">CBuildsFn</span><span class="o">.</span><span class="n">_make_hydra_compatible</span><span class="p">(</span>
                 <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_args_</span><span class="p">),</span>
@@ -4144,12 +4144,12 @@
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ConfigFromDict</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigFromDict</span><span class="p">:</span>
     <span class="n">_args_</span><span class="p">:</span> <span class="n">Any</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_args_</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">CBuildsFn</span><span class="o">.</span><span class="n">_make_hydra_compatible</span><span class="p">(</span>
                 <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_args_</span><span class="p">),</span>
@@ -4161,7 +4161,7 @@
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ConfigRange</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigRange</span><span class="p">:</span>
     <span class="n">start</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
     <span class="n">stop</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
     <span class="n">step</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
@@ -4169,7 +4169,7 @@
     <span class="n">_args_</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">(),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">stop</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">del</span> <span class="n">CBuildsFn</span>
@@ -4177,7 +4177,7 @@
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ConfigTimeDelta</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigTimeDelta</span><span class="p">:</span>
     <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
     <span class="n">days</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="n">seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -4188,18 +4188,18 @@
     <span class="n">weeks</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">BuildsFn</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="n">timedelta</span><span class="p">),</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">del</span> <span class="n">CBuildsFn</span>
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ConfigFromDefaultDict</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigFromDefaultDict</span><span class="p">:</span>
     <span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
     <span class="n">default_factory</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">CBuildsFn</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">BuildsFn</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="n">as_default_dict</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dict_</span><span class="p">,</span> <span class="n">defaultdict</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_factory</span> <span class="o">=</span> <span class="n">CBuildsFn</span><span class="o">.</span><span class="n">just</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dict_</span><span class="o">.</span><span class="n">default_factory</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">CBuildsFn</span><span class="o">.</span><span class="n">_make_hydra_compatible</span><span class="p">(</span>

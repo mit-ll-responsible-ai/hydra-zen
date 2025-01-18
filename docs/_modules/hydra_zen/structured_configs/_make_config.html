@@ -29,9 +29,9 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-codeautolink.css?v=125d5c1c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-codeautolink.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
@@ -386,12 +386,12 @@
   <h1>Source code for hydra_zen.structured_configs._make_config</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) 2025 Massachusetts Institute of Technology</span>
 <span class="c1"># SPDX-License-Identifier: MIT</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Literal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
 
-<span class="kn">from</span> <span class="nn">hydra_zen.typing</span> <span class="kn">import</span> <span class="n">DataclassOptions</span><span class="p">,</span> <span class="n">SupportedPrimitive</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.typing._implementations</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataclassOptions</span><span class="p">,</span> <span class="n">SupportedPrimitive</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.typing._implementations</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AllConvert</span><span class="p">,</span>
     <span class="n">DataClass</span><span class="p">,</span>
     <span class="n">DataClass_</span><span class="p">,</span>
@@ -399,13 +399,13 @@
     <span class="n">ZenConvert</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">._implementations</span> <span class="kn">import</span> <span class="n">DefaultBuilds</span><span class="p">,</span> <span class="n">ZenField</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._implementations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultBuilds</span><span class="p">,</span> <span class="n">ZenField</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ZenField&quot;</span><span class="p">,</span> <span class="s2">&quot;make_config&quot;</span><span class="p">]</span>
 
 
-<span class="k">class</span> <span class="nc">NOTHING</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NOTHING</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;`NOTHING` cannot be instantiated&quot;</span><span class="p">)</span>
 
 
@@ -414,7 +414,7 @@
 
 <div class="viewcode-block" id="make_config">
 <a class="viewcode-back" href="../../../generated/hydra_zen.make_config.html#hydra_zen.make_config">[docs]</a>
-<span class="k">def</span> <span class="nf">make_config</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_config</span><span class="p">(</span>
     <span class="o">*</span><span class="n">fields_as_args</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">],</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>

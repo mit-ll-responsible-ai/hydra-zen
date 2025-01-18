@@ -26,9 +26,9 @@
 <!-- Loaded before other Sphinx assets -->
 <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
-<link href="../_static/pygments.css?v=a746c00c" rel="stylesheet" type="text/css">
+<link href="../_static/pygments.css?v=8f2a1f02" rel="stylesheet" type="text/css">
 <link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
-<link href="../_static/sphinx-codeautolink.css?v=125d5c1c" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css"/>
 <link href="../_static/sphinx-design.min.css?v=95c83b7e" rel="stylesheet" type="text/css"/>
 <!-- So that users can add custom icons -->
 <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -278,20 +278,20 @@ not leverage runtime checking of it types. Create a script called <code class="d
 containing the following code.</p>
 <div class="literal-block-wrapper docutils container" id="id3">
 <div class="code-block-caption"><span class="caption-text">2: Creating toy example of library code. Contents of <code class="docutils literal notranslate"><span class="pre">toy_library.py</span></code>.</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#module-typing" title="typing"><span class="nn">typing</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Union" title="typing.Union"><span class="n">Union</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="typing.Sequence"><span class="n">Sequence</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.TypeAlias" title="typing.TypeAlias"><span class="n">TypeAlias</span></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#module-typing" title="typing"><span class="nn">typing</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Union" title="typing.Union"><span class="n">Union</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="typing.Sequence"><span class="n">Sequence</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.TypeAlias" title="typing.TypeAlias"><span class="n">TypeAlias</span></a>
 
-<span class="kn">from</span> <span class="nn">beartype.vale</span> <span class="kn">import</span> <span class="n">Is</span>
-<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="typing.Annotated"><span class="n">Annotated</span></a>
+<span class="kn">from</span><span class="w"> </span><span class="nn">beartype.vale</span><span class="w"> </span><span class="kn">import</span> <span class="n">Is</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="typing.Annotated"><span class="n">Annotated</span></a>
 
 
 <span class="n">PositiveInt</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.TypeAlias" title="typing.TypeAlias"><span class="n">TypeAlias</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="typing.Annotated"><span class="n">Annotated</span></a><span class="p">[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">Is</span><span class="p">[</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">]]</span>
 
 
-<span class="k">def</span> <span class="nf">process_age</span><span class="p">(</span><span class="n">age</span><span class="p">:</span> <span class="n">PositiveInt</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">process_age</span><span class="p">(</span><span class="n">age</span><span class="p">:</span> <span class="n">PositiveInt</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">age</span>
 
 
-<span class="k">def</span> <span class="nf">process_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Union" title="typing.Union"><span class="n">Union</span></a><span class="p">[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="typing.Sequence"><span class="n">Sequence</span></a><span class="p">[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">]]):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">process_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Union" title="typing.Union"><span class="n">Union</span></a><span class="p">[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="typing.Sequence"><span class="n">Sequence</span></a><span class="p">[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">]]):</span>
     <span class="k">return</span> <span class="n">shape</span>
 </pre></div>
 </div>
@@ -311,10 +311,10 @@ instantiation.</p>
 <p>Open a Python console – or Jupyter notebook – in the same directory as <code class="docutils literal notranslate"><span class="pre">toy_library.py</span></code> and create the following configs.</p>
 <div class="literal-block-wrapper docutils container" id="id5">
 <div class="code-block-caption"><span class="caption-text">3: Creating configs that include beartype validation.</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">toy_library</span> <span class="kn">import</span> <span class="n">process_age</span><span class="p">,</span> <span class="n">process_shape</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">toy_library</span><span class="w"> </span><span class="kn">import</span> <span class="n">process_age</span><span class="p">,</span> <span class="n">process_shape</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><span class="n">make_custom_builds_fn</span></a>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen.third_party.beartype</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.third_party.beartype.validates_with_beartype.html#hydra_zen.third_party.beartype.validates_with_beartype" title="hydra_zen.third_party.beartype.validates_with_beartype"><span class="n">validates_with_beartype</span></a>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><span class="n">make_custom_builds_fn</span></a>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.third_party.beartype</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.third_party.beartype.validates_with_beartype.html#hydra_zen.third_party.beartype.validates_with_beartype" title="hydra_zen.third_party.beartype.validates_with_beartype"><span class="n">validates_with_beartype</span></a>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">builds</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><span class="n">make_custom_builds_fn</span></a><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">populate_full_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -331,7 +331,7 @@ instantiation.</p>
 In the same console, verify that you can replicate the following behavior.</p>
 <div class="literal-block-wrapper docutils container" id="id6">
 <div class="code-block-caption"><span class="caption-text">4: Test that the type-checker catches bad configured values.</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a>
 
 <span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">(</span><span class="n">ConfAge</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>  <span class="c1"># OK</span>
 <span class="go">12</span>

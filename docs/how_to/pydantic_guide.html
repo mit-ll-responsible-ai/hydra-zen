@@ -26,9 +26,9 @@
 <!-- Loaded before other Sphinx assets -->
 <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
-<link href="../_static/pygments.css?v=a746c00c" rel="stylesheet" type="text/css">
+<link href="../_static/pygments.css?v=8f2a1f02" rel="stylesheet" type="text/css">
 <link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
-<link href="../_static/sphinx-codeautolink.css?v=125d5c1c" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css"/>
 <link href="../_static/sphinx-design.min.css?v=95c83b7e" rel="stylesheet" type="text/css"/>
 <!-- So that users can add custom icons -->
 <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -264,23 +264,23 @@ Hydra-app</strong>.</p>
 <p>Consider the following simple hydra-zen app:</p>
 <div class="literal-block-wrapper docutils container" id="id2">
 <div class="code-block-caption"><span class="caption-text">Contents of <code class="xref py py-obj docutils literal notranslate"><span class="pre">my_app.py</span></code></span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <span class="n">store</span>
-<span class="kn">from</span> <span class="nn">hydra_zen.third_party.pydantic</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.third_party.pydantic.pydantic_parser.html#hydra_zen.third_party.pydantic.pydantic_parser" title="hydra_zen.third_party.pydantic.pydantic_parser"><span class="n">pydantic_parser</span></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <span class="n">store</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.third_party.pydantic</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.third_party.pydantic.pydantic_parser.html#hydra_zen.third_party.pydantic.pydantic_parser" title="hydra_zen.third_party.pydantic.pydantic_parser"><span class="n">pydantic_parser</span></a>
 
-<span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#module-typing" title="typing"><span class="nn">typing</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="typing.Literal"><span class="n">Literal</span></a>
-<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">PositiveInt</span>
+<span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#module-typing" title="typing"><span class="nn">typing</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="typing.Literal"><span class="n">Literal</span></a>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">PositiveInt</span>
 
 
-<span class="kn">from</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a>
+<span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a>
 
 
 <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="nd">@dataclass</span></a>
-<span class="k">class</span> <span class="nc">Character</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Character</span><span class="p">:</span>
     <span class="n">age</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">22</span>
     <span class="n">name</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a> <span class="o">=</span> <span class="s2">"Bobby"</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span>
     <span class="n">character</span><span class="p">:</span> <span class="n">Character</span><span class="p">,</span>
     <span class="n">gear</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="tuple"><span class="nb">tuple</span></a><span class="p">[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
     <span class="n">mode</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="typing.Literal"><span class="n">Literal</span></a><span class="p">[</span><span class="s2">"easy"</span><span class="p">,</span> <span class="s2">"hard"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"easy"</span><span class="p">,</span>
@@ -289,7 +289,7 @@ Hydra-app</strong>.</p>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">hydra_zen</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a>
 
     <span class="n">store</span><span class="p">(</span><span class="n">main</span><span class="p">,</span> <span class="n">hydra_defaults</span><span class="o">=</span><span class="p">[</span><span class="s2">"_self_"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"character"</span><span class="p">:</span> <span class="s2">"base"</span><span class="p">}])</span>
     <span class="n">store</span><span class="p">(</span><span class="n">Character</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s2">"character"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"base"</span><span class="p">)</span>
