@@ -519,8 +519,36 @@ class Zen(Generic[P, R]):
 
         if version_base is not _UNSPECIFIED_:  # pragma: no cover
             kw["version_base"] = version_base
-
+        _monkeypatch_hydra()
         return hydra.main(**kw)(target)()
+
+
+# noqa: E402
+def _monkeypatch_hydra():
+    from hydra._internal.config_loader_impl import ConfigLoaderImpl, OverridesParser
+    from hydra._internal.config_repository import (
+        CachingConfigRepository,
+        ConfigRepository,
+    )
+
+    def _new_init(self, delegate):
+        self.delegate = delegate
+        self.cache = {}
+
+    CachingConfigRepository.__init__ = _new_init
+
+    def _parse_overrides_and_create_caching_repo(self, config_name, overrides):
+        parser = OverridesParser.create()
+        parsed_overrides = parser.parse_overrides(overrides=overrides)
+        caching_repo = CachingConfigRepository(
+            ConfigRepository(config_search_path=self.config_search_path)
+        )
+        self._process_config_searchpath(config_name, parsed_overrides, caching_repo)
+        return parsed_overrides, caching_repo
+
+    ConfigLoaderImpl._parse_overrides_and_create_caching_repo = (
+        _parse_overrides_and_create_caching_repo
+    )
 
 
 @overload

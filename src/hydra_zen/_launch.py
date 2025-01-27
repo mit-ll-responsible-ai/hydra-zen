@@ -182,6 +182,34 @@ def launch(
 ) -> Any: ...
 
 
+# noqa: E402
+def _monkeypatch_hydra():
+    from hydra._internal.config_loader_impl import ConfigLoaderImpl, OverridesParser
+    from hydra._internal.config_repository import (
+        CachingConfigRepository,
+        ConfigRepository,
+    )
+
+    def _new_init(self, delegate):
+        self.delegate = delegate
+        self.cache = {}
+
+    CachingConfigRepository.__init__ = _new_init
+
+    def _parse_overrides_and_create_caching_repo(self, config_name, overrides):
+        parser = OverridesParser.create()
+        parsed_overrides = parser.parse_overrides(overrides=overrides)
+        caching_repo = CachingConfigRepository(
+            ConfigRepository(config_search_path=self.config_search_path)
+        )
+        self._process_config_searchpath(config_name, parsed_overrides, caching_repo)
+        return parsed_overrides, caching_repo
+
+    ConfigLoaderImpl._parse_overrides_and_create_caching_repo = (
+        _parse_overrides_and_create_caching_repo
+    )
+
+
 def launch(
     config: Union[InstOrType[DataClass_], Mapping[str, Any]],
     task_function: Callable[[Any], Any],
@@ -390,7 +418,7 @@ def launch(
     If, instead, you want to configure a list as a single value - not to be iterated
     over in a multirun - you can instead use `hydra_zen.hydra_list`.
     """
-
+    _monkeypatch_hydra()
     # used for check below
     _num_dataclass_fields = 0
     if is_dataclass(config):
