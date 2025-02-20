@@ -230,7 +230,7 @@ def launch(
 
     to_dictconfig : bool (default: False)
         If ``True``, convert a ``dataclasses.dataclass`` to a ``omegaconf.DictConfig``.
-        Note, this will remove Hydra's cabability for validation with structured
+        Note, this will remove Hydra's capability for validation with structured
         configurations.
 
     config_name : str (default: "zen_launch")
