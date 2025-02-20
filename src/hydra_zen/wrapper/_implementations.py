@@ -975,7 +975,7 @@ _StoreCallSig = TypedDict("_StoreCallSig", {
     "name": Union[NodeName, Callable[[Any], NodeName]],
     "group": Union[GroupName, Callable[[Any], GroupName]],
     "package": Optional[Union[str, Callable[[Any], str]]],
-    "provider": Optional[str]),
+    "provider": Optional[str],
     "__kw": dict[str, Any],  # kwargs passed to to_config
     "to_config": Callable[[Any], Any],
 })
