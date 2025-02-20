@@ -971,14 +971,17 @@ def get_name(target: _HasName) -> str:
 #
 # This default dict enables us to easily update/merge the default arguments for a
 # specific ZenStore instance, in support of self-partialing behavior.
-_StoreCallSig = TypedDict("_StoreCallSig", {
-    "name": Union[NodeName, Callable[[Any], NodeName]],
-    "group": Union[GroupName, Callable[[Any], GroupName]],
-    "package": Optional[Union[str, Callable[[Any], str]]],
-    "provider": Optional[str],
-    "__kw": dict[str, Any],  # kwargs passed to to_config
-    "to_config": Callable[[Any], Any],
-})
+_StoreCallSig = TypedDict(
+    "_StoreCallSig",
+    {
+        "name": Union[NodeName, Callable[[Any], NodeName]],
+        "group": Union[GroupName, Callable[[Any], GroupName]],
+        "package": Optional[Union[str, Callable[[Any], str]]],
+        "provider": Optional[str],
+        "__kw": dict[str, Any],  # kwargs passed to to_config
+        "to_config": Callable[[Any], Any],
+    },
+)
 
 
 # TODO: make frozen dict
