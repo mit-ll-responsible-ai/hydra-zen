@@ -1374,18 +1374,21 @@
     <span class="k">return</span> <span class="n">name</span>
 
 
-<span class="k">class</span><span class="w"> </span><span class="nc">_StoreCallSig</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Arguments for ZenStore.__call__</span>
-
-<span class="sd">    This default dict enables us to easily update/merge the default arguments for a</span>
-<span class="sd">    specific ZenStore instance, in support of self-partialing behavior.&quot;&quot;&quot;</span>
-
-    <span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">NodeName</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">NodeName</span><span class="p">]]</span>
-    <span class="n">group</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">GroupName</span><span class="p">]]</span>
-    <span class="n">package</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]]</span>
-    <span class="n">provider</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-    <span class="n">__kw</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>  <span class="c1"># kwargs passed to to_config</span>
-    <span class="n">to_config</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span>
+<span class="c1"># Arguments for ZenStore.__call__</span>
+<span class="c1">#</span>
+<span class="c1"># This default dict enables us to easily update/merge the default arguments for a</span>
+<span class="c1"># specific ZenStore instance, in support of self-partialing behavior.</span>
+<span class="n">_StoreCallSig</span> <span class="o">=</span> <span class="n">TypedDict</span><span class="p">(</span>
+    <span class="s2">&quot;_StoreCallSig&quot;</span><span class="p">,</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">NodeName</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">NodeName</span><span class="p">]],</span>
+        <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">GroupName</span><span class="p">]],</span>
+        <span class="s2">&quot;package&quot;</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]],</span>
+        <span class="s2">&quot;provider&quot;</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="s2">&quot;__kw&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>  <span class="c1"># kwargs passed to to_config</span>
+        <span class="s2">&quot;to_config&quot;</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="p">},</span>
+<span class="p">)</span>
 
 
 <span class="c1"># TODO: make frozen dict</span>
