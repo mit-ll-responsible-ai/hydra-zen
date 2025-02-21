@@ -1618,7 +1618,11 @@ class ZenStore:
             }
 
             if self._deferred_to_config:
-                node = _Deferred(to_config, __target, merged_kw)
+                node = _Deferred(
+                    to_config,
+                    __target,  # pyright: ignore[reportUnknownArgumentType]
+                    merged_kw,
+                )
             else:
                 node = to_config(__target, **merged_kw)
 
