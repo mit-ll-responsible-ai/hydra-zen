@@ -2035,7 +2035,11 @@
             <span class="p">}</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_deferred_to_config</span><span class="p">:</span>
-                <span class="n">node</span> <span class="o">=</span> <span class="n">_Deferred</span><span class="p">(</span><span class="n">to_config</span><span class="p">,</span> <span class="n">__target</span><span class="p">,</span> <span class="n">merged_kw</span><span class="p">)</span>
+                <span class="n">node</span> <span class="o">=</span> <span class="n">_Deferred</span><span class="p">(</span>
+                    <span class="n">to_config</span><span class="p">,</span>
+                    <span class="n">__target</span><span class="p">,</span>  <span class="c1"># pyright: ignore[reportUnknownArgumentType]</span>
+                    <span class="n">merged_kw</span><span class="p">,</span>
+                <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">node</span> <span class="o">=</span> <span class="n">to_config</span><span class="p">(</span><span class="n">__target</span><span class="p">,</span> <span class="o">**</span><span class="n">merged_kw</span><span class="p">)</span>
 
