@@ -27,7 +27,7 @@
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet">
 <link href="../_static/pygments.css?v=8f2a1f02" rel="stylesheet" type="text/css">
 <link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
-<link href="../_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx-codeautolink.css?v=b2176991" rel="stylesheet" type="text/css"/>
 <link href="../_static/sphinx-design.min.css?v=95c83b7e" rel="stylesheet" type="text/css"/>
 <!-- So that users can add custom icons -->
 <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -311,13 +311,13 @@
 <p class="rubric">Notes</p>
 <p>Adding type-checking support for a custom type:</p>
 <p>To parameterize <a class="reference internal" href="#hydra_zen.BuildsFn" title="hydra_zen.BuildsFn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BuildsFn</span></code></a> with, e.g., support for the custom types <code class="xref py py-obj docutils literal notranslate"><span class="pre">MyTypeA</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">MyTypeB</span></code>, use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#module-typing" title="typing"><span class="nn">typing</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Union" title="typing.Union"><span class="n">Union</span></a>
 <span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">CustomConfigType</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">MyTypeA</span><span class="p">:</span> <span class="o">...</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">MyTypeB</span><span class="p">:</span> <span class="o">...</span>
 
-<span class="k">class</span><span class="w"> </span><span class="nc">MyBuilds</span><span class="p">(</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">CustomConfigType</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">MyTypeA</span><span class="p">,</span> <span class="n">MyTypeB</span><span class="p">]]]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyBuilds</span><span class="p">(</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">CustomConfigType</span><span class="p">[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Union" title="typing.Union"><span class="n">Union</span></a><span class="p">[</span><span class="n">MyTypeA</span><span class="p">,</span> <span class="n">MyTypeB</span><span class="p">]]]):</span>
     <span class="o">...</span>
 </pre></div>
 </div>
@@ -326,31 +326,31 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Quaternion</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">real</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">i</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">j</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">k</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">real</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#float" title="float"><span class="nb">float</span></a> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">i</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#float" title="float"><span class="nb">float</span></a> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">j</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#float" title="float"><span class="nb">float</span></a> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">k</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#float" title="float"><span class="nb">float</span></a> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">real</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">"Q"</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">"Q"</span> <span class="o">+</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#repr" title="repr"><span class="nb">repr</span></a><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>and you want hydra-zen’s config-creation functions to be able to automatically
 know how to make configs from instances of this type. You do so by creating your
 own subclass of <a class="reference internal" href="#hydra_zen.BuildsFn" title="hydra_zen.BuildsFn"><code class="xref py py-class docutils literal notranslate"><span class="pre">BuildsFn</span></code></a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <span class="n">BuildsFn</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#module-typing" title="typing"><span class="nn">typing</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Any" title="typing.Any"><span class="n">Any</span></a>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.BuildsFn.html#hydra_zen.BuildsFn" title="hydra_zen.structured_configs._implementations.BuildsFn"><span class="n">BuildsFn</span></a>
 <span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">CustomConfigType</span><span class="p">,</span> <span class="n">HydraSupportedType</span>
 
-<span class="k">class</span><span class="w"> </span><span class="nc">CustomBuilds</span><span class="p">(</span><span class="n">BuildsFn</span><span class="p">[</span><span class="n">CustomConfigType</span><span class="p">[</span><span class="n">Quaternion</span><span class="p">]]):</span>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_make_hydra_compatible</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">k</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HydraSupportedType</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Quaternion</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomBuilds</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.BuildsFn.html#hydra_zen.BuildsFn" title="hydra_zen.structured_configs._implementations.BuildsFn"><span class="n">BuildsFn</span></a><span class="p">[</span><span class="n">CustomConfigType</span><span class="p">[</span><span class="n">Quaternion</span><span class="p">]]):</span>
+    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#classmethod" title="classmethod"><span class="nd">@classmethod</span></a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_hydra_compatible</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Any" title="typing.Any"><span class="n">Any</span></a><span class="p">,</span> <span class="o">**</span><span class="n">k</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HydraSupportedType</span><span class="p">:</span>
+        <span class="k">if</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#isinstance" title="isinstance"><span class="nb">isinstance</span></a><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Quaternion</span><span class="p">):</span>
             <span class="n">real</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">_data</span>
             <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">builds</span><span class="p">(</span><span class="n">Quaternion</span><span class="p">,</span> <span class="n">real</span><span class="o">=</span><span class="n">real</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_make_hydra_compatible</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">return</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#super" title="super"><span class="nb">super</span></a><span class="p">()</span><span class="o">.</span><span class="n">_make_hydra_compatible</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">k</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Now you use the config-creation functions that are provided by <code class="xref py py-obj docutils literal notranslate"><span class="pre">CustomBuilds</span></code> instead of those provided by <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra_zen</span></code>:</p>
