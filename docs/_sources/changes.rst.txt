@@ -10,11 +10,9 @@ chronological order. All previous releases should still be available on pip.
 
 .. _v0.14.0:
 
-----------------------
-0.14.0rc1 - 2025-01-02
-----------------------
-
-.. note:: This is documentation for an pre-release version of hydra-zen. You can install this pre-release via `pip install --pre hydra-zen`
+-------------------
+0.14.0 - 2025-03-09
+-------------------
 
 - Drops support for Python 3.8
 - Adds support for Python 3.13
