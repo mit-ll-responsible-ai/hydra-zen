@@ -1,6 +1,7 @@
 # Copyright (c) 2025 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 import inspect
+import pickle
 from dataclasses import dataclass, field
 from functools import partial
 from pathlib import Path
@@ -55,15 +56,20 @@ class Child(Parent):
 
 
 class UsesNew:
+    xoo: int
+
     def __new__(cls, xoo: int):
         self = object.__new__(cls)
-        self.xoo = xoo  # type: ignore
+        self.xoo = xoo
         return self
 
     def __eq__(self, value: object) -> bool:
         if not isinstance(value, type(self)):
             return False
         return self.__dict__ == value.__dict__
+
+    def __reduce__(self):
+        return type(self), (self.xoo,)
 
 
 class HasGeneric(Generic[T]):
@@ -131,12 +137,28 @@ class PydanticModel(BaseModel):
         p(PydanticModel, xoo=1),
     ],
 )
-@pytest.mark.parametrize("use_meta_feature", [True, False])
-def test_roundtrip(obj: Param, use_meta_feature: bool):
+@pytest.mark.parametrize("use_meta_feature", [True, False], ids=["meta", "no_meta"])
+@pytest.mark.parametrize("use_partial", [True, False], ids=["partial", "no_partial"])
+@pytest.mark.parametrize("use_pickle", [True, False], ids=["pickle", "no_pickle"])
+def test_roundtrip(
+    obj: Param, use_meta_feature: bool, use_partial: bool, use_pickle: bool
+):
     kw = obj.kwargs.copy()
     if use_meta_feature:
         kw["zen_meta"] = {"_za": 1}
-    inst_out = instantiate(builds(obj.target, *obj.args, **kw))
+    inst_out = instantiate(builds(obj.target, *obj.args, **kw, zen_partial=use_partial))
+    if use_pickle:
+        inst_out = pickle.loads(pickle.dumps(inst_out))
+    if use_partial:
+        assert isinstance(inst_out, partial)
+        if isinstance(obj.target, partial):
+            target = obj.target.func
+        elif obj.target is HasGeneric[int]:
+            target = HasGeneric
+        else:
+            target = obj.target
+        assert isinstance(inst_out.func, type(target))  # type: ignore
+        inst_out = inst_out()
     out = obj.target(*obj.args, **obj.kwargs)
 
     if inspect.isclass(obj.target):
