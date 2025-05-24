@@ -45,7 +45,7 @@ class partial_with_wrapper(partial[T]):
         func: Callable[..., T],
         *args: Any,
         **keywords: Any,
-    ) -> "partial_with_wrapper":
+    ) -> "partial_with_wrapper[T]":
         if isinstance(func, partial_with_wrapper):
             # unwrap the partial_with_wrapper
             wrappers = func.wrappers + wrappers
