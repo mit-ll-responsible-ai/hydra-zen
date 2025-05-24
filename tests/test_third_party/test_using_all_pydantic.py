@@ -153,7 +153,7 @@ def test_roundtrip(
         assert isinstance(inst_out, partial)
         if isinstance(obj.target, partial):
             target = obj.target.func
-        elif obj.target is HasGeneric[int]:
+        elif isinstance(obj.target, (type(HasGeneric[int]), type(HasGeneric))):
             target = HasGeneric
         else:
             target = obj.target
