@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: MIT
 import collections.abc as abc
 import enum
+import functools
+import pickle
 import random
 import string
 import sys
@@ -44,6 +46,7 @@ from typing_extensions import (
 
 from hydra_zen import DefaultBuilds, builds, instantiate, mutable_value
 from hydra_zen._compatibility import HYDRA_VERSION, Version, _get_version
+from hydra_zen.funcs import partial_with_wrapper
 from hydra_zen.structured_configs._utils import (
     StrictDataclassOptions,
     field,
@@ -454,3 +457,62 @@ def test_strict_dataclass_options_reflects_current_dataclass_ver():
     actual_keys = set(signature(make_dataclass).parameters)
     actual_keys.remove("fields")
     assert strict_keys == actual_keys
+
+
+def pfunc(x: int, y: int = 1):
+    return x + y
+
+
+def pwrapper(func):
+    if hasattr(func, "__wrapped__"):
+        func.__wrapped__ += 1
+    else:
+        func.__wrapped__ = 1
+    return func
+
+
+@pytest.mark.parametrize("use_pickle", [True, False], ids=["pickle", "no_pickle"])
+def test_partial_with_wrapper(use_pickle: bool):
+    if hasattr(pfunc, "__wrapped__"):
+        del pfunc.__wrapped__  # type: ignore
+    p = partial_with_wrapper((pwrapper,), pfunc, 1, y=2)
+    if use_pickle:
+        p = pickle.loads(pickle.dumps(p))
+    assert isinstance(p, functools.partial)
+    assert not hasattr(pfunc, "__wrapped__")
+    assert p() == 3
+    assert pfunc.__wrapped__ == 1  # type: ignore
+
+    p2 = partial_with_wrapper((pwrapper,), p, y=3)
+    if use_pickle:
+        p2 = pickle.loads(pickle.dumps(p2))
+    assert isinstance(p2, partial_with_wrapper)
+    assert pfunc.__wrapped__ == 1  # type: ignore
+    # wrapper should be applied twice
+    assert p2() == 4
+    assert p2.func is pfunc
+    assert pfunc.__wrapped__ == 3  # type: ignore
+
+
+@given(...)
+def test_partial_parity(
+    args1: List[int], args2: List[int], kwargs1: Dict[str, int], kwargs2: Dict[str, int]
+):
+    def f(*args, **kwargs):
+        return args, kwargs
+
+    pw = partial_with_wrapper((pwrapper,), f, *args1, **kwargs1)
+    p = functools.partial(f, *args1, **kwargs1)
+    assert isinstance(pw, partial_with_wrapper)
+    assert isinstance(p, functools.partial)
+    assert pw.func is p.func
+    assert pw.args == p.args
+    assert pw.keywords == p.keywords
+
+    pw2 = partial_with_wrapper((pwrapper,), pw, *args2, **kwargs2)
+    p2 = functools.partial(p, *args2, **kwargs2)
+    assert isinstance(pw2, partial_with_wrapper)
+    assert isinstance(p2, functools.partial)
+    assert pw2.func is p2.func
+    assert pw2.args == p2.args
+    assert pw2.keywords == p2.keywords

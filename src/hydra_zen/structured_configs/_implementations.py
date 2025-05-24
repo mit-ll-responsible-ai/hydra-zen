@@ -592,6 +592,9 @@ _is_jax_compiled_func = functools.partial(
     _check_instance, "CompiledFunction", "PjitFunction", module="jaxlib.xla_extension"
 )
 
+_is_jax_compiled_func2 = functools.partial(
+    _check_instance, "CompiledFunction", "PjitFunction", module="jaxlib._jax"
+)
 _is_jax_unspecified = functools.partial(
     _check_instance, "UnspecifiedValue", module="jax._src.interpreters.pxla"
 )
@@ -1178,6 +1181,7 @@ class BuildsFn(Generic[T]):
                 or _is_ufunc(value)
                 or _is_numpy_array_func_dispatcher(value=value)
                 or _is_jax_compiled_func(value=value)
+                or _is_jax_compiled_func2(value=value)
                 or _is_jax_ufunc(value=value)
             )
         ):

@@ -1,5 +1,6 @@
 # Copyright (c) 2025 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+import functools
 from dataclasses import dataclass
 from typing import Any
 
@@ -61,10 +62,13 @@ def test_wrapper_with_various_config_flavors(meta: bool, partial: bool):
 
     cfg = builds(dict, x=22, **kw)
     out = instantiate(cfg, _target_wrapper_=wrapper_tracker)
-    assert wrapper_tracker.num_calls == 1
-    assert wrapper_tracker.funcs[0] is dict
     if partial:
-        out = out()  # type: ignore
+        assert isinstance(out, functools.partial)
+        assert out.func is dict
+        out = out()
+
+    assert wrapper_tracker.funcs[0] is dict
+    assert wrapper_tracker.num_calls == 1
     assert out == dict(x=22)
 
 
