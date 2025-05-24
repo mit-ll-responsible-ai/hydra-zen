@@ -94,7 +94,7 @@ def _call_target(
 
     if _partial_:
         try:
-            return partial_with_wrapper[Any](
+            return partial_with_wrapper[Any](  # type: ignore
                 cast(Wrappers, (target_wrapper,)), orig_target, *args, **kwargs
             )
         except Exception as e:
