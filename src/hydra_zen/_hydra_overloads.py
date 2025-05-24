@@ -19,7 +19,7 @@ E.g.
 """
 
 # pyright: strict
-# pyright: reportPrivateUsage=false
+# pyright: reportPrivateUsage=false, reportUnnecessaryIsInstance=false
 
 import pathlib
 from dataclasses import is_dataclass
@@ -54,7 +54,6 @@ def _call_target(
     target_wrapper: Callable[[F], F],
 ) -> Any:  # pragma: no cover
     """Call target (type) with args and kwargs."""
-    import functools
 
     from hydra._internal.instantiate._instantiate2 import (
         _convert_target_to_string,
@@ -63,7 +62,7 @@ def _call_target(
     from hydra.errors import InstantiationException
     from omegaconf import OmegaConf
 
-    from hydra_zen.funcs import zen_processing
+    from hydra_zen.funcs import partial_with_wrapper, zen_processing
 
     try:
         args, kwargs = _extract_pos_args(args, kwargs)
@@ -89,12 +88,13 @@ def _call_target(
     orig_target = _target_
     if _target_ is zen_processing:
         kwargs["_zen_target_wrapper"] = target_wrapper
-    else:
+    elif not _partial_:
+        # if _partial_ then we defer the wrapping
         _target_ = target_wrapper(_target_)
 
     if _partial_:
         try:
-            return functools.partial(_target_, *args, **kwargs)
+            return partial_with_wrapper((target_wrapper,), orig_target, *args, **kwargs)
         except Exception as e:
             msg = (
                 f"Error in creating partial({_convert_target_to_string(orig_target)}, ...) object:"
@@ -477,7 +477,7 @@ def save_as_yaml(
 
 
 def load_from_yaml(
-    file_: Union[str, pathlib.Path, IO[Any]]
+    file_: Union[str, pathlib.Path, IO[Any]],
 ) -> Union[DictConfig, ListConfig]:
     """
     Load a config from a yaml-format file
