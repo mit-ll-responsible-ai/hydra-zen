@@ -62,7 +62,7 @@ def _call_target(
     from hydra.errors import InstantiationException
     from omegaconf import OmegaConf
 
-    from hydra_zen.funcs import partial_with_wrapper, zen_processing
+    from hydra_zen.funcs import Wrappers, partial_with_wrapper, zen_processing
 
     try:
         args, kwargs = _extract_pos_args(args, kwargs)
@@ -94,7 +94,9 @@ def _call_target(
 
     if _partial_:
         try:
-            return partial_with_wrapper((target_wrapper,), orig_target, *args, **kwargs)
+            return partial_with_wrapper(
+                cast(Wrappers, (target_wrapper,)), orig_target, *args, **kwargs
+            )
         except Exception as e:
             msg = (
                 f"Error in creating partial({_convert_target_to_string(orig_target)}, ...) object:"
