@@ -981,6 +981,9 @@
     <span class="n">_check_instance</span><span class="p">,</span> <span class="s2">&quot;CompiledFunction&quot;</span><span class="p">,</span> <span class="s2">&quot;PjitFunction&quot;</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="s2">&quot;jaxlib.xla_extension&quot;</span>
 <span class="p">)</span>
 
+<span class="n">_is_jax_compiled_func2</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
+    <span class="n">_check_instance</span><span class="p">,</span> <span class="s2">&quot;CompiledFunction&quot;</span><span class="p">,</span> <span class="s2">&quot;PjitFunction&quot;</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="s2">&quot;jaxlib._jax&quot;</span>
+<span class="p">)</span>
 <span class="n">_is_jax_unspecified</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
     <span class="n">_check_instance</span><span class="p">,</span> <span class="s2">&quot;UnspecifiedValue&quot;</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="s2">&quot;jax._src.interpreters.pxla&quot;</span>
 <span class="p">)</span>
@@ -1580,6 +1583,7 @@
                 <span class="ow">or</span> <span class="n">_is_ufunc</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
                 <span class="ow">or</span> <span class="n">_is_numpy_array_func_dispatcher</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
                 <span class="ow">or</span> <span class="n">_is_jax_compiled_func</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="n">_is_jax_compiled_func2</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
                 <span class="ow">or</span> <span class="n">_is_jax_ufunc</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
             <span class="p">)</span>
         <span class="p">):</span>
