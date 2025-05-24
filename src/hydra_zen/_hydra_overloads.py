@@ -94,10 +94,8 @@ def _call_target(
 
     if _partial_:
         try:
-            return (
-                partial_with_wrapper[Any](
-                    cast(Wrappers, (target_wrapper,)), orig_target, *args, **kwargs
-                ),
+            return partial_with_wrapper[Any](
+                cast(Wrappers, (target_wrapper,)), orig_target, *args, **kwargs
             )
         except Exception as e:
             msg = (
