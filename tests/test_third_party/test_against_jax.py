@@ -13,7 +13,13 @@ from hydra_zen import builds, instantiate, just, to_yaml
 
 
 def test_builds_roundtrip_with_ufunc():
-    assert instantiate(builds(jnp.add, zen_partial=True))(1.0, 2.0) == jnp.array(3.0)
+    try:
+        assert instantiate(builds(jnp.add, zen_partial=True))(1.0, 2.0) == jnp.array(
+            3.0
+        )
+    except FileNotFoundError:
+        # Failed to open libtpu.so: libtpu.so: cannot open shared object file: No such file or directory
+        pytest.skip("JAX is not available or configured correctly.")
 
 
 jax_objects = [
