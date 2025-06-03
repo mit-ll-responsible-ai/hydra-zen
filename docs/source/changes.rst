@@ -8,7 +8,7 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse 
 chronological order. All previous releases should still be available on pip.
 
-.. _v0.14.1:
+.. _v0.15.0:
 
 -------------------
 0.15.0 - 2025-06-03
