@@ -8,6 +8,20 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse 
 chronological order. All previous releases should still be available on pip.
 
+.. _v0.14.1:
+
+-------------------
+0.15.0 - 2025-06-03
+-------------------
+
+This release improves support for `instantiate(... _target_wrapper_=<...>)` and
+`zen(..., instantiation_wrapper=<...>)`, and its interplay with partial-instantiation.
+deferring the wrapping process for partialed outputs. Previously, the resulting `.func`
+attribute of the partial'd object would be a wrapped function, which would not be pickle-compatible.
+
+Now a special class -- `partial_with_wrapper` -- is used so that the resulting partial'd object exposes the expected, unwrapped, `.func`` object, and is pickle-compatible. The wrapper is only applied when the partial'd object is called.
+
+
 .. _v0.14.0:
 
 -------------------
