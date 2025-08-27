@@ -28,7 +28,7 @@ OPTIONAL_TEST_DEPENDENCIES = (
     "numpy",
     "torch",
     "jax",
-    "pytorch_lightning",
+    "lightning",
     "pydantic",
     "beartype",
     "submitit",

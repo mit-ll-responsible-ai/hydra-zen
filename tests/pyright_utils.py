@@ -117,8 +117,7 @@ def get_docstring_examples(doc: str) -> str:
 
 
 def rst_to_code(src: str) -> str:
-    """
-    Consumes rst-formatted text like::
+    """Consumes rst-formatted text like::
 
        lopsem est decorum
 
@@ -226,8 +225,7 @@ def pyright_analyze(
     report_unnecessary_type_ignore_comment: Optional[bool] = None,
     type_checking_mode: Optional[Literal["basic", "strict"]] = None,
 ) -> list[PyrightOutput]:
-    r"""
-    Scan one or more Python objects, docstrings, or files with pyright.
+    r"""Scan one or more Python objects, docstrings, or files with pyright.
 
     Note that it is much faster to call this function once for N objects than N
     times - once for each object.
@@ -393,6 +391,7 @@ def pyright_analyze(
     ...     return x + 1
     >>> pyright_analyze(plus_1, scan_docstring=True)["summary"]["errorCount"]
     0
+
     """
     if path_to_pyright is None:  # pragma: no cover
         raise ModuleNotFoundError(

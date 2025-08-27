@@ -455,6 +455,7 @@ def hydrated_dataclass(
     FrozenInstanceError: cannot assign to field 'x'
 
     For more detailed examples, refer to `builds`.
+
     """
 
     def wrapper(decorated_obj: Any) -> Any:
@@ -625,8 +626,7 @@ class NOTHING:
 
 @dataclass(unsafe_hash=True)
 class ZenField:
-    """
-    ZenField(hint=Any, default=<class 'NOTHING'>, name=<class 'NOTHING'>)
+    """ZenField(hint=Any, default=<class 'NOTHING'>, name=<class 'NOTHING'>)
 
     Specifies a field's name and/or type-annotation and/or default value.
     Designed to specify fields in `make_config`.
@@ -657,13 +657,16 @@ class ZenField:
     See Also
     --------
     make_config: create a config with customized field names, default values, and annotations.
+
     """
 
     hint: Any = Any
     default: Union[Any, Field[Any]] = _utils.field(default=NOTHING)
     name: Union[str, type[NOTHING]] = NOTHING
     zen_convert: InitVar[Optional[ZenConvert]] = None
-    _builds_fn: "Union[BuildsFn[Any], Type[BuildsFn[Any]]]" = _utils.field(default_factory=lambda: DefaultBuilds)  # type: ignore
+    _builds_fn: "Union[BuildsFn[Any], Type[BuildsFn[Any]]]" = _utils.field(
+        default_factory=lambda: DefaultBuilds
+    )  # type: ignore
 
     def __post_init__(
         self,
@@ -766,6 +769,7 @@ class BuildsFn(Generic[T]):
       i: -12.0
       j: 0.0
       k: 0.0
+
     """
 
     __slots__ = ()
@@ -823,6 +827,7 @@ class BuildsFn(Generic[T]):
 
         >>> sanitized_type(Dict[str, frozenset])
         Dict[str, Any]
+
         """
         if hasattr(type_, "__supertype__"):
             # is NewType
@@ -954,7 +959,6 @@ class BuildsFn(Generic[T]):
             or is_dataclass(type_)
             or (isinstance(type_, type) and issubclass(type_, Enum))
         ):
-
             if wrap_optional and type_ is not Any:  # pragma: no cover
                 # normally get_type_hints automatically resolves Optional[...]
                 # when None is set as the default, but this has been flaky
@@ -1064,7 +1068,9 @@ class BuildsFn(Generic[T]):
         >>> x
         HasMutableDefault(a_list=[1, 2, 3, -1])
         >>> HasMutableDefault()
-        HasMutableDefault(a_list=[1, 2, 3])"""
+        HasMutableDefault(a_list=[1, 2, 3])
+
+        """
         cast = type(x)  # ensure that we return a copy of the default value
         settings = _utils.merge_settings(zen_convert, _BUILDS_CONVERT_SETTINGS)
         del zen_convert
@@ -1100,6 +1106,7 @@ class BuildsFn(Generic[T]):
             `bool`, `None`, `int`, `float`, `str`, `ByteString`, `pathlib.Path`,
             `dataclasses.MISSING`. As well as lists, tuples, dicts, and omegaconf
             containers containing the above.
+
         """
         from hydra_zen.wrapper import Zen
 
@@ -2109,6 +2116,7 @@ class BuildsFn(Generic[T]):
         {'a': 1, 'b': 2}
         >>> instantiate(Conf(a=-4))  # equivalent to calling: `partiald_dict(a=-4)`
         {'a': -4, 'b': 2}
+
         """
 
         zen_convert_settings = _utils.merge_settings(
@@ -3113,8 +3121,7 @@ class BuildsFn(Generic[T]):
         zen_convert: Optional[ZenConvert] = None,
         **fields_as_kwargs: Union[T, ZenField],
     ) -> type[DataClass]:
-        """
-        Returns a config with user-defined field names and, optionally,
+        """Returns a config with user-defined field names and, optionally,
         associated default values and/or type annotations.
 
         See the docstring for hydra_zen.make_config
@@ -3307,9 +3314,9 @@ class BuildsFn(Generic[T]):
 
         dataclass_options["bases"] = bases
         module = dataclass_options.pop("module", None)
-        assert _utils.parse_strict_dataclass_options(
+        assert _utils.parse_strict_dataclass_options(dataclass_options), (
             dataclass_options
-        ), dataclass_options
+        )
 
         out = make_dataclass(fields=config_fields, **dataclass_options)
 
@@ -3474,6 +3481,7 @@ class BuildsFn(Generic[T]):
         >>> Config = kwargs_of(lambda *, x, y: None, y=22)
         >>> signature(Config)
         <Signature (x: Any, y: Any = 22) -> None>
+
         """
         base_zen_detaclass: DataclassOptions = (
             cls._default_dataclass_options_for_kwargs_of.copy()
@@ -3531,8 +3539,7 @@ class ConfigPath:
 
 
 def get_target_path(obj: Union[HasTarget, HasTargetInst]) -> Any:
-    """
-    Returns the import-path from a targeted config.
+    """Returns the import-path from a targeted config.
 
     Parameters
     ----------
@@ -3547,6 +3554,7 @@ def get_target_path(obj: Union[HasTarget, HasTargetInst]) -> Any:
     Raises
     ------
     TypeError: ``obj`` does not have a ``_target_`` attribute.
+
     """
     if is_old_partial_builds(obj):
         # obj._partial_target_ is `Just[obj]`
@@ -3580,8 +3588,7 @@ def get_target(obj: HasTarget) -> Any: ...
 
 
 def get_target(obj: Union[HasTarget, HasTargetInst]) -> Any:
-    """
-    Returns the target-object from a targeted config.
+    """Returns the target-object from a targeted config.
 
     Parameters
     ----------
@@ -3640,6 +3647,7 @@ def get_target(obj: Union[HasTarget, HasTargetInst]) -> Any:
 
     >>> get_target(loaded_conf)  # type: ignore
     __main__.B
+
     """
     target = get_target_path(obj=obj)
 
@@ -3688,7 +3696,9 @@ def mutable_value(
     >>> x
     HasMutableDefault(a_list=[1, 2, 3, -1])
     >>> HasMutableDefault()
-    HasMutableDefault(a_list=[1, 2, 3])"""
+    HasMutableDefault(a_list=[1, 2, 3])
+
+    """
     return BuildsFunction._mutable_value(x, zen_convert=zen_convert)
 
 

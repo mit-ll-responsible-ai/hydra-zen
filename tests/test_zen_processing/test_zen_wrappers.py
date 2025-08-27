@@ -148,8 +148,7 @@ def test_zen_wrappers_expected_behavior(
     zen_meta: Dict[str, Any],
     as_yaml: bool,
 ):
-    """
-    Tests:
+    """Tests:
     - wrappers as functions
     - wrappers as PartialBuilds
     - wrappers as Just

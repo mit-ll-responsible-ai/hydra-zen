@@ -290,5 +290,6 @@ def just(
     >>> conf = instantiate(Conf2)
     >>> conf.reduction_fn(conf.data)
     (3+5j)
+
     """
     return DefaultBuilds.just(**locals())

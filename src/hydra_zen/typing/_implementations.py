@@ -386,6 +386,7 @@ class ZenConvert(TypedDict, total=False):
     True
     >>> (builds_str := BuildsStr()) is just(builds_str)
     True
+
     """
 
     flat_target: bool
@@ -593,6 +594,7 @@ class DataclassOptions(_Py312Dataclass, total=False):
     >>> UnHashConf = make_config(x=2, zen_dataclass=Opts(unsafe_hash=False))
     >>> UnHashConf.__hash__
     None
+
     """
 
     module: Optional[str]

@@ -1,7 +1,6 @@
 # Copyright (c) 2025 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-"""
-Provides annotation overloads for various hydra functions, using the types defined in `hydra_zen.typing`.
+"""Provides annotation overloads for various hydra functions, using the types defined in `hydra_zen.typing`.
 This enables tools like IDEs to be more incisive during static analysis and to provide users with additional
 context about their code.
 
@@ -196,8 +195,7 @@ def instantiate(
     _target_wrapper_: Union[Callable[[F], F], None] = None,
     **kwargs: Any,
 ) -> Any:
-    """
-    Instantiates the target of a targeted config.
+    """Instantiates the target of a targeted config.
 
     This is an alias of :func:`hydra.utils.instantiate` [1]_.
 
@@ -316,6 +314,7 @@ def instantiate(
 
     Only a subset of primitive types are supported by Hydra's validation system [2]_.
     See :ref:`data-val` for more general data validation capabilities via hydra-zen.
+
     """
     if _target_wrapper_ is None:
         return hydra_instantiate(config, *args, **kwargs)
@@ -345,8 +344,7 @@ def _apply_just(fn: F) -> F:
 
 @_apply_just
 def to_yaml(cfg: Any, *, resolve: bool = False, sort_keys: bool = False) -> str:
-    """
-    Serialize a config as a yaml-formatted string.
+    """Serialize a config as a yaml-formatted string.
 
     This is an alias of ``omegaconf.Omegaconf.to_yaml``.
 
@@ -428,6 +426,7 @@ def to_yaml(cfg: Any, *, resolve: bool = False, sort_keys: bool = False) -> str:
     >>> print(to_yaml(c4, sort_keys=True))
     a: ???
     b: ???
+
     """
 
     return OmegaConf.to_yaml(cfg=cfg, resolve=resolve, sort_keys=sort_keys)
@@ -437,8 +436,7 @@ def to_yaml(cfg: Any, *, resolve: bool = False, sort_keys: bool = False) -> str:
 def save_as_yaml(
     config: Any, f: Union[str, pathlib.Path, IO[Any]], resolve: bool = False
 ) -> None:
-    """
-    Save a config to a yaml-format file
+    """Save a config to a yaml-format file
 
     This is an alias of ``omegaconf.Omegaconf.save`` [1]_.
 
@@ -474,6 +472,7 @@ def save_as_yaml(
     >>> save_as_yaml(Conf, "test.yaml")  # file written to: test.yaml
     >>> load_from_yaml("test.yaml")
     {'a': 1, 'b': 'foo'}
+
     """
     return OmegaConf.save(config=config, f=f, resolve=resolve)
 
@@ -481,8 +480,7 @@ def save_as_yaml(
 def load_from_yaml(
     file_: Union[str, pathlib.Path, IO[Any]],
 ) -> Union[DictConfig, ListConfig]:
-    """
-    Load a config from a yaml-format file
+    """Load a config from a yaml-format file
 
     This is an alias of ``omegaconf.OmegaConf.load``.
 
@@ -515,5 +513,6 @@ def load_from_yaml(
     >>> save_as_yaml(Conf, "test.yaml")  # file written to: test.yaml
     >>> load_from_yaml("test.yaml")
     {'a': 1, 'b': 'foo'}
+
     """
     return OmegaConf.load(file_)

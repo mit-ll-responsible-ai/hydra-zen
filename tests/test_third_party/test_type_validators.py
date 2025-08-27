@@ -292,19 +292,19 @@ ClassWithSig.__init__ = _detached_init_  # type: ignore
     "args, kwargs, should_pass",
     # fmt: off
     [
-        (("a",), {}, True),                      #                       f("a") ✓
-        ((), dict(x="a"), True),                 #                     f(x="a") ✓
-        (("a", 1, 2), {}, True),                 #                 f("a", 1, 2) ✓
-        (("a",), dict(y=(1, "a")), True),        #          f("hi", y=(1, "a")) ✓
-        (("a",), dict(y=[1, "a"]), True),        #          f("hi", y=[1, "a"]) ✓
-        (("a",), dict(y=(1, "a"), z=1), True),   #      f("a", y=(1, "a"), z=1) ✓
-        (("a",), dict(y=(1, "a"), z="a"), True), #    f("a", y=(1, "a"), z="a") ✓
-        (([1],), {}, False),                     #                       f([1]) ✗
-        ((), dict(x=[1]), False),                #                     f(x=[1]) ✗
-        (("a", 2, "b"), {}, False),              #               f("a", 1, "b") ✗
-        (("a",), dict(y=(1, None)), False),      #     f("a", y=(1, None), z=1) ✗
-        (([1],), dict(y=(1, "a")), False),       #      f([1], y=(1, "a"), z=1) ✗
-        (([1],), dict(y=(1, None)), False),      #     f([1], y=(1, None), z=1) ✗
+        (("a",), {}, True),  #                       f("a") ✓
+        ((), dict(x="a"), True),  #                     f(x="a") ✓
+        (("a", 1, 2), {}, True),  #                 f("a", 1, 2) ✓
+        (("a",), dict(y=(1, "a")), True),  #          f("hi", y=(1, "a")) ✓
+        (("a",), dict(y=[1, "a"]), True),  #          f("hi", y=[1, "a"]) ✓
+        (("a",), dict(y=(1, "a"), z=1), True),  #      f("a", y=(1, "a"), z=1) ✓
+        (("a",), dict(y=(1, "a"), z="a"), True),  #    f("a", y=(1, "a"), z="a") ✓
+        (([1],), {}, False),  #                       f([1]) ✗
+        ((), dict(x=[1]), False),  #                     f(x=[1]) ✗
+        (("a", 2, "b"), {}, False),  #               f("a", 1, "b") ✗
+        (("a",), dict(y=(1, None)), False),  #     f("a", y=(1, None), z=1) ✗
+        (([1],), dict(y=(1, "a")), False),  #      f([1], y=(1, "a"), z=1) ✗
+        (([1],), dict(y=(1, None)), False),  #     f([1], y=(1, None), z=1) ✗
     ],
     # fmt: on
 )

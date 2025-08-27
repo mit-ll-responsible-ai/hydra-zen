@@ -36,8 +36,7 @@ def make_config(
     zen_convert: Optional[ZenConvert] = None,
     **fields_as_kwargs: Union[SupportedPrimitive, ZenField],
 ) -> type[DataClass]:
-    """
-    Returns a config with user-defined field names and, optionally,
+    """Returns a config with user-defined field names and, optionally,
     associated default values and/or type annotations.
 
     Unlike `builds`, `make_config` is not used to configure a particular target
@@ -271,6 +270,7 @@ def make_config(
     >>> # signature: C2(username: str, age: int = 0)
 
     See :ref:`data-val` for more general data validation capabilities via hydra-zen.
+
     """
     _locals = locals().copy()
     fields_as_args = _locals.pop("fields_as_args")

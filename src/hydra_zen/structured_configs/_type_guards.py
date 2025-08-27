@@ -156,6 +156,7 @@ def uses_zen_processing(x: Any) -> TypeGuard[Builds[Any]]:
     - hidden_field
     a: 1
     hidden_field: null
+
     """
     if not is_builds(x) or not hasattr(x, ZEN_TARGET_FIELD_NAME):
         return False
@@ -167,8 +168,7 @@ def uses_zen_processing(x: Any) -> TypeGuard[Builds[Any]]:
 
 
 def is_partial_builds(x: Any) -> TypeGuard[PartialBuilds[Any]]:
-    """
-    Returns `True` if the input is a targeted structured config that entails partial
+    """Returns `True` if the input is a targeted structured config that entails partial
     instantiation, either via `_partial_=True` [1]_ or via `_zen_partial=True`.
 
     Parameters
@@ -215,12 +215,12 @@ def is_partial_builds(x: Any) -> TypeGuard[PartialBuilds[Any]]:
     True
     >>> instantiate(Conf)
     functools.partial(<class 'int'>, 0)
+
     """
     if is_builds(x):
         return (
             # check if partial'd config via Hydra
-            safe_getattr(x, PARTIAL_FIELD_NAME, False)
-            is True
+            safe_getattr(x, PARTIAL_FIELD_NAME, False) is True
         ) or (
             # check if partial'd config via `zen_processing`
             uses_zen_processing(x)

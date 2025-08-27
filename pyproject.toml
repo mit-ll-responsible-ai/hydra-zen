@@ -1,22 +1,14 @@
-[build-system]
-requires = [
-       "setuptools >= 35.0.2",
-       "wheel >= 0.29.0",
-       "setuptools_scm[toml]==7.0.5",
-]
-build-backend = "setuptools.build_meta"
-
-
 [project]
 name = "hydra_zen"
 dynamic = ["version"]
 description = "Configurable, reproducible, and scalable workflows in Python, via Hydra"
 readme = "README.md"
-requires-python = ">=3.9"
-dependencies = ["hydra-core >= 1.2.0", 
-       "omegaconf >= 2.2.3", 
+requires-python = ">=3.9,<3.14"
+dependencies = [
+       "hydra-core >= 1.2.0",
+       "omegaconf >= 2.2.3",
        "typing-extensions >= 4.1.0, !=4.6.0",
-       ]
+]
 license = { text = "MIT" }
 keywords = [
        "machine learning",
@@ -28,13 +20,11 @@ keywords = [
        "Hydra",
        "dataclass",
 ]
-
 authors = [
        { name = "Ryan Soklaski", email = "rsoklaski@gmail.com" },
        { name = "Justin Goodwin", email = "jgoodwin@ll.mit.edu" },
 ]
 maintainers = [{ name = "Justin Goodwin", email = "jgoodwin@ll.mit.edu" }]
-
 classifiers = [
        "Development Status :: 4 - Beta",
        "License :: OSI Approved :: MIT License",
@@ -49,9 +39,40 @@ classifiers = [
        "Programming Language :: Python :: 3 :: Only",
 ]
 
+[dependency-groups]
+dev = [
+    "pytest>=3.9",
+    "hypothesis>=6.28.0",
+    "pytest-trio>=0.8.0",
+    "pyright>=1.1.404",
+    "ruff>=0.12.10",
+    "tox>=4.28.4",
+    "tox-uv>=1.28.0",
+    "tzdata>=2025.2",
+    "pytest-xdist>=3.8.0",
+    "pytest-cov>=6.2.1",
+    "pre-commit>=4.3.0",
+]
+docs = [
+       "sphinx>=8.1.3; python_version >= '3.11'",
+       "pydata-sphinx-theme>=0.16.1; python_version >= '3.11'",
+       "numpydoc>=1.9.0; python_version >= '3.11'",
+       "sphinx-copybutton>=0.5.2; python_version >= '3.11'",
+       "sphinx-design>=0.6.1; python_version >= '3.11'",
+       "sphinx-codeautolink>=0.17.4; python_version >= '3.11'",
+       "sphinx_favicon>=1.0.1; python_version >= '3.11'",
+]
+third_party = [
+    "torch==2.8.0+cpu",
+    "lightning>=2.0.0",
+    "numpy>1.25.2",
+    "jax>=0.4.0",
+    "submitit>=1.2.0",
+    "hydra-submitit-launcher>=1.2.0",
+]
+
 [project.optional-dependencies]
-test = ["pytest >= 3.9", "hypothesis >= 6.28.0", "pytest-trio >= 0.8.0"]
-pydantic = ["pydantic>=1.10.14,<2.0.0"]
+pydantic = ["pydantic>=1.10.14,<3.0.0"]
 beartype = ["beartype>=0.8.0"]
 
 [project.urls]
@@ -59,27 +80,59 @@ beartype = ["beartype>=0.8.0"]
 "Bug Reports" = "https://github.com/mit-ll-responsible-ai/hydra-zen/issues"
 "Source" = "https://github.com/mit-ll-responsible-ai/hydra-zen"
 
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
-[tool.setuptools_scm]
-write_to = "src/hydra_zen/_version.py"
-version_scheme = "no-guess-dev"
+[tool.hatch.version]
+source = "vcs"
+raw-options = { version_scheme = "no-guess-dev" }
 
+[tool.hatch.build.hooks.vcs]
+version-file = "src/hydra_zen/_version.py"
 
-[tool.setuptools]
-package-dir = { "" = "src" }
+[tool.hatch.build.targets.wheel]
+packages = ["src/hydra_zen"]
 
-[tool.setuptools.packages.find]
-where = ["src"]
-exclude = ["tests*", "tests.*"]
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
-[tool.setuptools.package-data]
-hydra_zen = ["py.typed"]
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cpu" }
+]
 
+[tool.ruff]
+line-length = 88
+target-version = "py313"
+ignore = [
+    "F811",   # Redefined while unused
+    "E203",   # Whitespace before ':' (handled by formatter)
+    "E501",   # Line too long (handled by formatter)
+    "E721",   # Do not compare types, use isinstance()
+    "F403",   # 'from module import *' used; unable to detect undefined names
+    "F405",   # Name may be undefined, or defined from star imports
+    "E701",   # Multiple statements on one line (colon)
+]
+select = ["E", "F", "W"]
 
-[tool.isort]
-known_first_party = ["hydra_zen", "tests"]
-profile = "black"
-combine_as_imports = true
+[tool.ruff.lint.per-file-ignores]
+# Equivalent to flake8 exclude: tests/annotations/*, tests/test_py310.py
+"tests/annotations/*" = ["E", "F", "W", "D"]
+"tests/test_py310.py" = ["E", "F", "W", "D"]
+
+[tool.ruff.lint.isort]
+# Equivalent to isort configuration
+known-first-party = ["hydra_zen", "tests"]
+combine-as-imports = true
+
+[tool.ruff.format]
+# Black-compatible formatting
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
 
 
 [tool.coverage.run]
@@ -108,15 +161,6 @@ trio_mode = true
 
 [tool.pyright]
 include = ["src"]
-exclude = [
-       "**/node_modules",
-       "**/__pycache__",
-       "src/hydra_zen/_version.py",
-       "**/third_party",
-       "**/.hypothesis",
-       "**/docs",
-       "**/.tox",
-]
 reportUnnecessaryTypeIgnoreComment = true
 reportUnnecessaryIsInstance = false
 
@@ -125,162 +169,69 @@ reportUnnecessaryIsInstance = false
 skip = 'docs/build/*'
 
 [tool.tox]
-legacy_tox_ini = """
-[tox]
-isolated_build = True
-envlist = py39, py310, py311, py312, py313
+requires = ["tox>=4.20"]
+env_list = ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
-[gh-actions]
-python =
-  3.9: py39
-  3.10: py310
-  3.11: py311
-  3.12: py312
-  3.13: py313
-
-
-[testenv]
-description = Runs test suite parallelized in the specified python enviornment and 
-              against number of available processes (up to 4). 
-              Run `tox -e py39 -- -n 0` to run tests in a python 3.9 with 
-              parallelization disabled.
-passenv = *
-deps = setuptools
-       pytest
-       hypothesis>=6.115.5
-       pytest-xdist
-       pytest-trio
-       tzdata
-commands = pytest tests/ {posargs: -n auto --maxprocesses=4}
-
-
-
-[testenv:min-deps]
-description = Runs test suite against minimum supported versions of dependencies.
-deps = hydra-core==1.2.0
-       omegaconf==2.2.3
-       typing-extensions==4.1.0
-       {[testenv]deps}
-       importlib-resources<6.2.0
-basepython = python3.9
-
-
-[testenv:pre-release]
-description = Runs test suite against pre-release versions of dependencies.
-pip_pre = true
-deps = {[testenv]deps}
-       pydantic<2.0.0
-       beartype
-       cloudpickle
-basepython = python3.10
-
-[testenv:coverage]
-description = Runs test suite and measures test-coverage. Fails if coverage is 
-              below 100 prcnt. Run `tox -e coverage -- -n 0` to disable parallelization.
-setenv = NUMBA_DISABLE_JIT=1
-usedevelop = true
-basepython = python3.10
-deps = {[testenv]deps}
-       coverage[toml]
-       pytest-cov
-       numpy
-       pydantic<2.0.0
-       beartype
-       cloudpickle
-commands = pytest --cov-report term-missing --cov-config=pyproject.toml --cov-fail-under=100 --cov=hydra_zen tests {posargs: -n auto --maxprocesses=4}
-
-
-[testenv:pyright-scan-docs]
-description = Installs pyright and scans hydra-zen docs & docstrings. Note that this can 
-              be slow. Runs in parallel by default. Run 
-              `tox -e pyright-scan-docs -- -n 0` to disable parallelization.
-usedevelop = true
-basepython = python3.10
-deps = {[testenv]deps}
-       torch
-       pytorch-lightning
-       numpy
-       jaxlib
-       jax
-       pydantic
-       beartype
-       scikit-learn
-       matplotlib
-       --requirement deps/requirements-pyright.txt
-commands = pytest tests/test_docs_typecheck.py
-
-
-[testenv:third-party]
-description = Runs test suite against optional 3rd party packages that hydra-zen 
-              provides specialized support for.
-install_command = pip install --upgrade --upgrade-strategy eager {opts} {packages}
-basepython = python3.10
-deps = {[testenv]deps}
-       torch
-       pytorch-lightning
-       numpy
-       jaxlib
-       jax
-       pydantic<2.0.0
-       beartype
-
-[testenv:pydantic-v2p0-smoketest]
-description = Ensures that importing pydantic 2.0 doesn't break things
-install_command = pip install --upgrade --upgrade-strategy eager {opts} {packages}
-basepython = python3.10
-deps = {[testenv]deps}
-       pydantic>=2.0.0
-
-
-[testenv:pyright]
-description = Ensure that hydra-zen's source code and test suite scan clean
-              under pyright, and that hydra-zen's public API has a 100 prcnt
-              type-completeness score.
-usedevelop = true
-basepython = python3.10
-deps = 
-       --requirement deps/requirements-pyright.txt
-
-commands = pyright tests/annotations/ src/ --level=error
-           pyright --ignoreexternal --verifytypes hydra_zen
-
-[testenv:format]
-description = Applies auto-flake (e.g. remove unsused imports), black, and isort 
-              in-place on source files and test suite. Running this can help fix a 
-              failing `enforce-format` run.
-skip_install=true
-deps =
-    autoflake
-    black==24.1.0
-    isort==5.13.2
-commands =
-    autoflake --recursive --in-place --remove-duplicate-keys --remove-unused-variables src/ tests/
-    isort src/ tests/
-    black src/ tests/
-
-[testenv:enforce-format]
-description = Ensures that source materials code and docs and test suite adhere to 
-              formatting and code-quality standards.
-skip_install=true
-basepython=python3.10
-deps=black==24.1.0
-     isort==5.13.2
-     flake8==7.0.0
-     pytest
-     codespell
-commands=
-    black src/ tests/ --diff --check
-    isort src/ tests/ --diff --check
-    flake8 src/ tests/
-    codespell src/ docs/
-    pytest project_tooling/test_headers.py 
-
-[testenv:docs]
-description = Uses Sphinx to generate html for the jatic-toolbox's docs. Stores the
-              results in `.tox/docs/build/html/`.
-basepython=python3.10
-changedir=docs
-deps=-r{toxinidir}/docs/requirements.txt
-commands=
-    sphinx-build -b html -d {envtmpdir}/doctrees ./source  {envdir}/build/html
+[tool.tox.env_run_base]
+runner = "uv-venv-lock-runner"
+description = """
+Runs test suite parallelized in the specified python environment and
+against number of available processes (up to 4).
+Run `tox -e 3.9 -- -n 0` to run tests in a python 3.9 with
+parallelization disabled.
 """
+uv_sync_locked = true
+dependency_groups = ["third_party", "dev"]
+extras = ["pydantic", "beartype"]
+commands = [["uv", "run", "pytest", "tests/", "-n", "auto", "--maxprocesses=4"]]
+
+[tool.tox.env.min_deps]
+runner = "uv-venv-lock-runner"
+uv_resolution = "lowest-direct"
+uv_sync_locked = false
+base_python = ["python3.12"]
+dependency_groups = ["dev"]
+description = "Runs test suite against minimum supported versions of dependencies"
+commands = [
+    ["uv", "run", "pytest", "tests/", "-n", "auto", "--maxprocesses=4"]
+]
+
+[tool.tox.env.coverage]
+description = """
+Runs test suite and measures test-coverage. Fails if coverage is
+below 100 percent. Run `tox -e coverage -- -n 0` to disable parallelization.
+"""
+
+commands = [
+    ["uv", "run", "pytest", "--cov=hydra_zen", "--cov-config", "pyproject.toml", "--cov-report", "term-missing", "--cov-fail-under=100", "tests/", "-n", "auto", "--maxprocesses=4"]
+]
+
+
+[tool.tox.env.pyright]
+description = """
+Ensure that hydra-zen's source code and test suite scan clean
+under pyright, and that hydra-zen's public API has a 100 percent
+type-completeness score.
+"""
+commands = [
+    ["uv", "run", "pyright", "tests/annotations/", "src/", "--level=error"],
+    ["uv", "run", "pyright", "--ignoreexternal", "--verifytypes", "hydra_zen"]
+]
+
+[tool.tox.env.hooks]
+description = "run code formatter and linter (auto-fix)"
+commands = [["pre-commit", "run", "--all-files", "--show-diff-on-failure"]]
+
+
+[tool.tox.env.build_docs]
+runner = "uv-venv-lock-runner"
+description = """
+Uses Sphinx to generate html for the hydra-zen's docs. Stores the
+results in `.tox/docs/build/html/`.
+"""
+dependency_groups = ["docs"]
+extras = ["pydantic", "beartype"]
+change_dir = "docs"
+commands = [
+    ["uv", "run", "sphinx-build", "-b", "html", "-d", "{env_tmp_dir}/doctrees", "./source", "{env_dir}/build/html"]
+]

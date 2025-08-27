@@ -52,8 +52,7 @@ _VAR_KEYWORD = inspect.Parameter.VAR_KEYWORD
 
 
 def coerce_sequences(obj: _T) -> _T:
-    """
-    Hydra is only able to read non-string sequences as lists (or ListConfig).
+    """Hydra is only able to read non-string sequences as lists (or ListConfig).
     This wrapper will cast these lists to their desired type, based
     on the annotated-type associated with that sequence.
 
@@ -97,6 +96,7 @@ def coerce_sequences(obj: _T) -> _T:
     >>> conf_wrapped = builds(f, x=(1, 2), zen_wrappers=convert_sequences)
     >>> instantiate(conf_wrapped)
     (1, 2)
+
     """
     if inspect.isclass(obj) and hasattr(type, "__init__"):
         hints = get_type_hints(obj.__init__)

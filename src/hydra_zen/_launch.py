@@ -67,8 +67,7 @@ def value_check(
     value: T,
     type_: Union[type, tuple[type, ...]],
 ) -> T:
-    """
-    For internal use only.
+    """For internal use only.
 
     Used to check the type of `value`. Numerical types can also be bound-checked.
 
@@ -79,7 +78,9 @@ def value_check(
 
     Raises
     ------
-    TypeError"""
+    TypeError
+
+    """
     # check internal params
     assert isinstance(name, str), name
 
@@ -146,6 +147,7 @@ def _store_config(
     References
     ----------
     .. [1] https://hydra.cc/docs/tutorials/structured_config/config_store
+
     """
     cs = ConfigStore().instance()
     cs.store(name=config_name, node=cfg)
@@ -194,8 +196,7 @@ def launch(
     with_log_configuration: bool = True,
     **override_kwargs: OverrideValues,
 ) -> Union[JobReturn, Any]:
-    r"""
-    Launches a Hydra job from a Python function rather than a CLI.
+    r"""Launches a Hydra job from a Python function rather than a CLI.
 
     `launch` is designed to closely match the interface of the standard Hydra CLI.
     For example, launching a Hydra job from the CLI via::
@@ -271,7 +272,6 @@ def launch(
 
     Examples
     --------
-
     **Basic usage**
 
     Let's define and launch a trivial Hydra app.
@@ -389,6 +389,7 @@ def launch(
 
     If, instead, you want to configure a list as a single value - not to be iterated
     over in a multirun - you can instead use `hydra_zen.hydra_list`.
+
     """
 
     # used for check below

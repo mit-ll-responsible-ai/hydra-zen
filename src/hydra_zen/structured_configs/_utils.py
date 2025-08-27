@@ -122,8 +122,7 @@ def safe_name(obj: Any, repr_allowed: bool = True) -> str:
 
 
 def is_classmethod(obj: Any) -> bool:
-    """
-    https://stackoverflow.com/a/19228282/6592114
+    """https://stackoverflow.com/a/19228282/6592114
 
     Credit to: Martijn Pieters
     License: CC BY-SA 4.0 (free to copy/redistribute/remix/transform)"""
@@ -191,10 +190,11 @@ def check_suspicious_interpolations(
 
 
 def valid_defaults_list(hydra_defaults: Any) -> bool:
-    """
-    Raises
+    """Raises
     ------
-    HydraZenValidationError: Duplicate _self_ entries"""
+    HydraZenValidationError: Duplicate _self_ entries
+
+    """
     if not isinstance(hydra_defaults, (list, ListConfig)):
         return False
 
@@ -271,8 +271,7 @@ _STRICT_DATACLASS_OPTION_KEYS.copy()
 def parse_dataclass_options(
     options: Mapping[str, Any], include_module: bool = True
 ) -> DataclassOptions:
-    """
-    Ensures `options` adheres to `DataclassOptions` and merges hydra-zen defaults
+    """Ensures `options` adheres to `DataclassOptions` and merges hydra-zen defaults
     for missing options.
 
     All valid `@dataclass`/`make_dataclass` options are supported, even for features
@@ -305,6 +304,7 @@ def parse_dataclass_options(
 
     >>> parse_dataclass_options({"slots": False})
     {'unsafe_hash': True}
+
     """
     if not isinstance(options, Mapping):
         raise ValueError(
@@ -378,7 +378,7 @@ def parse_dataclass_options(
 
 
 def parse_strict_dataclass_options(
-    options: Mapping[str, Any]
+    options: Mapping[str, Any],
 ) -> TypeGuard[StrictDataclassOptions]:
     return (
         options.keys() <= _STRICT_DATACLASS_OPTION_KEYS

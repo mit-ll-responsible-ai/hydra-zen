@@ -296,6 +296,7 @@ def make_custom_builds_fn(
 
     >>> instantiate(Conf, x="c")  # violates annotation: Literal["a", "b"]
     <Validation error: "c" is not "a" or "b">
+
     """
     excluded_fields = frozenset({"dataclass_name", "hydra_defaults", "builds_bases"})
     fn = builds_fn.builds

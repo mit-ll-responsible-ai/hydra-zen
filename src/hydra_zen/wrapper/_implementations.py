@@ -123,6 +123,7 @@ class Zen(Generic[P, R]):
     See Also
     --------
     zen : A decorator that returns a function that will auto-extract, resolve, and instantiate fields from an input config based on the decorated function's signature.
+
     """
 
     # Specifies reserved parameter name specified to pass the
@@ -143,8 +144,7 @@ class Zen(Generic[P, R]):
         run_in_context: bool = False,
         instantiation_wrapper: Union[None, Callable[[F2], F2]] = None,
     ) -> None:
-        """
-        Parameters
+        """Parameters
         ----------
         func : Callable[Sig, R], positional-only
             The function being wrapped.
@@ -188,6 +188,7 @@ class Zen(Generic[P, R]):
 
             This can be used to introduce a layer of validation or logging
             to all instantiation calls in your application.
+
         """
         if run_in_context and iscoroutinefunction(__func):
             raise TypeError(f"`{run_in_context=} is not supported for async functions.")
@@ -318,6 +319,7 @@ class Zen(Generic[P, R]):
         ------
         HydraValidationError
             `cfg` is not a valid input to the zen-wrapped function.
+
         """
         for _f in self._pre_call_iterable:
             if isinstance(_f, Zen):
@@ -372,8 +374,7 @@ class Zen(Generic[P, R]):
 
     # TODO: add "extract" option that enables returning dict of fields
     def __call__(self, __cfg: Union[ConfigLike, str]) -> R:
-        """
-        Extracts values from the input config based on the decorated function's
+        """Extracts values from the input config based on the decorated function's
         signature, resolves & instantiates them, and calls the function with them.
 
         Parameters
@@ -389,6 +390,7 @@ class Zen(Generic[P, R]):
         -------
         func_out : R
             The result of `func(<args extracted from cfg>)`
+
         """
         cfg = self._normalize_cfg(__cfg)
 
@@ -451,8 +453,7 @@ class Zen(Generic[P, R]):
         config_name: Optional[str] = None,
         version_base: Optional[str] = _UNSPECIFIED_,
     ) -> Callable[[Any], Any]:
-        """
-        Generates a Hydra-CLI for the wrapped function. Equivalent to `hydra.main(zen(func), [...])()`
+        """Generates a Hydra-CLI for the wrapped function. Equivalent to `hydra.main(zen(func), [...])()`
 
         Parameters
         ----------
@@ -480,6 +481,7 @@ class Zen(Generic[P, R]):
         -------
         hydra_main : Callable[[Any], Any]
             Equivalent to `hydra.main(zen(func), [...])()`
+
         """
 
         kw = dict(config_name=config_name)
@@ -814,6 +816,7 @@ def zen(
     >>> zen_f2.validate({"x": 1, "seed": 10})  # OK
     >>> zen_f2.validate({"x": 1})  # Missing seed as required by pre-call
     HydraZenValidationError: `cfg` is missing the following fields: seed
+
     """
     if __func is not None:
         return cast(
@@ -917,6 +920,7 @@ def default_to_config(
     _target_: __main__.func
     x: ???
     'y': ???
+
     """
 
     kw = kw.copy()
@@ -1360,6 +1364,7 @@ class ZenStore:
     A store can be copied, updated, and merged. Its entries can have their groups
     remapped, and individual entries can be deleted. See the docs for the corresponding
     methods for details and examples.
+
     """
 
     __slots__ = (
@@ -1382,8 +1387,7 @@ class ZenStore:
         overwrite_ok: bool = False,
         warn_node_kwarg: bool = True,
     ) -> None:
-        """
-        Parameters
+        """Parameters
         ----------
         name : Optional[str]
             The name for this store.
@@ -1408,6 +1412,7 @@ class ZenStore:
             This helps to protect users from mistakenly self-partializing a store
             with `store(node=Config)` instead of actually storing the node with
             `store(Config)`.
+
         """
         if not isinstance(deferred_to_config, bool):
             raise TypeError(
@@ -1461,6 +1466,7 @@ class ZenStore:
         True
         >>> store1 == store2
         False
+
         """
         if not isinstance(__o, ZenStore):
             return False
@@ -1543,6 +1549,7 @@ class ZenStore:
             If `obj` was specified, it is returned unchanged. Otherwise a new instance
             of `ZenStore` is return, which mirrors the internal state of this store and
             has updated default arguments.
+
         """
         if __target is None:
             if self._warn_node_kwarg and "node" in kw:
@@ -1661,6 +1668,7 @@ class ZenStore:
         >>> s2
         s1_copy
         {'G': ['a', 'b']}
+
         """
         cp = deepcopy(self)
 
@@ -1728,6 +1736,7 @@ class ZenStore:
         >>> s3
         s3
         {None: ['a'], 'A/1/p': ['b'], 'A/2/p': ['c']}
+
         """
         overwrite = overwrite_ok if overwrite_ok is not None else self._overwrite_ok
 
@@ -1776,6 +1785,7 @@ class ZenStore:
         >>> store.enqueue_all()
         >>> store.has_enqueued()
         True
+
         """
         self._queue.update(self._internal_repo.keys())
 
@@ -1801,6 +1811,7 @@ class ZenStore:
         >>> store.add_to_hydra_store()
         >>> store.has_enqueued()
         False
+
         """
         return bool(self._queue)
 
@@ -1839,6 +1850,7 @@ class ZenStore:
         >>> s3
         s3
         {None: ['g']}
+
         """
         if __other == self:
             return
@@ -1878,6 +1890,7 @@ class ZenStore:
         >>> s4
         s1_copy
         {None: ['f', 'g']}
+
         """
         cp = self.copy(store_name)
         cp.update(__other)
@@ -1931,6 +1944,7 @@ class ZenStore:
          ('fruit/apple', 'b'): {'x': 2},
          ('fruit/apple', 'c'): {'x': 3},
          ('fruit/orange', 'd'): {'x': 4}}
+
         """
         # store[group] ->
         #  {(group, name): node1, (group, name2): node2, (group/subgroup, name3): node3}
@@ -1990,6 +2004,7 @@ class ZenStore:
          'package': None,
          'provider': None,
          'node': {'x': 1}}
+
         """
         return _resolve_node(self._internal_repo[(group, name)], copy=True)
 
@@ -2053,6 +2068,7 @@ class ZenStore:
           'package': None,
           'provider': None,
           'node': {'x': 3}}]
+
         """
         yield from (_resolve_node(v, copy=True) for v in self._internal_repo.values())
 

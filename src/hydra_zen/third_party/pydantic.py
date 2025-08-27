@@ -14,7 +14,8 @@ __all__ = ["validates_with_pydantic"]
 
 if _pyd.__version__ >= "2.0":  # pragma: no cover
     _default_parser = _pyd.validate_call(
-        config={"arbitrary_types_allowed": True}, validate_return=False  # type: ignore
+        config={"arbitrary_types_allowed": True},
+        validate_return=False,  # type: ignore
     )
 else:  # pragma: no cover
     _default_parser = _pyd.validate_arguments(
@@ -30,6 +31,7 @@ def _constructor_as_fn(cls: Any) -> Any:
     `pydantic.validate_call` mishandles class constructors; it expects that
     `cls`/`self` should be passed explicitly to the constructor. This shim
     corrects that.
+
     """
 
     @functools.wraps(cls)
@@ -106,6 +108,7 @@ def pydantic_parser(target: _T, *, parser: Callable[[_T], _T] = _default_parser)
     >>> conf = builds(g, x=[1, 2, 3])
     >>> instantiate(conf, _target_wrapper_=pydantic_parser)
     (1, 2, 3)
+
     """
     if inspect.isbuiltin(target):
         return cast(_T, target)
@@ -126,9 +129,8 @@ def pydantic_parser(target: _T, *, parser: Callable[[_T], _T] = _default_parser)
 def validates_with_pydantic(
     obj: _T, *, validator: Callable[[_T], _T] = _default_parser
 ) -> _T:
-    """
-    .. deprecated:: 0.13.0
+    """.. deprecated:: 0.13.0
 
-       Use `hydra_zen.third_party.pydantic.pydantic_parser` instead.
+    Use `hydra_zen.third_party.pydantic.pydantic_parser` instead.
     """
     return pydantic_parser(obj, parser=validator)

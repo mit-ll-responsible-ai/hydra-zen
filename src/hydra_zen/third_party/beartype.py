@@ -120,6 +120,7 @@ def validates_with_beartype(obj: _T) -> _T:
 
     >>> validates_with_beartype(g)({1, 2, 3})  # input: a set
     BeartypeCallHintPepParamException: @beartyped g() parameter x={1, 2, 3} violates type hint [...]
+
     """
     if inspect.isclass(obj) and hasattr(type, "__init__"):
         obj.__init__ = bt.beartype(obj.__init__)

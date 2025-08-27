@@ -10,7 +10,7 @@ from hypothesis import assume, given
 from omegaconf import OmegaConf
 
 from hydra_zen import builds, instantiate, just, to_yaml
-from tests import check_identity
+from tests import is_same
 
 pl_objects = [
     pl.Trainer,
@@ -19,23 +19,21 @@ pl_objects = [
     pl.LightningModule,
     pl.accelerators.Accelerator,
     pl.callbacks.Callback,
-    pl.callbacks.GPUStatsMonitor,
+    pl.callbacks.DeviceStatsMonitor,
     pl.callbacks.early_stopping.EarlyStopping,
-    pl.loggers.base.LightningLoggerBase,
+    pl.loggers.Logger,
     pl.core.hooks.CheckpointHooks,
     pl.callbacks.gradient_accumulation_scheduler.GradientAccumulationScheduler,
     pl.callbacks.lr_monitor.LearningRateMonitor,
     pl.callbacks.model_checkpoint.ModelCheckpoint,
     pl.loggers.comet.CometLogger,
-    pl.plugins.training_type.TrainingTypePlugin,
-    pl.plugins.training_type.DataParallelPlugin,
-    pl.plugins.precision.PrecisionPlugin,
+    pl.plugins.precision.Precision,
 ]
 
 
 @pytest.mark.parametrize("obj", pl_objects)
 def test_just_roundtrip(obj):
-    assert check_identity(instantiate(just(obj)), obj)
+    assert is_same(instantiate(just(obj)), obj)
 
 
 @pytest.mark.parametrize("target", pl_objects)
