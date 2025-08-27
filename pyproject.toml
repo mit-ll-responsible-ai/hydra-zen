@@ -125,162 +125,164 @@ reportUnnecessaryIsInstance = false
 skip = 'docs/build/*'
 
 [tool.tox]
-legacy_tox_ini = """
-[tox]
-isolated_build = True
-envlist = py39, py310, py311, py312, py313
+isolated_build = true
+env_list = ["py39", "py310", "py311", "py312", "py313"]
 
-[gh-actions]
-python =
-  3.9: py39
-  3.10: py310
-  3.11: py311
-  3.12: py312
-  3.13: py313
+[tool.tox.gh_actions]
+python = { "3.9" = ["py39"], "3.10" = ["py310"], "3.11" = ["py311"], "3.12" = ["py312"], "3.13" = ["py313"] }
 
+[tool.tox.env_run_base]
+description = "Runs test suite parallelized in the specified python enviornment and against number of available processes (up to 4). Run `tox -e py39 -- -n 0` to run tests in a python 3.9 with parallelization disabled."
+pass_env = ["*"]
+deps = [
+    "setuptools",
+    "pytest",
+    "hypothesis>=6.115.5",
+    "pytest-xdist",
+    "pytest-trio",
+    "tzdata",
+]
+commands = [
+    ["pytest", "tests/", "{posargs:-n}", "{posargs:auto}", "{posargs:--maxprocesses=4}"],
+]
 
-[testenv]
-description = Runs test suite parallelized in the specified python enviornment and 
-              against number of available processes (up to 4). 
-              Run `tox -e py39 -- -n 0` to run tests in a python 3.9 with 
-              parallelization disabled.
-passenv = *
-deps = setuptools
-       pytest
-       hypothesis>=6.115.5
-       pytest-xdist
-       pytest-trio
-       tzdata
-commands = pytest tests/ {posargs: -n auto --maxprocesses=4}
+[tool.tox.env.min-deps]
+description = "Runs test suite against minimum supported versions of dependencies."
+deps = [
+    "hydra-core==1.2.0",
+    "omegaconf==2.2.3",
+    "typing-extensions==4.1.0",
+    "importlib-resources<6.2.0",
+    "{[tool.tox.env_run_base]deps}"
+]
+base_python = ["python3.9"]
 
-
-
-[testenv:min-deps]
-description = Runs test suite against minimum supported versions of dependencies.
-deps = hydra-core==1.2.0
-       omegaconf==2.2.3
-       typing-extensions==4.1.0
-       {[testenv]deps}
-       importlib-resources<6.2.0
-basepython = python3.9
-
-
-[testenv:pre-release]
-description = Runs test suite against pre-release versions of dependencies.
+[tool.tox.env.pre-release]
+description = "Runs test suite against pre-release versions of dependencies."
 pip_pre = true
-deps = {[testenv]deps}
-       pydantic<2.0.0
-       beartype
-       cloudpickle
-basepython = python3.10
+deps = [
+    "{[tool.tox.env_run_base]deps}",
+    "pydantic<2.0.0",
+    "beartype",
+    "cloudpickle",
+]
+base_python = ["python3.10"]
 
-[testenv:coverage]
-description = Runs test suite and measures test-coverage. Fails if coverage is 
-              below 100 prcnt. Run `tox -e coverage -- -n 0` to disable parallelization.
-setenv = NUMBA_DISABLE_JIT=1
+[tool.tox.env.coverage]
+description = "Runs test suite and measures test-coverage. Fails if coverage is below 100 prcnt. Run `tox -e coverage -- -n 0` to disable parallelization."
+set_env = { NUMBA_DISABLE_JIT = "1" }
 usedevelop = true
-basepython = python3.10
-deps = {[testenv]deps}
-       coverage[toml]
-       pytest-cov
-       numpy
-       pydantic<2.0.0
-       beartype
-       cloudpickle
-commands = pytest --cov-report term-missing --cov-config=pyproject.toml --cov-fail-under=100 --cov=hydra_zen tests {posargs: -n auto --maxprocesses=4}
+base_python = ["python3.10"]
+deps = [
+    "{[tool.tox.env_run_base]deps}",
+    "coverage[toml]",
+    "pytest-cov",
+    "numpy",
+    "pydantic<2.0.0",
+    "beartype",
+    "cloudpickle",
+]
+commands = [
+    ["pytest", "--cov-report", "term-missing", "--cov-config=pyproject.toml", "--cov-fail-under=100", "--cov=hydra_zen", "tests", "{posargs:-n}", "{posargs:auto}", "{posargs:--maxprocesses=4}"],
+]
 
-
-[testenv:pyright-scan-docs]
-description = Installs pyright and scans hydra-zen docs & docstrings. Note that this can 
-              be slow. Runs in parallel by default. Run 
-              `tox -e pyright-scan-docs -- -n 0` to disable parallelization.
+[tool.tox.env.pyright-scan-docs]
+description = "Installs pyright and scans hydra-zen docs & docstrings. Note that this can be slow. Runs in parallel by default. Run `tox -e pyright-scan-docs -- -n 0` to disable parallelization."
 usedevelop = true
-basepython = python3.10
-deps = {[testenv]deps}
-       torch
-       pytorch-lightning
-       numpy
-       jaxlib
-       jax
-       pydantic
-       beartype
-       scikit-learn
-       matplotlib
-       --requirement deps/requirements-pyright.txt
-commands = pytest tests/test_docs_typecheck.py
+base_python = ["python3.10"]
+deps = [
+    "{[tool.tox.env_run_base]deps}",
+    "torch",
+    "pytorch-lightning",
+    "numpy",
+    "jaxlib",
+    "jax",
+    "pydantic",
+    "beartype",
+    "scikit-learn",
+    "matplotlib",
+    "--requirement", "deps/requirements-pyright.txt",
+]
+commands = [
+    ["pytest", "tests/test_docs_typecheck.py"],
+]
 
+[tool.tox.env.third-party]
+description = "Runs test suite against optional 3rd party packages that hydra-zen provides specialized support for."
+install_command = "pip install --upgrade --upgrade-strategy eager {opts} {packages}"
+base_python = ["python3.10"]
+deps = [
+    "{[tool.tox.env_run_base]deps}",
+    "torch",
+    "pytorch-lightning",
+    "numpy",
+    "jaxlib",
+    "jax",
+    "pydantic<2.0.0",
+    "beartype",
+]
 
-[testenv:third-party]
-description = Runs test suite against optional 3rd party packages that hydra-zen 
-              provides specialized support for.
-install_command = pip install --upgrade --upgrade-strategy eager {opts} {packages}
-basepython = python3.10
-deps = {[testenv]deps}
-       torch
-       pytorch-lightning
-       numpy
-       jaxlib
-       jax
-       pydantic<2.0.0
-       beartype
+[tool.tox.env.pydantic-v2p0-smoketest]
+description = "Ensures that importing pydantic 2.0 doesn't break things"
+install_command = "pip install --upgrade --upgrade-strategy eager {opts} {packages}"
+base_python = ["python3.10"]
+deps = [
+    "{[tool.tox.env_run_base]deps}",
+    "pydantic>=2.0.0",
+]
 
-[testenv:pydantic-v2p0-smoketest]
-description = Ensures that importing pydantic 2.0 doesn't break things
-install_command = pip install --upgrade --upgrade-strategy eager {opts} {packages}
-basepython = python3.10
-deps = {[testenv]deps}
-       pydantic>=2.0.0
-
-
-[testenv:pyright]
-description = Ensure that hydra-zen's source code and test suite scan clean
-              under pyright, and that hydra-zen's public API has a 100 prcnt
-              type-completeness score.
+[tool.tox.env.pyright]
+description = "Ensure that hydra-zen's source code and test suite scan clean under pyright, and that hydra-zen's public API has a 100 prcnt type-completeness score."
 usedevelop = true
-basepython = python3.10
-deps = 
-       --requirement deps/requirements-pyright.txt
+base_python = ["python3.10"]
+deps = [
+    "--requirement", "deps/requirements-pyright.txt",
+]
+commands = [
+    ["pyright", "tests/annotations/", "src/", "--level=error"],
+    ["pyright", "--ignoreexternal", "--verifytypes", "hydra_zen"],
+]
 
-commands = pyright tests/annotations/ src/ --level=error
-           pyright --ignoreexternal --verifytypes hydra_zen
+[tool.tox.env.format]
+description = "Applies auto-flake (e.g. remove unsused imports), black, and isort in-place on source files and test suite. Running this can help fix a failing `enforce-format` run."
+skip_install = true
+deps = [
+    "autoflake",
+    "black==24.1.0",
+    "isort==5.13.2",
+]
+commands = [
+    ["autoflake", "--recursive", "--in-place", "--remove-duplicate-keys", "--remove-unused-variables", "src/", "tests/"],
+    ["isort", "src/", "tests/"],
+    ["black", "src/", "tests/"],
+]
 
-[testenv:format]
-description = Applies auto-flake (e.g. remove unsused imports), black, and isort 
-              in-place on source files and test suite. Running this can help fix a 
-              failing `enforce-format` run.
-skip_install=true
-deps =
-    autoflake
-    black==24.1.0
-    isort==5.13.2
-commands =
-    autoflake --recursive --in-place --remove-duplicate-keys --remove-unused-variables src/ tests/
-    isort src/ tests/
-    black src/ tests/
+[tool.tox.env.enforce-format]
+description = "Ensures that source materials code and docs and test suite adhere to formatting and code-quality standards."
+skip_install = true
+base_python = ["python3.10"]
+deps = [
+    "black==24.1.0",
+    "isort==5.13.2",
+    "flake8==7.0.0",
+    "pytest",
+    "codespell",
+]
+commands = [
+    ["black", "src/", "tests/", "--diff", "--check"],
+    ["isort", "src/", "tests/", "--diff", "--check"],
+    ["flake8", "src/", "tests/"],
+    ["codespell", "src/", "docs/"],
+    ["pytest", "project_tooling/test_headers.py"],
+]
 
-[testenv:enforce-format]
-description = Ensures that source materials code and docs and test suite adhere to 
-              formatting and code-quality standards.
-skip_install=true
-basepython=python3.10
-deps=black==24.1.0
-     isort==5.13.2
-     flake8==7.0.0
-     pytest
-     codespell
-commands=
-    black src/ tests/ --diff --check
-    isort src/ tests/ --diff --check
-    flake8 src/ tests/
-    codespell src/ docs/
-    pytest project_tooling/test_headers.py 
-
-[testenv:docs]
-description = Uses Sphinx to generate html for the jatic-toolbox's docs. Stores the
-              results in `.tox/docs/build/html/`.
-basepython=python3.10
-changedir=docs
-deps=-r{toxinidir}/docs/requirements.txt
-commands=
-    sphinx-build -b html -d {envtmpdir}/doctrees ./source  {envdir}/build/html
-"""
+[tool.tox.env.docs]
+description = "Uses Sphinx to generate html for the jatic-toolbox's docs. Stores the results in `.tox/docs/build/html/`."
+base_python = ["python3.10"]
+change_dir = "docs"
+deps = [
+    "-r{toxinidir}/docs/requirements.txt",
+]
+commands = [
+    ["sphinx-build", "-b", "html", "-d", "{envtmpdir}/doctrees", "./source", "{envdir}/build/html"],
+]
