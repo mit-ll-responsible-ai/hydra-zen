@@ -50,8 +50,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest >= 3.9", "hypothesis >= 6.28.0", "pytest-trio >= 0.8.0"]
-pydantic = ["pydantic>=1.10.14,<2.0.0"]
+pydantic = ["pydantic>=1.10.14,<3.0.0"]
 beartype = ["beartype>=0.8.0"]
 
 [project.urls]
@@ -59,6 +58,40 @@ beartype = ["beartype>=0.8.0"]
 "Bug Reports" = "https://github.com/mit-ll-responsible-ai/hydra-zen/issues"
 "Source" = "https://github.com/mit-ll-responsible-ai/hydra-zen"
 
+[dependency-groups]
+dev = [
+    "setuptools",
+    "pytest",
+    "hypothesis>=6.115.5",
+    "pytest-xdist",
+    "pytest-trio",
+    "tzdata",
+    "pytest-trio>=0.8.0",
+    "pyright==1.1.396",
+    "autoflake",
+    "black==24.1.0",
+    "isort==5.13.2",
+    "flake8==7.0.0",
+    "codespell",
+    "pytest-cov",
+]
+third_party = [
+    "torch",
+    "lightning",
+    "numpy",
+    "jax",
+    "submitit",
+    "hydra-submitit-launcher",
+]
+docs = [
+    "sphinx==8.1.3",
+    "pydata-sphinx-theme==0.16.1",
+    "numpydoc==1.9.0",
+    "sphinx-copybutton==0.5.2",
+    "sphinx-design==0.6.1",
+    "sphinx-codeautolink==0.17.4",
+    "sphinx_favicon==1.0.1",
+]
 
 [tool.setuptools_scm]
 write_to = "src/hydra_zen/_version.py"
@@ -134,38 +167,25 @@ python = { "3.9" = ["py39"], "3.10" = ["py310"], "3.11" = ["py311"], "3.12" = ["
 [tool.tox.env_run_base]
 description = "Runs test suite parallelized in the specified python enviornment and against number of available processes (up to 4). Run `tox -e py39 -- -n 0` to run tests in a python 3.9 with parallelization disabled."
 pass_env = ["*"]
-deps = [
-    "setuptools",
-    "pytest",
-    "hypothesis>=6.115.5",
-    "pytest-xdist",
-    "pytest-trio",
-    "tzdata",
-]
+dependency_groups = ["dev"] 
+extras = ["pydantic", "beartype"]
 commands = [
     ["pytest", "tests/", "{posargs:-n}", "{posargs:auto}", "{posargs:--maxprocesses=4}"],
 ]
 
 [tool.tox.env.min-deps]
 description = "Runs test suite against minimum supported versions of dependencies."
-deps = [
-    "hydra-core==1.2.0",
-    "omegaconf==2.2.3",
-    "typing-extensions==4.1.0",
-    "importlib-resources<6.2.0",
-    "{[tool.tox.env_run_base]deps}"
-]
+dependency_groups = ["dev"] 
+extras = ["pydantic", "beartype"]
+constraints = ["constraints/min_deps.txt"]
 base_python = ["python3.9"]
 
 [tool.tox.env.pre-release]
 description = "Runs test suite against pre-release versions of dependencies."
 pip_pre = true
-deps = [
-    "{[tool.tox.env_run_base]deps}",
-    "pydantic<2.0.0",
-    "beartype",
-    "cloudpickle",
-]
+dependency_groups = ["dev"] 
+extras = ["pydantic", "beartype"]
+constraints = ["constraints/v1_pydantic.txt"]
 base_python = ["python3.10"]
 
 [tool.tox.env.coverage]
@@ -173,15 +193,8 @@ description = "Runs test suite and measures test-coverage. Fails if coverage is 
 set_env = { NUMBA_DISABLE_JIT = "1" }
 usedevelop = true
 base_python = ["python3.10"]
-deps = [
-    "{[tool.tox.env_run_base]deps}",
-    "coverage[toml]",
-    "pytest-cov",
-    "numpy",
-    "pydantic<2.0.0",
-    "beartype",
-    "cloudpickle",
-]
+dependency_groups = ["dev", "third_party"] 
+extras = ["pydantic", "beartype"]
 commands = [
     ["pytest", "--cov-report", "term-missing", "--cov-config=pyproject.toml", "--cov-fail-under=100", "--cov=hydra_zen", "tests", "{posargs:-n}", "{posargs:auto}", "{posargs:--maxprocesses=4}"],
 ]
@@ -190,19 +203,8 @@ commands = [
 description = "Installs pyright and scans hydra-zen docs & docstrings. Note that this can be slow. Runs in parallel by default. Run `tox -e pyright-scan-docs -- -n 0` to disable parallelization."
 usedevelop = true
 base_python = ["python3.10"]
-deps = [
-    "{[tool.tox.env_run_base]deps}",
-    "torch",
-    "pytorch-lightning",
-    "numpy",
-    "jaxlib",
-    "jax",
-    "pydantic",
-    "beartype",
-    "scikit-learn",
-    "matplotlib",
-    "--requirement", "deps/requirements-pyright.txt",
-]
+dependency_groups = ["dev", "third_party"] 
+extras = ["pydantic", "beartype"]
 commands = [
     ["pytest", "tests/test_docs_typecheck.py"],
 ]
@@ -211,33 +213,23 @@ commands = [
 description = "Runs test suite against optional 3rd party packages that hydra-zen provides specialized support for."
 install_command = "pip install --upgrade --upgrade-strategy eager {opts} {packages}"
 base_python = ["python3.10"]
-deps = [
-    "{[tool.tox.env_run_base]deps}",
-    "torch",
-    "pytorch-lightning",
-    "numpy",
-    "jaxlib",
-    "jax",
-    "pydantic<2.0.0",
-    "beartype",
-]
+dependency_groups = ["dev", "third_party"] 
+extras = ["pydantic", "beartype"]
 
 [tool.tox.env.pydantic-v2p0-smoketest]
 description = "Ensures that importing pydantic 2.0 doesn't break things"
 install_command = "pip install --upgrade --upgrade-strategy eager {opts} {packages}"
 base_python = ["python3.10"]
-deps = [
-    "{[tool.tox.env_run_base]deps}",
-    "pydantic>=2.0.0",
-]
+dependency_groups = ["dev"] 
+extras = ["pydantic", "beartype"]
+constraints = ["constraints/v2_pydantic.txt"]
 
 [tool.tox.env.pyright]
 description = "Ensure that hydra-zen's source code and test suite scan clean under pyright, and that hydra-zen's public API has a 100 prcnt type-completeness score."
 usedevelop = true
 base_python = ["python3.10"]
-deps = [
-    "--requirement", "deps/requirements-pyright.txt",
-]
+dependency_groups = ["dev"] 
+extras = ["pydantic", "beartype"]
 commands = [
     ["pyright", "tests/annotations/", "src/", "--level=error"],
     ["pyright", "--ignoreexternal", "--verifytypes", "hydra_zen"],
@@ -246,11 +238,7 @@ commands = [
 [tool.tox.env.format]
 description = "Applies auto-flake (e.g. remove unsused imports), black, and isort in-place on source files and test suite. Running this can help fix a failing `enforce-format` run."
 skip_install = true
-deps = [
-    "autoflake",
-    "black==24.1.0",
-    "isort==5.13.2",
-]
+dependency_groups = ["dev"] 
 commands = [
     ["autoflake", "--recursive", "--in-place", "--remove-duplicate-keys", "--remove-unused-variables", "src/", "tests/"],
     ["isort", "src/", "tests/"],
@@ -261,13 +249,7 @@ commands = [
 description = "Ensures that source materials code and docs and test suite adhere to formatting and code-quality standards."
 skip_install = true
 base_python = ["python3.10"]
-deps = [
-    "black==24.1.0",
-    "isort==5.13.2",
-    "flake8==7.0.0",
-    "pytest",
-    "codespell",
-]
+dependency_groups = ["dev"] 
 commands = [
     ["black", "src/", "tests/", "--diff", "--check"],
     ["isort", "src/", "tests/", "--diff", "--check"],
@@ -280,9 +262,8 @@ commands = [
 description = "Uses Sphinx to generate html for the jatic-toolbox's docs. Stores the results in `.tox/docs/build/html/`."
 base_python = ["python3.10"]
 change_dir = "docs"
-deps = [
-    "-r{toxinidir}/docs/requirements.txt",
-]
+dependency_groups = ["docs"] 
+extras = ["pydantic", "beartype"]
 commands = [
     ["sphinx-build", "-b", "html", "-d", "{envtmpdir}/doctrees", "./source", "{envdir}/build/html"],
 ]

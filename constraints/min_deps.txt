@@ -1,0 +1,4 @@
+hydra-core==1.2.0
+omegaconf==2.2.3
+typing-extensions==4.2.0
+importlib-resources<6.2.0
