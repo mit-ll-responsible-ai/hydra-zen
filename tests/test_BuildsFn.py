@@ -21,7 +21,6 @@ from hydra_zen import (
 )
 from hydra_zen.errors import HydraZenUnsupportedPrimitiveError
 from hydra_zen.typing import CustomConfigType, DataclassOptions
-from hydra_zen.typing._implementations import DataclassOptions
 from hydra_zen.wrapper import default_to_config
 
 
@@ -205,3 +204,14 @@ def test_partial_supported():
     Cfg = MyBuildsFn.builds(dict, x=partial(A, x=2))
     to_yaml(Cfg)
     assert instantiate(Cfg)["x"]() == A(x=2)
+
+
+# A simple subclass for testing purposes
+class StandardBuilds(BuildsFn):
+    pass
+
+# Test case for a standard string
+def test_make_hydra_compatible_with_string():
+    """Tests that a standard string is returned as-is."""
+    input_str = "hello world"
+    assert StandardBuilds._make_hydra_compatible(input_str, convert_dataclass=False) == "hello world"

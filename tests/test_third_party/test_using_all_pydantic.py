@@ -273,3 +273,13 @@ async def test_async_support():
         match="xoo",
     ):
         await zen(async_func, instantiation_wrapper=pydantic_parser)(dict(xoo="aaa"))
+
+
+# Test case for a Pydantic URL
+def test_make_hydra_compatible_with_pydantic_url():
+    """Tests that a pydantic.AnyUrl object is converted to a string."""
+    # Create a Pydantic AnyUrl instance
+    url_obj = pydantic.AnyUrl("https://example.com/path")
+    
+    # The function should convert it to a plain string
+    assert MyBuilds._make_hydra_compatible(url_obj, convert_dataclass=False) == "https://example.com/path"
