@@ -2617,13 +2617,40 @@ class BuildsFn(Generic[T]):
             if is_dataclass(target):
                 _fields = {f.name: f for f in fields(target)}
             else:
-                _fields = target.__fields__  # type: ignore
+                # Use model_fields for pydantic v2, __fields__ for v1
+                if hasattr(target, "model_fields"):  # pragma: no cover
+                    _fields = target.model_fields  # type: ignore
+                else:  # pragma: no cover
+                    _fields = target.__fields__  # type: ignore
             _update = {}
             for name, param in signature_params.items():
                 if name not in _fields:
                     # field is InitVar
                     continue
                 f = _fields[name]
+
+                # For pydantic dataclasses, field.default is a FieldInfo object
+                if is_dataclass(target) and hasattr(
+                    target, "__pydantic_validator__"
+                ):  # pragma: no cover
+                    _field_default = getattr(f, "default", MISSING)
+                    if _check_instance(
+                        "FieldInfo", module="pydantic.fields", value=_field_default
+                    ):
+                        # Extract default_factory from the FieldInfo
+                        _default_factory = getattr(
+                            _field_default, "default_factory", None
+                        )
+                        if _default_factory is not None and callable(_default_factory):
+                            _update[name] = inspect.Parameter(
+                                name,
+                                param.kind,
+                                annotation=param.annotation,
+                                default=_default_factory(),
+                            )
+                        continue
+
+                # Standard dataclass handling
                 if f.default_factory is not MISSING and f.default_factory is not None:
                     _update[name] = inspect.Parameter(
                         name,
