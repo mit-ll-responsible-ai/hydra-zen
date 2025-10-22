@@ -59,6 +59,9 @@ if TYPE_CHECKING:
 
 __all__ = ["zen", "store", "Zen"]
 
+PreCall: TypeAlias = Optional[
+    Union[Callable[[Any], Any], Iterable[Callable[[Any], Any]]]
+]
 
 R = TypeVar("R")
 P = ParamSpec("P")
@@ -90,9 +93,6 @@ def is_instantiable(
 SKIPPED_PARAM_KINDS = frozenset(
     (Parameter.POSITIONAL_ONLY, Parameter.VAR_KEYWORD, Parameter.VAR_POSITIONAL)
 )
-
-
-PreCall = Optional[Union[Callable[[Any], Any], Iterable[Callable[[Any], Any]]]]
 
 
 def _flat_call(x: Iterable[Callable[P, Any]]) -> Callable[P, None]:
@@ -244,8 +244,9 @@ class Zen(Generic[P, R]):
         else:
             self._has_zen_cfg = False
 
-        self._pre_call_iterable = (
-            (pre_call,) if not isinstance(pre_call, Iterable) else pre_call
+        self._pre_call_iterable = cast(
+            Iterable[Callable[[Any], Any]],
+            ((pre_call,) if not isinstance(pre_call, Iterable) else pre_call),
         )
 
         # validate pre-call signatures
@@ -270,7 +271,7 @@ class Zen(Generic[P, R]):
                 )
 
         self.pre_call: Optional[Callable[[Any], Any]] = (
-            pre_call if not isinstance(pre_call, Iterable) else _flat_call(pre_call)
+            pre_call if not isinstance(pre_call, Iterable) else _flat_call(pre_call)  # type: ignore
         )
 
     def _normalize_cfg(
@@ -1732,14 +1733,14 @@ class ZenStore:
         overwrite = overwrite_ok if overwrite_ok is not None else self._overwrite_ok
 
         map_fn: Callable[[GroupName], GroupName] = (
-            (lambda x: old_group_to_new_group.get(x, x))
+            (lambda x: old_group_to_new_group.get(x, x))  # type: ignore
             if isinstance(old_group_to_new_group, Mapping)
             else old_group_to_new_group
         )
 
         copy = self.copy(store_name)
         for (group, name), entry in tuple(copy._internal_repo.items()):
-            new_group = map_fn(group)
+            new_group = map_fn(group)  # type: ignore
             if new_group != group:
                 del copy[group, name]
                 entry["group"] = new_group

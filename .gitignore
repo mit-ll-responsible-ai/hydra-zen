@@ -149,3 +149,6 @@ settings.json
 
 # setuptools_scm
 src/hydra_zen/_version.py
+
+# AI files
+.claude
