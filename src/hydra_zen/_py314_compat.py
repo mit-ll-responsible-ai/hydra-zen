@@ -32,29 +32,22 @@ def apply_hydra_argparse_patch() -> None:  # pragma: no cover
 
         from hydra._internal import utils as hydra_utils
 
-        # Store the original functions
         original_get_args_parser = hydra_utils.get_args_parser
         original_check_help = argparse.ArgumentParser._check_help
 
         @wraps(original_get_args_parser)
         def patched_get_args_parser():  # type: ignore
             """Patched version that disables help validation during parser creation."""
-            # Temporarily disable help validation
             argparse.ArgumentParser._check_help = lambda self, action: None
             try:
                 return original_get_args_parser()
             finally:
-                # Immediately restore normal validation
                 argparse.ArgumentParser._check_help = original_check_help
 
-        # Apply the monkey patch to hydra._internal.utils
         hydra_utils.get_args_parser = patched_get_args_parser
 
-        # Also patch it in sys.modules['hydra.main'] which is the actual module
-        # (Note: hydra.main as an attribute is a function, but the module is different)
         if "hydra.main" in sys.modules:
             sys.modules["hydra.main"].get_args_parser = patched_get_args_parser
 
     except (ImportError, AttributeError):
-        # If Hydra isn't installed or the structure changed, silently skip
         pass

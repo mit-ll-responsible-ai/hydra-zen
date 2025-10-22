@@ -31,6 +31,22 @@ from hydra_zen.structured_configs._implementations import ZEN_VALUE_CONVERSION
 from hydra_zen.typing import Partial
 from tests import is_same
 
+# Register type strategies to avoid SmallSearchSpaceWarning
+st.register_type_strategy(
+    Path, st.sampled_from([Path.cwd(), Path.home(), Path("/tmp"), Path(".")])
+)
+st.register_type_strategy(
+    partial,
+    st.builds(
+        partial,
+        func=st.sampled_from([lambda x: x, str, int]),
+        args=st.lists(st.integers(), max_size=2).map(tuple),
+        keywords=st.dictionaries(
+            st.sampled_from(["a", "b"]), st.integers(), max_size=2
+        ),
+    ),
+)
+
 
 def test_supported_primitives_in_sync_with_value_conversion():
     assert len(set(ZEN_SUPPORTED_PRIMITIVES)) == len(ZEN_SUPPORTED_PRIMITIVES)
