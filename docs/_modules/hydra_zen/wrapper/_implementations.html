@@ -445,6 +445,9 @@
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;zen&quot;</span><span class="p">,</span> <span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="s2">&quot;Zen&quot;</span><span class="p">]</span>
 
+<span class="n">PreCall</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Optional</span><span class="p">[</span>
+    <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]]</span>
+<span class="p">]</span>
 
 <span class="n">R</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;R&quot;</span><span class="p">)</span>
 <span class="n">P</span> <span class="o">=</span> <span class="n">ParamSpec</span><span class="p">(</span><span class="s2">&quot;P&quot;</span><span class="p">)</span>
@@ -476,9 +479,6 @@
 <span class="n">SKIPPED_PARAM_KINDS</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span>
     <span class="p">(</span><span class="n">Parameter</span><span class="o">.</span><span class="n">POSITIONAL_ONLY</span><span class="p">,</span> <span class="n">Parameter</span><span class="o">.</span><span class="n">VAR_KEYWORD</span><span class="p">,</span> <span class="n">Parameter</span><span class="o">.</span><span class="n">VAR_POSITIONAL</span><span class="p">)</span>
 <span class="p">)</span>
-
-
-<span class="n">PreCall</span> <span class="o">=</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]]]</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_flat_call</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
@@ -634,8 +634,9 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_has_zen_cfg</span> <span class="o">=</span> <span class="kc">False</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_pre_call_iterable</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="p">(</span><span class="n">pre_call</span><span class="p">,)</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pre_call</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">)</span> <span class="k">else</span> <span class="n">pre_call</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pre_call_iterable</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
+            <span class="n">Iterable</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]],</span>
+            <span class="p">((</span><span class="n">pre_call</span><span class="p">,)</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pre_call</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">)</span> <span class="k">else</span> <span class="n">pre_call</span><span class="p">),</span>
         <span class="p">)</span>
 
         <span class="c1"># validate pre-call signatures</span>
@@ -660,7 +661,7 @@
                 <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">pre_call</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">pre_call</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pre_call</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">)</span> <span class="k">else</span> <span class="n">_flat_call</span><span class="p">(</span><span class="n">pre_call</span><span class="p">)</span>
+            <span class="n">pre_call</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pre_call</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">)</span> <span class="k">else</span> <span class="n">_flat_call</span><span class="p">(</span><span class="n">pre_call</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
         <span class="p">)</span></div>
 
 
@@ -2155,14 +2156,14 @@
         <span class="n">overwrite</span> <span class="o">=</span> <span class="n">overwrite_ok</span> <span class="k">if</span> <span class="n">overwrite_ok</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_overwrite_ok</span>
 
         <span class="n">map_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">GroupName</span><span class="p">],</span> <span class="n">GroupName</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">old_group_to_new_group</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
+            <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">old_group_to_new_group</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">old_group_to_new_group</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">)</span>
             <span class="k">else</span> <span class="n">old_group_to_new_group</span>
         <span class="p">)</span>
 
         <span class="n">copy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">store_name</span><span class="p">)</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">name</span><span class="p">),</span> <span class="n">entry</span> <span class="ow">in</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">_internal_repo</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
-            <span class="n">new_group</span> <span class="o">=</span> <span class="n">map_fn</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+            <span class="n">new_group</span> <span class="o">=</span> <span class="n">map_fn</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
             <span class="k">if</span> <span class="n">new_group</span> <span class="o">!=</span> <span class="n">group</span><span class="p">:</span>
                 <span class="k">del</span> <span class="n">copy</span><span class="p">[</span><span class="n">group</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span>
                 <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;group&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_group</span>
