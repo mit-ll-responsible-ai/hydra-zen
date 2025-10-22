@@ -239,10 +239,9 @@
 chronological order. All previous releases should still be available on pip.</p>
 <section id="v0-16-0">
 <span id="id1"></span><h2>0.16.0 - 2025-10-22<a class="headerlink" href="#v0-16-0" title="Link to this heading">#</a></h2>
-<p>This release adds provisional support for Python 3.14.</p>
 <ul class="simple">
 <li><p>Adds provisional support for Python 3.14. See <a class="extlink-pull reference external" href="https://github.com/mit-ll-responsible-ai/hydra-zen/pull/827">pull request #827</a>.</p></li>
-<li><p>Adds a compatibility layer to address an incompatibility between Python 3.14’s stricter argparse validation and Hydra internal argparse functionality.</p></li>
+<li><p>Includes a minimal monkey-patch to Hydra’s CLI, applied upon importing hydra-zen, to prevent breakage from Python 3.14’s stricter argparse validation behavior.</p></li>
 </ul>
 </section>
 <section id="v0-15-0">
