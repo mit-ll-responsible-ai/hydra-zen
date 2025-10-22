@@ -45,6 +45,7 @@ classifiers = [
        "Programming Language :: Python :: 3.11",
        "Programming Language :: Python :: 3.12",
        "Programming Language :: Python :: 3.13",
+       "Programming Language :: Python :: 3.14",
        "Topic :: Scientific/Engineering",
        "Programming Language :: Python :: 3 :: Only",
 ]
@@ -128,7 +129,7 @@ skip = 'docs/build/*'
 legacy_tox_ini = """
 [tox]
 isolated_build = True
-envlist = py39, py310, py311, py312, py313
+envlist = py39, py310, py311, py312, py313, py314
 
 [gh-actions]
 python =
@@ -137,6 +138,7 @@ python =
   3.11: py311
   3.12: py312
   3.13: py313
+  3.14: py314
 
 
 [testenv]

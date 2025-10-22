@@ -456,6 +456,8 @@ def test_strict_dataclass_options_reflects_current_dataclass_ver():
     )
     actual_keys = set(signature(make_dataclass).parameters)
     actual_keys.remove("fields")
+    # Python 3.14 adds a `decorator` parameter that we intentionally exclude
+    actual_keys.discard("decorator")
     assert strict_keys == actual_keys
 
 

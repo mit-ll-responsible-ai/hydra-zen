@@ -1,5 +1,12 @@
 # Copyright (c) 2025 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+# flake8: noqa: E402
+
+from hydra_zen._py314_compat import apply_hydra_argparse_patch
+
+apply_hydra_argparse_patch()
+del apply_hydra_argparse_patch
+
 from typing import TYPE_CHECKING
 
 from ._hydra_overloads import (
