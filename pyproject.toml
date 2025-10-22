@@ -177,13 +177,13 @@ test = [
 # Formatting tools - SINGLE SOURCE OF TRUTH
 # These versions MUST stay in sync across all environments
 format = [
-    "ruff==0.8.4",
+    "ruff==0.14.1",
     "autoflake",
 ]
 
 # Linting/checking tools - SINGLE SOURCE OF TRUTH
 lint = [
-    "ruff==0.8.4",
+    "ruff==0.14.1",
     "codespell",
     "pytest",  # Needed for project_tooling/test_headers.py
 ]

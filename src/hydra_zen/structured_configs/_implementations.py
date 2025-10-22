@@ -3308,9 +3308,9 @@ class BuildsFn(Generic[T]):
 
         dataclass_options["bases"] = bases
         module = dataclass_options.pop("module", None)
-        assert _utils.parse_strict_dataclass_options(
+        assert _utils.parse_strict_dataclass_options(dataclass_options), (
             dataclass_options
-        ), dataclass_options
+        )
 
         out = make_dataclass(fields=config_fields, **dataclass_options)
 
