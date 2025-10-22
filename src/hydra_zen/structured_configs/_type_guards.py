@@ -219,8 +219,7 @@ def is_partial_builds(x: Any) -> TypeGuard[PartialBuilds[Any]]:
     if is_builds(x):
         return (
             # check if partial'd config via Hydra
-            safe_getattr(x, PARTIAL_FIELD_NAME, False)
-            is True
+            safe_getattr(x, PARTIAL_FIELD_NAME, False) is True
         ) or (
             # check if partial'd config via `zen_processing`
             uses_zen_processing(x)

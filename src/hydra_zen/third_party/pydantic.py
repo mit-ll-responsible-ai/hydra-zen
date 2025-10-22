@@ -14,7 +14,8 @@ __all__ = ["validates_with_pydantic"]
 
 if _pyd.__version__ >= "2.0":  # pragma: no cover
     _default_parser = _pyd.validate_call(
-        config={"arbitrary_types_allowed": True}, validate_return=False  # type: ignore
+        config={"arbitrary_types_allowed": True},
+        validate_return=False,  # type: ignore
     )
 else:  # pragma: no cover
     _default_parser = _pyd.validate_arguments(

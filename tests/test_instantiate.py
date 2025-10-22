@@ -38,7 +38,6 @@ def test_instantiate_wrapper_restores_state(calls):
             instantiate(cfg)
             assert pre_call_count == wrapper_tracker.num_calls
         elif c == "error_wrap":
-
             # hydra module should be restored even if we hit an error
             with pytest.raises(ValueError):
                 instantiate(cfg, _target_wrapper_=error_wrap)

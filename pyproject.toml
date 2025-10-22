@@ -82,6 +82,45 @@ known_first_party = ["hydra_zen", "tests"]
 profile = "black"
 combine_as_imports = true
 
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+exclude = [
+    ".git",
+    "__pycache__",
+    "docs",
+    "old",
+    "build",
+    "dist",
+    "tests/annotations",
+    "tests/test_py310.py",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+]
+ignore = [
+    "E501",  # line too long (formatter handles this)
+    "E701",  # multiple statements on one line
+    "E721",  # type comparison
+    "F403",  # star import
+    "F405",  # name may be undefined from star import
+    "F811",  # redefinition of unused name
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["hydra_zen", "tests"]
+combine-as-imports = true
+
+[tool.ruff.format]
+# Use black-compatible formatting
+quote-style = "double"
+indent-style = "space"
+
 
 [tool.coverage.run]
 branch = true
@@ -138,16 +177,13 @@ test = [
 # Formatting tools - SINGLE SOURCE OF TRUTH
 # These versions MUST stay in sync across all environments
 format = [
-    "black==24.1.0",
-    "isort==5.13.2",
+    "ruff==0.8.4",
     "autoflake",
 ]
 
 # Linting/checking tools - SINGLE SOURCE OF TRUTH
 lint = [
-    "black==24.1.0",
-    "isort==5.13.2",
-    "flake8==7.0.0",
+    "ruff==0.8.4",
     "codespell",
     "pytest",  # Needed for project_tooling/test_headers.py
 ]
@@ -312,16 +348,15 @@ commands = [
 
 [tool.tox.env.format]
 description = """
-    Applies auto-flake (e.g. remove unsused imports), black, and isort
-    in-place on source files and test suite. Running this can help fix a
-    failing `enforce-format` run.
+    Applies ruff linting and formatting to source files and test suite.
+    Running this can help fix a failing `enforce-format` run.
     """
 skip_install = true
 dependency_groups = ["format"]
 commands = [
     ["autoflake", "--recursive", "--in-place", "--remove-duplicate-keys", "--remove-unused-variables", "src/", "tests/"],
-    ["isort", "src/", "tests/"],
-    ["black", "src/", "tests/"],
+    ["ruff", "check", "--fix", "src/", "tests/"],
+    ["ruff", "format", "src/", "tests/"],
 ]
 
 [tool.tox.env."enforce-format"]
@@ -333,9 +368,8 @@ skip_install = true
 base_python = ["python3.10"]
 dependency_groups = ["lint"]
 commands = [
-    ["black", "src/", "tests/", "--diff", "--check"],
-    ["isort", "src/", "tests/", "--diff", "--check"],
-    ["flake8", "src/", "tests/"],
+    ["ruff", "check", "src/", "tests/"],
+    ["ruff", "format", "--check", "src/", "tests/"],
     ["codespell", "src/", "docs/"],
     ["pytest", "project_tooling/test_headers.py"],
 ]

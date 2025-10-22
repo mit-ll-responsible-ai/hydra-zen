@@ -663,7 +663,9 @@ class ZenField:
     default: Union[Any, Field[Any]] = _utils.field(default=NOTHING)
     name: Union[str, type[NOTHING]] = NOTHING
     zen_convert: InitVar[Optional[ZenConvert]] = None
-    _builds_fn: "Union[BuildsFn[Any], Type[BuildsFn[Any]]]" = _utils.field(default_factory=lambda: DefaultBuilds)  # type: ignore
+    _builds_fn: "Union[BuildsFn[Any], Type[BuildsFn[Any]]]" = _utils.field(
+        default_factory=lambda: DefaultBuilds
+    )  # type: ignore
 
     def __post_init__(
         self,
@@ -954,7 +956,6 @@ class BuildsFn(Generic[T]):
             or is_dataclass(type_)
             or (isinstance(type_, type) and issubclass(type_, Enum))
         ):
-
             if wrap_optional and type_ is not Any:  # pragma: no cover
                 # normally get_type_hints automatically resolves Optional[...]
                 # when None is set as the default, but this has been flaky
