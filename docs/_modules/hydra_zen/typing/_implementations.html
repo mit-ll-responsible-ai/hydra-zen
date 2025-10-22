@@ -808,14 +808,22 @@
     <span class="n">module</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 
 
+<span class="c1"># Note: Python 3.14 adds a `decorator` parameter to make_dataclass, but we</span>
+<span class="c1"># intentionally exclude it from hydra-zen&#39;s DataclassOptions because it&#39;s not</span>
+<span class="c1"># relevant for hydra-zen&#39;s use case of generating configs.</span>
+<span class="n">_Py314Dataclass</span> <span class="o">=</span> <span class="n">_Py312Dataclass</span>
+
+
 <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span>
     <span class="n">_StrictDataclassOptions</span> <span class="o">=</span> <span class="n">_AllPyDataclassOptions</span>
 <span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">11</span><span class="p">):</span>
     <span class="n">_StrictDataclassOptions</span> <span class="o">=</span> <span class="n">_Py310Dataclass</span>
 <span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
     <span class="n">_StrictDataclassOptions</span> <span class="o">=</span> <span class="n">_Py311Dataclass</span>
-<span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+<span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">14</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
     <span class="n">_StrictDataclassOptions</span> <span class="o">=</span> <span class="n">_Py312Dataclass</span>
+<span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="n">_StrictDataclassOptions</span> <span class="o">=</span> <span class="n">_Py314Dataclass</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">StrictDataclassOptions</span><span class="p">(</span><span class="n">_StrictDataclassOptions</span><span class="p">):</span>
