@@ -5,8 +5,19 @@
 Changelog
 =========
 
-This is a record of all past hydra-zen releases and what went into them, in reverse 
+This is a record of all past hydra-zen releases and what went into them, in reverse
 chronological order. All previous releases should still be available on pip.
+
+.. _v0.16.0:
+
+-------------------
+0.16.0 - 2025-10-22
+-------------------
+
+This release adds provisional support for Python 3.14.
+
+- Adds provisional support for Python 3.14. See :pull:`827`.
+- Adds a compatibility layer to address an incompatibility between Python 3.14's stricter argparse validation and Hydra internal argparse functionality.
 
 .. _v0.15.0:
 
