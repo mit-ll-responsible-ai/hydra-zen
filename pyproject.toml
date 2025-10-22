@@ -152,7 +152,9 @@ deps = [
     "pytest-trio",
     "tzdata",
 ]
-commands = [["pytest", "tests/", "{posargs: -n auto --maxprocesses=4}"]]
+commands = [
+    ["pytest", "tests/", "{posargs:-n}", "auto", "--maxprocesses=4"],
+]
 
 [tool.tox.env."min-deps"]
 description = "Runs test suite against minimum supported versions of dependencies."
@@ -208,16 +210,9 @@ deps = [
     "beartype",
     "cloudpickle",
 ]
-commands = [[
-    "pytest",
-    "--cov-report",
-    "term-missing",
-    "--cov-config=pyproject.toml",
-    "--cov-fail-under=100",
-    "--cov=hydra_zen",
-    "tests",
-    "{posargs: -n auto --maxprocesses=4}",
-]]
+commands = [
+    ["pytest", "--cov-report", "term-missing", "--cov-config=pyproject.toml", "--cov-fail-under=100", "--cov=hydra_zen", "tests", "{posargs:-n}", "auto", "--maxprocesses=4"],
+]
 
 [tool.tox.env."pyright-scan-docs"]
 description = """
@@ -245,7 +240,9 @@ deps = [
     "matplotlib",
     "-r deps/requirements-pyright.txt",
 ]
-commands = [["pytest", "tests/test_docs_typecheck.py"]]
+commands = [
+    ["pytest", "tests/test_docs_typecheck.py"],
+]
 
 [tool.tox.env."third-party"]
 description = """
@@ -307,15 +304,7 @@ description = """
 skip_install = true
 deps = ["autoflake", "black==24.1.0", "isort==5.13.2"]
 commands = [
-    [
-        "autoflake",
-        "--recursive",
-        "--in-place",
-        "--remove-duplicate-keys",
-        "--remove-unused-variables",
-        "src/",
-        "tests/",
-    ],
+    ["autoflake", "--recursive", "--in-place", "--remove-duplicate-keys", "--remove-unused-variables", "src/", "tests/"],
     ["isort", "src/", "tests/"],
     ["black", "src/", "tests/"],
 ]
@@ -335,11 +324,11 @@ deps = [
     "codespell",
 ]
 commands = [
-    ["black", "src/", "tests/", "--diff", "--check"],
-    ["isort", "src/", "tests/", "--diff", "--check"],
-    ["flake8", "src/", "tests/"],
-    ["codespell", "src/", "docs/"],
-    ["pytest", "project_tooling/test_headers.py"],
+    "black src/ tests/ --diff --check",
+    "isort src/ tests/ --diff --check",
+    "flake8 src/ tests/",
+    "codespell src/ docs/",
+    "pytest project_tooling/test_headers.py",
 ]
 
 [tool.tox.env.docs]
@@ -351,13 +340,5 @@ base_python = ["python3.10"]
 change_dir = "docs"
 deps = ["-r {tox_root}/docs/requirements.txt"]
 commands = [
-    [
-        "sphinx-build",
-        "-b",
-        "html",
-        "-d",
-        "{env_tmp_dir}/doctrees",
-        "./source",
-        "{env_dir}/build/html",
-    ],
+    "sphinx-build -b html -d {env_tmp_dir}/doctrees ./source {env_dir}/build/html",
 ]
