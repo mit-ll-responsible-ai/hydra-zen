@@ -445,7 +445,7 @@ class Zen(Generic[P, R]):
             **extra_kwargs,
         )  # type: ignore
 
-    def hydra_main(
+    def hydra_main(  # pragma: no cover
         self,
         config_path: Optional[str] = _UNSPECIFIED_,
         config_name: Optional[str] = None,
