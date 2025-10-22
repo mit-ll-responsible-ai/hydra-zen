@@ -4,6 +4,8 @@ code base.
 
 - [Installing hydra-zen for development](#installing-hydra-zen-for-development)
 - [Installing hydra-zen for development (using uv)](#installing-hydra-zen-for-development-using-uv)
+  - [Testing against different Python versions](#testing-against-different-python-versions)
+  - [Updating dependencies](#updating-dependencies)
 - [Configuring Your IDE](#configuring-your-ide)
 - [Adding New Features to the Public API](#adding-new-features-to-the-public-api)
 - [Running Our Tests Manually](#running-our-tests-manually)
@@ -163,6 +165,48 @@ python  # Interactive Python 3.9 REPL
 uv run --python 3.9 pytest tests/test_builds.py
 uv run --python 3.9 python  # REPL with Python 3.9
 ```
+
+### Updating dependencies
+
+The `uv.lock` file pins exact versions of all dependencies (including transitive dependencies) to ensure reproducible environments. It should be updated periodically to pick up bug fixes and security patches.
+
+**When to update:**
+- Before starting work on a new feature (get latest compatible versions)
+- After updating version constraints in `pyproject.toml`
+- Periodically (e.g., monthly) to stay reasonably current
+- When a security vulnerability is announced in a dependency
+
+**How to update:**
+
+```console
+# Update all dependencies to latest compatible versions
+uv sync --upgrade
+
+# Update a specific package
+uv sync --upgrade-package pytest
+
+# After updating, run tests to ensure everything still works
+uv run pytest tests/ -n auto
+
+# If tests pass, commit the updated lockfile
+git add uv.lock
+git commit -m "Update dependencies"
+```
+
+**Updating pinned tools (ruff, etc.):**
+
+The `format` and `lint` dependency groups use exact version pins. To update these:
+
+1. Edit `pyproject.toml` and update the version (e.g., `ruff==0.8.5`)
+2. Run `uv sync` to update the lockfile
+3. Run `uv run tox -e format` and `uv run tox -e enforce-format` to verify
+4. Commit both `pyproject.toml` and `uv.lock`
+
+**Best practices:**
+- Always run the full test suite after updating dependencies
+- Review the changelog of updated packages for breaking changes
+- Update dependencies in a separate commit/PR from feature work
+- If a dependency update breaks tests, investigate before proceeding
 
 ## Configuring Your IDE
 
