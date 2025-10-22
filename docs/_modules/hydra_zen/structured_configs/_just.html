@@ -392,9 +392,12 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Builds</span><span class="p">,</span> <span class="n">DataclassOptions</span><span class="p">,</span> <span class="n">Just</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.typing._implementations</span><span class="w"> </span><span class="kn">import</span> <span class="n">_HydraPrimitive</span>  <span class="c1"># type: ignore</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.typing._implementations</span><span class="w"> </span><span class="kn">import</span> <span class="n">_SupportedViaBuilds</span>  <span class="c1"># type: ignore</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.typing._implementations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataClass_</span><span class="p">,</span> <span class="n">ZenConvert</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.typing._implementations</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DataClass_</span><span class="p">,</span>
+    <span class="n">ZenConvert</span><span class="p">,</span>
+    <span class="n">_HydraPrimitive</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+    <span class="n">_SupportedViaBuilds</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+<span class="p">)</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">._implementations</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigComplex</span><span class="p">,</span> <span class="n">DefaultBuilds</span>
 

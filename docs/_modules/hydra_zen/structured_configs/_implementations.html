@@ -1054,7 +1054,9 @@
     <span class="n">default</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Field</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">NOTHING</span><span class="p">)</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">[</span><span class="n">NOTHING</span><span class="p">]]</span> <span class="o">=</span> <span class="n">NOTHING</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">_builds_fn</span><span class="p">:</span> <span class="s2">&quot;Union[BuildsFn[Any], Type[BuildsFn[Any]]]&quot;</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">DefaultBuilds</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+    <span class="n">_builds_fn</span><span class="p">:</span> <span class="s2">&quot;Union[BuildsFn[Any], Type[BuildsFn[Any]]]&quot;</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">DefaultBuilds</span>
+    <span class="p">)</span>  <span class="c1"># type: ignore</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1350,7 +1352,6 @@
             <span class="ow">or</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">type_</span><span class="p">)</span>
             <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">type_</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">type_</span><span class="p">,</span> <span class="n">Enum</span><span class="p">))</span>
         <span class="p">):</span>
-
             <span class="k">if</span> <span class="n">wrap_optional</span> <span class="ow">and</span> <span class="n">type_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
                 <span class="c1"># normally get_type_hints automatically resolves Optional[...]</span>
                 <span class="c1"># when None is set as the default, but this has been flaky</span>
@@ -3710,9 +3711,9 @@
 
         <span class="n">dataclass_options</span><span class="p">[</span><span class="s2">&quot;bases&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bases</span>
         <span class="n">module</span> <span class="o">=</span> <span class="n">dataclass_options</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;module&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="n">_utils</span><span class="o">.</span><span class="n">parse_strict_dataclass_options</span><span class="p">(</span>
+        <span class="k">assert</span> <span class="n">_utils</span><span class="o">.</span><span class="n">parse_strict_dataclass_options</span><span class="p">(</span><span class="n">dataclass_options</span><span class="p">),</span> <span class="p">(</span>
             <span class="n">dataclass_options</span>
-        <span class="p">),</span> <span class="n">dataclass_options</span>
+        <span class="p">)</span>
 
         <span class="n">out</span> <span class="o">=</span> <span class="n">make_dataclass</span><span class="p">(</span><span class="n">fields</span><span class="o">=</span><span class="n">config_fields</span><span class="p">,</span> <span class="o">**</span><span class="n">dataclass_options</span><span class="p">)</span>
 
