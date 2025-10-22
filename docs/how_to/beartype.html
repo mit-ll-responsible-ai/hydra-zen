@@ -296,14 +296,14 @@ containing the following code.</p>
 </pre></div>
 </div>
 </div>
-<p>Note that the annotation <code class="xref py py-obj docutils literal notranslate"><span class="pre">PositiveInt</span></code> indicates that an associated value should not only be an <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, but also have a non-negative value. Whereas</p>
+<p>Note that the annotation <code class="xref py py-obj docutils literal notranslate"><span class="pre">PositiveInt</span></code> indicates that an associated value should not only be an <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, but also have a non-negative value. Whereas</p>
 <div class="literal-block-wrapper docutils container" id="id4">
 <div class="code-block-caption"><span class="caption-text">Annotation of <code class="docutils literal notranslate"><span class="pre">shape</span></code></span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Union</span><span class="p">[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">]]</span>
 </pre></div>
 </div>
 </div>
-<p>indicates that a value should either be an <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> or any sequence (list, tuple,
+<p>indicates that a value should either be an <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> or any sequence (list, tuple,
 etc.) of ints.</p>
 <p>Supposing that our Hydra app will configure these two “toy” functions, let’s design
 their configs so that beartype will validate their configured values upon
