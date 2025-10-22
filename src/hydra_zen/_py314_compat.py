@@ -9,7 +9,7 @@ Must be imported before any Hydra imports occur.
 import sys
 
 
-def apply_hydra_argparse_patch() -> None:
+def apply_hydra_argparse_patch() -> None:  # pragma: no cover
     """Apply Python 3.14 compatibility patch for Hydra's argparse usage.
 
     Python 3.14 added validation in argparse._check_help that checks if '%'
