@@ -324,11 +324,11 @@ deps = [
     "codespell",
 ]
 commands = [
-    "black src/ tests/ --diff --check",
-    "isort src/ tests/ --diff --check",
-    "flake8 src/ tests/",
-    "codespell src/ docs/",
-    "pytest project_tooling/test_headers.py",
+    ["black", "src/", "tests/", "--diff", "--check"],
+    ["isort", "src/", "tests/", "--diff", "--check"],
+    ["flake8", "src/", "tests/"],
+    ["codespell", "src/", "docs/"],
+    ["pytest", "project_tooling/test_headers.py"],
 ]
 
 [tool.tox.env.docs]
@@ -340,5 +340,5 @@ base_python = ["python3.10"]
 change_dir = "docs"
 deps = ["-r {tox_root}/docs/requirements.txt"]
 commands = [
-    "sphinx-build -b html -d {env_tmp_dir}/doctrees ./source {env_dir}/build/html",
+    ["sphinx-build", "-b", "html", "-d", "{env_tmp_dir}/doctrees", "./source", "{env_dir}/build/html"],
 ]
