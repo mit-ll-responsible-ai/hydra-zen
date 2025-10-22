@@ -419,14 +419,22 @@ class _Py312Dataclass(_Py311Dataclass, total=False):
     module: Optional[str]
 
 
+# Note: Python 3.14 adds a `decorator` parameter to make_dataclass, but we
+# intentionally exclude it from hydra-zen's DataclassOptions because it's not
+# relevant for hydra-zen's use case of generating configs.
+_Py314Dataclass = _Py312Dataclass
+
+
 if sys.version_info < (3, 10):
     _StrictDataclassOptions = _AllPyDataclassOptions
 elif sys.version_info < (3, 11):
     _StrictDataclassOptions = _Py310Dataclass
 elif sys.version_info < (3, 12):  # pragma: no cover
     _StrictDataclassOptions = _Py311Dataclass
-else:  # pragma: no cover
+elif sys.version_info < (3, 14):  # pragma: no cover
     _StrictDataclassOptions = _Py312Dataclass
+else:  # pragma: no cover
+    _StrictDataclassOptions = _Py314Dataclass
 
 
 class StrictDataclassOptions(_StrictDataclassOptions):
