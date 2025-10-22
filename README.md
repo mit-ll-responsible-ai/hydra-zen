@@ -7,7 +7,7 @@
     <img src="https://img.shields.io/pypi/v/hydra-zen.svg" alt="PyPI" />
   </a>
   <a>
-    <img src="https://img.shields.io/badge/python-3.9%20&#8208;%203.13-blue.svg" alt="Python version support" />
+    <img src="https://img.shields.io/badge/python-3.9%20&#8208;%203.14-blue.svg" alt="Python version support" />
   </a>
   <a href="https://anaconda.org/conda-forge/hydra-zen">
     <img src="https://img.shields.io/conda/vn/conda-forge/hydra-zen.svg?logo=conda-forge&label=conda-forge&color=3A3A3A" alt="Conda-forge" />
