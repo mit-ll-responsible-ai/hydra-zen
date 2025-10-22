@@ -138,7 +138,7 @@ jobs:
     - name: Test with tox
       run: tox -e pre-release
 
-  smoke-test-pydantic-v2:
+  smoke-test-pydantic-v1:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
@@ -151,7 +151,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install tox tox-gh-actions
     - name: Test with tox
-      run: tox -e pydantic-v2p0-smoketest
+      run: tox -e pydantic-v1-smoketest
 
   check-repo-format:
     runs-on: ubuntu-latest

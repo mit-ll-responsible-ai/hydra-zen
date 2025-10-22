@@ -26,7 +26,7 @@ from typing import (
 
 import hypothesis.strategies as st
 import pytest
-from hypothesis import given, settings
+from hypothesis import assume, given, settings
 from omegaconf import II, OmegaConf, ValidationError
 from omegaconf.errors import (
     ConfigIndexError,
@@ -356,7 +356,7 @@ def f_for_interp(*args, **kwargs):
 @given(st.text(alphabet=string.ascii_lowercase, min_size=1).map(II))
 def test_is_interpolated_against_omegaconf_generated_interpolated_strs(text):
     assert is_interpolated_string(text)
-
+    assume(text != "config")
     # ensure interpolation actually works
     assert instantiate(builds(f_for_interp, text), **{text[2:-1]: 1}) == 1
 

@@ -52,7 +52,7 @@ classifiers = [
 
 [project.optional-dependencies]
 test = ["pytest >= 3.9", "hypothesis >= 6.28.0", "pytest-trio >= 0.8.0"]
-pydantic = ["pydantic>=1.10.14,<2.0.0"]
+pydantic = ["pydantic>=2.0.0"]
 beartype = ["beartype>=0.8.0"]
 
 [project.urls]
@@ -193,7 +193,7 @@ coverage = [
     "coverage[toml]",
     "pytest-cov",
     "numpy",
-    "pydantic<2.0.0",
+    "pydantic>=2.0.0",
     "beartype",
     "cloudpickle",
 ]
@@ -205,7 +205,7 @@ third-party = [
     "numpy",
     "jaxlib",
     "jax",
-    "pydantic<2.0.0",
+    "pydantic>=2.0.0",
     "beartype",
 ]
 
@@ -267,7 +267,7 @@ base_python = ["python3.10"]
 dependency_groups = ["test"]
 deps = [
     "setuptools",
-    "pydantic<2.0.0",
+    "pydantic>=2.0.0",
     "beartype",
     "cloudpickle",
 ]
@@ -322,14 +322,14 @@ base_python = ["python3.10"]
 dependency_groups = ["test", "third-party"]
 deps = ["setuptools"]
 
-[tool.tox.env."pydantic-v2p0-smoketest"]
-description = "Ensures that importing pydantic 2.0 doesn't break things"
+[tool.tox.env."pydantic-v1-smoketest"]
+description = "Ensures that importing pydantic 1.x doesn't break things"
 install_command = "pip install --upgrade --upgrade-strategy eager {opts} {packages}"
 base_python = ["python3.10"]
 dependency_groups = ["test"]
 deps = [
     "setuptools",
-    "pydantic>=2.0.0",
+    "pydantic>=1.10.14,<2.0.0",
 ]
 
 [tool.tox.env.pyright]
