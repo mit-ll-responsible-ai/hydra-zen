@@ -125,6 +125,64 @@ reportUnnecessaryIsInstance = false
 [tool.codespell]
 skip = 'docs/build/*'
 
+[dependency-groups]
+# Base test dependencies - used by most tox environments
+test = [
+    "pytest>=3.9",
+    "hypothesis>=6.115.5",
+    "pytest-xdist",
+    "pytest-trio>=0.8.0",
+    "tzdata",
+]
+
+# Formatting tools - SINGLE SOURCE OF TRUTH
+# These versions MUST stay in sync across all environments
+format = [
+    "black==24.1.0",
+    "isort==5.13.2",
+    "autoflake",
+]
+
+# Linting/checking tools - SINGLE SOURCE OF TRUTH
+lint = [
+    "black==24.1.0",
+    "isort==5.13.2",
+    "flake8==7.0.0",
+    "codespell",
+    "pytest",  # Needed for project_tooling/test_headers.py
+]
+
+# Coverage-specific tools
+coverage = [
+    "coverage[toml]",
+    "pytest-cov",
+    "numpy",
+    "pydantic<2.0.0",
+    "beartype",
+    "cloudpickle",
+]
+
+# Third-party ML/scientific libraries
+third-party = [
+    "torch",
+    "pytorch-lightning",
+    "numpy",
+    "jaxlib",
+    "jax",
+    "pydantic<2.0.0",
+    "beartype",
+]
+
+# Development dependencies - everything you need for local dev
+dev = [
+    {include-group = "test"},
+    {include-group = "format"},
+    {include-group = "lint"},
+    "tox",
+    "tox-uv",
+    "pre-commit",
+]
+
 [tool.tox]
 env_list = ["py39", "py310", "py311", "py312", "py313", "py314"]
 
@@ -144,14 +202,8 @@ description = """
     parallelization disabled.
     """
 pass_env = ["*"]
-deps = [
-    "setuptools",
-    "pytest",
-    "hypothesis>=6.115.5",
-    "pytest-xdist",
-    "pytest-trio",
-    "tzdata",
-]
+dependency_groups = ["test"]
+deps = ["setuptools"]
 commands = [
     ["pytest", "tests/", "{posargs:-n}", "auto", "--maxprocesses=4"],
 ]
@@ -176,13 +228,9 @@ deps = [
 description = "Runs test suite against pre-release versions of dependencies."
 pip_pre = true
 base_python = ["python3.10"]
+dependency_groups = ["test"]
 deps = [
     "setuptools",
-    "pytest",
-    "hypothesis>=6.115.5",
-    "pytest-xdist",
-    "pytest-trio",
-    "tzdata",
     "pydantic<2.0.0",
     "beartype",
     "cloudpickle",
@@ -196,20 +244,8 @@ description = """
 set_env = { "NUMBA_DISABLE_JIT" = "1" }
 use_develop = true
 base_python = ["python3.10"]
-deps = [
-    "setuptools",
-    "pytest",
-    "hypothesis>=6.115.5",
-    "pytest-xdist",
-    "pytest-trio",
-    "tzdata",
-    "coverage[toml]",
-    "pytest-cov",
-    "numpy",
-    "pydantic<2.0.0",
-    "beartype",
-    "cloudpickle",
-]
+dependency_groups = ["test", "coverage"]
+deps = ["setuptools"]
 commands = [
     ["pytest", "--cov-report", "term-missing", "--cov-config=pyproject.toml", "--cov-fail-under=100", "--cov=hydra_zen", "tests", "{posargs:-n}", "auto", "--maxprocesses=4"],
 ]
@@ -222,13 +258,9 @@ description = """
     """
 use_develop = true
 base_python = ["python3.10"]
+dependency_groups = ["test"]
 deps = [
     "setuptools",
-    "pytest",
-    "hypothesis>=6.115.5",
-    "pytest-xdist",
-    "pytest-trio",
-    "tzdata",
     "torch",
     "pytorch-lightning",
     "numpy",
@@ -251,33 +283,16 @@ description = """
     """
 install_command = "pip install --upgrade --upgrade-strategy eager {opts} {packages}"
 base_python = ["python3.10"]
-deps = [
-    "setuptools",
-    "pytest",
-    "hypothesis>=6.115.5",
-    "pytest-xdist",
-    "pytest-trio",
-    "tzdata",
-    "torch",
-    "pytorch-lightning",
-    "numpy",
-    "jaxlib",
-    "jax",
-    "pydantic<2.0.0",
-    "beartype",
-]
+dependency_groups = ["test", "third-party"]
+deps = ["setuptools"]
 
 [tool.tox.env."pydantic-v2p0-smoketest"]
 description = "Ensures that importing pydantic 2.0 doesn't break things"
 install_command = "pip install --upgrade --upgrade-strategy eager {opts} {packages}"
 base_python = ["python3.10"]
+dependency_groups = ["test"]
 deps = [
     "setuptools",
-    "pytest",
-    "hypothesis>=6.115.5",
-    "pytest-xdist",
-    "pytest-trio",
-    "tzdata",
     "pydantic>=2.0.0",
 ]
 
@@ -302,7 +317,7 @@ description = """
     failing `enforce-format` run.
     """
 skip_install = true
-deps = ["autoflake", "black==24.1.0", "isort==5.13.2"]
+dependency_groups = ["format"]
 commands = [
     ["autoflake", "--recursive", "--in-place", "--remove-duplicate-keys", "--remove-unused-variables", "src/", "tests/"],
     ["isort", "src/", "tests/"],
@@ -316,13 +331,7 @@ description = """
     """
 skip_install = true
 base_python = ["python3.10"]
-deps = [
-    "black==24.1.0",
-    "isort==5.13.2",
-    "flake8==7.0.0",
-    "pytest",
-    "codespell",
-]
+dependency_groups = ["lint"]
 commands = [
     ["black", "src/", "tests/", "--diff", "--check"],
     ["isort", "src/", "tests/", "--diff", "--check"],
