@@ -47,6 +47,9 @@ def f(x):
 
 NoneType = type(None)
 
+# Register type strategies to avoid SmallSearchSpaceWarning
+st.register_type_strategy(MyList, st.lists(st.integers()).map(MyList))
+
 
 def f_for_fuzz(x):
     return
@@ -105,6 +108,7 @@ def test_fuzz_sequence_coercion(annotation):
     coerce_sequences(f_for_fuzz)
 
 
+@pytest.mark.filterwarnings("ignore::hypothesis.errors.HypothesisDeprecationWarning")
 @example((1, 2))
 @example([1, 2])
 @example(1)
