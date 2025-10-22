@@ -6,9 +6,12 @@ from typing import Any, Callable, Optional, TypeVar, Union, overload
 from typing_extensions import Literal
 
 from hydra_zen.typing import Builds, DataclassOptions, Just
-from hydra_zen.typing._implementations import _HydraPrimitive  # type: ignore
-from hydra_zen.typing._implementations import _SupportedViaBuilds  # type: ignore
-from hydra_zen.typing._implementations import DataClass_, ZenConvert
+from hydra_zen.typing._implementations import (
+    DataClass_,
+    ZenConvert,
+    _HydraPrimitive,  # type: ignore
+    _SupportedViaBuilds,  # type: ignore
+)
 
 from ._implementations import ConfigComplex, DefaultBuilds
 

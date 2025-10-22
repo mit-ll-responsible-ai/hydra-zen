@@ -1,8 +1,11 @@
-Thanks for your interest in contributing to hydra-zen! Please read 
-through the following resources before you begin working on any contributions to this 
+Thanks for your interest in contributing to hydra-zen! Please read
+through the following resources before you begin working on any contributions to this
 code base.
 
 - [Installing hydra-zen for development](#installing-hydra-zen-for-development)
+- [Installing hydra-zen for development (using uv)](#installing-hydra-zen-for-development-using-uv)
+  - [Testing against different Python versions](#testing-against-different-python-versions)
+  - [Updating dependencies](#updating-dependencies)
 - [Configuring Your IDE](#configuring-your-ide)
 - [Adding New Features to the Public API](#adding-new-features-to-the-public-api)
 - [Running Our Tests Manually](#running-our-tests-manually)
@@ -29,6 +32,181 @@ pip install -e .
 the `-e` option ensures that any changes that you make to the project's source code will be reflected in your local install – you need not reinstall the package in order for your modifications to take effect.
 
 If your contributions involve changes to our support for NumPy, PyTorch, PyTorch-Lightning, JAX, pydantic, or beartype then you will need to install those dependencies as well, in order for our tests-against-third-parties to run locally in your environment.
+
+## Installing hydra-zen for development (using uv)
+
+[`uv`](https://docs.astral.sh/uv/) is a modern, fast Python package manager that provides significantly faster dependency resolution and installation compared to pip. It's recommended for contributors who want a streamlined development experience.
+
+### Installing uv
+
+Install `uv` using the standalone installer:
+
+```console
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Or on Windows (PowerShell):
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+Or via pip:
+
+```console
+pip install uv
+```
+
+### Setting up your development environment
+
+Once `uv` is installed, navigate to the top level of the `hydra-zen` repository and run:
+
+```console
+uv sync
+```
+
+This command will:
+- Create a virtual environment (`.venv`) if one doesn't exist
+- Install hydra-zen in editable mode
+- Install all development dependencies (test, formatting, linting, etc.)
+- Generate a `uv.lock` file for reproducible installs
+
+The `uv.lock` file ensures that all contributors use identical dependency versions, preventing "works on my machine" issues.
+
+### Running tests and commands
+
+With `uv`, you don't need to manually activate the virtual environment. Use `uv run` to execute commands:
+
+```console
+# Run tests
+uv run pytest tests/
+
+# Run tests in parallel
+uv run pytest tests/ -n auto
+
+# Run a specific test file
+uv run pytest tests/test_builds.py
+
+# Run tox environments
+uv run tox -e py313
+uv run tox -e format
+uv run tox -e coverage
+```
+
+### Formatting your code
+
+Format code using the same tools as the CI:
+
+```console
+# Auto-format code (uses black, isort, autoflake)
+uv run tox -e format
+
+# Or run formatting tools directly
+uv run black src/ tests/
+uv run isort src/ tests/
+```
+
+### Installing pre-commit hooks
+
+```console
+uv run pre-commit install
+uv run pre-commit run
+```
+
+### Why use uv?
+
+- **Speed**: 10-100x faster dependency resolution and installation
+- **Reproducibility**: `uv.lock` ensures identical environments across machines
+- **Convenience**: No need to activate virtual environments with `uv run`
+- **Single source of truth**: hydra-zen uses [PEP 735 dependency groups](https://peps.python.org/pep-0735/), which means development dependencies are defined once and shared between `uv` and `tox`
+
+### Dependency groups
+
+The project defines several dependency groups in `pyproject.toml`:
+
+- `test`: pytest, hypothesis, and testing tools
+- `format`: black, isort, autoflake (exact versions pinned)
+- `lint`: flake8, codespell, and linting tools (exact versions pinned)
+- `coverage`: coverage measurement tools
+- `dev`: All development dependencies (includes all groups above)
+
+The `format` and `lint` groups use exact version pins to ensure formatting and linting are consistent across all contributors and CI. These are the single source of truth used by both `uv` and `tox` environments.
+
+### Testing against different Python versions
+
+**Using tox (recommended for full test suite):**
+
+```console
+# Test against a single Python version (auto-downloads if needed)
+uv run tox -e py39
+
+# Test against multiple versions in parallel
+uv run tox -p -e py39,py310,py313
+
+# List all available tox environments
+uv run tox -a
+```
+
+**Using custom venvs (for interactive work or specific tests):**
+
+```console
+# Create a Python 3.9 venv
+uv venv --python 3.9 .venv-py39
+
+# Activate it and install dev dependencies
+source .venv-py39/bin/activate  # or .venv-py39\Scripts\activate on Windows
+uv pip install -e . --group dev
+
+# Run specific tests or use the REPL
+pytest tests/test_builds.py
+python  # Interactive Python 3.9 REPL
+
+# Or run without activating
+uv run --python 3.9 pytest tests/test_builds.py
+uv run --python 3.9 python  # REPL with Python 3.9
+```
+
+### Updating dependencies
+
+The `uv.lock` file pins exact versions of all dependencies (including transitive dependencies) to ensure reproducible environments. It should be updated periodically to pick up bug fixes and security patches.
+
+**When to update:**
+- Before starting work on a new feature (get latest compatible versions)
+- After updating version constraints in `pyproject.toml`
+- Periodically (e.g., monthly) to stay reasonably current
+- When a security vulnerability is announced in a dependency
+
+**How to update:**
+
+```console
+# Update all dependencies to latest compatible versions
+uv sync --upgrade
+
+# Update a specific package
+uv sync --upgrade-package pytest
+
+# After updating, run tests to ensure everything still works
+uv run pytest tests/ -n auto
+
+# If tests pass, commit the updated lockfile
+git add uv.lock
+git commit -m "Update dependencies"
+```
+
+**Updating pinned tools (ruff, etc.):**
+
+The `format` and `lint` dependency groups use exact version pins. To update these:
+
+1. Edit `pyproject.toml` and update the version (e.g., `ruff==0.8.5`)
+2. Run `uv sync` to update the lockfile
+3. Run `uv run tox -e format` and `uv run tox -e enforce-format` to verify
+4. Commit both `pyproject.toml` and `uv.lock`
+
+**Best practices:**
+- Always run the full test suite after updating dependencies
+- Review the changelog of updated packages for breaking changes
+- Update dependencies in a separate commit/PR from feature work
+- If a dependency update breaks tests, investigate before proceeding
 
 ## Configuring Your IDE
 
@@ -73,7 +251,13 @@ Install `tox`:
 pip install tox
 ```
 
-(if you like to use `conda` environments you can instead install `tox-conda`).
+Or with `uv`:
+
+```console
+uv pip install tox tox-uv
+```
+
+**Note**: hydra-zen uses `tox-uv` for faster environment creation and dependency resolution. The tox environments are configured to use [PEP 735 dependency groups](https://peps.python.org/pep-0735/), which means the test dependencies in `tox` environments are automatically synchronized with the dependency groups defined in `pyproject.toml`.
 
 List the various tox-jobs that are defined for hydra-zen:
 

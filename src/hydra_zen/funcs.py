@@ -5,6 +5,7 @@
 Simple helper functions used to implement `just` and `builds`. This module is designed specifically so
 that these functions have a legible module-path when they appear in configuration files.
 """
+
 import functools as _functools
 import typing as _tp
 from functools import partial
@@ -129,7 +130,6 @@ def zen_processing(
     _zen_target_wrapper: _tp.Union[None, _Wrapper] = None,
     **kwargs: _tp.Any,
 ) -> _tp.Any:
-
     if isinstance(_zen_wrappers, str) or not isinstance(_zen_wrappers, _tp.Sequence):
         unresolved_wrappers: _tp.Sequence[_WrapperConf] = (_zen_wrappers,)
     else:

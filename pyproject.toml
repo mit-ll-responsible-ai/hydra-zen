@@ -82,6 +82,45 @@ known_first_party = ["hydra_zen", "tests"]
 profile = "black"
 combine_as_imports = true
 
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+exclude = [
+    ".git",
+    "__pycache__",
+    "docs",
+    "old",
+    "build",
+    "dist",
+    "tests/annotations",
+    "tests/test_py310.py",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+]
+ignore = [
+    "E501",  # line too long (formatter handles this)
+    "E701",  # multiple statements on one line
+    "E721",  # type comparison
+    "F403",  # star import
+    "F405",  # name may be undefined from star import
+    "F811",  # redefinition of unused name
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["hydra_zen", "tests"]
+combine-as-imports = true
+
+[tool.ruff.format]
+# Use black-compatible formatting
+quote-style = "double"
+indent-style = "space"
+
 
 [tool.coverage.run]
 branch = true
@@ -125,6 +164,61 @@ reportUnnecessaryIsInstance = false
 [tool.codespell]
 skip = 'docs/build/*'
 
+[dependency-groups]
+# Base test dependencies - used by most tox environments
+test = [
+    "pytest>=3.9",
+    "hypothesis>=6.115.5",
+    "pytest-xdist",
+    "pytest-trio>=0.8.0",
+    "tzdata",
+]
+
+# Formatting tools - SINGLE SOURCE OF TRUTH
+# These versions MUST stay in sync across all environments
+format = [
+    "ruff==0.14.1",
+    "autoflake",
+]
+
+# Linting/checking tools - SINGLE SOURCE OF TRUTH
+lint = [
+    "ruff==0.14.1",
+    "codespell",
+    "pytest",  # Needed for project_tooling/test_headers.py
+]
+
+# Coverage-specific tools
+coverage = [
+    "coverage[toml]",
+    "pytest-cov",
+    "numpy",
+    "pydantic<2.0.0",
+    "beartype",
+    "cloudpickle",
+]
+
+# Third-party ML/scientific libraries
+third-party = [
+    "torch",
+    "pytorch-lightning",
+    "numpy",
+    "jaxlib",
+    "jax",
+    "pydantic<2.0.0",
+    "beartype",
+]
+
+# Development dependencies - everything you need for local dev
+dev = [
+    {include-group = "test"},
+    {include-group = "format"},
+    {include-group = "lint"},
+    "tox",
+    "tox-uv",
+    "pre-commit",
+]
+
 [tool.tox]
 env_list = ["py39", "py310", "py311", "py312", "py313", "py314"]
 
@@ -144,14 +238,8 @@ description = """
     parallelization disabled.
     """
 pass_env = ["*"]
-deps = [
-    "setuptools",
-    "pytest",
-    "hypothesis>=6.115.5",
-    "pytest-xdist",
-    "pytest-trio",
-    "tzdata",
-]
+dependency_groups = ["test"]
+deps = ["setuptools"]
 commands = [
     ["pytest", "tests/", "{posargs:-n}", "auto", "--maxprocesses=4"],
 ]
@@ -176,13 +264,9 @@ deps = [
 description = "Runs test suite against pre-release versions of dependencies."
 pip_pre = true
 base_python = ["python3.10"]
+dependency_groups = ["test"]
 deps = [
     "setuptools",
-    "pytest",
-    "hypothesis>=6.115.5",
-    "pytest-xdist",
-    "pytest-trio",
-    "tzdata",
     "pydantic<2.0.0",
     "beartype",
     "cloudpickle",
@@ -196,20 +280,8 @@ description = """
 set_env = { "NUMBA_DISABLE_JIT" = "1" }
 use_develop = true
 base_python = ["python3.10"]
-deps = [
-    "setuptools",
-    "pytest",
-    "hypothesis>=6.115.5",
-    "pytest-xdist",
-    "pytest-trio",
-    "tzdata",
-    "coverage[toml]",
-    "pytest-cov",
-    "numpy",
-    "pydantic<2.0.0",
-    "beartype",
-    "cloudpickle",
-]
+dependency_groups = ["test", "coverage"]
+deps = ["setuptools"]
 commands = [
     ["pytest", "--cov-report", "term-missing", "--cov-config=pyproject.toml", "--cov-fail-under=100", "--cov=hydra_zen", "tests", "{posargs:-n}", "auto", "--maxprocesses=4"],
 ]
@@ -222,13 +294,9 @@ description = """
     """
 use_develop = true
 base_python = ["python3.10"]
+dependency_groups = ["test"]
 deps = [
     "setuptools",
-    "pytest",
-    "hypothesis>=6.115.5",
-    "pytest-xdist",
-    "pytest-trio",
-    "tzdata",
     "torch",
     "pytorch-lightning",
     "numpy",
@@ -251,33 +319,16 @@ description = """
     """
 install_command = "pip install --upgrade --upgrade-strategy eager {opts} {packages}"
 base_python = ["python3.10"]
-deps = [
-    "setuptools",
-    "pytest",
-    "hypothesis>=6.115.5",
-    "pytest-xdist",
-    "pytest-trio",
-    "tzdata",
-    "torch",
-    "pytorch-lightning",
-    "numpy",
-    "jaxlib",
-    "jax",
-    "pydantic<2.0.0",
-    "beartype",
-]
+dependency_groups = ["test", "third-party"]
+deps = ["setuptools"]
 
 [tool.tox.env."pydantic-v2p0-smoketest"]
 description = "Ensures that importing pydantic 2.0 doesn't break things"
 install_command = "pip install --upgrade --upgrade-strategy eager {opts} {packages}"
 base_python = ["python3.10"]
+dependency_groups = ["test"]
 deps = [
     "setuptools",
-    "pytest",
-    "hypothesis>=6.115.5",
-    "pytest-xdist",
-    "pytest-trio",
-    "tzdata",
     "pydantic>=2.0.0",
 ]
 
@@ -297,16 +348,15 @@ commands = [
 
 [tool.tox.env.format]
 description = """
-    Applies auto-flake (e.g. remove unsused imports), black, and isort
-    in-place on source files and test suite. Running this can help fix a
-    failing `enforce-format` run.
+    Applies ruff linting and formatting to source files and test suite.
+    Running this can help fix a failing `enforce-format` run.
     """
 skip_install = true
-deps = ["autoflake", "black==24.1.0", "isort==5.13.2"]
+dependency_groups = ["format"]
 commands = [
     ["autoflake", "--recursive", "--in-place", "--remove-duplicate-keys", "--remove-unused-variables", "src/", "tests/"],
-    ["isort", "src/", "tests/"],
-    ["black", "src/", "tests/"],
+    ["ruff", "check", "--fix", "src/", "tests/"],
+    ["ruff", "format", "src/", "tests/"],
 ]
 
 [tool.tox.env."enforce-format"]
@@ -316,17 +366,10 @@ description = """
     """
 skip_install = true
 base_python = ["python3.10"]
-deps = [
-    "black==24.1.0",
-    "isort==5.13.2",
-    "flake8==7.0.0",
-    "pytest",
-    "codespell",
-]
+dependency_groups = ["lint"]
 commands = [
-    ["black", "src/", "tests/", "--diff", "--check"],
-    ["isort", "src/", "tests/", "--diff", "--check"],
-    ["flake8", "src/", "tests/"],
+    ["ruff", "check", "src/", "tests/"],
+    ["ruff", "format", "--check", "src/", "tests/"],
     ["codespell", "src/", "docs/"],
     ["pytest", "project_tooling/test_headers.py"],
 ]
