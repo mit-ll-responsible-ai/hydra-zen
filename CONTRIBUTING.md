@@ -130,6 +130,40 @@ The project defines several dependency groups in `pyproject.toml`:
 
 The `format` and `lint` groups use exact version pins to ensure formatting and linting are consistent across all contributors and CI. These are the single source of truth used by both `uv` and `tox` environments.
 
+### Testing against different Python versions
+
+**Using tox (recommended for full test suite):**
+
+```console
+# Test against a single Python version (auto-downloads if needed)
+uv run tox -e py39
+
+# Test against multiple versions in parallel
+uv run tox -p -e py39,py310,py313
+
+# List all available tox environments
+uv run tox -a
+```
+
+**Using custom venvs (for interactive work or specific tests):**
+
+```console
+# Create a Python 3.9 venv
+uv venv --python 3.9 .venv-py39
+
+# Activate it and install dev dependencies
+source .venv-py39/bin/activate  # or .venv-py39\Scripts\activate on Windows
+uv pip install -e . --group dev
+
+# Run specific tests or use the REPL
+pytest tests/test_builds.py
+python  # Interactive Python 3.9 REPL
+
+# Or run without activating
+uv run --python 3.9 pytest tests/test_builds.py
+uv run --python 3.9 python  # REPL with Python 3.9
+```
+
 ## Configuring Your IDE
 
 hydra-zen utilizes pyright to validate its interfaces. Thus it is recommended that developers use [an IDE with pyright language server](https://github.com/microsoft/pyright#installation). 
