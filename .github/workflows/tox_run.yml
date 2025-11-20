@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v6
       with:
@@ -38,7 +38,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python 3.11
       uses: actions/setup-python@v6
       with:
@@ -53,7 +53,7 @@ jobs:
   coverage:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python 3.10
       uses: actions/setup-python@v6
       with:
@@ -68,7 +68,7 @@ jobs:
   pyright-scan-docs:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python 3.10
       uses: actions/setup-python@v6
       with:
@@ -89,7 +89,7 @@ jobs:
   test-third-party:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python 3.10
       uses: actions/setup-python@v6
       with:
@@ -110,7 +110,7 @@ jobs:
   test-minimum-dependencies:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python 3.9
       uses: actions/setup-python@v6
       with:
@@ -126,7 +126,7 @@ jobs:
   test-against-pre-releases-of-dependencies:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python 3.10
       uses: actions/setup-python@v6
       with:
@@ -141,7 +141,7 @@ jobs:
   smoke-test-pydantic-v1:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python 3.10
       uses: actions/setup-python@v6
       with:
@@ -156,7 +156,7 @@ jobs:
   check-repo-format:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python 3.10
       uses: actions/setup-python@v6
       with:
@@ -171,7 +171,7 @@ jobs:
   run-pyright:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python 3.10
       uses: actions/setup-python@v6
       with:
@@ -186,7 +186,7 @@ jobs:
   test-docs-builds:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python 3.10
       uses: actions/setup-python@v6
       with:
@@ -201,7 +201,7 @@ jobs:
   run-mypy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python 3.10
       uses: actions/setup-python@v6
       with:
