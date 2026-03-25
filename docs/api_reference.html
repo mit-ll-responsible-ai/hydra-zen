@@ -36,8 +36,8 @@
 <link as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" rel="preload"/>
 <link as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" rel="preload"/>
 <script src="_static/documentation_options.js?v=5929fcd5"></script>
-<script src="_static/doctools.js?v=9bcbadda"></script>
-<script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+<script src="_static/doctools.js?v=fd6eb6e6"></script>
+<script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="_static/clipboard.min.js?v=a7894cd8"></script>
 <script src="_static/copybutton.js?v=30646c52"></script>
 <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
@@ -294,7 +294,7 @@ Then, <a class="reference internal" href="generated/hydra_zen.instantiate.html#h
 return the data and class-instances that we need for our application.</p>
 <section id="creating-configs">
 <span id="create-config"></span><h3>Creating Configs<a class="headerlink" href="#creating-configs" title="Link to this heading">#</a></h3>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a>(hydra_target, /, *pos_args[, ...])</p></td>
 <td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds(target,</span> <span class="pre">*args,</span> <span class="pre">**kw)</span></code> returns a Hydra-compatible config that, when instantiated, returns <code class="xref py py-obj docutils literal notranslate"><span class="pre">target(*args,</span> <span class="pre">**kw)</span></code>.</p></td>
@@ -325,7 +325,7 @@ return the data and class-instances that we need for our application.</p>
 <li class="toctree-l1"><a class="reference internal" href="store.html">hydra_zen.store</a></li>
 </ul>
 </div>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore" title="hydra_zen.ZenStore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZenStore</span></code></a>([name, deferred_to_config, ...])</p></td>
 <td><p>An abstraction over Hydra's store, for creating multiple, isolated config stores.</p></td>
@@ -342,7 +342,7 @@ return the data and class-instances that we need for our application.</p>
 <h2>Creating and Launching Jobs with Hydra<a class="headerlink" href="#creating-and-launching-jobs-with-hydra" title="Link to this heading">#</a></h2>
 <p>hydra-zen provides users the ability to launch a Hydra job via a
 Python function instead of from a commandline interface.</p>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zen</span></code></a>(func, /, pre_call, ZenWrapper)</p></td>
 <td><p>A wrapper that returns a function that will auto-extract, resolve, and instantiate fields from an input config based on the wrapped function's signature.</p></td>
@@ -358,7 +358,7 @@ Python function instead of from a commandline interface.</p>
 </div>
 <section id="instantiating-and-resolving-configs">
 <h3>Instantiating and Resolving Configs<a class="headerlink" href="#instantiating-and-resolving-configs" title="Link to this heading">#</a></h3>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">instantiate</span></code></a>(config, *args[, _target_wrapper_])</p></td>
 <td><p>Instantiates the target of a targeted config.</p></td>
@@ -372,7 +372,7 @@ Python function instead of from a commandline interface.</p>
 </section>
 <section id="utilities">
 <h3>Utilities<a class="headerlink" href="#utilities" title="Link to this heading">#</a></h3>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.make_custom_builds_fn.html#hydra_zen.make_custom_builds_fn" title="hydra_zen.make_custom_builds_fn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_custom_builds_fn</span></code></a>(*[, zen_partial, ...])</p></td>
 <td><p>Returns the <a class="reference internal" href="generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code></a> function, but with customized default values.</p></td>
@@ -394,7 +394,7 @@ Python function instead of from a commandline interface.</p>
 <h3>Working with YAMLs<a class="headerlink" href="#working-with-yamls" title="Link to this heading">#</a></h3>
 <p>Hydra serializes all configs to a YAML-format text when launching a job.
 The following utilities can be used to work with YAML-serialized configs.</p>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_yaml</span></code></a>(cfg, *[, resolve, sort_keys])</p></td>
 <td><p>Serialize a config as a yaml-formatted string.</p></td>
@@ -411,7 +411,7 @@ The following utilities can be used to work with YAML-serialized configs.</p>
 </section>
 <section id="hydra-zen-typing">
 <h3>hydra_zen.typing<a class="headerlink" href="#hydra-zen-typing" title="Link to this heading">#</a></h3>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.typing.DataclassOptions.html#hydra_zen.typing.DataclassOptions" title="hydra_zen.typing.DataclassOptions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataclassOptions</span></code></a></p></td>
 <td><p>Specifies dataclass-creation options via <code class="xref py py-obj docutils literal notranslate"><span class="pre">builds</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">just</span></code> et al.</p></td>
@@ -535,7 +535,7 @@ represents that complex value in a Hydra-compatible way.</p>
 <section id="runtime-data-validation">
 <span id="data-val"></span><h3>Runtime Data Validation<a class="headerlink" href="#runtime-data-validation" title="Link to this heading">#</a></h3>
 <p>Although Hydra provides some runtime type-checking functionality, it only supports <a class="reference internal" href="explanation/type_refinement.html#type-support"><span class="std std-ref">a limited set of types and annotations</span></a>. hydra-zen offers support for more robust runtime type-checking capabilities via various third-party libraries.</p>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hydra_zen.third_party.beartype.validates_with_beartype.html#hydra_zen.third_party.beartype.validates_with_beartype" title="hydra_zen.third_party.beartype.validates_with_beartype"><code class="xref py py-obj docutils literal notranslate"><span class="pre">beartype.validates_with_beartype</span></code></a>(obj)</p></td>
 <td><p>Enables runtime type-checking of values, via the library <code class="docutils literal notranslate"><span class="pre">beartype</span></code>.</p></td>
@@ -634,7 +634,7 @@ represents that complex value in a Hydra-compatible way.</p>
 </div>
 <div class="footer-item">
 <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
 </p>
 </div>
