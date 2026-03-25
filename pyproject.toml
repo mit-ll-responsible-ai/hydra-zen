@@ -379,7 +379,7 @@ description = """
     Uses Sphinx to generate html for the jatic-toolbox's docs. Stores the
     results in `.tox/docs/build/html/`.
     """
-base_python = ["python3.10"]
+base_python = ["python3.12"]
 change_dir = "docs"
 deps = ["-r {tox_root}/docs/requirements.txt"]
 commands = [
