@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Massachusetts Institute of Technology
+# Copyright (c) 2026 Massachusetts Institute of Technology
 
 # Usage:
 #
@@ -10,8 +10,8 @@ import os
 import os.path as path
 from pathlib import Path
 
-OLD_HEADER = "# Copyright (c) 2021 Massachusetts Institute of Technology"
-NEW_HEADER = "# Copyright (c) 2021 Massachusetts Institute of Technology\n# SPDX-License-Identifier: MIT"
+OLD_HEADER = "# Copyright (c) 2025 Massachusetts Institute of Technology"
+NEW_HEADER = "# Copyright (c) 2026 Massachusetts Institute of Technology\n# SPDX-License-Identifier: MIT"
 EXCLUDED = {"_version.py", "versioneer.py"}
 
 
