@@ -317,14 +317,14 @@ description = """
     Runs test suite against optional 3rd party packages that hydra-zen
     provides specialized support for.
     """
-install_command = "pip install --upgrade --upgrade-strategy eager {opts} {packages}"
+install_command = ["pip", "install", "--upgrade", "--upgrade-strategy", "eager", "{opts}", "{packages}"]
 base_python = ["python3.10"]
 dependency_groups = ["test", "third-party"]
 deps = ["setuptools"]
 
 [tool.tox.env."pydantic-v1-smoketest"]
 description = "Ensures that importing pydantic 1.x doesn't break things"
-install_command = "pip install --upgrade --upgrade-strategy eager {opts} {packages}"
+install_command = ["pip", "install", "--upgrade", "--upgrade-strategy", "eager", "{opts}", "{packages}"]
 base_python = ["python3.10"]
 dependency_groups = ["test"]
 deps = [
