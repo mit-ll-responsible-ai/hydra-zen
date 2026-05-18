@@ -453,6 +453,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen._compatibility</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">HYDRA_SUPPORTED_PRIMITIVE_TYPES</span><span class="p">,</span>
     <span class="n">HYDRA_SUPPORTED_PRIMITIVES</span><span class="p">,</span>
+    <span class="n">OMEGACONF_HANDLES_PATHLIB_LOCAL</span><span class="p">,</span>
     <span class="n">ZEN_SUPPORTED_PRIMITIVES</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.errors</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -576,28 +577,28 @@
 
 <span class="c1"># In python 3.13 the definitions for pathlib.Path, et al. were moved to the</span>
 <span class="c1"># pathlib._locals, changing the tag for yaml serialization. Thus we monkey-patch</span>
-<span class="c1"># omegaconf&#39;s yaml loader to handle these new strings.</span>
-<span class="n">_original_yaml_loader</span> <span class="o">=</span> <span class="n">_omegaconf_utils</span><span class="o">.</span><span class="n">get_yaml_loader</span>
+<span class="c1"># omegaconf&#39;s yaml loader to handle these new strings. OmegaConf 2.4.0 added</span>
+<span class="c1"># native pathlib._local support, so the patch is only needed on older versions.</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">OMEGACONF_HANDLES_PATHLIB_LOCAL</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="n">_original_yaml_loader</span> <span class="o">=</span> <span class="n">_omegaconf_utils</span><span class="o">.</span><span class="n">get_yaml_loader</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_patched_yaml_loader</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="n">loader</span> <span class="o">=</span> <span class="n">_original_yaml_loader</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">loader</span><span class="o">.</span><span class="n">add_constructor</span><span class="p">(</span>
+            <span class="s2">&quot;tag:yaml.org,2002:python/object/apply:pathlib._local.Path&quot;</span><span class="p">,</span>
+            <span class="k">lambda</span> <span class="n">loader</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="o">*</span><span class="n">loader</span><span class="o">.</span><span class="n">construct_sequence</span><span class="p">(</span><span class="n">node</span><span class="p">)),</span>
+        <span class="p">)</span>
+        <span class="n">loader</span><span class="o">.</span><span class="n">add_constructor</span><span class="p">(</span>
+            <span class="s2">&quot;tag:yaml.org,2002:python/object/apply:pathlib._local.PosixPath&quot;</span><span class="p">,</span>
+            <span class="k">lambda</span> <span class="n">loader</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">PosixPath</span><span class="p">(</span><span class="o">*</span><span class="n">loader</span><span class="o">.</span><span class="n">construct_sequence</span><span class="p">(</span><span class="n">node</span><span class="p">)),</span>
+        <span class="p">)</span>
+        <span class="n">loader</span><span class="o">.</span><span class="n">add_constructor</span><span class="p">(</span>
+            <span class="s2">&quot;tag:yaml.org,2002:python/object/apply:pathlib._local.WindowsPath&quot;</span><span class="p">,</span>
+            <span class="k">lambda</span> <span class="n">loader</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">WindowsPath</span><span class="p">(</span><span class="o">*</span><span class="n">loader</span><span class="o">.</span><span class="n">construct_sequence</span><span class="p">(</span><span class="n">node</span><span class="p">)),</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">loader</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_patched_yaml_loader</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-    <span class="n">loader</span> <span class="o">=</span> <span class="n">_original_yaml_loader</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">loader</span><span class="o">.</span><span class="n">add_constructor</span><span class="p">(</span>
-        <span class="s2">&quot;tag:yaml.org,2002:python/object/apply:pathlib._local.Path&quot;</span><span class="p">,</span>
-        <span class="k">lambda</span> <span class="n">loader</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="o">*</span><span class="n">loader</span><span class="o">.</span><span class="n">construct_sequence</span><span class="p">(</span><span class="n">node</span><span class="p">)),</span>
-    <span class="p">)</span>
-    <span class="n">loader</span><span class="o">.</span><span class="n">add_constructor</span><span class="p">(</span>
-        <span class="s2">&quot;tag:yaml.org,2002:python/object/apply:pathlib._local.PosixPath&quot;</span><span class="p">,</span>
-        <span class="k">lambda</span> <span class="n">loader</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">PosixPath</span><span class="p">(</span><span class="o">*</span><span class="n">loader</span><span class="o">.</span><span class="n">construct_sequence</span><span class="p">(</span><span class="n">node</span><span class="p">)),</span>
-    <span class="p">)</span>
-    <span class="n">loader</span><span class="o">.</span><span class="n">add_constructor</span><span class="p">(</span>
-        <span class="s2">&quot;tag:yaml.org,2002:python/object/apply:pathlib._local.WindowsPath&quot;</span><span class="p">,</span>
-        <span class="k">lambda</span> <span class="n">loader</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">WindowsPath</span><span class="p">(</span><span class="o">*</span><span class="n">loader</span><span class="o">.</span><span class="n">construct_sequence</span><span class="p">(</span><span class="n">node</span><span class="p">)),</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="n">loader</span>
-
-
-<span class="n">_omegaconf_utils</span><span class="o">.</span><span class="n">get_yaml_loader</span> <span class="o">=</span> <span class="n">_patched_yaml_loader</span>
+    <span class="n">_omegaconf_utils</span><span class="o">.</span><span class="n">get_yaml_loader</span> <span class="o">=</span> <span class="n">_patched_yaml_loader</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_retain_type_info</span><span class="p">(</span><span class="n">type_</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]):</span>
