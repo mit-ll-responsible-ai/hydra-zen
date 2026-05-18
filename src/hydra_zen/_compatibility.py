@@ -76,6 +76,7 @@ ZEN_SUPPORTED_PRIMITIVES: frozenset[type] = frozenset(
 
 HYDRA_SUPPORTS_OBJECT_CONVERT = HYDRA_VERSION >= Version(1, 3, 0)
 
-# OmegaConf 2.4.0 (PR #1296) moved `get_yaml_loader` out of `omegaconf._utils`
-# into `omegaconf._yaml` and registers the pathlib._local.* constructors itself.
-OMEGACONF_EXPOSES_GET_YAML_LOADER_IN_UTILS = OMEGACONF_VERSION < Version(2, 4, 0)
+# OmegaConf 2.4.0 (PR #1296) teaches its yaml loader to construct
+# pathlib._local.* paths (which Python 3.13 emits for pathlib.Path et al.).
+# On older OmegaConf we monkey-patch those constructors in ourselves.
+OMEGACONF_HANDLES_PATHLIB_LOCAL = OMEGACONF_VERSION >= Version(2, 4, 0)
