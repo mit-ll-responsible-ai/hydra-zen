@@ -186,7 +186,7 @@ del _builtin_function_or_method_type
 # pathlib._locals, changing the tag for yaml serialization. Thus we monkey-patch
 # omegaconf's yaml loader to handle these new strings. OmegaConf 2.4.0 added
 # native pathlib._local support, so the patch is only needed on older versions.
-if not OMEGACONF_HANDLES_PATHLIB_LOCAL:
+if not OMEGACONF_HANDLES_PATHLIB_LOCAL:  # pragma: no cover
     _original_yaml_loader = _omegaconf_utils.get_yaml_loader
 
     def _patched_yaml_loader(*args: Any, **kwargs: Any) -> Any:  # pragma: no cover
