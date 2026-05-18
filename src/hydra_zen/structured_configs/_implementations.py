@@ -60,6 +60,7 @@ from typing_extensions import (
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVE_TYPES,
     HYDRA_SUPPORTED_PRIMITIVES,
+    OMEGACONF_HANDLES_PATHLIB_LOCAL,
     ZEN_SUPPORTED_PRIMITIVES,
 )
 from hydra_zen.errors import (
@@ -183,28 +184,28 @@ del _builtin_function_or_method_type
 
 # In python 3.13 the definitions for pathlib.Path, et al. were moved to the
 # pathlib._locals, changing the tag for yaml serialization. Thus we monkey-patch
-# omegaconf's yaml loader to handle these new strings.
-_original_yaml_loader = _omegaconf_utils.get_yaml_loader
+# omegaconf's yaml loader to handle these new strings. OmegaConf 2.4.0 added
+# native pathlib._local support, so the patch is only needed on older versions.
+if not OMEGACONF_HANDLES_PATHLIB_LOCAL:  # pragma: no cover
+    _original_yaml_loader = _omegaconf_utils.get_yaml_loader
 
+    def _patched_yaml_loader(*args: Any, **kwargs: Any) -> Any:  # pragma: no cover
+        loader = _original_yaml_loader(*args, **kwargs)
+        loader.add_constructor(
+            "tag:yaml.org,2002:python/object/apply:pathlib._local.Path",
+            lambda loader, node: pathlib.Path(*loader.construct_sequence(node)),
+        )
+        loader.add_constructor(
+            "tag:yaml.org,2002:python/object/apply:pathlib._local.PosixPath",
+            lambda loader, node: pathlib.PosixPath(*loader.construct_sequence(node)),
+        )
+        loader.add_constructor(
+            "tag:yaml.org,2002:python/object/apply:pathlib._local.WindowsPath",
+            lambda loader, node: pathlib.WindowsPath(*loader.construct_sequence(node)),
+        )
+        return loader
 
-def _patched_yaml_loader(*args: Any, **kwargs: Any) -> Any:  # pragma: no cover
-    loader = _original_yaml_loader(*args, **kwargs)
-    loader.add_constructor(
-        "tag:yaml.org,2002:python/object/apply:pathlib._local.Path",
-        lambda loader, node: pathlib.Path(*loader.construct_sequence(node)),
-    )
-    loader.add_constructor(
-        "tag:yaml.org,2002:python/object/apply:pathlib._local.PosixPath",
-        lambda loader, node: pathlib.PosixPath(*loader.construct_sequence(node)),
-    )
-    loader.add_constructor(
-        "tag:yaml.org,2002:python/object/apply:pathlib._local.WindowsPath",
-        lambda loader, node: pathlib.WindowsPath(*loader.construct_sequence(node)),
-    )
-    return loader
-
-
-_omegaconf_utils.get_yaml_loader = _patched_yaml_loader
+    _omegaconf_utils.get_yaml_loader = _patched_yaml_loader
 
 
 def _retain_type_info(type_: type, value: Any, hydra_recursive: Optional[bool]):
