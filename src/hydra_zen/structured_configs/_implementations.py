@@ -60,6 +60,7 @@ from typing_extensions import (
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVE_TYPES,
     HYDRA_SUPPORTED_PRIMITIVES,
+    OMEGACONF_EXPOSES_GET_YAML_LOADER_IN_UTILS,
     ZEN_SUPPORTED_PRIMITIVES,
 )
 from hydra_zen.errors import (
@@ -185,10 +186,10 @@ del _builtin_function_or_method_type
 # pathlib._locals, changing the tag for yaml serialization. Thus we monkey-patch
 # omegaconf's yaml loader to handle these new strings.
 #
-# OmegaConf >= 2.4.0.dev11 (PR #1296) moved `get_yaml_loader` out of
-# `omegaconf._utils` and registers the pathlib._local constructors itself, so
-# this monkey-patch is only needed -- and only possible -- on older OmegaConf.
-if hasattr(_omegaconf_utils, "get_yaml_loader"):
+# OmegaConf 2.4.0 (PR #1296) moved `get_yaml_loader` out of `omegaconf._utils`
+# and registers the pathlib._local constructors itself, so this monkey-patch is
+# only needed -- and only possible -- on older OmegaConf.
+if OMEGACONF_EXPOSES_GET_YAML_LOADER_IN_UTILS:
     _original_yaml_loader = _omegaconf_utils.get_yaml_loader
 
     def _patched_yaml_loader(*args: Any, **kwargs: Any) -> Any:  # pragma: no cover
