@@ -208,6 +208,34 @@ if not OMEGACONF_HANDLES_PATHLIB_LOCAL:  # pragma: no cover
     _omegaconf_utils.get_yaml_loader = _patched_yaml_loader
 
 
+def _value_contains_builds(value: Any) -> bool:
+    # Returns `True` if `value` is a list/tuple/mapping that contains
+    # (possibly nested) a structured config as an element/value.
+    #
+    # Such a config will not be a subclass of the element-type specified by a
+    # container annotation (e.g. a `Builds_Inner` config vs. a `dict[str, Inner]`
+    # annotation), so OmegaConf's type-checking would reject it. See:
+    #    https://github.com/mit-ll-responsible-ai/hydra-zen/issues/858
+    if isinstance(value, Mapping):
+        return any(_value_contains_builds(v) for v in value.values())
+    elif isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        return any(_value_contains_builds(v) for v in value)
+    return is_builds(value)
+
+
+def _resolve_field_default(field_obj: Any) -> Any:
+    # Returns a field's default value, resolving its `default_factory` when present.
+    # dataclasses store mutable defaults (e.g. lists/dicts) via `default_factory`,
+    # so this is needed to inspect the actual container value -- e.g. to detect a
+    # nested structured config. Returns `MISSING` when there is no default.
+    default = safe_getattr(field_obj, "default", MISSING)
+    if default is MISSING:
+        factory = safe_getattr(field_obj, "default_factory", MISSING)
+        if factory is not MISSING and factory is not None:
+            return factory()
+    return default
+
+
 def _retain_type_info(type_: type, value: Any, hydra_recursive: Optional[bool]):
     # OmegaConf's type-checking occurs before instantiation occurs.
     # This means that, e.g., passing `Builds[int]` to a field `x: int`
@@ -227,6 +255,12 @@ def _retain_type_info(type_: type, value: Any, hydra_recursive: Optional[bool]):
         if _utils.is_interpolated_string(value):
             # an interpolated field may resolve to a structured conf, which may
             # instantiate to a value of the specified type
+            return False
+        elif _value_contains_builds(value):
+            # `value` is a container (e.g. list/dict) holding a structured config;
+            # broaden the annotation so OmegaConf doesn't type-check the config
+            # against the container's element type. See:
+            #    https://github.com/mit-ll-responsible-ai/hydra-zen/issues/858
             return False
         return True
     elif is_builds(type_):
@@ -2962,6 +2996,10 @@ class BuildsFn(Generic[T]):
                 # If `.default` is not set, then `value` is a Hydra-supported mutable
                 # value, and thus it is "sanitized"
                 sanitized_value = safe_getattr(_field, "default", value)
+                if sanitized_value is MISSING:
+                    # mutable defaults (e.g. lists/dicts) are stored via
+                    # `default_factory`; resolve it so the value can be inspected
+                    sanitized_value = _resolve_field_default(_field)
                 sanitized_type = (
                     cls._sanitized_type(type_, wrap_optional=sanitized_value is None)
                     if _retain_type_info(
@@ -3290,7 +3328,7 @@ class BuildsFn(Generic[T]):
                         f.hint
                         if _retain_type_info(
                             type_=f.hint,
-                            value=f.default.default,
+                            value=_resolve_field_default(f.default),
                             hydra_recursive=hydra_recursive,
                         )
                         else Any
