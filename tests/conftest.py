@@ -13,6 +13,7 @@ from typing import Optional
 import hypothesis.strategies as st
 import pytest
 from hydra.core.config_store import ConfigStore
+from hydra.core.plugins import Plugins
 from hypothesis import settings
 from omegaconf import DictConfig, ListConfig
 
@@ -68,6 +69,14 @@ def cleandir() -> Iterable[str]:
 @pytest.fixture()
 def clean_store() -> Iterable[dict]:
     """Provides access to configstore repo and restores state after test"""
+    # Hydra registers its plugin-provided configs (e.g. `hydra/sweeper/basic`)
+    # into the global ConfigStore lazily, upon first plugin discovery. We force
+    # discovery here so that the snapshot below includes those configs;
+    # otherwise restoring the snapshot would strip them from the global store
+    # and break later tests that compose the Hydra config (e.g. with
+    # `return_hydra_config=True`).
+    # See: https://github.com/mit-ll-responsible-ai/hydra-zen/issues/574
+    Plugins.instance().discover()
     prev_state = deepcopy(_store.repo)
     zen_prev_state = (store._internal_repo.copy(), store._queue.copy())
     yield _store.repo
