@@ -8,6 +8,14 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse
 chronological order. All previous releases should still be available on pip.
 
+.. _v0.16.1:
+
+-------------------
+0.16.1 - 2026-06-23
+-------------------
+
+- Fixes a bug where :func:`~hydra_zen.just` would fail to convert a dataclass to a config when one of its fields is annotated with a container of a dataclass type (e.g. ``dict[str, SomeDataclass]`` or ``list[SomeDataclass]``). Previously this raised an OmegaConf ``ValidationError`` during ``to_yaml``. See :issue:`858`.
+
 .. _v0.16.0:
 
 -------------------

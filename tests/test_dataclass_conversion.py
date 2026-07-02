@@ -21,6 +21,10 @@ from hydra_zen import (
     mutable_value,
 )
 from hydra_zen.errors import HydraZenUnsupportedPrimitiveError
+from hydra_zen.structured_configs._implementations import (
+    _resolve_field_default,
+    _value_contains_builds,
+)
 from hydra_zen.structured_configs._type_guards import is_builds
 from hydra_zen.typing import Builds
 from hydra_zen.typing._implementations import DataClass_, InstOrType, ZenConvert
@@ -128,6 +132,68 @@ def test_recursive_conversion(x):
     assert instantiate(just(x)) == x
     assert instantiate(builds(Nested, x=x.x)) == x
     assert instantiate(OmegaConf.create(OmegaConf.to_yaml(just(x)))) == x
+
+
+@dataclass
+class _Inner858:
+    x: int = 0
+
+
+@dataclass
+class _OuterDict858:
+    outer: "dict[str, _Inner858]"
+
+
+@dataclass
+class _OuterList858:
+    outer: "list[_Inner858]"
+
+
+@dataclass
+class _OuterNested858:
+    outer: "dict[str, list[_Inner858]]"
+
+
+@pytest.mark.parametrize(
+    "obj",
+    [
+        _OuterDict858(outer={"a": _Inner858(x=1)}),
+        _OuterList858(outer=[_Inner858(x=1)]),
+        _OuterNested858(outer={"a": [_Inner858(x=1), _Inner858(x=2)]}),
+    ],
+)
+def test_just_on_container_field_of_typed_dataclasses(obj):
+    # https://github.com/mit-ll-responsible-ai/hydra-zen/issues/858
+    # A dataclass whose field is annotated with a container of a dataclass type
+    # (e.g. `dict[str, Inner]`) used to fail to convert to yaml because the field's
+    # values get converted to `Builds_Inner` configs while the field's annotation
+    # retained the original (non-builds) element type, which OmegaConf rejects.
+    Conf = just(obj)
+    # must not raise omegaconf.errors.ValidationError
+    assert instantiate(OmegaConf.create(OmegaConf.to_yaml(Conf))) == obj
+
+
+def test_value_contains_builds():
+    # https://github.com/mit-ll-responsible-ai/hydra-zen/issues/858
+    cfg = just(_Inner858(x=1))
+    assert is_builds(cfg)
+    assert _value_contains_builds(cfg) is True
+    assert _value_contains_builds([0, cfg]) is True
+    assert _value_contains_builds({"a": cfg}) is True
+    assert _value_contains_builds({"a": [cfg]}) is True
+    assert _value_contains_builds([1, 2, 3]) is False
+    assert _value_contains_builds({"a": 1}) is False
+    assert _value_contains_builds("not a container") is False
+
+
+def test_resolve_field_default():
+    # https://github.com/mit-ll-responsible-ai/hydra-zen/issues/858
+    # plain default
+    assert _resolve_field_default(field(default=1)) == 1
+    # default_factory is resolved to its produced value
+    assert _resolve_field_default(field(default_factory=lambda: [1, 2])) == [1, 2]
+    # no default and no factory -> MISSING
+    assert _resolve_field_default(field()) is MISSING
 
 
 @dataclass
