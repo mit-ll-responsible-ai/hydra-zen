@@ -14,6 +14,7 @@ import hypothesis.strategies as st
 import pytest
 from hydra.conf import HydraConf
 from hydra.core.config_store import ConfigStore
+from hydra.core.plugins import Plugins
 from hypothesis import assume, given, note, settings
 from omegaconf import DictConfig, ListConfig
 
@@ -35,6 +36,11 @@ cs = ConfigStore().instance()
 @contextmanager
 def clean_store():
     """Provides access to configstore repo and restores state after test"""
+    # Force Hydra plugin discovery before snapshotting so the snapshot includes
+    # plugin-provided configs (e.g. `hydra/sweeper/basic`); otherwise restoring
+    # it would strip them from the global store. See:
+    # https://github.com/mit-ll-responsible-ai/hydra-zen/issues/574
+    Plugins.instance().discover()
     prev_state = deepcopy(cs.repo)
     zen_prev_state = (default_store._internal_repo.copy(), default_store._queue.copy())
     try:
