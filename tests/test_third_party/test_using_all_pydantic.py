@@ -13,6 +13,7 @@ from hydra.errors import InstantiationException
 from pydantic import BaseModel, PositiveInt
 
 from hydra_zen import BuildsFn, instantiate, zen
+from hydra_zen._compatibility import HYDRA_HAS_EXECUTION_POLICY
 from hydra_zen.third_party.pydantic import pydantic_parser
 
 T = TypeVar("T")
@@ -141,8 +142,25 @@ class PydanticModel(BaseModel):
 @pytest.mark.parametrize("use_partial", [True, False], ids=["partial", "no_partial"])
 @pytest.mark.parametrize("use_pickle", [True, False], ids=["pickle", "no_pickle"])
 def test_roundtrip(
-    obj: Param, use_meta_feature: bool, use_partial: bool, use_pickle: bool
+    obj: Param,
+    use_meta_feature: bool,
+    use_partial: bool,
+    use_pickle: bool,
+    request: pytest.FixtureRequest,
 ):
+    if (
+        use_pickle
+        and use_partial
+        and HYDRA_HAS_EXECUTION_POLICY
+        and any(isinstance(v, (list, dict)) for v in (*obj.args, *obj.kwargs.values()))
+    ):
+        request.applymarker(
+            pytest.mark.xfail(
+                reason="Hydra 1.4 leaves container args linked to their (unpicklable) "
+                "parent config: https://github.com/hydra-ecosystem/hydra/issues/3537",
+                strict=False,
+            )
+        )
     kw = obj.kwargs.copy()
     if use_meta_feature:
         kw["zen_meta"] = {"_za": 1}
