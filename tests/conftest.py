@@ -8,6 +8,7 @@ import sys
 import tempfile
 from collections.abc import Iterable
 from copy import deepcopy
+from pathlib import Path
 from typing import Optional
 
 import hypothesis.strategies as st
@@ -19,6 +20,14 @@ from omegaconf import DictConfig, ListConfig
 
 from hydra_zen import store
 from hydra_zen._compatibility import HYDRA_VERSION
+
+# `launch(..., multirun=True)` resolves the sweeper through Hydra's plugin
+# registry, which admits only classes defined under the `hydra_plugins`
+# namespace package. Expose the test-local sweeper plugin (tests/plugins/)
+# before Hydra builds that registry; conftest is imported before any test module.
+_PLUGINS_DIR = str(Path(__file__).parent / "plugins")
+if _PLUGINS_DIR not in sys.path:
+    sys.path.insert(0, _PLUGINS_DIR)
 
 _store = ConfigStore.instance()
 
