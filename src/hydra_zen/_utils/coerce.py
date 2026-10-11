@@ -16,12 +16,23 @@ from typing import (
     get_type_hints,
 )
 
+import omegaconf
 from omegaconf import ListConfig
 from typing_extensions import TypeGuard
 
 _T = TypeVar("_T", bound=Callable)
 
 __all__ = ["coerce_sequences"]
+
+# OmegaConf 2.4+ represents tuples as TupleConfig
+_CASTABLE_CONFIG_SEQUENCES: tuple[type, ...] = (list, ListConfig) + (
+    (getattr(omegaconf, "TupleConfig"),) if hasattr(omegaconf, "TupleConfig") else ()
+)
+
+
+def _is_castable(x: object) -> bool:
+    # exact-tuple check: tuple subclasses (e.g. named-tuples) are already cast
+    return type(x) is tuple or isinstance(x, _CASTABLE_CONFIG_SEQUENCES)
 
 
 def _is_namedtuple_type(x) -> TypeGuard[type[NamedTuple]]:  # pragma: no cover
@@ -184,7 +195,7 @@ def coerce_sequences(obj: _T) -> _T:
             args = list(args)
             for pos in list_caster_by_pos:
                 if pos < len(args):
-                    if isinstance(args[pos], (list, ListConfig)):
+                    if _is_castable(args[pos]):
                         args[pos] = list_caster_by_pos[pos](args[pos])
                 else:
                     # pos is inserted in dict in ascending order
@@ -193,7 +204,7 @@ def coerce_sequences(obj: _T) -> _T:
             named = set(list_caster_by_name).intersection(kwargs)
             for name in named:
                 # at least one named-arg needs to be cast
-                if isinstance(kwargs[name], (list, ListConfig)):
+                if _is_castable(kwargs[name]):
                     kwargs[name] = list_caster_by_name[name](kwargs[name])
 
         return obj(*args, **kwargs)

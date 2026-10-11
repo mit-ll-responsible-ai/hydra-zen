@@ -44,6 +44,7 @@ class partial_with_wrapper(partial[T]):
         cls,
         wrappers: Wrappers,
         func: Callable[..., T],
+        /,
         *args: Any,
         **keywords: Any,
     ) -> "partial_with_wrapper[T]":

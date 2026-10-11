@@ -86,7 +86,7 @@ def test_overrides_roundtrip(
         "+mrun": multirun(mrun),
     }
     (jobs,) = launch(
-        make_config(), instantiate, overrides, multirun=True, version_base="1.2"
+        make_config(), instantiate, overrides, multirun=True, version_base=None
     )
 
     assert len(jobs) == len(mrun)
@@ -141,7 +141,7 @@ def test_overrides_kwargs_roundtrip(
         ["+foo=1"],
         multirun=True,
         **overrides,
-        version_base="1.2",
+        version_base=None,
     )
     jobs1 = launch(
         make_config(),
@@ -149,7 +149,7 @@ def test_overrides_kwargs_roundtrip(
         {"+foo": 2},
         multirun=True,
         **overrides,
-        version_base="1.2",
+        version_base=None,
     )
 
     assert len(jobs[0]) == len(mrun)
@@ -201,7 +201,7 @@ def test_overrides_yaml(
         overrides["hydra.job.chdir"] = True
 
     (jobs,) = launch(
-        make_config(), instantiate, overrides, multirun=True, version_base="1.2"
+        make_config(), instantiate, overrides, multirun=True, version_base=None
     )
 
     assert len(jobs) == len(mrun)

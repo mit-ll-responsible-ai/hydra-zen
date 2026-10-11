@@ -69,3 +69,9 @@ if not TYPE_CHECKING:
         __version__ = "unknown version"
 else:  # pragma: no cover
     __version__: str
+
+# must run after hydra_zen.funcs is importable
+from hydra_zen._hydra14_compat import apply_partial_with_wrapper_patch
+
+apply_partial_with_wrapper_patch()
+del apply_partial_with_wrapper_patch

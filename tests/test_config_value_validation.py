@@ -19,7 +19,11 @@ from hydra_zen import (
     make_config,
     to_yaml,
 )
-from hydra_zen._compatibility import ZEN_SUPPORTED_PRIMITIVES
+from hydra_zen._compatibility import (
+    OMEGACONF_VERSION,
+    ZEN_SUPPORTED_PRIMITIVES,
+    Version,
+)
 from hydra_zen.errors import HydraZenUnsupportedPrimitiveError
 from hydra_zen.structured_configs._implementations import HYDRA_SUPPORTED_PRIMITIVES
 from tests import everything_except
@@ -98,6 +102,14 @@ construction_fn_variations = [
 ]
 
 
+def _config_key_examples(f):
+    # OmegaConf 2.4 made its containers unhashable, so they can't be used as keys
+    if OMEGACONF_VERSION < Version(2, 4, 0):
+        f = example(unsupported={ListConfig([1, 2]): 1})(f)
+        f = example(unsupported={DictConfig({1: 1}): 1})(f)
+    return f
+
+
 @pytest.mark.parametrize(
     "config_construction_fn",
     construction_fn_variations,
@@ -120,8 +132,7 @@ construction_fn_variations = [
 @example(unsupported={make_dataclass(1): 1})
 @example(unsupported={SomeType: 1})
 @example(unsupported={1j: 1})
-@example(unsupported={ListConfig([1, 2]): 1})
-@example(unsupported={DictConfig({1: 1}): 1})
+@_config_key_examples
 @settings(
     max_examples=20,
     deadline=None,

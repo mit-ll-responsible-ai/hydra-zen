@@ -23,11 +23,32 @@ from hydra.core.global_hydra import GlobalHydra
 from hydra.core.utils import JobReturn, run_job
 from hydra.plugins.sweeper import Sweeper
 from hydra.types import HydraContext, RunMode
+from hydra.utils import instantiate as hydra_instantiate
 from omegaconf import DictConfig, ListConfig, OmegaConf
 from typing_extensions import Literal, TypeAlias
 
+from hydra_zen._compatibility import (
+    HYDRA_HAS_EXECUTION_POLICY,
+    HYDRA_TARGET_POLICY_MODULE,
+)
 from hydra_zen._hydra_overloads import instantiate
 from hydra_zen.typing._implementations import DataClass_, InstOrType
+
+
+def _instantiate_plugin(plugin_cfg: Any) -> Any:
+    if HYDRA_TARGET_POLICY_MODULE is not None:  # pragma: no cover
+        # Hydra 1.3.7+ only permits `hydra._internal.*` plugin targets within a
+        # trusted context; mirrors `hydra.core.plugins.Plugins._instantiate`
+        from hydra._internal.utils import _get_cls_name
+
+        classname = _get_cls_name(plugin_cfg, pop=False)
+        kwargs = (
+            {"_execution_whitelist_": classname} if HYDRA_HAS_EXECUTION_POLICY else {}
+        )
+        with HYDRA_TARGET_POLICY_MODULE._trusted_internal_target(classname):
+            return hydra_instantiate(plugin_cfg, _recursive_=False, **kwargs)
+    return instantiate(plugin_cfg)  # pragma: no cover
+
 
 T = TypeVar("T", bound=Any)
 HydraPrimitives: TypeAlias = Union[None, int, float, bool, str, dict[str, str]]
@@ -459,7 +480,7 @@ def launch(
             _ = job.return_value
         else:
             # Instantiate sweeper without using Hydra's Plugin discovery (Zen!)
-            sweeper = instantiate(cfg.hydra.sweeper)
+            sweeper = _instantiate_plugin(cfg.hydra.sweeper)
             assert isinstance(sweeper, Sweeper)
             sweeper.setup(
                 config=cfg,

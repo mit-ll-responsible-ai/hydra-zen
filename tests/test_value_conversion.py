@@ -26,7 +26,12 @@ from hydra_zen import (
     mutable_value,
     to_yaml,
 )
-from hydra_zen._compatibility import ZEN_SUPPORTED_PRIMITIVES
+from hydra_zen._compatibility import (
+    HYDRA_VERSION,
+    OMEGACONF_VERSION,
+    ZEN_SUPPORTED_PRIMITIVES,
+    Version,
+)
 from hydra_zen.structured_configs._implementations import ZEN_VALUE_CONVERSION
 from hydra_zen.typing import Partial
 from tests import is_same
@@ -200,7 +205,6 @@ def test_pickle_compatibility(Config):
         Bbool,
         Bnone,
         Benum,
-        Blistconfig,
         Bset,
         Bfrozenset,
         Bcomplex,
@@ -212,7 +216,9 @@ def test_pickle_compatibility(Config):
         Brange2,
         Bcounter,
         Bdefaultdict,
-    ],
+    ]
+    # OmegaConf 2.4 made its containers unhashable
+    + ([Blistconfig] if OMEGACONF_VERSION < Version(2, 4, 0) else []),
 )
 def test_unsafe_hash_default(Config):
     assert Config().x.__hash__ is not None
@@ -425,7 +431,9 @@ def identity_with_dict_default(x={"a": 1}):
     return x
 
 
-@pytest.mark.xfail
+@pytest.mark.xfail(
+    HYDRA_VERSION < Version(1, 4, 0), reason="fixed in Hydra 1.4", strict=True
+)
 def test_known_failcase_hydra_2350():
     # https://github.com/facebookresearch/hydra/issues/2350
     # Overriding a default-value dictionary via instantiate interface results

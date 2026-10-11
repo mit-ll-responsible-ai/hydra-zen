@@ -1,11 +1,13 @@
 # Copyright (c) 2026 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+import importlib
 from collections import Counter, defaultdict, deque
 from datetime import timedelta
 from enum import Enum
 from functools import partial
 from pathlib import Path, PosixPath, WindowsPath
-from typing import Final, NamedTuple
+from types import ModuleType
+from typing import Final, NamedTuple, Optional
 
 import hydra
 import omegaconf
@@ -80,3 +82,23 @@ HYDRA_SUPPORTS_OBJECT_CONVERT = HYDRA_VERSION >= Version(1, 3, 0)
 # pathlib._local.* paths (which Python 3.13 emits for pathlib.Path et al.).
 # On older OmegaConf we monkey-patch those constructors in ourselves.
 OMEGACONF_HANDLES_PATHLIB_LOCAL = OMEGACONF_VERSION >= Version(2, 4, 0)
+
+
+# Hydra 1.3.6 added a policy that authorizes targets during instantiation
+# (`hydra._internal.target_policy`), which Hydra 1.4 reworked into an execution
+# policy (`hydra._internal.execution_policy`). We feature-detect these rather
+# than compare versions because Hydra 1.4 dev-builds report the same version.
+def _find_target_policy_module() -> Optional[ModuleType]:  # pragma: no cover
+    for name in ("execution_policy", "target_policy"):
+        try:
+            return importlib.import_module(f"hydra._internal.{name}")
+        except ImportError:
+            pass
+    return None
+
+
+HYDRA_TARGET_POLICY_MODULE: Final = _find_target_policy_module()
+HYDRA_HAS_EXECUTION_POLICY: Final = (
+    HYDRA_TARGET_POLICY_MODULE is not None
+    and HYDRA_TARGET_POLICY_MODULE.__name__ == "hydra._internal.execution_policy"
+)
