@@ -151,9 +151,11 @@ def test_hydra_type_validation_works(input_type):
     else:
         assert False
 
-    instantiate(Conf, x=1)
+    # Hydra 1.4 no longer validates call-site overrides to `instantiate`, thus we
+    # check the config's annotation via merging
+    assert instantiate(OmegaConf.merge(Conf, {"x": 1})).x == 1
     with pytest.raises(ValidationError):
-        instantiate(Conf, x="hi")
+        OmegaConf.merge(Conf, {"x": "hi"})
 
 
 @settings(max_examples=500, deadline=None)

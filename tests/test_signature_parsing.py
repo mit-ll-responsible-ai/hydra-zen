@@ -12,6 +12,7 @@ from typing import Any, Callable, Optional, get_type_hints
 import hypothesis.strategies as st
 import pytest
 from hypothesis import given, note, settings
+from omegaconf import OmegaConf
 from omegaconf.errors import ValidationError
 
 from hydra_zen import (
@@ -338,8 +339,13 @@ def f_with_dataclass_annotation(x: BuildsInt = BuildsInt()):
 
 
 instantiaters = [
+    # Hydra 1.4 no longer validates call-site overrides to `instantiate` (and passes
+    # dataclass instances through as-is), thus we provide `x` via merging
     lambda x: instantiate(
-        builds(f_with_dataclass_annotation, populate_full_signature=True), x=x
+        OmegaConf.merge(
+            builds(f_with_dataclass_annotation, populate_full_signature=True),
+            {"x": x},
+        )
     ),
     lambda x: instantiate(builds(f_with_dataclass_annotation, x=x)),
 ]
@@ -410,7 +416,7 @@ def test_type_widening_for_interpolated_field_is_needed():
         x: str = "${A}"
 
     with pytest.raises(ValidationError):
-        instantiate(Config, x=builds(str))
+        OmegaConf.merge(Config, {"x": builds(str)})
 
 
 def test_type_widening_for_interpolated_field():
