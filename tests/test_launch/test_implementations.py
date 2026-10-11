@@ -7,13 +7,14 @@ from typing import Optional
 
 import pytest
 from hydra.core.config_store import ConfigStore
-from hydra.core.override_parser.overrides_parser import OverridesParser
 from hydra.errors import ConfigCompositionException
 from hydra.plugins.sweeper import Sweeper
 from omegaconf.omegaconf import OmegaConf
 
 from hydra_zen import builds, instantiate, launch, make_config
+from hydra_zen._compatibility import HYDRA_VERSION, Version
 from hydra_zen._launch import _store_config
+from hydra_zen.errors import HydraZenValidationError
 
 try:
     import cloudpickle
@@ -153,38 +154,9 @@ def test_launch_with_multirun_overrides(version_base):
 ###############################################
 
 
-class LocalBasicSweeper(Sweeper):
-    def setup(self, *, hydra_context, task_function, config):
-        from hydra.core.plugins import Plugins
-
-        self.hydra_context = hydra_context
-        self.config = config
-        self.launcher = Plugins.instance().instantiate_launcher(
-            hydra_context=hydra_context,
-            task_function=task_function,
-            config=config,
-        )
-
-    def sweep(self, arguments):
-        assert self.launcher is not None
-        assert self.hydra_context is not None
-
-        parser = OverridesParser.create(config_loader=self.hydra_context.config_loader)
-        override = parser.parse_overrides(arguments)[0]
-        key = override.get_key_element()
-        sweep = [f"{key}={val}" for val in override.sweep_string_iterator()]
-        overrides = [[x] for x in sweep]
-
-        returns = []
-        for i, batch in enumerate(overrides):
-            result = self.launcher.launch([batch], initial_job_idx=i)[0]
-            returns.append(result)
-
-        return [returns]
-
-
-cs = ConfigStore.instance()
-cs.store(group="hydra/sweeper", name="local_test", node=builds(LocalBasicSweeper))
+# `hydra/sweeper=local_test` is provided by the test-local plugin package in
+# tests/plugins/hydra_plugins/hydra_zen_local_sweeper. Hydra admits a sweeper
+# only when it is defined under `hydra_plugins`, so it cannot live here.
 
 
 @pytest.mark.usefixtures("cleandir")
@@ -203,10 +175,92 @@ def test_launch_with_multirun_plugin(plugin, version_base):
         assert j.return_value == {"a": i + 1, "b": 1}
 
 
+class UnregisteredLocalSweeper(Sweeper):
+    def setup(self, *, hydra_context, task_function, config):
+        pass
+
+    def sweep(self, arguments):
+        return []
+
+
+@pytest.mark.usefixtures("cleandir", "clean_store")
+def test_launch_rejects_sweeper_defined_outside_hydra_plugins(version_base):
+    # `launch` constructs the sweeper via Hydra's plugin registry, which admits
+    # only classes defined under the `hydra_plugins` namespace package -- the
+    # same rule the Hydra CLI applies. Storing a config for a sweeper defined
+    # elsewhere is not enough.
+    ConfigStore.instance().store(
+        group="hydra/sweeper",
+        name="unregistered_test",
+        node=builds(UnregisteredLocalSweeper),
+    )
+    # Hydra 1.4 reports "Unknown plugin class" (plugins may be entry points)
+    with pytest.raises(RuntimeError, match="hydra_plugins|Unknown plugin class"):
+        launch(
+            builds(dict, a=1),
+            instantiate,
+            overrides=["hydra/sweeper=unregistered_test", "a=1,2"],
+            multirun=True,
+            **version_base,
+        )
+
+
+def _identity_wrapper(f):
+    return f
+
+
+@pytest.mark.usefixtures("cleandir", "clean_store")
+@pytest.mark.parametrize(
+    "zen_feature", [dict(zen_meta=dict(note="x")), dict(zen_wrappers=_identity_wrapper)]
+)
+def test_launch_rejects_zen_processed_sweeper_config(zen_feature, version_base):
+    # A hydra_plugins sweeper whose *config* uses a zen feature has `_target_`
+    # pointing at hydra-zen's zen-processing shim, which Hydra's registry
+    # cannot accept as a plugin class. `launch` explains that rather than
+    # surfacing Hydra's "Invalid plugin 'hydra_zen.funcs.zen_processing'".
+    # (Inheriting the feature through `builds_bases` produces the same
+    # `_target_`, so the message describes the target, not how it was built.)
+    from hydra_plugins.hydra_zen_local_sweeper.local_basic_sweeper import (
+        LocalBasicSweeper,
+    )
+
+    ConfigStore.instance().store(
+        group="hydra/sweeper",
+        name="zen_feature_test",
+        node=builds(LocalBasicSweeper, **zen_feature),
+    )
+    with pytest.raises(HydraZenValidationError, match="cannot be used on the sweeper"):
+        launch(
+            builds(dict, a=1),
+            instantiate,
+            overrides=["hydra/sweeper=zen_feature_test", "a=1,2"],
+            multirun=True,
+            **version_base,
+        )
+
+
+@pytest.mark.usefixtures("cleandir")
+def test_launch_leaves_a_non_dict_sweeper_node_to_hydra(version_base):
+    # `hydra.sweeper=null` must reach Hydra's own "not configured" error, not
+    # trip over the zen-processing pre-check.
+    with pytest.raises(RuntimeError, match="sweeper is not configured"):
+        launch(
+            builds(dict, a=1),
+            instantiate,
+            overrides=["hydra.sweeper=null", "a=1,2"],
+            multirun=True,
+            **version_base,
+        )
+
+
 @pytest.mark.filterwarnings(
     "ignore:Future Hydra versions will no longer change working directory"
 )
-@pytest.mark.parametrize("version_base", ["1.1", "1.2", None])
+@pytest.mark.parametrize(
+    "version_base",
+    # Hydra 1.4 removed support for legacy version_base values
+    ["1.1", "1.2", None] if HYDRA_VERSION < Version(1, 4, 0) else [None],
+)
 @pytest.mark.usefixtures("cleandir")
 def test_version_base(version_base: Optional[str]):
     def task(cfg):

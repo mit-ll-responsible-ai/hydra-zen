@@ -17,7 +17,11 @@ from hydra_zen import (
     make_config,
     mutable_value,
 )
-from hydra_zen._compatibility import HYDRA_SUPPORTS_OBJECT_CONVERT
+from hydra_zen._compatibility import (
+    HYDRA_SUPPORTS_OBJECT_CONVERT,
+    OMEGACONF_VERSION,
+    Version,
+)
 
 get_obj_path = DefaultBuilds._get_obj_path
 
@@ -128,10 +132,18 @@ def test_hydra_convert(
     )
     assert actual_types == expected_types
 
-    if convert in ("none", "partial", NotSet):
-        expected_field_type = ListConfig
+    # OmegaConf 2.4 represents tuples as TupleConfig, rather than ListConfig
+    if OMEGACONF_VERSION >= Version(2, 4, 0):
+        from omegaconf import TupleConfig
+
+        config_seq_type, native_seq_type = TupleConfig, tuple
     else:
-        expected_field_type = list
+        config_seq_type, native_seq_type = ListConfig, list
+
+    if convert in ("none", "partial", NotSet):
+        expected_field_type = config_seq_type
+    else:
+        expected_field_type = native_seq_type
 
     assert type(out["a_struct_config"]["x"]) is expected_field_type
 

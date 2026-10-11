@@ -29,6 +29,7 @@ from typing import IO, Any, Callable, TypeVar, Union, cast, overload
 from hydra.utils import instantiate as hydra_instantiate
 from omegaconf import MISSING, DictConfig, ListConfig, OmegaConf
 
+from ._compatibility import HYDRA_HAS_EXECUTION_POLICY, HYDRA_TARGET_POLICY_MODULE
 from .structured_configs._implementations import (
     ConfigComplex,
     ConfigPath,
@@ -113,6 +114,82 @@ def _call_target(
             if full_key:
                 msg += f"\nfull_key: {full_key}"
             raise InstantiationException(msg) from e
+
+
+def _call_target_with_policy(
+    _target_: F,
+    _partial_: bool,
+    args: tuple[Any, ...],
+    kwargs: dict[str, Any],
+    full_key: str,
+    execution_whitelist: Any,
+    deferred_call_context: Any,
+    *,
+    target_wrapper: Callable[[F], F],
+) -> Any:  # pragma: no cover
+    """Hydra 1.4+ version of `_call_target`, which applies `target_wrapper`.
+
+    Mirrors `hydra._internal.instantiate._instantiate2._call_target`: the
+    original target is authorized by Hydra's execution policy and only then is
+    the wrapper applied."""
+
+    from hydra._internal.instantiate import _instantiate2
+
+    from hydra_zen.funcs import Wrappers, partial_with_wrapper, zen_processing
+
+    # private Hydra internals; accessed via `Any` as they are not typed
+    policy: Any = HYDRA_TARGET_POLICY_MODULE
+    inst: Any = _instantiate2
+
+    args, kwargs = inst._extract_pos_args(args, kwargs, full_key)
+
+    resolved_target_name = policy._get_resolved_target_name_for_check(_target_)
+    effective_target, effective_args, effective_kwargs = (
+        policy._authorize_target_invocation(
+            _target_,
+            args,
+            kwargs,
+            full_key,
+            execution_whitelist,
+            allow_incomplete_partial=_partial_,
+        )
+    )
+    discovery_path = policy._authorize_discovery_path(
+        effective_target,
+        effective_args,
+        effective_kwargs,
+        full_key,
+        execution_whitelist,
+    )
+
+    if _target_ is zen_processing:
+        kwargs["_zen_target_wrapper"] = target_wrapper
+        call_target = _target_
+    elif _partial_:
+        try:
+            return partial_with_wrapper[Any](
+                cast(Wrappers, (target_wrapper,)), _target_, *args, **kwargs
+            )
+        except Exception as e:
+            policy._add_full_key_note(e, full_key)
+            raise
+    else:
+        call_target = target_wrapper(_target_)
+
+    try:
+        result = call_target(*args, **kwargs)
+    except Exception as e:
+        policy._add_full_key_note(e, full_key)
+        raise
+
+    return policy._mediate_target_result(
+        result,
+        discovery_path or resolved_target_name,
+        full_key,
+        execution_whitelist,
+        discovery_path=discovery_path,
+        call_context=deferred_call_context,
+    )
 
 
 class _TightBind:  # pragma: no cover
@@ -325,7 +402,13 @@ def instantiate(
     old = inst._call_target
     try:
         new_call_target = cast(
-            F, partial(_call_target, target_wrapper=_target_wrapper_)
+            F,
+            partial(
+                _call_target_with_policy
+                if HYDRA_HAS_EXECUTION_POLICY
+                else _call_target,
+                target_wrapper=_target_wrapper_,
+            ),
         )
         inst._call_target = new_call_target
         return hydra_instantiate(config, *args, **kwargs)

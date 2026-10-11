@@ -1368,9 +1368,9 @@ class BuildsFn(Generic[T]):
             type_value in _utils.KNOWN_MUTABLE_TYPES
             and type_value in HYDRA_SUPPORTED_PRIMITIVES
         ) or (
-            is_dataclass(value)
-            and not isinstance(value, type)
-            and value.__hash__ is None
+            # dataclasses reject unhashable defaults (e.g. dataclass instances, or
+            # OmegaConf containers, which are unhashable as of OmegaConf 2.4)
+            not isinstance(value, type) and value.__hash__ is None
         ):
             return cast(
                 Field[Any],

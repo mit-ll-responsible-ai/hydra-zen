@@ -121,7 +121,8 @@ def test_just_on_pydantic_dataclass(config_maker):
 def test_pydantic_runtime_type_checking():
     Conf = builds(User, populate_full_signature=True, hydra_convert="all")
     inst_bad = Conf(id=22, height=-50, age=-100)
-    with pytest.raises(InstantiationException):
+    # Hydra 1.4 no longer wraps target exceptions in InstantiationException
+    with pytest.raises((InstantiationException, pydantic.ValidationError)):
         instantiate(inst_bad)  # pydantic raises on invalid height
 
     inst_good = instantiate(Conf(id=22, height=50, age=25))

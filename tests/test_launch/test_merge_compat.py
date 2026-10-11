@@ -46,4 +46,4 @@ def test_merge_prevented_by_frozen_regression():
     )
     store(Model, group="model")
     store.add_to_hydra_store()
-    launch(Config, zen(app), version_base="1.2")
+    launch(Config, zen(app), version_base=None)

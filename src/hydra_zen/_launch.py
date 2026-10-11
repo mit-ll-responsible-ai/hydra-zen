@@ -20,13 +20,14 @@ from hydra import initialize
 from hydra._internal.callbacks import Callbacks
 from hydra.core.config_store import ConfigStore
 from hydra.core.global_hydra import GlobalHydra
+from hydra.core.plugins import Plugins
 from hydra.core.utils import JobReturn, run_job
-from hydra.plugins.sweeper import Sweeper
 from hydra.types import HydraContext, RunMode
 from omegaconf import DictConfig, ListConfig, OmegaConf
 from typing_extensions import Literal, TypeAlias
 
-from hydra_zen._hydra_overloads import instantiate
+from hydra_zen.errors import HydraZenValidationError
+from hydra_zen.structured_configs._globals import ZEN_PROCESSING_LOCATION
 from hydra_zen.typing._implementations import DataClass_, InstOrType
 
 T = TypeVar("T", bound=Any)
@@ -458,10 +459,35 @@ def launch(
             # access the result to trigger an exception in case the job failed.
             _ = job.return_value
         else:
-            # Instantiate sweeper without using Hydra's Plugin discovery (Zen!)
-            sweeper = instantiate(cfg.hydra.sweeper)
-            assert isinstance(sweeper, Sweeper)
-            sweeper.setup(
+            # Resolve the sweeper through Hydra's plugin registry rather than
+            # instantiating `cfg.hydra.sweeper` directly. Hydra >= 1.3.7 refuses
+            # to instantiate `hydra._internal.*` targets named by declarative
+            # config -- which is what the stock `hydra/sweeper=basic` selects --
+            # and exempts only the plugins it constructs itself. This is the
+            # supported path: it checks that the class is a registered plugin,
+            # instantiates it, and calls `setup()` on it.
+            #
+            # The registry reads the config's `_target_` as the plugin class, so
+            # a sweeper config whose `_target_` is hydra-zen's zen-processing
+            # shim (what zen_meta / zen_wrappers produce, also via
+            # builds_bases) is refused with a message about hydra-zen
+            # internals. Say what actually went wrong instead. Anything that is
+            # not a DictConfig is left for Hydra to report in its own words.
+            sweeper_cfg = cfg.hydra.sweeper
+            if (
+                isinstance(sweeper_cfg, DictConfig)
+                and sweeper_cfg.get("_target_") == ZEN_PROCESSING_LOCATION
+            ):
+                raise HydraZenValidationError(
+                    "`launch` constructs the sweeper through Hydra's plugin "
+                    "registry, which requires the sweeper config's `_target_` "
+                    "to name the plugin class directly. This sweeper config's "
+                    f"`_target_` is `{ZEN_PROCESSING_LOCATION}` -- hydra-zen's "
+                    "zen-processing shim, which `zen_meta` and `zen_wrappers` "
+                    "produce (including when inherited through `builds_bases`). "
+                    "Those features cannot be used on the sweeper config."
+                )
+            sweeper = Plugins.instance().instantiate_sweeper(
                 config=cfg,
                 hydra_context=hydra_context,
                 task_function=task_function,
