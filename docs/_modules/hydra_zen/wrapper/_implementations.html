@@ -462,18 +462,18 @@
     <span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <span class="n">BuildsFn</span>
 
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;zen&quot;</span><span class="p">,</span> <span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="s2">&quot;Zen&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"zen"</span><span class="p">,</span> <span class="s2">"store"</span><span class="p">,</span> <span class="s2">"Zen"</span><span class="p">]</span>
 
 <span class="n">PreCall</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Optional</span><span class="p">[</span>
     <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]]</span>
 <span class="p">]</span>
 
-<span class="n">R</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;R&quot;</span><span class="p">)</span>
-<span class="n">P</span> <span class="o">=</span> <span class="n">ParamSpec</span><span class="p">(</span><span class="s2">&quot;P&quot;</span><span class="p">)</span>
-<span class="n">P2</span> <span class="o">=</span> <span class="n">ParamSpec</span><span class="p">(</span><span class="s2">&quot;P2&quot;</span><span class="p">)</span>
-<span class="n">R2</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;R2&quot;</span><span class="p">)</span>
-<span class="n">F</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;F&quot;</span><span class="p">)</span>
-<span class="n">F2</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;F2&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
+<span class="n">R</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"R"</span><span class="p">)</span>
+<span class="n">P</span> <span class="o">=</span> <span class="n">ParamSpec</span><span class="p">(</span><span class="s2">"P"</span><span class="p">)</span>
+<span class="n">P2</span> <span class="o">=</span> <span class="n">ParamSpec</span><span class="p">(</span><span class="s2">"P2"</span><span class="p">)</span>
+<span class="n">R2</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"R2"</span><span class="p">)</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"F"</span><span class="p">)</span>
+<span class="n">F2</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"F2"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
 
 
 <span class="n">_UNSPECIFIED_</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="nb">object</span><span class="p">()</span>
@@ -515,7 +515,7 @@
 <div class="viewcode-block" id="Zen">
 <a class="viewcode-back" href="../../../generated/hydra_zen.wrapper.Zen.html#hydra_zen.Zen">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Zen</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Implements the wrapping logic that is exposed by `hydra_zen.zen`</span>
+<span class="w">    </span><span class="sd">"""Implements the wrapping logic that is exposed by `hydra_zen.zen`</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -525,19 +525,19 @@
 <span class="sd">    CFG_NAME : str</span>
 <span class="sd">        The reserved parameter name specifies to pass the input config through</span>
 <span class="sd">        to the inner function. Can be overwritted via subclassing. Defaults</span>
-<span class="sd">        to &#39;zen_cfg&#39;</span>
+<span class="sd">        to 'zen_cfg'</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
-<span class="sd">    zen : A decorator that returns a function that will auto-extract, resolve, and instantiate fields from an input config based on the decorated function&#39;s signature.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    zen : A decorator that returns a function that will auto-extract, resolve, and instantiate fields from an input config based on the decorated function's signature.</span>
+<span class="sd">    """</span>
 
     <span class="c1"># Specifies reserved parameter name specified to pass the</span>
     <span class="c1"># config through to the task function</span>
-    <span class="n">CFG_NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;zen_cfg&quot;</span>
+    <span class="n">CFG_NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"zen_cfg"</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;zen[</span><span class="si">{</span><span class="p">(</span><span class="n">safe_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">))</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span><span class="si">}</span><span class="s2">)](cfg, /)&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"zen[</span><span class="si">{</span><span class="p">(</span><span class="n">safe_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">))</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span><span class="si">}</span><span class="s2">)](cfg, /)"</span>
 
 <div class="viewcode-block" id="Zen.__init__">
 <a class="viewcode-back" href="../../../generated/hydra_zen.wrapper.Zen.html#hydra_zen.Zen.__init__">[docs]</a>
@@ -552,14 +552,14 @@
         <span class="n">run_in_context</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">instantiation_wrapper</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">F2</span><span class="p">],</span> <span class="n">F2</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        func : Callable[Sig, R], positional-only</span>
 <span class="sd">            The function being wrapped.</span>
 
 <span class="sd">        unpack_kwargs: bool, optional (default=False)</span>
-<span class="sd">            If `True` a `**kwargs` field in the wrapped function&#39;s signature will be</span>
+<span class="sd">            If `True` a `**kwargs` field in the wrapped function's signature will be</span>
 <span class="sd">            populated by all of the input config entries that are not specified by the rest</span>
 <span class="sd">            of the signature (and that are not specified by the `exclude` argument).</span>
 
@@ -578,7 +578,7 @@
 <span class="sd">            are called.</span>
 
 <span class="sd">        exclude : Optional[str | Iterable[str]]</span>
-<span class="sd">            Specifies one or more parameter names in the function&#39;s signature</span>
+<span class="sd">            Specifies one or more parameter names in the function's signature</span>
 <span class="sd">            that will not be extracted from input configs by the zen-wrapped function.</span>
 
 <span class="sd">            A single string of comma-separated names can be specified.</span>
@@ -597,9 +597,9 @@
 
 <span class="sd">            This can be used to introduce a layer of validation or logging</span>
 <span class="sd">            to all instantiation calls in your application.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">run_in_context</span> <span class="ow">and</span> <span class="n">iscoroutinefunction</span><span class="p">(</span><span class="n">__func</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">run_in_context</span><span class="si">=}</span><span class="s2"> is not supported for async functions.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"`</span><span class="si">{</span><span class="n">run_in_context</span><span class="si">=}</span><span class="s2"> is not supported for async functions."</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]</span> <span class="o">=</span> <span class="n">__func</span>
         <span class="k">try</span><span class="p">:</span>
@@ -609,21 +609,21 @@
             <span class="p">)</span>
         <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">HydraZenValidationError</span><span class="p">(</span>
-                <span class="s2">&quot;hydra_zen.zen can only wrap callables that possess inspectable &quot;</span>
-                <span class="s2">&quot;signatures.&quot;</span>
+                <span class="s2">"hydra_zen.zen can only wrap callables that possess inspectable "</span>
+                <span class="s2">"signatures."</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">unpack_kwargs</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`unpack_kwargs` must be type `bool` got </span><span class="si">{</span><span class="n">unpack_kwargs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"`unpack_kwargs` must be type `bool` got </span><span class="si">{</span><span class="n">unpack_kwargs</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resolve_pre_call</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;`resolve_pre_call` must be type `bool` got </span><span class="si">{</span><span class="n">resolve_pre_call</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"`resolve_pre_call` must be type `bool` got </span><span class="si">{</span><span class="n">resolve_pre_call</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">run_in_context</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;`run_in_context` must be type `bool` got </span><span class="si">{</span><span class="n">run_in_context</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"`run_in_context` must be type `bool` got </span><span class="si">{</span><span class="n">run_in_context</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_instantiation_wrapper</span> <span class="o">=</span> <span class="n">instantiation_wrapper</span>
@@ -639,7 +639,7 @@
         <span class="k">if</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_exclude</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exclude</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_exclude</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">exclude</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_exclude</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">exclude</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">)}</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_exclude</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">exclude</span><span class="p">)</span>
 
@@ -665,8 +665,8 @@
 
             <span class="k">if</span> <span class="n">run_in_context</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_f</span><span class="p">,</span> <span class="n">Zen</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_f</span><span class="o">.</span><span class="n">_run_in_context</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">HydraZenValidationError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;zen-wrapped pre_call function </span><span class="si">{</span><span class="n">_f</span><span class="si">!r}</span><span class="s2"> cannot specify &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;`run_in_context=True` when the main wrapper specifies it as well.&quot;</span>
+                    <span class="sa">f</span><span class="s2">"zen-wrapped pre_call function </span><span class="si">{</span><span class="n">_f</span><span class="si">!r}</span><span class="s2"> cannot specify "</span>
+                    <span class="sa">f</span><span class="s2">"`run_in_context=True` when the main wrapper specifies it as well."</span>
                 <span class="p">)</span>
 
             <span class="n">_f_params</span> <span class="o">=</span> <span class="n">signature</span><span class="p">(</span><span class="n">_f</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>  <span class="c1"># type: ignore</span>
@@ -675,8 +675,8 @@
                 <span class="n">_f_params</span>
             <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">HydraZenValidationError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;pre_call function </span><span class="si">{</span><span class="n">_f</span><span class="si">}</span><span class="s2"> must be able to accept a single &quot;</span>
-                    <span class="s2">&quot;positional argument&quot;</span>
+                    <span class="sa">f</span><span class="s2">"pre_call function </span><span class="si">{</span><span class="n">_f</span><span class="si">}</span><span class="s2"> must be able to accept a single "</span>
+                    <span class="s2">"positional argument"</span>
                 <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">pre_call</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span>
@@ -704,22 +704,22 @@
         <span class="k">elif</span> <span class="ow">not</span> <span class="n">OmegaConf</span><span class="o">.</span><span class="n">is_config</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
                 <span class="k">raise</span> <span class="n">HydraZenValidationError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;`cfg` must be a dataclass, dict/DictConfig, or &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;dict-style yaml-string. Got </span><span class="si">{</span><span class="n">cfg</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">"`cfg` must be a dataclass, dict/DictConfig, or "</span>
+                    <span class="sa">f</span><span class="s2">"dict-style yaml-string. Got </span><span class="si">{</span><span class="n">cfg</span><span class="si">}</span><span class="s2">"</span>
                 <span class="p">)</span>
             <span class="n">cfg</span> <span class="o">=</span> <span class="n">OmegaConf</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">HydraZenValidationError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;`cfg` must be a dataclass, dict/DictConfig, or &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;dict-style yaml-string. Got </span><span class="si">{</span><span class="n">cfg</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"`cfg` must be a dataclass, dict/DictConfig, or "</span>
+                <span class="sa">f</span><span class="s2">"dict-style yaml-string. Got </span><span class="si">{</span><span class="n">cfg</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">cfg</span>
 
 <div class="viewcode-block" id="Zen.validate">
 <a class="viewcode-back" href="../../../generated/hydra_zen.wrapper.Zen.html#hydra_zen.Zen.validate">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__cfg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ConfigLike</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validates the input config based on the decorated function without calling said function.</span>
+<span class="w">        </span><span class="sd">"""Validates the input config based on the decorated function without calling said function.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -731,7 +731,7 @@
 <span class="sd">        ------</span>
 <span class="sd">        HydraValidationError</span>
 <span class="sd">            `cfg` is not a valid input to the zen-wrapped function.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">for</span> <span class="n">_f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pre_call_iterable</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_f</span><span class="p">,</span> <span class="n">Zen</span><span class="p">):</span>
                 <span class="n">_f</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">__cfg</span><span class="p">)</span>
@@ -742,18 +742,18 @@
             <span class="n">p</span><span class="o">.</span><span class="n">kind</span> <span class="ow">is</span> <span class="n">p</span><span class="o">.</span><span class="n">POSITIONAL_ONLY</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
         <span class="p">)</span>
 
-        <span class="n">_args_</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="s2">&quot;_args_&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">_args_</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="s2">"_args_"</span><span class="p">,</span> <span class="p">[])</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_args_</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">HydraZenValidationError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;`cfg._args_` must be a sequence type (e.g. a list), got </span><span class="si">{</span><span class="n">_args_</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"`cfg._args_` must be a sequence type (e.g. a list), got </span><span class="si">{</span><span class="n">_args_</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">num_pos_only</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">_args_</span><span class="p">)</span> <span class="o">!=</span> <span class="n">num_pos_only</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">HydraZenValidationError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="si">}</span><span class="s2"> has </span><span class="si">{</span><span class="n">num_pos_only</span><span class="si">}</span><span class="s2"> positional-only arguments, but &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;`cfg` specifies </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;_args_&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[]))</span><span class="si">}</span><span class="s2"> positional &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;arguments via `_args_`.&quot;</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="si">}</span><span class="s2"> has </span><span class="si">{</span><span class="n">num_pos_only</span><span class="si">}</span><span class="s2"> positional-only arguments, but "</span>
+                <span class="sa">f</span><span class="s2">"`cfg` specifies </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span><span class="w"> </span><span class="s1">'_args_'</span><span class="p">,</span><span class="w"> </span><span class="p">[]))</span><span class="si">}</span><span class="s2"> positional "</span>
+                <span class="sa">f</span><span class="s2">"arguments via `_args_`."</span>
             <span class="p">)</span>
 
         <span class="n">missing_params</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
@@ -769,14 +769,14 @@
 
         <span class="k">if</span> <span class="n">missing_params</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">HydraZenValidationError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;`cfg` is missing the following fields: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing_params</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"`cfg` is missing the following fields: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing_params</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">instantiate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__c</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiates each config that is extracted by `zen` before calling the wrapped function.</span>
+<span class="w">        </span><span class="sd">"""Instantiates each config that is extracted by `zen` before calling the wrapped function.</span>
 
-<span class="sd">        Overwrite this to change `ZenWrapper`&#39;s instantiation behavior.&quot;&quot;&quot;</span>
+<span class="sd">        Overwrite this to change `ZenWrapper`'s instantiation behavior."""</span>
         <span class="n">__c</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">__c</span><span class="p">,</span> <span class="n">_target_wrapper_</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_instantiation_wrapper</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">__c</span><span class="p">,</span> <span class="p">(</span><span class="n">ListConfig</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">)):</span>
@@ -784,12 +784,12 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">__c</span>
 
-    <span class="c1"># TODO: add &quot;extract&quot; option that enables returning dict of fields</span>
+    <span class="c1"># TODO: add "extract" option that enables returning dict of fields</span>
 <div class="viewcode-block" id="Zen.__call__">
 <a class="viewcode-back" href="../../../generated/hydra_zen.wrapper.Zen.html#hydra_zen.Zen.__call__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__cfg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ConfigLike</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">R</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Extracts values from the input config based on the decorated function&#39;s</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Extracts values from the input config based on the decorated function's</span>
 <span class="sd">        signature, resolves &amp; instantiates them, and calls the function with them.</span>
 
 <span class="sd">        Parameters</span>
@@ -805,7 +805,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        func_out : R</span>
 <span class="sd">            The result of `func(&lt;args extracted from cfg&gt;)`</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_cfg</span><span class="p">(</span><span class="n">__cfg</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve</span><span class="p">:</span>
@@ -822,7 +822,7 @@
             <span class="p">)</span>
             <span class="n">pre_call</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
 
-        <span class="n">args_</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="s2">&quot;_args_&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="n">args_</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="s2">"_args_"</span><span class="p">,</span> <span class="p">[]))</span>
 
         <span class="n">cfg_kwargs</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">name</span><span class="p">:</span> <span class="p">(</span>
@@ -870,7 +870,7 @@
         <span class="n">config_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">version_base</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">_UNSPECIFIED_</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Generates a Hydra-CLI for the wrapped function. Equivalent to `hydra.main(zen(func), [...])()`</span>
 
 <span class="sd">        Parameters</span>
@@ -893,13 +893,13 @@
 
 <span class="sd">            - If the version_base parameter is not specified, Hydra 1.x will use defaults compatible with version 1.1. Also in this case, a warning is issued to indicate an explicit version_base is preferred.</span>
 <span class="sd">            - If the version_base parameter is None, then the defaults are chosen for the current minor Hydra version. For example for Hydra 1.2, then would imply config_path=None and hydra.job.chdir=False.</span>
-<span class="sd">            - If the version_base parameter is an explicit version string like &quot;1.1&quot;, then the defaults appropriate to that version are used.</span>
+<span class="sd">            - If the version_base parameter is an explicit version string like "1.1", then the defaults appropriate to that version are used.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        hydra_main : Callable[[Any], Any]</span>
 <span class="sd">            Equivalent to `hydra.main(zen(func), [...])()`</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">kw</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">config_name</span><span class="o">=</span><span class="n">config_name</span><span class="p">)</span>
 
@@ -910,13 +910,13 @@
         <span class="k">if</span> <span class="p">(</span><span class="n">config_path</span> <span class="ow">is</span> <span class="n">_UNSPECIFIED_</span> <span class="ow">and</span> <span class="n">HYDRA_VERSION</span> <span class="o">&lt;</span> <span class="n">Version</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span>
             <span class="p">(</span>
                 <span class="nb">isinstance</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-                <span class="ow">or</span> <span class="p">(</span><span class="n">config_path</span> <span class="ow">is</span> <span class="n">_UNSPECIFIED_</span> <span class="ow">and</span> <span class="n">version_base</span> <span class="o">==</span> <span class="s2">&quot;1.1&quot;</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="p">(</span><span class="n">config_path</span> <span class="ow">is</span> <span class="n">_UNSPECIFIED_</span> <span class="ow">and</span> <span class="n">version_base</span> <span class="o">==</span> <span class="s2">"1.1"</span><span class="p">)</span>
             <span class="p">)</span>
             <span class="ow">and</span> <span class="n">HYDRA_VERSION</span> <span class="o">&lt;</span> <span class="n">Version</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="p">):</span>  <span class="c1"># pragma: no cover</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;Specifying config_path via hydra_zen.zen(...).hydra_main &quot;</span>
-                <span class="s2">&quot;is only supported for Hydra 1.3.0+&quot;</span>
+                <span class="s2">"Specifying config_path via hydra_zen.zen(...).hydra_main "</span>
+                <span class="s2">"is only supported for Hydra 1.3.0+"</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">Version</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">HYDRA_VERSION</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="c1"># Here we create an on-the-fly wrapper so that Hydra can trace</span>
@@ -934,10 +934,10 @@
             <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span>
 
         <span class="k">if</span> <span class="n">config_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_UNSPECIFIED_</span><span class="p">:</span>
-            <span class="n">kw</span><span class="p">[</span><span class="s2">&quot;config_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config_path</span>
+            <span class="n">kw</span><span class="p">[</span><span class="s2">"config_path"</span><span class="p">]</span> <span class="o">=</span> <span class="n">config_path</span>
 
         <span class="k">if</span> <span class="n">version_base</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_UNSPECIFIED_</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-            <span class="n">kw</span><span class="p">[</span><span class="s2">&quot;version_base&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">version_base</span>
+            <span class="n">kw</span><span class="p">[</span><span class="s2">"version_base"</span><span class="p">]</span> <span class="o">=</span> <span class="n">version_base</span>
 
         <span class="k">return</span> <span class="n">hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">)(</span><span class="n">target</span><span class="p">)()</span></div>
 </div>
@@ -985,22 +985,22 @@
     <span class="n">ZenWrapper</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Zen</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Zen</span><span class="p">,</span>
     <span class="n">instantiation_wrapper</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">F2</span><span class="p">],</span> <span class="n">F2</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Callable</span><span class="p">[</span><span class="n">P2</span><span class="p">,</span> <span class="n">R2</span><span class="p">]],</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P2</span><span class="p">,</span> <span class="n">R2</span><span class="p">]],</span> <span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;zen(func, /, pre_call, ZenWrapper)</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""zen(func, /, pre_call, ZenWrapper)</span>
 
 <span class="sd">    A wrapper that returns a function that will auto-extract, resolve, and</span>
-<span class="sd">    instantiate fields from an input config based on the wrapped function&#39;s signature.</span>
+<span class="sd">    instantiate fields from an input config based on the wrapped function's signature.</span>
 
 <span class="sd">    .. code-block:: pycon</span>
 
 <span class="sd">       &gt;&gt;&gt; fn = lambda x, y, z : x+y+z</span>
 <span class="sd">       &gt;&gt;&gt; wrapped_fn = zen(fn)</span>
 
-<span class="sd">       &gt;&gt;&gt; cfg = dict(x=1, y=builds(int, 4), z=&quot;${y}&quot;, unused=100)</span>
+<span class="sd">       &gt;&gt;&gt; cfg = dict(x=1, y=builds(int, 4), z="${y}", unused=100)</span>
 <span class="sd">       &gt;&gt;&gt; wrapped_fn(cfg)  # x=1, y=4, z=4</span>
 <span class="sd">       9</span>
 
 <span class="sd">    The main purpose of `zen` is to enable a user to write/use Hydra-agnostic functions</span>
-<span class="sd">    as the task functions for their Hydra app. See &quot;Notes&quot; for more details.</span>
+<span class="sd">    as the task functions for their Hydra app. See "Notes" for more details.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1008,7 +1008,7 @@
 <span class="sd">        The function being wrapped.</span>
 
 <span class="sd">    unpack_kwargs: bool, optional (default=False)</span>
-<span class="sd">        If `True` a `**kwargs` field in the wrapped function&#39;s signature will be</span>
+<span class="sd">        If `True` a `**kwargs` field in the wrapped function's signature will be</span>
 <span class="sd">        populated by all of the input config entries that are not specified by the rest</span>
 <span class="sd">        of the signature (and that are not specified by the `exclude` argument).</span>
 
@@ -1026,7 +1026,7 @@
 <span class="sd">        interpolation occurs after the pre-call functions are called.</span>
 
 <span class="sd">    exclude : Optional[str | Iterable[str]]</span>
-<span class="sd">        Specifies one or more parameter names in the function&#39;s signature</span>
+<span class="sd">        Specifies one or more parameter names in the function's signature</span>
 <span class="sd">        that will not be extracted from input configs by the zen-wrapped function.</span>
 
 <span class="sd">        A single string of comma-separated names can be specified.</span>
@@ -1056,7 +1056,7 @@
 
 <span class="sd">        The wrapped function is an instance of `hydra_zen.wrapper.Zen` and accepts</span>
 <span class="sd">        a single Hydra config (a dataclass, dictionary, or omegaconf container). The</span>
-<span class="sd">        parameters of the wrapped function&#39;s signature determine the fields that are</span>
+<span class="sd">        parameters of the wrapped function's signature determine the fields that are</span>
 <span class="sd">        extracted from the config; only those fields that are accessed will be resolved</span>
 <span class="sd">        and instantiated.</span>
 
@@ -1081,7 +1081,7 @@
 <span class="sd">               return func(**kwargs)</span>
 <span class="sd">           return wrapped</span>
 
-<span class="sd">    The presence of a parameter named &quot;zen_cfg&quot; in the wrapped function&#39;s signature</span>
+<span class="sd">    The presence of a parameter named "zen_cfg" in the wrapped function's signature</span>
 <span class="sd">    will cause `zen` to pass the full, resolved config to that field. This specific</span>
 <span class="sd">    parameter name can be overridden via `Zen.CFG_NAME`.</span>
 
@@ -1096,18 +1096,18 @@
 <span class="sd">    &gt;&gt;&gt; zen_f = zen(f)</span>
 
 <span class="sd">    The wrapped function – `zen_f` – accepts a single argument: a Hydra-compatible</span>
-<span class="sd">    config that has the attributes &quot;x&quot; and &quot;y&quot;:</span>
+<span class="sd">    config that has the attributes "x" and "y":</span>
 
 <span class="sd">    &gt;&gt;&gt; zen_f</span>
 <span class="sd">    zen[f(x, y)](cfg, /)</span>
 
-<span class="sd">    &quot;Configs&quot; – dataclasses, dictionaries, and omegaconf containers – are acceptable</span>
+<span class="sd">    "Configs" – dataclasses, dictionaries, and omegaconf containers – are acceptable</span>
 <span class="sd">    inputs to zen-wrapped functions. Interpolated fields will be resolved and</span>
 <span class="sd">    sub-configs will be instantiated. Excess fields in the config are unused.</span>
 
 <span class="sd">    &gt;&gt;&gt; zen_f(make_config(x=1, y=2, z=999))  # z is not used</span>
 <span class="sd">    3</span>
-<span class="sd">    &gt;&gt;&gt; zen_f(dict(x=2, y=&quot;${x}&quot;))  # y will resolve to 2</span>
+<span class="sd">    &gt;&gt;&gt; zen_f(dict(x=2, y="${x}"))  # y will resolve to 2</span>
 <span class="sd">    4</span>
 <span class="sd">    &gt;&gt;&gt; zen_f(dict(x=2, y=builds(int, 10)))  # y will instantiate to 10</span>
 <span class="sd">    12</span>
@@ -1119,26 +1119,26 @@
 <span class="sd">    &gt;&gt;&gt; zen_f.func(-1, 1)</span>
 <span class="sd">    0</span>
 
-<span class="sd">    `zen` is compatible with partial&#39;d functions.</span>
+<span class="sd">    `zen` is compatible with partial'd functions.</span>
 
 <span class="sd">    &gt;&gt;&gt; from functools import partial</span>
 <span class="sd">    &gt;&gt;&gt; pf = partial(lambda x, y: x + y, x=10)</span>
 <span class="sd">    &gt;&gt;&gt; zpf = zen(pf)</span>
 <span class="sd">    &gt;&gt;&gt; zpf(dict(y=1))</span>
 <span class="sd">    11</span>
-<span class="sd">    &gt;&gt;&gt; zpf(dict(x=&#39;${y}&#39;, y=1))</span>
+<span class="sd">    &gt;&gt;&gt; zpf(dict(x='${y}', y=1))</span>
 <span class="sd">    2</span>
 
 <span class="sd">    One can specify `exclude` to prevent particular variables from being extracted from</span>
 <span class="sd">    a config:</span>
 
 <span class="sd">    &gt;&gt;&gt; def g(x=1, y=2): return (x, y)</span>
-<span class="sd">    &gt;&gt;&gt; cfg = {&quot;x&quot;: -10, &quot;y&quot;: -20}</span>
+<span class="sd">    &gt;&gt;&gt; cfg = {"x": -10, "y": -20}</span>
 <span class="sd">    &gt;&gt;&gt; zen(g)(cfg)  # extracts x &amp; y from config to call f</span>
 <span class="sd">    (-10, -20)</span>
-<span class="sd">    &gt;&gt;&gt; zen(g, exclude=&quot;x&quot;)(cfg)  # extracts y from config to call f(x=1, ...)</span>
+<span class="sd">    &gt;&gt;&gt; zen(g, exclude="x")(cfg)  # extracts y from config to call f(x=1, ...)</span>
 <span class="sd">    (1, -20)</span>
-<span class="sd">    &gt;&gt;&gt; zen(g, exclude=&quot;x,y&quot;)(cfg)  # defers to f&#39;s defaults</span>
+<span class="sd">    &gt;&gt;&gt; zen(g, exclude="x,y")(cfg)  # defers to f's defaults</span>
 <span class="sd">    (1, 2)</span>
 
 <span class="sd">    Populating a `**kwargs` field via `unpack_kwargs=True`:</span>
@@ -1150,19 +1150,19 @@
 <span class="sd">    &gt;&gt;&gt; zen(h, unpack_kwargs=False)(cfg)</span>
 <span class="sd">    (1, {})</span>
 <span class="sd">    &gt;&gt;&gt; zen(h, unpack_kwargs=True)(cfg)</span>
-<span class="sd">    (1, {&#39;b&#39;: 22})</span>
+<span class="sd">    (1, {'b': 22})</span>
 
 
 <span class="sd">    **Passing Through The Full Input Config**</span>
 
 <span class="sd">    Some task functions require complete access to the full config to gain access to</span>
-<span class="sd">    sub-configs. One can specify the field named `zen_config` in their task function&#39;s</span>
+<span class="sd">    sub-configs. One can specify the field named `zen_config` in their task function's</span>
 <span class="sd">    signature to signal `zen` that it should pass the full config to that parameter .</span>
 
 <span class="sd">    &gt;&gt;&gt; def zf(x: int, zen_cfg):</span>
 <span class="sd">    ...     return x, zen_cfg</span>
-<span class="sd">    &gt;&gt;&gt; zen(zf)(dict(x=1, y=&quot;${x}&quot;, foo=&quot;bar&quot;))</span>
-<span class="sd">    (1, {&#39;x&#39;: 1, &#39;y&#39;: 1, &#39;foo&#39;: &#39;bar&#39;})</span>
+<span class="sd">    &gt;&gt;&gt; zen(zf)(dict(x=1, y="${x}", foo="bar"))</span>
+<span class="sd">    (1, {'x': 1, 'y': 1, 'foo': 'bar'})</span>
 
 <span class="sd">    **Including a pre-call function**</span>
 
@@ -1205,13 +1205,13 @@
 <span class="sd">       # example.py</span>
 <span class="sd">       from hydra_zen import zen, store</span>
 
-<span class="sd">       @store(name=&quot;my_app&quot;)</span>
+<span class="sd">       @store(name="my_app")</span>
 <span class="sd">       def task(x: int, y: int):</span>
 <span class="sd">           print(x + y)</span>
 
-<span class="sd">       if __name__ == &quot;__main__&quot;:</span>
+<span class="sd">       if __name__ == "__main__":</span>
 <span class="sd">           store.add_to_hydra_store()</span>
-<span class="sd">           zen(task).hydra_main(config_name=&quot;my_app&quot;, config_path=None, version_base=&quot;1.2&quot;)</span>
+<span class="sd">           zen(task).hydra_main(config_name="my_app", config_path=None, version_base="1.2")</span>
 
 
 <span class="sd">    .. code-block:: console</span>
@@ -1227,17 +1227,17 @@
 
 <span class="sd">    &gt;&gt;&gt; def f2(x: int): ...</span>
 <span class="sd">    &gt;&gt;&gt; zen_f = zen(f2)</span>
-<span class="sd">    &gt;&gt;&gt; zen_f.validate({&quot;x&quot;: 1})  # OK</span>
-<span class="sd">    &gt;&gt;&gt; zen_f.validate({&quot;y&quot;: 1})  # Missing x</span>
+<span class="sd">    &gt;&gt;&gt; zen_f.validate({"x": 1})  # OK</span>
+<span class="sd">    &gt;&gt;&gt; zen_f.validate({"y": 1})  # Missing x</span>
 <span class="sd">    HydraZenValidationError: `cfg` is missing the following fields: x</span>
 
 <span class="sd">    Validation propagates through zen-wrapped pre-call functions:</span>
 
 <span class="sd">    &gt;&gt;&gt; zen_f2 = zen(f2, pre_call=zen(lambda seed: None))</span>
-<span class="sd">    &gt;&gt;&gt; zen_f2.validate({&quot;x&quot;: 1, &quot;seed&quot;: 10})  # OK</span>
-<span class="sd">    &gt;&gt;&gt; zen_f2.validate({&quot;x&quot;: 1})  # Missing seed as required by pre-call</span>
+<span class="sd">    &gt;&gt;&gt; zen_f2.validate({"x": 1, "seed": 10})  # OK</span>
+<span class="sd">    &gt;&gt;&gt; zen_f2.validate({"x": 1})  # Missing seed as required by pre-call</span>
 <span class="sd">    HydraZenValidationError: `cfg` is missing the following fields: seed</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">__func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
             <span class="n">Zen</span><span class="p">[</span><span class="n">P</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span>
@@ -1282,10 +1282,10 @@
         <span class="n">ListConfig</span><span class="p">,</span>
         <span class="n">DictConfig</span><span class="p">,</span>
     <span class="p">],</span>
-    <span class="n">CustomBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="s2">&quot;BuildsFn[Any]&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">DefaultBuilds</span><span class="p">,</span>
+    <span class="n">CustomBuildsFn</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="s2">"BuildsFn[Any]"</span><span class="p">]</span> <span class="o">=</span> <span class="n">DefaultBuilds</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">,</span> <span class="nb">type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="n">ListConfig</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a config that describes `target`.</span>
+<span class="w">    </span><span class="sd">"""Creates a config that describes `target`.</span>
 
 <span class="sd">    This function is designed to selectively apply `hydra_zen.builds` or</span>
 <span class="sd">    `hydra_zen.just` in a way that permits maximum compatibility with common</span>
@@ -1317,8 +1317,8 @@
 <span class="sd">    Lists and dictionaries</span>
 
 <span class="sd">    &gt;&gt;&gt; from hydra_zen.wrapper import default_to_config</span>
-<span class="sd">    &gt;&gt;&gt; default_to_config([1, {&quot;z&quot;: 2+2j}])</span>
-<span class="sd">    [1, {&#39;z&#39;: ConfigComplex(real=2.0, imag=2.0, _target_=&#39;builtins.complex&#39;)}]</span>
+<span class="sd">    &gt;&gt;&gt; default_to_config([1, {"z": 2+2j}])</span>
+<span class="sd">    [1, {'z': ConfigComplex(real=2.0, imag=2.0, _target_='builtins.complex')}]</span>
 
 <span class="sd">    Dataclass types</span>
 
@@ -1331,7 +1331,7 @@
 
 <span class="sd">    &gt;&gt;&gt; Builds_A = default_to_config(A, y=22)</span>
 <span class="sd">    &gt;&gt;&gt; Builds_A(x=1)</span>
-<span class="sd">    Builds_A(x=1, y=22, _target_=&#39;__main__.A&#39;)</span>
+<span class="sd">    Builds_A(x=1, y=22, _target_='__main__.A')</span>
 <span class="sd">    &gt;&gt;&gt; issubclass(Builds_A, A)</span>
 <span class="sd">    True</span>
 
@@ -1342,27 +1342,27 @@
 <span class="sd">    &gt;&gt;&gt; print(to_yaml(default_to_config(func)))</span>
 <span class="sd">    _target_: __main__.func</span>
 <span class="sd">    x: ???</span>
-<span class="sd">    &#39;y&#39;: ???</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    'y': ???</span>
+<span class="sd">    """</span>
 
     <span class="n">kw</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">HydraConf</span><span class="p">):</span>
-                <span class="c1"># don&#39;t auto-config HydraConf</span>
+                <span class="c1"># don't auto-config HydraConf</span>
                 <span class="k">return</span> <span class="n">target</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">kw</span> <span class="ow">and</span> <span class="n">CustomBuildsFn</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;types.&quot;</span><span class="p">):</span>  <span class="c1"># type: ignore</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">kw</span> <span class="ow">and</span> <span class="n">CustomBuildsFn</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"types."</span><span class="p">):</span>  <span class="c1"># type: ignore</span>
                 <span class="c1"># handles dataclasses returned by make_config()</span>
                 <span class="k">return</span> <span class="n">target</span>
-            <span class="n">kw</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;populate_full_signature&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-            <span class="n">kw</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;builds_bases&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">target</span><span class="p">,))</span>
+            <span class="n">kw</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"populate_full_signature"</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="n">kw</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"builds_bases"</span><span class="p">,</span> <span class="p">(</span><span class="n">target</span><span class="p">,))</span>
             <span class="k">return</span> <span class="n">CustomBuildsFn</span><span class="o">.</span><span class="n">builds</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">kw</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;store(&lt;dataclass-instance&gt;, [...]) does not support specifying &quot;</span>
-                <span class="s2">&quot;keyword arguments&quot;</span>
+                <span class="s2">"store(&lt;dataclass-instance&gt;, [...]) does not support specifying "</span>
+                <span class="s2">"keyword arguments"</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">target</span>
 
@@ -1373,7 +1373,7 @@
         <span class="k">return</span> <span class="n">target</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">t</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">target</span><span class="p">)</span>
-        <span class="n">kw</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;populate_full_signature&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">kw</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"populate_full_signature"</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="nb">type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="n">CustomBuildsFn</span><span class="o">.</span><span class="n">builds</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">))</span></div>
 
 
@@ -1384,12 +1384,12 @@
 
 <span class="c1"># TODO: Should we automatically snake-case?</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="n">_HasName</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;__name__&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">"__name__"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Cannot infer config store entry name for </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">. It does not have a &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;`__name__` attribute. Please manually specify `store(</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">, &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;name=&lt;some name&gt;, [...])`&quot;</span>
+            <span class="sa">f</span><span class="s2">"Cannot infer config store entry name for </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">. It does not have a "</span>
+            <span class="sa">f</span><span class="s2">"`__name__` attribute. Please manually specify `store(</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">, "</span>
+            <span class="sa">f</span><span class="s2">"name=&lt;some name&gt;, [...])`"</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="n">name</span>
 
@@ -1399,14 +1399,14 @@
 <span class="c1"># This default dict enables us to easily update/merge the default arguments for a</span>
 <span class="c1"># specific ZenStore instance, in support of self-partialing behavior.</span>
 <span class="n">_StoreCallSig</span> <span class="o">=</span> <span class="n">TypedDict</span><span class="p">(</span>
-    <span class="s2">&quot;_StoreCallSig&quot;</span><span class="p">,</span>
+    <span class="s2">"_StoreCallSig"</span><span class="p">,</span>
     <span class="p">{</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">NodeName</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">NodeName</span><span class="p">]],</span>
-        <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">GroupName</span><span class="p">]],</span>
-        <span class="s2">&quot;package&quot;</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]],</span>
-        <span class="s2">&quot;provider&quot;</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-        <span class="s2">&quot;__kw&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>  <span class="c1"># kwargs passed to to_config</span>
-        <span class="s2">&quot;to_config&quot;</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="s2">"name"</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">NodeName</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">NodeName</span><span class="p">]],</span>
+        <span class="s2">"group"</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">GroupName</span><span class="p">]],</span>
+        <span class="s2">"package"</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]],</span>
+        <span class="s2">"provider"</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="s2">"__kw"</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>  <span class="c1"># kwargs passed to to_config</span>
+        <span class="s2">"to_config"</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
     <span class="p">},</span>
 <span class="p">)</span>
 
@@ -1422,12 +1422,12 @@
 <span class="p">)</span>
 
 <span class="n">_DEFAULT_KEYS</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span>
-    <span class="n">_StoreCallSig</span><span class="o">.</span><span class="n">__required_keys__</span> <span class="o">-</span> <span class="p">{</span><span class="s2">&quot;__kw&quot;</span><span class="p">}</span>
+    <span class="n">_StoreCallSig</span><span class="o">.</span><span class="n">__required_keys__</span> <span class="o">-</span> <span class="p">{</span><span class="s2">"__kw"</span><span class="p">}</span>
 <span class="p">)</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_Deferred</span><span class="p">:</span>
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;to_config&quot;</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="s2">&quot;kw&quot;</span><span class="p">)</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"to_config"</span><span class="p">,</span> <span class="s2">"target"</span><span class="p">,</span> <span class="s2">"kw"</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">to_config</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">F</span><span class="p">],</span> <span class="n">Node</span><span class="p">],</span> <span class="n">target</span><span class="p">:</span> <span class="n">F</span><span class="p">,</span> <span class="n">kw</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
@@ -1441,11 +1441,11 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_node</span><span class="p">(</span><span class="n">entry</span><span class="p">:</span> <span class="n">StoreEntry</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StoreEntry</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Given an entry, updates the entry so that its node is not deferred, and returns</span>
-<span class="sd">    the entry. This function is a passthrough for an entry whose node is not deferred&quot;&quot;&quot;</span>
-    <span class="n">item</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;node&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Given an entry, updates the entry so that its node is not deferred, and returns</span>
+<span class="sd">    the entry. This function is a passthrough for an entry whose node is not deferred"""</span>
+    <span class="n">item</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">"node"</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">_Deferred</span><span class="p">):</span>
-        <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;node&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span><span class="p">()</span>
+        <span class="n">entry</span><span class="p">[</span><span class="s2">"node"</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">copy</span><span class="p">:</span>
         <span class="n">entry</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -1455,7 +1455,7 @@
 <div class="viewcode-block" id="ZenStore">
 <a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ZenStore</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;An abstraction over Hydra&#39;s store, for creating multiple, isolated config stores.</span>
+<span class="w">    </span><span class="sd">"""An abstraction over Hydra's store, for creating multiple, isolated config stores.</span>
 
 <span class="sd">    Whereas Hydra exposes a single global config store that provides no warnings when</span>
 <span class="sd">    store entries are overwritted, `ZenStore` instances are isolated, do not populate</span>
@@ -1470,7 +1470,7 @@
 <span class="sd">    .. code-block:: python</span>
 
 <span class="sd">       store = ZenStore(</span>
-<span class="sd">           name=&quot;zen_store&quot;,</span>
+<span class="sd">           name="zen_store",</span>
 <span class="sd">           deferred_to_config=True,</span>
 <span class="sd">           deferred_hydra_store=True,</span>
 <span class="sd">       )</span>
@@ -1509,20 +1509,20 @@
 <span class="sd">            from hydra_zen import builds, store</span>
 <span class="sd">            def func(x, y): ...</span>
 
-<span class="sd">            store(builds(func, x=2, y=3, populate_full_signature=True), name=&quot;func&quot;)</span>
+<span class="sd">            store(builds(func, x=2, y=3, populate_full_signature=True), name="func")</span>
 
-<span class="sd">    It can also be used to decorate config-targets and dataclasses, enabling &quot;inline&quot;</span>
+<span class="sd">    It can also be used to decorate config-targets and dataclasses, enabling "inline"</span>
 <span class="sd">    config creation and storage patterns.</span>
 
 <span class="sd">    These auto config-creation capabilities are designed to be deferred until a</span>
-<span class="sd">    config is actually accessed by users or added to Hydra&#39;s global config store. This</span>
+<span class="sd">    config is actually accessed by users or added to Hydra's global config store. This</span>
 <span class="sd">    enables store-decorator patterns to be used within library code without slowing</span>
 <span class="sd">    down import times.</span>
 
 <span class="sd">    **Self-partialing patterns**</span>
 
 <span class="sd">    A `ZenStore` instance can be called repeatedly - without a config target - with</span>
-<span class="sd">    different options to incrementally change the store&#39;s default configurations. E.g.</span>
+<span class="sd">    different options to incrementally change the store's default configurations. E.g.</span>
 <span class="sd">    the following are effectively equivalent</span>
 
 <span class="sd">    .. tab-set::</span>
@@ -1533,15 +1533,15 @@
 
 <span class="sd">               from hydra_zen import store</span>
 
-<span class="sd">               book_store = store(group=&quot;books&quot;)</span>
-<span class="sd">               romance_store = book_store(provider=&quot;genre: romance&quot;)</span>
-<span class="sd">               fantasy_store = book_store(provider=&quot;genre: fantasy&quot;)</span>
+<span class="sd">               book_store = store(group="books")</span>
+<span class="sd">               romance_store = book_store(provider="genre: romance")</span>
+<span class="sd">               fantasy_store = book_store(provider="genre: fantasy")</span>
 
-<span class="sd">               romance_store({&quot;title&quot;: &quot;heartfelt&quot;})</span>
-<span class="sd">               romance_store({&quot;title&quot;: &quot;lustfully longingness&quot;})</span>
+<span class="sd">               romance_store({"title": "heartfelt"})</span>
+<span class="sd">               romance_store({"title": "lustfully longingness"})</span>
 
-<span class="sd">               fantasy_store({&quot;title&quot;: &quot;elvish cookbook&quot;})</span>
-<span class="sd">               fantasy_store({&quot;title&quot;: &quot;dwarves can&#39;t jump&quot;})</span>
+<span class="sd">               fantasy_store({"title": "elvish cookbook"})</span>
+<span class="sd">               fantasy_store({"title": "dwarves can't jump"})</span>
 
 
 <span class="sd">      .. tab-item:: Manual pattern</span>
@@ -1551,31 +1551,31 @@
 <span class="sd">            from hydra_zen import store</span>
 
 <span class="sd">            store(</span>
-<span class="sd">                {&quot;title&quot;: &quot;heartfelt&quot;},</span>
-<span class="sd">                group=&quot;book&quot;,</span>
-<span class="sd">                provider=&quot;genre: romance&quot;,</span>
+<span class="sd">                {"title": "heartfelt"},</span>
+<span class="sd">                group="book",</span>
+<span class="sd">                provider="genre: romance",</span>
 <span class="sd">            )</span>
 <span class="sd">            store(</span>
-<span class="sd">                {&quot;title&quot;: &quot;lustfully longingness&quot;},</span>
-<span class="sd">                group=&quot;book&quot;,</span>
-<span class="sd">                provider=&quot;genre: romance&quot;,</span>
+<span class="sd">                {"title": "lustfully longingness"},</span>
+<span class="sd">                group="book",</span>
+<span class="sd">                provider="genre: romance",</span>
 <span class="sd">            )</span>
 
 <span class="sd">            store(</span>
-<span class="sd">                {&quot;title&quot;: &quot;elvish cookbook&quot;},</span>
-<span class="sd">                group=&quot;book&quot;,</span>
-<span class="sd">                provider=&quot;genre: fantasy&quot;,</span>
+<span class="sd">                {"title": "elvish cookbook"},</span>
+<span class="sd">                group="book",</span>
+<span class="sd">                provider="genre: fantasy",</span>
 <span class="sd">            )</span>
 <span class="sd">            store(</span>
-<span class="sd">                {&quot;title&quot;: &quot;dwarves can&#39;t jump&quot;},</span>
-<span class="sd">                group=&quot;book&quot;,</span>
-<span class="sd">                provider=&quot;genre: fantasy&quot;,</span>
+<span class="sd">                {"title": "dwarves can't jump"},</span>
+<span class="sd">                group="book",</span>
+<span class="sd">                provider="genre: fantasy",</span>
 <span class="sd">            )</span>
 
 <span class="sd">    **Configuring Hydra itself**</span>
 
-<span class="sd">    Special support is provided for overriding Hydra&#39;s configuration; the name and</span>
-<span class="sd">    group of the store entry is inferred to be &#39;config&#39; and &#39;hydra&#39;, respectively,</span>
+<span class="sd">    Special support is provided for overriding Hydra's configuration; the name and</span>
+<span class="sd">    group of the store entry is inferred to be 'config' and 'hydra', respectively,</span>
 <span class="sd">    when an instance/subclass of `HydraConf` is being stored. E.g., specifying</span>
 
 <span class="sd">    .. code-block:: python</span>
@@ -1589,7 +1589,7 @@
 
 <span class="sd">    .. code-block:: python</span>
 
-<span class="sd">       store(HydraConf(job=JobConf(chdir=True)), name=&quot;config&quot;, group=&quot;hydra&quot;, provider=&quot;hydra_zen&quot;)</span>
+<span class="sd">       store(HydraConf(job=JobConf(chdir=True)), name="config", group="hydra", provider="hydra_zen")</span>
 
 <span class="sd">    Additionally, overwriting the store entry for `HydraConf` will not raise an error</span>
 <span class="sd">    even if `ZenStore(overwrite_ok=False)` is specified.</span>
@@ -1605,58 +1605,58 @@
 
 <span class="sd">    **Basic usage**</span>
 
-<span class="sd">    Let&#39;s add a config to hydra-zen&#39;s pre-instantiated `ZenStore` instance. Each store</span>
+<span class="sd">    Let's add a config to hydra-zen's pre-instantiated `ZenStore` instance. Each store</span>
 <span class="sd">    entry must have an associated name. Optionally, a group, package, and/or provider</span>
 <span class="sd">    may be specified for the entry as well.</span>
 
-<span class="sd">    &gt;&gt;&gt; config1 = {&#39;name&#39;: &#39;Roger&#39;, &#39;age&#39;: 24}</span>
-<span class="sd">    &gt;&gt;&gt; config2 = {&#39;name&#39;: &#39;Rita&#39;, &#39;age&#39;: 27}</span>
-<span class="sd">    &gt;&gt;&gt; _ = store(config1, name=&quot;roger&quot;, group=&quot;profiles&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; _ = store(config2, name=&quot;rita&quot;, group=&quot;profiles&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; config1 = {'name': 'Roger', 'age': 24}</span>
+<span class="sd">    &gt;&gt;&gt; config2 = {'name': 'Rita', 'age': 27}</span>
+<span class="sd">    &gt;&gt;&gt; _ = store(config1, name="roger", group="profiles")</span>
+<span class="sd">    &gt;&gt;&gt; _ = store(config2, name="rita", group="profiles")</span>
 <span class="sd">    &gt;&gt;&gt; store</span>
 <span class="sd">    zen_store</span>
-<span class="sd">    {&#39;profiles&#39;: [&#39;roger&#39;, &#39;rita&#39;]}</span>
+<span class="sd">    {'profiles': ['roger', 'rita']}</span>
 
-<span class="sd">    A store&#39;s entries are keyed by their `(group, name)` pairs (the default group is</span>
+<span class="sd">    A store's entries are keyed by their `(group, name)` pairs (the default group is</span>
 <span class="sd">    `None`).</span>
 
-<span class="sd">    &gt;&gt;&gt; store[&quot;profiles&quot;, &quot;roger&quot;]  # (group, name) -&gt; config node</span>
-<span class="sd">    {&#39;name&#39;: &#39;Roger&#39;, age: 24}</span>
+<span class="sd">    &gt;&gt;&gt; store["profiles", "roger"]  # (group, name) -&gt; config node</span>
+<span class="sd">    {'name': 'Roger', age: 24}</span>
 
-<span class="sd">    By default, the stored config(s) will be &quot;enqueued&quot; for addition to Hydra&#39;s config</span>
+<span class="sd">    By default, the stored config(s) will be "enqueued" for addition to Hydra's config</span>
 <span class="sd">    store. The method `.add_to_hydra_store()` must be called to add the enqueued</span>
-<span class="sd">    configs to Hydra&#39;s central store.</span>
+<span class="sd">    configs to Hydra's central store.</span>
 
 <span class="sd">    &gt;&gt;&gt; store.has_enqueued()</span>
 <span class="sd">    True</span>
-<span class="sd">    &gt;&gt;&gt; store.add_to_hydra_store()  # adds all enqueued entries to Hydra&#39;s global store</span>
+<span class="sd">    &gt;&gt;&gt; store.add_to_hydra_store()  # adds all enqueued entries to Hydra's global store</span>
 <span class="sd">    &gt;&gt;&gt; store.has_enqueued()</span>
 <span class="sd">    False</span>
 
 <span class="sd">    By default, attempting to overwrite an entry will result in an error.</span>
 
-<span class="sd">    &gt;&gt;&gt; store({}, name=&quot;rita&quot;, group=&quot;profiles&quot;)  # same name and group as above</span>
+<span class="sd">    &gt;&gt;&gt; store({}, name="rita", group="profiles")  # same name and group as above</span>
 <span class="sd">    ValueError: (name=rita group=profiles): Hydra config store entry already exists.</span>
 <span class="sd">    Specify `overwrite_ok=True` to enable replacing config store entries</span>
 
 <span class="sd">    We can create a distinct store that has an independent internal repository of</span>
 <span class="sd">    configs.</span>
 
-<span class="sd">    &gt;&gt;&gt; new_store = ZenStore(&quot;new_store&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; _ = new_store([1, 2, 3], name=&quot;backbone&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; new_store = ZenStore("new_store")</span>
+<span class="sd">    &gt;&gt;&gt; _ = new_store([1, 2, 3], name="backbone")</span>
 
 <span class="sd">    &gt;&gt;&gt; store</span>
 <span class="sd">    zen_store</span>
-<span class="sd">    {&#39;profiles&#39;: [&#39;roger&#39;, &#39;rita&#39;]}</span>
+<span class="sd">    {'profiles': ['roger', 'rita']}</span>
 <span class="sd">    &gt;&gt;&gt; new_store</span>
 <span class="sd">    new_store</span>
-<span class="sd">    {None: [&#39;backbone&#39;]}</span>
+<span class="sd">    {None: ['backbone']}</span>
 
 <span class="sd">    .. _store-autoconf:</span>
 
 <span class="sd">    **Auto-config capabilities**</span>
 
-<span class="sd">    The input to a store is processed by the store&#39;s `to_config` function prior to</span>
+<span class="sd">    The input to a store is processed by the store's `to_config` function prior to</span>
 <span class="sd">    creating the stored config node. This defaults to</span>
 <span class="sd">    `hydra_zen.wrapper.default_to_config`, which applies `hydra_zen.builds` or</span>
 <span class="sd">    `hydra_zen.just` to inputs based on their types.</span>
@@ -1671,7 +1671,7 @@
 
 <span class="sd">    &gt;&gt;&gt; store2 = ZenStore()</span>
 <span class="sd">    &gt;&gt;&gt; _ = store2(sum_it, a=1, b=2)  # entry name defaults to `sum_it.__name__`</span>
-<span class="sd">    &gt;&gt;&gt; config = store2[None, &quot;sum_it&quot;]</span>
+<span class="sd">    &gt;&gt;&gt; config = store2[None, "sum_it"]</span>
 <span class="sd">    &gt;&gt;&gt; pyaml(config)</span>
 <span class="sd">    _target_: __main__.sum_it</span>
 <span class="sd">    a: 1</span>
@@ -1682,36 +1682,36 @@
 
 <span class="sd">    **Support for decorator patterns**</span>
 
-<span class="sd">    `ZenStore.__call__` is a pass-through and can be used as a decorator. Let&#39;s add two</span>
+<span class="sd">    `ZenStore.__call__` is a pass-through and can be used as a decorator. Let's add two</span>
 <span class="sd">    store entries for `func` by decorating it.</span>
 
 <span class="sd">    &gt;&gt;&gt; store = ZenStore()</span>
 
-<span class="sd">    &gt;&gt;&gt; @store(a=1, b=22, name=&quot;func1&quot;)</span>
-<span class="sd">    ... @store(a=-10, name=&quot;func2&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; @store(a=1, b=22, name="func1")</span>
+<span class="sd">    ... @store(a=-10, name="func2")</span>
 <span class="sd">    ... def func(a: int, b: int):</span>
 <span class="sd">    ...     return a - b</span>
 
-<span class="sd">    Each application of `@store` utilizes the store&#39;s auto-config capability</span>
+<span class="sd">    Each application of `@store` utilizes the store's auto-config capability</span>
 <span class="sd">    to create and store a config inline. I.e. the above snippet is equivalent to</span>
 
 <span class="sd">    &gt;&gt;&gt; from hydra_zen import builds</span>
 <span class="sd">    &gt;&gt;&gt;</span>
-<span class="sd">    &gt;&gt;&gt; store(builds(func, a=1, b=22), name=&quot;func1&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; store(builds(func, a=1, b=22), name="func1")</span>
 <span class="sd">    &gt;&gt;&gt; store(builds(func, a=-10,</span>
 <span class="sd">    ...              populate_full_signature=True</span>
 <span class="sd">    ...              ),</span>
-<span class="sd">    ...       name=&quot;func2&quot;,</span>
+<span class="sd">    ...       name="func2",</span>
 <span class="sd">    ... )</span>
 
 
 <span class="sd">    &gt;&gt;&gt; func(10, 3)  # the decorated function is left unchanged</span>
 <span class="sd">    7</span>
-<span class="sd">    &gt;&gt;&gt; pyaml(store[None, &quot;func1&quot;])</span>
+<span class="sd">    &gt;&gt;&gt; pyaml(store[None, "func1"])</span>
 <span class="sd">    _target_: __main__.func</span>
 <span class="sd">    a: 1</span>
 <span class="sd">    b: 22</span>
-<span class="sd">    &gt;&gt;&gt; pyaml(store[None, &quot;func2&quot;])</span>
+<span class="sd">    &gt;&gt;&gt; pyaml(store[None, "func2"])</span>
 <span class="sd">    _target_: __main__.func</span>
 <span class="sd">    b: ???</span>
 <span class="sd">    a: -10</span>
@@ -1723,28 +1723,28 @@
 
 <span class="sd">    .. _self-partial:</span>
 
-<span class="sd">    **Customizable store defaults via &#39;self-partialing&#39; patterns**</span>
+<span class="sd">    **Customizable store defaults via 'self-partialing' patterns**</span>
 
-<span class="sd">    The default values for a store&#39;s `__call__` parameters – `group`, `to_config`, etc.</span>
+<span class="sd">    The default values for a store's `__call__` parameters – `group`, `to_config`, etc.</span>
 <span class="sd">    – can easily be customized. Simply call the store with those new values and</span>
-<span class="sd">    without specifying an object to be stored. This will return a &quot;mirrored&quot; store</span>
+<span class="sd">    without specifying an object to be stored. This will return a "mirrored" store</span>
 <span class="sd">    instance – with the same internal state as the original store – with updated</span>
 <span class="sd">    defaults.</span>
 
-<span class="sd">    For example, let&#39;s create a store where we want to store multiple configs under a</span>
-<span class="sd">    `&#39;math&#39;` group and under a `&#39;functools&#39;` group, respectively.</span>
+<span class="sd">    For example, let's create a store where we want to store multiple configs under a</span>
+<span class="sd">    `'math'` group and under a `'functools'` group, respectively.</span>
 
 <span class="sd">    &gt;&gt;&gt; import math</span>
 <span class="sd">    &gt;&gt;&gt; import functools</span>
 
 <span class="sd">    &gt;&gt;&gt; new_store = ZenStore()</span>
-<span class="sd">    &gt;&gt;&gt; math_store = new_store(group=&quot;math&quot;)  # overwrites group default</span>
-<span class="sd">    &gt;&gt;&gt; tool_store = new_store(group=&quot;functools&quot;)  # overwrites group default</span>
+<span class="sd">    &gt;&gt;&gt; math_store = new_store(group="math")  # overwrites group default</span>
+<span class="sd">    &gt;&gt;&gt; tool_store = new_store(group="functools")  # overwrites group default</span>
 
 <span class="sd">    `math_store` and `tool_store` both share the same internal state as `new_store`, but</span>
 <span class="sd">    have overwritten default values for the `group`.</span>
 
-<span class="sd">    &gt;&gt;&gt; math_store(math.floor)  # equivalent to: `new_store(math.floor, group=&quot;math&quot;)`</span>
+<span class="sd">    &gt;&gt;&gt; math_store(math.floor)  # equivalent to: `new_store(math.floor, group="math")`</span>
 <span class="sd">    &gt;&gt;&gt; math_store(math.ceil)</span>
 <span class="sd">    &gt;&gt;&gt; tool_store(functools.lru_cache)</span>
 <span class="sd">    &gt;&gt;&gt; tool_store(functools.wraps)</span>
@@ -1753,32 +1753,32 @@
 
 <span class="sd">    &gt;&gt;&gt; new_store</span>
 <span class="sd">    custom_store</span>
-<span class="sd">    {&#39;math&#39;: [&#39;floor&#39;, &#39;ceil&#39;], &#39;functools&#39;: [&#39;lru_cache&#39;, &#39;wraps&#39;]}</span>
+<span class="sd">    {'math': ['floor', 'ceil'], 'functools': ['lru_cache', 'wraps']}</span>
 
-<span class="sd">    These &quot;self-partialing&quot; patterns can be chained indefinitely and can be used to set</span>
+<span class="sd">    These "self-partialing" patterns can be chained indefinitely and can be used to set</span>
 <span class="sd">    partial defaults for the `to_config` function.</span>
 
-<span class="sd">    &gt;&gt;&gt; profile_store = new_store(group=&quot;profile&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; schemaless = profile_store(schema=&quot;&lt;none&gt;&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; profile_store = new_store(group="profile")</span>
+<span class="sd">    &gt;&gt;&gt; schemaless = profile_store(schema="&lt;none&gt;")</span>
 
 <span class="sd">    &gt;&gt;&gt; from dataclasses import dataclass</span>
 <span class="sd">    &gt;&gt;&gt;</span>
-<span class="sd">    &gt;&gt;&gt; @profile_store(name=&quot;admin&quot;, has_root=True)</span>
-<span class="sd">    &gt;&gt;&gt; @schemaless(name=&quot;test_admin&quot;, has_root=True)</span>
-<span class="sd">    &gt;&gt;&gt; @schemaless(name=&quot;test_user&quot;, has_root=False)</span>
+<span class="sd">    &gt;&gt;&gt; @profile_store(name="admin", has_root=True)</span>
+<span class="sd">    &gt;&gt;&gt; @schemaless(name="test_admin", has_root=True)</span>
+<span class="sd">    &gt;&gt;&gt; @schemaless(name="test_user", has_root=False)</span>
 <span class="sd">    &gt;&gt;&gt; @dataclass</span>
 <span class="sd">    &gt;&gt;&gt; class Profile:</span>
 <span class="sd">    &gt;&gt;&gt;     username: str</span>
 <span class="sd">    &gt;&gt;&gt;     schema: str</span>
 <span class="sd">    &gt;&gt;&gt;     has_root: bool</span>
 
-<span class="sd">    &gt;&gt;&gt; pyaml(new_store[&quot;profile&quot;, &quot;admin&quot;])</span>
+<span class="sd">    &gt;&gt;&gt; pyaml(new_store["profile", "admin"])</span>
 <span class="sd">    username: ???</span>
 <span class="sd">    schema: ???</span>
 <span class="sd">    has_root: true</span>
 <span class="sd">    _target_: __main__.Profile</span>
 
-<span class="sd">    &gt;&gt;&gt; pyaml(new_store[&quot;profile&quot;, &quot;test_admin&quot;])</span>
+<span class="sd">    &gt;&gt;&gt; pyaml(new_store["profile", "test_admin"])</span>
 <span class="sd">    username: ???</span>
 <span class="sd">    schema: &lt;none&gt;</span>
 <span class="sd">    has_root: true</span>
@@ -1789,17 +1789,17 @@
 <span class="sd">    A store can be copied, updated, and merged. Its entries can have their groups</span>
 <span class="sd">    remapped, and individual entries can be deleted. See the docs for the corresponding</span>
 <span class="sd">    methods for details and examples.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;_internal_repo&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;_defaults&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;_queue&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;_deferred_to_config&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;_deferred_store&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;_overwrite_ok&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;_warn_node_kwarg&quot;</span><span class="p">,</span>
+        <span class="s2">"name"</span><span class="p">,</span>
+        <span class="s2">"_internal_repo"</span><span class="p">,</span>
+        <span class="s2">"_defaults"</span><span class="p">,</span>
+        <span class="s2">"_queue"</span><span class="p">,</span>
+        <span class="s2">"_deferred_to_config"</span><span class="p">,</span>
+        <span class="s2">"_deferred_store"</span><span class="p">,</span>
+        <span class="s2">"_overwrite_ok"</span><span class="p">,</span>
+        <span class="s2">"_warn_node_kwarg"</span><span class="p">,</span>
     <span class="p">)</span>
 
 <div class="viewcode-block" id="ZenStore.__init__">
@@ -1813,7 +1813,7 @@
         <span class="n">overwrite_ok</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">warn_node_kwarg</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        name : Optional[str]</span>
@@ -1824,12 +1824,12 @@
 <span class="sd">            target until that specific entry is accessed by the store.</span>
 
 <span class="sd">        deferred_hydra_store : bool, default=True</span>
-<span class="sd">            If `True` (default), this store will not add entries to Hydra&#39;s global</span>
+<span class="sd">            If `True` (default), this store will not add entries to Hydra's global</span>
 <span class="sd">            config store until `store.add_to_hydra_store` is called explicitly.</span>
 
 <span class="sd">        overwrite_ok : bool, default=False</span>
 <span class="sd">            If `False` (default), attempting to overwrite entries in this store and</span>
-<span class="sd">            trying to use this store to overwrite entries in Hydra&#39;s global store</span>
+<span class="sd">            trying to use this store to overwrite entries in Hydra's global store</span>
 <span class="sd">            will raise a `ValueError`.</span>
 
 <span class="sd">        warn_node_kwarg: bool, default=True</span>
@@ -1839,26 +1839,26 @@
 <span class="sd">            This helps to protect users from mistakenly self-partializing a store</span>
 <span class="sd">            with `store(node=Config)` instead of actually storing the node with</span>
 <span class="sd">            `store(Config)`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">deferred_to_config</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;deferred_to_config must be a bool, got </span><span class="si">{</span><span class="n">deferred_to_config</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"deferred_to_config must be a bool, got </span><span class="si">{</span><span class="n">deferred_to_config</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">overwrite_ok</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;overwrite_ok must be a bool, got </span><span class="si">{</span><span class="n">overwrite_ok</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"overwrite_ok must be a bool, got </span><span class="si">{</span><span class="n">overwrite_ok</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">deferred_hydra_store</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;deferred_hydra_store must be a bool, got </span><span class="si">{</span><span class="n">deferred_hydra_store</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"deferred_hydra_store must be a bool, got </span><span class="si">{</span><span class="n">deferred_hydra_store</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;custom_store&quot;</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"custom_store"</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">name</span>
 
         <span class="c1"># The following attributes are mirrored across store instances that are</span>
-        <span class="c1"># created via the &#39;self-partialing&#39; process</span>
+        <span class="c1"># created via the 'self-partialing' process</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">NodeName</span><span class="p">],</span> <span class="n">StoreEntry</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="c1"># Internal repo entries that have yet to be added to Hydra&#39;s config store</span>
+        <span class="c1"># Internal repo entries that have yet to be added to Hydra's config store</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">NodeName</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_deferred_to_config</span> <span class="o">=</span> <span class="n">deferred_to_config</span>
@@ -1876,26 +1876,26 @@
         <span class="k">for</span> <span class="n">grp</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">:</span>
             <span class="n">groups_contents</span><span class="p">[</span><span class="n">grp</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">groups_contents</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">groups_contents</span><span class="p">))</span><span class="si">}</span><span class="s2">"</span>
 
 <div class="viewcode-block" id="ZenStore.__eq__">
 <a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.__eq__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__o</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns `True` if two stores share identical internal repos and queues.</span>
+<span class="w">        </span><span class="sd">"""Returns `True` if two stores share identical internal repos and queues.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from hydra_zen import ZenStore</span>
 <span class="sd">        &gt;&gt;&gt; store1 = ZenStore()</span>
 <span class="sd">        &gt;&gt;&gt; store2 = ZenStore()</span>
-<span class="sd">        &gt;&gt;&gt; store1_a = store1(group=&#39;a&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; _ = store1_a(dict(x=1), name=&quot;foo&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; store1_a = store1(group='a')</span>
+<span class="sd">        &gt;&gt;&gt; _ = store1_a(dict(x=1), name="foo")</span>
 
 <span class="sd">        &gt;&gt;&gt; store1 == store1_a</span>
 <span class="sd">        True</span>
 <span class="sd">        &gt;&gt;&gt; store1 == store2</span>
 <span class="sd">        False</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">__o</span><span class="p">,</span> <span class="n">ZenStore</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="n">__o</span><span class="o">.</span><span class="n">_internal_repo</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span> <span class="ow">and</span> <span class="n">__o</span><span class="o">.</span><span class="n">_queue</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span></div>
@@ -1931,7 +1931,7 @@
 <div class="viewcode-block" id="ZenStore.__call__">
 <a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.__call__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">__target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">F</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">F</span><span class="p">,</span> <span class="n">Self</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;__call__(target : Optional[T] = None, /, name: NodeName | Callable[[Any], NodeName]] = ..., group: GroupName | Callable[[T], GroupName]] = None, package: Optional[str | Callable[[T], str]]] | None], provider: Optional[str], to_config: Callable[[T], Node] = ..., **to_config_kw: Any) -&gt; T | ZenStore</span>
+<span class="w">        </span><span class="sd">"""__call__(target : Optional[T] = None, /, name: NodeName | Callable[[Any], NodeName]] = ..., group: GroupName | Callable[[T], GroupName]] = None, package: Optional[str | Callable[[T], str]]] | None], provider: Optional[str], to_config: Callable[[T], Node] = ..., **to_config_kw: Any) -&gt; T | ZenStore</span>
 
 <span class="sd">        Store a config or :ref:`customize the default values &lt;self-partial&gt;` of the store.</span>
 
@@ -1944,29 +1944,29 @@
 <span class="sd">            mirrored store instance with updated default arguments.</span>
 
 <span class="sd">        name : NodeName | Callable[[T], NodeName]</span>
-<span class="sd">            The entry&#39;s name, or a callable that will be called as</span>
+<span class="sd">            The entry's name, or a callable that will be called as</span>
 <span class="sd">            `(obj) -&gt; entry-name`. The default is `lambda obj: obj.__name__`.</span>
 
 <span class="sd">            Store entries are keyed off of `(group, name)`.</span>
 
 <span class="sd">        group : Optional[GroupName | Callable[[T], GroupName]]</span>
-<span class="sd">            The entry&#39;s group&#39;s name, or a callable that will be called as</span>
+<span class="sd">            The entry's group's name, or a callable that will be called as</span>
 <span class="sd">            `(obj) -&gt; entry-group`. The default is `None`. Subgroups can be</span>
 <span class="sd">            specified using / within the group name.</span>
 
 <span class="sd">            Store entries are keyed off of `(group, name)`.</span>
 
 <span class="sd">        to_config : Callable[[T], Node] = default_to_config</span>
-<span class="sd">            Called on `obj` to produce the entry&#39;s &quot;node&quot; (the config).</span>
+<span class="sd">            Called on `obj` to produce the entry's "node" (the config).</span>
 <span class="sd">            Refer to  `hydra_zen.wrapper.default_to_config` for the default</span>
 <span class="sd">            behavior. Specify `lambda x: x` to have `obj` be stored directly</span>
-<span class="sd">            as the entry&#39;s node.</span>
+<span class="sd">            as the entry's node.</span>
 
 <span class="sd">            By default the call to `to_config` is deferred until the entry</span>
 <span class="sd">            is actually accessed by the store.</span>
 
 <span class="sd">        package : Optional[str | Callable[[Any], str]]</span>
-<span class="sd">            The entry&#39;s package. Default is `None`.</span>
+<span class="sd">            The entry's package. Default is `None`.</span>
 
 <span class="sd">        provider : Optional[str]</span>
 <span class="sd">            An optional provider name for the entry.</span>
@@ -1980,15 +1980,15 @@
 <span class="sd">            If `obj` was specified, it is returned unchanged. Otherwise a new instance</span>
 <span class="sd">            of `ZenStore` is return, which mirrors the internal state of this store and</span>
 <span class="sd">            has updated default arguments.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">__target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warn_node_kwarg</span> <span class="ow">and</span> <span class="s2">&quot;node&quot;</span> <span class="ow">in</span> <span class="n">kw</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warn_node_kwarg</span> <span class="ow">and</span> <span class="s2">"node"</span> <span class="ow">in</span> <span class="n">kw</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="s2">&quot;hydra-zen&#39;s store API does not use the `node` keyword. To store a &quot;</span>
-                    <span class="s2">&quot;config, specify it as a positional argument: `store(&lt;config&gt;)`.&quot;</span>
-                    <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">If the use of `node` was intentional, you can suppress this &quot;</span>
-                    <span class="s2">&quot;warning by using a store that is initialized via `ZenStore&quot;</span>
-                    <span class="s2">&quot;(warn_node_kwarg=False).&quot;</span>
+                    <span class="s2">"hydra-zen's store API does not use the `node` keyword. To store a "</span>
+                    <span class="s2">"config, specify it as a positional argument: `store(&lt;config&gt;)`."</span>
+                    <span class="s2">"</span><span class="se">\n\n</span><span class="s2">If the use of `node` was intentional, you can suppress this "</span>
+                    <span class="s2">"warning by using a store that is initialized via `ZenStore"</span>
+                    <span class="s2">"(warn_node_kwarg=False)."</span>
                 <span class="p">)</span>
 
             <span class="n">_s</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span>
@@ -2007,50 +2007,50 @@
 
             <span class="n">new_defaults</span><span class="p">:</span> <span class="n">_StoreCallSig</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">kw</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_DEFAULT_KEYS</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kw</span><span class="p">}</span>  <span class="c1"># type: ignore</span>
 
-            <span class="n">new_defaults</span><span class="p">[</span><span class="s2">&quot;__kw&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="o">**</span><span class="n">_s</span><span class="o">.</span><span class="n">_defaults</span><span class="p">[</span><span class="s2">&quot;__kw&quot;</span><span class="p">],</span>
+            <span class="n">new_defaults</span><span class="p">[</span><span class="s2">"__kw"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="o">**</span><span class="n">_s</span><span class="o">.</span><span class="n">_defaults</span><span class="p">[</span><span class="s2">"__kw"</span><span class="p">],</span>
                 <span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">kw</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">kw</span><span class="p">)</span> <span class="o">-</span> <span class="n">_DEFAULT_KEYS</span><span class="p">},</span>
             <span class="p">}</span>
             <span class="n">_s</span><span class="o">.</span><span class="n">_defaults</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_defaults</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">_s</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">to_config</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;to_config&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defaults</span><span class="p">[</span><span class="s2">&quot;to_config&quot;</span><span class="p">])</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defaults</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
-            <span class="n">group</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;group&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defaults</span><span class="p">[</span><span class="s2">&quot;group&quot;</span><span class="p">])</span>
-            <span class="n">package</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;package&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defaults</span><span class="p">[</span><span class="s2">&quot;package&quot;</span><span class="p">])</span>
-            <span class="n">provider</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;provider&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defaults</span><span class="p">[</span><span class="s2">&quot;provider&quot;</span><span class="p">])</span>
+            <span class="n">to_config</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"to_config"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defaults</span><span class="p">[</span><span class="s2">"to_config"</span><span class="p">])</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defaults</span><span class="p">[</span><span class="s2">"name"</span><span class="p">])</span>
+            <span class="n">group</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"group"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defaults</span><span class="p">[</span><span class="s2">"group"</span><span class="p">])</span>
+            <span class="n">package</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"package"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defaults</span><span class="p">[</span><span class="s2">"package"</span><span class="p">])</span>
+            <span class="n">provider</span> <span class="o">=</span> <span class="n">kw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"provider"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defaults</span><span class="p">[</span><span class="s2">"provider"</span><span class="p">])</span>
 
             <span class="k">if</span> <span class="p">(</span>
                 <span class="nb">isinstance</span><span class="p">(</span><span class="n">__target</span><span class="p">,</span> <span class="n">HydraConf</span><span class="p">)</span>
                 <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">__target</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span>
                 <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">__target</span><span class="p">,</span> <span class="n">HydraConf</span><span class="p">)</span>
             <span class="p">):</span>
-                <span class="c1"># User is re-configuring Hydra&#39;s config; we provide &quot;smart&quot; defaults</span>
-                <span class="c1"># for the entry&#39;s name, group, and package</span>
-                <span class="k">if</span> <span class="s2">&quot;name&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kw</span> <span class="ow">and</span> <span class="s2">&quot;group&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kw</span><span class="p">:</span>  <span class="c1"># pragma: no branch</span>
+                <span class="c1"># User is re-configuring Hydra's config; we provide "smart" defaults</span>
+                <span class="c1"># for the entry's name, group, and package</span>
+                <span class="k">if</span> <span class="s2">"name"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kw</span> <span class="ow">and</span> <span class="s2">"group"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kw</span><span class="p">:</span>  <span class="c1"># pragma: no branch</span>
                     <span class="c1"># only apply when neither name nor group are specified</span>
-                    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;config&quot;</span>
-                    <span class="n">group</span> <span class="o">=</span> <span class="s2">&quot;hydra&quot;</span>
-                    <span class="k">if</span> <span class="s2">&quot;provider&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kw</span><span class="p">:</span>  <span class="c1"># pragma: no branch</span>
-                        <span class="n">provider</span> <span class="o">=</span> <span class="s2">&quot;hydra_zen&quot;</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="s2">"config"</span>
+                    <span class="n">group</span> <span class="o">=</span> <span class="s2">"hydra"</span>
+                    <span class="k">if</span> <span class="s2">"provider"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kw</span><span class="p">:</span>  <span class="c1"># pragma: no branch</span>
+                        <span class="n">provider</span> <span class="o">=</span> <span class="s2">"hydra_zen"</span>
 
             <span class="n">_name</span><span class="p">:</span> <span class="n">NodeName</span> <span class="o">=</span> <span class="n">name</span><span class="p">(</span><span class="n">__target</span><span class="p">)</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">else</span> <span class="n">name</span>  <span class="c1"># type: ignore</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`name` must be a string, got </span><span class="si">{</span><span class="n">_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"`name` must be a string, got </span><span class="si">{</span><span class="n">_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">del</span> <span class="n">name</span>
 
             <span class="n">_group</span><span class="p">:</span> <span class="n">GroupName</span> <span class="o">=</span> <span class="n">group</span><span class="p">(</span><span class="n">__target</span><span class="p">)</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">group</span><span class="p">)</span> <span class="k">else</span> <span class="n">group</span>  <span class="c1"># type: ignore</span>
             <span class="k">if</span> <span class="n">_group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_group</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`group` must be a string or None, got </span><span class="si">{</span><span class="n">_group</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"`group` must be a string or None, got </span><span class="si">{</span><span class="n">_group</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">del</span> <span class="n">group</span>
 
             <span class="n">_pkg</span> <span class="o">=</span> <span class="n">package</span><span class="p">(</span><span class="n">__target</span><span class="p">)</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">package</span><span class="p">)</span> <span class="k">else</span> <span class="n">package</span>
             <span class="k">if</span> <span class="n">_pkg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_pkg</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`package` must be a string or None, got </span><span class="si">{</span><span class="n">_pkg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"`package` must be a string or None, got </span><span class="si">{</span><span class="n">_pkg</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">del</span> <span class="n">package</span>
 
             <span class="n">merged_kw</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_defaults</span><span class="p">[</span><span class="s2">&quot;__kw&quot;</span><span class="p">],</span>
+                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_defaults</span><span class="p">[</span><span class="s2">"__kw"</span><span class="p">],</span>
                 <span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">kw</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">kw</span><span class="p">)</span> <span class="o">-</span> <span class="n">_DEFAULT_KEYS</span><span class="p">},</span>
             <span class="p">}</span>
 
@@ -2078,7 +2078,7 @@
 <div class="viewcode-block" id="ZenStore.copy">
 <a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.copy">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">store_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a copy of the store with the same overridden defaults.</span>
+<span class="w">        </span><span class="sd">"""Returns a copy of the store with the same overridden defaults.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -2091,20 +2091,20 @@
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from hydra_zen import ZenStore</span>
-<span class="sd">        &gt;&gt;&gt; s1 = ZenStore()(group=&quot;G&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; s1({}, name=&quot;a&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; s1 = ZenStore()(group="G")</span>
+<span class="sd">        &gt;&gt;&gt; s1({}, name="a")</span>
 <span class="sd">        &gt;&gt;&gt; s2 = s1.copy()</span>
-<span class="sd">        &gt;&gt;&gt; s2({}, name=&quot;b&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; s2({}, name="b")</span>
 <span class="sd">        &gt;&gt;&gt; s1</span>
 <span class="sd">        s1</span>
-<span class="sd">        {&#39;G&#39;: [&#39;a&#39;]}</span>
+<span class="sd">        {'G': ['a']}</span>
 <span class="sd">        &gt;&gt;&gt; s2</span>
 <span class="sd">        s1_copy</span>
-<span class="sd">        {&#39;G&#39;: [&#39;a&#39;, &#39;b&#39;]}</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        {'G': ['a', 'b']}</span>
+<span class="sd">        """</span>
         <span class="n">cp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="n">cp</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">store_name</span> <span class="k">if</span> <span class="n">store_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_copy&quot;</span>
+        <span class="n">cp</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">store_name</span> <span class="k">if</span> <span class="n">store_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">"_copy"</span>
         <span class="k">return</span> <span class="n">cp</span></div>
 
 
@@ -2119,7 +2119,7 @@
         <span class="n">store_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">overwrite_ok</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a copy of a store whose entries&#39; groups have been updated according to the provided mapping.</span>
+<span class="w">        </span><span class="sd">"""Create a copy of a store whose entries' groups have been updated according to the provided mapping.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -2147,31 +2147,31 @@
 
 <span class="sd">        Creating an initial store</span>
 
-<span class="sd">        &gt;&gt;&gt; s1 = ZenStore(&quot;s1&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; s1({}, group=None, name=&quot;a&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; s1({}, group=&quot;A/1&quot;, name=&quot;b&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; s1({}, group=&quot;A/2&quot;, name=&quot;c&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; s1 = ZenStore("s1")</span>
+<span class="sd">        &gt;&gt;&gt; s1({}, group=None, name="a")</span>
+<span class="sd">        &gt;&gt;&gt; s1({}, group="A/1", name="b")</span>
+<span class="sd">        &gt;&gt;&gt; s1({}, group="A/2", name="c")</span>
 <span class="sd">        &gt;&gt;&gt; s1</span>
 <span class="sd">        s1</span>
-<span class="sd">        {None: [&#39;a&#39;], &#39;A/1&#39;: [&#39;b&#39;], &#39;A/2&#39;: [&#39;c&#39;]}</span>
+<span class="sd">        {None: ['a'], 'A/1': ['b'], 'A/2': ['c']}</span>
 
-<span class="sd">        Replacing group &quot;A/1&quot; with &quot;B&quot;, via a mapping</span>
+<span class="sd">        Replacing group "A/1" with "B", via a mapping</span>
 
-<span class="sd">        &gt;&gt;&gt; s2 = s1.copy_with_mapped_groups({&quot;A/1&quot;: &quot;B&quot;}, store_name=&quot;s2&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; s2 = s1.copy_with_mapped_groups({"A/1": "B"}, store_name="s2")</span>
 <span class="sd">        &gt;&gt;&gt; s2</span>
 <span class="sd">        s2</span>
-<span class="sd">        {None: [&#39;a&#39;], &#39;A/2&#39;: [&#39;c&#39;], &#39;B&#39;: [&#39;b&#39;]}</span>
+<span class="sd">        {None: ['a'], 'A/2': ['c'], 'B': ['b']}</span>
 
-<span class="sd">        Placing all entries under group &quot;A/&quot; within a new inner group &quot;p&quot;, via a</span>
+<span class="sd">        Placing all entries under group "A/" within a new inner group "p", via a</span>
 <span class="sd">        function</span>
 
 <span class="sd">        &gt;&gt;&gt; s3 = s1.copy_with_mapped_groups(</span>
-<span class="sd">        ...     lambda g: g + &quot;/p&quot; if g and g.startswith(&quot;A/&quot;) else g, store_name=&quot;s3&quot;</span>
+<span class="sd">        ...     lambda g: g + "/p" if g and g.startswith("A/") else g, store_name="s3"</span>
 <span class="sd">        ... )</span>
 <span class="sd">        &gt;&gt;&gt; s3</span>
 <span class="sd">        s3</span>
-<span class="sd">        {None: [&#39;a&#39;], &#39;A/1/p&#39;: [&#39;b&#39;], &#39;A/2/p&#39;: [&#39;c&#39;]}</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        {None: ['a'], 'A/1/p': ['b'], 'A/2/p': ['c']}</span>
+<span class="sd">        """</span>
         <span class="n">overwrite</span> <span class="o">=</span> <span class="n">overwrite_ok</span> <span class="k">if</span> <span class="n">overwrite_ok</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_overwrite_ok</span>
 
         <span class="n">map_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">GroupName</span><span class="p">],</span> <span class="n">GroupName</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
@@ -2185,14 +2185,14 @@
             <span class="n">new_group</span> <span class="o">=</span> <span class="n">map_fn</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
             <span class="k">if</span> <span class="n">new_group</span> <span class="o">!=</span> <span class="n">group</span><span class="p">:</span>
                 <span class="k">del</span> <span class="n">copy</span><span class="p">[</span><span class="n">group</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span>
-                <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;group&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_group</span>
+                <span class="n">entry</span><span class="p">[</span><span class="s2">"group"</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_group</span>
                 <span class="n">copy</span><span class="o">.</span><span class="n">_set_entry</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">copy</span></div>
 
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">groups</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">GroupName</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a sorted list of the groups registered with this store&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Returns a sorted list of the groups registered with this store"""</span>
         <span class="n">set_</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">GroupName</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">group</span> <span class="k">for</span> <span class="n">group</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">}</span>
         <span class="k">if</span> <span class="kc">None</span> <span class="ow">in</span> <span class="n">set_</span><span class="p">:</span>
             <span class="n">set_</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
@@ -2205,13 +2205,13 @@
 <div class="viewcode-block" id="ZenStore.enqueue_all">
 <a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.enqueue_all">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">enqueue_all</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add all of the store&#39;s entries to the queue to be added to hydra&#39;s store.</span>
+<span class="w">        </span><span class="sd">"""Add all of the store's entries to the queue to be added to hydra's store.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from hydra_zen import ZenStore</span>
 <span class="sd">        &gt;&gt;&gt; store = ZenStore(deferred_hydra_store=True)</span>
-<span class="sd">        &gt;&gt;&gt; store({&quot;a&quot;: 1}, name)</span>
+<span class="sd">        &gt;&gt;&gt; store({"a": 1}, name)</span>
 <span class="sd">        &gt;&gt;&gt; store.has_enqueued()</span>
 <span class="sd">        True</span>
 
@@ -2222,15 +2222,15 @@
 <span class="sd">        &gt;&gt;&gt; store.enqueue_all()</span>
 <span class="sd">        &gt;&gt;&gt; store.has_enqueued()</span>
 <span class="sd">        True</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
 
 
 <div class="viewcode-block" id="ZenStore.has_enqueued">
 <a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.has_enqueued">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">has_enqueued</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;`True` if this store has entries that have not yet been added to</span>
-<span class="sd">        Hydra&#39;s config store.</span>
+<span class="w">        </span><span class="sd">"""`True` if this store has entries that have not yet been added to</span>
+<span class="sd">        Hydra's config store.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2243,20 +2243,20 @@
 <span class="sd">        &gt;&gt;&gt; store.has_enqueued()</span>
 <span class="sd">        False</span>
 
-<span class="sd">        &gt;&gt;&gt; store({&quot;a&quot;: 1}, name)</span>
+<span class="sd">        &gt;&gt;&gt; store({"a": 1}, name)</span>
 <span class="sd">        &gt;&gt;&gt; store.has_enqueued()</span>
 <span class="sd">        True</span>
 
 <span class="sd">        &gt;&gt;&gt; store.add_to_hydra_store()</span>
 <span class="sd">        &gt;&gt;&gt; store.has_enqueued()</span>
 <span class="sd">        False</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;`True` if entries have been added to this store, regardless of whether or</span>
-<span class="sd">        not they have been added to Hydra&#39;s config store&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""`True` if entries have been added to this store, regardless of whether or</span>
+<span class="sd">        not they have been added to Hydra's config store"""</span>
         <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -2264,8 +2264,8 @@
 
 <div class="viewcode-block" id="ZenStore.update">
 <a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.update">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__other</span><span class="p">:</span> <span class="s2">&quot;ZenStore&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates the store inplace with redundant entries being overwritten.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__other</span><span class="p">:</span> <span class="s2">"ZenStore"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Updates the store inplace with redundant entries being overwritten.</span>
 
 <span class="sd">        Can also be applied via the `|=` in-place operator.</span>
 
@@ -2274,24 +2274,24 @@
 <span class="sd">        &gt;&gt;&gt; from hydra_zen import ZenStore</span>
 <span class="sd">        &gt;&gt;&gt; def f(): ...</span>
 <span class="sd">        &gt;&gt;&gt; def g(): ...</span>
-<span class="sd">        &gt;&gt;&gt; s1 = ZenStore(&quot;s1&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; s2 = ZenStore(&quot;s2&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; s1 = ZenStore("s1")</span>
+<span class="sd">        &gt;&gt;&gt; s2 = ZenStore("s2")</span>
 <span class="sd">        &gt;&gt;&gt; s1(f)  # store f in s1</span>
 <span class="sd">        &gt;&gt;&gt; s2(g)  # store g in s2</span>
 
 <span class="sd">        &gt;&gt;&gt; s1.update(s2)</span>
 <span class="sd">        &gt;&gt;&gt; s1  # s1 now has entries for both f and g</span>
 <span class="sd">        s1</span>
-<span class="sd">        {None: [&#39;f&#39;, &#39;g&#39;]}</span>
+<span class="sd">        {None: ['f', 'g']}</span>
 
 <span class="sd">        Alternatively, the `|=` operator can be used to update a store inplace.</span>
 
-<span class="sd">        &gt;&gt;&gt; s3 = ZenStore(&quot;s3&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; s3 = ZenStore("s3")</span>
 <span class="sd">        &gt;&gt;&gt; s3 |= s2</span>
 <span class="sd">        &gt;&gt;&gt; s3</span>
 <span class="sd">        s3</span>
-<span class="sd">        {None: [&#39;g&#39;]}</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        {None: ['g']}</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">__other</span> <span class="o">==</span> <span class="bp">self</span><span class="p">:</span>
             <span class="k">return</span>
 
@@ -2305,11 +2305,11 @@
 <div class="viewcode-block" id="ZenStore.merge">
 <a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.merge">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">merge</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">__other</span><span class="p">:</span> <span class="s2">&quot;ZenStore&quot;</span><span class="p">,</span> <span class="n">store_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">__other</span><span class="p">:</span> <span class="s2">"ZenStore"</span><span class="p">,</span> <span class="n">store_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new store by merging two stores.</span>
+<span class="w">        </span><span class="sd">"""Create a new store by merging two stores.</span>
 
-<span class="sd">        The new store&#39;s default settings will reflect those of `self` in</span>
+<span class="sd">        The new store's default settings will reflect those of `self` in</span>
 <span class="sd">        `self.merge(other)`. This can also be applied via the `|` operator.</span>
 
 <span class="sd">        Examples</span>
@@ -2317,32 +2317,32 @@
 <span class="sd">        &gt;&gt;&gt; from hydra_zen import ZenStore</span>
 <span class="sd">        &gt;&gt;&gt; def f(): ...</span>
 <span class="sd">        &gt;&gt;&gt; def g(): ...</span>
-<span class="sd">        &gt;&gt;&gt; s1 = ZenStore(&quot;s1&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; s2 = ZenStore(&quot;s2&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; s1 = ZenStore("s1")</span>
+<span class="sd">        &gt;&gt;&gt; s2 = ZenStore("s2")</span>
 <span class="sd">        &gt;&gt;&gt; s1(f)  # store f in s1</span>
 <span class="sd">        &gt;&gt;&gt; s2(g)  # store g in s2</span>
 
 <span class="sd">        &gt;&gt;&gt; s3 = s1.merge(s2)</span>
 <span class="sd">        &gt;&gt;&gt; s3</span>
 <span class="sd">        s1_copy</span>
-<span class="sd">        {None: [&#39;f&#39;, &#39;g&#39;]}</span>
+<span class="sd">        {None: ['f', 'g']}</span>
 
 <span class="sd">        Alternatively, the `|` operator can be used to merge stores.</span>
 
 <span class="sd">        &gt;&gt;&gt; s4 = s1 | s2</span>
 <span class="sd">        &gt;&gt;&gt; s4</span>
 <span class="sd">        s1_copy</span>
-<span class="sd">        {None: [&#39;f&#39;, &#39;g&#39;]}</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        {None: ['f', 'g']}</span>
+<span class="sd">        """</span>
         <span class="n">cp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">store_name</span><span class="p">)</span>
         <span class="n">cp</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">__other</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cp</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;ZenStore&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">"ZenStore"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__ior__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;ZenStore&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__ior__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">"ZenStore"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
@@ -2355,7 +2355,7 @@
 <div class="viewcode-block" id="ZenStore.__getitem__">
 <a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.__getitem__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">NodeName</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Node</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Access a entry&#39;s config node by specifying `(group, name)`. Or, access a</span>
+<span class="w">        </span><span class="sd">"""Access a entry's config node by specifying `(group, name)`. Or, access a</span>
 <span class="sd">        mapping of `(group, name) -&gt; node` for all nodes in a specified group,</span>
 <span class="sd">        including nodes within subgroups.</span>
 
@@ -2366,46 +2366,46 @@
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from hydra_zen import store</span>
-<span class="sd">        &gt;&gt;&gt; store(dict(x=1), name=&quot;a&quot;, group=&quot;fruit&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; store(dict(x=2), name=&quot;b&quot;, group=&quot;fruit/apple&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; store(dict(x=3), name=&quot;c&quot;, group=&quot;fruit/apple&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; store(dict(x=4), name=&quot;d&quot;, group=&quot;fruit/orange&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; store(dict(x=5), name=&quot;e&quot;, group=&quot;veggie&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; store(dict(x=1), name="a", group="fruit")</span>
+<span class="sd">        &gt;&gt;&gt; store(dict(x=2), name="b", group="fruit/apple")</span>
+<span class="sd">        &gt;&gt;&gt; store(dict(x=3), name="c", group="fruit/apple")</span>
+<span class="sd">        &gt;&gt;&gt; store(dict(x=4), name="d", group="fruit/orange")</span>
+<span class="sd">        &gt;&gt;&gt; store(dict(x=5), name="e", group="veggie")</span>
 
-<span class="sd">        Accessing an individual entry&#39;s config node.</span>
+<span class="sd">        Accessing an individual entry's config node.</span>
 
-<span class="sd">        &gt;&gt;&gt; store[&quot;fruit/apple&quot;, &quot;b&quot;]</span>
-<span class="sd">        {&#39;x&#39;: 2}</span>
+<span class="sd">        &gt;&gt;&gt; store["fruit/apple", "b"]</span>
+<span class="sd">        {'x': 2}</span>
 
-<span class="sd">        Accessing all config nodes under the &quot;fruit/apple&quot; group</span>
+<span class="sd">        Accessing all config nodes under the "fruit/apple" group</span>
 
-<span class="sd">        &gt;&gt;&gt; store[&quot;fruit/apple&quot;]</span>
-<span class="sd">        {(&#39;fruit/apple&#39;, &#39;b&#39;): {&#39;x&#39;: 2}, (&#39;fruit/apple&#39;, &#39;c&#39;): {&#39;x&#39;: 3}}</span>
+<span class="sd">        &gt;&gt;&gt; store["fruit/apple"]</span>
+<span class="sd">        {('fruit/apple', 'b'): {'x': 2}, ('fruit/apple', 'c'): {'x': 3}}</span>
 
-<span class="sd">        Accessing all config nodes under the &quot;fruit&quot; group</span>
+<span class="sd">        Accessing all config nodes under the "fruit" group</span>
 
-<span class="sd">        &gt;&gt;&gt; store[&quot;fruit&quot;]</span>
-<span class="sd">        {(&#39;fruit&#39;, &#39;a&#39;): {&#39;x&#39;: 1},</span>
-<span class="sd">         (&#39;fruit/apple&#39;, &#39;b&#39;): {&#39;x&#39;: 2},</span>
-<span class="sd">         (&#39;fruit/apple&#39;, &#39;c&#39;): {&#39;x&#39;: 3},</span>
-<span class="sd">         (&#39;fruit/orange&#39;, &#39;d&#39;): {&#39;x&#39;: 4}}</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; store["fruit"]</span>
+<span class="sd">        {('fruit', 'a'): {'x': 1},</span>
+<span class="sd">         ('fruit/apple', 'b'): {'x': 2},</span>
+<span class="sd">         ('fruit/apple', 'c'): {'x': 3},</span>
+<span class="sd">         ('fruit/orange', 'd'): {'x': 4}}</span>
+<span class="sd">        """</span>
         <span class="c1"># store[group] -&gt;</span>
         <span class="c1">#  {(group, name): node1, (group, name2): node2, (group/subgroup, name3): node3}</span>
         <span class="c1">#</span>
         <span class="c1"># store[group, name] -&gt; node</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">key_not_none</span> <span class="o">=</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-            <span class="n">key_w_ender</span> <span class="o">=</span> <span class="n">key</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&lt;ZEN_NEVER&gt;&quot;</span>
+            <span class="n">key_w_ender</span> <span class="o">=</span> <span class="n">key</span> <span class="o">+</span> <span class="s2">"/"</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">"&lt;ZEN_NEVER&gt;"</span>
             <span class="k">return</span> <span class="p">{</span>
-                <span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span> <span class="n">_resolve_node</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="s2">&quot;node&quot;</span><span class="p">]</span>
+                <span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span> <span class="n">_resolve_node</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="s2">"node"</span><span class="p">]</span>
                 <span class="k">for</span> <span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">name</span><span class="p">),</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">group</span> <span class="o">==</span> <span class="n">key</span>
                 <span class="ow">or</span> <span class="p">(</span>
                     <span class="n">key_not_none</span> <span class="ow">and</span> <span class="n">group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">group</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">key_w_ender</span><span class="p">)</span>
                 <span class="p">)</span>
             <span class="p">}</span>
-        <span class="k">return</span> <span class="n">_resolve_node</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="s2">&quot;node&quot;</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="n">_resolve_node</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="s2">"node"</span><span class="p">]</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">NodeName</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -2421,7 +2421,7 @@
 <div class="viewcode-block" id="ZenStore.get_entry">
 <a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.get_entry">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">GroupName</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">NodeName</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StoreEntry</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Access a store entry, which is a mapping that specifies the entry&#39;s</span>
+<span class="w">        </span><span class="sd">"""Access a store entry, which is a mapping that specifies the entry's</span>
 <span class="sd">        name, group, package, provider, and node.</span>
 
 <span class="sd">        Parameters</span>
@@ -2440,33 +2440,33 @@
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        Mutating the returned mapping will not affect the store&#39;s internal entry.</span>
+<span class="sd">        Mutating the returned mapping will not affect the store's internal entry.</span>
 <span class="sd">        Mutating a node in the returned entry may have unintended consequences and</span>
 <span class="sd">        is not advised.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from hydra_zen import store, ZenStore</span>
-<span class="sd">        &gt;&gt;&gt; store(dict(x=1), name=&quot;a&quot;, group=&quot;fruit&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; store.get_entry(&quot;fruit&quot;, &quot;a&quot;)</span>
-<span class="sd">        {&#39;name&#39;: &#39;a&#39;,</span>
-<span class="sd">         &#39;group&#39;: &#39;fruit&#39;,</span>
-<span class="sd">         &#39;package&#39;: None,</span>
-<span class="sd">         &#39;provider&#39;: None,</span>
-<span class="sd">         &#39;node&#39;: {&#39;x&#39;: 1}}</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; store(dict(x=1), name="a", group="fruit")</span>
+<span class="sd">        &gt;&gt;&gt; store.get_entry("fruit", "a")</span>
+<span class="sd">        {'name': 'a',</span>
+<span class="sd">         'group': 'fruit',</span>
+<span class="sd">         'package': None,</span>
+<span class="sd">         'provider': None,</span>
+<span class="sd">         'node': {'x': 1}}</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">_resolve_node</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">[(</span><span class="n">group</span><span class="p">,</span> <span class="n">name</span><span class="p">)],</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_set_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__entry</span><span class="p">:</span> <span class="n">StoreEntry</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">_group</span> <span class="o">=</span> <span class="n">__entry</span><span class="p">[</span><span class="s2">&quot;group&quot;</span><span class="p">]</span>
-        <span class="n">_name</span> <span class="o">=</span> <span class="n">__entry</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+        <span class="n">_group</span> <span class="o">=</span> <span class="n">__entry</span><span class="p">[</span><span class="s2">"group"</span><span class="p">]</span>
+        <span class="n">_name</span> <span class="o">=</span> <span class="n">__entry</span><span class="p">[</span><span class="s2">"name"</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">overwrite</span> <span class="ow">and</span> <span class="p">(</span><span class="n">_group</span><span class="p">,</span> <span class="n">_name</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;(name=</span><span class="si">{</span><span class="n">__entry</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> group=</span><span class="si">{</span><span class="n">__entry</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">): &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Store entry already exists. Use a store initialized &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;with `ZenStore(overwrite_ok=True)` to overwrite config store &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;entries.&quot;</span>
+                <span class="sa">f</span><span class="s2">"(name=</span><span class="si">{</span><span class="n">__entry</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="si">}</span><span class="s2"> group=</span><span class="si">{</span><span class="n">__entry</span><span class="p">[</span><span class="s1">'group'</span><span class="p">]</span><span class="si">}</span><span class="s2">): "</span>
+                <span class="sa">f</span><span class="s2">"Store entry already exists. Use a store initialized "</span>
+                <span class="sa">f</span><span class="s2">"with `ZenStore(overwrite_ok=True)` to overwrite config store "</span>
+                <span class="sa">f</span><span class="s2">"entries."</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">[</span><span class="n">_group</span><span class="p">,</span> <span class="n">_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">__entry</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">_group</span><span class="p">,</span> <span class="n">_name</span><span class="p">))</span>
@@ -2475,11 +2475,11 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">add_to_hydra_store</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">GroupName</span><span class="p">,</span> <span class="n">NodeName</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks if group or (group, node-name) exists in zen-store.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Checks if group or (group, node-name) exists in zen-store."""</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="p">)</span>  <span class="c1"># pragma: no branch</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">key_w_end</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">key</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
+            <span class="n">key_w_end</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">key</span> <span class="o">+</span> <span class="s2">"/"</span>
             <span class="k">return</span> <span class="nb">any</span><span class="p">(</span>
                 <span class="n">key</span> <span class="o">==</span> <span class="n">group</span> <span class="ow">or</span> <span class="n">group</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">key_w_end</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">group</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span>
@@ -2490,44 +2490,44 @@
 <div class="viewcode-block" id="ZenStore.__iter__">
 <a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.__iter__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">StoreEntry</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Yields all entries in this store.</span>
+<span class="w">        </span><span class="sd">"""Yields all entries in this store.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        Mutating the returned mappings will not affect the store&#39;s internal entries.</span>
+<span class="sd">        Mutating the returned mappings will not affect the store's internal entries.</span>
 <span class="sd">        Mutating a node in an entry may have unintended consequences and is not advised.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; from hydra_zen import store</span>
-<span class="sd">        &gt;&gt;&gt; store(dict(x=1), name=&quot;a&quot;, group=&quot;fruit&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; store(dict(x=2), name=&quot;b&quot;, group=&quot;fruit/orange&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; store(dict(x=3), name=&quot;c&quot;, group=&quot;veggie&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; store(dict(x=1), name="a", group="fruit")</span>
+<span class="sd">        &gt;&gt;&gt; store(dict(x=2), name="b", group="fruit/orange")</span>
+<span class="sd">        &gt;&gt;&gt; store(dict(x=3), name="c", group="veggie")</span>
 
 <span class="sd">        &gt;&gt;&gt; list(store)</span>
-<span class="sd">        [{&#39;name&#39;: &#39;a&#39;,</span>
-<span class="sd">          &#39;group&#39;: &#39;fruit&#39;,</span>
-<span class="sd">          &#39;package&#39;: None,</span>
-<span class="sd">          &#39;provider&#39;: None,</span>
-<span class="sd">          &#39;node&#39;: {&#39;x&#39;: 1}},</span>
-<span class="sd">         {&#39;name&#39;: &#39;b&#39;,</span>
-<span class="sd">          &#39;group&#39;: &#39;fruit/orange&#39;,</span>
-<span class="sd">          &#39;package&#39;: None,</span>
-<span class="sd">          &#39;provider&#39;: None,</span>
-<span class="sd">          &#39;node&#39;: {&#39;x&#39;: 2}},</span>
-<span class="sd">         {&#39;name&#39;: &#39;c&#39;,</span>
-<span class="sd">          &#39;group&#39;: &#39;veggie&#39;,</span>
-<span class="sd">          &#39;package&#39;: None,</span>
-<span class="sd">          &#39;provider&#39;: None,</span>
-<span class="sd">          &#39;node&#39;: {&#39;x&#39;: 3}}]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        [{'name': 'a',</span>
+<span class="sd">          'group': 'fruit',</span>
+<span class="sd">          'package': None,</span>
+<span class="sd">          'provider': None,</span>
+<span class="sd">          'node': {'x': 1}},</span>
+<span class="sd">         {'name': 'b',</span>
+<span class="sd">          'group': 'fruit/orange',</span>
+<span class="sd">          'package': None,</span>
+<span class="sd">          'provider': None,</span>
+<span class="sd">          'node': {'x': 2}},</span>
+<span class="sd">         {'name': 'c',</span>
+<span class="sd">          'group': 'veggie',</span>
+<span class="sd">          'package': None,</span>
+<span class="sd">          'provider': None,</span>
+<span class="sd">          'node': {'x': 3}}]</span>
+<span class="sd">        """</span>
         <span class="k">yield from</span> <span class="p">(</span><span class="n">_resolve_node</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_internal_repo</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
 
 
 <div class="viewcode-block" id="ZenStore.add_to_hydra_store">
 <a class="viewcode-back" href="../../../generated/hydra_zen.ZenStore.html#hydra_zen.ZenStore.add_to_hydra_store">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_to_hydra_store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">overwrite_ok</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds all of this store&#39;s enqueued entries to Hydra&#39;s global config store.</span>
+<span class="w">        </span><span class="sd">"""Adds all of this store's enqueued entries to Hydra's global config store.</span>
 
 <span class="sd">        This method need not be called for a store initialized as</span>
 <span class="sd">        `ZenStore(deferred_hydra_store=False)`.</span>
@@ -2535,7 +2535,7 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        overwrite_ok : Optional[bool]</span>
-<span class="sd">            If `False`, this method raises `ValueError` if an entry in Hydra&#39;s config</span>
+<span class="sd">            If `False`, this method raises `ValueError` if an entry in Hydra's config</span>
 <span class="sd">            store will be overwritten. Defaults to the value of `overwrite_ok`</span>
 <span class="sd">            specified when initializing this store.</span>
 
@@ -2545,15 +2545,15 @@
 <span class="sd">        &gt;&gt;&gt; store1 = ZenStore()</span>
 <span class="sd">        &gt;&gt;&gt; store2 = ZenStore()</span>
 
-<span class="sd">        &gt;&gt;&gt; store1({&#39;a&#39;: 1}, name=&quot;x&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; store1({'a': 1}, name="x")</span>
 <span class="sd">        &gt;&gt;&gt; store1.add_to_hydra_store()</span>
-<span class="sd">        &gt;&gt;&gt; store2({&#39;a&#39;: 2}, name=&quot;x&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; store2({'a': 2}, name="x")</span>
 <span class="sd">        &gt;&gt;&gt; store2.add_to_hydra_store()</span>
 <span class="sd">        ValueError: (name=x group=None): Hydra config store entry already exists. Specify `overwrite_ok=True` to enable replacing config store entries</span>
 
 <span class="sd">        &gt;&gt;&gt; store2.add_to_hydra_store(overwrite_ok=True)  # successfully overwrites entry</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">_store</span> <span class="o">=</span> <span class="n">ConfigStore</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span><span class="o">.</span><span class="n">store</span>
 
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="p">):</span>
@@ -2564,19 +2564,19 @@
                     <span class="ow">or</span> <span class="p">(</span><span class="n">overwrite_ok</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_overwrite_ok</span><span class="p">)</span>
                 <span class="p">)</span>
                 <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exists_in_hydra_store</span><span class="p">(</span>
-                    <span class="n">name</span><span class="o">=</span><span class="n">entry</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">group</span><span class="o">=</span><span class="n">entry</span><span class="p">[</span><span class="s2">&quot;group&quot;</span><span class="p">]</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">entry</span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span> <span class="n">group</span><span class="o">=</span><span class="n">entry</span><span class="p">[</span><span class="s2">"group"</span><span class="p">]</span>
                 <span class="p">)</span>
-                <span class="c1"># It is okay if we are overwriting Hydra&#39;s default store</span>
+                <span class="c1"># It is okay if we are overwriting Hydra's default store</span>
                 <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span>
-                    <span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;group&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="p">(</span><span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="s2">&quot;hydra&quot;</span><span class="p">)</span>
-                    <span class="ow">and</span> <span class="n">ConfigStore</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span><span class="o">.</span><span class="n">repo</span><span class="p">[</span><span class="s2">&quot;hydra&quot;</span><span class="p">][</span><span class="s2">&quot;config.yaml&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">provider</span>
-                    <span class="o">==</span> <span class="s2">&quot;hydra&quot;</span>
+                    <span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span> <span class="n">entry</span><span class="p">[</span><span class="s2">"group"</span><span class="p">])</span> <span class="o">==</span> <span class="p">(</span><span class="s2">"config"</span><span class="p">,</span> <span class="s2">"hydra"</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="n">ConfigStore</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span><span class="o">.</span><span class="n">repo</span><span class="p">[</span><span class="s2">"hydra"</span><span class="p">][</span><span class="s2">"config.yaml"</span><span class="p">]</span><span class="o">.</span><span class="n">provider</span>
+                    <span class="o">==</span> <span class="s2">"hydra"</span>
                 <span class="p">)</span>
             <span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;(name=</span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> group=</span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">): &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;Hydra config store entry already exists. Specify &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;`overwrite_ok=True` to enable replacing config store entries&quot;</span>
+                    <span class="sa">f</span><span class="s2">"(name=</span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="si">}</span><span class="s2"> group=</span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">'group'</span><span class="p">]</span><span class="si">}</span><span class="s2">): "</span>
+                    <span class="sa">f</span><span class="s2">"Hydra config store entry already exists. Specify "</span>
+                    <span class="sa">f</span><span class="s2">"`overwrite_ok=True` to enable replacing config store entries"</span>
                 <span class="p">)</span>
             <span class="n">_store</span><span class="p">(</span><span class="o">**</span><span class="n">entry</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
@@ -2592,16 +2592,16 @@
         <span class="n">repo</span> <span class="o">=</span> <span class="n">hydra_store</span><span class="o">.</span><span class="n">repo</span>
 
         <span class="k">if</span> <span class="n">group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">group_name</span> <span class="ow">in</span> <span class="n">group</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">group_name</span> <span class="ow">in</span> <span class="n">group</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">):</span>
                 <span class="n">repo</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">group_name</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">repo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.yaml&quot;</span> <span class="ow">in</span> <span class="n">repo</span></div>
+        <span class="k">return</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">".yaml"</span> <span class="ow">in</span> <span class="n">repo</span></div>
 
 
 
 <span class="n">store</span><span class="p">:</span> <span class="n">ZenStore</span> <span class="o">=</span> <span class="n">ZenStore</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zen_store&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"zen_store"</span><span class="p">,</span>
     <span class="n">deferred_to_config</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">deferred_hydra_store</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>

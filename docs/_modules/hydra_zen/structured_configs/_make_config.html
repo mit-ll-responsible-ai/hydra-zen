@@ -420,12 +420,12 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">._implementations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultBuilds</span><span class="p">,</span> <span class="n">ZenField</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ZenField&quot;</span><span class="p">,</span> <span class="s2">&quot;make_config&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"ZenField"</span><span class="p">,</span> <span class="s2">"make_config"</span><span class="p">]</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">NOTHING</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;`NOTHING` cannot be instantiated&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"`NOTHING` cannot be instantiated"</span><span class="p">)</span>
 
 
 <span class="n">_MAKE_CONFIG_SETTINGS</span> <span class="o">=</span> <span class="n">AllConvert</span><span class="p">(</span><span class="n">dataclass</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">flat_target</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -436,14 +436,14 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">make_config</span><span class="p">(</span>
     <span class="o">*</span><span class="n">fields_as_args</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">],</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">"none"</span><span class="p">,</span> <span class="s2">"partial"</span><span class="p">,</span> <span class="s2">"all"</span><span class="p">,</span> <span class="s2">"object"</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hydra_defaults</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DefaultsList</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">bases</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">fields_as_kwargs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">SupportedPrimitive</span><span class="p">,</span> <span class="n">ZenField</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">DataClass</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Returns a config with user-defined field names and, optionally,</span>
 <span class="sd">    associated default values and/or type annotations.</span>
 
@@ -460,12 +460,12 @@
 <span class="sd">    **fields_as_kwargs : SupportedPrimitive | ZenField</span>
 <span class="sd">        Like ``fields_as_args``, but field-name/default-value pairs are</span>
 <span class="sd">        specified as keyword arguments. `ZenField` can also be used here</span>
-<span class="sd">        to express a field&#39;s type-annotation and/or its default value.</span>
+<span class="sd">        to express a field's type-annotation and/or its default value.</span>
 
 <span class="sd">        Named parameters of the forms ``hydra_xx``, ``zen_xx``, and ``_zen_xx`` are reserved to ensure future-compatibility, and cannot be specified by the user.</span>
 
 <span class="sd">    zen_convert : Optional[ZenConvert]</span>
-<span class="sd">        A dictionary that modifies hydra-zen&#39;s value and type conversion behavior.</span>
+<span class="sd">        A dictionary that modifies hydra-zen's value and type conversion behavior.</span>
 <span class="sd">        Consists of the following optional key-value pairs (:ref:`zen-convert`):</span>
 
 <span class="sd">        - `dataclass` : `bool` (default=False):</span>
@@ -483,13 +483,13 @@
 
 <span class="sd">        If ``None``, the ``_recursive_`` attribute is not set on the resulting config.</span>
 
-<span class="sd">    hydra_convert : Optional[Literal[&quot;none&quot;, &quot;partial&quot;, &quot;all&quot;, &quot;object&quot;]], optional (default=&quot;none&quot;)</span>
+<span class="sd">    hydra_convert : Optional[Literal["none", "partial", "all", "object"]], optional (default="none")</span>
 <span class="sd">        Determines how Hydra handles the non-primitive objects passed to configuration [3]_.</span>
 
-<span class="sd">        - ``&quot;none&quot;``: Passed objects are DictConfig and ListConfig, default</span>
-<span class="sd">        - ``&quot;partial&quot;``: Passed objects are converted to dict and list, with the exception of Structured Configs (and their fields).</span>
-<span class="sd">        - ``&quot;all&quot;``: Passed objects are dicts, lists and primitives without a trace of OmegaConf containers</span>
-<span class="sd">        - ``&quot;object&quot;``: Passed objects are converted to dict and list. Structured Configs are converted to instances of the backing dataclass / attr class.</span>
+<span class="sd">        - ``"none"``: Passed objects are DictConfig and ListConfig, default</span>
+<span class="sd">        - ``"partial"``: Passed objects are converted to dict and list, with the exception of Structured Configs (and their fields).</span>
+<span class="sd">        - ``"all"``: Passed objects are dicts, lists and primitives without a trace of OmegaConf containers</span>
+<span class="sd">        - ``"object"``: Passed objects are converted to dict and list. Structured Configs are converted to instances of the backing dataclass / attr class.</span>
 
 <span class="sd">        If ``None``, the ``_convert_`` attribute is not set on the resulting config.</span>
 
@@ -502,22 +502,22 @@
 <span class="sd">        A dictionary can specify any option that is supported by</span>
 <span class="sd">        :py:func:`dataclasses.make_dataclass` other than `fields`.</span>
 
-<span class="sd">        Additionally, a ``&#39;module&#39;: &lt;str&gt;`` entry can be specified to enable pickle</span>
+<span class="sd">        Additionally, a ``'module': &lt;str&gt;`` entry can be specified to enable pickle</span>
 <span class="sd">        compatibility. See `hydra_zen.typing.DataclassOptions` for details.</span>
 
 <span class="sd">    frozen : bool, optional (default=False)</span>
 <span class="sd">        .. deprecated:: 0.9.0</span>
 <span class="sd">            `frozen` will be removed in hydra-zen 0.10.0. It is replaced by</span>
-<span class="sd">            ``zen_dataclass={&#39;frozen&#39;: &lt;bool&gt;}``.</span>
+<span class="sd">            ``zen_dataclass={'frozen': &lt;bool&gt;}``.</span>
 
-<span class="sd">        If ``True``, the resulting config class will produce &#39;frozen&#39; (i.e. immutable)</span>
+<span class="sd">        If ``True``, the resulting config class will produce 'frozen' (i.e. immutable)</span>
 <span class="sd">        instances. I.e. setting/deleting an attribute of an instance of the config will</span>
 <span class="sd">        raise :py:class:`dataclasses.FrozenInstanceError` at runtime.</span>
 
-<span class="sd">    config_name : str, optional (default=&quot;Config&quot;)</span>
+<span class="sd">    config_name : str, optional (default="Config")</span>
 <span class="sd">        .. deprecated:: 0.9.0</span>
 <span class="sd">            `config_name` will be removed in hydra-zen 0.10.0. It is replaced by</span>
-<span class="sd">            ``zen_dataclass={&#39;cls_name&#39;: &lt;str&gt;}``.</span>
+<span class="sd">            ``zen_dataclass={'cls_name': &lt;str&gt;}``.</span>
 
 <span class="sd">        The class name of the resulting config class.</span>
 
@@ -534,14 +534,14 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    The resulting &quot;config&quot; is a dataclass-object [4]_ with Hydra-specific attributes</span>
+<span class="sd">    The resulting "config" is a dataclass-object [4]_ with Hydra-specific attributes</span>
 <span class="sd">    attached to it, along with the attributes specified via ``fields_as_args`` and</span>
 <span class="sd">    ``fields_as_kwargs``. **Unlike std-lib dataclasses, the default value for</span>
 <span class="sd">    unsafe_hash is True.**</span>
 
 <span class="sd">    Any field specified without a type-annotation is automatically annotated with</span>
 <span class="sd">    :py:class:`typing.Any`. Hydra only supports a narrow subset of types [5]_;</span>
-<span class="sd">    `make_config` will automatically &#39;broaden&#39; any user-specified annotations so that</span>
+<span class="sd">    `make_config` will automatically 'broaden' any user-specified annotations so that</span>
 <span class="sd">    they are compatible with Hydra.</span>
 
 <span class="sd">    `make_config` will automatically manipulate certain types of default values to</span>
@@ -557,8 +557,8 @@
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
-<span class="sd">    builds : Create a targeted structured config designed to &quot;build&quot; a particular object.</span>
-<span class="sd">    just : Create a config that &quot;just&quot; returns a class-object or function, without instantiating/calling it.</span>
+<span class="sd">    builds : Create a targeted structured config designed to "build" a particular object.</span>
+<span class="sd">    just : Create a config that "just" returns a class-object or function, without instantiating/calling it.</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -579,28 +579,28 @@
 
 <span class="sd">    **Basic Usage**</span>
 
-<span class="sd">    Let&#39;s create a bare-bones config with two fields, named &#39;a&#39; and &#39;b&#39;.</span>
+<span class="sd">    Let's create a bare-bones config with two fields, named 'a' and 'b'.</span>
 
-<span class="sd">    &gt;&gt;&gt; Conf1 = make_config(&quot;a&quot;, &quot;b&quot;)  # sig: `Conf(a: Any, b: Any)`</span>
+<span class="sd">    &gt;&gt;&gt; Conf1 = make_config("a", "b")  # sig: `Conf(a: Any, b: Any)`</span>
 <span class="sd">    &gt;&gt;&gt; pp(Conf1)</span>
 <span class="sd">    a: ???</span>
 <span class="sd">    b: ???</span>
 
-<span class="sd">    Now we&#39;ll configure these fields with particular values:</span>
+<span class="sd">    Now we'll configure these fields with particular values:</span>
 
-<span class="sd">    &gt;&gt;&gt; conf1 = Conf1(1, &quot;hi&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; conf1 = Conf1(1, "hi")</span>
 <span class="sd">    &gt;&gt;&gt; pp(conf1)</span>
 <span class="sd">    a: 1</span>
 <span class="sd">    b: hi</span>
 <span class="sd">    &gt;&gt;&gt; conf1.a</span>
 <span class="sd">    1</span>
 <span class="sd">    &gt;&gt;&gt; conf1.b</span>
-<span class="sd">    &#39;hi&#39;</span>
+<span class="sd">    'hi'</span>
 
 <span class="sd">    We can also specify fields via keyword args; this is especially convenient</span>
 <span class="sd">    for providing associated default values.</span>
 
-<span class="sd">    &gt;&gt;&gt; Conf2 = make_config(&quot;unit&quot;, data=[-10, -20])</span>
+<span class="sd">    &gt;&gt;&gt; Conf2 = make_config("unit", data=[-10, -20])</span>
 <span class="sd">    &gt;&gt;&gt; pp(Conf2)</span>
 <span class="sd">    unit: ???</span>
 <span class="sd">    data:</span>
@@ -664,8 +664,8 @@
 <span class="sd">    checks at runtime to ensure that a configured value matches its associated</span>
 <span class="sd">    type [4]_.</span>
 
-<span class="sd">    &gt;&gt;&gt; pp(ProfileConf(username=&quot;piro&quot;, age=False))  # age should be an integer</span>
-<span class="sd">    &lt;ValidationError: Value &#39;False&#39; could not be converted to Integer&gt;</span>
+<span class="sd">    &gt;&gt;&gt; pp(ProfileConf(username="piro", age=False))  # age should be an integer</span>
+<span class="sd">    &lt;ValidationError: Value 'False' could not be converted to Integer&gt;</span>
 
 <span class="sd">    These default values can be provided alongside type annotations</span>
 
@@ -674,14 +674,14 @@
 <span class="sd">    `ZenField` can also be used to specify ``fields_as_args``; here, field names</span>
 <span class="sd">    must be specified as well.</span>
 
-<span class="sd">    &gt;&gt;&gt; C2 = make_config(zf(name=&quot;username&quot;, hint=str), age=zf(int, 0))</span>
+<span class="sd">    &gt;&gt;&gt; C2 = make_config(zf(name="username", hint=str), age=zf(int, 0))</span>
 <span class="sd">    &gt;&gt;&gt; # signature: C2(username: str, age: int = 0)</span>
 
 <span class="sd">    See :ref:`data-val` for more general data validation capabilities via hydra-zen.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">_locals</span> <span class="o">=</span> <span class="nb">locals</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">fields_as_args</span> <span class="o">=</span> <span class="n">_locals</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;fields_as_args&quot;</span><span class="p">)</span>
-    <span class="n">fields_as_kwargs</span> <span class="o">=</span> <span class="n">_locals</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;fields_as_kwargs&quot;</span><span class="p">)</span>
+    <span class="n">fields_as_args</span> <span class="o">=</span> <span class="n">_locals</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"fields_as_args"</span><span class="p">)</span>
+    <span class="n">fields_as_kwargs</span> <span class="o">=</span> <span class="n">_locals</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"fields_as_kwargs"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">DefaultBuilds</span><span class="o">.</span><span class="n">make_config</span><span class="p">(</span><span class="o">*</span><span class="n">fields_as_args</span><span class="p">,</span> <span class="o">**</span><span class="n">_locals</span><span class="p">,</span> <span class="o">**</span><span class="n">fields_as_kwargs</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div>
 
 </pre></div>

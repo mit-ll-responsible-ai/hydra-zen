@@ -440,31 +440,31 @@
 <span class="p">)</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;Just&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Builds&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;PartialBuilds&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Partial&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Importable&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;SupportedPrimitive&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;ZenWrappers&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;ZenPartialBuilds&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;HydraPartialBuilds&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;ZenConvert&quot;</span><span class="p">,</span>
+    <span class="s2">"Just"</span><span class="p">,</span>
+    <span class="s2">"Builds"</span><span class="p">,</span>
+    <span class="s2">"PartialBuilds"</span><span class="p">,</span>
+    <span class="s2">"Partial"</span><span class="p">,</span>
+    <span class="s2">"Importable"</span><span class="p">,</span>
+    <span class="s2">"SupportedPrimitive"</span><span class="p">,</span>
+    <span class="s2">"ZenWrappers"</span><span class="p">,</span>
+    <span class="s2">"ZenPartialBuilds"</span><span class="p">,</span>
+    <span class="s2">"HydraPartialBuilds"</span><span class="p">,</span>
+    <span class="s2">"ZenConvert"</span><span class="p">,</span>
 <span class="p">]</span>
 
-<span class="n">P</span> <span class="o">=</span> <span class="n">ParamSpec</span><span class="p">(</span><span class="s2">&quot;P&quot;</span><span class="p">)</span>
-<span class="n">R</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;R&quot;</span><span class="p">)</span>
+<span class="n">P</span> <span class="o">=</span> <span class="n">ParamSpec</span><span class="p">(</span><span class="s2">"P"</span><span class="p">)</span>
+<span class="n">R</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"R"</span><span class="p">)</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">EmptyDict</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
     <span class="k">pass</span>
 
 
-<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">covariant</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">T2</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T2&quot;</span><span class="p">)</span>
-<span class="n">T3</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T3&quot;</span><span class="p">)</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">,</span> <span class="n">covariant</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">T2</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T2"</span><span class="p">)</span>
+<span class="n">T3</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T3"</span><span class="p">)</span>
 
-<span class="n">T4</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T4&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
+<span class="n">T4</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T4"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
 
 
 <span class="n">InstOrType</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="nb">type</span><span class="p">[</span><span class="n">T</span><span class="p">]]</span>
@@ -488,7 +488,7 @@
 
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Partial</span><span class="p">(</span><span class="n">Protocol</span><span class="p">[</span><span class="n">T2</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A protocol that matches against `functools.partial`&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""A protocol that matches against `functools.partial`"""</span>
 
     <span class="fm">__call__</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">T2</span><span class="p">]</span>
 
@@ -510,11 +510,11 @@
         <span class="k">def</span><span class="w"> </span><span class="nf">__class_getitem__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">types</span><span class="o">.</span><span class="n">GenericAlias</span><span class="p">:</span> <span class="o">...</span>
 
 
-<span class="n">InterpStr</span> <span class="o">=</span> <span class="n">NewType</span><span class="p">(</span><span class="s2">&quot;InterpStr&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+<span class="n">InterpStr</span> <span class="o">=</span> <span class="n">NewType</span><span class="p">(</span><span class="s2">"InterpStr"</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">DataClass_</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-    <span class="c1"># doesn&#39;t provide __init__, __getattribute__, etc.</span>
+    <span class="c1"># doesn't provide __init__, __getattribute__, etc.</span>
     <span class="n">__dataclass_fields__</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Field</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span>
 
 
@@ -548,7 +548,7 @@
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Just</span><span class="p">(</span><span class="n">Builds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">Protocol</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># interpolated string for importing obj</span>
-    <span class="n">_target_</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;hydra_zen.funcs.get_obj&quot;</span>
+    <span class="n">_target_</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"hydra_zen.funcs.get_obj"</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">ZenPartialMixin</span><span class="p">(</span><span class="n">Protocol</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
@@ -562,7 +562,7 @@
 
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ZenPartialBuilds</span><span class="p">(</span><span class="n">Builds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">ZenPartialMixin</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">Protocol</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
-    <span class="n">_target_</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;hydra_zen.funcs.zen_processing&quot;</span>
+    <span class="n">_target_</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"hydra_zen.funcs.zen_processing"</span>
 
 
 <span class="nd">@runtime_checkable</span>
@@ -577,7 +577,7 @@
 
 <span class="n">AnyBuilds</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">BuildsWithSig</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
 
-<span class="n">Importable</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Importable&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
+<span class="n">Importable</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"Importable"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
 
 <span class="n">_HydraPrimitive</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span>
     <span class="nb">bool</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ByteString</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">WindowsPath</span><span class="p">,</span> <span class="n">PosixPath</span>
@@ -593,12 +593,12 @@
     <span class="n">_MISSING_TYPE</span><span class="p">,</span>
     <span class="c1"># Even thought this is redundant with Sequence, it seems to</span>
     <span class="c1"># be needed for pyright to do proper checking of tuple contents</span>
-    <span class="nb">tuple</span><span class="p">[</span><span class="s2">&quot;HydraSupportedType&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
-    <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;HydraSupportedType&quot;</span><span class="p">],</span>
-    <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="s2">&quot;HydraSupportedType&quot;</span><span class="p">],</span>
+    <span class="nb">tuple</span><span class="p">[</span><span class="s2">"HydraSupportedType"</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+    <span class="n">Sequence</span><span class="p">[</span><span class="s2">"HydraSupportedType"</span><span class="p">],</span>
+    <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="s2">"HydraSupportedType"</span><span class="p">],</span>
 <span class="p">]</span>
-<span class="sd">&quot;&quot;&quot;Describes types that are compatible with Hydra -- they can be used in</span>
-<span class="sd">configs provided to Hydra.&quot;&quot;&quot;</span>
+<span class="sd">"""Describes types that are compatible with Hydra -- they can be used in</span>
+<span class="sd">configs provided to Hydra."""</span>
 
 <span class="n">_SupportedViaBuilds</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span>
     <span class="n">Partial</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
@@ -623,31 +623,31 @@
 
 <span class="n">SupportedPrimitive</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span>
     <span class="n">_SupportedPrimitive</span><span class="p">,</span>
-    <span class="nb">frozenset</span><span class="p">[</span><span class="s2">&quot;SupportedPrimitive&quot;</span><span class="p">],</span>
+    <span class="nb">frozenset</span><span class="p">[</span><span class="s2">"SupportedPrimitive"</span><span class="p">],</span>
     <span class="c1"># Even thought this is redundant with Sequence, it seems to</span>
     <span class="c1"># be needed for pyright to do proper checking of tuple contents</span>
-    <span class="nb">tuple</span><span class="p">[</span><span class="s2">&quot;SupportedPrimitive&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+    <span class="nb">tuple</span><span class="p">[</span><span class="s2">"SupportedPrimitive"</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
     <span class="c1"># Mutable generic containers need to be invariant, so</span>
     <span class="c1"># we have to settle for Sequence/Mapping. While this</span>
     <span class="c1"># is overly permissive in terms of sequence-type, it</span>
     <span class="c1"># at least affords quality checking of sequence content</span>
-    <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;SupportedPrimitive&quot;</span><span class="p">],</span>
+    <span class="n">Sequence</span><span class="p">[</span><span class="s2">"SupportedPrimitive"</span><span class="p">],</span>
     <span class="c1"># Mapping is covariant only in value</span>
-    <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="s2">&quot;SupportedPrimitive&quot;</span><span class="p">],</span>
+    <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="s2">"SupportedPrimitive"</span><span class="p">],</span>
 <span class="p">]</span>
-<span class="sd">&quot;&quot;&quot;Describes types that are natively supported by hydra-zen&#39;s config-creation</span>
-<span class="sd">functions.&quot;&quot;&quot;</span>
+<span class="sd">"""Describes types that are natively supported by hydra-zen's config-creation</span>
+<span class="sd">functions."""</span>
 
 <span class="n">CustomConfigType</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span>
     <span class="n">T2</span><span class="p">,</span>
     <span class="n">HydraSupportedType</span><span class="p">,</span>
-    <span class="nb">tuple</span><span class="p">[</span><span class="s2">&quot;CustomConfigType[T2]&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
-    <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;CustomConfigType[T2]&quot;</span><span class="p">],</span>
-    <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="s2">&quot;CustomConfigType[T2]&quot;</span><span class="p">],</span>
-    <span class="n">Partial</span><span class="p">[</span><span class="s2">&quot;CustomConfigType[T2]&quot;</span><span class="p">],</span>
+    <span class="nb">tuple</span><span class="p">[</span><span class="s2">"CustomConfigType[T2]"</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+    <span class="n">Sequence</span><span class="p">[</span><span class="s2">"CustomConfigType[T2]"</span><span class="p">],</span>
+    <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="s2">"CustomConfigType[T2]"</span><span class="p">],</span>
+    <span class="n">Partial</span><span class="p">[</span><span class="s2">"CustomConfigType[T2]"</span><span class="p">],</span>
     <span class="n">Partial</span><span class="p">[</span><span class="n">T2</span><span class="p">],</span>
 <span class="p">]</span>
-<span class="sd">&quot;&quot;&quot;The type `CustomConfigType[MyType]` describes: `MyType`, all hydra-zen config-compatible types, and all hydra-zen compatible containers containing said types.</span>
+<span class="sd">"""The type `CustomConfigType[MyType]` describes: `MyType`, all hydra-zen config-compatible types, and all hydra-zen compatible containers containing said types.</span>
 
 <span class="sd">This is use for parameterizing `hydra_zen.BuildsFn` with custom type information. Example::</span>
 
@@ -665,7 +665,7 @@
 <span class="sd">   builds(dict, x=MyType(), y=[1, MyType()])  # type-checker: OK</span>
 <span class="sd">   builds(dict, x=BadType(), y=[1, MyType()]) # type-checker: Bad!</span>
 <span class="sd">   builds(dict, x=MyType(), y=[1, BadType()]) # type-checker: Bad!</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 
 <span class="n">ZenWrapper</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span>
@@ -698,7 +698,7 @@
 
 
 <span class="c1"># used for runtime type-checking</span>
-<span class="n">convert_types</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;dataclass&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="s2">&quot;flat_target&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">}</span>
+<span class="n">convert_types</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"dataclass"</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="s2">"flat_target"</span><span class="p">:</span> <span class="nb">bool</span><span class="p">}</span>
 
 <span class="n">GroupName</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 <span class="n">NodeName</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="nb">str</span>
@@ -717,7 +717,7 @@
 <div class="viewcode-block" id="ZenConvert">
 <a class="viewcode-back" href="../../../generated/hydra_zen.typing.ZenConvert.html#hydra_zen.typing.ZenConvert">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ZenConvert</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A TypedDict that provides a type-checked interface for specifying zen-convert</span>
+<span class="w">    </span><span class="sd">"""A TypedDict that provides a type-checked interface for specifying zen-convert</span>
 <span class="sd">    options that configure the hydra-zen config-creation functions (e.g., `builds`,</span>
 <span class="sd">    `just`, and `make_config`).</span>
 
@@ -746,10 +746,10 @@
 <span class="sd">    &gt;&gt;&gt; zc()</span>
 <span class="sd">    {}</span>
 <span class="sd">    &gt;&gt;&gt; zc(dataclass=True)</span>
-<span class="sd">    {&quot;dataclass&quot;: True}</span>
+<span class="sd">    {"dataclass": True}</span>
 <span class="sd">    &gt;&gt;&gt; # static type-checker will raise, but runtime will not</span>
 <span class="sd">    &gt;&gt;&gt; zc(apple=1)  # type: ignore</span>
-<span class="sd">    {&quot;apple&quot;: 1}</span>
+<span class="sd">    {"apple": 1}</span>
 
 <span class="sd">    **Configuring dataclass auto-config behaviors**</span>
 
@@ -764,36 +764,36 @@
 <span class="sd">    &gt;&gt;&gt; I(just(b))</span>
 <span class="sd">    B(x=1)</span>
 <span class="sd">    &gt;&gt;&gt; I(just(b, zen_convert=zc(dataclass=False)))  # returns omegaconf.DictConfig</span>
-<span class="sd">    {&quot;x&quot;: 1}</span>
+<span class="sd">    {"x": 1}</span>
 
 <span class="sd">    &gt;&gt;&gt; I(builds(dict, y=b))</span>
-<span class="sd">    {&#39;y&#39;: B(x=1)}</span>
+<span class="sd">    {'y': B(x=1)}</span>
 <span class="sd">    &gt;&gt;&gt; I(builds(dict, y=b, zen_convert=zc(dataclass=False)))  # returns omegaconf.DictConfig</span>
-<span class="sd">    {&#39;y&#39;: {&#39;x&#39;: 1}}</span>
+<span class="sd">    {'y': {'x': 1}}</span>
 
 <span class="sd">    &gt;&gt;&gt; I(make_config(y=b))  # returns omegaconf.DictConfig</span>
-<span class="sd">    {&#39;y&#39;: {&#39;x&#39;: 1}}</span>
-<span class="sd">    &gt;&gt;&gt; I(make_config(y=b, zen_convert=zc(dataclass=True), hydra_convert=&quot;all&quot;))</span>
-<span class="sd">    {&#39;y&#39;: B(x=1)}</span>
+<span class="sd">    {'y': {'x': 1}}</span>
+<span class="sd">    &gt;&gt;&gt; I(make_config(y=b, zen_convert=zc(dataclass=True), hydra_convert="all"))</span>
+<span class="sd">    {'y': B(x=1)}</span>
 
 <span class="sd">    Auto-config support does not work with dynamically-generated dataclass types</span>
 
 <span class="sd">    &gt;&gt;&gt; just(make_config(z=1))</span>
 <span class="sd">    HydraZenUnsupportedPrimitiveError: ...</span>
 <span class="sd">    &gt;&gt;&gt; I(just(make_config(z=1), zen_convert=zc(dataclass=False)))</span>
-<span class="sd">    {&#39;z&#39;: 1}</span>
+<span class="sd">    {'z': 1}</span>
 
 <span class="sd">    A dataclass with a `_target_` field will not be converted:</span>
 
 <span class="sd">    &gt;&gt;&gt; @dataclass</span>
 <span class="sd">    ... class BuildsStr:</span>
-<span class="sd">    ...     _target_: str = &#39;builtins.str&#39;</span>
+<span class="sd">    ...     _target_: str = 'builtins.str'</span>
 <span class="sd">    ...</span>
 <span class="sd">    &gt;&gt;&gt; BuildsStr is just(BuildsStr)</span>
 <span class="sd">    True</span>
 <span class="sd">    &gt;&gt;&gt; (builds_str := BuildsStr()) is just(builds_str)</span>
 <span class="sd">    True</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">flat_target</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">dataclass</span><span class="p">:</span> <span class="nb">bool</span></div>
@@ -828,8 +828,8 @@
 
 
 <span class="c1"># Note: Python 3.14 adds a `decorator` parameter to make_dataclass, but we</span>
-<span class="c1"># intentionally exclude it from hydra-zen&#39;s DataclassOptions because it&#39;s not</span>
-<span class="c1"># relevant for hydra-zen&#39;s use case of generating configs.</span>
+<span class="c1"># intentionally exclude it from hydra-zen's DataclassOptions because it's not</span>
+<span class="c1"># relevant for hydra-zen's use case of generating configs.</span>
 <span class="n">_Py314Dataclass</span> <span class="o">=</span> <span class="n">_Py312Dataclass</span>
 
 
@@ -852,14 +852,14 @@
 <div class="viewcode-block" id="DataclassOptions">
 <a class="viewcode-back" href="../../../generated/hydra_zen.typing.DataclassOptions.html#hydra_zen.typing.DataclassOptions">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DataclassOptions</span><span class="p">(</span><span class="n">_Py312Dataclass</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Specifies dataclass-creation options via `builds`, `just` et al.</span>
+<span class="w">    </span><span class="sd">"""Specifies dataclass-creation options via `builds`, `just` et al.</span>
 
 <span class="sd">    Note that, unlike :func:`dataclasses.make_dataclass`, the default value for</span>
-<span class="sd">    `unsafe_hash` is `True` for hydra-zen&#39;s dataclass-generating functions.</span>
+<span class="sd">    `unsafe_hash` is `True` for hydra-zen's dataclass-generating functions.</span>
 <span class="sd">    See the documentation for :func:`dataclasses.make_dataclass` for more details [1]_.</span>
 
 <span class="sd">    Options that are not supported by the local Python version will be ignored by</span>
-<span class="sd">    hydra-zen&#39;s config-creation functions.</span>
+<span class="sd">    hydra-zen's config-creation functions.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -867,7 +867,7 @@
 <span class="sd">        If specified, determines the name of the returned class object. Otherwise the</span>
 <span class="sd">        name is inferred by hydra-zen.</span>
 
-<span class="sd">    module : str, default=&#39;typing&#39;</span>
+<span class="sd">    module : str, default='typing'</span>
 <span class="sd">        If specified, sets the `__module__` attribute of the resulting dataclass.</span>
 
 <span class="sd">        Specifying the module string-path in which the dataclass was generated, and</span>
@@ -887,7 +887,7 @@
 <span class="sd">        repr string will have the class name and the name and repr of each field, in</span>
 <span class="sd">        the order they are defined in the class. Fields that are marked as being</span>
 <span class="sd">        excluded from the repr are not included. For example:</span>
-<span class="sd">        `InventoryItem(name=&#39;widget&#39;, unit_price=3.0, quantity_on_hand=10)`.</span>
+<span class="sd">        `InventoryItem(name='widget', unit_price=3.0, quantity_on_hand=10)`.</span>
 
 <span class="sd">    eq : bool, optional (default=True)</span>
 <span class="sd">        If true (the default), an __eq__() method will be generated. This method</span>
@@ -962,7 +962,7 @@
 
 <span class="sd">    &gt;&gt;&gt; conf = make_config(x=1, zen_dataclass=Opts(frozen=True))()</span>
 <span class="sd">    &gt;&gt;&gt; conf.x = 2</span>
-<span class="sd">    FrozenInstanceError: cannot assign to field &#39;x&#39;</span>
+<span class="sd">    FrozenInstanceError: cannot assign to field 'x'</span>
 
 <span class="sd">    Creating a pickle-compatible config:</span>
 
@@ -977,8 +977,8 @@
 <span class="sd">       from hydra_zen import builds</span>
 
 <span class="sd">       DictConf = builds(dict,</span>
-<span class="sd">                         zen_dataclass={&#39;module&#39;: &#39;mylib.foo&#39;,</span>
-<span class="sd">                                        &#39;cls_name&#39;: &#39;DictConf&#39;})</span>
+<span class="sd">                         zen_dataclass={'module': 'mylib.foo',</span>
+<span class="sd">                                        'cls_name': 'DictConf'})</span>
 
 <span class="sd">       assert DictConf is loads(dumps(DictConf))</span>
 
@@ -993,14 +993,14 @@
 <span class="sd">    &gt;&gt;&gt; conf.add_x(2)</span>
 <span class="sd">    102</span>
 
-<span class="sd">    Dataclasse objects created by hydra-zen&#39;s config-creation functions will be created</span>
+<span class="sd">    Dataclasse objects created by hydra-zen's config-creation functions will be created</span>
 <span class="sd">    with `unsafe_hash=True` by default. This is in contrast with the default behavior of</span>
 <span class="sd">    :py:func:`dataclasses.dataclass`. This is to help ensure smooth compatibility</span>
 <span class="sd">    through Python 3.11, which changed the mutability checking rules for dataclasses</span>
 <span class="sd">    [2]_.</span>
 
 <span class="sd">    &gt;&gt;&gt; from dataclasses import make_dataclass</span>
-<span class="sd">    &gt;&gt;&gt; DataClass = make_dataclass(fields=[], cls_name=&quot;A&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; DataClass = make_dataclass(fields=[], cls_name="A")</span>
 <span class="sd">    &gt;&gt;&gt; DataClass.__hash__</span>
 <span class="sd">    None</span>
 
@@ -1011,7 +1011,7 @@
 <span class="sd">    &gt;&gt;&gt; UnHashConf = make_config(x=2, zen_dataclass=Opts(unsafe_hash=False))</span>
 <span class="sd">    &gt;&gt;&gt; UnHashConf.__hash__</span>
 <span class="sd">    None</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">module</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="n">target</span><span class="p">:</span> <span class="nb">str</span>
@@ -1026,7 +1026,7 @@
 <span class="n">DEFAULT_DATACLASS_OPTIONS</span> <span class="o">=</span> <span class="n">DataclassOptions</span><span class="p">(</span><span class="n">unsafe_hash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">PERMITTED_DATACLASS_OPTIONS</span> <span class="o">=</span> <span class="n">_permitted_keys</span><span class="p">(</span><span class="n">DataclassOptions</span><span class="p">)</span>
 <span class="n">UNSUPPORTED_DATACLASS_OPTIONS</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">_permitted_keys</span><span class="p">(</span><span class="n">_Py312Dataclass</span><span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="s2">&quot;module&quot;</span><span class="p">}</span>
+    <span class="n">_permitted_keys</span><span class="p">(</span><span class="n">_Py312Dataclass</span><span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="s2">"module"</span><span class="p">}</span>
 <span class="p">)</span> <span class="o">-</span> <span class="n">_permitted_keys</span><span class="p">(</span><span class="n">StrictDataclassOptions</span><span class="p">)</span>
 <span class="k">del</span> <span class="n">_AllPyDataclassOptions</span><span class="p">,</span> <span class="n">_Py310Dataclass</span><span class="p">,</span> <span class="n">_Py311Dataclass</span><span class="p">,</span> <span class="n">_Py312Dataclass</span>
 </pre></div>

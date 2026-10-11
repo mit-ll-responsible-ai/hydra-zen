@@ -425,16 +425,17 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">hydra._internal.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callbacks</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">hydra.core.config_store</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigStore</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">hydra.core.global_hydra</span><span class="w"> </span><span class="kn">import</span> <span class="n">GlobalHydra</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra.core.plugins</span><span class="w"> </span><span class="kn">import</span> <span class="n">Plugins</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">hydra.core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">JobReturn</span><span class="p">,</span> <span class="n">run_job</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">hydra.plugins.sweeper</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sweeper</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">hydra.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">HydraContext</span><span class="p">,</span> <span class="n">RunMode</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">omegaconf</span><span class="w"> </span><span class="kn">import</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">,</span> <span class="n">OmegaConf</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">TypeAlias</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen._hydra_overloads</span><span class="w"> </span><span class="kn">import</span> <span class="n">instantiate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">HydraZenValidationError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.structured_configs._globals</span><span class="w"> </span><span class="kn">import</span> <span class="n">ZEN_PROCESSING_LOCATION</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.typing._implementations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataClass_</span><span class="p">,</span> <span class="n">InstOrType</span>
 
-<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Any</span><span class="p">)</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Any</span><span class="p">)</span>
 <span class="n">HydraPrimitives</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
@@ -448,23 +449,23 @@
     <span class="k">pass</span>
 
 
-<span class="n">T1</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T1&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">HydraPrimitives</span><span class="p">)</span>
+<span class="n">T1</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T1"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">HydraPrimitives</span><span class="p">)</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">hydra_list</span><span class="p">(</span><span class="n">TUserList</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">T1</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Signals that a sequence is provided as a single configured value (i.e. it is not</span>
-<span class="sd">    to be iterated over during a multirun)&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Signals that a sequence is provided as a single configured value (i.e. it is not</span>
+<span class="sd">    to be iterated over during a multirun)"""</span>
 
 
-<span class="n">T2</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T2&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Union</span><span class="p">[</span><span class="n">HydraPrimitives</span><span class="p">,</span> <span class="n">hydra_list</span><span class="p">[</span><span class="n">HydraPrimitives</span><span class="p">]])</span>
+<span class="n">T2</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T2"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Union</span><span class="p">[</span><span class="n">HydraPrimitives</span><span class="p">,</span> <span class="n">hydra_list</span><span class="p">[</span><span class="n">HydraPrimitives</span><span class="p">]])</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">multirun</span><span class="p">(</span><span class="n">TUserList</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">T2</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Signals that a sequence is to be iterated over in a multirun&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Signals that a sequence is to be iterated over in a multirun"""</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_safe_name</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;__name__&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s2">"__name__"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">value_check</span><span class="p">(</span>
@@ -472,26 +473,26 @@
     <span class="n">value</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
     <span class="n">type_</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="o">...</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    For internal use only.</span>
 
 <span class="sd">    Used to check the type of `value`. Numerical types can also be bound-checked.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; value_check(&quot;x&quot;, 1, type_=str)</span>
+<span class="sd">    &gt;&gt;&gt; value_check("x", 1, type_=str)</span>
 <span class="sd">    TypeError: `x` must be of type(s) `str`, got 1 (type: int)</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
-<span class="sd">    TypeError&quot;&quot;&quot;</span>
+<span class="sd">    TypeError"""</span>
     <span class="c1"># check internal params</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="n">name</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">type_</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">` must be of type(s) &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">_safe_name</span><span class="p">(</span><span class="n">type_</span><span class="p">)</span><span class="si">}</span><span class="s2">`, got </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2"> (type: </span><span class="si">{</span><span class="n">_safe_name</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">))</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="sa">f</span><span class="s2">"`</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">` must be of type(s) "</span>
+            <span class="sa">f</span><span class="s2">"`</span><span class="si">{</span><span class="n">_safe_name</span><span class="p">(</span><span class="n">type_</span><span class="p">)</span><span class="si">}</span><span class="s2">`, got </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2"> (type: </span><span class="si">{</span><span class="n">_safe_name</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">))</span><span class="si">}</span><span class="s2">)"</span>
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
@@ -506,11 +507,11 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_process_dict_overrides</span><span class="p">(</span><span class="n">overrides</span><span class="p">:</span> <span class="n">OverrideDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert dict overrides to a list of Hydra CLI compatible args&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Convert dict overrides to a list of Hydra CLI compatible args"""</span>
     <span class="n">launch_overrides</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">overrides</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">v</span> <span class="o">=</span> <span class="s2">&quot;null&quot;</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="s2">"null"</span>
 
         <span class="n">value_check</span><span class="p">(</span>
             <span class="n">k</span><span class="p">,</span>
@@ -518,17 +519,17 @@
             <span class="n">type_</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">multirun</span><span class="p">,</span> <span class="n">hydra_list</span><span class="p">),</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">multirun</span><span class="p">):</span>
-            <span class="n">v</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">v</span><span class="p">)</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="s2">","</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">v</span><span class="p">)</span>
 
-        <span class="n">launch_overrides</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">launch_overrides</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">launch_overrides</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_store_config</span><span class="p">(</span>
     <span class="n">cfg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">,</span> <span class="nb">type</span><span class="p">[</span><span class="n">DataClass_</span><span class="p">],</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
-    <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;hydra_launch&quot;</span><span class="p">,</span>
+    <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"hydra_launch"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stores configuration object in Hydra&#39;s ConfigStore.</span>
+<span class="w">    </span><span class="sd">"""Stores configuration object in Hydra's ConfigStore.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -551,7 +552,7 @@
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
 <span class="sd">    .. [1] https://hydra.cc/docs/tutorials/structured_config/config_store</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">cs</span> <span class="o">=</span> <span class="n">ConfigStore</span><span class="p">()</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
     <span class="n">cs</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">config_name</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="n">cfg</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">config_name</span>
@@ -596,12 +597,12 @@
     <span class="n">multirun</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">version_base</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">[</span><span class="n">_NotSet</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">_NotSet</span><span class="p">,</span>
     <span class="n">to_dictconfig</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;zen_launch&quot;</span><span class="p">,</span>
-    <span class="n">job_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;zen_launch&quot;</span><span class="p">,</span>
+    <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"zen_launch"</span><span class="p">,</span>
+    <span class="n">job_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"zen_launch"</span><span class="p">,</span>
     <span class="n">with_log_configuration</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="o">**</span><span class="n">override_kwargs</span><span class="p">:</span> <span class="n">OverrideValues</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">JobReturn</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Launches a Hydra job from a Python function rather than a CLI.</span>
 
 <span class="sd">    `launch` is designed to closely match the interface of the standard Hydra CLI.</span>
@@ -611,7 +612,7 @@
 
 <span class="sd">    corresponds to the following usage of `launch`:</span>
 
-<span class="sd">       &gt;&gt;&gt; job = launch(config, task_function, overrides=[&quot;job/group=group_name&quot;, &quot;job.group.param=1&quot;])</span>
+<span class="sd">       &gt;&gt;&gt; job = launch(config, task_function, overrides=["job/group=group_name", "job.group.param=1"])</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -624,7 +625,7 @@
 
 <span class="sd">    overrides : Optional[Union[OverrideMapping, List[str]]] (default: None)</span>
 <span class="sd">        If provided, sets/overrides values in ``config``. See [1]_ and [2]_</span>
-<span class="sd">        for a detailed discussion of the &quot;grammar&quot; supported by ``overrides``.</span>
+<span class="sd">        for a detailed discussion of the "grammar" supported by ``overrides``.</span>
 
 <span class="sd">    multirun : bool (default: False)</span>
 <span class="sd">        Launch a Hydra multi-run ([3]_).</span>
@@ -633,17 +634,17 @@
 <span class="sd">        Available starting with Hydra 1.2.0.</span>
 <span class="sd">        - If the `version_base parameter` is not specified, Hydra 1.x will use defaults compatible with version 1.1. Also in this case, a warning is issued to indicate an explicit version_base is preferred.</span>
 <span class="sd">        - If the `version_base parameter` is `None`, then the defaults are chosen for the current minor Hydra version. For example for Hydra 1.2, then would imply `config_path=None` and `hydra.job.chdir=False`.</span>
-<span class="sd">        - If the `version_base` parameter is an explicit version string like &quot;1.1&quot;, then the defaults appropriate to that version are used.</span>
+<span class="sd">        - If the `version_base` parameter is an explicit version string like "1.1", then the defaults appropriate to that version are used.</span>
 
 <span class="sd">    to_dictconfig : bool (default: False)</span>
 <span class="sd">        If ``True``, convert a ``dataclasses.dataclass`` to a ``omegaconf.DictConfig``.</span>
-<span class="sd">        Note, this will remove Hydra&#39;s capability for validation with structured</span>
+<span class="sd">        Note, this will remove Hydra's capability for validation with structured</span>
 <span class="sd">        configurations.</span>
 
-<span class="sd">    config_name : str (default: &quot;zen_launch&quot;)</span>
-<span class="sd">        Name of the stored configuration in Hydra&#39;s ConfigStore API.</span>
+<span class="sd">    config_name : str (default: "zen_launch")</span>
+<span class="sd">        Name of the stored configuration in Hydra's ConfigStore API.</span>
 
-<span class="sd">    job_name : str (default: &quot;zen_launch&quot;)</span>
+<span class="sd">    job_name : str (default: "zen_launch")</span>
 
 <span class="sd">    with_log_configuration : bool (default: True)</span>
 <span class="sd">        If ``True``, enables the configuration of the logging subsystem from the loaded</span>
@@ -681,69 +682,69 @@
 
 <span class="sd">    **Basic usage**</span>
 
-<span class="sd">    Let&#39;s define and launch a trivial Hydra app.</span>
+<span class="sd">    Let's define and launch a trivial Hydra app.</span>
 
 <span class="sd">    &gt;&gt;&gt; from hydra_zen import make_config, launch, to_yaml</span>
 
 <span class="sd">    First, we will define a config, which determines the configurable interface to our</span>
-<span class="sd">    &quot;app&quot;. For the purpose of example, we&#39;ll design the &quot;interface&quot; of this config to accept</span>
+<span class="sd">    "app". For the purpose of example, we'll design the "interface" of this config to accept</span>
 <span class="sd">    two configurable parameters: ``a`` and ``b``.</span>
 
-<span class="sd">    &gt;&gt;&gt; Conf = make_config(&quot;a&quot;, &quot;b&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; Conf = make_config("a", "b")</span>
 
 <span class="sd">    Our task function accepts the config as an input and uses it to run some generic functionality.</span>
-<span class="sd">    For simplicity&#39;s sake, let&#39;s design this task function to: convert the job&#39;s config to a</span>
+<span class="sd">    For simplicity's sake, let's design this task function to: convert the job's config to a</span>
 <span class="sd">    yaml-formatted string, print it, and then return the string.</span>
 
 <span class="sd">    &gt;&gt;&gt; def task_fn(cfg):</span>
-<span class="sd">    ...     out = to_yaml(cfg)  # task&#39;s input config, converted to yaml-string</span>
+<span class="sd">    ...     out = to_yaml(cfg)  # task's input config, converted to yaml-string</span>
 <span class="sd">    ...     print(out)</span>
 <span class="sd">    ...     return out</span>
 
-<span class="sd">    Now, let&#39;s use `launch` to run this task function via Hydra, using particular configured</span>
-<span class="sd">    values (or, &quot;overrides&quot;) for ``a`` and ``b``.</span>
+<span class="sd">    Now, let's use `launch` to run this task function via Hydra, using particular configured</span>
+<span class="sd">    values (or, "overrides") for ``a`` and ``b``.</span>
 
-<span class="sd">    &gt;&gt;&gt; job_out = launch(Conf, task_fn, a=1, b=&#39;foo&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; job_out = launch(Conf, task_fn, a=1, b='foo')</span>
 <span class="sd">    a: 1</span>
 <span class="sd">    b: foo</span>
 
-<span class="sd">    Let&#39;s inspect ``job_out`` to see the ways that it summarizes the results of this job.</span>
+<span class="sd">    Let's inspect ``job_out`` to see the ways that it summarizes the results of this job.</span>
 
 <span class="sd">    &gt;&gt;&gt; job_out.return_value  # the value returned by `task_fn`</span>
-<span class="sd">    &#39;a: 1\nb: foo\n&#39;</span>
+<span class="sd">    'a: 1\nb: foo\n'</span>
 
-<span class="sd">    &gt;&gt;&gt; job_out.working_dir  # where the job&#39;s outputs, logs, and configs are saved</span>
-<span class="sd">    &#39;outputs/2021-10-19/15-27-11&#39;</span>
+<span class="sd">    &gt;&gt;&gt; job_out.working_dir  # where the job's outputs, logs, and configs are saved</span>
+<span class="sd">    'outputs/2021-10-19/15-27-11'</span>
 
 <span class="sd">    &gt;&gt;&gt; job_out.cfg  # the particular config used to run our task-function</span>
-<span class="sd">    {&#39;a&#39;: 1, &#39;b&#39;: &#39;foo&#39;}</span>
+<span class="sd">    {'a': 1, 'b': 'foo'}</span>
 
 <span class="sd">    &gt;&gt;&gt; job_out.overrides  # the overrides that we provides</span>
-<span class="sd">    [&#39;a=1&#39;, &quot;b=&#39;foo&#39;&quot;]</span>
+<span class="sd">    ['a=1', "b='foo'"]</span>
 
-<span class="sd">    &gt;&gt;&gt; job_out.status  # the job&#39;s completion status</span>
+<span class="sd">    &gt;&gt;&gt; job_out.status  # the job's completion status</span>
 <span class="sd">    &lt;JobStatus.COMPLETED: 1&gt;</span>
 
 <span class="sd">    **Launching a multirun job**</span>
 
 <span class="sd">    We can launch multiple runs of our task-function, using various configured values.</span>
-<span class="sd">    Let&#39;s launch a multirun that sweeps over three configurations</span>
+<span class="sd">    Let's launch a multirun that sweeps over three configurations</span>
 
 <span class="sd">    &gt;&gt;&gt; (outputs,) = launch(</span>
 <span class="sd">    ...     Conf,</span>
 <span class="sd">    ...     task_fn,</span>
-<span class="sd">    ...     a=&quot;1,2,3&quot;,</span>
-<span class="sd">    ...     b=&quot;bar&quot;,</span>
+<span class="sd">    ...     a="1,2,3",</span>
+<span class="sd">    ...     b="bar",</span>
 <span class="sd">    ...     multirun=True,</span>
 <span class="sd">    ... )</span>
 <span class="sd">    [2021-10-19 17:50:07,334][HYDRA] Launching 3 jobs locally</span>
-<span class="sd">    [2021-10-19 17:50:07,334][HYDRA] 	#0 : a=1 b=&#39;bar&#39;</span>
+<span class="sd">    [2021-10-19 17:50:07,334][HYDRA] 	#0 : a=1 b='bar'</span>
 <span class="sd">    a: 1</span>
 <span class="sd">    b: bar</span>
-<span class="sd">    [2021-10-19 17:50:07,434][HYDRA] 	#1 : a=2 b=&#39;bar&#39;</span>
+<span class="sd">    [2021-10-19 17:50:07,434][HYDRA] 	#1 : a=2 b='bar'</span>
 <span class="sd">    a: 2</span>
 <span class="sd">    b: bar</span>
-<span class="sd">    [2021-10-19 17:50:07,535][HYDRA] 	#2 : a=3 b=&#39;bar&#39;</span>
+<span class="sd">    [2021-10-19 17:50:07,535][HYDRA] 	#2 : a=3 b='bar'</span>
 <span class="sd">    a: 3</span>
 <span class="sd">    b: bar</span>
 
@@ -752,27 +753,27 @@
 <span class="sd">    &gt;&gt;&gt; len(outputs)</span>
 <span class="sd">    3</span>
 <span class="sd">    &gt;&gt;&gt; [j.cfg for j in outputs]</span>
-<span class="sd">    [{&#39;a&#39;: 1, &#39;b&#39;: &#39;bar&#39;}, {&#39;a&#39;: 2, &#39;b&#39;: &#39;bar&#39;}, {&#39;a&#39;: 3, &#39;b&#39;: &#39;bar&#39;}]</span>
+<span class="sd">    [{'a': 1, 'b': 'bar'}, {'a': 2, 'b': 'bar'}, {'a': 3, 'b': 'bar'}]</span>
 
-<span class="sd">    Each run&#39;s outputs, logs, and configs are saved to separate working directories</span>
+<span class="sd">    Each run's outputs, logs, and configs are saved to separate working directories</span>
 
 <span class="sd">    &gt;&gt;&gt; [j.working_dir for j in outputs]</span>
-<span class="sd">    [&#39;multirun/2021-10-19/17-50-07\\0&#39;,</span>
-<span class="sd">    &#39;multirun/2021-10-19/17-50-07\\1&#39;,</span>
-<span class="sd">    &#39;multirun/2021-10-19/17-50-07\\2&#39;]</span>
+<span class="sd">    ['multirun/2021-10-19/17-50-07\\0',</span>
+<span class="sd">    'multirun/2021-10-19/17-50-07\\1',</span>
+<span class="sd">    'multirun/2021-10-19/17-50-07\\2']</span>
 
 <span class="sd">    **Launching with quoted overrides**</span>
 
 <span class="sd">    Some of the Hydra CLI override syntax cannot be specified as keyword arguments. In such cases we can instead provide a list or a dict with quoted overrides.</span>
 
-<span class="sd">    &gt;&gt;&gt; job_out = launch(Conf, task_fn, a=1, b=&quot;foo&quot;, overrides={&quot;+c&quot;: 22})</span>
+<span class="sd">    &gt;&gt;&gt; job_out = launch(Conf, task_fn, a=1, b="foo", overrides={"+c": 22})</span>
 <span class="sd">    a: 1</span>
 <span class="sd">    b: foo</span>
 <span class="sd">    c: 22</span>
 <span class="sd">    &gt;&gt;&gt; job_out.overrides  # the overrides that we provides</span>
-<span class="sd">    [&#39;a=1&#39;, &#39;b=foo&#39;, &#39;+c=22&#39;]</span>
+<span class="sd">    ['a=1', 'b=foo', '+c=22']</span>
 
-<span class="sd">    &gt;&gt;&gt; launch(Conf, task_fn, overrides=[&quot;a=1&quot;, &quot;b=&#39;foo&#39;&quot;, &quot;+c=22&quot;])</span>
+<span class="sd">    &gt;&gt;&gt; launch(Conf, task_fn, overrides=["a=1", "b='foo'", "+c=22"])</span>
 <span class="sd">    a: 1</span>
 <span class="sd">    b: foo</span>
 <span class="sd">    c: 22</span>
@@ -789,14 +790,14 @@
 <span class="sd">    ...     make_config(),</span>
 <span class="sd">    ...     instantiate,</span>
 <span class="sd">    ...     overrides={</span>
-<span class="sd">    ...          &quot;+param&quot;: multirun(values_for_experiment)</span>
+<span class="sd">    ...          "+param": multirun(values_for_experiment)</span>
 <span class="sd">    ...     },</span>
 <span class="sd">    ...     multirun=True</span>
 <span class="sd">    ... )</span>
 
 <span class="sd">    If, instead, you want to configure a list as a single value - not to be iterated</span>
 <span class="sd">    over in a multirun - you can instead use `hydra_zen.hydra_list`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># used for check below</span>
     <span class="n">_num_dataclass_fields</span> <span class="o">=</span> <span class="mi">0</span>
@@ -826,7 +827,7 @@
     <span class="k">with</span> <span class="n">initialize</span><span class="p">(</span>
         <span class="n">config_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">job_name</span><span class="o">=</span><span class="n">job_name</span><span class="p">,</span>
-        <span class="o">**</span><span class="p">({}</span> <span class="k">if</span> <span class="n">version_base</span> <span class="ow">is</span> <span class="n">_NotSet</span> <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;version_base&quot;</span><span class="p">:</span> <span class="n">version_base</span><span class="p">}),</span>  <span class="c1"># type: ignore</span>
+        <span class="o">**</span><span class="p">({}</span> <span class="k">if</span> <span class="n">version_base</span> <span class="ow">is</span> <span class="n">_NotSet</span> <span class="k">else</span> <span class="p">{</span><span class="s2">"version_base"</span><span class="p">:</span> <span class="n">version_base</span><span class="p">}),</span>  <span class="c1"># type: ignore</span>
     <span class="p">):</span>
         <span class="c1"># taken from hydra.compose with support for MULTIRUN</span>
         <span class="n">gh</span> <span class="o">=</span> <span class="n">GlobalHydra</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
@@ -856,7 +857,7 @@
                 <span class="n">hydra_context</span><span class="o">=</span><span class="n">hydra_context</span><span class="p">,</span>
                 <span class="n">task_function</span><span class="o">=</span><span class="n">task_function</span><span class="p">,</span>
                 <span class="n">config</span><span class="o">=</span><span class="n">cfg</span><span class="p">,</span>
-                <span class="n">job_dir_key</span><span class="o">=</span><span class="s2">&quot;hydra.run.dir&quot;</span><span class="p">,</span>
+                <span class="n">job_dir_key</span><span class="o">=</span><span class="s2">"hydra.run.dir"</span><span class="p">,</span>
                 <span class="n">job_subdir_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">configure_logging</span><span class="o">=</span><span class="n">with_log_configuration</span><span class="p">,</span>
             <span class="p">)</span>
@@ -865,10 +866,35 @@
             <span class="c1"># access the result to trigger an exception in case the job failed.</span>
             <span class="n">_</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">return_value</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Instantiate sweeper without using Hydra&#39;s Plugin discovery (Zen!)</span>
-            <span class="n">sweeper</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">hydra</span><span class="o">.</span><span class="n">sweeper</span><span class="p">)</span>
-            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sweeper</span><span class="p">,</span> <span class="n">Sweeper</span><span class="p">)</span>
-            <span class="n">sweeper</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span>
+            <span class="c1"># Resolve the sweeper through Hydra's plugin registry rather than</span>
+            <span class="c1"># instantiating `cfg.hydra.sweeper` directly. Hydra &gt;= 1.3.7 refuses</span>
+            <span class="c1"># to instantiate `hydra._internal.*` targets named by declarative</span>
+            <span class="c1"># config -- which is what the stock `hydra/sweeper=basic` selects --</span>
+            <span class="c1"># and exempts only the plugins it constructs itself. This is the</span>
+            <span class="c1"># supported path: it checks that the class is a registered plugin,</span>
+            <span class="c1"># instantiates it, and calls `setup()` on it.</span>
+            <span class="c1">#</span>
+            <span class="c1"># The registry reads the config's `_target_` as the plugin class, so</span>
+            <span class="c1"># a sweeper config whose `_target_` is hydra-zen's zen-processing</span>
+            <span class="c1"># shim (what zen_meta / zen_wrappers produce, also via</span>
+            <span class="c1"># builds_bases) is refused with a message about hydra-zen</span>
+            <span class="c1"># internals. Say what actually went wrong instead. Anything that is</span>
+            <span class="c1"># not a DictConfig is left for Hydra to report in its own words.</span>
+            <span class="n">sweeper_cfg</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">hydra</span><span class="o">.</span><span class="n">sweeper</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">sweeper_cfg</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="n">sweeper_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"_target_"</span><span class="p">)</span> <span class="o">==</span> <span class="n">ZEN_PROCESSING_LOCATION</span>
+            <span class="p">):</span>
+                <span class="k">raise</span> <span class="n">HydraZenValidationError</span><span class="p">(</span>
+                    <span class="s2">"`launch` constructs the sweeper through Hydra's plugin "</span>
+                    <span class="s2">"registry, which requires the sweeper config's `_target_` "</span>
+                    <span class="s2">"to name the plugin class directly. This sweeper config's "</span>
+                    <span class="sa">f</span><span class="s2">"`_target_` is `</span><span class="si">{</span><span class="n">ZEN_PROCESSING_LOCATION</span><span class="si">}</span><span class="s2">` -- hydra-zen's "</span>
+                    <span class="s2">"zen-processing shim, which `zen_meta` and `zen_wrappers` "</span>
+                    <span class="s2">"produce (including when inherited through `builds_bases`). "</span>
+                    <span class="s2">"Those features cannot be used on the sweeper config."</span>
+                <span class="p">)</span>
+            <span class="n">sweeper</span> <span class="o">=</span> <span class="n">Plugins</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span><span class="o">.</span><span class="n">instantiate_sweeper</span><span class="p">(</span>
                 <span class="n">config</span><span class="o">=</span><span class="n">cfg</span><span class="p">,</span>
                 <span class="n">hydra_context</span><span class="o">=</span><span class="n">hydra_context</span><span class="p">,</span>
                 <span class="n">task_function</span><span class="o">=</span><span class="n">task_function</span><span class="p">,</span>
@@ -888,13 +914,13 @@
             <span class="ow">and</span> <span class="n">_num_dataclass_fields_after</span> <span class="o">&lt;</span> <span class="n">_num_dataclass_fields</span>
         <span class="p">):</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;Your dataclass-based config was mutated by this run. If you just &quot;</span>
-                <span class="s2">&quot;executed with a `hydra/launcher` that utilizes cloudpickle (e.g., &quot;</span>
-                <span class="s2">&quot;hydra-submitit-launcher), there is a known issue with dataclasses &quot;</span>
-                <span class="s2">&quot;(see: https://github.com/cloudpipe/cloudpickle/issues/386). You will &quot;</span>
-                <span class="s2">&quot;have to restart your interactive environment to run `launch` again. &quot;</span>
-                <span class="s2">&quot;To avoid this issue you can use the `launch` option: &quot;</span>
-                <span class="s2">&quot;`to_dictconfig=True`.&quot;</span>
+                <span class="s2">"Your dataclass-based config was mutated by this run. If you just "</span>
+                <span class="s2">"executed with a `hydra/launcher` that utilizes cloudpickle (e.g., "</span>
+                <span class="s2">"hydra-submitit-launcher), there is a known issue with dataclasses "</span>
+                <span class="s2">"(see: https://github.com/cloudpipe/cloudpickle/issues/386). You will "</span>
+                <span class="s2">"have to restart your interactive environment to run `launch` again. "</span>
+                <span class="s2">"To avoid this issue you can use the `launch` option: "</span>
+                <span class="s2">"`to_dictconfig=True`."</span>
             <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">job</span></div>

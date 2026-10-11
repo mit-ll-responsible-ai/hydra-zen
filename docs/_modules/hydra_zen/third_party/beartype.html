@@ -412,21 +412,21 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen._utils.coerce</span><span class="w"> </span><span class="kn">import</span> <span class="n">coerce_sequences</span>
 
-<span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
+<span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"_T"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;validates_with_beartype&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"validates_with_beartype"</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="validates_with_beartype">
 <a class="viewcode-back" href="../../../generated/hydra_zen.third_party.beartype.validates_with_beartype.html#hydra_zen.third_party.beartype.validates_with_beartype">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">validates_with_beartype</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">_T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enables runtime type-checking of values, via the library ``beartype``.</span>
+<span class="w">    </span><span class="sd">"""Enables runtime type-checking of values, via the library ``beartype``.</span>
 
 <span class="sd">    I.e. ``obj = validates_with_beartype(obj)`` adds runtime type-checking</span>
 <span class="sd">    to all calls of ``obj(*args, **kwargs)``, based on the type-annotations</span>
 <span class="sd">    specified in the signature of ``obj``.</span>
 
-<span class="sd">    This is designed to be used as a &quot;zen-wrapper&quot;; see Examples for details.</span>
+<span class="sd">    This is designed to be used as a "zen-wrapper"; see Examples for details.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -445,7 +445,7 @@
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    ``beartype`` [1]_ must be installed as a separate dependency to leverage this</span>
-<span class="sd">    validator. Refer to beartype&#39;s documentation [2]_ to see what varieties of types it</span>
+<span class="sd">    validator. Refer to beartype's documentation [2]_ to see what varieties of types it</span>
 <span class="sd">    does and does not support.</span>
 
 <span class="sd">    Using ``validates_with_beartype`` as a ``zen_wrapper`` will create a dependency on</span>
@@ -457,7 +457,7 @@
 <span class="sd">    hydra-zen adds a data-coercion step that is not performed by ``beartype``.</span>
 <span class="sd">    This only impacts fields in ``obj`` annotated with a (non-string) sequence-type</span>
 <span class="sd">    annotation, which are passed list-type data. All other fields rely solely on</span>
-<span class="sd">    beartype&#39;s native behavior.</span>
+<span class="sd">    beartype's native behavior.</span>
 
 <span class="sd">    E.g. a field with a ``Tuple``-annotation, if passed a list, will see that list be</span>
 <span class="sd">    cast to a tuple. See the Examples section for more details.</span>
@@ -475,7 +475,7 @@
 
 <span class="sd">    &gt;&gt;&gt; from beartype.cave import ScalarTypes</span>
 <span class="sd">    &gt;&gt;&gt; def f(x: ScalarTypes): return x  # a scalar is any real-valued number</span>
-<span class="sd">    &gt;&gt;&gt; f([1, 2])  # doesn&#39;t catch bad input</span>
+<span class="sd">    &gt;&gt;&gt; f([1, 2])  # doesn't catch bad input</span>
 <span class="sd">    [1, 2]</span>
 
 <span class="sd">    &gt;&gt;&gt; val_f = validates_with_beartype(f)  # f + validation</span>
@@ -527,8 +527,8 @@
 
 <span class="sd">    &gt;&gt;&gt; validates_with_beartype(g)({1, 2, 3})  # input: a set</span>
 <span class="sd">    BeartypeCallHintPepParamException: @beartyped g() parameter x={1, 2, 3} violates type hint [...]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="s2">&quot;__init__&quot;</span><span class="p">):</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="s2">"__init__"</span><span class="p">):</span>
         <span class="n">obj</span><span class="o">.</span><span class="fm">__init__</span> <span class="o">=</span> <span class="n">bt</span><span class="o">.</span><span class="n">beartype</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span>
         <span class="n">target</span> <span class="o">=</span> <span class="n">obj</span>
     <span class="k">else</span><span class="p">:</span>

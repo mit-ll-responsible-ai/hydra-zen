@@ -421,13 +421,13 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">._implementations</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigComplex</span><span class="p">,</span> <span class="n">DefaultBuilds</span>
 
 <span class="c1"># pyright: strict</span>
-<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
-<span class="n">TD</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TD&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">DataClass_</span><span class="p">)</span>
-<span class="n">TC</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TC&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
-<span class="n">TP</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TP&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">_HydraPrimitive</span><span class="p">)</span>
-<span class="n">TB</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TB&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Union</span><span class="p">[</span><span class="n">_SupportedViaBuilds</span><span class="p">,</span> <span class="nb">frozenset</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">)</span>
+<span class="n">TD</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"TD"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">DataClass_</span><span class="p">)</span>
+<span class="n">TC</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"TC"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
+<span class="n">TP</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"TP"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">_HydraPrimitive</span><span class="p">)</span>
+<span class="n">TB</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"TB"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Union</span><span class="p">[</span><span class="n">_SupportedViaBuilds</span><span class="p">,</span> <span class="nb">frozenset</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;just&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"just"</span><span class="p">]</span>
 
 
 <span class="nd">@overload</span>
@@ -436,7 +436,7 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">"none"</span><span class="p">,</span> <span class="s2">"partial"</span><span class="p">,</span> <span class="s2">"all"</span><span class="p">,</span> <span class="s2">"object"</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TP</span><span class="p">:</span> <span class="o">...</span>
 
@@ -447,7 +447,7 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">"none"</span><span class="p">,</span> <span class="s2">"partial"</span><span class="p">,</span> <span class="s2">"all"</span><span class="p">,</span> <span class="s2">"object"</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigComplex</span><span class="p">:</span> <span class="o">...</span>
 
@@ -458,7 +458,7 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">"none"</span><span class="p">,</span> <span class="s2">"partial"</span><span class="p">,</span> <span class="s2">"all"</span><span class="p">,</span> <span class="s2">"object"</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Just</span><span class="p">[</span><span class="n">TC</span><span class="p">]:</span> <span class="o">...</span>
 
@@ -469,7 +469,7 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">"none"</span><span class="p">,</span> <span class="s2">"partial"</span><span class="p">,</span> <span class="s2">"all"</span><span class="p">,</span> <span class="s2">"object"</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Builds</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">TB</span><span class="p">]]:</span> <span class="o">...</span>
 
@@ -480,7 +480,7 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">"none"</span><span class="p">,</span> <span class="s2">"partial"</span><span class="p">,</span> <span class="s2">"all"</span><span class="p">,</span> <span class="s2">"object"</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">TD</span><span class="p">]]]:</span> <span class="o">...</span>
 
@@ -491,7 +491,7 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">ZenConvert</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">"none"</span><span class="p">,</span> <span class="s2">"partial"</span><span class="p">,</span> <span class="s2">"all"</span><span class="p">,</span> <span class="s2">"object"</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span> <span class="o">...</span>
 
@@ -502,7 +502,7 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">"none"</span><span class="p">,</span> <span class="s2">"partial"</span><span class="p">,</span> <span class="s2">"all"</span><span class="p">,</span> <span class="s2">"object"</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span> <span class="o">...</span>
 
@@ -514,10 +514,10 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hydra_recursive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">hydra_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">"none"</span><span class="p">,</span> <span class="s2">"partial"</span><span class="p">,</span> <span class="s2">"all"</span><span class="p">,</span> <span class="s2">"object"</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">zen_dataclass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataclassOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;`just(obj)` returns a config that, when instantiated, just returns `obj`.</span>
+<span class="w">    </span><span class="sd">"""`just(obj)` returns a config that, when instantiated, just returns `obj`.</span>
 
 <span class="sd">    I.e., `instantiate(just(obj)) == obj`</span>
 
@@ -530,7 +530,7 @@
 <span class="sd">        supported by Hydra or has auto-config support via hydra-zen.</span>
 
 <span class="sd">    zen_convert : Optional[ZenConvert]</span>
-<span class="sd">        A dictionary that modifies hydra-zen&#39;s value and type conversion behavior.</span>
+<span class="sd">        A dictionary that modifies hydra-zen's value and type conversion behavior.</span>
 <span class="sd">        Consists of the following optional key-value pairs (:ref:`zen-convert`):</span>
 
 <span class="sd">        - `dataclass` : `bool` (default=True):</span>
@@ -546,16 +546,16 @@
 
 <span class="sd">        If ``None``, the ``_recursive_`` attribute is not set on the resulting config.</span>
 
-<span class="sd">    hydra_convert : Optional[Literal[&quot;none&quot;, &quot;partial&quot;, &quot;all&quot;, &quot;object&quot;]], optional (default=&quot;none&quot;)</span>
+<span class="sd">    hydra_convert : Optional[Literal["none", "partial", "all", "object"]], optional (default="none")</span>
 <span class="sd">        Determines how Hydra treats the non-primitive, omegaconf-specific objects</span>
 <span class="sd">        during instantiateion [3]_.</span>
 
-<span class="sd">        - ``&quot;none&quot;``: No conversion occurs; omegaconf containers are passed through (Default)</span>
-<span class="sd">        - ``&quot;partial&quot;``: ``DictConfig`` and ``ListConfig`` objects converted to ``dict`` and</span>
+<span class="sd">        - ``"none"``: No conversion occurs; omegaconf containers are passed through (Default)</span>
+<span class="sd">        - ``"partial"``: ``DictConfig`` and ``ListConfig`` objects converted to ``dict`` and</span>
 <span class="sd">          ``list``, respectively. Structured configs and their fields are passed without conversion.</span>
-<span class="sd">        - ``&quot;all&quot;``: All passed objects are converted to dicts, lists, and primitives, without</span>
+<span class="sd">        - ``"all"``: All passed objects are converted to dicts, lists, and primitives, without</span>
 <span class="sd">          a trace of OmegaConf containers.</span>
-<span class="sd">        - ``&quot;object&quot;``: Passed objects are converted to dict and list. Structured Configs are converted to instances of the backing dataclass / attr class.</span>
+<span class="sd">        - ``"object"``: Passed objects are converted to dict and list. Structured Configs are converted to instances of the backing dataclass / attr class.</span>
 
 <span class="sd">        If ``None``, the ``_convert_`` attribute is not set on the resulting config.</span>
 
@@ -588,12 +588,12 @@
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
-<span class="sd">    builds : Create a targeted structured config designed to &quot;build&quot; a particular object.</span>
+<span class="sd">    builds : Create a targeted structured config designed to "build" a particular object.</span>
 <span class="sd">    make_config: Creates a general config with customized field names, default values, and annotations.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    Here, a &quot;config&quot; is a dynamically-generated dataclass type that is designed to be</span>
+<span class="sd">    Here, a "config" is a dynamically-generated dataclass type that is designed to be</span>
 <span class="sd">    compatible with Hydra [1]_.</span>
 
 <span class="sd">    The configs produced by ``just(&lt;type_or_func&gt;)`` introduce an explicit dependency</span>
@@ -611,8 +611,8 @@
 
 <span class="sd">    &gt;&gt;&gt; just(1)</span>
 <span class="sd">    1</span>
-<span class="sd">    &gt;&gt;&gt; just({&quot;a&quot;: False})</span>
-<span class="sd">    {&quot;a&quot;: False}</span>
+<span class="sd">    &gt;&gt;&gt; just({"a": False})</span>
+<span class="sd">    {"a": False}</span>
 
 <span class="sd">    `just` can be used to create a config that will simply import a class-object or function when the config is instantiated by Hydra.</span>
 
@@ -629,9 +629,9 @@
 <span class="sd">    ``obj``</span>
 
 <span class="sd">    &gt;&gt;&gt; just(A)</span>
-<span class="sd">    Just_A(_target_=&#39;hydra_zen.funcs.get_obj&#39;, path=&#39;__main__.A&#39;)</span>
+<span class="sd">    Just_A(_target_='hydra_zen.funcs.get_obj', path='__main__.A')</span>
 <span class="sd">    &gt;&gt;&gt; just(my_func)</span>
-<span class="sd">    Just_my_func(_target_=&#39;hydra_zen.funcs.get_obj&#39;, path=&#39;__main__.my_func&#39;)</span>
+<span class="sd">    Just_my_func(_target_='hydra_zen.funcs.get_obj', path='__main__.my_func')</span>
 
 <span class="sd">    **Auto-config support**</span>
 
@@ -641,12 +641,12 @@
 <span class="sd">    that value.</span>
 
 <span class="sd">    &gt;&gt;&gt; just(1+2j)</span>
-<span class="sd">    ConfigComplex(real=1.0, imag=2.0, _target_=&#39;builtins.complex&#39;)</span>
+<span class="sd">    ConfigComplex(real=1.0, imag=2.0, _target_='builtins.complex')</span>
 <span class="sd">    &gt;&gt;&gt; instantiate(just(1+2j))</span>
 <span class="sd">    (1+2j)</span>
 
 <span class="sd">    &gt;&gt;&gt; just({1, 2, 3})</span>
-<span class="sd">    Builds_set(_target_=&#39;builtins.set&#39;, _args_=((1, 2, 3),))</span>
+<span class="sd">    Builds_set(_target_='builtins.set', _args_=((1, 2, 3),))</span>
 <span class="sd">    &gt;&gt;&gt; instantiate(just({1, 2, 3}))</span>
 <span class="sd">    {1, 2, 3}</span>
 
@@ -665,7 +665,7 @@
 
 <span class="sd">    `just` operates recursively within sequences, mappings, and dataclass fields.</span>
 
-<span class="sd">    &gt;&gt;&gt; z_dict = {&#39;a&#39;: [3-4j, 1+2j]}</span>
+<span class="sd">    &gt;&gt;&gt; z_dict = {'a': [3-4j, 1+2j]}</span>
 <span class="sd">    &gt;&gt;&gt; assert instantiate(just(z_dict)) == z_dict</span>
 <span class="sd">    &gt;&gt;&gt;</span>
 <span class="sd">    &gt;&gt;&gt; from typing import Any</span>
@@ -700,7 +700,7 @@
 <span class="sd">    &gt;&gt;&gt; conf = instantiate(Conf2)</span>
 <span class="sd">    &gt;&gt;&gt; conf.reduction_fn(conf.data)</span>
 <span class="sd">    (3+5j)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">DefaultBuilds</span><span class="o">.</span><span class="n">just</span><span class="p">(</span><span class="o">**</span><span class="nb">locals</span><span class="p">())</span></div>
 
 </pre></div>

@@ -290,13 +290,13 @@ And, suppose that there are particular database-server configurations that we wa
 
 <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="nd">@dataclass</span></a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Server</span><span class="p">:</span>
-    <span class="n">name</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a>
-    <span class="n">port</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a>
+    <span class="n">name</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="nb">str</span></a>
+    <span class="n">port</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/builtins/functions.html#int" title="int"><span class="nb">int</span></a>
 
 
 <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="nd">@dataclass</span></a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Database</span><span class="p">:</span>
-    <span class="n">name</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a>
+    <span class="n">name</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="nb">str</span></a>
 
 <span class="c1"># For convenience:</span>
 <span class="c1"># Tell the store to automatically infer the entry-name from</span>
@@ -320,8 +320,8 @@ And, suppose that there are particular database-server configurations that we wa
 <span class="k">def</span><span class="w"> </span><span class="nf">task</span><span class="p">(</span><span class="n">db</span><span class="p">:</span> <span class="n">Database</span><span class="p">,</span> <span class="n">server</span><span class="p">:</span> <span class="n">Server</span><span class="p">):</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a>
 
-    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="sa">f</span><span class="s2">"db:</span><span class="se">\n</span><span class="si">{</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">(</span><span class="n">db</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="sa">f</span><span class="s2">"server:</span><span class="se">\n</span><span class="si">{</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">(</span><span class="n">server</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/builtins/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="sa">f</span><span class="s2">"db:</span><span class="se">\n</span><span class="si">{</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">(</span><span class="n">db</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/builtins/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="sa">f</span><span class="s2">"server:</span><span class="se">\n</span><span class="si">{</span><a class="sphinx-codeautolink-a" href="../generated/hydra_zen.to_yaml.html#hydra_zen.to_yaml" title="hydra_zen.to_yaml"><span class="n">to_yaml</span></a><span class="p">(</span><span class="n">server</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 
 <span class="c1"># The 'top-level' config for our app w/ a specified default</span>
@@ -407,7 +407,7 @@ And, suppose that there are particular database-server configurations that we wa
 <span class="n">experiment_store</span><span class="p">(</span>
     <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a><span class="p">(</span>
         <span class="n">hydra_defaults</span><span class="o">=</span><span class="p">[</span><span class="s2">"_self_"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"override /db"</span><span class="p">:</span> <span class="s2">"sqlite"</span><span class="p">}],</span>
-        <span class="n">server</span><span class="o">=</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">8080</span><span class="p">),</span>
+        <span class="n">server</span><span class="o">=</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">8080</span><span class="p">),</span>
         <span class="n">bases</span><span class="o">=</span><span class="p">(</span><span class="n">Config</span><span class="p">,),</span>
     <span class="p">),</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">"aplite"</span><span class="p">,</span>
@@ -422,7 +422,7 @@ And, suppose that there are particular database-server configurations that we wa
             <span class="p">{</span><span class="s2">"override /db"</span><span class="p">:</span> <span class="s2">"sqlite"</span><span class="p">},</span>
             <span class="p">{</span><span class="s2">"override /server"</span><span class="p">:</span> <span class="s2">"nginx"</span><span class="p">},</span>
         <span class="p">],</span>
-        <span class="n">server</span><span class="o">=</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">8080</span><span class="p">),</span>
+        <span class="n">server</span><span class="o">=</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">8080</span><span class="p">),</span>
         <span class="n">bases</span><span class="o">=</span><span class="p">(</span><span class="n">Config</span><span class="p">,)</span>
     <span class="p">),</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">"nglite"</span><span class="p">,</span>
