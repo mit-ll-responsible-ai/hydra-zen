@@ -431,11 +431,33 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">omegaconf</span><span class="w"> </span><span class="kn">import</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">,</span> <span class="n">OmegaConf</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">TypeAlias</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen._compatibility</span><span class="w"> </span><span class="kn">import</span> <span class="n">HYDRA_HAS_EXECUTION_POLICY</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen._execution_whitelist</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">active_execution_whitelist</span><span class="p">,</span>
+    <span class="n">check_whitelist_supported</span><span class="p">,</span>
+    <span class="n">resolve_execution_whitelist</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">HydraZenValidationError</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.structured_configs._globals</span><span class="w"> </span><span class="kn">import</span> <span class="n">ZEN_PROCESSING_LOCATION</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.typing._implementations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataClass_</span><span class="p">,</span> <span class="n">InstOrType</span>
 
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Any</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_execution_whitelist_kwargs</span><span class="p">(</span><span class="n">execution_whitelist</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""The execution whitelist to provide to Hydra for a launched job."""</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">HYDRA_HAS_EXECUTION_POLICY</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="n">check_whitelist_supported</span><span class="p">(</span><span class="n">execution_whitelist</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">execution_whitelist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="c1"># Hydra activates the context's whitelist for the job, resetting any</span>
+        <span class="c1"># outer context; thus we must forward the active whitelist</span>
+        <span class="n">execution_whitelist</span> <span class="o">=</span> <span class="n">active_execution_whitelist</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">{</span>  <span class="c1"># pragma: no cover</span>
+        <span class="s2">"execution_whitelist"</span><span class="p">:</span> <span class="n">resolve_execution_whitelist</span><span class="p">(</span><span class="n">execution_whitelist</span><span class="p">)</span>
+    <span class="p">}</span>
+
+
 <span class="n">HydraPrimitives</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
@@ -569,6 +591,7 @@
     <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">job_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">with_log_configuration</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">execution_whitelist</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="o">**</span><span class="n">override_kwargs</span><span class="p">:</span> <span class="n">OverrideValues</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JobReturn</span><span class="p">:</span> <span class="o">...</span>
 
@@ -584,6 +607,7 @@
     <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">job_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="n">with_log_configuration</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">execution_whitelist</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
     <span class="o">**</span><span class="n">override_kwargs</span><span class="p">:</span> <span class="n">OverrideValues</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span> <span class="o">...</span>
 
@@ -600,6 +624,7 @@
     <span class="n">config_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"zen_launch"</span><span class="p">,</span>
     <span class="n">job_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"zen_launch"</span><span class="p">,</span>
     <span class="n">with_log_configuration</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">execution_whitelist</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">override_kwargs</span><span class="p">:</span> <span class="n">OverrideValues</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">JobReturn</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
@@ -649,6 +674,22 @@
 <span class="sd">    with_log_configuration : bool (default: True)</span>
 <span class="sd">        If ``True``, enables the configuration of the logging subsystem from the loaded</span>
 <span class="sd">        config.</span>
+
+<span class="sd">    execution_whitelist : str | Sequence[str] | UNSAFE_DISABLE_EXECUTION_CHECKS, optional</span>
+<span class="sd">        Requires hydra-core 1.4 or later. The execution whitelist that is active</span>
+<span class="sd">        while the job runs (see ``hydra.main(execution_whitelist=...)``). If not</span>
+<span class="sd">        specified, an active ``hydra.utils.execution_whitelist(...)`` context is</span>
+<span class="sd">        used, if any.</span>
+
+<span class="sd">        As with ``hydra.main``, a specified whitelist *replaces* (rather than</span>
+<span class="sd">        extends) an active ``execution_whitelist(...)`` context for the duration of</span>
+<span class="sd">        the job. This differs from ``instantiate(..., _execution_whitelist_=...)``,</span>
+<span class="sd">        which extends an active context. Include any entries that you need, e.g.</span>
+<span class="sd">        ``execution_whitelist=["auto", "torch.*"]``.</span>
+
+<span class="sd">        ``"auto"``, either alone or as an entry in a sequence, expands to every</span>
+<span class="sd">        target that hydra-zen generated in-code (via ``builds``, ``just``, etc.)</span>
+<span class="sd">        during this process. See :func:`~hydra_zen.instantiate` for details.</span>
 
 <span class="sd">    **override_kwargs : OverrideValues</span>
 <span class="sd">        Keyword arguments to override existing configuration values.  Note, this only</span>
@@ -849,7 +890,9 @@
         <span class="n">run_start</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">cfg</span><span class="p">,</span> <span class="n">config_name</span><span class="o">=</span><span class="n">config_name</span><span class="p">)</span>
 
         <span class="n">hydra_context</span> <span class="o">=</span> <span class="n">HydraContext</span><span class="p">(</span>
-            <span class="n">config_loader</span><span class="o">=</span><span class="n">gh</span><span class="o">.</span><span class="n">config_loader</span><span class="p">(),</span> <span class="n">callbacks</span><span class="o">=</span><span class="n">callbacks</span>
+            <span class="n">config_loader</span><span class="o">=</span><span class="n">gh</span><span class="o">.</span><span class="n">config_loader</span><span class="p">(),</span>
+            <span class="n">callbacks</span><span class="o">=</span><span class="n">callbacks</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">_execution_whitelist_kwargs</span><span class="p">(</span><span class="n">execution_whitelist</span><span class="p">),</span>
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">multirun</span><span class="p">:</span>

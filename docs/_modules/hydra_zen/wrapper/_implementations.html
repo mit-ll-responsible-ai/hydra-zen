@@ -444,6 +444,10 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <span class="n">instantiate</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen._compatibility</span><span class="w"> </span><span class="kn">import</span> <span class="n">HYDRA_VERSION</span><span class="p">,</span> <span class="n">Version</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen._execution_whitelist</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">check_whitelist_supported</span><span class="p">,</span>
+    <span class="n">resolve_execution_whitelist</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">HydraZenValidationError</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.structured_configs._implementations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultBuilds</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.structured_configs._type_guards</span><span class="w"> </span><span class="kn">import</span> <span class="n">safe_getattr</span>
@@ -869,6 +873,7 @@
         <span class="n">config_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">_UNSPECIFIED_</span><span class="p">,</span>
         <span class="n">config_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">version_base</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">_UNSPECIFIED_</span><span class="p">,</span>
+        <span class="n">execution_whitelist</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Generates a Hydra-CLI for the wrapped function. Equivalent to `hydra.main(zen(func), [...])()`</span>
@@ -894,6 +899,13 @@
 <span class="sd">            - If the version_base parameter is not specified, Hydra 1.x will use defaults compatible with version 1.1. Also in this case, a warning is issued to indicate an explicit version_base is preferred.</span>
 <span class="sd">            - If the version_base parameter is None, then the defaults are chosen for the current minor Hydra version. For example for Hydra 1.2, then would imply config_path=None and hydra.job.chdir=False.</span>
 <span class="sd">            - If the version_base parameter is an explicit version string like "1.1", then the defaults appropriate to that version are used.</span>
+
+<span class="sd">        execution_whitelist : str | Sequence[str] | UNSAFE_DISABLE_EXECUTION_CHECKS, optional</span>
+<span class="sd">            Requires hydra-core 1.4 or later. Forwarded to</span>
+<span class="sd">            ``hydra.main(execution_whitelist=...)``. ``"auto"``, either alone or as</span>
+<span class="sd">            an entry in a sequence, expands to every target that hydra-zen generated</span>
+<span class="sd">            in-code (via ``builds``, ``just``, etc.) prior to this call. See</span>
+<span class="sd">            :func:`~hydra_zen.instantiate` for details.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -938,6 +950,10 @@
 
         <span class="k">if</span> <span class="n">version_base</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_UNSPECIFIED_</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="n">kw</span><span class="p">[</span><span class="s2">"version_base"</span><span class="p">]</span> <span class="o">=</span> <span class="n">version_base</span>
+
+        <span class="n">check_whitelist_supported</span><span class="p">(</span><span class="n">execution_whitelist</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">execution_whitelist</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kw</span><span class="p">[</span><span class="s2">"execution_whitelist"</span><span class="p">]</span> <span class="o">=</span> <span class="n">resolve_execution_whitelist</span><span class="p">(</span><span class="n">execution_whitelist</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="o">**</span><span class="n">kw</span><span class="p">)(</span><span class="n">target</span><span class="p">)()</span></div>
 </div>

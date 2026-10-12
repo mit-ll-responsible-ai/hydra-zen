@@ -468,6 +468,7 @@
     <span class="n">OMEGACONF_HANDLES_PATHLIB_LOCAL</span><span class="p">,</span>
     <span class="n">ZEN_SUPPORTED_PRIMITIVES</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen._execution_whitelist</span><span class="w"> </span><span class="kn">import</span> <span class="n">mark_builtin_targets</span><span class="p">,</span> <span class="n">register_target</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen.errors</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">HydraZenDeprecationWarning</span><span class="p">,</span>
     <span class="n">HydraZenUnsupportedPrimitiveError</span><span class="p">,</span>
@@ -1452,7 +1453,9 @@
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_just</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Just</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">Just</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="n">register_target</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Just</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_mutable_value</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">zen_convert</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZenConvert</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
@@ -2680,6 +2683,10 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">target_path</span> <span class="o">=</span> <span class="n">manual_target_path</span>
 
+        <span class="c1"># Registered for `"auto"` execution whitelists only once the config has</span>
+        <span class="c1"># successfully been created.</span>
+        <span class="n">paths_to_register</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">target_path</span><span class="p">]</span>
+
         <span class="k">if</span> <span class="n">zen_wrappers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">zen_wrappers</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">zen_wrappers</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="n">zen_wrappers</span> <span class="o">=</span> <span class="p">(</span><span class="n">zen_wrappers</span><span class="p">,)</span>
@@ -2716,13 +2723,17 @@
                         <span class="n">validated_wrappers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wrapper</span><span class="p">)</span>
 
                 <span class="k">elif</span> <span class="nb">callable</span><span class="p">(</span><span class="n">wrapper</span><span class="p">):</span>
-                    <span class="n">validated_wrappers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="n">wrapper</span><span class="p">))</span>
+                    <span class="n">wrapper_path</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="n">wrapper</span><span class="p">)</span>
+                    <span class="n">paths_to_register</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wrapper_path</span><span class="p">)</span>
+                    <span class="n">validated_wrappers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wrapper_path</span><span class="p">)</span>
 
                 <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">wrapper</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                     <span class="c1"># Assumed that wrapper is either a valid omegaconf-style interpolation string</span>
                     <span class="c1"># or a "valid" path for importing an object. The latter seems hopeless for validating:</span>
                     <span class="c1"># https://stackoverflow.com/a/47538106/6592114</span>
                     <span class="c1"># so we can't make any assurances here.</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">_utils</span><span class="o">.</span><span class="n">is_interpolated_string</span><span class="p">(</span><span class="n">wrapper</span><span class="p">):</span>
+                        <span class="n">paths_to_register</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wrapper</span><span class="p">)</span>
                     <span class="n">validated_wrappers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wrapper</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
@@ -3425,6 +3436,9 @@
         <span class="k">assert</span> <span class="ow">not</span> <span class="p">(</span>
             <span class="n">requires_zen_processing</span> <span class="ow">and</span> <span class="n">safe_getattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">PARTIAL_FIELD_NAME</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths_to_register</span><span class="p">:</span>
+            <span class="n">register_target</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
             <span class="n">Union</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">Builds</span><span class="p">[</span><span class="n">Importable</span><span class="p">]],</span> <span class="nb">type</span><span class="p">[</span><span class="n">BuildsWithSig</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">P</span><span class="p">]]],</span> <span class="n">out</span>
@@ -4302,6 +4316,27 @@
     <span class="n">ConfigFromDict</span><span class="p">,</span> <span class="n">_target_</span><span class="o">=</span><span class="n">BuildsFn</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="n">Counter</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="n">ZEN_VALUE_CONVERSION</span><span class="p">[</span><span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">]</span> <span class="o">=</span> <span class="n">_unpack_partial</span>
+
+<span class="c1"># Targets that hydra-zen generates for value conversion, and hydra-zen's resolvers</span>
+<span class="c1"># (whose resolved paths are themselves authorized: see `_target_policy_patches`)</span>
+<span class="k">for</span> <span class="n">_obj</span> <span class="ow">in</span> <span class="p">(</span>
+    <span class="nb">complex</span><span class="p">,</span>
+    <span class="n">Path</span><span class="p">,</span>
+    <span class="nb">range</span><span class="p">,</span>
+    <span class="n">timedelta</span><span class="p">,</span>
+    <span class="n">as_default_dict</span><span class="p">,</span>
+    <span class="nb">set</span><span class="p">,</span>
+    <span class="nb">frozenset</span><span class="p">,</span>
+    <span class="n">deque</span><span class="p">,</span>
+    <span class="nb">bytes</span><span class="p">,</span>
+    <span class="nb">bytearray</span><span class="p">,</span>
+    <span class="n">Counter</span><span class="p">,</span>
+    <span class="n">get_obj</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">register_target</span><span class="p">(</span><span class="n">BuildsFn</span><span class="o">.</span><span class="n">_get_obj_path</span><span class="p">(</span><span class="n">_obj</span><span class="p">))</span>
+<span class="n">register_target</span><span class="p">(</span><span class="n">ZEN_PROCESSING_LOCATION</span><span class="p">)</span>
+<span class="n">mark_builtin_targets</span><span class="p">()</span>
+<span class="k">del</span> <span class="n">_obj</span>
 </pre></div>
 
                 </article>

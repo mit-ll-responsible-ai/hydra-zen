@@ -602,7 +602,7 @@ checked according to the signature of <code class="xref py py-obj docutils liter
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hydra_zen.wrapper.Zen.hydra_main">
-<span class="sig-name descname"><span class="pre">hydra_main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;object</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;object</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/wrapper/_implementations.html#Zen.hydra_main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.wrapper.Zen.hydra_main" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">hydra_main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;object</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;object</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">execution_whitelist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydra_zen/wrapper/_implementations.html#Zen.hydra_main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydra_zen.wrapper.Zen.hydra_main" title="Link to this definition">#</a></dt>
 <dd><p>Generates a Hydra-CLI for the wrapped function. Equivalent to <code class="xref py py-obj docutils literal notranslate"><span class="pre">hydra.main(zen(func),</span> <span class="pre">[...])()</span></code></p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -623,6 +623,12 @@ use.</p>
 <li><p>If the version_base parameter is None, then the defaults are chosen for the current minor Hydra version. For example for Hydra 1.2, then would imply config_path=None and hydra.job.chdir=False.</p></li>
 <li><p>If the version_base parameter is an explicit version string like “1.1”, then the defaults appropriate to that version are used.</p></li>
 </ul>
+</dd>
+<dt><strong>execution_whitelist</strong><span class="classifier">str | Sequence[str] | UNSAFE_DISABLE_EXECUTION_CHECKS, optional</span></dt><dd><p>Requires hydra-core 1.4 or later. Forwarded to
+<code class="docutils literal notranslate"><span class="pre">hydra.main(execution_whitelist=...)</span></code>. <code class="docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code>, either alone or as
+an entry in a sequence, expands to every target that hydra-zen generated
+in-code (via <code class="docutils literal notranslate"><span class="pre">builds</span></code>, <code class="docutils literal notranslate"><span class="pre">just</span></code>, etc.) prior to this call. See
+<a class="reference internal" href="hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><code class="xref py py-func docutils literal notranslate"><span class="pre">instantiate()</span></code></a> for details.</p>
 </dd>
 </dl>
 </dd>

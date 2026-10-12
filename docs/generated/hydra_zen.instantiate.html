@@ -326,6 +326,16 @@ to the config-instantiation process.</p>
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">_target_wrapper_(target)(*args,</span> <span class="pre">**kwargs)</span></code> will be called rather than
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">target(*args,</span> <span class="pre">**kwargs)</span></code>.</p>
 </dd>
+<dt><strong>_execution_whitelist_</strong><span class="classifier">str | Sequence[str] | UNSAFE_DISABLE_EXECUTION_CHECKS, optional</span></dt><dd><p>Requires hydra-core 1.4 or later. The execution whitelist with which Hydra
+authorizes the targets that it instantiates <a class="reference internal" href="#rfffea48737d8-5" id="id3">[5]</a>.</p>
+<p>hydra-zen treats configs as trusted code, thus by default Hydra’s execution
+checks are disabled, unless a <code class="docutils literal notranslate"><span class="pre">hydra.utils.execution_whitelist(...)</span></code>
+context is active (e.g., via <code class="docutils literal notranslate"><span class="pre">hydra.main(execution_whitelist=...)</span></code>), in
+which case that whitelist is used.</p>
+<p><code class="docutils literal notranslate"><span class="pre">"auto"</span></code>, either alone or as an entry in a sequence, expands to every
+target that hydra-zen generated in-code (via <code class="docutils literal notranslate"><span class="pre">builds</span></code>, <code class="docutils literal notranslate"><span class="pre">just</span></code>, etc.)
+during this process. E.g., <code class="docutils literal notranslate"><span class="pre">_execution_whitelist_=["auto",</span> <span class="pre">"torch.*"]</span></code>.</p>
+</dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -349,9 +359,9 @@ by <code class="docutils literal notranslate"><span class="pre">config</span></c
 <p>This is an alias for <code class="docutils literal notranslate"><span class="pre">hydra.utils.instantiate</span></code>, but adds additional static type
 information.</p>
 <p>During instantiation, Hydra performs runtime validation of data based on a limited set of
-type-annotations that can be associated with the fields of the provided config <a class="reference internal" href="#rfffea48737d8-2" id="id3">[2]</a> <a class="reference internal" href="#rfffea48737d8-3" id="id4">[3]</a>.</p>
+type-annotations that can be associated with the fields of the provided config <a class="reference internal" href="#rfffea48737d8-2" id="id4">[2]</a> <a class="reference internal" href="#rfffea48737d8-3" id="id5">[3]</a>.</p>
 <p>Hydra supports a string-based syntax for variable interpolation, which enables configured
-values to be set in a self-referential and dynamic manner <a class="reference internal" href="#rfffea48737d8-4" id="id5">[4]</a>.</p>
+values to be set in a self-referential and dynamic manner <a class="reference internal" href="#rfffea48737d8-4" id="id6">[4]</a>.</p>
 <p class="rubric">References</p>
 <div class="citation-list" role="list">
 <div class="citation" id="rfffea48737d8-1" role="doc-biblioentry">
@@ -361,17 +371,21 @@ values to be set in a self-referential and dynamic manner <a class="reference in
 </div>
 <div class="citation" id="rfffea48737d8-2" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a href="#id3" role="doc-backlink">1</a>,<a href="#id11" role="doc-backlink">2</a>)</span>
+<span class="backrefs">(<a href="#id4" role="doc-backlink">1</a>,<a href="#id13" role="doc-backlink">2</a>)</span>
 <p><a class="reference external" href="https://omegaconf.readthedocs.io/en/latest/structured_config.html#simple-types">https://omegaconf.readthedocs.io/en/latest/structured_config.html#simple-types</a></p>
 </div>
 <div class="citation" id="rfffea48737d8-3" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a href="#id4" role="doc-backlink">3</a><span class="fn-bracket">]</span></span>
+<span class="label"><span class="fn-bracket">[</span><a href="#id5" role="doc-backlink">3</a><span class="fn-bracket">]</span></span>
 <p><a class="reference external" href="https://omegaconf.readthedocs.io/en/latest/structured_config.html#runtime-type-validation-and-conversion">https://omegaconf.readthedocs.io/en/latest/structured_config.html#runtime-type-validation-and-conversion</a></p>
 </div>
 <div class="citation" id="rfffea48737d8-4" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a href="#id5" role="doc-backlink">1</a>,<a href="#id10" role="doc-backlink">2</a>)</span>
+<span class="backrefs">(<a href="#id6" role="doc-backlink">1</a>,<a href="#id12" role="doc-backlink">2</a>)</span>
 <p><a class="reference external" href="https://omegaconf.readthedocs.io/en/latest/usage.html#variable-interpolation">https://omegaconf.readthedocs.io/en/latest/usage.html#variable-interpolation</a></p>
+</div>
+<div class="citation" id="rfffea48737d8-5" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a href="#id3" role="doc-backlink">5</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://hydra.cc/docs/advanced/execution_whitelist/">https://hydra.cc/docs/advanced/execution_whitelist/</a></p>
 </div>
 </div>
 <p class="rubric">Examples</p>
@@ -406,7 +420,7 @@ values to be set in a self-referential and dynamic manner <a class="reference in
 </div>
 <p><strong>Leveraging Variable Interpolation</strong></p>
 <p>Hydra provides a powerful language for absolute and relative
-interpolated variables among configs <a class="reference internal" href="#rfffea48737d8-4" id="id10">[4]</a>. Let’s make a config
+interpolated variables among configs <a class="reference internal" href="#rfffea48737d8-4" id="id12">[4]</a>. Let’s make a config
 where multiple fields reference the field <code class="docutils literal notranslate"><span class="pre">name</span></code> via absolute
 interpolation.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.make_config.html#hydra_zen.make_config" title="hydra_zen.make_config"><span class="n">make_config</span></a>
@@ -432,7 +446,7 @@ interpolation.</p>
 <span class="go">    object_type=Builds_g</span>
 </pre></div>
 </div>
-<p>Only a subset of primitive types are supported by Hydra’s validation system <a class="reference internal" href="#rfffea48737d8-2" id="id11">[2]</a>.
+<p>Only a subset of primitive types are supported by Hydra’s validation system <a class="reference internal" href="#rfffea48737d8-2" id="id13">[2]</a>.
 See <a class="reference internal" href="../api_reference.html#data-val"><span class="std std-ref">Runtime Data Validation</span></a> for more general data validation capabilities via hydra-zen.</p>
 </dd></dl>
 </section>

@@ -1,0 +1,431 @@
+
+<!DOCTYPE html>
+
+<html data-content_root="../" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="hydra-zen's threat model: configs are trusted code, and how to opt into Hydra's execution whitelist." name="description"/>
+<link href="../_static/hydra_zen_favicon_64x64.ico" rel="icon" type="image/x-icon"/>
+<link href="../_static/hydra_zen_favicon_32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="../_static/hydra_zen_favicon_64x64.png" rel="icon" sizes="64x64" type="image/png"/>
+<title>Configs Are Code: Threat Model — hydra-zen  documentation</title>
+<script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+<!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+<noscript>
+<style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+</noscript>
+<!-- Loaded before other Sphinx assets -->
+<link href="../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet"/>
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet"/>
+<link href="../_static/pygments.css?v=8f2a1f02" rel="stylesheet" type="text/css"/>
+<link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx-codeautolink.css?v=b2176991" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx-design.min.css?v=95c83b7e" rel="stylesheet" type="text/css"/>
+<!-- So that users can add custom icons -->
+<script defer="" src="../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+<!-- Pre-loaded scripts that we'll load fully later -->
+<link as="script" href="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" rel="preload"/>
+<link as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" rel="preload"/>
+<script src="../_static/documentation_options.js?v=5929fcd5"></script>
+<script src="../_static/doctools.js?v=fd6eb6e6"></script>
+<script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+<script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+<script src="../_static/copybutton.js?v=30646c52"></script>
+<script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-115029372-2"></script>
+<script src="../_static/gtag.js?v=dff6cbd6"></script>
+<script src="../_static/design-tabs.js?v=f930bc37"></script>
+<script>DOCUMENTATION_OPTIONS.pagename = 'explanation/security';</script>
+<script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="../api_reference.html" rel="next" title="Reference"/>
+<link href="hydrated_dataclass.html" rel="prev" title="Combining Statically-Defined and Dynamically-Generated Configurations"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="en" name="docsearch:language"/>
+<meta content="" name="docsearch:version"/>
+<script src="../_static/searchtools.js"></script>
+<script src="../_static/language_data.js"></script>
+<script src="../searchindex.js"></script>
+</head>
+<body data-default-mode="">
+<div class="skip-link d-print-none" id="pst-skip-link"><a href="#main-content">Skip to main content</a></div>
+<div id="pst-scroll-pixel-helper"></div>
+<button class="btn rounded-pill" id="pst-back-to-top" type="button">
+<i class="fa-solid fa-arrow-up"></i>Back to top</button>
+<dialog id="pst-search-dialog">
+<form action="../search.html" class="bd-search d-flex align-items-center" method="get">
+<i class="fa-solid fa-magnifying-glass"></i>
+<input aria-label="Search the docs ..." autocapitalize="off" autocomplete="off" autocorrect="off" class="form-control" name="q" placeholder="Search the docs ..." spellcheck="false" type="search"/>
+<span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+</dialog>
+<div class="pst-async-banner-revealer d-none">
+<aside aria-label="Version warning" class="d-none d-print-none" id="bd-header-version-warning"></aside>
+</div>
+<header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none" id="pst-header">
+<div class="bd-header__inner bd-page-width">
+<button aria-label="Site navigation" class="pst-navbar-icon sidebar-toggle primary-toggle">
+<span class="fa-solid fa-bars"></span>
+</button>
+<div class="col-lg-3 navbar-header-items__start">
+<div class="navbar-item">
+<a class="navbar-brand logo" href="../index.html">
+<img alt="hydra-zen  documentation - Home" class="logo__image only-light" src="../_static/Hydra-Zen_logo_full_light_blue.png"/>
+<img alt="hydra-zen  documentation - Home" class="logo__image only-dark pst-js-only" src="../_static/Hydra-Zen_logo_full_light_blue.png"/>
+</a></div>
+</div>
+<div class="col-lg-9 navbar-header-items">
+<div class="me-auto navbar-header-items__center">
+<div class="navbar-item">
+<nav>
+<ul class="bd-navbar-elements navbar-nav">
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../how_tos.html">
+    How-To Guides
+  </a>
+</li>
+<li class="nav-item current active">
+<a class="nav-link nav-internal" href="../explanation.html">
+    Explanation
+  </a>
+</li>
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../api_reference.html">
+    Reference
+  </a>
+</li>
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../changes.html">
+    Changelog
+  </a>
+</li>
+</ul>
+</nav></div>
+</div>
+<div class="navbar-header-items__end">
+<div class="navbar-item navbar-persistent--container">
+<button aria-label="Search" class="btn search-button-field search-button__button pst-js-only" data-bs-placement="bottom" data-bs-toggle="tooltip" title="Search">
+<i class="fa-solid fa-magnifying-glass"></i>
+<span class="search-button__default-text">Search</span>
+<span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+</div>
+<div class="navbar-item">
+<div class="theme-switch-container dropdown pst-js-only" data-bs-placement="bottom" data-bs-toggle="tooltip" title="Color mode">
+<button aria-label="Color mode" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" data-bs-toggle="dropdown">
+<i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+<i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+<i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+</button>
+<ul class="dropdown-menu dropdown-menu-end">
+<li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+<li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+<li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+</ul>
+</div></div>
+<div class="navbar-item"><ul aria-label="Icon Links" class="navbar-icon-links">
+<li class="nav-item">
+<a class="nav-link pst-navbar-icon" data-bs-placement="bottom" data-bs-toggle="tooltip" href="https://github.com/mit-ll-responsible-ai/hydra-zen" rel="noopener" target="_blank" title="GitHub"><i aria-hidden="true" class="fab fa-github-square fa-lg"></i><span class="visually-hidden">GitHub</span></a>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="navbar-persistent--mobile">
+<button aria-label="Search" class="btn search-button-field search-button__button pst-js-only" data-bs-placement="bottom" data-bs-toggle="tooltip" title="Search">
+<i class="fa-solid fa-magnifying-glass"></i>
+<span class="search-button__default-text">Search</span>
+<span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+</div>
+<button aria-label="On this page" class="pst-navbar-icon sidebar-toggle secondary-toggle">
+<span class="fa-solid fa-outdent"></span>
+</button>
+</div>
+</header>
+<div class="bd-container">
+<div class="bd-container__inner bd-page-width">
+<dialog id="pst-primary-sidebar-modal"></dialog>
+<div class="bd-sidebar-primary bd-sidebar" id="pst-primary-sidebar">
+<div class="sidebar-header-items sidebar-primary__section">
+<div class="sidebar-header-items__center">
+<div class="navbar-item">
+<nav>
+<ul class="bd-navbar-elements navbar-nav">
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../how_tos.html">
+    How-To Guides
+  </a>
+</li>
+<li class="nav-item current active">
+<a class="nav-link nav-internal" href="../explanation.html">
+    Explanation
+  </a>
+</li>
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../api_reference.html">
+    Reference
+  </a>
+</li>
+<li class="nav-item">
+<a class="nav-link nav-internal" href="../changes.html">
+    Changelog
+  </a>
+</li>
+</ul>
+</nav></div>
+</div>
+<div class="sidebar-header-items__end">
+<div class="navbar-item">
+<div class="theme-switch-container dropdown pst-js-only" data-bs-placement="bottom" data-bs-toggle="tooltip" title="Color mode">
+<button aria-label="Color mode" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" data-bs-toggle="dropdown">
+<i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+<i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+<i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+</button>
+<ul class="dropdown-menu dropdown-menu-end">
+<li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+<li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+<li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+</ul>
+</div></div>
+<div class="navbar-item"><ul aria-label="Icon Links" class="navbar-icon-links">
+<li class="nav-item">
+<a class="nav-link pst-navbar-icon" data-bs-placement="bottom" data-bs-toggle="tooltip" href="https://github.com/mit-ll-responsible-ai/hydra-zen" rel="noopener" target="_blank" title="GitHub"><i aria-hidden="true" class="fab fa-github-square fa-lg"></i><span class="visually-hidden">GitHub</span></a>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sidebar-primary-items__start sidebar-primary__section">
+<div class="sidebar-primary-item pst-sidebar-collapse"><button aria-controls="pst-primary-sidebar" aria-expanded="true" id="pst-collapse-sidebar-button"><svg aria-hidden="true" class="pst-icon svg-inline--fa" focusable="false" role="img" viewbox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+<path d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z" fill="currentColor"></path>
+</svg>
+<span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+<span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+<div class="sidebar-primary-item">
+<nav aria-label="Section Navigation" class="bd-docs-nav bd-links">
+<p aria-level="1" class="bd-links__title" role="heading">Section Navigation</p>
+<div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="type_refinement.html">Understanding hydra-zen’s Automatic Type Refinement Behavior</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dont_repeat_yourself.html">Don’t Repeat Yourself: Keeping DRY with Dynamically-Generated Configs 🌞</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hydrated_dataclass.html">Combining Statically-Defined and Dynamically-Generated Configurations</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Configs Are Code: Threat Model</a></li>
+</ul>
+</div>
+</nav></div>
+</div>
+<div class="sidebar-primary-items__end sidebar-primary__section">
+<div class="sidebar-primary-item">
+<div class="flat" data-ea-manual="true" data-ea-publisher="readthedocs" data-ea-type="readthedocs-sidebar" id="ethical-ad-placement">
+</div></div>
+</div>
+</div>
+<main class="bd-main" id="main-content" role="main">
+<div class="bd-content">
+<div class="bd-article-container">
+<div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+<div class="header-article-items__start">
+<div class="header-article-item">
+<nav aria-label="Breadcrumb" class="d-print-none">
+<ul class="bd-breadcrumbs">
+<li class="breadcrumb-item breadcrumb-home">
+<a aria-label="Home" class="nav-link" href="../index.html">
+<i class="fa-solid fa-home"></i>
+</a>
+</li>
+<li class="breadcrumb-item"><a class="nav-link" href="../explanation.html">Explanation</a></li>
+<li aria-current="page" class="breadcrumb-item active"><span class="ellipsis">Configs Are Code: Threat Model</span></li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+</div>
+<div id="searchbox"></div>
+<article class="bd-article">
+<section id="configs-are-code-threat-model">
+<span id="security"></span><h1>Configs Are Code: Threat Model<a class="headerlink" href="#configs-are-code-threat-model" title="Link to this heading">#</a></h1>
+<p>A Hydra config can choose which Python code runs: instantiating a config imports and
+calls its <code class="docutils literal notranslate"><span class="pre">_target_</span></code>. So a config is code, much like a pickle file is, and it
+should be treated with the same level of trust.</p>
+<p>hydra-zen’s configs are generated <em>from</em> your Python code. <code class="docutils literal notranslate"><span class="pre">builds(f)</span></code> writes a config
+that calls <code class="docutils literal notranslate"><span class="pre">f</span></code> because you asked it to. Thus, by default, hydra-zen treats configs as
+trusted code.</p>
+<section id="when-should-you-worry">
+<h2>When Should You Worry?<a class="headerlink" href="#when-should-you-worry" title="Link to this heading">#</a></h2>
+<p>In the everyday workflow (you write the code, you run it, and you supply the
+command-line overrides) there is no attacker. Anyone who can type
+<code class="docutils literal notranslate"><span class="pre">model._target_=os.system</span></code> at your command line could just as easily run Python
+directly.</p>
+<p>Config values become a risk when they come from someone <strong>less trusted than the
+program that instantiates them</strong>, for example:</p>
+<ul class="simple">
+<li><p>a YAML config, or saved <code class="docutils literal notranslate"><span class="pre">.hydra/config.yaml</span></code>, that someone else wrote or could have
+modified, which you then load and instantiate;</p></li>
+<li><p>a service (e.g. a job-submission web UI) that forwards users’ overrides to a Hydra
+app running with the service’s privileges.</p></li>
+</ul>
+<p>Do not instantiate configs from sources you don’t trust. Hydra’s own checks on
+instantiation are, <a class="reference external" href="https://hydra.cc/docs/advanced/execution_whitelist/">in Hydra’s words</a>,
+defense in depth, not a security boundary: Hydra has many other ways for configs and
+command-line overrides to choose what code runs (launchers, plugins, <code class="docutils literal notranslate"><span class="pre">hydra</span></code> settings,
+and more).</p>
+<section id="remote-launchers">
+<h3>Remote launchers<a class="headerlink" href="#remote-launchers" title="Link to this heading">#</a></h3>
+<p>Launchers that run jobs elsewhere (e.g. on a cluster) send the job, including its config,
+through some channel (a shared filesystem, a queue, an object store). Hydra’s launchers
+serialize jobs with pickle, so whoever can write to that channel can run arbitrary code,
+regardless of any whitelist. Make sure that only you can write to that channel.</p>
+</section>
+</section>
+<section id="hydra-s-execution-whitelist">
+<h2>Hydra’s Execution Whitelist<a class="headerlink" href="#hydra-s-execution-whitelist" title="Link to this heading">#</a></h2>
+<p>hydra-core 1.4 introduced an execution whitelist, which restricts which targets
+instantiation may use <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. Without a whitelist, Hydra 1.4 warns on every instantiated
+target, and Hydra 1.5 will raise an error.</p>
+<p>hydra-zen’s behavior:</p>
+<ul class="simple">
+<li><p><strong>By default, hydra-zen treats configs as trusted code.</strong>
+<a class="reference internal" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><code class="xref py py-func docutils literal notranslate"><span class="pre">instantiate()</span></code></a> (and therefore <a class="reference internal" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><code class="xref py py-func docutils literal notranslate"><span class="pre">zen()</span></code></a> and
+<a class="reference internal" href="../generated/hydra_zen.launch.html#hydra_zen.launch" title="hydra_zen.launch"><code class="xref py py-func docutils literal notranslate"><span class="pre">launch()</span></code></a>) instantiates with Hydra’s execution checks disabled,
+unless a whitelist is active, e.g. via <code class="docutils literal notranslate"><span class="pre">hydra.main(execution_whitelist=...)</span></code>, or
+<code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">hydra.utils.execution_whitelist(...):</span></code>.</p></li>
+<li><p><strong>You can opt into a whitelist</strong> via <code class="docutils literal notranslate"><span class="pre">instantiate(...,</span> <span class="pre">_execution_whitelist_=...)</span></code>,
+<code class="docutils literal notranslate"><span class="pre">launch(...,</span> <span class="pre">execution_whitelist=...)</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">zen(...).hydra_main(...,</span> <span class="pre">execution_whitelist=...)</span></code>.</p></li>
+<li><p><strong>“auto”</strong> expands to every target that hydra-zen generated in-code (via <code class="docutils literal notranslate"><span class="pre">builds</span></code>,
+<code class="docutils literal notranslate"><span class="pre">just</span></code>, <code class="docutils literal notranslate"><span class="pre">zen_wrappers</span></code>, etc.) during this process. It can be combined with other
+entries, e.g. <code class="docutils literal notranslate"><span class="pre">["auto",</span> <span class="pre">"torch.*"]</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">instantiate(...,</span> <span class="pre">_execution_whitelist_=...)</span></code> <em>extends</em> an active
+<code class="docutils literal notranslate"><span class="pre">execution_whitelist(...)</span></code> context, whereas the whitelist of <code class="docutils literal notranslate"><span class="pre">launch</span></code> and
+<code class="docutils literal notranslate"><span class="pre">hydra_main</span></code> <em>replaces</em> it for the job’s duration (as with <code class="docutils literal notranslate"><span class="pre">hydra.main</span></code>).</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">hydra_zen</span><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">task</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/builtins/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
+
+<span class="n">Conf</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../generated/hydra_zen.builds.html#hydra_zen.builds" title="hydra_zen.builds"><span class="n">builds</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="dict"><span class="nb">dict</span></a><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">(</span><span class="n">Conf</span><span class="p">,</span> <span class="n">_execution_whitelist_</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">)</span>  <span class="c1"># OK: `dict` was built in-code</span>
+<a class="sphinx-codeautolink-a" href="../generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><span class="n">instantiate</span></a><span class="p">({</span><span class="s2">"_target_"</span><span class="p">:</span> <span class="s2">"os.getcwd"</span><span class="p">},</span> <span class="n">_execution_whitelist_</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">)</span>  <span class="c1"># rejected</span>
+
+<a class="sphinx-codeautolink-a" href="../generated/hydra_zen.zen.html#hydra_zen.zen" title="hydra_zen.zen"><span class="n">zen</span></a><span class="p">(</span><span class="n">task</span><span class="p">)</span><span class="o">.</span><span class="n">hydra_main</span><span class="p">(</span><span class="n">config_name</span><span class="o">=</span><span class="s2">"main"</span><span class="p">,</span> <span class="n">execution_whitelist</span><span class="o">=</span><span class="p">[</span><span class="s2">"auto"</span><span class="p">,</span> <span class="s2">"torch.*"</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Enforcing a whitelist rejects any target that isn’t on it, including legitimate ones: a
+<code class="docutils literal notranslate"><span class="pre">_target_</span></code> overridden at the command line, targets in YAML configs, or the result of a
+factory that returns a class or other callable (Hydra also authorizes callable results).
+Add these to the whitelist explicitly.</p>
+<p>hydra-zen’s <code class="docutils literal notranslate"><span class="pre">zen_meta</span></code>, <code class="docutils literal notranslate"><span class="pre">zen_wrappers</span></code>, and <code class="docutils literal notranslate"><span class="pre">just</span></code> features resolve objects from
+import paths. Whatever policy is active (Hydra’s blocklist, or a whitelist) is applied to
+those paths too, just as Hydra applies it to its own resolvers such as
+<code class="docutils literal notranslate"><span class="pre">hydra.utils.get_object</span></code>.</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a href="#id1" role="doc-backlink">1</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://hydra.cc/docs/advanced/execution_whitelist/">https://hydra.cc/docs/advanced/execution_whitelist/</a></p>
+</aside>
+</aside>
+</section>
+</section>
+</article>
+<footer class="prev-next-footer d-print-none">
+<div class="prev-next-area">
+<a class="left-prev" href="hydrated_dataclass.html" title="previous page">
+<i class="fa-solid fa-angle-left"></i>
+<div class="prev-next-info">
+<p class="prev-next-subtitle">previous</p>
+<p class="prev-next-title">Combining Statically-Defined and Dynamically-Generated Configurations</p>
+</div>
+</a>
+<a class="right-next" href="../api_reference.html" title="next page">
+<div class="prev-next-info">
+<p class="prev-next-subtitle">next</p>
+<p class="prev-next-title">Reference</p>
+</div>
+<i class="fa-solid fa-angle-right"></i>
+</a>
+</div>
+</footer>
+</div>
+<dialog id="pst-secondary-sidebar-modal"></dialog>
+<div class="bd-sidebar-secondary bd-toc" id="pst-secondary-sidebar"><div class="sidebar-secondary-items sidebar-secondary__inner">
+<div class="sidebar-secondary-item">
+<div class="page-toc tocsection onthispage" id="pst-page-navigation-heading-2">
+<i class="fa-solid fa-list"></i> On this page
+  </div>
+<nav aria-labelledby="pst-page-navigation-heading-2" class="page-toc" id="pst-page-toc-nav">
+<ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-should-you-worry">When Should You Worry?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#remote-launchers">Remote launchers</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hydra-s-execution-whitelist">Hydra’s Execution Whitelist</a></li>
+</ul>
+</nav></div>
+<div class="sidebar-secondary-item">
+<div class="tocsection sourcelink">
+<a href="../_sources/explanation/security.rst.txt">
+<i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+</div>
+</div>
+</div></div>
+</div>
+<footer class="bd-footer-content">
+</footer>
+</main>
+</div>
+</div>
+<!-- Scripts loaded after <body> so the DOM is not blocked -->
+<script defer="" src="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
+<script defer="" src="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+<footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+<div class="footer-items__start">
+<div class="footer-item">
+<p class="copyright">
+    
+      © Copyright 2023 Massachusetts Institute of Technology.
+      <br/>
+</p>
+</div>
+<div class="footer-item">
+<p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+</p>
+</div>
+</div>
+<div class="footer-items__end">
+<div class="footer-item">
+<p class="theme-version">
+<!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.19.0.
+</p></div>
+</div>
+</div>
+</footer>
+</body>
+</html>
