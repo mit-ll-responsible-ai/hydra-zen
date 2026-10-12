@@ -4,9 +4,10 @@ import functools
 import inspect
 import pathlib
 import sys
+import types
 import warnings
 from collections import Counter, defaultdict, deque
-from collections.abc import Collection, Mapping, Sequence
+from collections.abc import Collection, Mapping, Sequence, Set as _abc_Set
 from dataclasses import (  # use this for runtime checks
     MISSING,
     Field as _Field,
@@ -20,7 +21,7 @@ from dataclasses import (  # use this for runtime checks
 from datetime import timedelta
 from enum import Enum
 from functools import partial
-from itertools import chain
+from itertools import chain, takewhile
 from pathlib import Path, PosixPath, WindowsPath
 from typing import (
     Annotated,
@@ -217,6 +218,11 @@ def _value_contains_builds(value: Any) -> bool:
     # container annotation (e.g. a `Builds_Inner` config vs. a `dict[str, Inner]`
     # annotation), so OmegaConf's type-checking would reject it. See:
     #    https://github.com/mit-ll-responsible-ai/hydra-zen/issues/858
+    if isinstance(value, (DictConfig, ListConfig)):
+        # Iterating an OmegaConf container resolves its values, which raises for
+        # `???` and for interpolations that cannot be resolved yet. Config
+        # creation must not resolve them, so these are not inspected.
+        return False
     if isinstance(value, Mapping):
         return any(_value_contains_builds(v) for v in value.values())
     elif isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
@@ -224,17 +230,72 @@ def _value_contains_builds(value: Any) -> bool:
     return is_builds(value)
 
 
-def _resolve_field_default(field_obj: Any) -> Any:
-    # Returns a field's default value, resolving its `default_factory` when present.
-    # dataclasses store mutable defaults (e.g. lists/dicts) via `default_factory`,
-    # so this is needed to inspect the actual container value -- e.g. to detect a
-    # nested structured config. Returns `MISSING` when there is no default.
+_CONTAINER_ANNOTATION_NAMES = frozenset(
+    {
+        "list",
+        "dict",
+        "tuple",
+        "set",
+        "frozenset",
+        "List",
+        "Dict",
+        "Tuple",
+        "Set",
+        "FrozenSet",
+        "Sequence",
+        "MutableSequence",
+        "Mapping",
+        "MutableMapping",
+        "Collection",
+        "Optional",
+        "Union",
+    }
+)
+
+_UNION_ORIGINS: tuple[Any, ...] = (Union,) + (
+    (types.UnionType,) if hasattr(types, "UnionType") else ()
+)
+
+
+def _is_container_annotation(type_: Any) -> bool:
+    # Returns `True` if `type_` annotates a container -- e.g. `list[int]`,
+    # `dict[str, T]`, `Optional[list[T]]`, `Sequence[T]` or bare `tuple` -- i.e.
+    # a value whose elements OmegaConf type-checks against the annotation's
+    # element type. An unresolved forward reference (a string) is judged by its
+    # leading name.
+    if isinstance(type_, str):
+        head = type_.strip()
+        head = head[len("typing.") :] if head.startswith("typing.") else head
+        head = "".join(takewhile(lambda c: c.isalnum() or c == "_", head))
+        return head in _CONTAINER_ANNOTATION_NAMES
+    origin = get_origin(type_)
+    if origin is Annotated:
+        return _is_container_annotation(get_args(type_)[0])
+    if origin in _UNION_ORIGINS:
+        return any(_is_container_annotation(arg) for arg in get_args(type_))
+    if origin is not None:
+        type_ = origin
+    return (
+        isinstance(type_, type)
+        and issubclass(type_, (Mapping, Sequence, _abc_Set))
+        and not issubclass(type_, (str, bytes))
+    )
+
+
+def _resolve_field_default(field_obj: Any, type_: Any = Any) -> Any:
+    # Returns a field's default value. A `default_factory` is resolved only when
+    # `type_` annotates a container: that is the one case where the produced
+    # value needs inspecting (for structured configs nested among its
+    # elements), and calling a user-supplied factory during config creation is
+    # otherwise a side effect that config creation never had. Returns `MISSING`
+    # when there is no default or when the factory is not resolved.
     default = safe_getattr(field_obj, "default", MISSING)
-    if default is MISSING:
-        factory = safe_getattr(field_obj, "default_factory", MISSING)
-        if factory is not MISSING and factory is not None:
-            return factory()
-    return default
+    if default is not MISSING:
+        return default
+    factory = safe_getattr(field_obj, "default_factory", MISSING)
+    if factory is MISSING or factory is None or not _is_container_annotation(type_):
+        return MISSING
+    return factory()
 
 
 def _retain_type_info(type_: type, value: Any, hydra_recursive: Optional[bool]):
@@ -3010,7 +3071,7 @@ class BuildsFn(Generic[T]):
                 if sanitized_value is MISSING:
                     # mutable defaults (e.g. lists/dicts) are stored via
                     # `default_factory`; resolve it so the value can be inspected
-                    sanitized_value = _resolve_field_default(_field)
+                    sanitized_value = _resolve_field_default(_field, type_)
                 sanitized_type = (
                     cls._sanitized_type(type_, wrap_optional=sanitized_value is None)
                     if _retain_type_info(
@@ -3342,7 +3403,7 @@ class BuildsFn(Generic[T]):
                         f.hint
                         if _retain_type_info(
                             type_=f.hint,
-                            value=_resolve_field_default(f.default),
+                            value=_resolve_field_default(f.default, f.hint),
                             hydra_recursive=hydra_recursive,
                         )
                         else Any

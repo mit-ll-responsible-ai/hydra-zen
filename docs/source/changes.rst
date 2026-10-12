@@ -8,6 +8,14 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse
 chronological order. All previous releases should still be available on pip.
 
+.. _v0.17.1:
+
+-------------------
+0.17.1 - unreleased
+-------------------
+
+- Fixes a bug where :func:`~hydra_zen.just` would fail to convert a dataclass to a config when one of its fields is annotated with a container of a dataclass type (e.g. ``dict[str, SomeDataclass]`` or ``list[SomeDataclass]``). Previously this raised an OmegaConf ``ValidationError`` during ``to_yaml``. See :issue:`858` and :pull:`875`.
+
 .. _v0.17.0:
 
 -------------------
@@ -38,7 +46,6 @@ Changes
 - Adds support for hydra-core 1.4's execution whitelist. hydra-zen treats configs as trusted code: by default, :func:`~hydra_zen.instantiate`, :func:`~hydra_zen.zen`, and :func:`~hydra_zen.launch` instantiate with Hydra's execution checks disabled, unless a whitelist is active (e.g. via ``hydra.main(execution_whitelist=...)``). Users can opt into a whitelist via ``instantiate(..., _execution_whitelist_=...)``, ``launch(..., execution_whitelist=...)``, and ``zen(...).hydra_main(..., execution_whitelist=...)``, where ``"auto"`` expands to every target that hydra-zen generated in-code. See :ref:`security`.
 - Hydra's target policy (hydra-core 1.3.6+) is now applied to the import paths that ``zen_meta``, ``zen_wrappers``, and ``just`` resolve, as Hydra applies it to its own resolvers.
 - ``launch`` now forwards an active ``hydra.utils.execution_whitelist(...)`` context to the launched job.
-- Fixes a bug where :func:`~hydra_zen.just` would fail to convert a dataclass to a config when one of its fields is annotated with a container of a dataclass type (e.g. ``dict[str, SomeDataclass]`` or ``list[SomeDataclass]``). Previously this raised an OmegaConf ``ValidationError`` during ``to_yaml``. See :issue:`858`.
 
 Release & Supply-Chain Hardening
 --------------------------------

@@ -2,13 +2,13 @@
 # SPDX-License-Identifier: MIT
 from dataclasses import MISSING, InitVar, dataclass, field
 from pathlib import Path
-from typing import Any, Callable, TypeVar
+from typing import Any, Callable, Optional, Sequence, TypeVar
 
 import hypothesis.strategies as st
 import pytest
 from hypothesis import given
-from omegaconf import OmegaConf
-from typing_extensions import TypeAlias
+from omegaconf import DictConfig, ListConfig, OmegaConf
+from typing_extensions import Annotated, TypeAlias
 
 from hydra_zen import (
     ZenField,
@@ -22,6 +22,7 @@ from hydra_zen import (
 )
 from hydra_zen.errors import HydraZenUnsupportedPrimitiveError
 from hydra_zen.structured_configs._implementations import (
+    _is_container_annotation,
     _resolve_field_default,
     _value_contains_builds,
 )
@@ -170,7 +171,19 @@ def test_just_on_container_field_of_typed_dataclasses(obj):
     # retained the original (non-builds) element type, which OmegaConf rejects.
     Conf = just(obj)
     # must not raise omegaconf.errors.ValidationError
-    assert instantiate(OmegaConf.create(OmegaConf.to_yaml(Conf))) == obj
+    out = instantiate(OmegaConf.create(OmegaConf.to_yaml(Conf)), _convert_="all")
+    assert out == obj
+    # `==` alone would also hold for a `DictConfig` standing in for `_Inner858`;
+    # check that the elements really are instances of the annotated type
+    assert all(isinstance(leaf, _Inner858) for leaf in _leaves(out.outer))
+
+
+def _leaves(x: Any) -> list[Any]:
+    if isinstance(x, dict):
+        return [leaf for v in x.values() for leaf in _leaves(v)]
+    if isinstance(x, (list, tuple)):
+        return [leaf for v in x for leaf in _leaves(v)]
+    return [x]
 
 
 def test_value_contains_builds():
@@ -186,14 +199,93 @@ def test_value_contains_builds():
     assert _value_contains_builds("not a container") is False
 
 
+@pytest.mark.parametrize(
+    "value",
+    [
+        DictConfig({"a": "???"}),
+        DictConfig({"a": "${nope}"}),
+        ListConfig(["???"]),
+        ListConfig(["${nope}"]),
+        {"a": DictConfig({"b": "${nope}"})},
+        [ListConfig(["${nope}"])],
+    ],
+)
+def test_value_contains_builds_does_not_resolve_omegaconf_containers(value):
+    # Iterating a DictConfig/ListConfig resolves its values; `???` and
+    # unresolvable interpolations must survive config creation untouched.
+    assert _value_contains_builds(value) is False
+
+
+@pytest.mark.parametrize(
+    "type_",
+    [
+        list[int],
+        dict[str, int],
+        tuple[int, ...],
+        set[int],
+        frozenset,
+        tuple,
+        Sequence[int],
+        Optional[list[int]],
+        Annotated[list[int], "meta"],
+        "dict[str, _Inner858]",
+        "typing.List[int]",
+        "Optional[list[int]]",
+    ],
+)
+def test_is_container_annotation(type_):
+    assert _is_container_annotation(type_) is True
+
+
+@pytest.mark.parametrize(
+    "type_",
+    [int, str, bytes, Any, Optional[int], _Inner858, "int", "_Inner858", "typing.Any"],
+)
+def test_is_not_container_annotation(type_):
+    assert _is_container_annotation(type_) is False
+
+
 def test_resolve_field_default():
     # https://github.com/mit-ll-responsible-ai/hydra-zen/issues/858
     # plain default
-    assert _resolve_field_default(field(default=1)) == 1
-    # default_factory is resolved to its produced value
-    assert _resolve_field_default(field(default_factory=lambda: [1, 2])) == [1, 2]
+    assert _resolve_field_default(field(default=1), int) == 1
     # no default and no factory -> MISSING
-    assert _resolve_field_default(field()) is MISSING
+    assert _resolve_field_default(field(), list[int]) is MISSING
+
+    calls = []
+
+    def factory():
+        calls.append(1)
+        return [1, 2]
+
+    # a factory is resolved only when the annotation is a container: that is the
+    # one case where its value needs inspecting for nested structured configs
+    assert _resolve_field_default(field(default_factory=factory), int) is MISSING
+    assert _resolve_field_default(field(default_factory=factory), Any) is MISSING
+    assert _resolve_field_default(field(default_factory=factory)) is MISSING
+    assert calls == []
+    assert _resolve_field_default(field(default_factory=factory), list[int]) == [1, 2]
+    assert calls == [1]
+
+
+def _takes_int_858(x: int): ...
+
+
+def _takes_list_858(x: list[int]): ...
+
+
+def test_builds_calls_default_factory_only_for_container_annotations():
+    calls = []
+
+    def factory():
+        calls.append(1)
+        return [1]
+
+    builds(_takes_int_858, x=field(default_factory=factory))
+    assert calls == []
+
+    builds(_takes_list_858, x=field(default_factory=factory))
+    assert calls == [1]
 
 
 @dataclass
