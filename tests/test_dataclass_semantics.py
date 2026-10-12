@@ -348,9 +348,7 @@ def test_namespace(fn):
 def test_kwonly(kw_only: bool, fn):
     Conf = fn(zen_dataclass={"kw_only": kw_only})
 
-    if sys.version_info < (3, 10):
-        _ = Conf(2)
-    elif kw_only is True:
+    if kw_only is True:
         with pytest.raises(Exception):
             _ = Conf(2)
 

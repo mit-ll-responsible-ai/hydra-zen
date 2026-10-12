@@ -100,7 +100,7 @@ class Partial(Protocol[T2]):
         cls: type[Self], __func: Callable[..., T2], *args: Any, **kwargs: Any
     ) -> Self: ...
 
-    if TYPE_CHECKING and sys.version_info >= (3, 9):  # pragma: no cover
+    if TYPE_CHECKING:  # pragma: no cover
 
         def __class_getitem__(cls, item: Any) -> types.GenericAlias: ...
 
@@ -392,7 +392,7 @@ class ZenConvert(TypedDict, total=False):
     dataclass: bool
 
 
-class _AllPyDataclassOptions(TypedDict, total=False):
+class _Py311Dataclass(TypedDict, total=False):
     cls_name: str
     namespace: Optional[dict[str, Any]]
     bases: tuple[type[DataClass_], ...]
@@ -402,16 +402,9 @@ class _AllPyDataclassOptions(TypedDict, total=False):
     order: bool
     unsafe_hash: bool
     frozen: bool
-
-
-class _Py310Dataclass(_AllPyDataclassOptions, total=False):
-    # py310+
     match_args: bool
     kw_only: bool
     slots: bool
-
-
-class _Py311Dataclass(_Py310Dataclass, total=False):
     weakref_slot: bool
 
 
@@ -422,19 +415,10 @@ class _Py312Dataclass(_Py311Dataclass, total=False):
 # Note: Python 3.14 adds a `decorator` parameter to make_dataclass, but we
 # intentionally exclude it from hydra-zen's DataclassOptions because it's not
 # relevant for hydra-zen's use case of generating configs.
-_Py314Dataclass = _Py312Dataclass
-
-
-if sys.version_info < (3, 10):
-    _StrictDataclassOptions = _AllPyDataclassOptions
-elif sys.version_info < (3, 11):
-    _StrictDataclassOptions = _Py310Dataclass
-elif sys.version_info < (3, 12):  # pragma: no cover
+if sys.version_info < (3, 12):  # pragma: no cover
     _StrictDataclassOptions = _Py311Dataclass
-elif sys.version_info < (3, 14):  # pragma: no cover
-    _StrictDataclassOptions = _Py312Dataclass
 else:  # pragma: no cover
-    _StrictDataclassOptions = _Py314Dataclass
+    _StrictDataclassOptions = _Py312Dataclass
 
 
 class StrictDataclassOptions(_StrictDataclassOptions):
@@ -509,23 +493,23 @@ class DataclassOptions(_Py312Dataclass, total=False):
         exception. This emulates read-only frozen instances.
 
     match_args : bool, optional (default=True)
-        (*New in version 3.10*) If true (the default is `True`), the `__match_args__`
+        If true (the default is `True`), the `__match_args__`
         tuple will be created from the list of parameters to the generated `__init__()`
         method (even if `__init__()` is not generated, see above). If false, or if
         `__match_args__` is already defined in the class, then `__match_args__` will
         not be generated.
 
     kw_only : bool, optional (default=False)
-        (*New in version 3.10*) If true (the default value is `False`), then all fields
+        If true (the default value is `False`), then all fields
         will be marked as keyword-only.
 
     slots : bool, optional (default=False)
-        (*New in version 3.10*) If true (the default is `False`), `__slots__` attribute
+        If true (the default is `False`), `__slots__` attribute
         will be generated and new class will be returned instead of the original one.
         If `__slots__` is already defined in the class, then `TypeError` is raised.
 
     weakref_slot : bool, optional (default=False)
-        (*New in version 3.11*) If true (the default is `False`), add a slot named
+        If true (the default is `False`), add a slot named
         “__weakref__”, which is required to make an instance weakref-able. It is an
         error to specify `weakref_slot=True` without also specifying `slots=True`.
 
@@ -617,4 +601,4 @@ PERMITTED_DATACLASS_OPTIONS = _permitted_keys(DataclassOptions)
 UNSUPPORTED_DATACLASS_OPTIONS = (
     _permitted_keys(_Py312Dataclass) - {"module"}
 ) - _permitted_keys(StrictDataclassOptions)
-del _AllPyDataclassOptions, _Py310Dataclass, _Py311Dataclass, _Py312Dataclass
+del _Py311Dataclass, _Py312Dataclass

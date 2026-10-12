@@ -60,9 +60,6 @@ for _module_name in OPTIONAL_TEST_DEPENDENCIES:
 
 collect_ignore_glob.append("*py36*")
 
-if sys.version_info < (3, 10):
-    collect_ignore_glob.append("*py310*")
-
 
 @pytest.fixture()
 def cleandir() -> Iterable[str]:

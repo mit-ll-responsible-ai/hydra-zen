@@ -6,7 +6,6 @@ import functools
 import pickle
 import random
 import string
-import sys
 from dataclasses import InitVar, dataclass, field as dataclass_field, make_dataclass
 from inspect import signature
 from pathlib import Path, PosixPath, WindowsPath
@@ -251,7 +250,7 @@ NoneType: TypeAlias = None
         ),
         (tuple[tuple[int, ...], ...], tuple[Any, ...]),
         (Optional[tuple[tuple[int, ...], ...]], Optional[tuple[Any, ...]]),
-        (InitVar[list[frozenset]], Any if sys.version_info < (3, 8) else list[Any]),
+        (InitVar[list[frozenset]], list[Any]),
     ],
 )
 def test_sanitized_type_expected_behavior(in_type, expected_type):
