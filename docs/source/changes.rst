@@ -8,11 +8,25 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse
 chronological order. All previous releases should still be available on pip.
 
-.. _v0.16.1:
+.. _v0.17.0:
 
 -------------------
-0.16.1 - unreleased
+0.17.0 - 2026-10-12
 -------------------
+
+This release restores compatibility with hydra-core 1.3.6+ and omegaconf 2.4, and adds
+support for hydra-core 1.4, including its execution whitelist. See :pull:`890`, :pull:`891`, and :pull:`892`.
+
+Compatibility
+-------------
+
+- Supports hydra-core 1.3.6+ (current stable: 1.3.7), whose target policy rejected objects created by hydra-zen's ``_target_wrapper_`` and ``zen_wrappers`` features. See :issue:`886`.
+- Supports omegaconf 2.4. ``ListConfig``/``DictConfig`` values, which omegaconf 2.4 makes unhashable, can again be used as defaults in :func:`~hydra_zen.builds`; previously they raised a "mutable default" error on Python 3.11+.
+- Uses a future-compatible YAML loader for omegaconf. See :pull:`870`.
+- Supports hydra-core 1.4. Note that Hydra 1.4 itself changes some instantiation behaviors: arguments passed to ``instantiate`` are no longer validated against the config's annotations, and objects instantiated with OmegaConf containers as arguments may not be picklable (`hydra#3537 <https://github.com/facebookresearch/hydra/issues/3537>`_).
+
+Changes
+-------
 
 - Fixes ``launch(..., multirun=True)`` raising ``InstantiationException`` on hydra-core 1.3.7, which refuses to instantiate ``hydra._internal.*`` targets named by declarative config -- including the stock ``hydra/sweeper=basic``. ``launch`` now constructs the sweeper through Hydra's plugin registry (``Plugins.instantiate_sweeper``), the supported path, instead of instantiating the sweeper config directly. See :pull:`885`.
 
