@@ -4,6 +4,9 @@ on:
   schedule:
     - cron: '0 2 * * *' # run at 2 AM UTC
 
+permissions:
+  contents: read
+
 jobs:
   test-against-pre-releases-of-dependencies:
     runs-on: ubuntu-latest

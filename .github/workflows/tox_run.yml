@@ -12,6 +12,9 @@ on:
       - main
       - develop
 
+permissions:
+  contents: read
+
 jobs:
   tests:
     runs-on: ubuntu-latest
