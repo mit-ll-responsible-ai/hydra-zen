@@ -18,9 +18,11 @@ from hypothesis import HealthCheck, assume, given, settings
 from omegaconf import DictConfig, ListConfig, OmegaConf, ValidationError
 
 from hydra_zen import (
+    ZenField,
     builds,
     get_target,
     instantiate,
+    just,
     make_config,
     make_custom_builds_fn,
     mutable_value,
@@ -452,3 +454,79 @@ def test_default_dict():
     assert actual == x
     assert isinstance(actual, defaultdict)
     assert actual.default_factory is list
+
+
+def _takes_dict(x: dict[str, int]):
+    return x
+
+
+def _takes_list(x: list[int]):
+    return x
+
+
+def _takes_any(x):
+    return x
+
+
+@dataclass
+class _HoldsDict:
+    x: dict[str, int]
+
+
+@dataclass
+class _HoldsList:
+    x: list[int]
+
+
+@dataclass
+class _HoldsAny:
+    x: Any
+
+
+def _is_dict(v) -> bool:
+    return isinstance(v, (dict, DictConfig))
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        DictConfig({"a": "???"}),
+        DictConfig({"a": "${missing}"}),
+        DictConfig({"a": {"b": "${..missing}"}}),
+        ListConfig(["???"]),
+        ListConfig(["${missing}"]),
+        {"a": DictConfig({"b": "${missing}"})},
+        [ListConfig(["${missing}"])],
+    ],
+)
+@pytest.mark.parametrize(
+    "make_conf",
+    [
+        pytest.param(
+            lambda v: builds(_takes_dict if _is_dict(v) else _takes_list, x=v),
+            id="builds-annotated",
+        ),
+        pytest.param(lambda v: builds(_takes_any, x=v), id="builds-unannotated"),
+        pytest.param(lambda v: make_config(x=v), id="make_config"),
+        pytest.param(
+            lambda v: make_config(
+                x=ZenField(dict[str, int] if _is_dict(v) else list[int], v)
+            ),
+            id="make_config-hinted",
+        ),
+        pytest.param(
+            lambda v: just(_HoldsDict(x=v) if _is_dict(v) else _HoldsList(x=v)),
+            id="just-annotated",
+        ),
+        pytest.param(lambda v: just(_HoldsAny(x=v)), id="just-unannotated"),
+    ],
+)
+def test_config_creation_does_not_resolve_omegaconf_containers(value, make_conf):
+    # Creating a config must never read or resolve its default values: missing
+    # values and interpolations in OmegaConf containers are only meaningful once
+    # the config is composed, so they must be preserved verbatim.
+    expected = OmegaConf.to_container(OmegaConf.create({"x": value}), resolve=False)
+    Conf = make_conf(value)
+    actual = OmegaConf.to_container(OmegaConf.create(to_yaml(Conf)), resolve=False)
+    assert isinstance(actual, dict) and isinstance(expected, dict)
+    assert actual["x"] == expected["x"]
