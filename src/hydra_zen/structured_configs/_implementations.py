@@ -63,7 +63,7 @@ from hydra_zen._compatibility import (
     OMEGACONF_HANDLES_PATHLIB_LOCAL,
     ZEN_SUPPORTED_PRIMITIVES,
 )
-from hydra_zen._execution_whitelist import register_target
+from hydra_zen._execution_whitelist import mark_builtin_targets, register_target
 from hydra_zen.errors import (
     HydraZenDeprecationWarning,
     HydraZenUnsupportedPrimitiveError,
@@ -2260,7 +2260,10 @@ class BuildsFn(Generic[T]):
                 target_path = cls._get_obj_path(target)
         else:
             target_path = manual_target_path
-        register_target(target_path)
+
+        # Registered for `"auto"` execution whitelists only once the config has
+        # successfully been created.
+        paths_to_register: list[str] = [target_path]
 
         if zen_wrappers is not None:
             if not isinstance(zen_wrappers, Sequence) or isinstance(zen_wrappers, str):
@@ -2299,7 +2302,7 @@ class BuildsFn(Generic[T]):
 
                 elif callable(wrapper):
                     wrapper_path = cls._get_obj_path(wrapper)
-                    register_target(wrapper_path)
+                    paths_to_register.append(wrapper_path)
                     validated_wrappers.append(wrapper_path)
 
                 elif isinstance(wrapper, str):
@@ -2308,7 +2311,7 @@ class BuildsFn(Generic[T]):
                     # https://stackoverflow.com/a/47538106/6592114
                     # so we can't make any assurances here.
                     if not _utils.is_interpolated_string(wrapper):
-                        register_target(wrapper)
+                        paths_to_register.append(wrapper)
                     validated_wrappers.append(wrapper)
                 else:
                     raise TypeError(
@@ -3011,6 +3014,9 @@ class BuildsFn(Generic[T]):
         assert not (
             requires_zen_processing and safe_getattr(out, PARTIAL_FIELD_NAME, False)
         )
+
+        for path in paths_to_register:
+            register_target(path)
 
         return cast(
             Union[type[Builds[Importable]], type[BuildsWithSig[type[R], P]]], out
@@ -3903,4 +3909,5 @@ for _obj in (
 ):
     register_target(BuildsFn._get_obj_path(_obj))
 register_target(ZEN_PROCESSING_LOCATION)
+mark_builtin_targets()
 del _obj

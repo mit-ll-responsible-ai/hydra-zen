@@ -14,6 +14,7 @@ own targets:
 
 import functools
 import sys
+from collections.abc import Sequence
 from typing import Any, Callable
 
 _PATCHED_FLAG = "__hydra_zen_patched__"
@@ -108,6 +109,7 @@ def apply_resolver_authorization_patch() -> None:  # pragma: no cover
     from hydra.utils import get_object
 
     unsafe = getattr(policy, "UNSAFE_DISABLE_EXECUTION_CHECKS", None)
+    authorize_result = getattr(policy, "_authorize_discovery_result", None)
 
     def make_patched(original: Any) -> Any:
         # `rest` is `(execution_whitelist,)` on Hydra 1.4 and empty on Hydra 1.3.x
@@ -124,7 +126,9 @@ def apply_resolver_authorization_patch() -> None:  # pragma: no cover
                 paths: list[Any] = [kwargs.get("path", args[0] if args else None)]
             else:
                 wrappers = kwargs.get("_zen_wrappers", ())
-                if isinstance(wrappers, str) or not isinstance(wrappers, (list, tuple)):
+                # Mirrors `zen_processing`'s handling of `_zen_wrappers`. Note that
+                # Hydra passes list-values as `ListConfig`, not `list`.
+                if isinstance(wrappers, str) or not isinstance(wrappers, Sequence):
                     wrappers = (wrappers,)
                 paths = [kwargs.get("_zen_target"), *wrappers]
 
@@ -138,9 +142,15 @@ def apply_resolver_authorization_patch() -> None:  # pragma: no cover
                 except Exception:
                     # nothing to authorize: the target will fail to resolve it
                     continue
-                # authorize the identity of what the path actually resolves to
-                policy._authorize_resolved_target_identity(obj, path, full_key, *rest)
-                policy._reject_protected_result(obj, path, full_key, *rest)
+                # authorize what the path actually resolves to
+                if authorize_result is not None:
+                    # Hydra 1.4: exactly what Hydra applies to `get_object(path)`
+                    authorize_result(path, obj, full_key, *rest)
+                else:
+                    policy._authorize_resolved_target_identity(
+                        obj, path, full_key, *rest
+                    )
+                    policy._reject_protected_result(obj, path, full_key, *rest)
             return None
 
         return _authorize_discovery_path

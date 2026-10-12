@@ -1,5 +1,6 @@
 # Copyright (c) 2026 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
+import functools
 import importlib
 from collections import Counter, defaultdict, deque
 from datetime import timedelta
@@ -91,6 +92,7 @@ OMEGACONF_HANDLES_PATHLIB_LOCAL = OMEGACONF_VERSION >= Version(2, 4, 0)
 #
 # The module is deliberately never stored as an attribute of a hydra-zen module:
 # an attribute path to Hydra's private policy state would be reachable from configs.
+@functools.lru_cache(maxsize=None)
 def _target_policy_module() -> Optional[ModuleType]:  # pragma: no cover
     """Returns Hydra's private target/execution policy module, if it exists."""
     for name in ("execution_policy", "target_policy"):
@@ -102,6 +104,7 @@ def _target_policy_module() -> Optional[ModuleType]:  # pragma: no cover
 
 
 HYDRA_HAS_TARGET_POLICY: Final = _target_policy_module() is not None
-HYDRA_HAS_EXECUTION_POLICY: Final = getattr(
-    _target_policy_module(), "__name__", None
-) == ("hydra._internal.execution_policy")
+HYDRA_HAS_EXECUTION_POLICY: Final = (
+    getattr(_target_policy_module(), "__name__", None)
+    == "hydra._internal.execution_policy"
+)

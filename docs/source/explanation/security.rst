@@ -65,6 +65,9 @@ hydra-zen's behavior:
 - **"auto"** expands to every target that hydra-zen generated in-code (via ``builds``,
   ``just``, ``zen_wrappers``, etc.) during this process. It can be combined with other
   entries, e.g. ``["auto", "torch.*"]``.
+- ``instantiate(..., _execution_whitelist_=...)`` *extends* an active
+  ``execution_whitelist(...)`` context, whereas the whitelist of ``launch`` and
+  ``hydra_main`` *replaces* it for the job's duration (as with ``hydra.main``).
 
 .. code-block:: python
 

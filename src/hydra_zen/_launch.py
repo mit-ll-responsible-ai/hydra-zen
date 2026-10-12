@@ -274,6 +274,12 @@ def launch(
         specified, an active ``hydra.utils.execution_whitelist(...)`` context is
         used, if any.
 
+        As with ``hydra.main``, a specified whitelist *replaces* (rather than
+        extends) an active ``execution_whitelist(...)`` context for the duration of
+        the job. This differs from ``instantiate(..., _execution_whitelist_=...)``,
+        which extends an active context. Include any entries that you need, e.g.
+        ``execution_whitelist=["auto", "torch.*"]``.
+
         ``"auto"``, either alone or as an entry in a sequence, expands to every
         target that hydra-zen generated in-code (via ``builds``, ``just``, etc.)
         during this process. See :func:`~hydra_zen.instantiate` for details.

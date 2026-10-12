@@ -8,8 +8,8 @@ expands to every target that hydra-zen generated in-code (via `builds`, `just`,
 etc.) during this process.
 """
 
-from collections.abc import Sequence
-from typing import Any
+from collections.abc import Iterable, Mapping, Sequence
+from typing import Any, Optional
 
 from ._compatibility import HYDRA_HAS_EXECUTION_POLICY, _target_policy_module
 
@@ -20,27 +20,69 @@ AUTO = "auto"
 # insertion-ordered set of import paths of the targets that hydra-zen generated
 _ZEN_TARGETS: dict[str, None] = {}
 
+# `tuple(_ZEN_TARGETS)`, cached until the next registration
+_ZEN_TARGETS_TUPLE: Optional[tuple[str, ...]] = None
+
+# the targets that hydra-zen itself registers upon import; see `mark_builtin_targets`
+_BUILTIN_TARGETS: tuple[str, ...] = ()
+
 
 def register_target(path: str) -> None:
     """Records `path` as a target that hydra-zen generated in-code."""
-    _ZEN_TARGETS[path] = None
+    global _ZEN_TARGETS_TUPLE
+    if path not in _ZEN_TARGETS:
+        _ZEN_TARGETS[path] = None
+        _ZEN_TARGETS_TUPLE = None
 
 
 def zen_targets() -> tuple[str, ...]:
     """Returns the import paths of all targets that hydra-zen has generated in-code,
     during this process."""
-    return tuple(_ZEN_TARGETS)
+    global _ZEN_TARGETS_TUPLE
+    if _ZEN_TARGETS_TUPLE is None:
+        _ZEN_TARGETS_TUPLE = tuple(_ZEN_TARGETS)
+    return _ZEN_TARGETS_TUPLE
+
+
+def mark_builtin_targets() -> None:
+    """Records the current registry as hydra-zen's built-in targets (e.g. those
+    used for value conversion)."""
+    global _BUILTIN_TARGETS
+    _BUILTIN_TARGETS = zen_targets()
+
+
+def reset_targets(targets: Optional[Iterable[str]] = None) -> None:
+    """Replaces the registry with `targets` (default: hydra-zen's built-in targets).
+
+    For testing purposes only."""
+    global _ZEN_TARGETS_TUPLE
+    _ZEN_TARGETS.clear()
+    _ZEN_TARGETS.update(dict.fromkeys(_BUILTIN_TARGETS if targets is None else targets))
+    _ZEN_TARGETS_TUPLE = None
 
 
 def resolve_execution_whitelist(value: Any) -> Any:
-    """Expands `"auto"`, whether passed alone or within a sequence of whitelist
-    entries, to the targets that hydra-zen generated in-code. All other values are
-    passed through unchanged."""
+    """Expands `"auto"`, whether passed alone or as an entry of a collection of
+    whitelist entries, to the targets that hydra-zen generated in-code.
+
+    Non-sequence collections of entries (e.g. sets) are converted to tuples; all
+    other values are passed through unchanged."""
     if isinstance(value, str):
         return zen_targets() if value == AUTO else value
-    if isinstance(value, Sequence) and AUTO in value:
-        return tuple(dict.fromkeys([*(v for v in value if v != AUTO), *zen_targets()]))
-    return value
+    if not isinstance(value, Iterable) or isinstance(value, (bytes, Mapping)):
+        return value  # e.g. `UNSAFE_DISABLE_EXECUTION_CHECKS` or a policy object
+    entries: Any = value if isinstance(value, Sequence) else tuple(value)
+    if AUTO not in entries:
+        return entries
+    return tuple(dict.fromkeys([*(v for v in entries if v != AUTO), *zen_targets()]))
+
+
+def active_execution_whitelist() -> Any:  # pragma: no cover
+    """Returns the whitelist of the active `hydra.utils.execution_whitelist(...)`
+    context, if any."""
+    assert HYDRA_HAS_EXECUTION_POLICY
+    policy: Any = _target_policy_module()
+    return policy._get_active_execution_whitelist()
 
 
 def default_execution_whitelist() -> Any:  # pragma: no cover
@@ -50,19 +92,10 @@ def default_execution_whitelist() -> Any:  # pragma: no cover
     one established by `hydra.main(execution_whitelist=...)`) if there is one, and
     otherwise disables Hydra's execution checks: hydra-zen treats configs as code.
     """
-    assert HYDRA_HAS_EXECUTION_POLICY
-    policy: Any = _target_policy_module()
-    if policy._get_active_execution_whitelist() is not None:
+    if active_execution_whitelist() is not None:
         return None  # Hydra will use the active whitelist
-    return policy.UNSAFE_DISABLE_EXECUTION_CHECKS
-
-
-def active_execution_whitelist() -> Any:  # pragma: no cover
-    """Returns the whitelist of the active `hydra.utils.execution_whitelist(...)`
-    context, if any."""
-    assert HYDRA_HAS_EXECUTION_POLICY
     policy: Any = _target_policy_module()
-    return policy._get_active_execution_whitelist()
+    return policy.UNSAFE_DISABLE_EXECUTION_CHECKS
 
 
 def check_whitelist_supported(value: Any) -> None:
