@@ -8,6 +8,54 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse
 chronological order. All previous releases should still be available on pip.
 
+.. _v1.0.0:
+
+------------------
+1.0.0 - unreleased
+------------------
+
+hydra-zen 1.0 marks the stability of its API, which has been in production use for
+years. It drops support for end-of-life Python versions and old releases of Hydra and
+OmegaConf, and removes options that have been deprecated since 2022.
+
+Stability
+---------
+
+From 1.0 onward, hydra-zen follows `semantic versioning <https://semver.org/>`_: its
+public API will not change in backwards-incompatible ways outside of a major release.
+Note that hydra-zen is built on Hydra and OmegaConf; new releases of those libraries
+can change the behavior of instantiation and config composition independently of
+hydra-zen. hydra-zen will ship compatibility fixes for such releases in minor or patch
+releases.
+
+Compatibility
+-------------
+
+- Requires Python 3.11 or later (Python 3.9 and 3.10 have reached end-of-life). Adds
+  testing against Python 3.15.
+- Requires hydra-core 1.3.2 or later and omegaconf 2.3.0 or later.
+- hydra-zen no longer depends on ``typing-extensions``.
+- ``hydra_zen.third_party.pydantic`` requires pydantic 2. pydantic 1 is no longer
+  supported.
+
+Removals
+--------
+
+The following were deprecated in hydra-zen 0.9.0 (or, for ``validates_with_pydantic``,
+0.13.0), and are removed:
+
+- ``builds(..., frozen=<...>)`` and ``builds(..., dataclass_name=<...>)``. Use
+  ``builds(..., zen_dataclass={'frozen': <...>, 'cls_name': <...>})``.
+- ``make_config(..., frozen=<...>)`` and ``make_config(..., config_name=<...>)``. Use
+  ``make_config(..., zen_dataclass={'frozen': <...>, 'cls_name': <...>})``.
+- ``make_custom_builds_fn(..., frozen=<...>)``. Use
+  ``make_custom_builds_fn(..., zen_dataclass={'frozen': <...>})``.
+- ``hydra_zen.third_party.pydantic.validates_with_pydantic``. Use
+  :func:`~hydra_zen.third_party.pydantic.pydantic_parser`.
+
+Passing a removed option to ``builds`` or ``make_config`` raises a ``TypeError`` that
+points to its replacement, rather than silently creating a config field with that name.
+
 .. _v0.17.0:
 
 -------------------

@@ -48,7 +48,7 @@ hydra-zen is a Python library that simplifies the process of writing code (resea
 Learn about hydra-zen [**at a glance**](https://mit-ll-responsible-ai.github.io/hydra-zen/index.html#hydra-zen-at-a-glance).
   
 ## Installation
-`hydra-zen` is lightweight: its only dependencies are `hydra-core` and `typing-extensions`.
+`hydra-zen` is lightweight: its only dependency is `hydra-core` (and, through it, `omegaconf`).
 
 ```console
 pip install hydra-zen

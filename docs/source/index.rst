@@ -271,8 +271,8 @@ hydra-zen also also provides Hydra users with powerful, novel functionality. Wit
 Installation
 ============
 
-hydra-zen is lightweight: its only dependencies are ``hydra-core`` and 
-``typing-extensions``. To install it, run:
+hydra-zen is lightweight: its only dependency is ``hydra-core`` (and, through it,
+``omegaconf``). To install it, run:
 
 .. code:: console
 

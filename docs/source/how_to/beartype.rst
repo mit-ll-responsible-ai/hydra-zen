@@ -45,7 +45,7 @@ containing the following code.
    from typing import Union, Sequence, TypeAlias
    
    from beartype.vale import Is
-   from typing_extensions import Annotated
+   from typing import Annotated
    
    
    PositiveInt: TypeAlias = Annotated[int, Is[lambda x: x >= 0]]

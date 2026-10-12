@@ -35,7 +35,7 @@ authors = [
 maintainers = [{ name = "Justin Goodwin", email = "jgoodwin@ll.mit.edu" }]
 
 classifiers = [
-       "Development Status :: 4 - Beta",
+       "Development Status :: 5 - Production/Stable",
        "License :: OSI Approved :: MIT License",
        "Operating System :: OS Independent",
        "Intended Audience :: Science/Research",
