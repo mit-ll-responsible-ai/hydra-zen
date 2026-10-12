@@ -21,6 +21,10 @@ chronological order. All previous releases should still be available on pip.
   - A custom sweeper must be a Hydra plugin: its class must be defined under the ``hydra_plugins`` namespace package, and the sweeper config's ``_target_`` must name that class directly. Sweepers defined elsewhere are no longer accepted, even if their config is in the ``ConfigStore``. Because ``zen_meta`` and ``zen_wrappers`` route a config's ``_target_`` through ``hydra_zen.funcs.zen_processing``, they cannot be used on the sweeper config itself; ``launch`` raises a ``HydraZenValidationError`` saying so.
   - Hydra builds its plugin registry once per process, on first use. A ``hydra_plugins`` package must therefore be importable before the first ``launch`` (or any other Hydra initialization) in the process. One added to ``sys.path`` afterwards is never scanned: its config is missing (``Could not find hydra/sweeper/<name>``), or, if its module was imported by hand, its class is reported as ``Unknown plugin class``.
 
+- Adds support for hydra-core 1.4's execution whitelist. hydra-zen treats configs as trusted code: by default, :func:`~hydra_zen.instantiate`, :func:`~hydra_zen.zen`, and :func:`~hydra_zen.launch` instantiate with Hydra's execution checks disabled, unless a whitelist is active (e.g. via ``hydra.main(execution_whitelist=...)``). Users can opt into a whitelist via ``instantiate(..., _execution_whitelist_=...)``, ``launch(..., execution_whitelist=...)``, and ``zen(...).hydra_main(..., execution_whitelist=...)``, where ``"auto"`` expands to every target that hydra-zen generated in-code. See :ref:`security`.
+- Hydra's target policy (hydra-core 1.3.6+) is now applied to the import paths that ``zen_meta``, ``zen_wrappers``, and ``just`` resolve, as Hydra applies it to its own resolvers.
+- ``launch`` now forwards an active ``hydra.utils.execution_whitelist(...)`` context to the launched job.
+
 .. _v0.16.0:
 
 -------------------

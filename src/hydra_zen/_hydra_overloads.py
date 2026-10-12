@@ -29,7 +29,12 @@ from typing import IO, Any, Callable, TypeVar, Union, cast, overload
 from hydra.utils import instantiate as hydra_instantiate
 from omegaconf import MISSING, DictConfig, ListConfig, OmegaConf
 
-from ._compatibility import HYDRA_HAS_EXECUTION_POLICY, HYDRA_TARGET_POLICY_MODULE
+from ._compatibility import HYDRA_HAS_EXECUTION_POLICY, _target_policy_module
+from ._execution_whitelist import (
+    check_whitelist_supported,
+    default_execution_whitelist,
+    resolve_execution_whitelist,
+)
 from .structured_configs._implementations import (
     ConfigComplex,
     ConfigPath,
@@ -138,7 +143,7 @@ def _call_target_with_policy(
     from hydra_zen.funcs import Wrappers, partial_with_wrapper, zen_processing
 
     # private Hydra internals; accessed via `Any` as they are not typed
-    policy: Any = HYDRA_TARGET_POLICY_MODULE
+    policy: Any = _target_policy_module()
     inst: Any = _instantiate2
 
     args, kwargs = inst._extract_pos_args(args, kwargs, full_key)
@@ -190,6 +195,9 @@ def _call_target_with_policy(
         discovery_path=discovery_path,
         call_context=deferred_call_context,
     )
+
+
+_NOT_SET: Any = object()
 
 
 class _TightBind:  # pragma: no cover
@@ -302,6 +310,19 @@ def instantiate(
         `_target_wrapper_(target)(*args, **kwargs)` will be called rather than
         `target(*args, **kwargs)`.
 
+    _execution_whitelist_ : str | Sequence[str] | UNSAFE_DISABLE_EXECUTION_CHECKS, optional
+        Requires hydra-core 1.4 or later. The execution whitelist with which Hydra
+        authorizes the targets that it instantiates [5]_.
+
+        hydra-zen treats configs as trusted code, thus by default Hydra's execution
+        checks are disabled, unless a ``hydra.utils.execution_whitelist(...)``
+        context is active (e.g., via ``hydra.main(execution_whitelist=...)``), in
+        which case that whitelist is used.
+
+        ``"auto"``, either alone or as an entry in a sequence, expands to every
+        target that hydra-zen generated in-code (via ``builds``, ``just``, etc.)
+        during this process. E.g., ``_execution_whitelist_=["auto", "torch.*"]``.
+
     Returns
     -------
     instantiated : T
@@ -330,6 +351,7 @@ def instantiate(
     .. [2] https://omegaconf.readthedocs.io/en/latest/structured_config.html#simple-types
     .. [3] https://omegaconf.readthedocs.io/en/latest/structured_config.html#runtime-type-validation-and-conversion
     .. [4] https://omegaconf.readthedocs.io/en/latest/usage.html#variable-interpolation
+    .. [5] https://hydra.cc/docs/advanced/execution_whitelist/
 
     Examples
     --------
@@ -394,6 +416,18 @@ def instantiate(
     Only a subset of primitive types are supported by Hydra's validation system [2]_.
     See :ref:`data-val` for more general data validation capabilities via hydra-zen.
     """
+    whitelist = kwargs.pop("_execution_whitelist_", _NOT_SET)
+    if HYDRA_HAS_EXECUTION_POLICY:  # pragma: no cover
+        whitelist = (
+            default_execution_whitelist()
+            if whitelist is _NOT_SET
+            else resolve_execution_whitelist(whitelist)
+        )
+        if whitelist is not None:
+            kwargs["_execution_whitelist_"] = whitelist
+    elif whitelist is not _NOT_SET:  # pragma: no cover
+        check_whitelist_supported(whitelist)
+
     if _target_wrapper_ is None:
         return hydra_instantiate(config, *args, **kwargs)
 

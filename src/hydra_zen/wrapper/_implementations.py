@@ -39,6 +39,10 @@ from typing_extensions import (
 
 from hydra_zen import instantiate
 from hydra_zen._compatibility import HYDRA_VERSION, Version
+from hydra_zen._execution_whitelist import (
+    check_whitelist_supported,
+    resolve_execution_whitelist,
+)
 from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.structured_configs._implementations import DefaultBuilds
 from hydra_zen.structured_configs._type_guards import safe_getattr
@@ -451,6 +455,7 @@ class Zen(Generic[P, R]):
         config_path: Optional[str] = _UNSPECIFIED_,
         config_name: Optional[str] = None,
         version_base: Optional[str] = _UNSPECIFIED_,
+        execution_whitelist: Any = None,
     ) -> Callable[[Any], Any]:
         """
         Generates a Hydra-CLI for the wrapped function. Equivalent to `hydra.main(zen(func), [...])()`
@@ -476,6 +481,13 @@ class Zen(Generic[P, R]):
             - If the version_base parameter is not specified, Hydra 1.x will use defaults compatible with version 1.1. Also in this case, a warning is issued to indicate an explicit version_base is preferred.
             - If the version_base parameter is None, then the defaults are chosen for the current minor Hydra version. For example for Hydra 1.2, then would imply config_path=None and hydra.job.chdir=False.
             - If the version_base parameter is an explicit version string like "1.1", then the defaults appropriate to that version are used.
+
+        execution_whitelist : str | Sequence[str] | UNSAFE_DISABLE_EXECUTION_CHECKS, optional
+            Requires hydra-core 1.4 or later. Forwarded to
+            ``hydra.main(execution_whitelist=...)``. ``"auto"``, either alone or as
+            an entry in a sequence, expands to every target that hydra-zen generated
+            in-code (via ``builds``, ``just``, etc.) prior to this call. See
+            :func:`~hydra_zen.instantiate` for details.
 
         Returns
         -------
@@ -520,6 +532,10 @@ class Zen(Generic[P, R]):
 
         if version_base is not _UNSPECIFIED_:  # pragma: no cover
             kw["version_base"] = version_base
+
+        check_whitelist_supported(execution_whitelist)
+        if execution_whitelist is not None:
+            kw["execution_whitelist"] = resolve_execution_whitelist(execution_whitelist)
 
         return hydra.main(**kw)(target)()
 
