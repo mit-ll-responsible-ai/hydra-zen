@@ -44,7 +44,7 @@ from typing_extensions import (
 )
 
 from hydra_zen import DefaultBuilds, builds, instantiate, mutable_value
-from hydra_zen._compatibility import HYDRA_VERSION, Version, _get_version
+from hydra_zen._compatibility import Version, _get_version
 from hydra_zen.funcs import partial_with_wrapper
 from hydra_zen.structured_configs._utils import (
     StrictDataclassOptions,
@@ -170,22 +170,10 @@ NoneType: TypeAlias = None
         pytest.param(
             tuple[str, Unpack[Ts]],
             tuple[Any, ...],
-            marks=[
-                pytest.mark.xfail(
-                    HYDRA_VERSION < Version(1, 2, 0),
-                    reason="Hydra 1.1.2 doesn't parse tuples beyond first element.",
-                ),
-            ],
         ),
         pytest.param(
             tuple[str, Unpack[Ts], int],
             tuple[Any, ...],
-            marks=[
-                pytest.mark.xfail(
-                    HYDRA_VERSION < Version(1, 2, 0),
-                    reason="Hydra 1.1.2 doesn't parse tuples beyond first element.",
-                ),
-            ],
         ),
         (Annotated[int, int], int),
         (Annotated[tuple[str, str], int], tuple[str, str]),

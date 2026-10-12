@@ -10,7 +10,6 @@ from typing import Any, Callable, Final, Optional, TypeVar, Union, cast, overloa
 from omegaconf import II, DictConfig, ListConfig
 from typing_extensions import Literal, TypeGuard
 
-from hydra_zen._compatibility import HYDRA_SUPPORTS_OBJECT_CONVERT
 from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.typing import DataclassOptions, ZenConvert
 from hydra_zen.typing._implementations import (
@@ -386,11 +385,7 @@ def parse_strict_dataclass_options(
     )
 
 
-_HYDRA_CONVERT_OPTIONS = (
-    {"none", "partial", "all", "object"}
-    if HYDRA_SUPPORTS_OBJECT_CONVERT
-    else {"none", "partial", "all"}
-)
+_HYDRA_CONVERT_OPTIONS = {"none", "partial", "all", "object"}
 
 
 def validate_hydra_options(
@@ -404,7 +399,6 @@ def validate_hydra_options(
 
     if hydra_convert is not None and hydra_convert not in _HYDRA_CONVERT_OPTIONS:
         raise ValueError(
-            f"`hydra_convert` must be 'none', 'partial',"
-            f"{' object' if HYDRA_SUPPORTS_OBJECT_CONVERT else ''} or 'all', got: "
+            f"`hydra_convert` must be 'none', 'partial', 'object', or 'all', got: "
             f"{hydra_convert}"
         )

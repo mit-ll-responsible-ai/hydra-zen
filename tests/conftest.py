@@ -96,11 +96,7 @@ def clean_store() -> Iterable[dict]:
 def version_base() -> dict[str, Optional[str]]:
     """Return version_base according to local version, or empty dict for versions
     preceding version_base"""
-    return (
-        {"version_base": ".".join(str(i) for i in HYDRA_VERSION)}
-        if HYDRA_VERSION >= (1, 2, 0)
-        else {}
-    )
+    return {"version_base": ".".join(str(i) for i in HYDRA_VERSION)}
 
 
 pytest_plugins = "pytester"

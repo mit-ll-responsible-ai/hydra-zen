@@ -18,7 +18,6 @@ from hydra_zen import (
     mutable_value,
 )
 from hydra_zen._compatibility import (
-    HYDRA_SUPPORTS_OBJECT_CONVERT,
     OMEGACONF_VERSION,
     Version,
 )
@@ -148,23 +147,11 @@ def test_hydra_convert(
     assert type(out["a_struct_config"]["x"]) is expected_field_type
 
 
-@pytest.mark.xfail(
-    not HYDRA_SUPPORTS_OBJECT_CONVERT,
-    raises=ValueError,
-    reason="Hydra 1.3.0 required for _convert_ = 'object'",
-)
 def test_object_convert():
-    Conf = make_config(
-        a=builds(dict, b=1), hydra_convert="object"
-    )  # should raise if local Hydra version is < 1.3.0
+    Conf = make_config(a=builds(dict, b=1), hydra_convert="object")
     assert isinstance(instantiate(Conf), Conf)
 
 
-@pytest.mark.xfail(
-    not HYDRA_SUPPORTS_OBJECT_CONVERT,
-    raises=ValueError,
-    reason="Hydra 1.3.0 required for _convert_ = 'object'",
-)
 def test_object_convert_hydrated():
     @hydrated_dataclass(dict, hydra_convert="object")
     class A: ...

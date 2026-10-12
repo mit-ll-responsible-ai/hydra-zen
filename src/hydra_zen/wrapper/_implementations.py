@@ -38,7 +38,6 @@ from typing_extensions import (
 )
 
 from hydra_zen import instantiate
-from hydra_zen._compatibility import HYDRA_VERSION, Version
 from hydra_zen._execution_whitelist import (
     check_whitelist_supported,
     resolve_execution_whitelist,
@@ -498,21 +497,8 @@ class Zen(Generic[P, R]):
         kw = dict(config_name=config_name)
 
         # For relative config paths, Hydra looks in the directory relative to the file
-        # in which the task function is defined. Unfortunately, it is only able to
-        # follow wrappers starting in Hydra 1.3.0. Thus `Zen.hydra_main` cannot
-        # handle string config_path entries until Hydra 1.3.0
-        if (config_path is _UNSPECIFIED_ and HYDRA_VERSION < Version(1, 2, 0)) or (
-            (
-                isinstance(config_path, str)
-                or (config_path is _UNSPECIFIED_ and version_base == "1.1")
-            )
-            and HYDRA_VERSION < Version(1, 3, 0)
-        ):  # pragma: no cover
-            warnings.warn(
-                "Specifying config_path via hydra_zen.zen(...).hydra_main "
-                "is only supported for Hydra 1.3.0+"
-            )
-        if Version(1, 3, 0) <= HYDRA_VERSION and isinstance(config_path, str):
+        # in which the task function is defined.
+        if isinstance(config_path, str):
             # Here we create an on-the-fly wrapper so that Hydra can trace
             # back through the wrapper to the original task function
             # We could give `Zen` as `__wrapped__` attr, but this messes with

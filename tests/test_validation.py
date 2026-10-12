@@ -9,7 +9,6 @@ from itertools import zip_longest
 
 import hypothesis.strategies as st
 import pytest
-from hydra import __version__ as HYDRA_VERSION
 from hypothesis import assume, given, settings
 from omegaconf import OmegaConf
 
@@ -90,9 +89,6 @@ def test_deprecation_shim_for_hydrated_dataclass_doesnt_permit_new_kwargs():
             pass
 
 
-@pytest.mark.skipif(
-    HYDRA_VERSION < "1.1.1", reason="Hydra squatted on the name 'target' until v1.1.1"
-)
 def test_builds_with_target_as_named_arg_works():
     out = instantiate(builds(dict, target=1, b=2))
     assert out == {"target": 1, "b": 2}

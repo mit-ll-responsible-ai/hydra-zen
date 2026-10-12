@@ -13,8 +13,8 @@ dynamic = ["version"]
 description = "Configurable, reproducible, and scalable workflows in Python, via Hydra"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = ["hydra-core >= 1.2.0", 
-       "omegaconf >= 2.2.3", 
+dependencies = ["hydra-core >= 1.3.2", 
+       "omegaconf >= 2.3.0", 
        "typing-extensions >= 4.1.0, !=4.6.0",
        ]
 license = { text = "MIT" }
@@ -244,8 +244,8 @@ commands = [
 description = "Runs test suite against minimum supported versions of dependencies."
 base_python = ["python3.11"]
 deps = [
-    "hydra-core==1.2.0",
-    "omegaconf==2.2.3",
+    "hydra-core==1.3.2",
+    "omegaconf==2.3.0",
     "typing-extensions==4.1.0",
     "setuptools",
     "pytest",
