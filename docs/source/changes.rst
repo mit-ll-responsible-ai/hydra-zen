@@ -39,6 +39,15 @@ Changes
 - Hydra's target policy (hydra-core 1.3.6+) is now applied to the import paths that ``zen_meta``, ``zen_wrappers``, and ``just`` resolve, as Hydra applies it to its own resolvers.
 - ``launch`` now forwards an active ``hydra.utils.execution_whitelist(...)`` context to the launched job.
 
+Release & Supply-Chain Hardening
+--------------------------------
+
+hydra-zen's CI and release workflows have been hardened. See :pull:`895` and :pull:`896`.
+
+- Releases are published to PyPI via trusted publishing. The release artifacts are built using hash-pinned build tools, in a job that has no publishing credentials; uploading them requires a maintainer's approval.
+- All GitHub Actions are pinned to full-length commit SHAs, and every workflow runs with a least-privilege, read-only token by default.
+- Added a security policy (``SECURITY.md``). Please report vulnerabilities privately through GitHub's `private vulnerability reporting <https://github.com/mit-ll-responsible-ai/hydra-zen/security/advisories/new>`_.
+
 .. _v0.16.0:
 
 -------------------
