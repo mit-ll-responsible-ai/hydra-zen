@@ -1,9 +1,15 @@
 # Copyright (c) 2026 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
 
-from typing import Any, Callable, Optional, TypeVar, Union, overload
-
-from typing_extensions import Literal
+from typing import (
+    Any,
+    Callable,
+    Literal,
+    Optional,
+    TypeVar,
+    Union,
+    overload,
+)
 
 from hydra_zen.typing import Builds, DataclassOptions, Just
 from hydra_zen.typing._implementations import (

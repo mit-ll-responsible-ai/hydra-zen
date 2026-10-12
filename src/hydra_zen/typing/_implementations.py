@@ -16,23 +16,21 @@ from typing import (
     Callable,
     ClassVar,
     Final,
+    Literal,
     NewType,
     Optional,
-    TypeVar,
-    Union,
-)
-
-from omegaconf import DictConfig, ListConfig
-from typing_extensions import (
-    Literal,
     ParamSpec,
     Protocol,
     Required,
     Self,
     TypeAlias,
     TypedDict,
+    TypeVar,
+    Union,
     runtime_checkable,
 )
+
+from omegaconf import DictConfig, ListConfig
 
 __all__ = [
     "Just",

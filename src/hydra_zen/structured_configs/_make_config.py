@@ -1,8 +1,10 @@
 # Copyright (c) 2026 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-from typing import Optional, Union
-
-from typing_extensions import Literal
+from typing import (
+    Literal,
+    Optional,
+    Union,
+)
 
 from hydra_zen.typing import DataclassOptions, SupportedPrimitive
 from hydra_zen.typing._implementations import (

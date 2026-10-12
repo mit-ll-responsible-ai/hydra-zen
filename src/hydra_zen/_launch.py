@@ -9,7 +9,9 @@ from typing import (
     Any,
     Callable,
     Generic,
+    Literal,
     Optional,
+    TypeAlias,
     TypeVar,
     Union,
     cast,
@@ -24,7 +26,6 @@ from hydra.core.plugins import Plugins
 from hydra.core.utils import JobReturn, run_job
 from hydra.types import HydraContext, RunMode
 from omegaconf import DictConfig, ListConfig, OmegaConf
-from typing_extensions import Literal, TypeAlias
 
 from hydra_zen._compatibility import HYDRA_HAS_EXECUTION_POLICY
 from hydra_zen._execution_whitelist import (

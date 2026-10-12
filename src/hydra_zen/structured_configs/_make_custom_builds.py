@@ -10,14 +10,13 @@ from typing import (
     Any,
     Callable,
     Final,
+    Literal,
     Optional,
     TypeVar,
     Union,
     cast,
     overload,
 )
-
-from typing_extensions import Literal
 
 from hydra_zen.errors import HydraZenDeprecationWarning
 from hydra_zen.typing import DataclassOptions, ZenWrappers
@@ -286,7 +285,7 @@ def make_custom_builds_fn(
     Now all configs produced via ``build_a_bear`` will include type-checking
     during instantiation.
 
-    >>> from typing_extensions import Literal
+    >>> from typing import Literal
     >>> def f(x: Literal["a", "b"]): return x
 
     >>> Conf = build_a_bear(f)  # a conf that includes `validates_with_beartype`

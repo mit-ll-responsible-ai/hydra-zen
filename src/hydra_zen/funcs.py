@@ -9,11 +9,15 @@ that these functions have a legible module-path when they appear in configuratio
 import functools as _functools
 import typing as _tp
 from functools import partial
-from typing import Any, Callable, TypeVar
+from typing import (
+    Any,
+    Callable,
+    TypeAlias,
+    TypeVar,
+)
 
 from hydra._internal import utils as _hydra_internal_utils
 from hydra.utils import log as _log
-from typing_extensions import TypeAlias
 
 from hydra_zen.structured_configs._utils import (
     is_interpolated_string as _is_interpolated_string,

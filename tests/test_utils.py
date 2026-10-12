@@ -6,6 +6,7 @@ import functools
 import pickle
 import random
 import string
+import typing
 from dataclasses import InitVar, dataclass, field as dataclass_field, make_dataclass
 from inspect import signature
 from pathlib import Path, PosixPath, WindowsPath
@@ -175,6 +176,9 @@ NoneType: TypeAlias = None
             tuple[str, Unpack[Ts], int],
             tuple[Any, ...],
         ),
+        # `typing.Unpack` differs from `typing_extensions.Unpack` on Python 3.11
+        (tuple[str, typing.Unpack[Ts]], tuple[Any, ...]),
+        (tuple[str, *Ts], tuple[Any, ...]),
         (Annotated[int, int], int),
         (Annotated[tuple[str, str], int], tuple[str, str]),
         (Annotated[Builds, int], Any),

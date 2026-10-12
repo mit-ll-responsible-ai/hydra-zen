@@ -26,16 +26,26 @@ from typing import (
     Annotated,
     Any,
     Callable,
+    Concatenate,
     Dict,
     Final,
     Generic,
     List,
+    Literal,
     Optional,
+    ParamSpec,
+    ParamSpecArgs,
+    ParamSpecKwargs,
+    Protocol,
+    Self,
     Tuple,
     Type,
+    TypeAlias,
     TypeVar,
     Union,
+    Unpack,
     cast,
+    dataclass_transform,
     get_args,
     get_origin,
     get_type_hints,
@@ -43,19 +53,6 @@ from typing import (
 )
 
 from omegaconf import DictConfig, ListConfig, _utils as _omegaconf_utils
-from typing_extensions import (
-    Concatenate,
-    Literal,
-    ParamSpec,
-    ParamSpecArgs,
-    ParamSpecKwargs,
-    Protocol,
-    Self,
-    TypeAlias,
-    Unpack,
-    _AnnotatedAlias,
-    dataclass_transform,
-)
 
 from hydra_zen._compatibility import (
     HYDRA_SUPPORTED_PRIMITIVE_TYPES,
@@ -129,6 +126,17 @@ from ._utils import merge_settings
 T = TypeVar("T")
 _T = TypeVar("_T")
 P = ParamSpec("P")
+
+# On Python 3.11, `typing_extensions.Unpack` is distinct from `typing.Unpack`;
+# recognize both in users' annotations.
+_UNPACK_TYPES: frozenset[Any] = frozenset({Unpack})
+try:  # pragma: no cover
+    from typing_extensions import Unpack as _TE_Unpack
+
+    _UNPACK_TYPES |= {_TE_Unpack}
+    del _TE_Unpack
+except ImportError:  # pragma: no cover
+    pass
 R = TypeVar("R")
 
 TD = TypeVar("TD", bound=DataClass_)
@@ -843,21 +851,10 @@ class BuildsFn(Generic[T]):
 
         if origin is not None:
             # Support for Annotated[x, y]
-            # Python 3.9+
             # # type_: Annotated[x, y]; origin -> Annotated; args -> (x, y)
             if origin is Annotated:  # pragma: no cover
                 return cls._sanitized_type(
                     get_args(type_)[0],
-                    primitive_only=primitive_only,
-                    wrap_optional=wrap_optional,
-                    nested=nested,
-                )
-
-            # Python 3.7-3.8
-            # type_: Annotated[x, y]; origin -> x
-            if isinstance(type_, _AnnotatedAlias):  # pragma: no cover
-                return cls._sanitized_type(
-                    origin,
                     primitive_only=primitive_only,
                     wrap_optional=wrap_optional,
                     nested=nested,
@@ -917,7 +914,7 @@ class BuildsFn(Generic[T]):
                 args = cast(tuple[type, ...], args)
                 unique_args = set(args)
 
-                if any(get_origin(tp) is Unpack for tp in unique_args):
+                if any(get_origin(tp) in _UNPACK_TYPES for tp in unique_args):
                     # E.g. Tuple[*Ts]
                     return tuple[Any, ...]
 

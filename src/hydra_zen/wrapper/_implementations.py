@@ -16,7 +16,14 @@ from typing import (
     DefaultDict,
     Final,
     Generic,
+    Literal,
     Optional,
+    ParamSpec,
+    Protocol,
+    Self,
+    TypeAlias,
+    TypedDict,
+    TypeGuard,
     TypeVar,
     Union,
     cast,
@@ -27,15 +34,6 @@ import hydra
 from hydra.conf import HydraConf
 from hydra.core.config_store import ConfigStore
 from omegaconf import DictConfig, ListConfig, OmegaConf
-from typing_extensions import (
-    Literal,
-    ParamSpec,
-    Protocol,
-    Self,
-    TypeAlias,
-    TypedDict,
-    TypeGuard,
-)
 
 from hydra_zen import instantiate
 from hydra_zen._execution_whitelist import (

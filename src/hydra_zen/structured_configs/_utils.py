@@ -5,10 +5,20 @@ import warnings
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import MISSING, field as _field, is_dataclass
 from keyword import iskeyword
-from typing import Any, Callable, Final, Optional, TypeVar, Union, cast, overload
+from typing import (
+    Any,
+    Callable,
+    Final,
+    Literal,
+    Optional,
+    TypeGuard,
+    TypeVar,
+    Union,
+    cast,
+    overload,
+)
 
 from omegaconf import II, DictConfig, ListConfig
-from typing_extensions import Literal, TypeGuard
 
 from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.typing import DataclassOptions, ZenConvert

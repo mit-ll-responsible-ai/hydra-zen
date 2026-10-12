@@ -6,9 +6,17 @@ from collections.abc import Mapping
 # Stores overloads for `builds` with different default-values for signature
 # pyright: strict
 # pragma: no cover
-from typing import Any, Callable, Generic, Optional, TypeVar, Union, overload
-
-from typing_extensions import Literal, ParamSpec
+from typing import (
+    Any,
+    Callable,
+    Generic,
+    Literal,
+    Optional,
+    ParamSpec,
+    TypeVar,
+    Union,
+    overload,
+)
 
 from ._implementations import (
     AnyBuilds,

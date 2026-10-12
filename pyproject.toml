@@ -14,8 +14,7 @@ description = "Configurable, reproducible, and scalable workflows in Python, via
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = ["hydra-core >= 1.3.2", 
-       "omegaconf >= 2.3.0", 
-       "typing-extensions >= 4.1.0, !=4.6.0",
+       "omegaconf >= 2.3.0",
        ]
 license = { text = "MIT" }
 keywords = [
@@ -169,6 +168,7 @@ test = [
     "pytest-xdist",
     "pytest-trio>=0.8.0",
     "tzdata",
+    "typing-extensions",
 ]
 
 # Formatting tools - SINGLE SOURCE OF TRUTH
@@ -246,14 +246,13 @@ base_python = ["python3.11"]
 deps = [
     "hydra-core==1.3.2",
     "omegaconf==2.3.0",
-    "typing-extensions==4.1.0",
     "setuptools",
     "pytest",
     "hypothesis>=6.115.5",
     "pytest-xdist",
     "pytest-trio",
     "tzdata",
-    "importlib-resources<6.2.0",
+    "typing-extensions",
 ]
 
 [tool.tox.env."pre-release"]
