@@ -26,11 +26,33 @@ from hydra.types import HydraContext, RunMode
 from omegaconf import DictConfig, ListConfig, OmegaConf
 from typing_extensions import Literal, TypeAlias
 
+from hydra_zen._compatibility import HYDRA_HAS_EXECUTION_POLICY
+from hydra_zen._execution_whitelist import (
+    active_execution_whitelist,
+    check_whitelist_supported,
+    resolve_execution_whitelist,
+)
 from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.structured_configs._globals import ZEN_PROCESSING_LOCATION
 from hydra_zen.typing._implementations import DataClass_, InstOrType
 
 T = TypeVar("T", bound=Any)
+
+
+def _execution_whitelist_kwargs(execution_whitelist: Any) -> dict[str, Any]:
+    """The execution whitelist to provide to Hydra for a launched job."""
+    if not HYDRA_HAS_EXECUTION_POLICY:  # pragma: no cover
+        check_whitelist_supported(execution_whitelist)
+        return {}
+    if execution_whitelist is None:  # pragma: no cover
+        # Hydra activates the context's whitelist for the job, resetting any
+        # outer context; thus we must forward the active whitelist
+        execution_whitelist = active_execution_whitelist()
+    return {  # pragma: no cover
+        "execution_whitelist": resolve_execution_whitelist(execution_whitelist)
+    }
+
+
 HydraPrimitives: TypeAlias = Union[None, int, float, bool, str, dict[str, str]]
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -164,6 +186,7 @@ def launch(
     config_name: str = ...,
     job_name: str = ...,
     with_log_configuration: bool = ...,
+    execution_whitelist: Any = ...,
     **override_kwargs: OverrideValues,
 ) -> JobReturn: ...
 
@@ -179,6 +202,7 @@ def launch(
     config_name: str = ...,
     job_name: str = ...,
     with_log_configuration: bool = ...,
+    execution_whitelist: Any = ...,
     **override_kwargs: OverrideValues,
 ) -> Any: ...
 
@@ -193,6 +217,7 @@ def launch(
     config_name: str = "zen_launch",
     job_name: str = "zen_launch",
     with_log_configuration: bool = True,
+    execution_whitelist: Any = None,
     **override_kwargs: OverrideValues,
 ) -> Union[JobReturn, Any]:
     r"""
@@ -242,6 +267,16 @@ def launch(
     with_log_configuration : bool (default: True)
         If ``True``, enables the configuration of the logging subsystem from the loaded
         config.
+
+    execution_whitelist : str | Sequence[str] | UNSAFE_DISABLE_EXECUTION_CHECKS, optional
+        Requires hydra-core 1.4 or later. The execution whitelist that is active
+        while the job runs (see ``hydra.main(execution_whitelist=...)``). If not
+        specified, an active ``hydra.utils.execution_whitelist(...)`` context is
+        used, if any.
+
+        ``"auto"``, either alone or as an entry in a sequence, expands to every
+        target that hydra-zen generated in-code (via ``builds``, ``just``, etc.)
+        during this process. See :func:`~hydra_zen.instantiate` for details.
 
     **override_kwargs : OverrideValues
         Keyword arguments to override existing configuration values.  Note, this only
@@ -442,7 +477,9 @@ def launch(
         run_start(config=cfg, config_name=config_name)
 
         hydra_context = HydraContext(
-            config_loader=gh.config_loader(), callbacks=callbacks
+            config_loader=gh.config_loader(),
+            callbacks=callbacks,
+            **_execution_whitelist_kwargs(execution_whitelist),
         )
 
         if not multirun:

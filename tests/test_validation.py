@@ -24,7 +24,7 @@ from hydra_zen import (
     make_custom_builds_fn,
     to_yaml,
 )
-from hydra_zen._compatibility import HYDRA_TARGET_POLICY_MODULE
+from hydra_zen._compatibility import HYDRA_HAS_TARGET_POLICY
 from hydra_zen.errors import HydraZenUnsupportedPrimitiveError
 from hydra_zen.structured_configs._globals import (
     HYDRA_FIELD_NAMES,
@@ -252,7 +252,7 @@ def test_builds_raises_when_base_has_invalid_arg(full_sig, partial):
         pytest.param(
             inspect.signature,
             marks=pytest.mark.skipif(
-                HYDRA_TARGET_POLICY_MODULE is not None,
+                HYDRA_HAS_TARGET_POLICY,
                 reason="Hydra's target policy blocks inspect.signature",
             ),
         ),

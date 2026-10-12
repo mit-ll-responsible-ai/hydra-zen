@@ -71,7 +71,11 @@ else:  # pragma: no cover
     __version__: str
 
 # must run after hydra_zen.funcs is importable
-from hydra_zen._hydra14_compat import apply_partial_with_wrapper_patch
+from hydra_zen._target_policy_patches import (
+    apply_partial_with_wrapper_patch,
+    apply_resolver_authorization_patch,
+)
 
 apply_partial_with_wrapper_patch()
-del apply_partial_with_wrapper_patch
+apply_resolver_authorization_patch()
+del apply_partial_with_wrapper_patch, apply_resolver_authorization_patch

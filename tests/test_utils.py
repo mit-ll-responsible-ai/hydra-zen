@@ -356,7 +356,7 @@ def f_for_interp(*args, **kwargs):
 @given(st.text(alphabet=string.ascii_lowercase, min_size=1).map(II))
 def test_is_interpolated_against_omegaconf_generated_interpolated_strs(text):
     assert is_interpolated_string(text)
-    assume(text != "config")
+    assume(text[2:-1] != "config")
     # ensure interpolation actually works
     assert instantiate(builds(f_for_interp, text), **{text[2:-1]: 1}) == 1
 

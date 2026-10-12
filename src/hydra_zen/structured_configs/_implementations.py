@@ -63,6 +63,7 @@ from hydra_zen._compatibility import (
     OMEGACONF_HANDLES_PATHLIB_LOCAL,
     ZEN_SUPPORTED_PRIMITIVES,
 )
+from hydra_zen._execution_whitelist import register_target
 from hydra_zen.errors import (
     HydraZenDeprecationWarning,
     HydraZenUnsupportedPrimitiveError,
@@ -1033,7 +1034,9 @@ class BuildsFn(Generic[T]):
 
     @classmethod
     def _just(cls, obj: Any) -> Just:
-        return Just(path=cls._get_obj_path(obj))
+        path = cls._get_obj_path(obj)
+        register_target(path)
+        return Just(path=path)
 
     @classmethod
     def _mutable_value(cls, x: _T, *, zen_convert: Optional[ZenConvert] = None) -> _T:
@@ -2257,6 +2260,7 @@ class BuildsFn(Generic[T]):
                 target_path = cls._get_obj_path(target)
         else:
             target_path = manual_target_path
+        register_target(target_path)
 
         if zen_wrappers is not None:
             if not isinstance(zen_wrappers, Sequence) or isinstance(zen_wrappers, str):
@@ -2294,13 +2298,17 @@ class BuildsFn(Generic[T]):
                         validated_wrappers.append(wrapper)
 
                 elif callable(wrapper):
-                    validated_wrappers.append(cls._get_obj_path(wrapper))
+                    wrapper_path = cls._get_obj_path(wrapper)
+                    register_target(wrapper_path)
+                    validated_wrappers.append(wrapper_path)
 
                 elif isinstance(wrapper, str):
                     # Assumed that wrapper is either a valid omegaconf-style interpolation string
                     # or a "valid" path for importing an object. The latter seems hopeless for validating:
                     # https://stackoverflow.com/a/47538106/6592114
                     # so we can't make any assurances here.
+                    if not _utils.is_interpolated_string(wrapper):
+                        register_target(wrapper)
                     validated_wrappers.append(wrapper)
                 else:
                     raise TypeError(
@@ -3876,3 +3884,23 @@ ZEN_VALUE_CONVERSION[Counter] = partial(
     ConfigFromDict, _target_=BuildsFn._get_obj_path(Counter)
 )
 ZEN_VALUE_CONVERSION[functools.partial] = _unpack_partial
+
+# Targets that hydra-zen generates for value conversion, and hydra-zen's resolvers
+# (whose resolved paths are themselves authorized: see `_target_policy_patches`)
+for _obj in (
+    complex,
+    Path,
+    range,
+    timedelta,
+    as_default_dict,
+    set,
+    frozenset,
+    deque,
+    bytes,
+    bytearray,
+    Counter,
+    get_obj,
+):
+    register_target(BuildsFn._get_obj_path(_obj))
+register_target(ZEN_PROCESSING_LOCATION)
+del _obj

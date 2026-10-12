@@ -88,7 +88,11 @@ OMEGACONF_HANDLES_PATHLIB_LOCAL = OMEGACONF_VERSION >= Version(2, 4, 0)
 # (`hydra._internal.target_policy`), which Hydra 1.4 reworked into an execution
 # policy (`hydra._internal.execution_policy`). We feature-detect these rather
 # than compare versions because Hydra 1.4 dev-builds report the same version.
-def _find_target_policy_module() -> Optional[ModuleType]:  # pragma: no cover
+#
+# The module is deliberately never stored as an attribute of a hydra-zen module:
+# an attribute path to Hydra's private policy state would be reachable from configs.
+def _target_policy_module() -> Optional[ModuleType]:  # pragma: no cover
+    """Returns Hydra's private target/execution policy module, if it exists."""
     for name in ("execution_policy", "target_policy"):
         try:
             return importlib.import_module(f"hydra._internal.{name}")
@@ -97,8 +101,7 @@ def _find_target_policy_module() -> Optional[ModuleType]:  # pragma: no cover
     return None
 
 
-HYDRA_TARGET_POLICY_MODULE: Final = _find_target_policy_module()
-HYDRA_HAS_EXECUTION_POLICY: Final = (
-    HYDRA_TARGET_POLICY_MODULE is not None
-    and HYDRA_TARGET_POLICY_MODULE.__name__ == "hydra._internal.execution_policy"
-)
+HYDRA_HAS_TARGET_POLICY: Final = _target_policy_module() is not None
+HYDRA_HAS_EXECUTION_POLICY: Final = getattr(
+    _target_policy_module(), "__name__", None
+) == ("hydra._internal.execution_policy")
