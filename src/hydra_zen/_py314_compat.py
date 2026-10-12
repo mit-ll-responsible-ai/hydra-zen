@@ -22,8 +22,13 @@ def apply_hydra_argparse_patch() -> None:  # pragma: no cover
     2. It's new in Python 3.14 (didn't exist in earlier versions)
     3. Hydra's help strings work correctly when actually displayed
     4. We restore normal behavior immediately after
+
+    Hydra 1.4 includes this fix itself, so the patch is only applied for Hydra 1.3.
+    It can be removed once hydra-zen requires Hydra 1.4+.
     """
-    if sys.version_info < (3, 14):
+    from hydra_zen._compatibility import HYDRA_VERSION, Version
+
+    if sys.version_info < (3, 14) or HYDRA_VERSION >= Version(1, 4, 0):
         return
 
     try:
