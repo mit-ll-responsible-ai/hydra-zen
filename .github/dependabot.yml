@@ -24,6 +24,9 @@ updates:
       interval: "weekly"
     cooldown:
       default-days: 7
+    ignore:
+      # must match the version pinned in [build-system].requires (pyproject.toml)
+      - dependency-name: "setuptools-scm"
   # uv.lock (development environment)
   - package-ecosystem: "uv"
     directory: "/"
