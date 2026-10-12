@@ -4,6 +4,14 @@ name: Upload Python Package
 on:
   release:
     types: [created]
+  # Build (but don't publish) on PRs and pushes, so that changes to the build
+  # tools (deps/requirements-build.txt) or to pyproject.toml are tested by CI.
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -38,6 +46,7 @@ jobs:
   pypi-publish:
     needs: build-artifacts
     name: Upload release to PyPI
+    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     environment: pypi-publish
     permissions:
