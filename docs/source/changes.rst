@@ -8,11 +8,25 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse
 chronological order. All previous releases should still be available on pip.
 
-.. _v0.16.1:
+.. _v0.17.0:
 
 -------------------
-0.16.1 - unreleased
+0.17.0 - 2026-10-12
 -------------------
+
+This release restores compatibility with hydra-core 1.3.6+ and omegaconf 2.4, and adds
+support for hydra-core 1.4, including its execution whitelist. See :pull:`890`, :pull:`891`, and :pull:`892`.
+
+Compatibility
+-------------
+
+- Supports hydra-core 1.3.6+ (current stable: 1.3.7), whose target policy rejected objects created by hydra-zen's ``_target_wrapper_`` and ``zen_wrappers`` features. See :issue:`886`.
+- Supports omegaconf 2.4. ``ListConfig``/``DictConfig`` values, which omegaconf 2.4 makes unhashable, can again be used as defaults in :func:`~hydra_zen.builds`; previously they raised a "mutable default" error on Python 3.11+.
+- Uses a future-compatible YAML loader for omegaconf. See :pull:`870`.
+- Supports hydra-core 1.4. Note that Hydra 1.4 itself changes some instantiation behaviors: arguments passed to ``instantiate`` are no longer validated against the config's annotations, and objects instantiated with OmegaConf containers as arguments may not be picklable (`hydra#3537 <https://github.com/facebookresearch/hydra/issues/3537>`_).
+
+Changes
+-------
 
 - Fixes ``launch(..., multirun=True)`` raising ``InstantiationException`` on hydra-core 1.3.7, which refuses to instantiate ``hydra._internal.*`` targets named by declarative config -- including the stock ``hydra/sweeper=basic``. ``launch`` now constructs the sweeper through Hydra's plugin registry (``Plugins.instantiate_sweeper``), the supported path, instead of instantiating the sweeper config directly. See :pull:`885`.
 
@@ -24,6 +38,15 @@ chronological order. All previous releases should still be available on pip.
 - Adds support for hydra-core 1.4's execution whitelist. hydra-zen treats configs as trusted code: by default, :func:`~hydra_zen.instantiate`, :func:`~hydra_zen.zen`, and :func:`~hydra_zen.launch` instantiate with Hydra's execution checks disabled, unless a whitelist is active (e.g. via ``hydra.main(execution_whitelist=...)``). Users can opt into a whitelist via ``instantiate(..., _execution_whitelist_=...)``, ``launch(..., execution_whitelist=...)``, and ``zen(...).hydra_main(..., execution_whitelist=...)``, where ``"auto"`` expands to every target that hydra-zen generated in-code. See :ref:`security`.
 - Hydra's target policy (hydra-core 1.3.6+) is now applied to the import paths that ``zen_meta``, ``zen_wrappers``, and ``just`` resolve, as Hydra applies it to its own resolvers.
 - ``launch`` now forwards an active ``hydra.utils.execution_whitelist(...)`` context to the launched job.
+
+Release & Supply-Chain Hardening
+--------------------------------
+
+hydra-zen's CI and release workflows have been hardened. See :pull:`895` and :pull:`896`.
+
+- Releases are published to PyPI via trusted publishing. The release artifacts are built using hash-pinned build tools, in a job that has no publishing credentials; uploading them requires a maintainer's approval.
+- All GitHub Actions are pinned to full-length commit SHAs, and every workflow runs with a least-privilege, read-only token by default.
+- Added a security policy (``SECURITY.md``). Please report vulnerabilities privately through GitHub's `private vulnerability reporting <https://github.com/mit-ll-responsible-ai/hydra-zen/security/advisories/new>`_.
 
 .. _v0.16.0:
 
