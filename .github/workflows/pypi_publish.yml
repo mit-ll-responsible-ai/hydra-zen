@@ -8,24 +8,29 @@ on:
 permissions:
   contents: read
 
+# Building runs without access to the pypi-publish environment. Only the
+# publishing job uses it, so the environment's required review gates the
+# upload itself, and the built artifacts can be inspected before approving.
 jobs:
   build-artifacts:
     name: Builds wheel artifacts
     runs-on: ubuntu-latest
-    environment: pypi-publish
     steps:
-    - uses: actions/checkout@v7
-    - name: Set up Python
-      uses: actions/setup-python@v6
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
-        python-version: '3.x'
+        persist-credentials: false
+    - name: Set up Python
+      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      with:
+        python-version: '3.12'
     - name: Build
+      # The build tools are hash-pinned (deps/requirements-build.txt), and
+      # --no-isolation keeps `build` from installing unpinned build dependencies.
       run: |
-        python -m pip install --upgrade pip
-        pip install build
-        python -m build
+        python -m pip install --require-hashes -r deps/requirements-build.txt
+        python -m build --no-isolation
     - name: Upload artifacts
-      uses: actions/upload-artifact@v7
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       with:
         name: dist
         path: dist
@@ -39,10 +44,9 @@ jobs:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
     - name: Download artifacts
-      uses: actions/download-artifact@v8
+      uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
       with:
         name: dist
         path: dist
-    # retrieve your distributions here
     - name: Publish package distributions to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
+      uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
