@@ -100,22 +100,6 @@ def make_config(
         Additionally, a ``'module': <str>`` entry can be specified to enable pickle
         compatibility. See `hydra_zen.typing.DataclassOptions` for details.
 
-    frozen : bool, optional (default=False)
-        .. deprecated:: 0.9.0
-            `frozen` will be removed in hydra-zen 0.10.0. It is replaced by
-            ``zen_dataclass={'frozen': <bool>}``.
-
-        If ``True``, the resulting config class will produce 'frozen' (i.e. immutable)
-        instances. I.e. setting/deleting an attribute of an instance of the config will
-        raise :py:class:`dataclasses.FrozenInstanceError` at runtime.
-
-    config_name : str, optional (default="Config")
-        .. deprecated:: 0.9.0
-            `config_name` will be removed in hydra-zen 0.10.0. It is replaced by
-            ``zen_dataclass={'cls_name': <str>}``.
-
-        The class name of the resulting config class.
-
     Returns
     -------
     Config : Type[DataClass]

@@ -317,16 +317,6 @@ base_python = ["python3.11"]
 dependency_groups = ["test", "third-party"]
 deps = ["setuptools"]
 
-[tool.tox.env."pydantic-v1-smoketest"]
-description = "Ensures that importing pydantic 1.x doesn't break things"
-install_command = ["pip", "install", "--upgrade", "--upgrade-strategy", "eager", "{opts}", "{packages}"]
-base_python = ["python3.11"]
-dependency_groups = ["test"]
-deps = [
-    "setuptools",
-    "pydantic>=1.10.14,<2.0.0",
-]
-
 [tool.tox.env.pyright]
 description = """
     Ensure that hydra-zen's source code and test suite scan clean

@@ -62,7 +62,6 @@ from hydra_zen._compatibility import (
 )
 from hydra_zen._execution_whitelist import mark_builtin_targets, register_target
 from hydra_zen.errors import (
-    HydraZenDeprecationWarning,
     HydraZenUnsupportedPrimitiveError,
     HydraZenValidationError,
 )
@@ -697,6 +696,21 @@ class ZenField:
 
 
 _MAKE_CONFIG_SETTINGS = AllConvert(dataclass=False, flat_target=False)
+
+
+def _raise_on_removed_options(
+    fn_name: str, kwargs: Mapping[str, Any], removed: Mapping[str, str]
+) -> None:
+    # These options were deprecated in hydra-zen 0.9.0 and removed in 1.0.0. They
+    # are rejected, rather than treated as config fields, so that code that still
+    # uses them fails loudly.
+    for name, option in removed.items():
+        if name in kwargs:
+            raise TypeError(
+                f"`{fn_name}(..., {name}=<...>)` was removed in hydra-zen 1.0.0. "
+                f"Specify `{fn_name}(..., zen_dataclass={{'{option}': <...>}})` "
+                f"instead."
+            )
 
 
 class BuildsFn(Generic[T]):
@@ -1416,10 +1430,8 @@ class BuildsFn(Generic[T]):
         hydra_recursive: Optional[bool] = ...,
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
-        dataclass_name: Optional[str] = ...,
         builds_bases: tuple[()] = ...,
         zen_dataclass: Optional[DataclassOptions] = None,
-        frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
     ) -> type[BuildsWithSig[type[R], P]]: ...
 
@@ -1436,10 +1448,8 @@ class BuildsFn(Generic[T]):
         hydra_recursive: Optional[bool] = ...,
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
-        dataclass_name: Optional[str] = ...,
         builds_bases: tuple[()] = ...,
         zen_dataclass: Optional[DataclassOptions] = None,
-        frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
     ) -> type[BuildsWithSig[type[R], P]]: ...
 
@@ -1457,10 +1467,8 @@ class BuildsFn(Generic[T]):
         hydra_recursive: Optional[bool] = ...,
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
-        dataclass_name: Optional[str] = ...,
         builds_bases: tuple[type[DataClass_], ...] = ...,
         zen_dataclass: Optional[DataclassOptions] = None,
-        frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
     ) -> type[Builds[Importable]]: ...
@@ -1479,10 +1487,8 @@ class BuildsFn(Generic[T]):
         hydra_recursive: Optional[bool] = ...,
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
-        dataclass_name: Optional[str] = ...,
         builds_bases: tuple[type[DataClass_], ...] = ...,
         zen_dataclass: Optional[DataclassOptions] = None,
-        frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
     ) -> type[Builds[Importable]]: ...
@@ -1501,10 +1507,8 @@ class BuildsFn(Generic[T]):
         hydra_recursive: Optional[bool] = ...,
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
-        dataclass_name: Optional[str] = ...,
         builds_bases: tuple[type[DataClass_], ...] = ...,
         zen_dataclass: Optional[DataclassOptions] = None,
-        frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
     ) -> type[PartialBuilds[Importable]]: ...
@@ -1523,10 +1527,8 @@ class BuildsFn(Generic[T]):
         hydra_recursive: Optional[bool] = ...,
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
-        dataclass_name: Optional[str] = ...,
         builds_bases: tuple[type[DataClass_], ...] = ...,
         zen_dataclass: Optional[DataclassOptions] = None,
-        frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
     ) -> type[PartialBuilds[Importable]]: ...
@@ -1545,10 +1547,8 @@ class BuildsFn(Generic[T]):
         hydra_recursive: Optional[bool] = ...,
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
-        dataclass_name: Optional[str] = ...,
         builds_bases: tuple[type[DataClass_], ...] = ...,
         zen_dataclass: Optional[DataclassOptions] = None,
-        frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
     ) -> Union[type[Builds[Importable]], type[PartialBuilds[Importable]]]: ...
@@ -1567,10 +1567,8 @@ class BuildsFn(Generic[T]):
         hydra_recursive: Optional[bool] = ...,
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
-        dataclass_name: Optional[str] = ...,
         builds_bases: tuple[type[DataClass_], ...] = ...,
         zen_dataclass: Optional[DataclassOptions] = None,
-        frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
     ) -> Union[type[Builds[Importable]], type[PartialBuilds[Importable]]]: ...
@@ -1589,10 +1587,8 @@ class BuildsFn(Generic[T]):
         hydra_recursive: Optional[bool] = ...,
         hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
         hydra_defaults: Optional[DefaultsList] = ...,
-        dataclass_name: Optional[str] = ...,
         builds_bases: tuple[type[DataClass_], ...] = ...,
         zen_dataclass: Optional[DataclassOptions] = None,
-        frozen: bool = ...,
         zen_convert: Optional[ZenConvert] = ...,
         **kwargs_for_target: T,
     ) -> Union[
@@ -1750,22 +1746,6 @@ class BuildsFn(Generic[T]):
 
             The `module` field can be specified to enable pickle
             compatibility. See `hydra_zen.typing.DataclassOptions` for details.
-
-        frozen : bool, optional (default=False)
-            .. deprecated:: 0.9.0
-                `frozen` will be removed in hydra-zen 0.10.0. It is replaced by
-                `zen_dataclass={'frozen': <bool>}`.
-
-            If ``True``, the resulting config will create frozen (i.e. immutable) instances.
-            I.e. setting/deleting an attribute of an instance will raise
-            :py:class:`dataclasses.FrozenInstanceError` at runtime.
-
-        dataclass_name : Optional[str]
-            .. deprecated:: 0.9.0
-                `dataclass_name` will be removed in hydra-zen 0.10.0. It is replaced by
-                `zen_dataclass={'cls_name': <str>}`.
-
-            If specified, determines the name of the returned class object.
 
         Returns
         -------
@@ -2125,25 +2105,11 @@ class BuildsFn(Generic[T]):
         manual_target_path = zen_dataclass.pop("target", None)
         target_repr = zen_dataclass.pop("target_repr", True)
 
-        if "frozen" in kwargs_for_target:
-            warnings.warn(
-                HydraZenDeprecationWarning(
-                    "Specifying `builds(..., frozen=<...>)` is deprecated. Instead, "
-                    "specify `builds(..., zen_dataclass={'frozen': <...>})"
-                ),
-                stacklevel=2,
-            )
-            zen_dataclass["frozen"] = kwargs_for_target.pop("frozen")
-
-        if "dataclass_name" in kwargs_for_target:
-            warnings.warn(
-                HydraZenDeprecationWarning(
-                    "Specifying `builds(..., dataclass_name=<...>)` is deprecated. "
-                    "Instead specify `builds(..., zen_dataclass={'cls_name': <...>})"
-                ),
-                stacklevel=2,
-            )
-            zen_dataclass["cls_name"] = kwargs_for_target.pop("dataclass_name")
+        _raise_on_removed_options(
+            "builds",
+            kwargs_for_target,
+            {"frozen": "frozen", "dataclass_name": "cls_name"},
+        )
         if not builds_bases:
             builds_bases = zen_dataclass.get("bases", ())
 
@@ -3169,25 +3135,11 @@ class BuildsFn(Generic[T]):
         # initial validation
         _utils.parse_dataclass_options(zen_dataclass)
 
-        if "frozen" in fields_as_kwargs:
-            warnings.warn(
-                HydraZenDeprecationWarning(
-                    "Specifying `builds(frozen=<...>)` is deprecated. Instead, "
-                    "specify `builds(zen_dataclass={'frozen': <...>})"
-                ),
-                stacklevel=2,
-            )
-            zen_dataclass["frozen"] = fields_as_kwargs.pop("frozen")  # type: ignore
-
-        if "config_name" in fields_as_kwargs:
-            warnings.warn(
-                HydraZenDeprecationWarning(
-                    "Specifying `make_config(config_name=<...>)` is deprecated. "
-                    "Instead specify `make_config(zen_dataclass={'cls_name': <...>})"
-                ),
-                stacklevel=2,
-            )
-            zen_dataclass["cls_name"] = fields_as_kwargs.pop("config_name")  # type: ignore
+        _raise_on_removed_options(
+            "make_config",
+            fields_as_kwargs,
+            {"frozen": "frozen", "config_name": "cls_name"},
+        )
 
         if not bases:
             bases = zen_dataclass.get("bases", ())

@@ -46,6 +46,7 @@ from hydra_zen.structured_configs._implementations import (
 from hydra_zen.typing import (
     Builds,
     CustomConfigType,
+    DataclassOptions,
     HydraPartialBuilds,
     Partial,
     PartialBuilds,
@@ -788,9 +789,8 @@ def check_overloads_arent_too_restrictive():
         fbuilds: FullBuilds,
         pbuilds: PBuilds,
         hydra_convert: Optional[Literal["none", "partial", "all"]],
-        frozen: bool,
         builds_bases: Tuple[Type[DataClass_], ...],
-        dataclass_name: Optional[str],
+        zen_dataclass: Optional[DataclassOptions],
         **kwargs_for_target: Any,
     ):
         def func(x: int) -> str: ...
@@ -803,9 +803,8 @@ def check_overloads_arent_too_restrictive():
             populate_full_signature=populate_full_signature,
             hydra_recursive=hydra_recursive,
             hydra_convert=hydra_convert,
-            frozen=frozen,
             builds_bases=builds_bases,
-            dataclass_name=dataclass_name,
+            zen_dataclass=zen_dataclass,
             **kwargs_for_target,
         )
 
@@ -822,9 +821,8 @@ def check_overloads_arent_too_restrictive():
             populate_full_signature=populate_full_signature,
             hydra_recursive=hydra_recursive,
             hydra_convert=hydra_convert,
-            frozen=frozen,
             builds_bases=builds_bases,
-            dataclass_name=dataclass_name,
+            zen_dataclass=zen_dataclass,
             **kwargs_for_target,
         )
 
@@ -841,9 +839,8 @@ def check_overloads_arent_too_restrictive():
             populate_full_signature=populate_full_signature,
             hydra_recursive=hydra_recursive,
             hydra_convert=hydra_convert,
-            frozen=frozen,
             builds_bases=builds_bases,
-            dataclass_name=dataclass_name,
+            zen_dataclass=zen_dataclass,
             **kwargs_for_target,
         )
 

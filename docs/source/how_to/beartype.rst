@@ -26,7 +26,7 @@ In this How-To guide we will:
 .. tip::
    
    hydra-zen also provides support for the popular runtime type-checker `pydantic <https://pydantic-docs.helpmanual.io/>`_. It can be used instead of beartype. 
-   Consult the reference for :func:`~hydra_zen.third_party.pydantic.validates_with_pydantic` to adapt this How-To accordingly.
+   Consult the reference for :func:`~hydra_zen.third_party.pydantic.pydantic_parser` to adapt this How-To accordingly.
 
 To begin, we will install beartype in our Python environment.
 
