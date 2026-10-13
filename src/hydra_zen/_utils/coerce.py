@@ -8,6 +8,7 @@ from functools import wraps
 from typing import (
     Callable,
     NamedTuple,
+    TypeGuard,
     TypeVar,
     Union,
     cast,
@@ -18,7 +19,6 @@ from typing import (
 
 import omegaconf
 from omegaconf import ListConfig
-from typing_extensions import TypeGuard
 
 _T = TypeVar("_T", bound=Callable)
 

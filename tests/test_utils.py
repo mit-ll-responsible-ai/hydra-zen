@@ -6,7 +6,7 @@ import functools
 import pickle
 import random
 import string
-import sys
+import typing
 from dataclasses import InitVar, dataclass, field as dataclass_field, make_dataclass
 from inspect import signature
 from pathlib import Path, PosixPath, WindowsPath
@@ -45,7 +45,7 @@ from typing_extensions import (
 )
 
 from hydra_zen import DefaultBuilds, builds, instantiate, mutable_value
-from hydra_zen._compatibility import HYDRA_VERSION, Version, _get_version
+from hydra_zen._compatibility import Version, _get_version
 from hydra_zen.funcs import partial_with_wrapper
 from hydra_zen.structured_configs._utils import (
     StrictDataclassOptions,
@@ -171,23 +171,14 @@ NoneType: TypeAlias = None
         pytest.param(
             tuple[str, Unpack[Ts]],
             tuple[Any, ...],
-            marks=[
-                pytest.mark.xfail(
-                    HYDRA_VERSION < Version(1, 2, 0),
-                    reason="Hydra 1.1.2 doesn't parse tuples beyond first element.",
-                ),
-            ],
         ),
         pytest.param(
             tuple[str, Unpack[Ts], int],
             tuple[Any, ...],
-            marks=[
-                pytest.mark.xfail(
-                    HYDRA_VERSION < Version(1, 2, 0),
-                    reason="Hydra 1.1.2 doesn't parse tuples beyond first element.",
-                ),
-            ],
         ),
+        # `typing.Unpack` differs from `typing_extensions.Unpack` on Python 3.11
+        (tuple[str, typing.Unpack[Ts]], tuple[Any, ...]),
+        (tuple[str, *Ts], tuple[Any, ...]),
         (Annotated[int, int], int),
         (Annotated[tuple[str, str], int], tuple[str, str]),
         (Annotated[Builds, int], Any),
@@ -251,7 +242,7 @@ NoneType: TypeAlias = None
         ),
         (tuple[tuple[int, ...], ...], tuple[Any, ...]),
         (Optional[tuple[tuple[int, ...], ...]], Optional[tuple[Any, ...]]),
-        (InitVar[list[frozenset]], Any if sys.version_info < (3, 8) else list[Any]),
+        (InitVar[list[frozenset]], list[Any]),
     ],
 )
 def test_sanitized_type_expected_behavior(in_type, expected_type):

@@ -29,11 +29,11 @@ PYDANT = None
 BEAR = None
 
 try:
-    from hydra_zen.third_party.pydantic import validates_with_pydantic
+    from hydra_zen.third_party.pydantic import pydantic_parser
 
-    all_validators.append(validates_with_pydantic)
-    PYDANT = validates_with_pydantic
-    del validates_with_pydantic
+    all_validators.append(pydantic_parser)
+    PYDANT = pydantic_parser
+    del pydantic_parser
 except ImportError:
     pass
 

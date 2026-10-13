@@ -7,7 +7,6 @@ from typing import Any, Deque, Optional, TypeVar, Union, cast
 import hypothesis.strategies as st
 
 from hydra_zen import BuildsFn, ZenStore
-from hydra_zen._compatibility import HYDRA_SUPPORTS_OBJECT_CONVERT
 from hydra_zen.typing import DataclassOptions
 from hydra_zen.typing._implementations import ZenConvert
 
@@ -75,7 +74,7 @@ _valid_builds_strats = dict(
             "none",
             "partial",
             "all",
-            *(("object",) if HYDRA_SUPPORTS_OBJECT_CONVERT else ()),
+            "object",
         ]
     ),
     builds_bases=st.just(()),

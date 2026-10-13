@@ -266,5 +266,4 @@ Although Hydra provides some runtime type-checking functionality, it only suppor
    :toctree: generated/
 
    beartype.validates_with_beartype
-   pydantic.validates_with_pydantic
    pydantic.pydantic_parser

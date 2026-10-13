@@ -9,18 +9,18 @@ import pydantic as _pyd
 
 _T = TypeVar("_T", bound=Callable[..., Any])
 
-__all__ = ["validates_with_pydantic"]
+__all__ = ["pydantic_parser"]
 
+if not hasattr(_pyd, "validate_call"):  # pragma: no cover
+    raise ImportError(
+        f"hydra_zen.third_party.pydantic requires pydantic 2.0 or later "
+        f"(installed: {_pyd.VERSION})."
+    )
 
-if _pyd.__version__ >= "2.0":  # pragma: no cover
-    _default_parser = _pyd.validate_call(
-        config={"arbitrary_types_allowed": True},
-        validate_return=False,  # type: ignore
-    )
-else:  # pragma: no cover
-    _default_parser = _pyd.validate_arguments(
-        config={"arbitrary_types_allowed": True, "validate_return": False}  # type: ignore
-    )
+_default_parser = _pyd.validate_call(
+    config={"arbitrary_types_allowed": True},
+    validate_return=False,
+)
 
 
 def _constructor_as_fn(cls: Any) -> Any:
@@ -122,14 +122,3 @@ def pydantic_parser(target: _T, *, parser: Callable[[_T], _T] = _default_parser)
         return cast(_T, parser(_constructor_as_fn(target)))
 
     return parser(target)
-
-
-def validates_with_pydantic(
-    obj: _T, *, validator: Callable[[_T], _T] = _default_parser
-) -> _T:
-    """
-    .. deprecated:: 0.13.0
-
-       Use `hydra_zen.third_party.pydantic.pydantic_parser` instead.
-    """
-    return pydantic_parser(obj, parser=validator)

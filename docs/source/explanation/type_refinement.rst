@@ -31,7 +31,7 @@ This means that the following config:
 
 .. code-block:: python
 
-   from typing_extensions import Literal
+   from typing import Literal
    from dataclasses import dataclass
    
    @dataclass

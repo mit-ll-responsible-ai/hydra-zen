@@ -91,14 +91,13 @@ def test_make_builds_fn_produces_builds_with_expected_defaults_and_behaviors(
     assert to_yaml(via_custom) == to_yaml(via_builds)
 
 
-@pytest.mark.filterwarnings("ignore:Specifying")
 @given(...)
 def test_frozen(kwargs: DataclassOptions, frozen: bool):
     buildf = make_custom_builds_fn(zen_dataclass=kwargs)
     if not kwargs.get("frozen", False) and frozen is False:
         assume(False)
 
-    kw = dict(frozen=True) if frozen else {}
+    kw = dict(zen_dataclass={"frozen": True}) if frozen else {}
     conf = buildf(dict, x=1, **kw)()
 
     with pytest.raises(FrozenInstanceError):

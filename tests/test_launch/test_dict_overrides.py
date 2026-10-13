@@ -17,7 +17,6 @@ from hydra_zen import (
     make_config,
     multirun,
 )
-from hydra_zen._compatibility import HYDRA_VERSION, Version
 from hydra_zen._launch import value_check
 
 any_types = st.from_type(type)
@@ -196,9 +195,8 @@ def test_overrides_yaml(
         "+bool_": bool_,
         "+list_": hydra_list(list_),
         "+mrun": multirun(mrun),
+        "hydra.job.chdir": True,
     }
-    if HYDRA_VERSION >= Version(1, 2, 0):
-        overrides["hydra.job.chdir"] = True
 
     (jobs,) = launch(
         make_config(), instantiate, overrides, multirun=True, version_base=None

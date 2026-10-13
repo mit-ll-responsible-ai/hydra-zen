@@ -15,7 +15,7 @@ from pydantic.dataclasses import dataclass as pyd_dataclass
 from typing_extensions import Literal
 
 from hydra_zen import builds, get_target, instantiate, just, to_yaml
-from hydra_zen.third_party.pydantic import validates_with_pydantic
+from hydra_zen.third_party.pydantic import pydantic_parser
 
 if pydantic.__version__.startswith("1."):
     pytest.skip("These tests are for pydantic v2", allow_module_level=True)
@@ -41,7 +41,7 @@ def test_pydantic_specific_fields_function(custom_type, good_val, bad_val):
         return x
 
     f.__annotations__["x"] = custom_type
-    wrapped = validates_with_pydantic(f)
+    wrapped = pydantic_parser(f)
 
     wrapped(good_val)  # ok
     with pytest.raises(Exception):
@@ -54,10 +54,10 @@ def test_pydantic_specific_fields_class(custom_type, good_val, bad_val):
         def __init__(self, x: custom_type) -> None:
             pass
 
-    validates_with_pydantic(A)(good_val)
+    pydantic_parser(A)(good_val)
 
     with pytest.raises(Exception):
-        validates_with_pydantic(A)(bad_val)
+        pydantic_parser(A)(bad_val)
 
 
 @pyd_dataclass

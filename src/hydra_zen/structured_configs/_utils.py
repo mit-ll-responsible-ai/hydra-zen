@@ -5,17 +5,25 @@ import warnings
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import MISSING, field as _field, is_dataclass
 from keyword import iskeyword
-from typing import Any, Callable, Final, Optional, TypeVar, Union, cast, overload
+from typing import (
+    Any,
+    Callable,
+    Final,
+    Literal,
+    Optional,
+    TypeGuard,
+    TypeVar,
+    Union,
+    cast,
+    overload,
+)
 
 from omegaconf import II, DictConfig, ListConfig
-from typing_extensions import Literal, TypeGuard
 
-from hydra_zen._compatibility import HYDRA_SUPPORTS_OBJECT_CONVERT
 from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.typing import DataclassOptions, ZenConvert
 from hydra_zen.typing._implementations import (
     DEFAULT_DATACLASS_OPTIONS,
-    UNSUPPORTED_DATACLASS_OPTIONS,
     AllConvert,
     Field,
     InterpStr,
@@ -315,9 +323,7 @@ def parse_dataclass_options(
     merged = DEFAULT_DATACLASS_OPTIONS.copy()
 
     for name, val in options.items():
-        if name in UNSUPPORTED_DATACLASS_OPTIONS:
-            continue
-        elif name not in _DATACLASS_OPTION_KEYS:
+        if name not in _DATACLASS_OPTION_KEYS:
             raise ValueError(f"{name} is not a valid dataclass option.")
 
         if name == "module":
@@ -386,11 +392,7 @@ def parse_strict_dataclass_options(
     )
 
 
-_HYDRA_CONVERT_OPTIONS = (
-    {"none", "partial", "all", "object"}
-    if HYDRA_SUPPORTS_OBJECT_CONVERT
-    else {"none", "partial", "all"}
-)
+_HYDRA_CONVERT_OPTIONS = {"none", "partial", "all", "object"}
 
 
 def validate_hydra_options(
@@ -404,7 +406,6 @@ def validate_hydra_options(
 
     if hydra_convert is not None and hydra_convert not in _HYDRA_CONVERT_OPTIONS:
         raise ValueError(
-            f"`hydra_convert` must be 'none', 'partial',"
-            f"{' object' if HYDRA_SUPPORTS_OBJECT_CONVERT else ''} or 'all', got: "
+            f"`hydra_convert` must be 'none', 'partial', 'object', or 'all', got: "
             f"{hydra_convert}"
         )

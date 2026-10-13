@@ -13,7 +13,6 @@ from hypothesis import example, given, strategies as st
 from omegaconf import DictConfig
 
 from hydra_zen import builds, instantiate, just, make_config, to_yaml, zen
-from hydra_zen._compatibility import HYDRA_VERSION
 from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.wrapper import Zen
 from tests.custom_strategies import everything_except
@@ -534,11 +533,6 @@ def test_hydra_main():
     }
 
 
-@pytest.mark.xfail(
-    HYDRA_VERSION < (1, 3, 0),
-    reason="hydra_main(config_path=...) only supports wrapped task functions starting "
-    "in Hydra 1.3.0",
-)
 @pytest.mark.skipif(
     sys.platform.startswith("win") and bool(os.environ.get("CI")),
     reason="Things are weird on GitHub Actions and Windows",

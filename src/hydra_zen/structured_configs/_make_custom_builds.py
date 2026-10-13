@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: MIT
 # pyright: strict
 import inspect
-import warnings
 from collections.abc import Collection, Mapping
 from functools import wraps
 from typing import (
@@ -10,6 +9,7 @@ from typing import (
     Any,
     Callable,
     Final,
+    Literal,
     Optional,
     TypeVar,
     Union,
@@ -17,9 +17,6 @@ from typing import (
     overload,
 )
 
-from typing_extensions import Literal
-
-from hydra_zen.errors import HydraZenDeprecationWarning
 from hydra_zen.typing import DataclassOptions, ZenWrappers
 from hydra_zen.typing._builds_overloads import FullBuilds, PBuilds, StdBuilds
 from hydra_zen.typing._implementations import InstOrType, ZenConvert
@@ -37,9 +34,6 @@ __BUILDS_DEFAULTS: Final[dict[str, Any]] = {
     if p.kind is p.KEYWORD_ONLY
 }
 __BUILDS_DEFAULTS["zen_exclude"] = frozenset()
-# TODO: Remove deprecated options once they are phased out
-__BUILDS_DEFAULTS["frozen"] = False
-__BUILDS_DEFAULTS["dataclass_name"] = None
 del _builds_sig
 
 # TODO: parameterize the return types and attach this
@@ -60,7 +54,6 @@ def make_custom_builds_fn(
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
-    frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     builds_fn: InstOrType[BuildsFn[T]] = DefaultBuilds,
 ) -> FullBuilds[T]: ...
@@ -78,7 +71,6 @@ def make_custom_builds_fn(
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
-    frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     builds_fn: InstOrType[BuildsFn[T]] = DefaultBuilds,
 ) -> PBuilds[T]: ...
@@ -96,7 +88,6 @@ def make_custom_builds_fn(
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
-    frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     builds_fn: InstOrType[BuildsFn[T]] = DefaultBuilds,
 ) -> StdBuilds[T]: ...
@@ -114,7 +105,6 @@ def make_custom_builds_fn(
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
-    frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     builds_fn: InstOrType[BuildsFn[T]] = DefaultBuilds,
 ) -> Union[FullBuilds[T], StdBuilds[T]]: ...
@@ -132,7 +122,6 @@ def make_custom_builds_fn(
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
-    frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     builds_fn: InstOrType[BuildsFn[T]] = DefaultBuilds,
 ) -> Union[PBuilds[T], StdBuilds[T]]: ...
@@ -150,7 +139,6 @@ def make_custom_builds_fn(
     hydra_recursive: Optional[bool] = ...,
     hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = ...,
     zen_dataclass: Optional[DataclassOptions] = ...,
-    frozen: bool = ...,
     zen_convert: Optional[ZenConvert] = ...,
     builds_fn: InstOrType[BuildsFn[T]] = DefaultBuilds,
 ) -> Union[
@@ -170,7 +158,6 @@ def make_custom_builds_fn(
     hydra_recursive: Optional[bool] = None,
     hydra_convert: Optional[Literal["none", "partial", "all", "object"]] = None,
     zen_dataclass: Optional[DataclassOptions] = None,
-    frozen: bool = False,
     zen_convert: Optional[ZenConvert] = None,
     builds_fn: InstOrType[BuildsFn[T]] = DefaultBuilds,
 ) -> Union[
@@ -228,13 +215,6 @@ def make_custom_builds_fn(
     hydra_convert : Optional[Literal["none", "partial", "all", "object"]], optional (default="none")
         Specifies a new the default value for ``builds(..., hydra_convert=<..>)``
 
-    frozen : bool, optional (default=False)
-        .. deprecated:: 0.9.0
-            `frozen` will be removed in hydra-zen 0.10.0. It is replaced by
-            `zen_dataclass={'frozen': <bool>}`.
-
-        Specifies a new the default value for ``builds(..., frozen=<..>)``
-
     builds_fn: BuildsFn[T]
         The builds-function whose defaults are modified.
 
@@ -286,7 +266,7 @@ def make_custom_builds_fn(
     Now all configs produced via ``build_a_bear`` will include type-checking
     during instantiation.
 
-    >>> from typing_extensions import Literal
+    >>> from typing import Literal
     >>> def f(x: Literal["a", "b"]): return x
 
     >>> Conf = build_a_bear(f)  # a conf that includes `validates_with_beartype`
@@ -297,7 +277,7 @@ def make_custom_builds_fn(
     >>> instantiate(Conf, x="c")  # violates annotation: Literal["a", "b"]
     <Validation error: "c" is not "a" or "b">
     """
-    excluded_fields = frozenset({"dataclass_name", "hydra_defaults", "builds_bases"})
+    excluded_fields = frozenset({"hydra_defaults", "builds_bases"})
     fn = builds_fn.builds
     del builds_fn
     LOCALS = locals()
@@ -309,8 +289,6 @@ def make_custom_builds_fn(
         name: LOCALS[name] for name in __BUILDS_DEFAULTS if name not in excluded_fields
     }
 
-    _frozen = _new_defaults.pop("frozen")
-
     # This self-check was causing issues with type-checkers (pyright) -
     # causing them to resolve the return type of this function as "unknown"
     if not TYPE_CHECKING:  # pragma: no branch
@@ -320,17 +298,6 @@ def make_custom_builds_fn(
     _zen_dataclass: Optional[DataclassOptions] = _new_defaults.pop("zen_dataclass")
     if _zen_dataclass is None:
         _zen_dataclass = {}
-
-    if _frozen is True:
-        warnings.warn(
-            HydraZenDeprecationWarning(
-                "Specifying `builds(..., frozen=<...>)` is deprecated. Instead, "
-                "specify `builds(..., zen_dataclass={'frozen': <...>})"
-            ),
-            stacklevel=2,
-        )
-
-        _zen_dataclass["frozen"] = _frozen
 
     _zen_dataclass = parse_dataclass_options(_zen_dataclass)
 

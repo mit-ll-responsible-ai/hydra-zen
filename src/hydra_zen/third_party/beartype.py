@@ -33,7 +33,7 @@ def validates_with_beartype(obj: _T) -> _T:
 
     See Also
     --------
-    hydra_zen.third_party.pydantic.validates_with_pydantic
+    hydra_zen.third_party.pydantic.pydantic_parser
 
     Notes
     -----

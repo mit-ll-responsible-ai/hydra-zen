@@ -9,7 +9,9 @@ from typing import (
     Any,
     Callable,
     Generic,
+    Literal,
     Optional,
+    TypeAlias,
     TypeVar,
     Union,
     cast,
@@ -24,7 +26,6 @@ from hydra.core.plugins import Plugins
 from hydra.core.utils import JobReturn, run_job
 from hydra.types import HydraContext, RunMode
 from omegaconf import DictConfig, ListConfig, OmegaConf
-from typing_extensions import Literal, TypeAlias
 
 from hydra_zen._compatibility import HYDRA_HAS_EXECUTION_POLICY
 from hydra_zen._execution_whitelist import (
@@ -249,7 +250,6 @@ def launch(
         Launch a Hydra multi-run ([3]_).
 
     version_base : Optional[str], optional (default=not-specified)
-        Available starting with Hydra 1.2.0.
         - If the `version_base parameter` is not specified, Hydra 1.x will use defaults compatible with version 1.1. Also in this case, a warning is issued to indicate an explicit version_base is preferred.
         - If the `version_base parameter` is `None`, then the defaults are chosen for the current minor Hydra version. For example for Hydra 1.2, then would imply `config_path=None` and `hydra.job.chdir=False`.
         - If the `version_base` parameter is an explicit version string like "1.1", then the defaults appropriate to that version are used.

@@ -3,9 +3,13 @@
 # pyright: strict
 from dataclasses import MISSING
 from functools import partial
-from typing import TYPE_CHECKING, Any, Protocol, Union
-
-from typing_extensions import TypeGuard
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Protocol,
+    TypeGuard,
+    Union,
+)
 
 from hydra_zen.funcs import get_obj, zen_processing
 from hydra_zen.structured_configs._utils import safe_name

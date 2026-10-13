@@ -19,7 +19,6 @@ from hydra_zen import (
     make_custom_builds_fn,
     to_yaml,
 )
-from hydra_zen.errors import HydraZenDeprecationWarning
 
 
 def f_three_vars(x, y, z):
@@ -109,14 +108,11 @@ class FrozenHydrated:
     x: int = 2
 
 
-@pytest.mark.filterwarnings("ignore:Specifying")
 @pytest.mark.parametrize(
     "fn",
     [
         lambda: builds(dict, x=2, zen_dataclass={"frozen": True})(),
-        lambda: builds(dict, x=2, frozen=True)(),
         lambda: make_custom_builds_fn(zen_dataclass={"frozen": True})(dict, x=2)(),
-        lambda: make_custom_builds_fn(frozen=True)(dict, x=2)(),
         lambda: FrozenHydrated(),
     ],
 )
@@ -348,9 +344,7 @@ def test_namespace(fn):
 def test_kwonly(kw_only: bool, fn):
     Conf = fn(zen_dataclass={"kw_only": kw_only})
 
-    if sys.version_info < (3, 10):
-        _ = Conf(2)
-    elif kw_only is True:
+    if kw_only is True:
         with pytest.raises(Exception):
             _ = Conf(2)
 
@@ -378,26 +372,18 @@ def test_bases(fn):
 @pytest.mark.parametrize(
     "fn",
     [
-        lambda **kw: builds(dict, **kw),
-        lambda **kw: make_custom_builds_fn(**kw),
-        make_config,
+        lambda: builds(dict, frozen=True),
+        lambda: builds(dict, dataclass_name="hi"),
+        lambda: make_config(frozen=True),
+        lambda: make_config(config_name="hi"),
+        lambda: make_custom_builds_fn(frozen=True),  # type: ignore
     ],
 )
-def test_frozen_deprecated(fn):
-    with pytest.warns(HydraZenDeprecationWarning):
-        fn(frozen=True)
-
-
-@pytest.mark.parametrize(
-    "fn",
-    [
-        lambda **kw: builds(dict, **kw),
-        lambda **kw: make_config(config_name=kw["dataclass_name"]),
-    ],
-)
-def test_dataclassname_deprecated(fn):
-    with pytest.warns(HydraZenDeprecationWarning):
-        fn(dataclass_name="hi")
+def test_options_removed_in_v1_raise(fn):
+    # These options were deprecated in 0.9.0 and removed in 1.0.0. They must not
+    # silently become config fields.
+    with pytest.raises(TypeError, match="frozen|dataclass_name|config_name"):
+        fn()
 
 
 def test_unhashable_dataclass_supported():

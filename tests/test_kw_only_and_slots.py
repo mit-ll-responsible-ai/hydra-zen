@@ -1,9 +1,5 @@
 # Copyright (c) 2026 Massachusetts Institute of Technology
 # SPDX-License-Identifier: MIT
-import sys
-
-assert sys.version_info > (3, 9)
-
 from dataclasses import KW_ONLY, dataclass
 
 import hypothesis.strategies as st
