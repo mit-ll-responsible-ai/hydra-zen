@@ -25,7 +25,7 @@ numpy_objects = [
     np.add,
     np.ufunc,  # ufuncs work!
     np.linalg.norm,
-    np.linalg.linalg.eigvalsh,
+    np.linalg.eigvalsh,
     np.reshape,
     np.random.rand,
     np.random.Generator,

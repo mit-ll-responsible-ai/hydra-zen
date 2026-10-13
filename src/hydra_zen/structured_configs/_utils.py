@@ -24,7 +24,6 @@ from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.typing import DataclassOptions, ZenConvert
 from hydra_zen.typing._implementations import (
     DEFAULT_DATACLASS_OPTIONS,
-    UNSUPPORTED_DATACLASS_OPTIONS,
     AllConvert,
     Field,
     InterpStr,
@@ -324,9 +323,7 @@ def parse_dataclass_options(
     merged = DEFAULT_DATACLASS_OPTIONS.copy()
 
     for name, val in options.items():
-        if name in UNSUPPORTED_DATACLASS_OPTIONS:
-            continue
-        elif name not in _DATACLASS_OPTION_KEYS:
+        if name not in _DATACLASS_OPTION_KEYS:
             raise ValueError(f"{name} is not a valid dataclass option.")
 
         if name == "module":

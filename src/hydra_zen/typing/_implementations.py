@@ -5,8 +5,8 @@
 
 import sys
 import types
-from collections.abc import ByteString, Mapping, Sequence
-from dataclasses import _MISSING_TYPE  # pyright: ignore[reportPrivateUsage]
+from collections.abc import Mapping, Sequence
+from dataclasses import MISSING as _DC_MISSING
 from datetime import timedelta
 from enum import Enum
 from pathlib import Path, PosixPath, WindowsPath
@@ -61,6 +61,13 @@ T4 = TypeVar("T4", bound=Callable[..., Any])
 
 
 InstOrType: TypeAlias = Union[T, type[T]]
+
+
+# `dataclasses._MISSING_TYPE` is private and was removed in Python 3.15
+if TYPE_CHECKING:
+    from dataclasses import _MISSING_TYPE  # pyright: ignore[reportPrivateUsage]
+else:
+    _MISSING_TYPE = type(_DC_MISSING)
 
 
 if TYPE_CHECKING:
@@ -173,7 +180,17 @@ AnyBuilds: TypeAlias = Union[Builds[T], BuildsWithSig[T, Any]]
 Importable = TypeVar("Importable", bound=Callable[..., Any])
 
 _HydraPrimitive: TypeAlias = Union[
-    bool, None, int, float, str, ByteString, Path, WindowsPath, PosixPath
+    bool,
+    None,
+    int,
+    float,
+    str,
+    bytes,
+    bytearray,
+    memoryview,
+    Path,
+    WindowsPath,
+    PosixPath,
 ]
 
 HydraSupportedType = Union[
@@ -596,7 +613,4 @@ def _permitted_keys(typed_dict: Any) -> frozenset[str]:
 
 DEFAULT_DATACLASS_OPTIONS = DataclassOptions(unsafe_hash=True)
 PERMITTED_DATACLASS_OPTIONS = _permitted_keys(DataclassOptions)
-UNSUPPORTED_DATACLASS_OPTIONS = (
-    _permitted_keys(_Py312Dataclass) - {"module"}
-) - _permitted_keys(StrictDataclassOptions)
 del _Py311Dataclass, _Py312Dataclass

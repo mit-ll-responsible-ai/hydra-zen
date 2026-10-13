@@ -434,7 +434,6 @@ def test_get_obj_path_raises_for_unknown_name():
         get_obj_path(1)
 
 
-@pytest.mark.filterwarnings("ignore:Specifying")
 @pytest.mark.parametrize(
     "dc_option, err_msg",
     [
@@ -444,6 +443,14 @@ def test_get_obj_path_raises_for_unknown_name():
         (
             {"module": "2"},
             "dataclass option `module` must be a valid module name, got 2",
+        ),
+        (
+            {"cls_name": 1},
+            "dataclass option `cls_name` must be a valid identifier, got 1",
+        ),
+        (
+            {"cls_name": "not valid"},
+            "dataclass option `cls_name` must be a valid identifier, got not valid",
         ),
         ({"bases": 1}, "dataclass option `bases` must be a tuple of dataclass types"),
         (
