@@ -8,6 +8,17 @@ Changelog
 This is a record of all past hydra-zen releases and what went into them, in reverse
 chronological order. All previous releases should still be available on pip.
 
+.. _v0.17.1:
+
+-------------------
+0.17.1 - unreleased
+-------------------
+
+- Fixes ``import hydra_zen`` failing on Python 3.15, which removed the private
+  ``dataclasses._MISSING_TYPE``. Adds Python 3.15 to hydra-zen's test matrix.
+- No longer uses ``collections.abc.ByteString``, which is deprecated and slated for
+  removal from Python.
+
 .. _v0.17.0:
 
 -------------------
