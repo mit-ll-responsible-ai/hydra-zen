@@ -4,10 +4,9 @@ import functools
 import inspect
 import pathlib
 import sys
-import types
 import warnings
 from collections import Counter, defaultdict, deque
-from collections.abc import Collection, Mapping, Sequence, Set as _abc_Set
+from collections.abc import Collection, Mapping, Sequence
 from dataclasses import (  # use this for runtime checks
     MISSING,
     Field as _Field,
@@ -21,7 +20,7 @@ from dataclasses import (  # use this for runtime checks
 from datetime import timedelta
 from enum import Enum
 from functools import partial
-from itertools import chain, takewhile
+from itertools import chain
 from pathlib import Path, PosixPath, WindowsPath
 from typing import (
     Annotated,
@@ -211,17 +210,13 @@ if not OMEGACONF_HANDLES_PATHLIB_LOCAL:  # pragma: no cover
 
 
 def _value_contains_builds(value: Any) -> bool:
-    # Returns `True` if `value` is a list/tuple/mapping that contains
-    # (possibly nested) a structured config as an element/value.
+    # Returns `True` if `value` is a structured config, or a list/tuple/mapping
+    # that contains (possibly nested) one as an element/value.
     #
-    # Such a config will not be a subclass of the element-type specified by a
-    # container annotation (e.g. a `Builds_Inner` config vs. a `dict[str, Inner]`
-    # annotation), so OmegaConf's type-checking would reject it. See:
-    #    https://github.com/mit-ll-responsible-ai/hydra-zen/issues/858
+    # An OmegaConf container is never inspected: iterating one resolves its
+    # values, which raises for `???` and for interpolations that cannot be
+    # resolved yet, and config creation must not resolve them.
     if isinstance(value, (DictConfig, ListConfig)):
-        # Iterating an OmegaConf container resolves its values, which raises for
-        # `???` and for interpolations that cannot be resolved yet. Config
-        # creation must not resolve them, so these are not inspected.
         return False
     if isinstance(value, Mapping):
         return any(_value_contains_builds(v) for v in value.values())
@@ -230,75 +225,70 @@ def _value_contains_builds(value: Any) -> bool:
     return is_builds(value)
 
 
-_CONTAINER_ANNOTATION_NAMES = frozenset(
-    {
-        "list",
-        "dict",
-        "tuple",
-        "set",
-        "frozenset",
-        "List",
-        "Dict",
-        "Tuple",
-        "Set",
-        "FrozenSet",
-        "Sequence",
-        "MutableSequence",
-        "Mapping",
-        "MutableMapping",
-        "Collection",
-        "Optional",
-        "Union",
-    }
-)
-
-_UNION_ORIGINS: tuple[Any, ...] = (Union,) + (
-    (types.UnionType,) if hasattr(types, "UnionType") else ()
-)
-
-
-def _is_container_annotation(type_: Any) -> bool:
-    # Returns `True` if `type_` annotates a container -- e.g. `list[int]`,
-    # `dict[str, T]`, `Optional[list[T]]`, `Sequence[T]` or bare `tuple` -- i.e.
-    # a value whose elements OmegaConf type-checks against the annotation's
-    # element type. An unresolved forward reference (a string) is judged by its
-    # leading name.
-    if isinstance(type_, str):
-        head = type_.strip()
-        head = head[len("typing.") :] if head.startswith("typing.") else head
-        head = "".join(takewhile(lambda c: c.isalnum() or c == "_", head))
-        return head in _CONTAINER_ANNOTATION_NAMES
+def _config_rejected_by(type_: Any, value: Any) -> bool:
+    # Returns `True` if a structured config nested in the container `value` would
+    # be rejected by the (sanitized) annotation `type_`: OmegaConf type-checks
+    # each element against the annotation's element type, and a config passes
+    # only if that type is `Any` (or names no element type) or the config is an
+    # instance -- a subclass, for a config class -- of it. That rejection is the
+    # bug this fixes: `list[Inner]` holding a `Builds_Inner`. An annotation that
+    # already accepts the config keeps its element type, and with it OmegaConf's
+    # validation of the container. See:
+    #    https://github.com/mit-ll-responsible-ai/hydra-zen/issues/858
+    if isinstance(value, (DictConfig, ListConfig)) or type_ is Any:
+        return False
     origin = get_origin(type_)
-    if origin is Annotated:
-        return _is_container_annotation(get_args(type_)[0])
-    if origin in _UNION_ORIGINS:
-        return any(_is_container_annotation(arg) for arg in get_args(type_))
-    if origin is not None:
-        type_ = origin
-    return (
-        isinstance(type_, type)
-        and issubclass(type_, (Mapping, Sequence, _abc_Set))
-        and not issubclass(type_, (str, bytes))
-    )
+    if origin is Union:
+        members = [arg for arg in get_args(type_) if arg is not type(None)]
+        if is_builds(value) and members == [dict]:
+            # OmegaConf accepts a config in an `Optional[dict]` slot (it is
+            # wrapped as a `DictConfig`), unlike a `dict`/`dict[K, V]` slot
+            return False
+        return bool(members) and all(_config_rejected_by(m, value) for m in members)
+    if is_builds(value):
+        leaf = type_ if origin is None else origin
+        if not isinstance(leaf, type):
+            return False
+        if isinstance(value, type):
+            return not issubclass(value, leaf)
+        return not isinstance(value, leaf)
+    args = get_args(type_)
+    if origin is None or not isinstance(origin, type) or not args:
+        return False  # a bare container names no element type: nothing to reject
+    if isinstance(value, Mapping):
+        return (
+            issubclass(origin, Mapping)
+            and len(args) > 1
+            and any(_config_rejected_by(args[1], v) for v in value.values())
+        )
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        return issubclass(origin, Sequence) and any(
+            _config_rejected_by(args[0], v) for v in value
+        )
+    return False  # the value's kind does not match the annotation's
 
 
-def _resolve_field_default(field_obj: Any, type_: Any = Any) -> Any:
-    # Returns a field's default value. A `default_factory` is resolved only when
-    # `type_` annotates a container: that is the one case where the produced
-    # value needs inspecting (for structured configs nested among its
-    # elements), and calling a user-supplied factory during config creation is
-    # otherwise a side effect that config creation never had. Returns `MISSING`
-    # when there is no default or when the factory is not resolved.
+def _resolve_field_default(field_obj: Any) -> Any:
+    # Returns a field's default value. A mutable default (e.g. a list or dict) is
+    # stored via `default_factory`, so resolve the factory to get at the value --
+    # a nested config has to be seen to be acted on. Only ever called on a field
+    # hydra-zen built itself, so no user-supplied factory runs here.
     default = safe_getattr(field_obj, "default", MISSING)
     if default is not MISSING:
         return default
     factory = safe_getattr(field_obj, "default_factory", MISSING)
-    if factory is MISSING or factory is None or not _is_container_annotation(type_):
+    if factory is MISSING or factory is None:
         return MISSING
     return factory()
 
 
-def _retain_type_info(type_: type, value: Any, hydra_recursive: Optional[bool]):
+def _retain_type_info(
+    type_: type,
+    value: Any,
+    hydra_recursive: Optional[bool],
+    *,
+    sanitize: Optional[Callable[[Any], Any]] = None,
+):
     # OmegaConf's type-checking occurs before instantiation occurs.
     # This means that, e.g., passing `Builds[int]` to a field `x: int`
     # will fail Hydra's type-checking upon instantiation, even though
@@ -319,11 +309,12 @@ def _retain_type_info(type_: type, value: Any, hydra_recursive: Optional[bool]):
             # instantiate to a value of the specified type
             return False
         elif _value_contains_builds(value):
-            # `value` is a container (e.g. list/dict) holding a structured config;
-            # broaden the annotation so OmegaConf doesn't type-check the config
-            # against the container's element type. See:
-            #    https://github.com/mit-ll-responsible-ai/hydra-zen/issues/858
-            return False
+            # `value` is a container (e.g. list/dict) holding a structured config.
+            # OmegaConf validates against the *sanitized* annotation, so judge the
+            # config against that; broaden only if it would be rejected.
+            return not _config_rejected_by(
+                sanitize(type_) if sanitize is not None else type_, value
+            )
         return True
     elif is_builds(type_):
         return True
@@ -3062,22 +3053,23 @@ class BuildsFn(Generic[T]):
                         field_name=item[0],
                         convert_dataclass=zen_convert_settings["dataclass"],
                     )
+                    # a mutable value is stored via a `default_factory` that
+                    # hydra-zen just created; resolve it so a nested config can
+                    # be seen. A `Field` the caller passed in is left alone: its
+                    # factory is user code and must not run during config creation
+                    sanitized_value = safe_getattr(_field, "default", value)
+                    if sanitized_value is MISSING:
+                        sanitized_value = _resolve_field_default(_field)
                 else:
                     _field = value
-
-                # If `.default` is not set, then `value` is a Hydra-supported mutable
-                # value, and thus it is "sanitized"
-                sanitized_value = safe_getattr(_field, "default", value)
-                if sanitized_value is MISSING:
-                    # mutable defaults (e.g. lists/dicts) are stored via
-                    # `default_factory`; resolve it so the value can be inspected
-                    sanitized_value = _resolve_field_default(_field, type_)
+                    sanitized_value = safe_getattr(_field, "default", value)
                 sanitized_type = (
                     cls._sanitized_type(type_, wrap_optional=sanitized_value is None)
                     if _retain_type_info(
                         type_=type_,
                         value=sanitized_value,
                         hydra_recursive=hydra_recursive,
+                        sanitize=cls._sanitized_type,
                     )
                     else Any
                 )
@@ -3403,7 +3395,7 @@ class BuildsFn(Generic[T]):
                         f.hint
                         if _retain_type_info(
                             type_=f.hint,
-                            value=_resolve_field_default(f.default, f.hint),
+                            value=_resolve_field_default(f.default),
                             hydra_recursive=hydra_recursive,
                         )
                         else Any
