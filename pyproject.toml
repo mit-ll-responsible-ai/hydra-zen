@@ -262,6 +262,12 @@ deps = [
     "importlib-resources<6.2.0",
 ]
 
+[tool.tox.env."hydra-1-3-6"]
+description = "Runs test suite against hydra-core 1.3.6, whose execution policy lacks helpers added in 1.3.7."
+base_python = ["python3.11"]
+dependency_groups = ["test"]
+deps = ["hydra-core==1.3.6", "setuptools"]
+
 [tool.tox.env."pre-release"]
 description = "Runs test suite against pre-release versions of dependencies."
 pip_pre = true

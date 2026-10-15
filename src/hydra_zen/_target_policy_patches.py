@@ -110,6 +110,8 @@ def apply_resolver_authorization_patch() -> None:  # pragma: no cover
 
     unsafe = getattr(policy, "UNSAFE_DISABLE_EXECUTION_CHECKS", None)
     authorize_result = getattr(policy, "_authorize_discovery_result", None)
+    # added in Hydra 1.3.7; Hydra 1.3.6 has no protected-result check
+    reject_protected = getattr(policy, "_reject_protected_result", None)
 
     def make_patched(original: Any) -> Any:
         # `rest` is `(execution_whitelist,)` on Hydra 1.4 and empty on Hydra 1.3.x
@@ -150,7 +152,8 @@ def apply_resolver_authorization_patch() -> None:  # pragma: no cover
                     policy._authorize_resolved_target_identity(
                         obj, path, full_key, *rest
                     )
-                    policy._reject_protected_result(obj, path, full_key, *rest)
+                    if reject_protected is not None:
+                        reject_protected(obj, path, full_key, *rest)
             return None
 
         return _authorize_discovery_path

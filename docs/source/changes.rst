@@ -18,6 +18,9 @@ chronological order. All previous releases should still be available on pip.
   ``dataclasses._MISSING_TYPE``. Adds Python 3.15 to hydra-zen's test matrix.
 - No longer uses ``collections.abc.ByteString``, which is deprecated and slated for
   removal from Python.
+- Fixes a regression in 0.17.0 on hydra-core 1.3.6: instantiating configs made with
+  :func:`~hydra_zen.just`, ``zen_meta``, or ``zen_wrappers`` (or that use a callable as
+  a value) raised ``AttributeError``. Adds hydra-core 1.3.6 to hydra-zen's CI. See :issue:`904`.
 
 .. _v0.17.0:
 
