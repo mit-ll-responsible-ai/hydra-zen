@@ -16,6 +16,9 @@ chronological order. All previous releases should still be available on pip.
 
 - Fixes ``import hydra_zen`` failing on Python 3.15, which removed the private
   ``dataclasses._MISSING_TYPE``. Adds Python 3.15 to hydra-zen's test matrix.
+- :func:`~hydra_zen.instantiate` keeps supporting dataclass configs that hold arbitrary
+  objects, such as ``instantiate(Conf(model=my_model))``, on hydra-core 1.4.0rc2+. Hydra
+  now rejects these unless ``allow_objects`` is set explicitly, which hydra-zen now does.
 - No longer uses ``collections.abc.ByteString``, which is deprecated and slated for
   removal from Python.
 - Fixes a regression in 0.17.0 on hydra-core 1.3.6: instantiating configs made with
