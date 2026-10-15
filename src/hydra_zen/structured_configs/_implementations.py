@@ -1102,7 +1102,7 @@ class BuildsFn(Generic[T]):
         Notes
         -----
         Hydra supports the following types:
-            `bool`, `None`, `int`, `float`, `str`, `ByteString`, `pathlib.Path`,
+            `bool`, `None`, `int`, `float`, `str`, `bytes`, `pathlib.Path`,
             `dataclasses.MISSING`. As well as lists, tuples, dicts, and omegaconf
             containers containing the above.
         """

@@ -46,6 +46,7 @@ classifiers = [
        "Programming Language :: Python :: 3.12",
        "Programming Language :: Python :: 3.13",
        "Programming Language :: Python :: 3.14",
+       "Programming Language :: Python :: 3.15",
        "Topic :: Scientific/Engineering",
        "Programming Language :: Python :: 3 :: Only",
 ]
@@ -220,7 +221,7 @@ dev = [
 ]
 
 [tool.tox]
-env_list = ["py39", "py310", "py311", "py312", "py313", "py314"]
+env_list = ["py39", "py310", "py311", "py312", "py313", "py314", "py315"]
 
 [tool.tox.gh_actions.python]
 "3.9" = "py39"
@@ -229,6 +230,7 @@ env_list = ["py39", "py310", "py311", "py312", "py313", "py314"]
 "3.12" = "py312"
 "3.13" = "py313"
 "3.14" = "py314"
+"3.15" = "py315"
 
 [tool.tox.env_run_base]
 description = """
@@ -259,6 +261,12 @@ deps = [
     "tzdata",
     "importlib-resources<6.2.0",
 ]
+
+[tool.tox.env."hydra-1-3-6"]
+description = "Runs test suite against hydra-core 1.3.6, whose execution policy lacks helpers added in 1.3.7."
+base_python = ["python3.11"]
+dependency_groups = ["test"]
+deps = ["hydra-core==1.3.6", "setuptools"]
 
 [tool.tox.env."pre-release"]
 description = "Runs test suite against pre-release versions of dependencies."
