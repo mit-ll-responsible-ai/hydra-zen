@@ -410,8 +410,8 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">types</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ByteString</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">_MISSING_TYPE</span>  <span class="c1"># pyright: ignore[reportPrivateUsage]</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">MISSING</span> <span class="k">as</span> <span class="n">_DC_MISSING</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">timedelta</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span><span class="p">,</span> <span class="n">PosixPath</span><span class="p">,</span> <span class="n">WindowsPath</span>
@@ -468,6 +468,13 @@
 
 
 <span class="n">InstOrType</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="nb">type</span><span class="p">[</span><span class="n">T</span><span class="p">]]</span>
+
+
+<span class="c1"># `dataclasses._MISSING_TYPE` is private and was removed in Python 3.15</span>
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">_MISSING_TYPE</span>  <span class="c1"># pyright: ignore[reportPrivateUsage]</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">_MISSING_TYPE</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">_DC_MISSING</span><span class="p">)</span>
 
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
@@ -580,7 +587,17 @@
 <span class="n">Importable</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"Importable"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
 
 <span class="n">_HydraPrimitive</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span>
-    <span class="nb">bool</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ByteString</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">WindowsPath</span><span class="p">,</span> <span class="n">PosixPath</span>
+    <span class="nb">bool</span><span class="p">,</span>
+    <span class="kc">None</span><span class="p">,</span>
+    <span class="nb">int</span><span class="p">,</span>
+    <span class="nb">float</span><span class="p">,</span>
+    <span class="nb">str</span><span class="p">,</span>
+    <span class="nb">bytes</span><span class="p">,</span>
+    <span class="nb">bytearray</span><span class="p">,</span>
+    <span class="nb">memoryview</span><span class="p">,</span>
+    <span class="n">Path</span><span class="p">,</span>
+    <span class="n">WindowsPath</span><span class="p">,</span>
+    <span class="n">PosixPath</span><span class="p">,</span>
 <span class="p">]</span>
 
 <span class="n">HydraSupportedType</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span>
