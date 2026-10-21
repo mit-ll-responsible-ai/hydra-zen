@@ -86,3 +86,29 @@ def test_recursive_wrappers(inner_meta: bool, outer_meta: bool):
     assert wrapper_tracker.funcs[0] is tuple
     assert wrapper_tracker.funcs[1] is dict
     assert out == dict(x=(1, 2, 3))
+
+
+class RuntimeObj:
+    pass
+
+
+def identity(x: Any) -> Any:
+    return x
+
+
+@pytest.mark.parametrize("use_wrapper", [False, True])
+def test_runtime_objects_in_dataclass_configs(use_wrapper: bool):
+    # Hydra 1.4 rejects arbitrary objects in structured configs unless
+    # `allow_objects` is set; hydra-zen's `instantiate` keeps supporting them
+    obj = RuntimeObj()
+    kw: dict[str, Any] = {"_target_wrapper_": identity} if use_wrapper else {}
+    Conf = builds(identity, populate_full_signature=True)
+    assert instantiate(Conf(x=obj), **kw) is obj
+    assert instantiate(Conf(x=[obj]), **kw)[0] is obj
+
+    @dataclass
+    class FnTarget:
+        _target_: Any = identity
+        x: Any = 1
+
+    assert instantiate(FnTarget, **kw) == 1

@@ -428,6 +428,11 @@ def instantiate(
     elif whitelist is not _NOT_SET:  # pragma: no cover
         check_whitelist_supported(whitelist)
 
+    if is_dataclass(config):
+        # Hydra 1.4 no longer lets structured configs hold arbitrary objects (e.g.
+        # `instantiate(Conf(model=obj))`) unless `allow_objects` is set explicitly
+        config = OmegaConf.structured(config, flags={"allow_objects": True})
+
     if _target_wrapper_ is None:
         return hydra_instantiate(config, *args, **kwargs)
 
