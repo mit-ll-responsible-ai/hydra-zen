@@ -227,11 +227,6 @@ def valid_defaults_list(hydra_defaults: Any) -> bool:
         else:
             return False
 
-    if not has_self:
-        warnings.warn(
-            "Defaults list is missing `_self_`. See https://hydra.cc/docs/upgrades/1.0_to_1.1/default_composition_order for more information",
-            category=UserWarning,
-        )
     return True
 
 
