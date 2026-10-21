@@ -16,6 +16,9 @@ chronological order. All previous releases should still be available on pip.
 
 - Fixes ``import hydra_zen`` failing on Python 3.15, which removed the private
   ``dataclasses._MISSING_TYPE``. Adds Python 3.15 to hydra-zen's test matrix.
+- :func:`~hydra_zen.instantiate` keeps supporting dataclass configs that hold arbitrary
+  objects, such as ``instantiate(Conf(model=my_model))``, on hydra-core 1.4.0rc2+. Hydra
+  now rejects these unless ``allow_objects`` is set explicitly, which hydra-zen now does.
 - No longer warns when ``hydra_defaults`` lacks ``_self_``. Hydra appends ``_self_``
   to such a defaults list, and hydra-core 1.1-1.3 already issue this warning for
   primary configs, where it matters. Hydra 1.4 drops the warning. See :pull:`909`.
