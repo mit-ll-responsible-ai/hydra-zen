@@ -11,7 +11,7 @@ chronological order. All previous releases should still be available on pip.
 .. _v0.17.2:
 
 -------------------
-0.17.2 - unreleased
+0.17.2 - 2026-10-21
 -------------------
 
 - :func:`~hydra_zen.instantiate` keeps supporting dataclass configs that hold arbitrary
