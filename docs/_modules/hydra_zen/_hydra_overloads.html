@@ -835,6 +835,11 @@
     <span class="k">elif</span> <span class="n">whitelist</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_NOT_SET</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
         <span class="n">check_whitelist_supported</span><span class="p">(</span><span class="n">whitelist</span><span class="p">)</span>
 
+    <span class="k">if</span> <span class="n">is_dataclass</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+        <span class="c1"># Hydra 1.4 no longer lets structured configs hold arbitrary objects (e.g.</span>
+        <span class="c1"># `instantiate(Conf(model=obj))`) unless `allow_objects` is set explicitly</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">OmegaConf</span><span class="o">.</span><span class="n">structured</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="p">{</span><span class="s2">"allow_objects"</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+
     <span class="k">if</span> <span class="n">_target_wrapper_</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">hydra_instantiate</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 

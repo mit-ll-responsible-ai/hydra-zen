@@ -265,6 +265,9 @@ chronological order. All previous releases should still be available on pip.</p>
 <ul class="simple">
 <li><p>Fixes <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">hydra_zen</span></code> failing on Python 3.15, which removed the private
 <code class="docutils literal notranslate"><span class="pre">dataclasses._MISSING_TYPE</span></code>. Adds Python 3.15 to hydra-zen’s test matrix.</p></li>
+<li><p><a class="reference internal" href="generated/hydra_zen.instantiate.html#hydra_zen.instantiate" title="hydra_zen.instantiate"><code class="xref py py-func docutils literal notranslate"><span class="pre">instantiate()</span></code></a> keeps supporting dataclass configs that hold arbitrary
+objects, such as <code class="docutils literal notranslate"><span class="pre">instantiate(Conf(model=my_model))</span></code>, on hydra-core 1.4.0rc2+. Hydra
+now rejects these unless <code class="docutils literal notranslate"><span class="pre">allow_objects</span></code> is set explicitly, which hydra-zen now does.</p></li>
 <li><p>No longer uses <code class="docutils literal notranslate"><span class="pre">collections.abc.ByteString</span></code>, which is deprecated and slated for
 removal from Python.</p></li>
 <li><p>Fixes a regression in 0.17.0 on hydra-core 1.3.6: instantiating configs made with
