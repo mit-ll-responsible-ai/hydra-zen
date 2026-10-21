@@ -18,7 +18,7 @@ chronological order. All previous releases should still be available on pip.
   ``dataclasses._MISSING_TYPE``. Adds Python 3.15 to hydra-zen's test matrix.
 - No longer warns when ``hydra_defaults`` lacks ``_self_``. Hydra appends ``_self_``
   to such a defaults list, and hydra-core 1.1-1.3 already issue this warning for
-  primary configs, where it matters. Hydra 1.4 drops the warning. See :pull:`905`.
+  primary configs, where it matters. Hydra 1.4 drops the warning. See :pull:`909`.
 - No longer uses ``collections.abc.ByteString``, which is deprecated and slated for
   removal from Python.
 - Fixes a regression in 0.17.0 on hydra-core 1.3.6: instantiating configs made with
