@@ -78,7 +78,6 @@ ZEN_SUPPORTED_PRIMITIVES: frozenset[type] = frozenset(
 
 
 HYDRA_SUPPORTS_OBJECT_CONVERT = HYDRA_VERSION >= Version(1, 3, 0)
-HYDRA_REQUIRES_DEFAULTS_LIST_SELF = Version(1, 1, 0) <= HYDRA_VERSION < Version(1, 4, 0)
 
 # OmegaConf 2.4.0 (PR #1296) teaches its yaml loader to construct
 # pathlib._local.* paths (which Python 3.13 emits for pathlib.Path et al.).

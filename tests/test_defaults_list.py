@@ -12,7 +12,6 @@ from hypothesis import given
 from omegaconf import DictConfig, ListConfig
 
 from hydra_zen import MISSING, builds, instantiate, launch, make_config
-from hydra_zen._compatibility import HYDRA_REQUIRES_DEFAULTS_LIST_SELF
 from hydra_zen.errors import HydraZenValidationError
 
 
@@ -108,16 +107,12 @@ def test_hydra_defaults_raises_multiple_self(selfs: list, others: list):
         make_config(defaults=defaults)
 
 
-@pytest.mark.xfail(
-    not HYDRA_REQUIRES_DEFAULTS_LIST_SELF,
-    reason="Hydra 1.4.0 no longer requires _self_ in defaults list",
-)
-def test_no_self_in_defaults_warns():
-    with pytest.warns(UserWarning):
-        builds(dict, hydra_defaults=[{"a": "b"}])
-
-    with pytest.warns(UserWarning):
-        make_config(hydra_defaults=[{"a": "b"}])
+@pytest.mark.filterwarnings("error")
+def test_no_self_in_defaults_does_not_warn():
+    # Hydra appends `_self_` to a defaults list that lacks it, and warns on its own
+    # where that matters (Hydra < 1.4, primary configs only)
+    builds(dict, hydra_defaults=[{"a": "b"}])
+    make_config(hydra_defaults=[{"a": "b"}])
 
 
 def test_redundant_defaults_in_make_config_raises():

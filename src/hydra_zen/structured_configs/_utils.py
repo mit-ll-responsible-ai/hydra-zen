@@ -10,10 +10,7 @@ from typing import Any, Callable, Final, Optional, TypeVar, Union, cast, overloa
 from omegaconf import II, DictConfig, ListConfig
 from typing_extensions import Literal, TypeGuard
 
-from hydra_zen._compatibility import (
-    HYDRA_REQUIRES_DEFAULTS_LIST_SELF,
-    HYDRA_SUPPORTS_OBJECT_CONVERT,
-)
+from hydra_zen._compatibility import HYDRA_SUPPORTS_OBJECT_CONVERT
 from hydra_zen.errors import HydraZenValidationError
 from hydra_zen.typing import DataclassOptions, ZenConvert
 from hydra_zen.typing._implementations import (
@@ -230,11 +227,6 @@ def valid_defaults_list(hydra_defaults: Any) -> bool:
         else:
             return False
 
-    if not has_self and HYDRA_REQUIRES_DEFAULTS_LIST_SELF:
-        warnings.warn(
-            "Defaults list is missing `_self_`. See https://hydra.cc/docs/upgrades/1.0_to_1.1/default_composition_order for more information",
-            category=UserWarning,
-        )
     return True
 
 
