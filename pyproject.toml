@@ -2,7 +2,7 @@
 requires = [
        "setuptools >= 35.0.2",
        "wheel >= 0.29.0",
-       "setuptools_scm[toml]==7.0.5",
+       "setuptools_scm[toml]==10.3.4",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -183,13 +183,13 @@ test = [
 # Formatting tools - SINGLE SOURCE OF TRUTH
 # These versions MUST stay in sync across all environments
 format = [
-    "ruff==0.14.1",
+    "ruff==0.17.1",
     "autoflake",
 ]
 
 # Linting/checking tools - SINGLE SOURCE OF TRUTH
 lint = [
-    "ruff==0.14.1",
+    "ruff==0.17.1",
     "codespell",
     "pytest",  # Needed for project_tooling/test_headers.py
 ]
